@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+	background-color: rgb(25,25,25);
+}
+
+canvas {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+}
