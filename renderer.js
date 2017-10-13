@@ -141,8 +141,6 @@ Renderer.prototype.refresh = function () {
         pointsizes[4 + i] = 4;
     }
 
-
-
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
@@ -152,7 +150,7 @@ Renderer.prototype.refresh = function () {
     gl.bindBuffer(gl.ARRAY_BUFFER, pointsizeBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, pointsizes, gl.STATIC_DRAW);
 
-    gl.useProgram(transformShaderProgram);
+    gl.useProgram(this.layer0.transformShaderProgram);
     gl.bindBuffer(gl.ARRAY_BUFFER, property0Buffer);
     gl.bufferData(gl.ARRAY_BUFFER, property0, gl.STATIC_DRAW);
     gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
@@ -160,7 +158,7 @@ Renderer.prototype.refresh = function () {
     gl.enableVertexAttribArray(this.transformIn0);
     gl.enable(gl.RASTERIZER_DISCARD);
 
-    this.layer0.tiles[0]
+    this.layer0.style.color._preDraw();
 
     gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, colorBuffer);
     gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, pointsizeBuffer);
@@ -172,7 +170,6 @@ Renderer.prototype.refresh = function () {
     gl.disable(gl.RASTERIZER_DISCARD);
     gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null)
     gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null)
-
 
     gl.useProgram(shaderProgram);
 
@@ -213,7 +210,7 @@ UniformColor.prototype._postShaderCompile = function(shaderProgram){
     //Get uniform location
     this._uniformLocation=gl.getUniformLocation(shaderProgram, `color${this._uniformID}`);
 }
-UniformColor.prototype._preDraw = function(shader){
+UniformColor.prototype._preDraw = function(){
     //Set uniform
     gl.uniform4f(this._uniformLocation, this.r, this.g, this.b, this.a);
 }
@@ -268,6 +265,7 @@ Layer.prototype._compileTransformShader = function () {
     if (!gl.getProgramParameter(this.transformShaderProgram, gl.LINK_STATUS)) {
         console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.transformShaderProgram));
     }
+    this.style.color._postShaderCompile(this.transformShaderProgram);
     this.selectedUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'selected');
     this.animUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'anim');
     this.transformIn0 = gl.getAttribLocation(this.transformShaderProgram, 'property0');

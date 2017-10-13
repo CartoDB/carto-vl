@@ -1,7 +1,5 @@
 "use strict";
 
-
-
 function start() {
     var renderer = new Renderer(document.getElementById('glCanvas'));
     var layer = renderer.addLayer();
@@ -24,8 +22,6 @@ function start() {
             }
         };
         layer.setTile({ x: 0, y: 0, z: 0 }, features);
-        layer.selected=data.rows[0].latin_species.hashCode();
-        layer.anim=0.0;
         function animate(time){
                 if (!window.anim || layer.anim>=1.){
                     window.anim=time;
@@ -35,14 +31,12 @@ function start() {
                 if (layer.anim>1){
                     layer.anim=1;
                 }
-                    window.requestAnimationFrame(animate);
+                window.requestAnimationFrame(animate);
                 renderer.refresh();
         }
         window.requestAnimationFrame(animate);
         renderer.refresh();
     });
-
-
 
     window.onresize = function () { renderer.refresh(); };
     $(window).bind('mousewheel DOMMouseScroll', function (event) {
