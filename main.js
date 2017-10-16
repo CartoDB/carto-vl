@@ -3,7 +3,7 @@
 function start() {
     var renderer = new Renderer(document.getElementById('glCanvas'));
     var layer = renderer.addLayer();
-    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees"), function (data) {
+    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees LIMIT 8000"), function (data) {
         console.log("Downloaded", data);
         console.log("Rows:", data.rows.length);
         var points = new Float32Array(data.rows.length * 2);
