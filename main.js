@@ -61,8 +61,12 @@ function start() {
         }
     };
     document.onkeypress = function (event) {
-        layer.style.color.blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
+        //layer.style.color.blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
+        layer.style.color = new DiscreteRampColor('latin_species',
+            ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
+            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]);
         layer.style.width.blendTo(8. * Math.random(), 400);
+        layer._compileTransformShader();
         renderer.refresh();
     }
     document.onmouseup = function () {

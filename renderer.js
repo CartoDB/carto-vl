@@ -8,7 +8,8 @@ String.prototype.hashCode = function () {
         hash = ((hash << 5) - hash) + chr;
         hash |= 0; // Convert to 32bit integer
     }
-    return hash;
+    var f = (hash / 1000000);
+    return f - Math.floor(f);
 };
 
 const transformVS = `#version 300 es
@@ -124,30 +125,37 @@ function refresh() {
     gl.enable(gl.CULL_FACE);
 
     //TODO for each layer, for each tile
-    var tile = this.layer0.tiles[0];
-    gl.useProgram(this.layer0.transformShaderProgram);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
-    gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
+    if (this.layer0.style.color.isAnimated() || this.layer0.style.width.isAnimated()) {
+        //TODO or if style has changed
 
-    gl.enableVertexAttribArray(this.transformIn0);
-    gl.enable(gl.RASTERIZER_DISCARD);
+        var tile = this.layer0.tiles[0];
+        gl.useProgram(this.layer0.transformShaderProgram);
 
-    this.layer0.style.color._preDraw();
-    this.layer0.style.width._preDraw();
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
+        gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
 
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.pointsizeBuffer);
-    gl.beginTransformFeedback(gl.POINTS);
-    gl.uniform1f(this.selectedUniformLocation, this.layer0.selected);
-    gl.uniform1f(this.animUniformLocation, this.layer0.anim);
-    gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-    gl.endTransformFeedback();
-    gl.disable(gl.RASTERIZER_DISCARD);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null)
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null)
+        gl.enableVertexAttribArray(this.transformIn0);
+        gl.enable(gl.RASTERIZER_DISCARD);
+
+        this.layer0.style.color._preDraw();
+        this.layer0.style.width._preDraw();
+
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.pointsizeBuffer);
+        gl.beginTransformFeedback(gl.POINTS);
+        gl.uniform1f(this.selectedUniformLocation, this.layer0.selected);
+        gl.uniform1f(this.animUniformLocation, this.layer0.anim);
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+        gl.endTransformFeedback();
+        gl.disable(gl.RASTERIZER_DISCARD);
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null)
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null)
+
+    }
 
     gl.useProgram(shaderProgram);
+    var tile = this.layer0.tiles[0];
 
     gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
     gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
@@ -166,6 +174,7 @@ function refresh() {
     gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
     if (this.layer0.style.color.isAnimated() || this.layer0.style.width.isAnimated()) {
+        console.log(this.layer0.style.color.isAnimated(), this.layer0.style.width.isAnimated());
         window.requestAnimationFrame(refresh.bind(this));
     }
 }
@@ -272,9 +281,108 @@ UniformFloat.prototype.isAnimated = function () {
 function DiscreteRampFloat(property, keys, values, defaultValue) {
     //TODO
 }
+
+
+
 function DiscreteRampColor(property, keys, values, defaultValue) {
-    //TODO
+    defaultValue = defaultValue.map(x => 255 * x);
+    this.property = property;
+    this.keys = keys;
+    this.values = values;
+    this.defaultValue = defaultValue;
+    this.texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 8;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array(4 * width);
+    if (typeof keys[0] === 'string') {
+        keys = keys.map(str => Math.floor(str.hashCode() * width));
+    }
+    for (var i = 0; i < width; i++) {
+        pixel[4 * i + 0] = defaultValue[0];
+        pixel[4 * i + 1] = defaultValue[1];
+        pixel[4 * i + 2] = defaultValue[2];
+        pixel[4 * i + 3] = defaultValue[3];
+    }
+    keys.forEach((k, index) => {
+        pixel[k * 4 + 0] = 255 * values[index][0];
+        pixel[k * 4 + 1] = 255 * values[index][1];
+        pixel[k * 4 + 2] = 255 * values[index][2];
+        pixel[k * 4 + 3] = 255 * values[index][3];
+    });
+
+    console.log(pixel)
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+        width, height, border, srcFormat, srcType,
+        pixel);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
+DiscreteRampColor.prototype._applyToShaderSource = function (where, shaderSource, uniformID) {
+    this._uniformID = uniformID;
+    //Add uniform declaration to shader
+    shaderSource = shaderSource.replace('$PREFACE', `uniform sampler2D tex${this._uniformID};\n$PREFACE`);
+    //Read from uniform in shader
+    //TODO repace property0 by propertyX
+    shaderSource = shaderSource.replace(where, `texture(tex${this._uniformID}, vec2(property0, 0.5)).rgba`);
+    console.log(shaderSource);
+    return shaderSource;
+}
+DiscreteRampColor.prototype._postShaderCompile = function (shaderProgram) {
+    this._uniformLocation = gl.getUniformLocation(shaderProgram, `tex${this._uniformID}`);
+}
+function evalColor(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var a = evalColor(color.a, time);
+    var b = evalColor(color.b, time);
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    return a.map((va, index) => {
+        return (1 - m) * va + m * b[index];//TODO non linear functions
+    });
+}
+function simplifyColorExpr(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    if (m >= 1) {
+        return color.b;
+    }
+    return color;
+}
+DiscreteRampColor.prototype._preDraw = function () {
+    const t = Date.now();
+    //this.color = simplifyColorExpr(this.color, t);
+    //const color = evalColor(this.color, t);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.uniform1i(this._uniformLocation, 0);
+}
+DiscreteRampColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
+    const t = Date.now();
+    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
+}
+DiscreteRampColor.prototype.isAnimated = function () {
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
 
 //f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
 //values are control-points of the output, results will be linearly interpolated between control points
