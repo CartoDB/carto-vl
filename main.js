@@ -22,17 +22,15 @@ function start() {
             }
         };
         layer.setTile({ x: 0, y: 0, z: 0 }, features);
-        renderer.refresh();//TODO remove
     });
 
     window.onresize = function () { renderer.refresh(); };
     $(window).bind('mousewheel DOMMouseScroll', function (event) {
         if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-            renderer.zoom *= 0.8;
+            renderer.setZoom(renderer.getZoom() * 0.8);
         } else {
-            renderer.zoom /= 0.8;
+            renderer.setZoom(renderer.getZoom() / 0.8);
         }
-        renderer.refresh();//TODO remove
     });
 
 
@@ -50,24 +48,23 @@ function start() {
     };
     document.onmousemove = function (event) {
         if (isDragging) {
-            var k = renderer.zoom / document.body.clientHeight * 2.;
-            renderer.center.x += (draggOffset.x - event.clientX) * k;
-            renderer.center.y += -(draggOffset.y - event.clientY) * k;
+            var c = renderer.getCenter();
+            var k = renderer.getZoom() / document.body.clientHeight * 2.;
+            c.x += (draggOffset.x - event.clientX) * k;
+            c.y += -(draggOffset.y - event.clientY) * k;
+            renderer.setCenter(c.x, c.y);
             draggOffset = {
                 x: event.clientX,
                 y: event.clientY
             };
-            renderer.refresh();//TODO remove
         }
     };
     document.onkeypress = function (event) {
         //layer.style.color.blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
-        layer.style.color = new DiscreteRampColor('latin_species',
+        layer.style.setColor(new DiscreteRampColor('latin_species',
             ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
-            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]);
-        layer.style.width.blendTo(8. * Math.random(), 400);
-        layer._compileTransformShader();//TODO remove
-        renderer.refresh();//TODO remove
+            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));
+        layer.style.getWidth().blendTo(8. * Math.random(), 400);
     }
     document.onmouseup = function () {
         isDragging = false;

@@ -122,51 +122,56 @@ function refresh() {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
-    //TODO for each layer, for each tile
+    //TODO for each layer
 
-    if (this.layer0.style.color.isAnimated() || this.layer0.style.width.isAnimated()) {
+    if (this.layer0.style.updated || this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated() || !this.layer0.tiles.every(t => t.initialized)) {
         //TODO or if style has changed (colors should inform to parent => color => layer => renderer)
-        //TODO or if tile has changed
         gl.useProgram(this.layer0.transformShaderProgram);
-        this.layer0.style.color._preDraw();
-        this.layer0.style.width._preDraw();
+        this.layer0.style._color._preDraw();
+        this.layer0.style._width._preDraw();
         gl.enableVertexAttribArray(this.transformIn0);
         gl.enable(gl.RASTERIZER_DISCARD);
 
-        var tile = this.layer0.tiles[0];
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
-        gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.widthBuffer);
-        gl.beginTransformFeedback(gl.POINTS);
-        gl.uniform1f(this.selectedUniformLocation, this.layer0.selected);
-        gl.uniform1f(this.animUniformLocation, this.layer0.anim);
-        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-        gl.endTransformFeedback();
+        this.layer0.tiles.forEach(tile => {
+            if (!(this.layer0.style.updated || this.layer0.style._color.isAnimated() ||
+                this.layer0.style._width.isAnimated() || !tile.initialized)) {
+                return;
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
+            gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
+            gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
+            gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.widthBuffer);
+            gl.beginTransformFeedback(gl.POINTS);
+            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+            gl.endTransformFeedback();
+
+            tile.initialized = true;
+        });
 
         gl.disable(gl.RASTERIZER_DISCARD);
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null)
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null)
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
+        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null);
     }
 
     gl.useProgram(shaderProgram);
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
     gl.enableVertexAttribArray(this.vertexColorAttribute);
     gl.enableVertexAttribArray(this.vertexWidthAttribute);
-    var s = 1. / this.zoom;
+    var s = 1. / this._zoom;
     gl.uniform2f(this.vertexScaleUniformLocation, s / aspect, s);
-    gl.uniform2f(this.vertexOffsetUniformLocation, this.center.x, this.center.y);
+    gl.uniform2f(this.vertexOffsetUniformLocation, this._center.x, this._center.y);
 
-    var tile = this.layer0.tiles[0];
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-    gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.colorBuffer);
-    gl.vertexAttribPointer(this.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.widthBuffer);
-    gl.vertexAttribPointer(this.vertexWidthAttribute, 1, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+    this.layer0.tiles.forEach(tile => {
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+        gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.colorBuffer);
+        gl.vertexAttribPointer(this.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.widthBuffer);
+        gl.vertexAttribPointer(this.vertexWidthAttribute, 1, gl.FLOAT, false, 0, 0);
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+    });
 
-    if (this.layer0.style.color.isAnimated() || this.layer0.style.width.isAnimated()) {
+    if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated()) {
         window.requestAnimationFrame(refresh.bind(this));
     }
 }
@@ -216,6 +221,7 @@ UniformColor.prototype._preDraw = function () {
 UniformColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
     const t = Date.now();
     this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
+    this.notify();
 }
 UniformColor.prototype.isAnimated = function () {
     return !Array.isArray(this.color);
@@ -365,14 +371,6 @@ DiscreteRampColor.prototype.isAnimated = function () {
 
 
 
-
-
-
-
-
-
-
-
 //f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
 //values are control-points of the output, results will be linearly interpolated between control points
 function ContinuousRampFloat(property, minKey, maxKey, values, f = 'linear') {
@@ -382,23 +380,54 @@ function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
     //TODO
 }
 
+function Style(layer) {
+    this.layer = layer;
+    this.updated = true;
 
-function Layer(geometryType) {
+    this._width = new UniformFloat(3);
+    this._width.notify = () => { window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer)); };
+
+    this._color = new UniformColor([1, 1, 1, 1]);
+    this._color.notify = () => {
+        this.layer._compileTransformShader();
+        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+    };
+}
+Style.prototype.setWidth = function (float) {
+    this._width = float;
+    this.updated = true;
+    float.notify = () => { window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer)); };
+    float.notify();
+}
+Style.prototype.setColor = function (color) {
+    this._color = color;
+    this.updated = true;
+    color.notify = () => {
+        this.layer._compileTransformShader();
+        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+    };
+    color.notify();
+}
+Style.prototype.getWidth = function () {
+    return this._width;
+}
+Style.prototype.getColor = function () {
+    return this._color;
+}
+
+function Layer(renderer, geometryType) {
+    this.renderer = renderer;
     this.geometryType = geometryType;
-    this.style = {
-        width: new UniformFloat(3),
-        color: new UniformColor([1, 1, 1, 1]),
-    }
+    this.style = new Style(this);
+    this.tiles = [];
     this._compileTransformShader();
-    //for each style property => add animation utils
-    // add blend(NEW_VALUE, ANIM_TIME, ANIM_BLEND_FUNC)
 }
 
 Layer.prototype._compileTransformShader = function () {
     //Apply width and color
-
+    console.log(this)
     var transformVertexShader = compileShader(
-        this.style.width._applyToShader('$WIDTH', this.style.color._applyToShaderSource('$COLOR', transformVS, 0), 1)
+        this.style._width._applyToShader('$WIDTH', this.style._color._applyToShaderSource('$COLOR', transformVS, 0), 1)
             .replace('$PREFACE', ''), gl.VERTEX_SHADER);
     var transformFragmentShader = compileShader(transformFS, gl.FRAGMENT_SHADER);
     this.transformShaderProgram = gl.createProgram();
@@ -409,8 +438,8 @@ Layer.prototype._compileTransformShader = function () {
     if (!gl.getProgramParameter(this.transformShaderProgram, gl.LINK_STATUS)) {
         console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.transformShaderProgram));
     }
-    this.style.color._postShaderCompile(this.transformShaderProgram);
-    this.style.width._postShaderCompile(this.transformShaderProgram);
+    this.style._color._postShaderCompile(this.transformShaderProgram);
+    this.style._width._postShaderCompile(this.transformShaderProgram);
     this.selectedUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'selected');
     this.animUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'anim');
     this.transformIn0 = gl.getAttribLocation(this.transformShaderProgram, 'property0');
@@ -425,12 +454,11 @@ features{
         }
 }
 */
-Layer.prototype.setTile = function (tileXYZ, features) {
-    this.tiles = [features];
-    var tile = features;
+Layer.prototype.setTile = function (tileXYZ, tile) {
+    this.tiles.push(tile);
 
-    var points = features.geom;
-    var property0 = features.properties.latin_species;
+    var points = tile.geom;
+    var property0 = tile.properties.latin_species;
 
     tile.vertexBuffer = gl.createBuffer();
     tile.colorBuffer = gl.createBuffer();
@@ -455,6 +483,8 @@ Layer.prototype.setTile = function (tileXYZ, features) {
     gl.bufferData(gl.ARRAY_BUFFER, property0, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    window.requestAnimationFrame(refresh.bind(this.renderer));
 }
 
 function Renderer(canvas) {
@@ -466,13 +496,30 @@ function Renderer(canvas) {
             return null
         }
         this._initShaders();
-        this.center = { x: 0, y: 0 };
-        this.zoom = 1;
+        this._center = { x: 0, y: 0 };
+        this._zoom = 1;
     }
 }
 
 Renderer.prototype.addLayer = function () {
-    var layer = new Layer('points');
+    var layer = new Layer(this, 'points');
     this.layer0 = layer;
     return layer;
+}
+
+Renderer.prototype.getCenter = function () {
+    return { x: this._center.x, y: this._center.y };
+}
+Renderer.prototype.setCenter = function (x, y) {
+    this._center.x = x;
+    this._center.y = y;
+    window.requestAnimationFrame(refresh.bind(this));
+}
+
+Renderer.prototype.getZoom = function () {
+    return this._zoom;
+}
+Renderer.prototype.setZoom = function (zoom) {
+    this._zoom = zoom;
+    window.requestAnimationFrame(refresh.bind(this));
 }
