@@ -60,10 +60,10 @@ function start() {
         }
     };
     document.onkeypress = function (event) {
-        //layer.style.color.blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
-        layer.style.setColor(new DiscreteRampColor('latin_species',
+        layer.style.getColor().blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
+        /*layer.style.setColor(new DiscreteRampColor('latin_species',
             ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
-            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));
+            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));*/
         layer.style.getWidth().blendTo(8. * Math.random(), 400);
     }
     document.onmouseup = function () {
