@@ -37,7 +37,7 @@ void main(void) {
 }
 `;
 
-const shaderFS = `
+const renderFS = `
 precision mediump float;
 
 varying lowp vec4 color;
@@ -50,7 +50,7 @@ void main(void) {
     gl_FragColor = color;
 }`;
 
-const shaderVS = `
+const renderVS = `
 precision highp float;
 attribute vec2 vertexPosition;
 attribute vec4 vertexColor;
@@ -71,8 +71,8 @@ var transformShaderProgram;
 var shaderProgram;
 
 Renderer.prototype._initShaders = function () {
-    var fragmentShader = compileShader(shaderFS, gl.FRAGMENT_SHADER);
-    var vertexShader = compileShader(shaderVS, gl.VERTEX_SHADER);
+    var fragmentShader = compileShader(renderFS, gl.FRAGMENT_SHADER);
+    var vertexShader = compileShader(renderVS, gl.VERTEX_SHADER);
     shaderProgram = gl.createProgram();
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
@@ -89,8 +89,6 @@ Renderer.prototype._initShaders = function () {
     this.vertexOffsetUniformLocation = gl.getUniformLocation(shaderProgram, 'vertexOffset');
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
 }
-
-
 function compileShader(sourceCode, type) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
@@ -103,10 +101,8 @@ function compileShader(sourceCode, type) {
     return shader;
 }
 
-Renderer.prototype.refresh = function () {
-    var points = this.layer0.tiles[0].geom;
-    var property0 = this.layer0.tiles[0].properties.latin_species;
-
+Renderer.prototype.refresh = refresh;
+function refresh() {
     var canvas = document.getElementById('glCanvas');
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
@@ -127,45 +123,25 @@ Renderer.prototype.refresh = function () {
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
-    var vertexBuffer = gl.createBuffer();
-    var colorBuffer = gl.createBuffer();
-    var pointsizeBuffer = gl.createBuffer();
-    var property0Buffer = gl.createBuffer();
-
-    var colors = new Float32Array(points.length * 2);
-    var pointsizes = new Float32Array(points.length / 2);
-
-    for (var i = 0; i < points.length / 2; i++) {
-        colors[4 * i + 0] = 1.;
-        colors[4 * i + 3] = 1.;
-        pointsizes[4 + i] = 4;
-    }
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, pointsizeBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, pointsizes, gl.STATIC_DRAW);
-
+    //TODO for each layer, for each tile
+    var tile = this.layer0.tiles[0];
     gl.useProgram(this.layer0.transformShaderProgram);
-    gl.bindBuffer(gl.ARRAY_BUFFER, property0Buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, property0, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
     gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
 
     gl.enableVertexAttribArray(this.transformIn0);
     gl.enable(gl.RASTERIZER_DISCARD);
 
     this.layer0.style.color._preDraw();
+    this.layer0.style.width._preDraw();
 
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, colorBuffer);
-    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, pointsizeBuffer);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
+    gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.pointsizeBuffer);
     gl.beginTransformFeedback(gl.POINTS);
     gl.uniform1f(this.selectedUniformLocation, this.layer0.selected);
     gl.uniform1f(this.animUniformLocation, this.layer0.anim);
-    gl.drawArrays(gl.POINTS, 0, points.length / 2);
+    gl.drawArrays(gl.POINTS, 0, tile.numVertex);
     gl.endTransformFeedback();
     gl.disable(gl.RASTERIZER_DISCARD);
     gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null)
@@ -173,11 +149,11 @@ Renderer.prototype.refresh = function () {
 
     gl.useProgram(shaderProgram);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
     gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.colorBuffer);
     gl.vertexAttribPointer(this.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, pointsizeBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.pointsizeBuffer);
     gl.vertexAttribPointer(this.vertexPointSizeAttribute, 1, gl.FLOAT, false, 0, 0);
 
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
@@ -187,65 +163,134 @@ Renderer.prototype.refresh = function () {
     var s = 0.75 / this.zoom;
     gl.uniform2f(this.vertexScaleUniformLocation, s / aspect, s);
     gl.uniform2f(this.vertexOffsetUniformLocation, this.center.x, this.center.y);
-    gl.drawArrays(gl.POINTS, 0, points.length / 2);
+    gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+    if (this.layer0.style.color.isAnimated() || this.layer0.style.width.isAnimated()) {
+        window.requestAnimationFrame(refresh.bind(this));
+    }
 }
 
-function UniformColor(r,g,b,a){
-    this.r=r;
-    this.g=g;
-    this.b=b;
-    this.a=a;
+function UniformColor(color) {
+    this.color = color;
 }
 
-UniformColor.prototype._applyToShaderSource = function(where, shaderSource, uniformID){
-    //Get uniform ID from shader
-    this._uniformID=uniformID;
+UniformColor.prototype._applyToShaderSource = function (where, shaderSource, uniformID) {
+    this._uniformID = uniformID;
     //Add uniform declaration to shader
-    shaderSource=shaderSource.replace('$PREFACE', `uniform vec4 color${this._uniformID};\n$PREFACE`);
+    shaderSource = shaderSource.replace('$PREFACE', `uniform vec4 color${this._uniformID};\n$PREFACE`);
     //Read from uniform in shader
-    shaderSource=shaderSource.replace(where, `color${this._uniformID}`);
+    shaderSource = shaderSource.replace(where, `color${this._uniformID}`);
     return shaderSource;
 }
-UniformColor.prototype._postShaderCompile = function(shaderProgram){
-    //Get uniform location
-    this._uniformLocation=gl.getUniformLocation(shaderProgram, `color${this._uniformID}`);
+UniformColor.prototype._postShaderCompile = function (shaderProgram) {
+    this._uniformLocation = gl.getUniformLocation(shaderProgram, `color${this._uniformID}`);
 }
-UniformColor.prototype._preDraw = function(){
-    //Set uniform
-    gl.uniform4f(this._uniformLocation, this.r, this.g, this.b, this.a);
+function evalColor(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var a = evalColor(color.a, time);
+    var b = evalColor(color.b, time);
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    return a.map((va, index) => {
+        return (1 - m) * va + m * b[index];//TODO non linear functions
+    });
+}
+function simplifyColorExpr(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    if (m >= 1) {
+        return color.b;
+    }
+    return color;
+}
+UniformColor.prototype._preDraw = function () {
+    const t = Date.now();
+    this.color = simplifyColorExpr(this.color, t);
+    const color = evalColor(this.color, t);
+    gl.uniform4f(this._uniformLocation, color[0], color[1], color[2], color[3]);
+}
+UniformColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
+    const t = Date.now();
+    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
+}
+UniformColor.prototype.isAnimated = function () {
+    return !Array.isArray(this.color);
 }
 
-
-function UniformFloat(size){
-    this.size=size;
+function UniformFloat(size) {
+    this.expr = size;
 }
-UniformFloat.prototype._applyToShader = function(where, shader){
-    //Get uniform ID from shader
+UniformFloat.prototype._applyToShader = function (where, shaderSource, uniformID) {
+    this._uniformID = uniformID;
     //Add uniform declaration to shader
+    shaderSource = shaderSource.replace('$PREFACE', `uniform float f${this._uniformID};\n$PREFACE`);
     //Read from uniform in shader
+    shaderSource = shaderSource.replace(where, `f${this._uniformID}`);
+    return shaderSource;
+}
+UniformFloat.prototype._postShaderCompile = function (shaderProgram) {
+    this._uniformLocation = gl.getUniformLocation(shaderProgram, `f${this._uniformID}`);
+}
+function evalFloatExpr(expr, time) {
+    if (Number.isFinite(expr)) {
+        return expr;
+    }
+    var a = evalFloatExpr(expr.a, time);
+    var b = evalFloatExpr(expr.b, time);
+    var m = (time - expr.aTime) / (expr.bTime - expr.aTime);
+    return (1 - m) * a + m * b; //TODO non linear functions
+}
+function simplifyFloatExpr(expr, time) {
+    if (Number.isFinite(expr)) {
+        return expr;
+    }
+    var m = (time - expr.aTime) / (expr.bTime - expr.aTime);
+    if (m >= 1) {
+        return expr.b;
+    }
+    return expr;
+}
+UniformFloat.prototype._preDraw = function () {
+    const t = Date.now();
+    console.log(111, this.expr);
+    this.expr = simplifyFloatExpr(this.expr, t);
+    const v = evalFloatExpr(this.expr, t);
+    gl.uniform1f(this._uniformLocation, v);
+}
+UniformFloat.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
+    const t = Date.now();
+    this.expr = { a: this.expr, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
+}
+UniformFloat.prototype.isAnimated = function () {
+    return !Number.isFinite(this.expr);
 }
 
-function DiscreteRampFloat(property, keys, values, defaultValue){
+
+function DiscreteRampFloat(property, keys, values, defaultValue) {
     //TODO
 }
-function DiscreteRampColor(property, keys, values, defaultValue){
+function DiscreteRampColor(property, keys, values, defaultValue) {
     //TODO
 }
 
 //f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
-function ContinuousRampFloat(property, minKey, maxKey, values, f='linear'){
+//values are control-points of the output, results will be linearly interpolated between control points
+function ContinuousRampFloat(property, minKey, maxKey, values, f = 'linear') {
     //TODO
 }
-function ContinuousRampColor(property, minKey, maxKey, values, f='linear'){
+function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
     //TODO
 }
 
 
 function Layer(geometryType) {
-    this.geometryType=geometryType;
-    this.style ={
+    this.geometryType = geometryType;
+    this.style = {
         width: new UniformFloat(3),
-        color: new UniformColor(1,1,1,1),
+        color: new UniformColor([1, 1, 1, 1]),
     }
     this._compileTransformShader();
     //for each style property => add animation utils
@@ -255,7 +300,9 @@ function Layer(geometryType) {
 Layer.prototype._compileTransformShader = function () {
     //Apply width and color
 
-    var transformVertexShader = compileShader(this.style.color._applyToShaderSource('$COLOR', transformVS, 0).replace('$POINTSIZE', '1.').replace('$PREFACE', ''), gl.VERTEX_SHADER);
+    var transformVertexShader = compileShader(
+        this.style.width._applyToShader('$POINTSIZE', this.style.color._applyToShaderSource('$COLOR', transformVS, 0), 1)
+            .replace('$PREFACE', ''), gl.VERTEX_SHADER);
     var transformFragmentShader = compileShader(transformFS, gl.FRAGMENT_SHADER);
     this.transformShaderProgram = gl.createProgram();
     gl.attachShader(this.transformShaderProgram, transformVertexShader);
@@ -266,6 +313,7 @@ Layer.prototype._compileTransformShader = function () {
         console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.transformShaderProgram));
     }
     this.style.color._postShaderCompile(this.transformShaderProgram);
+    this.style.width._postShaderCompile(this.transformShaderProgram);
     this.selectedUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'selected');
     this.animUniformLocation = gl.getUniformLocation(this.transformShaderProgram, 'anim');
     this.transformIn0 = gl.getAttribLocation(this.transformShaderProgram, 'property0');
@@ -282,6 +330,34 @@ features{
 */
 Layer.prototype.setTile = function (tileXYZ, features) {
     this.tiles = [features];
+    var tile = features;
+
+    var points = features.geom;
+    var property0 = features.properties.latin_species;
+
+    tile.vertexBuffer = gl.createBuffer();
+    tile.colorBuffer = gl.createBuffer();
+    tile.pointsizeBuffer = gl.createBuffer();
+    tile.property0Buffer = gl.createBuffer();
+
+    tile.numVertex = points.length / 2;
+
+    var colors = new Float32Array(points.length * 2);
+    var pointsizes = new Float32Array(points.length / 2);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.pointsizeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, pointsizes, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, property0, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 }
 
 Layer.prototype.refreshStyle = function () {

@@ -22,19 +22,6 @@ function start() {
             }
         };
         layer.setTile({ x: 0, y: 0, z: 0 }, features);
-        function animate(time){
-                if (!window.anim || layer.anim>=1.){
-                    window.anim=time;
-                }
-                layer.anim=(time-window.anim)/600.;
-                layer.style.color.g=layer.anim
-                if (layer.anim>1){
-                    layer.anim=1;
-                }
-                window.requestAnimationFrame(animate);
-                renderer.refresh();
-        }
-        window.requestAnimationFrame(animate);
         renderer.refresh();
     });
 
@@ -73,6 +60,11 @@ function start() {
             renderer.refresh();
         }
     };
+    document.onkeypress = function (event) {
+        layer.style.color.blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
+        layer.style.width.blendTo(8. * Math.random(), 400);
+        renderer.refresh();
+    }
     document.onmouseup = function () {
         isDragging = false;
     };
