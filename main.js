@@ -22,7 +22,7 @@ function start() {
             }
         };
         layer.setTile({ x: 0, y: 0, z: 0 }, features);
-        renderer.refresh();
+        renderer.refresh();//TODO remove
     });
 
     window.onresize = function () { renderer.refresh(); };
@@ -32,7 +32,7 @@ function start() {
         } else {
             renderer.zoom /= 0.8;
         }
-        renderer.refresh();
+        renderer.refresh();//TODO remove
     });
 
 
@@ -57,7 +57,7 @@ function start() {
                 x: event.clientX,
                 y: event.clientY
             };
-            renderer.refresh();
+            renderer.refresh();//TODO remove
         }
     };
     document.onkeypress = function (event) {
@@ -66,8 +66,8 @@ function start() {
             ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
             [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]);
         layer.style.width.blendTo(8. * Math.random(), 400);
-        layer._compileTransformShader();
-        renderer.refresh();
+        layer._compileTransformShader();//TODO remove
+        renderer.refresh();//TODO remove
     }
     document.onmouseup = function () {
         isDragging = false;
