@@ -28,7 +28,7 @@ varying lowp vec4 color;
 
 void main(void) {
     gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
-    gl_PointSize = 10.;
+    gl_PointSize = 3.;
     color = texture2D(colorTex, featureID);
 }`;
 
@@ -67,7 +67,7 @@ $PREFACE
 uniform sampler2D property0;
 
 void main(void) {
-    float p0=texture2D(property0, uv).r;
+    float p0=texture2D(property0, uv).a;
     gl_FragColor = $COLOR;
 }
 `;
@@ -106,7 +106,11 @@ function compileShader(sourceCode, type) {
 }
 
 Renderer.prototype.refresh = refresh;
-function refresh() {
+function refresh(timestamp) {
+    if (this.lastFrame == timestamp) {
+        return;
+    }
+    this.lastFrame = timestamp;
     var canvas = document.getElementById('glCanvas');//TODO this should be a renderer property
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
@@ -132,33 +136,8 @@ function refresh() {
 
     //TODO for each layer
 
-    if ( this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated()) {
+    if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated()) {
         //TODO refactor
-        /*gl.useProgram(this.layer0.transformShaderProgram);
-        this.layer0.style._width._preDraw();
-        gl.enableVertexAttribArray(this.transformIn0);
-        gl.enable(gl.RASTERIZER_DISCARD);
-
-        this.layer0.tiles.forEach(tile => {
-            if (!(this.layer0.style.updated || this.layer0.style._color.isAnimated() ||
-                this.layer0.style._width.isAnimated() || !tile.initialized)) {
-                return;
-            }
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.property0Buffer);
-            gl.vertexAttribPointer(this.transformIn0, 1, gl.FLOAT, false, 0, 0);
-            gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, tile.colorBuffer);
-            gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, tile.widthBuffer);
-            gl.beginTransformFeedback(gl.POINTS);
-            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-            gl.endTransformFeedback();
-
-            tile.initialized = true;
-        });
-
-        gl.disable(gl.RASTERIZER_DISCARD);
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
-        gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null);*/
-
         console.log("RESTYLE", this.layer0.style.updated)
         // Render To Texture
         var tile = this.layer0.tiles[0];
@@ -180,14 +159,14 @@ function refresh() {
         gl.enableVertexAttribArray(this.colorShaderVertex);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(this.layer0.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
-        gl.viewport(0,0,1024*8, 16);
+        gl.viewport(0, 0, 1024 * 8, 16);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         this.layer0.style.updated = false;
-        tile.initialized=true;
+        tile.initialized = true;
     }
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -223,13 +202,12 @@ function UniformColor(color) {
     this.color = color;
 }
 
-UniformColor.prototype._applyToShaderSource = function (where, shaderSource, uniformID) {
+UniformColor.prototype._applyToShaderSource = function (uniformID) {
     this._uniformID = uniformID;
-    //Add uniform declaration to shader
-    shaderSource = shaderSource.replace('$PREFACE', `uniform vec4 color${this._uniformID};\n$PREFACE`);
-    //Read from uniform in shader
-    shaderSource = shaderSource.replace(where, `color${this._uniformID}`);
-    return shaderSource;
+    return {
+        preface: `uniform vec4 color${this._uniformID};\n`,
+        inline: `color${this._uniformID}`
+    };
 }
 UniformColor.prototype._postShaderCompile = function (shaderProgram) {
     this._uniformLocation = gl.getUniformLocation(shaderProgram, `color${this._uniformID}`);
@@ -267,6 +245,57 @@ UniformColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc
     this.notify();
 }
 UniformColor.prototype.isAnimated = function () {
+    return !Array.isArray(this.color);
+}
+
+
+
+
+function ColorBlend(a, b, mix) {
+    this.a = a;
+    this.b = b;
+    if (mix.indexOf('ms') >= 0) {
+        duration = Number(mix.replace('ms', ''));
+        this.aTime = Date.now();
+        this.bTime = this.aTime + duration;
+        mix = 'anim';
+    }
+    this.mix = mix;
+}
+ColorBlend.prototype._applyToShaderSource = function (uniformID) {
+    this._uniformID = uniformID;
+    const a = this.a._applyToShaderSource(1);
+    const b = this.b._applyToShaderSource(2);
+    return {
+        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
+        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
+    };
+}
+ColorBlend.prototype._postShaderCompile = function (shaderProgram) {
+    this._uniformLocation = gl.getUniformLocation(shaderProgram, `mix${this._uniformID}`);
+    this.a._postShaderCompile(shaderProgram);
+    this.b._postShaderCompile(shaderProgram);
+}
+ColorBlend.prototype._preDraw = function () {
+    var mix = this.mix;
+    if (mix == 'anim') {
+        const time = Date.now();
+        mix = (time - this.aTime) / (this.bTime - this.aTime);
+    }
+    gl.uniform1f(this._uniformLocation, mix);
+    this.a._preDraw();
+    this.b._preDraw();
+}
+ColorBlend.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
+    const t = Date.now();
+    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
+    this.notify();
+
+    //Create colorMix: childs (this and final)
+    //Update on parent
+    //notify()
+}
+ColorBlend.prototype.isAnimated = function () {
     return !Array.isArray(this.color);
 }
 
@@ -318,6 +347,7 @@ UniformFloat.prototype.isAnimated = function () {
 }
 
 
+
 function DiscreteRampFloat(property, keys, values, defaultValue) {
     //TODO
 }
@@ -363,15 +393,12 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 }
-DiscreteRampColor.prototype._applyToShaderSource = function (where, shaderSource, uniformID) {
+DiscreteRampColor.prototype._applyToShaderSource = function (uniformID) {
     this._uniformID = uniformID;
-    //Add uniform declaration to shader
-    shaderSource = shaderSource.replace('$PREFACE', `uniform sampler2D texRamp${this._uniformID};\n$PREFACE`);
-    //Read from uniform in shader
-    //TODO replace property0 by propertyX
-    shaderSource = shaderSource.replace(where, `texture2D(texRamp${this._uniformID}, vec2(p0, 0.5)).rgba`);
-    console.log(shaderSource)
-    return shaderSource;
+    return {
+        preface: `uniform sampler2D texRamp${this._uniformID};\n`,
+        inline: `texture2D(texRamp${this._uniformID}, vec2(p0, 0.5)).rgba`
+    };
 }
 DiscreteRampColor.prototype._postShaderCompile = function (shaderProgram) {
     this._uniformLocation = gl.getUniformLocation(shaderProgram, `texRamp${this._uniformID}`);
@@ -466,12 +493,17 @@ function Layer(renderer, geometryType) {
     this.tiles = [];
     this._compileColorShader();
 }
-var R=false;
+
+
+
+var R = false;
 Layer.prototype._compileColorShader = function () {
     console.log("Recompile")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
-    const source = this.style._color._applyToShaderSource('$COLOR', colorStylerFS, 0)
-        .replace('$PREFACE', '');
+    const colorModifier = this.style._color._applyToShaderSource(0);
+    var source = colorStylerFS;
+    source = source.replace('$PREFACE', colorModifier.preface);
+    source = source.replace('$COLOR', colorModifier.inline);
     //console.log(this, source);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     this.colorShader = gl.createProgram();
@@ -500,19 +532,19 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     tile.texP0 = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
     const level = 0;
-    const internalFormat = gl.R32F;
     const width = 8 * 1024;
     const height = 16;
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
-    const pixel = new Float32Array(width*height);
+    const pixel = new Float32Array(width * height*4);
     for (var i = 0; i < property0.length; i++) {
         pixel[i] = property0[i];
     }
 
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.R32F,
-        width, height, 0, gl.RED, srcType,
+
+    gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
+        width, height, 0, gl.ALPHA, srcType,
         pixel);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -524,7 +556,7 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width*height).fill(255));
+        new Uint8Array(4 * width * height).fill(255));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -551,7 +583,11 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
 function Renderer(canvas) {
     if (!gl) {
         //TODO use webgl 1
-        gl = canvas.getContext('webgl2');
+        gl = canvas.getContext('webgl');
+        var ext = gl.getExtension("OES_texture_float");
+        if (!ext) {
+           console.error("this machine or browser does not support OES_texture_float");
+        }
         if (!gl) {
             console.warn('Unable to initialize WebGL2. Your browser may not support it.');
             return null

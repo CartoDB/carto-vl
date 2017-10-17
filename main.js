@@ -61,9 +61,17 @@ function start() {
     };
     document.onkeypress = function (event) {
         //layer.style.getColor().blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
-        layer.style.setColor(new DiscreteRampColor('latin_species',
+        /*layer.style.setColor(new DiscreteRampColor('latin_species',
             ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
-            [[0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));
+            [[0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));*/
+
+        const ramp = new DiscreteRampColor('latin_species',
+            ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
+            [[0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [1, 0, 0, 1]);
+            const yellow = new UniformColor([1, 1, 0, 1]);
+            const red = new UniformColor([1, 0, 0, 1]);
+            layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
+
         layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
