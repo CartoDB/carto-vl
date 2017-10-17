@@ -3,7 +3,7 @@
 function start() {
     var renderer = new Renderer(document.getElementById('glCanvas'));
     var layer = renderer.addLayer();
-    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees LIMIT 8000"), function (data) {
+    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees LIMIT 80000"), function (data) {
         console.log("Downloaded", data);
         console.log("Rows:", data.rows.length);
         var points = new Float32Array(data.rows.length * 2);
@@ -60,11 +60,11 @@ function start() {
         }
     };
     document.onkeypress = function (event) {
-        layer.style.getColor().blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
-        /*layer.style.setColor(new DiscreteRampColor('latin_species',
+        //layer.style.getColor().blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
+        layer.style.setColor(new DiscreteRampColor('latin_species',
             ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
-            [[0, 0, 0, 1], [1, 1, 1, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));*/
-        layer.style.getWidth().blendTo(8. * Math.random(), 400);
+            [[0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));
+        layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
         isDragging = false;
