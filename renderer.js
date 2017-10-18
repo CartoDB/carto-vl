@@ -281,8 +281,10 @@ function UniformColor(color) {
     this.color = color;
 }
 
-UniformColor.prototype._applyToShaderSource = function (uniformID) {
-    this._uniformID = uniformID;
+
+
+UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
     return {
         preface: `uniform vec4 color${this._uniformID};\n`,
         inline: `color${this._uniformID}`
@@ -338,10 +340,10 @@ function ColorBlend(a, b, mix) {
     }
     this.mix = mix;
 }
-ColorBlend.prototype._applyToShaderSource = function (uniformID) {
-    this._uniformID = uniformID;
-    const a = this.a._applyToShaderSource(1);
-    const b = this.b._applyToShaderSource(2);
+ColorBlend.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
+    const a = this.a._applyToShaderSource(uniformIDMaker);
+    const b = this.b._applyToShaderSource(uniformIDMaker);
     return {
         preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
         inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
@@ -403,8 +405,8 @@ ColorBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc =
 function UniformFloat(size) {
     this.expr = size;
 }
-UniformFloat.prototype._applyToShaderSource = function (uniformID) {
-    this._uniformID = uniformID;
+UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float float${this._uniformID};\n`,
         inline: `float${this._uniformID}/10.`
@@ -493,8 +495,8 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
-DiscreteRampColor.prototype._applyToShaderSource = function (uniformID) {
-    this._uniformID = uniformID;
+DiscreteRampColor.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
     return {
         preface: `uniform sampler2D texRamp${this._uniformID};\n`,
         inline: `texture2D(texRamp${this._uniformID}, vec2((p0), 0.5)).rgba`
@@ -614,7 +616,8 @@ function Layer(renderer, geometryType) {
 Layer.prototype._compileColorShader = function () {
     console.log("Recompile color")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
-    const colorModifier = this.style._color._applyToShaderSource(0);
+    var uniformIDcounter = 0;
+    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++);
     var source = colorStylerFS;
     source = source.replace('$PREFACE', colorModifier.preface);
     source = source.replace('$COLOR', colorModifier.inline);
@@ -639,7 +642,8 @@ Layer.prototype._compileWidthShader = function () {
     console.log("Recompile width", this)
     var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
     console.log(this)
-    const widthModifier = this.style._width._applyToShaderSource(0);
+    var uniformIDcounter = 0;
+    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++);
     var source = widthStylerFS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
