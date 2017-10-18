@@ -11,14 +11,15 @@ uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 
 uniform sampler2D colorTex;
+uniform sampler2D widthTex;
 
 varying lowp vec4 color;
 
 void main(void) {
     float size=4.;
-    color = texture2D(colorTex, featureID);
-    gl_PointSize = size;
     gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
+    gl_PointSize = texture2D(widthTex, featureID).a*10.;
+    color = texture2D(colorTex, featureID);
 }`;
 
 const renderFS = `
@@ -54,10 +55,63 @@ varying  vec2 uv;
 $PREFACE
 
 uniform sampler2D property0;
+uniform sampler2D property1;
+uniform sampler2D property2;
+uniform sampler2D property3;
+uniform sampler2D property4;
+uniform sampler2D property5;
+uniform sampler2D property6;
+uniform sampler2D property7;
 
 void main(void) {
     float p0=texture2D(property0, uv).a;
+    float p1=texture2D(property1, uv).a;
+    float p2=texture2D(property2, uv).a;
+    float p3=texture2D(property3, uv).a;
+    float p4=texture2D(property4, uv).a;
+    float p5=texture2D(property5, uv).a;
+    float p6=texture2D(property6, uv).a;
+    float p7=texture2D(property7, uv).a;
     gl_FragColor = $COLOR;
+}
+`;
+
+
+
+
+const widthStylerVS = `
+
+precision highp float;
+attribute vec2 vertex;
+
+varying  vec2 uv;
+
+void main(void) {
+    uv = vertex*0.5+vec2(0.5);
+    gl_Position  = vec4(vertex, 0.5, 1.);
+}
+`;
+
+const widthStylerFS = `
+
+precision highp float;
+
+varying  vec2 uv;
+
+$PREFACE
+
+uniform sampler2D property0;
+uniform sampler2D property1;
+uniform sampler2D property2;
+uniform sampler2D property3;
+
+
+void main(void) {
+    float p0=texture2D(property0, uv).a;
+    float p1=texture2D(property1, uv).a;
+    float p2=texture2D(property2, uv).a;
+    float p3=texture2D(property3, uv).a;
+    gl_FragColor = vec4($WIDTH);
 }
 `;
 
@@ -79,6 +133,7 @@ Renderer.prototype._initShaders = function () {
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexScale');
     this.vertexOffsetUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexOffset');
     this.rendererColorTex = gl.getUniformLocation(this.finalRendererProgram, 'colorTex');
+    this.rendererWidthTex = gl.getUniformLocation(this.finalRendererProgram, 'widthTex');
 }
 function compileShader(sourceCode, type) {
     var shader = gl.createShader(type);
@@ -100,6 +155,8 @@ function refresh(timestamp) {
         return;
     }
     this.lastFrame = timestamp;
+
+    console.log('Re-render')
 
     var canvas = document.getElementById('glCanvas');//TODO this should be a renderer property
     var width = gl.canvas.clientWidth;
@@ -125,10 +182,10 @@ function refresh(timestamp) {
     gl.enable(gl.CULL_FACE);
 
     //TODO for each layer
-
-    if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated()) {
+    console.log(this.layer0.style)
+    if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated() || this.layer0.style.updated) {
         //TODO refactor
-        //console.log("RESTYLE", this.layer0.style.updated)
+        console.log("Restyle", timestamp)
         // Render To Texture
         var tile = this.layer0.tiles[0];
         var fb = gl.createFramebuffer();
@@ -142,17 +199,45 @@ function refresh(timestamp) {
         gl.useProgram(this.layer0.colorShader);
 
         this.layer0.style._color._preDraw();
-        this.layer0.style._width._preDraw();
 
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
-        gl.uniform1i(this.layer0.colorShaderTex0, 4);
+        for (var i = 0; i < 8; i++) {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
+            gl.uniform1i(this.layer0.colorShaderTex[i], i);
+        }
 
         gl.enableVertexAttribArray(this.colorShaderVertex);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(this.layer0.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        //WIDTH
+
+        fb = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+        gl.viewport(0, 0, 1024 * 8, 16);
+
+        //var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+        //console.log(status);
+
+        gl.useProgram(this.layer0.widthShader);
+
+        this.layer0.style._width._preDraw();
+
+        for (var i = 0; i < 8; i++) {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
+            gl.uniform1i(this.layer0.widthShaderTex[i], i);
+        }
+
+        gl.enableVertexAttribArray(this.layer0.widthShaderVertex);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(this.layer0.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
 
         this.layer0.style.updated = false;
         tile.initialized = true;
@@ -179,9 +264,9 @@ function refresh(timestamp) {
         gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
         gl.uniform1i(this.rendererColorTex, 0);
 
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
-        gl.uniform1i(gl.getUniformLocation(this.finalRendererProgram, 'property0'), 5);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+        gl.uniform1i(this.rendererWidthTex, 1);
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
@@ -233,13 +318,8 @@ UniformColor.prototype._preDraw = function () {
     const color = evalColor(this.color, t);
     gl.uniform4f(this._uniformLocation, color[0], color[1], color[2], color[3]);
 }
-UniformColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
-    const t = Date.now();
-    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
-    this.notify();
-}
 UniformColor.prototype.isAnimated = function () {
-    return !Array.isArray(this.color);
+    return false;
 }
 
 
@@ -248,6 +328,8 @@ UniformColor.prototype.isAnimated = function () {
 function ColorBlend(a, b, mix) {
     this.a = a;
     this.b = b;
+    a.parent = this;
+    b.parent = this;
     if (mix.indexOf('ms') >= 0) {
         duration = Number(mix.replace('ms', ''));
         this.aTime = Date.now();
@@ -275,37 +357,61 @@ ColorBlend.prototype._preDraw = function () {
     if (mix == 'anim') {
         const time = Date.now();
         mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (mix >= 1.) {
+            mix = 1.;
+            this.mix = 1.;
+            //TODO free A, free blend
+            this.parent.replaceChild(this, this.b);
+        }
     }
     gl.uniform1f(this._uniformLocation, mix);
     this.a._preDraw();
     this.b._preDraw();
 }
-ColorBlend.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
-    const t = Date.now();
-    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
-    this.notify();
-
-    //Create colorMix: childs (this and final)
-    //Update on parent
-    //notify()
-}
 ColorBlend.prototype.isAnimated = function () {
-    return !Array.isArray(this.color);
+    return this.mix === 'anim';
 }
+ColorBlend.prototype.replaceChild = function (toReplace, replacer) {
+    if (this.a = toReplace) {
+        this.a = replacer;
+    } else {
+        this.b = replacer;
+    }
+    replacer.parent = this;
+    replacer.notify = toReplace.notify;
+}
+
+function genericColorBlend(initial, final, duration, blendFunc) {
+    const parent = initial.parent;
+    const blend = new ColorBlend(initial, final, `${duration}ms`);
+    parent.replaceChild(initial, blend);
+    blend.notify();
+}
+
+DiscreteRampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericColorBlend(this, finalValue, duration, blendFunc);
+}
+UniformColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericColorBlend(this, finalValue, duration, blendFunc);
+}
+ColorBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericColorBlend(this, finalValue, duration, blendFunc);
+}
+
+
 
 function UniformFloat(size) {
     this.expr = size;
 }
-UniformFloat.prototype._applyToShader = function (where, shaderSource, uniformID) {
+UniformFloat.prototype._applyToShaderSource = function (uniformID) {
     this._uniformID = uniformID;
-    //Add uniform declaration to shader
-    shaderSource = shaderSource.replace('$PREFACE', `uniform float f${this._uniformID};\n$PREFACE`);
-    //Read from uniform in shader
-    shaderSource = shaderSource.replace(where, `f${this._uniformID}`);
-    return shaderSource;
+    return {
+        preface: `uniform float float${this._uniformID};\n`,
+        inline: `float${this._uniformID}/10.`
+    };
 }
 UniformFloat.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `f${this._uniformID}`);
+    this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
 }
 function evalFloatExpr(expr, time) {
     if (Number.isFinite(expr)) {
@@ -330,16 +436,16 @@ UniformFloat.prototype._preDraw = function () {
     const t = Date.now();
     this.expr = simplifyFloatExpr(this.expr, t);
     const v = evalFloatExpr(this.expr, t);
+    console.log("F", v)
     gl.uniform1f(this._uniformLocation, v);
+}
+UniformFloat.prototype.isAnimated = function () {
+    return !Number.isFinite(this.expr);
 }
 UniformFloat.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
     const t = Date.now();
     this.expr = { a: this.expr, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
 }
-UniformFloat.prototype.isAnimated = function () {
-    return !Number.isFinite(this.expr);
-}
-
 
 
 function DiscreteRampFloat(property, keys, values, defaultValue) {
@@ -426,13 +532,10 @@ DiscreteRampColor.prototype._preDraw = function () {
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this._uniformLocation, 10);
 }
-DiscreteRampColor.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
-    const t = Date.now();
-    this.color = { a: this.color, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
-}
 DiscreteRampColor.prototype.isAnimated = function () {
     return false;
 }
+
 
 
 
@@ -450,9 +553,13 @@ function Style(layer) {
     this.updated = true;
 
     this._width = new UniformFloat(3);
-    this._width.notify = () => { window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer)); };
-
+    this._width.parent = this;
+    this._width.notify = () => {
+        this.layer._compileWidthShader();
+        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+    };
     this._color = new UniformColor([0, 1, 0, 1]);
+    this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
@@ -461,12 +568,27 @@ function Style(layer) {
 Style.prototype.setWidth = function (float) {
     this._width = float;
     this.updated = true;
-    float.notify = () => { window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer)); };
+    float.parent = this;
+    float.notify = () => {
+        this.layer._compileWidthShader();
+        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+    };
     float.notify();
 }
+Style.prototype.replaceChild = function (toReplace, replacer) {
+    if (toReplace == this._color) {
+        this._color = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else {
+        console.warn('No child found');
+    }
+}
+
 Style.prototype.setColor = function (color) {
     this._color = color;
     this.updated = true;
+    color.parent = this;
     color.notify = () => {
         this.layer._compileColorShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
@@ -486,13 +608,11 @@ function Layer(renderer, geometryType) {
     this.style = new Style(this);
     this.tiles = [];
     this._compileColorShader();
+    this._compileWidthShader();
 }
 
-
-
-var R = false;
 Layer.prototype._compileColorShader = function () {
-    console.log("Recompile")
+    console.log("Recompile color")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
     const colorModifier = this.style._color._applyToShaderSource(0);
     var source = colorStylerFS;
@@ -509,8 +629,37 @@ Layer.prototype._compileColorShader = function () {
     }
     this.style._color._postShaderCompile(this.colorShader);
     this.colorShaderVertex = gl.getAttribLocation(this.colorShader, 'vertex');
-    this.colorShaderTex0 = gl.getUniformLocation(this.colorShader, 'property0');
+    this.colorShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.colorShaderTex[i] = gl.getUniformLocation(this.colorShader, `property${i}`);
+    }
 }
+
+Layer.prototype._compileWidthShader = function () {
+    console.log("Recompile width", this)
+    var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
+    console.log(this)
+    const widthModifier = this.style._width._applyToShaderSource(0);
+    var source = widthStylerFS;
+    source = source.replace('$PREFACE', widthModifier.preface);
+    source = source.replace('$WIDTH', widthModifier.inline);
+    console.log(this, source);
+    var FS = compileShader(source, gl.FRAGMENT_SHADER);
+    this.widthShader = gl.createProgram();
+    gl.attachShader(this.widthShader, VS);
+    gl.attachShader(this.widthShader, FS);
+    gl.linkProgram(this.widthShader);
+    if (!gl.getProgramParameter(this.widthShader, gl.LINK_STATUS)) {
+        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.widthShader));
+    }
+    this.style._width._postShaderCompile(this.widthShader);
+    this.widthShaderVertex = gl.getAttribLocation(this.widthShader, 'vertex');
+    this.widthShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.widthShaderTex[i] = gl.getUniformLocation(this.widthShader, `property${i}`);
+    }
+}
+
 
 Layer.prototype.setTile = function (tileXYZ, tile) {
     this.tiles.push(tile);
@@ -523,8 +672,9 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
 
     tile.numVertex = points.length / 2;
 
-    tile.texP0 = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
+    tile.propertyTex = [];
+    tile.propertyTex[0] = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[0]);
     const level = 0;
     const width = 8 * 1024;
     const height = 16;
@@ -550,6 +700,16 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4 * width * height).fill(255));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    tile.texWidth = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
+        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array(4 * width * height));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

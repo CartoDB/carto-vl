@@ -7,13 +7,13 @@ function start() {
     var layer = renderer.addLayer();
 
     var autoinc = 5;
-//WHERE latin_species LIKE 'Platanus x hispanica'
-// AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
+    //WHERE latin_species LIKE 'Platanus x hispanica'
+    // AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
     $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
         console.log("Downloaded", data);
         var points = new Float32Array(data.rows.length * 2);
         var property0 = new Float32Array(data.rows.length);
-        var i=0;
+        var i = 0;
         data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
             if (map[e.latin_species.toLowerCase()] === undefined) {
@@ -77,8 +77,14 @@ function start() {
             [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0, 0, 0, 1]);
         const yellow = new UniformColor([1, 1, 0, 1]);
         const red = new UniformColor([1, 0, 0, 1]);
-        layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
-        layer.style.getWidth().blendTo(8. * Math.random(), 1400);
+        //layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
+        if (Math.random() > 0.5) {
+            layer.style.getColor().blendTo(ramp, 1000);
+        } else {
+            layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 1]), 1000);
+        }
+        layer.style.getWidth().blendTo(10. * Math.random(), 400);
+        //layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
         isDragging = false;
