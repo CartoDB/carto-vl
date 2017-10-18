@@ -1,18 +1,5 @@
 var gl;
 
-//TODO using hashes is unsafe, prefer using an autoincrement counter
-String.prototype.hashCode = function () {
-    var hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-        chr = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
-    var f = (hash / 1000000);
-    return f - Math.floor(f);
-};
-
 const renderVS = `
 
 precision highp float;
@@ -23,17 +10,22 @@ attribute vec2 featureID;
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 uniform sampler2D colorTex;
+uniform sampler2D property0;
 
 varying lowp vec4 color;
 
 void main(void) {
     gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
-    gl_PointSize = 3.;
+    float size=4.;
+    gl_PointSize = size;
     color = texture2D(colorTex, featureID);
+    vec2 fid= vec2(featureID.x, featureID.y);
+    float p0=texture2D(property0, fid).a;
+    //color = vec4(p0*255.>=24.&&p0*255.<=26., p0*255.<11.&&p0*255.>9., p0*255.<6., true)+featureID.xxxx*0.0001;
 }`;
 
 const renderFS = `
-precision lowp float;
+precision highp float;
 
 varying lowp vec4 color;
 
@@ -48,19 +40,19 @@ const colorStylerVS = `
 precision highp float;
 attribute vec2 vertex;
 
-varying highp vec2 uv;
+varying  vec2 uv;
 
 void main(void) {
-    uv = vertex;
+    uv = vertex*0.5+vec2(0.5);
     gl_Position  = vec4(vertex, 0.5, 1.);
 }
 `;
 
 const colorStylerFS = `
 
-precision lowp float;
+precision highp float;
 
-varying highp vec2 uv;
+varying  vec2 uv;
 
 $PREFACE
 
@@ -123,7 +115,7 @@ function refresh(timestamp) {
     var aspect = canvas.clientWidth / canvas.clientHeight;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    gl.clearColor(0.1, 0.5, 0.5, 1);//TODO this should be a renderer property
+    gl.clearColor(0.2, 0.2, 0.2, 1);//TODO this should be a renderer property
     //TODO blending with CSS and other html+css elements
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -138,12 +130,14 @@ function refresh(timestamp) {
 
     if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated()) {
         //TODO refactor
-        console.log("RESTYLE", this.layer0.style.updated)
+        //console.log("RESTYLE", this.layer0.style.updated)
         // Render To Texture
         var tile = this.layer0.tiles[0];
         var fb = gl.createFramebuffer();
         gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+        gl.viewport(0, 0, 1024 * 8, 16);
+
         //var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         //console.log(status);
 
@@ -152,22 +146,21 @@ function refresh(timestamp) {
         this.layer0.style._color._preDraw();
         this.layer0.style._width._preDraw();
 
-        gl.activeTexture(gl.TEXTURE0);
+        gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
-        gl.uniform1i(this.layer0.colorShaderTex0, 0);
+        gl.uniform1i(this.layer0.colorShaderTex0, 4);
 
         gl.enableVertexAttribArray(this.colorShaderVertex);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(this.layer0.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
-        gl.viewport(0, 0, 1024 * 8, 16);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         this.layer0.style.updated = false;
         tile.initialized = true;
     }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     gl.useProgram(shaderProgram);
@@ -188,6 +181,10 @@ function refresh(timestamp) {
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
         gl.uniform1i(this.rendererColorTex, 0);
+
+        gl.activeTexture(gl.TEXTURE5);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
+        gl.uniform1i(gl.getUniformLocation(shaderProgram, 'property0'), 5);
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
@@ -364,27 +361,30 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     const level = 0;
     const internalFormat = gl.RGBA;
-    const width = 8;
+    const width = 256;
     const height = 1;
     const border = 0;
     const srcFormat = gl.RGBA;
     const srcType = gl.UNSIGNED_BYTE;
     const pixel = new Uint8Array(4 * width);
-    if (typeof keys[0] === 'string') {
-        keys = keys.map(str => Math.floor(str.hashCode() * width));
-    }
+    console.log("KEYS", keys, values);
+    console.log(defaultValue);
     for (var i = 0; i < width; i++) {
-        pixel[4 * i + 0] = defaultValue[0];
-        pixel[4 * i + 1] = defaultValue[1];
-        pixel[4 * i + 2] = defaultValue[2];
-        pixel[4 * i + 3] = defaultValue[3];
+        pixel[4 * i + 0] = defaultValue[0] * 0;
+        pixel[4 * i + 1] = defaultValue[1] * 0;
+        pixel[4 * i + 2] = defaultValue[2] * 0;
+        pixel[4 * i + 3] = 255;
     }
+    console.log("def", pixel);
+
     keys.forEach((k, index) => {
+        console.log("K", Math.round(k), index, values[index]);
         pixel[k * 4 + 0] = 255 * values[index][0];
         pixel[k * 4 + 1] = 255 * values[index][1];
         pixel[k * 4 + 2] = 255 * values[index][2];
         pixel[k * 4 + 3] = 255 * values[index][3];
     });
+
 
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
         width, height, border, srcFormat, srcType,
@@ -392,12 +392,13 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 DiscreteRampColor.prototype._applyToShaderSource = function (uniformID) {
     this._uniformID = uniformID;
     return {
         preface: `uniform sampler2D texRamp${this._uniformID};\n`,
-        inline: `texture2D(texRamp${this._uniformID}, vec2(p0, 0.5)).rgba`
+        inline: `texture2D(texRamp${this._uniformID}, vec2((p0), 0.5)).rgba`
     };
 }
 DiscreteRampColor.prototype._postShaderCompile = function (shaderProgram) {
@@ -537,10 +538,11 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
-    const pixel = new Float32Array(width * height*4);
+    const pixel = new Float32Array(width * height).fill(255);
     for (var i = 0; i < property0.length; i++) {
-        pixel[i] = property0[i];
+        pixel[i] = property0[i] / 255.;
     }
+    console.log(2234, pixel, property0)
 
 
     gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
@@ -560,14 +562,16 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
 
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
         ids[i + 0] = ((i / 2) % width) / width;
-        ids[i + 1] = Math.round((i / 2) / width) / height;
+        ids[i + 1] = Math.floor((i / 2) / width) / height;
     }
+    console.log("IDS", ids)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
@@ -586,7 +590,7 @@ function Renderer(canvas) {
         gl = canvas.getContext('webgl');
         var ext = gl.getExtension("OES_texture_float");
         if (!ext) {
-           console.error("this machine or browser does not support OES_texture_float");
+            console.error("this machine or browser does not support OES_texture_float");
         }
         if (!gl) {
             console.warn('Unable to initialize WebGL2. Your browser may not support it.');
