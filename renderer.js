@@ -15,13 +15,10 @@ uniform sampler2D property0;
 varying lowp vec4 color;
 
 void main(void) {
-    gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
     float size=4.;
-    gl_PointSize = size;
     color = texture2D(colorTex, featureID);
-    vec2 fid= vec2(featureID.x, featureID.y);
-    float p0=texture2D(property0, fid).a;
-    //color = vec4(p0*255.>=24.&&p0*255.<=26., p0*255.<11.&&p0*255.>9., p0*255.<6., true)+featureID.xxxx*0.0001;
+    gl_PointSize = size;
+    gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
 }`;
 
 const renderFS = `
@@ -29,8 +26,8 @@ precision highp float;
 
 varying lowp vec4 color;
 
-
 void main(void) {
+    //TODO circular AA points
     gl_FragColor = color;
 }`;
 
@@ -64,26 +61,24 @@ void main(void) {
 }
 `;
 
-var shaderProgram;
-
 Renderer.prototype._initShaders = function () {
     var fragmentShader = compileShader(renderFS, gl.FRAGMENT_SHADER);
     var vertexShader = compileShader(renderVS, gl.VERTEX_SHADER);
-    shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-        console.warn('Unable to link the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+    this.finalRendererProgram = gl.createProgram();
+    gl.attachShader(this.finalRendererProgram, vertexShader);
+    gl.attachShader(this.finalRendererProgram, fragmentShader);
+    gl.linkProgram(this.finalRendererProgram);
+    if (!gl.getProgramParameter(this.finalRendererProgram, gl.LINK_STATUS)) {
+        console.warn('Unable to link the shader program: ' + gl.getProgramInfoLog(this.finalRendererProgram));
+        //TODO throw
     }
-    this.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'vertexPosition');
-    this.vertexColorAttribute = gl.getAttribLocation(shaderProgram, 'vertexColor');
-    this.vertexWidthAttribute = gl.getAttribLocation(shaderProgram, 'vertexWidth');
-    this.vertexScaleUniformLocation = gl.getUniformLocation(shaderProgram, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(shaderProgram, 'vertexOffset');
-    this.rendererColorTex = gl.getUniformLocation(shaderProgram, 'colorTex');
-    this.FeatureIdAttr = gl.getAttribLocation(shaderProgram, 'featureID');
+    this.vertexPositionAttribute = gl.getAttribLocation(this.finalRendererProgram, 'vertexPosition');
+    this.FeatureIdAttr = gl.getAttribLocation(this.finalRendererProgram, 'featureID');
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
+
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexOffset');
+    this.rendererColorTex = gl.getUniformLocation(this.finalRendererProgram, 'colorTex');
 }
 function compileShader(sourceCode, type) {
     var shader = gl.createShader(type);
@@ -91,6 +86,7 @@ function compileShader(sourceCode, type) {
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         console.warn('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader), sourceCode);
+        //TODO throw
         gl.deleteShader(shader);
         return null;
     }
@@ -99,10 +95,12 @@ function compileShader(sourceCode, type) {
 
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
     }
     this.lastFrame = timestamp;
+
     var canvas = document.getElementById('glCanvas');//TODO this should be a renderer property
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
@@ -163,7 +161,7 @@ function refresh(timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    gl.useProgram(shaderProgram);
+    gl.useProgram(this.finalRendererProgram);
     var s = 1. / this._zoom;
     gl.uniform2f(this.vertexScaleUniformLocation, s / aspect, s);
     gl.uniform2f(this.vertexOffsetUniformLocation, this._center.x, this._center.y);
@@ -184,7 +182,7 @@ function refresh(timestamp) {
 
         gl.activeTexture(gl.TEXTURE5);
         gl.bindTexture(gl.TEXTURE_2D, tile.texP0);
-        gl.uniform1i(gl.getUniformLocation(shaderProgram, 'property0'), 5);
+        gl.uniform1i(gl.getUniformLocation(this.finalRendererProgram, 'property0'), 5);
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
@@ -206,8 +204,8 @@ UniformColor.prototype._applyToShaderSource = function (uniformID) {
         inline: `color${this._uniformID}`
     };
 }
-UniformColor.prototype._postShaderCompile = function (shaderProgram) {
-    this._uniformLocation = gl.getUniformLocation(shaderProgram, `color${this._uniformID}`);
+UniformColor.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
 }
 function evalColor(color, time) {
     if (Array.isArray(color)) {
@@ -268,10 +266,10 @@ ColorBlend.prototype._applyToShaderSource = function (uniformID) {
         inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
     };
 }
-ColorBlend.prototype._postShaderCompile = function (shaderProgram) {
-    this._uniformLocation = gl.getUniformLocation(shaderProgram, `mix${this._uniformID}`);
-    this.a._postShaderCompile(shaderProgram);
-    this.b._postShaderCompile(shaderProgram);
+ColorBlend.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
+    this.a._postShaderCompile(program);
+    this.b._postShaderCompile(program);
 }
 ColorBlend.prototype._preDraw = function () {
     var mix = this.mix;
@@ -307,8 +305,8 @@ UniformFloat.prototype._applyToShader = function (where, shaderSource, uniformID
     shaderSource = shaderSource.replace(where, `f${this._uniformID}`);
     return shaderSource;
 }
-UniformFloat.prototype._postShaderCompile = function (shaderProgram) {
-    this._uniformLocation = gl.getUniformLocation(shaderProgram, `f${this._uniformID}`);
+UniformFloat.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `f${this._uniformID}`);
 }
 function evalFloatExpr(expr, time) {
     if (Number.isFinite(expr)) {
@@ -401,8 +399,8 @@ DiscreteRampColor.prototype._applyToShaderSource = function (uniformID) {
         inline: `texture2D(texRamp${this._uniformID}, vec2((p0), 0.5)).rgba`
     };
 }
-DiscreteRampColor.prototype._postShaderCompile = function (shaderProgram) {
-    this._uniformLocation = gl.getUniformLocation(shaderProgram, `texRamp${this._uniformID}`);
+DiscreteRampColor.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `texRamp${this._uniformID}`);
 }
 function evalColor(color, time) {
     if (Array.isArray(color)) {
