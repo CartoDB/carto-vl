@@ -9,8 +9,8 @@ attribute vec2 featureID;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
+
 uniform sampler2D colorTex;
-uniform sampler2D property0;
 
 varying lowp vec4 color;
 
@@ -22,7 +22,7 @@ void main(void) {
 }`;
 
 const renderFS = `
-precision highp float;
+precision mediump float;
 
 varying lowp vec4 color;
 
@@ -153,7 +153,6 @@ function refresh(timestamp) {
         gl.vertexAttribPointer(this.layer0.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
-
 
         this.layer0.style.updated = false;
         tile.initialized = true;
@@ -365,18 +364,14 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     const srcFormat = gl.RGBA;
     const srcType = gl.UNSIGNED_BYTE;
     const pixel = new Uint8Array(4 * width);
-    console.log("KEYS", keys, values);
-    console.log(defaultValue);
     for (var i = 0; i < width; i++) {
         pixel[4 * i + 0] = defaultValue[0] * 0;
         pixel[4 * i + 1] = defaultValue[1] * 0;
         pixel[4 * i + 2] = defaultValue[2] * 0;
         pixel[4 * i + 3] = 255;
     }
-    console.log("def", pixel);
 
     keys.forEach((k, index) => {
-        console.log("K", Math.round(k), index, values[index]);
         pixel[k * 4 + 0] = 255 * values[index][0];
         pixel[k * 4 + 1] = 255 * values[index][1];
         pixel[k * 4 + 2] = 255 * values[index][2];
@@ -540,8 +535,6 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     for (var i = 0; i < property0.length; i++) {
         pixel[i] = property0[i] / 255.;
     }
-    console.log(2234, pixel, property0)
-
 
     gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
         width, height, 0, gl.ALPHA, srcType,
@@ -569,7 +562,6 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
         ids[i + 0] = ((i / 2) % width) / width;
         ids[i + 1] = Math.floor((i / 2) / width) / height;
     }
-    console.log("IDS", ids)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);

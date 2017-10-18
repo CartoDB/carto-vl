@@ -11,35 +11,19 @@ function start() {
 // AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
     $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
         console.log("Downloaded", data);
-        console.log("Rows:", data.rows.length);
         var points = new Float32Array(data.rows.length * 2);
         var property0 = new Float32Array(data.rows.length);
         var i=0;
-        data.rows.forEach((e) => {
-            var index=i;
+        data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
             if (map[e.latin_species.toLowerCase()] === undefined) {
                 map[e.latin_species.toLowerCase()] = autoinc;
-                autoinc+=5;
+                autoinc++;
             }
-            //e.latin_species='Platanus x hispanica';
-            if (map[e.latin_species.toLowerCase()] === undefined) {
-                map[e.latin_species.toLowerCase()] = autoinc;
-                autoinc+=5;
-            }
-            if (e.latin_species!='Platanus x hispanica'){
-               // return;
-            }
-
             points[2 * index + 0] = (point[0] + 13631285) / 10000.;
             points[2 * index + 1] = (point[1] - 4540319.5) / 10000.;
             property0[index] = map[e.latin_species.toLowerCase()];
-            if (!property0[index]){
-                console.log("BUG", index, map)
-            }
-            i++;
         });
-        console.log("BB", property0)
         var features = {
             count: data.rows.length,
             geom: points,
@@ -86,11 +70,6 @@ function start() {
         }
     };
     document.onkeypress = function (event) {
-        //layer.style.getColor().blendTo([Math.random(), Math.random(), Math.random(), 1], 200);
-        /*layer.style.setColor(new DiscreteRampColor('latin_species',
-            ['Metrosideros excelsa', 'Ficus nitida', `Arbutus 'Marina`],
-            [[0, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [1, 0, 0, 1]));*/
-
         const ramp = new DiscreteRampColor('latin_species',
             ["Lophostemon confertus", "Platanus x hispanica", "Metrosideros excelsa"].map(str => {
                 return map[str.toLowerCase()];
@@ -99,7 +78,6 @@ function start() {
         const yellow = new UniformColor([1, 1, 0, 1]);
         const red = new UniformColor([1, 0, 0, 1]);
         layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
-
         layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
