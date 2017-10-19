@@ -177,13 +177,12 @@ function refresh(timestamp) {
     var aspect = canvas.clientWidth / canvas.clientHeight;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    gl.clearColor(0.2, 0.2, 0.2, 1);//TODO this should be a renderer property
+    gl.clearColor(0.1, 0.1, 0.1, 1);//TODO this should be a renderer property
     //TODO blending with CSS and other html+css elements
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     //TODO controllable
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
+
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -191,6 +190,9 @@ function refresh(timestamp) {
     //TODO for each layer
     if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated() || this.layer0.style.updated) {
         //TODO refactor
+        gl.disable(gl.BLEND);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
         console.log("Restyle", timestamp)
         // Render To Texture
         var tile = this.layer0.tiles[0];
@@ -229,6 +231,7 @@ function refresh(timestamp) {
         //console.log(status);
 
         gl.useProgram(this.layer0.widthShader);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         this.layer0.style._width._preDraw();
 
@@ -248,6 +251,10 @@ function refresh(timestamp) {
         this.layer0.style.updated = false;
         tile.initialized = true;
     }
+
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.BLEND);
+
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -557,6 +564,37 @@ function hexToRgb(hex) {
 
 
 
+/*
+    color: ramp(temp, 0º, 30º, carto-color)
+    width: exprNear(date, SIM_TIME, 0, 4)
+*/
+
+function Near(property, center,  minVal, maxVal){
+    this.property=property;
+    this.center=center;
+    this.minVal=minVal;
+    this.maxVal=maxVal;
+}
+
+Near.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
+    console.log(this.center)
+    return {
+        preface: `uniform float near${this._uniformID};\n`,
+        inline: `mix(${this.maxVal},${this.minVal} , abs(p1-near${this._uniformID})/20.)/10.`
+    };
+}
+Near.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `near${this._uniformID}`);
+}
+Near.prototype._preDraw = function () {
+    this.center=Date.now()*0.5%4000;
+    gl.uniform1f(this._uniformLocation, this.center);
+}
+Near.prototype.isAnimated = function () {
+    return true;
+}
+
 //f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
 //values are control-points of the output, results will be linearly interpolated between control points
 function ContinuousRampFloat(property, minKey, maxKey, values, f = 'linear') {
@@ -580,18 +618,15 @@ function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
     const srcFormat = gl.RGBA;
     const srcType = gl.UNSIGNED_BYTE;
     const pixel = new Uint8Array(4 * width);
-    console.log(values)
     for (var i = 0; i < width; i++) {
         const vraw = values[Math.floor(i / width * values.length)];
         const v = [hexToRgb(vraw).r, hexToRgb(vraw).g, hexToRgb(vraw).b, 255];
-        console.log(values, v, Math.floor(i / width * values.length))
         pixel[4 * i + 0] = v[0];
         pixel[4 * i + 1] = v[1];
         pixel[4 * i + 2] = v[2];
         pixel[4 * i + 3] = v[3];
     }
 
-    console.log("PA", pixel)
 
     gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
         width, height, border, srcFormat, srcType,
@@ -642,9 +677,10 @@ function Style(layer) {
 }
 Style.prototype.setWidth = function (float) {
     this._width = float;
-    this.updated = true;
     float.parent = this;
+    console.log("SET", float)
     float.notify = () => {
+        this.updated = true;
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
@@ -738,10 +774,12 @@ Layer.prototype._compileWidthShader = function () {
 
 
 Layer.prototype.setTile = function (tileXYZ, tile) {
+    console.log("Tile", tile)
     this.tiles.push(tile);
 
     var points = tile.geom;
     var property0 = tile.properties.p0;
+    var property1 = tile.properties.p1;
 
     tile.vertexBuffer = gl.createBuffer();
     tile.featureIDBuffer = gl.createBuffer();
@@ -764,8 +802,6 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     for (var i = 0; i < property0.length; i++) {
         pixel[i] = property0[i];
     }
-    console.log(pixel)
-
     gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
         width, height, 0, gl.ALPHA, srcType,
         pixel);
@@ -773,6 +809,23 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    {
+        tile.propertyTex[1] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[1]);
+
+        const pixel = new Float32Array(width * height).fill(255);
+        for (var i = 0; i < property1.length; i++) {
+            pixel[i] = property1[i];
+        }
+        gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
+            width, height, 0, gl.ALPHA, srcType,
+            pixel);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    }
 
 
     tile.texColor = gl.createTexture();
