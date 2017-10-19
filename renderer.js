@@ -36,7 +36,7 @@ void main(void) {
     //TODO fix AA (use point size)
     vec2 p = 2.*gl_PointCoord-vec2(1.);
     vec4 c = color;
-    float l =length(p);
+    float l = length(p);
     c.a *=  1. - smoothstep(0.9, 1.1, l);
     gl_FragColor = c;
 }`;
@@ -547,22 +547,23 @@ function hexToRgb(hex) {
 
 /*
     color: ramp(temp, 0º, 30º, carto-color)
-    width: exprNear(date, SIM_TIME, 0, 4)
+    width: exprNear(date, SIM_TIME, fullRegion, blendRegion, 0, 4)
 */
 
-function Near(property, center, minVal, maxVal) {
+function Near(property, center, activatedRegion, blendRegion, minVal, maxVal) {
     this.property = property;
     this.center = center;
     this.minVal = minVal;
     this.maxVal = maxVal;
+    this.activatedRegion = activatedRegion;
+    this.blendRegion = blendRegion;
 }
 
 Near.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
-    console.log(this.center)
     return {
         preface: `uniform float near${this._uniformID};\n`,
-        inline: `mix(${this.maxVal},${this.minVal} , abs(p1-near${this._uniformID})/20.)/10.`
+        inline: `mix(${this.maxVal}.,${this.minVal}., max(abs(p1-near${this._uniformID})-${this.activatedRegion/2.}, 0.)/${this.blendRegion/2.})/10.`
     };
 }
 Near.prototype._postShaderCompile = function (program) {
