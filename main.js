@@ -9,26 +9,27 @@ function start() {
     var autoinc = 5;
     //WHERE latin_species LIKE 'Platanus x hispanica'
     // AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
-    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
+    $.getJSON("http://viz2.carto.com/api/v1/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp FROM ow  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
+        //$.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
         console.log("Downloaded", data);
         var points = new Float32Array(data.rows.length * 2);
         var property0 = new Float32Array(data.rows.length);
         var i = 0;
         data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
-            if (map[e.latin_species.toLowerCase()] === undefined) {
+            /*if (map[e.latin_species.toLowerCase()] === undefined) {
                 map[e.latin_species.toLowerCase()] = autoinc;
                 autoinc++;
-            }
-            points[2 * index + 0] = (point[0] + 13631285) / 10000.;
-            points[2 * index + 1] = (point[1] - 4540319.5) / 10000.;
-            property0[index] = map[e.latin_species.toLowerCase()];
+            }*/
+            points[2 * index + 0] = (point[0]) / 10000000.;
+            points[2 * index + 1] = (point[1]) / 10000000.;
+            property0[index] = Number(e.temp);
         });
         var features = {
             count: data.rows.length,
             geom: points,
             properties: {
-                latin_species: property0
+                p0: property0
             }
         };
         layer.setTile({ x: 0, y: 0, z: 0 }, features);
@@ -79,11 +80,13 @@ function start() {
         const red = new UniformColor([1, 0, 0, 1]);
         //layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
         if (Math.random() > 0.5) {
-            layer.style.getColor().blendTo(ramp, 1000);
+            //layer.style.getColor().blendTo(ramp, 1000);
+            layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
         } else {
-            layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 1]), 1000);
+            //layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
+            layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88471', '#cf597e']), 1000);
         }
-        layer.style.getWidth().blendTo(10. * Math.random(), 400);
+        layer.style.getWidth().blendTo(0. + 1. * 15. * Math.random(), 1000);
         //layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
