@@ -16,9 +16,14 @@ uniform sampler2D widthTex;
 varying lowp vec4 color;
 
 void main(void) {
-    float size=4.;
-    gl_Position  = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
-    gl_PointSize = texture2D(widthTex, featureID).a*10.;
+    float size = texture2D(widthTex, featureID).a*10.;
+    vec4 p = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
+    if (size==0.){
+        //Optimization: setting the Z value outside the clipping region, no fragment shader will be invoked for this point
+        p.z=100.;
+    }
+    gl_Position  = p;
+    gl_PointSize = size;
     color = texture2D(colorTex, featureID);
 }`;
 
@@ -28,7 +33,7 @@ precision mediump float;
 varying lowp vec4 color;
 
 void main(void) {
-    //TODO circular AA points
+    //TODO fix AA (use point size)
     vec2 p = 2.*gl_PointCoord-vec2(1.);
     vec4 c = color;
     float l =length(p);
@@ -62,33 +67,15 @@ uniform sampler2D property0;
 uniform sampler2D property1;
 uniform sampler2D property2;
 uniform sampler2D property3;
-uniform sampler2D property4;
-uniform sampler2D property5;
-uniform sampler2D property6;
-uniform sampler2D property7;
-
-
-//http://iquilezles.org/www/articles/palettes/palettes.htm
-vec3 palette(float t,vec3 a,vec3 b, vec3 c, vec3 d){
-    return a + b*cos(6.28318*(c*t+d));
-}
-
 
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
     float p2=texture2D(property2, uv).a;
     float p3=texture2D(property3, uv).a;
-    float p4=texture2D(property4, uv).a;
-    float p5=texture2D(property5, uv).a;
-    float p6=texture2D(property6, uv).a;
-    float p7=texture2D(property7, uv).a;
     gl_FragColor = $COLOR;
 }
 `;
-
-
-
 
 const widthStylerVS = `
 
@@ -144,6 +131,8 @@ Renderer.prototype._initShaders = function () {
     this.rendererColorTex = gl.getUniformLocation(this.finalRendererProgram, 'colorTex');
     this.rendererWidthTex = gl.getUniformLocation(this.finalRendererProgram, 'widthTex');
 }
+
+//TODO to utils.js
 function compileShader(sourceCode, type) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
@@ -163,7 +152,8 @@ function refresh(timestamp) {
     }
     this.lastFrame = timestamp;
 
-    console.log('Re-render')
+    //console.log('Re-render')
+
 
     var canvas = document.getElementById('glCanvas');//TODO this should be a renderer property
     var width = gl.canvas.clientWidth;
@@ -176,13 +166,9 @@ function refresh(timestamp) {
 
     var aspect = canvas.clientWidth / canvas.clientHeight;
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-    gl.clearColor(0.1, 0.1, 0.1, 1);//TODO this should be a renderer property
-    //TODO blending with CSS and other html+css elements
+    gl.disable(gl.BLEND);
+    gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    //TODO controllable
-
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -191,18 +177,18 @@ function refresh(timestamp) {
     if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated() || this.layer0.style.updated) {
         //TODO refactor
         gl.disable(gl.BLEND);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
-        console.log("Restyle", timestamp)
+        //console.log("Restyle", timestamp)
         // Render To Texture
+        //TODO for each tile
         var tile = this.layer0.tiles[0];
-        var fb = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        if (!this.auxFB) {
+            this.auxFB = gl.createFramebuffer();
+        }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
         gl.viewport(0, 0, 1024 * 8, 16);
-
-        //var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        //console.log(status);
 
         gl.useProgram(this.layer0.colorShader);
 
@@ -222,13 +208,8 @@ function refresh(timestamp) {
 
         //WIDTH
 
-        fb = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
         gl.viewport(0, 0, 1024 * 8, 16);
-
-        //var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        //console.log(status);
 
         gl.useProgram(this.layer0.widthShader);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -569,11 +550,11 @@ function hexToRgb(hex) {
     width: exprNear(date, SIM_TIME, 0, 4)
 */
 
-function Near(property, center,  minVal, maxVal){
-    this.property=property;
-    this.center=center;
-    this.minVal=minVal;
-    this.maxVal=maxVal;
+function Near(property, center, minVal, maxVal) {
+    this.property = property;
+    this.center = center;
+    this.minVal = minVal;
+    this.maxVal = maxVal;
 }
 
 Near.prototype._applyToShaderSource = function (uniformIDMaker) {
@@ -588,7 +569,7 @@ Near.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `near${this._uniformID}`);
 }
 Near.prototype._preDraw = function () {
-    this.center=Date.now()*0.5%4000;
+    this.center = Date.now() * 0.5 % 4000;
     gl.uniform1f(this._uniformLocation, this.center);
 }
 Near.prototype.isAnimated = function () {
