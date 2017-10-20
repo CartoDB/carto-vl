@@ -71,8 +71,8 @@ uniform sampler2D property3;
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
-    float p2=texture2D(property2, uv).a;
-    float p3=texture2D(property3, uv).a;
+    //float p2=texture2D(property2, uv).a;
+    //float p3=texture2D(property3, uv).a;
     gl_FragColor = $COLOR;
 }
 `;
@@ -106,8 +106,8 @@ uniform sampler2D property3;
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
-    float p2=texture2D(property2, uv).a;
-    float p3=texture2D(property3, uv).a;
+    //float p2=texture2D(property2, uv).a;
+    //float p3=texture2D(property3, uv).a;
     gl_FragColor = vec4($WIDTH);
 }
 `;
@@ -177,7 +177,6 @@ function refresh(timestamp) {
     if (this.layer0.style._color.isAnimated() || this.layer0.style._width.isAnimated() || this.layer0.style.updated) {
         //TODO refactor
         gl.disable(gl.BLEND);
-        gl.clear(gl.COLOR_BUFFER_BIT);
 
         //console.log("Restyle", timestamp)
         // Render To Texture
@@ -188,7 +187,8 @@ function refresh(timestamp) {
         }
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-        gl.viewport(0, 0, 1024 * 8, 16);
+        gl.viewport(0, 0, 4096, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         gl.useProgram(this.layer0.colorShader);
 
@@ -209,10 +209,9 @@ function refresh(timestamp) {
         //WIDTH
 
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-        gl.viewport(0, 0, 1024 * 8, 16);
 
         gl.useProgram(this.layer0.widthShader);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
         this.layer0.style._width._preDraw();
 
@@ -563,7 +562,7 @@ Near.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float near${this._uniformID};\n`,
-        inline: `mix(${this.maxVal}.,${this.minVal}., max(abs(p1-near${this._uniformID})-${this.activatedRegion/2.}, 0.)/${this.blendRegion/2.})/10.`
+        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p1-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/10.`
     };
 }
 Near.prototype._postShaderCompile = function (program) {
@@ -769,12 +768,14 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     tile.numVertex = points.length / 2;
 
     const level = 0;
-    const width = 8 * 1024;
-    const height = 16;
+    const width = 4096;
+    const height = Math.ceil(tile.numVertex / width);
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
+    tile.height = height;
 
+    console.log("tile", width, tile.height)
 
     tile.propertyTex = [];
     tile.propertyTex[0] = gl.createTexture();

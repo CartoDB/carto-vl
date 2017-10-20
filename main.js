@@ -75,7 +75,7 @@ function start() {
     };
     layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
     layer.style.getWidth().blendTo(3., 1000);
-    layer.style.setWidth(new Near('diff', Date.now()*0.1%4000, 15,15, 0.,2.), 1000);
+    layer.style.setWidth(new Near('diff', Date.now()*0.1%4000, 15,15, 1.,5.), 1000);
 
     document.onkeypress = function (event) {
         const ramp = new DiscreteRampColor('latin_species',
