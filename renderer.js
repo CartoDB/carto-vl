@@ -16,11 +16,11 @@ uniform sampler2D widthTex;
 varying lowp vec4 color;
 
 void main(void) {
-    float size = texture2D(widthTex, featureID).a*10.;
+    float size = texture2D(widthTex, featureID).a*25.;
     vec4 p = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
     if (size==0.){
         //Optimization: setting the Z value outside the clipping region, no fragment shader will be invoked for this point
-        p.z=100.;
+        p=vec4(100.);
     }
     gl_Position  = p;
     gl_PointSize = size;
@@ -405,7 +405,7 @@ UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float float${this._uniformID};\n`,
-        inline: `float${this._uniformID}/10.`
+        inline: `float${this._uniformID}/25.`
     };
 }
 UniformFloat.prototype._postShaderCompile = function (program) {
@@ -562,14 +562,14 @@ Near.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float near${this._uniformID};\n`,
-        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p1-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/10.`
+        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p1-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/25.`
     };
 }
 Near.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `near${this._uniformID}`);
 }
 Near.prototype._preDraw = function () {
-    this.center = Date.now() * 0.5 % 4000;
+    this.center = Date.now() * 0.01 % 4000;
     gl.uniform1f(this._uniformLocation, this.center);
 }
 Near.prototype.isAnimated = function () {
