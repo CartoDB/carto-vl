@@ -9,19 +9,19 @@ function start() {
     var autoinc = 5;
     //WHERE latin_species LIKE 'Platanus x hispanica'
     // AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
-    $.getJSON("http://viz2.carto.com/api/v1/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS diff FROM ow  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
-        //$.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
+    //  $.getJSON("http://viz2.carto.com/api/v1/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS diff FROM ow  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
+    $.getJSON("https://dmanzanares.carto.com:443/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), latin_species FROM sf_trees  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
         console.log("Downloaded", data);
         var points = new Float32Array(data.rows.length * 2);
-        var property0 = new Float32Array(data.rows.length);
+        var property0 = [];
         var property1 = new Float32Array(data.rows.length);
         var i = 0;
         data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
             points[2 * index + 0] = (point[0]);
             points[2 * index + 1] = (point[1]);
-            property0[index] = Number(e.temp);
-            property1[index] = Number(e.diff);
+            property0[index] = (e.latin_species.toLowerCase());
+            //property1[index] = Number(e.diff);
         });
         var tile = {
             center: { x: 0, y: 0 },
@@ -30,7 +30,7 @@ function start() {
             geom: points,
             properties: {
                 'zero': property0,
-                'one': property1
+                //'one': property1
             }
         };
         layer.addTile(tile);
@@ -73,17 +73,16 @@ function start() {
     };
     layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
     layer.style.getWidth().blendTo(3., 1000);
-    layer.style.setWidth(new Near('diff', Date.now() * 0.1 % 4000, 1, 29, 1., 10.), 1000);
 
     document.onkeypress = function (event) {
-        const ramp = new DiscreteRampColor('latin_species',
+        const ramp = new DiscreteRampColor('zero',
             ["Lophostemon confertus", "Platanus x hispanica", "Metrosideros excelsa"].map(str => {
-                return map[str.toLowerCase()];
+                return str.toLowerCase();
             }),
-            [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0, 0, 0, 1]);
+            [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0.3, 0.3, 0.3, 1]);
         const yellow = new UniformColor([1, 1, 0, 1]);
         const red = new UniformColor([1, 0, 0, 1]);
-        //layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
+        layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
         if (Math.random() > 0.5) {
             //layer.style.getColor().blendTo(ramp, 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);

@@ -193,7 +193,7 @@ function refresh(timestamp) {
 
                 gl.useProgram(layer.colorShader);
 
-                layer.style._color._preDraw();
+                layer.style._color._preDraw(layer);
 
                 for (var i = 0; i < layer.propertyCount; i++) {
                     gl.activeTexture(gl.TEXTURE0 + i);
@@ -215,7 +215,7 @@ function refresh(timestamp) {
                 gl.viewport(0, 0, 4096, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
-                layer.style._width._preDraw();
+                layer.style._width._preDraw(layer);
                 for (var i = 0; i < layer.propertyCount; i++) {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
@@ -245,7 +245,6 @@ function refresh(timestamp) {
 
 
         layer.tiles.forEach(tile => {
-            console.log(this)
             gl.uniform2f(this.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
             gl.uniform2f(this.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
 
@@ -353,7 +352,7 @@ ColorBlend.prototype._postShaderCompile = function (program) {
     this.a._postShaderCompile(program);
     this.b._postShaderCompile(program);
 }
-ColorBlend.prototype._preDraw = function () {
+ColorBlend.prototype._preDraw = function (l) {
     var mix = this.mix;
     if (mix == 'anim') {
         const time = Date.now();
@@ -366,8 +365,8 @@ ColorBlend.prototype._preDraw = function () {
         }
     }
     gl.uniform1f(this._uniformLocation, mix);
-    this.a._preDraw();
-    this.b._preDraw();
+    this.a._preDraw(l);
+    this.b._preDraw(l);
 }
 ColorBlend.prototype.isAnimated = function () {
     return this.mix === 'anim';
@@ -464,37 +463,7 @@ function DiscreteRampColor(property, keys, values, defaultValue) {
     this.values = values;
     this.defaultValue = defaultValue;
     this.texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    const level = 0;
-    const internalFormat = gl.RGBA;
-    const width = 256;
-    const height = 1;
-    const border = 0;
-    const srcFormat = gl.RGBA;
-    const srcType = gl.UNSIGNED_BYTE;
-    const pixel = new Uint8Array(4 * width);
-    for (var i = 0; i < width; i++) {
-        pixel[4 * i + 0] = defaultValue[0] * 0;
-        pixel[4 * i + 1] = defaultValue[1] * 0;
-        pixel[4 * i + 2] = defaultValue[2] * 0;
-        pixel[4 * i + 3] = 255;
-    }
 
-    keys.forEach((k, index) => {
-        pixel[k * 4 + 0] = 255 * values[index][0];
-        pixel[k * 4 + 1] = 255 * values[index][1];
-        pixel[k * 4 + 2] = 255 * values[index][2];
-        pixel[k * 4 + 3] = 255 * values[index][3];
-    });
-
-
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-        width, height, border, srcFormat, srcType,
-        pixel);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 DiscreteRampColor.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
@@ -527,10 +496,47 @@ function simplifyColorExpr(color, time) {
     }
     return color;
 }
-DiscreteRampColor.prototype._preDraw = function () {
-    const t = Date.now();
-    //this.color = simplifyColorExpr(this.color, t);
-    //const color = evalColor(this.color, t);
+DiscreteRampColor.prototype._preDraw = function (layer) {
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 256;
+    const height = 1;
+    const border = 0;
+    const srcFormat = gl.RGBA;
+    const srcType = gl.UNSIGNED_BYTE;
+    const pixel = new Uint8Array(4 * width);
+    for (var i = 0; i < width; i++) {
+        pixel[4 * i + 0] = this.defaultValue[0];
+        pixel[4 * i + 1] = this.defaultValue[1];
+        pixel[4 * i + 2] = this.defaultValue[2];
+        pixel[4 * i + 3] = 255;
+    }
+
+    console.log("DRC", layer)
+    var keys = this.keys;
+    if (!Number.isFinite(this.keys[0])) {
+        keys = this.keys.map(k => layer.categoryMap[this.property][k]);
+    }
+
+    keys.forEach((k, index) => {
+        pixel[k * 4 + 0] = 255 * this.values[index][0];
+        pixel[k * 4 + 1] = 255 * this.values[index][1];
+        pixel[k * 4 + 2] = 255 * this.values[index][2];
+        pixel[k * 4 + 3] = 255 * this.values[index][3];
+    });
+
+    console.log(this.keys, keys, pixel, layer.categoryMap[this.property])
+
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+        width, height, border, srcFormat, srcType,
+        pixel);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+
     gl.activeTexture(gl.TEXTURE10);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this._uniformLocation, 10);
@@ -709,6 +715,7 @@ function Layer(renderer, geometryType) {
     this._compileWidthShader();
     this.propertyCount = 0;
     this.propertyID = {};
+    this.categoryMap = {};
 }
 
 Layer.prototype._compileColorShader = function () {
@@ -799,9 +806,20 @@ Layer.prototype.addTile = function (tile) {
                 pixel[i] = property[i];
             }
             if (isCategory) {
-                for (var i = 0; i < property.length; i++) {
-                    pixel[i] = pixel[i] / 256.;
+                var map = this.categoryMap[k];
+                if (!map) {
+                    map = {};
+                    this.categoryMap[k] = map;
                 }
+                for (var i = 0; i < property.length; i++) {
+                    var catID = map[property[i]];
+                    if (catID === undefined) {
+                        map[property[i]] = Object.keys(map).length;
+                        catID = map[property[i]];
+                    }
+                    pixel[i] = catID / 256.;
+                }
+                console.log(pixel, map, "CAT", property)
             }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
                 width, height, 0, gl.ALPHA, srcType,
