@@ -181,56 +181,55 @@ function refresh(timestamp) {
 
             //console.log("Restyle", timestamp)
             // Render To Texture
-            //TODO for each tile
-            var tile = layer.tiles[0];
-            if (!this.auxFB) {
-                this.auxFB = gl.createFramebuffer();
-            }
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-            gl.viewport(0, 0, 4096, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            // COLOR
+            layer.tiles.forEach(tile => {
+                if (!this.auxFB) {
+                    this.auxFB = gl.createFramebuffer();
+                }
+                gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+                gl.viewport(0, 0, 4096, tile.height);
+                gl.clear(gl.COLOR_BUFFER_BIT);
 
-            gl.useProgram(layer.colorShader);
+                gl.useProgram(layer.colorShader);
 
-            layer.style._color._preDraw();
+                layer.style._color._preDraw();
 
-            for (var i = 0; i < 8; i++) {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
-                gl.uniform1i(layer.colorShaderTex[i], i);
-            }
+                for (var i = 0; i < 8; i++) {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
+                    gl.uniform1i(layer.colorShaderTex[i], i);
+                }
 
-            gl.enableVertexAttribArray(this.colorShaderVertex);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(layer.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(this.colorShaderVertex);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+                gl.vertexAttribPointer(layer.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+            });
 
             //WIDTH
+            layer.tiles.forEach(tile => {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+                gl.useProgram(layer.widthShader);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                layer.style._width._preDraw();
+                for (var i = 0; i < 8; i++) {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
+                    gl.uniform1i(layer.widthShaderTex[i], i);
+                }
 
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+                gl.enableVertexAttribArray(layer.widthShaderVertex);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+                gl.vertexAttribPointer(layer.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
-            gl.useProgram(layer.widthShader);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-            layer.style._width._preDraw();
+                layer.style.updated = false;
+                tile.initialized = true;
+            });
 
-            for (var i = 0; i < 8; i++) {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
-                gl.uniform1i(layer.widthShaderTex[i], i);
-            }
-
-            gl.enableVertexAttribArray(layer.widthShaderVertex);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(layer.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-
-            layer.style.updated = false;
-            tile.initialized = true;
         }
 
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
