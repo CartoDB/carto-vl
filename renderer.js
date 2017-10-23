@@ -165,18 +165,15 @@ function refresh(timestamp) {
     }
 
     var aspect = canvas.clientWidth / canvas.clientHeight;
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-    gl.disable(gl.BLEND);
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
-    //TODO for each layer
     this.layers.forEach(layer => {
         if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
-            //TODO refactor
+            //TODO refactor condition
             gl.disable(gl.BLEND);
 
             if (!this.auxFB) {
@@ -321,8 +318,6 @@ UniformColor.prototype._preDraw = function () {
 UniformColor.prototype.isAnimated = function () {
     return false;
 }
-
-
 
 
 function ColorBlend(a, b, mix) {
