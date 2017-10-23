@@ -1,5 +1,7 @@
 var gl;
 
+const RTT_WIDTH = 1024;
+
 const renderVS = `
 
 precision highp float;
@@ -16,19 +18,15 @@ uniform sampler2D widthTex;
 varying lowp vec4 color;
 
 void main(void) {
-    float size = texture2D(widthTex, featureID).a*25.;
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    if (size==0.){
-        //Optimization: setting the Z value outside the clipping region, no fragment shader will be invoked for this point
-        p=vec4(100.);
-    }
+    float size = texture2D(widthTex, featureID).a;
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
     gl_Position  = p;
-    gl_PointSize = size;
+    gl_PointSize = size*25.;
     color = texture2D(colorTex, featureID);
 }`;
 
 const renderFS = `
-precision mediump float;
+precision lowp float;
 
 varying lowp vec4 color;
 
@@ -168,13 +166,13 @@ function refresh(timestamp) {
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
     this.layers.forEach(layer => {
         if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
             //TODO refactor condition
             gl.disable(gl.BLEND);
+            gl.disable(gl.DEPTH_TEST);
 
             if (!this.auxFB) {
                 this.auxFB = gl.createFramebuffer();
@@ -185,7 +183,7 @@ function refresh(timestamp) {
             // COLOR
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-                gl.viewport(0, 0, 4096, tile.height);
+                gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
                 gl.useProgram(layer.colorShader);
@@ -209,7 +207,7 @@ function refresh(timestamp) {
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
                 gl.useProgram(layer.widthShader);
-                gl.viewport(0, 0, 4096, tile.height);
+                gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
                 layer.style._width._preDraw(layer);
@@ -230,6 +228,8 @@ function refresh(timestamp) {
             });
 
         }
+
+        gl.enable(gl.DEPTH_TEST);
 
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -775,7 +775,7 @@ Layer.prototype.addTile = function (tile) {
 
     var points = tile.geom;
     const level = 0;
-    const width = 4096;
+    const width = RTT_WIDTH;
     tile.numVertex = points.length / 2;
     const height = Math.ceil(tile.numVertex / width);
     const border = 0;

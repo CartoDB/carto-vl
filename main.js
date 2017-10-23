@@ -18,8 +18,8 @@ function start() {
         var i = 0;
         data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
-            points[2 * index + 0] = (point[0]);
-            points[2 * index + 1] = (point[1]);
+            points[2 * index + 0] = (point[0])+Math.random()*1000;
+            points[2 * index + 1] = (point[1])+Math.random()*1000;
             property0[index] = Number(e.temp);
             property1[index] = Number(e.diff);
         });
