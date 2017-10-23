@@ -18,24 +18,22 @@ function start() {
         var i = 0;
         data.rows.forEach((e, index) => {
             var point = $.parseJSON(e.st_asgeojson).coordinates;
-            /*if (map[e.latin_species.toLowerCase()] === undefined) {
-                map[e.latin_species.toLowerCase()] = autoinc;
-                autoinc++;
-            }*/
-            points[2 * index + 0] = (point[0]) / 10000000.;
-            points[2 * index + 1] = (point[1]) / 10000000.;
+            points[2 * index + 0] = (point[0]);
+            points[2 * index + 1] = (point[1]);
             property0[index] = Number(e.temp);
             property1[index] = Number(e.diff);
         });
-        var features = {
+        var tile = {
+            center: { x: 0, y: 0 },
+            scale: 1 / 10000000.,
             count: data.rows.length,
             geom: points,
             properties: {
-                p0: property0,
-                p1: property1
+                'zero': property0,
+                'one': property1
             }
         };
-        layer.setTile({ x: 0, y: 0, z: 0 }, features);
+        layer.addTile(tile);
     });
 
     window.onresize = function () { renderer.refresh(); };
@@ -75,7 +73,7 @@ function start() {
     };
     layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
     layer.style.getWidth().blendTo(3., 1000);
-    layer.style.setWidth(new Near('diff', Date.now()*0.1%4000, 1,29, 1.,10.), 1000);
+    layer.style.setWidth(new Near('diff', Date.now() * 0.1 % 4000, 1, 29, 1., 10.), 1000);
 
     document.onkeypress = function (event) {
         const ramp = new DiscreteRampColor('latin_species',
@@ -93,7 +91,7 @@ function start() {
             //layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88471', '#cf597e']), 1000);
         }
-//        layer.style.getWidth().center=Math.random()*4000.;
+        //        layer.style.getWidth().center=Math.random()*4000.;
         //layer.style.getWidth().notify();
         //layer.style.getWidth().blendTo(0. + 1. * 15. * Math.random(), 1000);
         //layer.style.getWidth().blendTo(8. * Math.random(), 1400);

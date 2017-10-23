@@ -17,7 +17,7 @@ varying lowp vec4 color;
 
 void main(void) {
     float size = texture2D(widthTex, featureID).a*25.;
-    vec4 p = vec4(vertexScale*(vertexPosition-vertexOffset), 0.5, 1.);
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
     if (size==0.){
         //Optimization: setting the Z value outside the clipping region, no fragment shader will be invoked for this point
         p=vec4(100.);
@@ -175,18 +175,18 @@ function refresh(timestamp) {
 
     //TODO for each layer
     this.layers.forEach(layer => {
-        if (layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated) {
+        if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
             //TODO refactor
             gl.disable(gl.BLEND);
 
+            if (!this.auxFB) {
+                this.auxFB = gl.createFramebuffer();
+            }
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
             //console.log("Restyle", timestamp)
             // Render To Texture
             // COLOR
             layer.tiles.forEach(tile => {
-                if (!this.auxFB) {
-                    this.auxFB = gl.createFramebuffer();
-                }
-                gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
                 gl.viewport(0, 0, 4096, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
@@ -195,7 +195,7 @@ function refresh(timestamp) {
 
                 layer.style._color._preDraw();
 
-                for (var i = 0; i < 8; i++) {
+                for (var i = 0; i < layer.propertyCount; i++) {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
                     gl.uniform1i(layer.colorShaderTex[i], i);
@@ -212,9 +212,11 @@ function refresh(timestamp) {
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
                 gl.useProgram(layer.widthShader);
+                gl.viewport(0, 0, 4096, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
+
                 layer.style._width._preDraw();
-                for (var i = 0; i < 8; i++) {
+                for (var i = 0; i < layer.propertyCount; i++) {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[i]);
                     gl.uniform1i(layer.widthShaderTex[i], i);
@@ -240,10 +242,13 @@ function refresh(timestamp) {
 
         gl.useProgram(this.finalRendererProgram);
         var s = 1. / this._zoom;
-        gl.uniform2f(this.vertexScaleUniformLocation, s / aspect, s);
-        gl.uniform2f(this.vertexOffsetUniformLocation, this._center.x, this._center.y);
+
 
         layer.tiles.forEach(tile => {
+            console.log(this)
+            gl.uniform2f(this.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
+            gl.uniform2f(this.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
+
             gl.enableVertexAttribArray(this.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
             gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
@@ -702,6 +707,8 @@ function Layer(renderer, geometryType) {
     this.tiles = [];
     this._compileColorShader();
     this._compileWidthShader();
+    this.propertyCount = 0;
+    this.propertyID = {};
 }
 
 Layer.prototype._compileColorShader = function () {
@@ -754,62 +761,60 @@ Layer.prototype._compileWidthShader = function () {
     }
 }
 
+Layer.prototype.removeTile = function (tile) {
+    //TODO
+}
 
-Layer.prototype.setTile = function (tileXYZ, tile) {
-    console.log("Tile", tile)
+//TODO => setTileProperty (or geom)
+
+Layer.prototype.addTile = function (tile) {
     this.tiles.push(tile);
+    tile.propertyTex = [];
 
     var points = tile.geom;
-    var property0 = tile.properties.p0;
-    var property1 = tile.properties.p1;
-
-    tile.vertexBuffer = gl.createBuffer();
-    tile.featureIDBuffer = gl.createBuffer();
-
-    tile.numVertex = points.length / 2;
-
     const level = 0;
     const width = 4096;
+    tile.numVertex = points.length / 2;
     const height = Math.ceil(tile.numVertex / width);
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
     tile.height = height;
 
-    console.log("tile", width, tile.height)
 
-    tile.propertyTex = [];
-    tile.propertyTex[0] = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[0]);
-
-    const pixel = new Float32Array(width * height).fill(255);
-    for (var i = 0; i < property0.length; i++) {
-        pixel[i] = property0[i];
-    }
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-        width, height, 0, gl.ALPHA, srcType,
-        pixel);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    {
-        tile.propertyTex[1] = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[1]);
-
-        const pixel = new Float32Array(width * height).fill(255);
-        for (var i = 0; i < property1.length; i++) {
-            pixel[i] = property1[i];
+    for (var k in tile.properties) {
+        if (tile.properties.hasOwnProperty(k) && tile.properties[k].length > 0) {
+            const isCategory = !Number.isFinite(tile.properties[k][0]);
+            const property = tile.properties[k];
+            var propertyID = this.propertyID[k];
+            if (propertyID === undefined) {
+                propertyID = this.propertyCount;
+                this.propertyCount++;
+                this.propertyID.k = propertyID;
+            }
+            tile.propertyTex[propertyID] = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
+            const pixel = new Float32Array(width * height);
+            for (var i = 0; i < property.length; i++) {
+                pixel[i] = property[i];
+            }
+            if (isCategory) {
+                for (var i = 0; i < property.length; i++) {
+                    pixel[i] = pixel[i] / 256.;
+                }
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
+                width, height, 0, gl.ALPHA, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
-        gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-            width, height, 0, gl.ALPHA, srcType,
-            pixel);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
     }
+
+    tile.vertexBuffer = gl.createBuffer();
+    tile.featureIDBuffer = gl.createBuffer();
 
 
     tile.texColor = gl.createTexture();
@@ -826,7 +831,7 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width * height));
+        new Uint8Array(4 * width * height).fill(100));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -849,6 +854,8 @@ Layer.prototype.setTile = function (tileXYZ, tile) {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     window.requestAnimationFrame(refresh.bind(this.renderer));
+
+    return tile;
 }
 
 function Renderer(canvas) {
