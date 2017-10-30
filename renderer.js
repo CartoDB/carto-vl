@@ -333,10 +333,10 @@ function ColorBlend(a, b, mix) {
     }
     this.mix = mix;
 }
-ColorBlend.prototype._applyToShaderSource = function (uniformIDMaker) {
+ColorBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyID) {
     this._uniformID = uniformIDMaker();
-    const a = this.a._applyToShaderSource(uniformIDMaker);
-    const b = this.b._applyToShaderSource(uniformIDMaker);
+    const a = this.a._applyToShaderSource(uniformIDMaker, propertyID);
+    const b = this.b._applyToShaderSource(uniformIDMaker, propertyID);
     return {
         preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
         inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
@@ -508,7 +508,6 @@ DiscreteRampColor.prototype._preDraw = function (layer) {
         pixel[4 * i + 3] = 255;
     }
 
-    console.log("DRC", layer)
     var keys = this.keys;
     if (!Number.isFinite(this.keys[0])) {
         keys = this.keys.map(k => layer.categoryMap[this.property][k]);
@@ -565,11 +564,13 @@ function Near(property, center, activatedRegion, blendRegion, minVal, maxVal) {
     this.blendRegion = blendRegion;
 }
 
-Near.prototype._applyToShaderSource = function (uniformIDMaker) {
+Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
     this._uniformID = uniformIDMaker();
+    const propertyID = propertyIDs[this.property];
+    console.log("ASD", propertyIDs, propertyID, this.property)
     return {
         preface: `uniform float near${this._uniformID};\n`,
-        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p1-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/25.`
+        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p${propertyID}-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/25.`
     };
 }
 Near.prototype._postShaderCompile = function (program) {
@@ -717,7 +718,7 @@ Layer.prototype._compileColorShader = function () {
     console.log("Recompile color")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
-    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++);
+    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, this.propertyID);
     var source = colorStylerFS;
     source = source.replace('$PREFACE', colorModifier.preface);
     source = source.replace('$COLOR', colorModifier.inline);
@@ -742,7 +743,7 @@ Layer.prototype._compileWidthShader = function () {
     console.log("Recompile width", this)
     var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
-    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++);
+    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, this.propertyID);
     var source = widthStylerFS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
@@ -792,7 +793,7 @@ Layer.prototype.addTile = function (tile) {
             if (propertyID === undefined) {
                 propertyID = this.propertyCount;
                 this.propertyCount++;
-                this.propertyID.k = propertyID;
+                this.propertyID[k] = propertyID;
             }
             tile.propertyTex[propertyID] = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
