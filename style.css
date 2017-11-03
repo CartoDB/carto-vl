@@ -24,3 +24,8 @@ textarea{
     top: 120px;
     left: 0;
 }
+
+#sqlEntry {
+    top: 240px;
+    left: 0;
+}

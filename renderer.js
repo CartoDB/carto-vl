@@ -792,7 +792,9 @@ Layer.prototype._compileWidthShader = function () {
 }
 
 Layer.prototype.removeTile = function (tile) {
-    //TODO
+    this.tiles = this.tiles.filter(t => t !== tile);
+    console.log("REM", this.tiles)
+    //TODO free GL resources
 }
 
 //TODO => setTileProperty (or geom)

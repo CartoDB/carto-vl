@@ -2,6 +2,8 @@
 
 var renderer;
 var layer;
+var oldtile;
+var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
@@ -17,10 +19,15 @@ function styleColor(e) {
         layer.style.getColor().blendTo(color, 1000);
     }
 }
-function start() {
-    renderer = new Renderer(document.getElementById('glCanvas'));
-    layer = renderer.addLayer();
-    $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS date FROM wwi_ships  WHERE the_geom_webmercator IS NOT NULL  LIMIT 10000000") + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
+
+function getData(){
+    if (ajax){
+        ajax.abort();
+    }
+    ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
+        if (oldtile){
+            layer.removeTile(oldtile);
+        }
         console.log("Downloaded", data);
         const fields = Object.keys(data.fields).filter(name => name != 'st_asgeojson');
         var properties = fields.map(_ => new Float32Array(data.rows.length));
@@ -44,12 +51,19 @@ function start() {
             tile.properties[name] = properties[pid];
         })
         console.log("Tile", tile);
-        layer.addTile(tile);
+        oldtile=layer.addTile(tile);
         styleWidth();
         styleColor();
     });
+}
+function start() {
+    renderer = new Renderer(document.getElementById('glCanvas'));
+    layer = renderer.addLayer();
+
+    getData();
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
+    $('#sqlEntry').on('input', getData);
 
     // Pan and zoom
     window.onresize = function () { renderer.refresh(); };
