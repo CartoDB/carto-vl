@@ -949,3 +949,5 @@ Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
     window.requestAnimationFrame(refresh.bind(this));
 }
+
+export default Renderer;
