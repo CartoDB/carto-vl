@@ -464,7 +464,7 @@ function genericFloatBlend(initial, final, duration, blendFunc) {
     parent.replaceChild(initial, blend);
     blend.notify();
 }
-Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+_Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericFloatBlend(this, finalValue, duration, blendFunc);
 }
 UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
@@ -666,7 +666,6 @@ _RampColor.prototype._preDraw = function () {
     gl.uniform1i(this._texLoc, 12);
     gl.uniform1f(this._keyMinLoc, evalFloatUniform(this.minKey));
     gl.uniform1f(this._keyWidthLoc, evalFloatUniform(this.maxKey) - evalFloatUniform(this.minKey));
-    console.log(evalFloatUniform(this.minKey), evalFloatUniform(this.maxKey), this)
 }
 _RampColor.prototype.isAnimated = function () {
     return false;
@@ -776,7 +775,6 @@ Layer.prototype._compileWidthShader = function () {
     var source = widthStylerFS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
-    console.log(this, source);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     this.widthShader = gl.createProgram();
     gl.attachShader(this.widthShader, VS);
@@ -844,7 +842,6 @@ Layer.prototype.addTile = function (tile) {
                     }
                     pixel[i] = catID / 256.;
                 }
-                console.log(pixel, map, "CAT", property)
             }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
                 width, height, 0, gl.ALPHA, srcType,
