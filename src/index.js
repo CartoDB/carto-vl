@@ -1,5 +1,7 @@
 "use strict";
 
+import r from './renderer';
+
 var renderer;
 var layer;
 var oldtile;

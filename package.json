@@ -1,0 +1,23 @@
+{
+  "name": "renderer-prototype",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CartoDB/renderer-prototype.git"
+  },
+  "keywords": [],
+  "author": "David Manzanares",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CartoDB/renderer-prototype/issues"
+  },
+  "homepage": "https://github.com/CartoDB/renderer-prototype#readme",
+  "devDependencies": {
+    "webpack": "^3.8.1"
+  }
+}
