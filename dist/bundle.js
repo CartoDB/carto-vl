@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["renderer"] = factory();
+	else
+		root["renderer"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -69,8 +79,8 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["start"] = start;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__renderer__);
 
 
 
@@ -95,12 +105,12 @@ function styleColor(e) {
     }
 }
 
-function getData(){
-    if (ajax){
+function getData() {
+    if (ajax) {
         ajax.abort();
     }
     ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
-        if (oldtile){
+        if (oldtile) {
             layer.removeTile(oldtile);
         }
         console.log("Downloaded", data);
@@ -126,13 +136,13 @@ function getData(){
             tile.properties[name] = properties[pid];
         })
         console.log("Tile", tile);
-        oldtile=layer.addTile(tile);
+        oldtile = layer.addTile(tile);
         styleWidth();
         styleColor();
     });
 }
 function start() {
-    renderer = new Renderer(document.getElementById('glCanvas'));
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* default */](document.getElementById('glCanvas'));
     layer = renderer.addLayer();
 
     getData();
@@ -179,11 +189,11 @@ function start() {
     };
 }
 
-
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 var gl;
 
 const RTT_WIDTH = 1024;
@@ -1136,6 +1146,8 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
+/* harmony default export */ __webpack_exports__["a"] = (Renderer);
 
 /***/ })
 /******/ ]);
+});

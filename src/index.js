@@ -1,6 +1,6 @@
 "use strict";
 
-import r from './renderer';
+import Renderer from './renderer';
 
 var renderer;
 var layer;
@@ -22,12 +22,12 @@ function styleColor(e) {
     }
 }
 
-function getData(){
-    if (ajax){
+function getData() {
+    if (ajax) {
         ajax.abort();
     }
     ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
-        if (oldtile){
+        if (oldtile) {
             layer.removeTile(oldtile);
         }
         console.log("Downloaded", data);
@@ -53,12 +53,12 @@ function getData(){
             tile.properties[name] = properties[pid];
         })
         console.log("Tile", tile);
-        oldtile=layer.addTile(tile);
+        oldtile = layer.addTile(tile);
         styleWidth();
         styleColor();
     });
 }
-function start() {
+export function start() {
     renderer = new Renderer(document.getElementById('glCanvas'));
     layer = renderer.addLayer();
 
