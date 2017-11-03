@@ -272,6 +272,14 @@ function refresh(timestamp) {
     });
 }
 
+function Color(color){
+    color = color.filter(x => true);
+    if (color.length!=4 || !color.every(Number.isFinite)){
+        return null;
+    }
+    return new UniformColor(color);
+}
+
 function UniformColor(color) {
     this.color = color;
 }
@@ -728,7 +736,7 @@ function Style(layer) {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = new UniformColor([0, 1, 0, 1]);
+    this._color = Color([0, 1, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();

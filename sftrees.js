@@ -80,14 +80,14 @@ function start() {
                 return str.toLowerCase();
             }),
             [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0.3, 0.3, 0.3, 1]);
-        const yellow = new UniformColor([1, 1, 0, 1]);
-        const red = new UniformColor([1, 0, 0, 1]);
+        const yellow = Color([1, 1, 0, 1]);
+        const red = Color([1, 0, 0, 1]);
         layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
         if (Math.random() > 0.5) {
             //layer.style.getColor().blendTo(ramp, 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
         } else {
-            //layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
+            //layer.style.getColor().blendTo(Color([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88471', '#cf597e']), 1000);
         }
         //        layer.style.getWidth().center=Math.random()*4000.;

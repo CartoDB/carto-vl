@@ -75,19 +75,20 @@ function start() {
     layer.style.getWidth().blendTo(new UniformFloat(3.), 1000);
 
     document.onkeypress = function (event) {
+        return;
         const ramp = new DiscreteRampColor('latin_species',
             ["Lophostemon confertus", "Platanus x hispanica", "Metrosideros excelsa"].map(str => {
                 return map[str.toLowerCase()];
             }),
             [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0, 0, 0, 1]);
-        const yellow = new UniformColor([1, 1, 0, 1]);
-        const red = new UniformColor([1, 0, 0, 1]);
+        const yellow = Color([1, 1, 0, 1]);
+        const red = Color([1, 0, 0, 1]);
         //layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
         if (Math.random() > 0.5) {
             //layer.style.getColor().blendTo(ramp, 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
         } else {
-            //layer.style.getColor().blendTo(new UniformColor([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
+            //layer.style.getColor().blendTo(Color([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
             //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88471', '#cf597e']), 1000);
         }
         //        layer.style.getWidth().center=Math.random()*4000.;
@@ -99,8 +100,17 @@ function start() {
         isDragging = false;
     };
 
-    $('#styleEntry').on('input', function (e) {
+    $('#widthStyleEntry').on('input', function (e) {
         const width = eval(e.target.value);
-        layer.style.getWidth().blendTo(width, 1000);
+        if (width) {
+            layer.style.getWidth().blendTo(width, 1000);
+        }
+    });
+    $('#colorStyleEntry').on('input', function (e) {
+        const color = eval(e.target.value);
+        if (color) {
+            layer.style.getColor().blendTo(color, 1000);
+        }
+        console.log(color);
     });
 }
