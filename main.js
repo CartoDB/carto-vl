@@ -1,15 +1,26 @@
 "use strict";
 
-var map = {};
+var renderer;
+var layer;
 
+function styleWidth(e) {
+    const v = document.getElementById("widthStyleEntry").value;
+    const width = eval(v);
+    if (width) {
+        layer.style.getWidth().blendTo(width, 1000);
+    }
+}
+function styleColor(e) {
+    const v = document.getElementById("colorStyleEntry").value;
+    const color = eval(v);
+    if (color) {
+        layer.style.getColor().blendTo(color, 1000);
+    }
+}
 function start() {
-    var renderer = new Renderer(document.getElementById('glCanvas'));
-    var layer = renderer.addLayer();
-
-    var autoinc = 5;
-    //WHERE latin_species LIKE 'Platanus x hispanica'
-    // AND ((latin_species LIKE 'Platanus x hispanica') OR (LOWER(latin_species) LIKE 'metrosideros excelsa') OR (latin_species LIKE 'lophostemon confertus'))
-    $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS diff FROM wwi_ships  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1000000"), function (data) {
+    renderer = new Renderer(document.getElementById('glCanvas'));
+    layer = renderer.addLayer();
+    $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent("SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS diff FROM wwi_ships  WHERE the_geom_webmercator IS NOT NULL  LIMIT 10000000") + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
         console.log("Downloaded", data);
         var points = new Float32Array(data.rows.length * 2);
         var property0 = new Float32Array(data.rows.length);
@@ -28,14 +39,19 @@ function start() {
             count: data.rows.length,
             geom: points,
             properties: {
-                'zero': property0,
+                'temp': property0,
                 'date': property1
             }
         };
+        console.log("Tile", tile);
         layer.addTile(tile);
-        layer.style.setWidth(new Near('date', ()=>(Date.now() * 0.01 % 4000), 1, 29, 1., 10.), 1000);
+        styleWidth();
+        styleColor();
     });
+    $('#widthStyleEntry').on('input', styleWidth);
+    $('#colorStyleEntry').on('input', styleColor);
 
+    // Pan and zoom
     window.onresize = function () { renderer.refresh(); };
     $(window).bind('mousewheel DOMMouseScroll', function (event) {
         if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
@@ -44,8 +60,6 @@ function start() {
             renderer.setZoom(renderer.getZoom() / 0.8);
         }
     });
-
-
     var isDragging = false;
     var draggOffset = {
         x: 0.,
@@ -71,46 +85,7 @@ function start() {
             };
         }
     };
-    layer.style.getColor().blendTo(new ContinuousRampColor('p0', 5, 30, ['#008080', '#70a494', '#b4c8a8', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
-    layer.style.getWidth().blendTo(Float(3.), 1000);
-
-    document.onkeypress = function (event) {
-        return;
-        const ramp = new DiscreteRampColor('latin_species',
-            ["Lophostemon confertus", "Platanus x hispanica", "Metrosideros excelsa"].map(str => {
-                return map[str.toLowerCase()];
-            }),
-            [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1]], [0, 0, 0, 1]);
-        const yellow = Color([1, 1, 0, 1]);
-        const red = Color([1, 0, 0, 1]);
-        //layer.style.setColor(new ColorBlend(yellow, ramp, "500ms"));
-        if (Math.random() > 0.5) {
-            //layer.style.getColor().blendTo(ramp, 1000);
-            //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#3d5941', '#778868', '#b5b991', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
-        } else {
-            //layer.style.getColor().blendTo(Color([Math.random(), Math.random(), Math.random(), 0.4]), 1000);
-            //layer.style.getColor().blendTo(new ContinuousRampColor('p0', 0, 35, ['#009392', '#39b185', '#9ccb86', '#e9e29c', '#eeb479', '#e88471', '#cf597e']), 1000);
-        }
-        //        layer.style.getWidth().center=Math.random()*4000.;
-        //layer.style.getWidth().notify();
-        layer.style.getWidth().blendTo(Float(0. + 1. * 15. * Math.random()), 1000);
-        //layer.style.getWidth().blendTo(8. * Math.random(), 1400);
-    }
     document.onmouseup = function () {
         isDragging = false;
     };
-
-    $('#widthStyleEntry').on('input', function (e) {
-        const width = eval(e.target.value);
-        if (width) {
-            layer.style.getWidth().blendTo(width, 1000);
-        }
-    });
-    $('#colorStyleEntry').on('input', function (e) {
-        const color = eval(e.target.value);
-        if (color) {
-            layer.style.getColor().blendTo(color, 1000);
-        }
-        console.log(color);
-    });
 }

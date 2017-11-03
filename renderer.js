@@ -272,13 +272,6 @@ function refresh(timestamp) {
     });
 }
 
-function Color(color) {
-    color = color.filter(x => true);
-    if (color.length != 4 || !color.every(Number.isFinite)) {
-        return null;
-    }
-    return new UniformColor(color);
-}
 
 function UniformColor(color) {
     this.color = color;
@@ -400,7 +393,7 @@ UniformColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc
 ColorBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericColorBlend(this, finalValue, duration, blendFunc);
 }
-ContinuousRampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+_RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericColorBlend(this, finalValue, duration, blendFunc);
 }
 
@@ -680,11 +673,11 @@ Near.prototype._postShaderCompile = function (program) {
     this._positiveLoc = gl.getUniformLocation(program, `positive${this._UID}`);
     this._negativeLoc = gl.getUniformLocation(program, `negative${this._UID}`);
 }
-function evalFloatUniform(x){
+function evalFloatUniform(x) {
     if (typeof x === "function") {
         x = x();
     }
-    if (Number.isFinite(x)){
+    if (Number.isFinite(x)) {
         return x;
     }
     return 0;
@@ -701,18 +694,28 @@ Near.prototype.isAnimated = function () {
     return typeof this.center === "function";
 }
 
-//f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
-//values are control-points of the output, results will be linearly interpolated between control points
-function ContinuousRampFloat(property, minKey, maxKey, values, f = 'linear') {
-    //TODO
+function Color(color) {
+    if (Array.isArray(color)) {
+        color = color.filter(x => true);
+        if (color.length != 4 || !color.every(Number.isFinite)) {
+            return null;
+        }
+        return new UniformColor(color);
+    }
+    return null;
 }
 
-function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
+
+function RampColor(property, minKey, maxKey, values) {
+    //TODO contiunuos vs discrete should be a function applied to values
+    return new _RampColor(property, minKey, maxKey, values);
+}
+
+function _RampColor(property, minKey, maxKey, values) {
     this.property = property;
     this.minKey = minKey;
     this.maxKey = maxKey;
     this.values = values;
-    this.f = f;
 
     this.texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -725,8 +728,12 @@ function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
     const srcType = gl.UNSIGNED_BYTE;
     const pixel = new Uint8Array(4 * width);
     for (var i = 0; i < width; i++) {
-        const vraw = values[Math.floor(i / width * values.length)];
-        const v = [hexToRgb(vraw).r, hexToRgb(vraw).g, hexToRgb(vraw).b, 255];
+        const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+        const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+        const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+        const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+        const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+        const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
         pixel[4 * i + 0] = v[0];
         pixel[4 * i + 1] = v[1];
         pixel[4 * i + 2] = v[2];
@@ -739,27 +746,27 @@ function ContinuousRampColor(property, minKey, maxKey, values, f = 'linear') {
         pixel);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 }
 
-ContinuousRampColor.prototype._applyToShaderSource = function (uniformIDMaker) {
+_RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
+    const propertyID = propertyIDs[this.property];
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform sampler2D texRamp${this._uniformID};\n`,
-        inline: `texture2D(texRamp${this._uniformID}, vec2((p0-(${this.minKey}.))/${this.maxKey - this.minKey}., 0.5)).rgba`
-        //inline: `vec4((p0-(${this.minKey}.))/${this.maxKey - this.minKey}.)`
+        inline: `texture2D(texRamp${this._uniformID}, vec2((p${propertyID}-(${this.minKey}.))/${this.maxKey - this.minKey}., 0.5)).rgba`
     };
 }
-ContinuousRampColor.prototype._postShaderCompile = function (program) {
+_RampColor.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `texRamp${this._uniformID}`);
 }
-ContinuousRampColor.prototype._preDraw = function () {
+_RampColor.prototype._preDraw = function () {
     gl.activeTexture(gl.TEXTURE12);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this._uniformLocation, 12);
 }
-ContinuousRampColor.prototype.isAnimated = function () {
+_RampColor.prototype.isAnimated = function () {
     return false;
 }
 
