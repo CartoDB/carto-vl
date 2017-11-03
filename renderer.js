@@ -273,12 +273,19 @@ function refresh(timestamp) {
 }
 
 
+function Color(color) {
+    if (Array.isArray(color)) {
+        color = color.filter(x => true);
+        if (color.length != 4 || !color.every(Number.isFinite)) {
+            return null;
+        }
+        return new UniformColor(color);
+    }
+    return null;
+}
 function UniformColor(color) {
     this.color = color;
 }
-
-
-
 UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
@@ -694,18 +701,6 @@ Near.prototype.isAnimated = function () {
     return typeof this.center === "function";
 }
 
-function Color(color) {
-    if (Array.isArray(color)) {
-        color = color.filter(x => true);
-        if (color.length != 4 || !color.every(Number.isFinite)) {
-            return null;
-        }
-        return new UniformColor(color);
-    }
-    return null;
-}
-
-
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be a function applied to values
     return new _RampColor(property, minKey, maxKey, values);
@@ -752,19 +747,28 @@ function _RampColor(property, minKey, maxKey, values) {
 
 _RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
     const propertyID = propertyIDs[this.property];
-    this._uniformID = uniformIDMaker();
+    this._UID = uniformIDMaker();
     return {
-        preface: `uniform sampler2D texRamp${this._uniformID};\n`,
-        inline: `texture2D(texRamp${this._uniformID}, vec2((p${propertyID}-(${this.minKey}.))/${this.maxKey - this.minKey}., 0.5)).rgba`
+        preface: `
+        uniform sampler2D texRamp${this._UID};
+        uniform float keyMin${this._UID};
+        uniform float keyWidth${this._UID};
+        `,
+        inline: `texture2D(texRamp${this._UID}, vec2((p${propertyID}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
     };
 }
 _RampColor.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `texRamp${this._uniformID}`);
+    this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
+    this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
+    this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
 }
 _RampColor.prototype._preDraw = function () {
-    gl.activeTexture(gl.TEXTURE12);
+    gl.activeTexture(gl.TEXTURE12);//TODO remove hardcode
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.uniform1i(this._uniformLocation, 12);
+    gl.uniform1i(this._texLoc, 12);
+    gl.uniform1f(this._keyMinLoc, evalFloatUniform(this.minKey));
+    gl.uniform1f(this._keyWidthLoc, evalFloatUniform(this.maxKey) - evalFloatUniform(this.minKey));
+    console.log(evalFloatUniform(this.minKey), evalFloatUniform(this.maxKey), this)
 }
 _RampColor.prototype.isAnimated = function () {
     return false;
