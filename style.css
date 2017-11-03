@@ -8,3 +8,12 @@ canvas {
     height: 100vh;
     display: block;
 }
+
+textarea {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100px;
+    opacity: 0.75;
+}

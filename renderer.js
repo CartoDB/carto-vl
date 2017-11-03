@@ -398,6 +398,77 @@ ContinuousRampColor.prototype.blendTo = function (finalValue, duration = 500, bl
 
 
 
+function FloatBlend(a, b, mix) {
+    this.a = a;
+    this.b = b;
+    a.parent = this;
+    b.parent = this;
+    if (mix.indexOf('ms') >= 0) {
+        duration = Number(mix.replace('ms', ''));
+        this.aTime = Date.now();
+        this.bTime = this.aTime + duration;
+        mix = 'anim';
+    }
+    this.mix = mix;
+}
+FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyID) {
+    this._uniformID = uniformIDMaker();
+    const a = this.a._applyToShaderSource(uniformIDMaker, propertyID);
+    const b = this.b._applyToShaderSource(uniformIDMaker, propertyID);
+    return {
+        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
+        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
+    };
+}
+FloatBlend.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
+    this.a._postShaderCompile(program);
+    this.b._postShaderCompile(program);
+}
+FloatBlend.prototype._preDraw = function (l) {
+    var mix = this.mix;
+    if (mix == 'anim') {
+        const time = Date.now();
+        mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (mix >= 1.) {
+            mix = 1.;
+            this.mix = 1.;
+            //TODO free A, free blend
+            this.parent.replaceChild(this, this.b);
+        }
+    }
+    gl.uniform1f(this._uniformLocation, mix);
+    this.a._preDraw(l);
+    this.b._preDraw(l);
+}
+FloatBlend.prototype.isAnimated = function () {
+    return this.mix === 'anim';
+}
+FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
+    if (this.a = toReplace) {
+        this.a = replacer;
+    } else {
+        this.b = replacer;
+    }
+    replacer.parent = this;
+    replacer.notify = toReplace.notify;
+}
+function genericFloatBlend(initial, final, duration, blendFunc) {
+    const parent = initial.parent;
+    const blend = new FloatBlend(initial, final, `${duration}ms`);
+    parent.replaceChild(initial, blend);
+    blend.notify();
+}
+Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericFloatBlend(this, finalValue, duration, blendFunc);
+}
+UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericFloatBlend(this, finalValue, duration, blendFunc);
+}
+FloatBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericFloatBlend(this, finalValue, duration, blendFunc);
+}
+
 function UniformFloat(size) {
     this.expr = size;
 }
@@ -439,10 +510,10 @@ UniformFloat.prototype._preDraw = function () {
 UniformFloat.prototype.isAnimated = function () {
     return !Number.isFinite(this.expr);
 }
-UniformFloat.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
+/*UniformFloat.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
     const t = Date.now();
     this.expr = { a: this.expr, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
-}
+}*/
 
 
 function DiscreteRampFloat(property, keys, values, defaultValue) {
@@ -666,10 +737,9 @@ function Style(layer) {
 }
 Style.prototype.setWidth = function (float) {
     this._width = float;
+    this.updated = true;
     float.parent = this;
-    console.log("SET", float)
     float.notify = () => {
-        this.updated = true;
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
@@ -678,6 +748,10 @@ Style.prototype.setWidth = function (float) {
 Style.prototype.replaceChild = function (toReplace, replacer) {
     if (toReplace == this._color) {
         this._color = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._width) {
+        this._width = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     } else {
