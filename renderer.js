@@ -391,9 +391,6 @@ function genericColorBlend(initial, final, duration, blendFunc) {
     blend.notify();
 }
 
-DiscreteRampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericColorBlend(this, finalValue, duration, blendFunc);
-}
 UniformColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericColorBlend(this, finalValue, duration, blendFunc);
 }
@@ -525,105 +522,6 @@ UniformFloat.prototype._preDraw = function () {
 UniformFloat.prototype.isAnimated = function () {
     return !Number.isFinite(this.expr);
 }
-/*UniformFloat.prototype.blendTo = function (finalValue, duration = 200, blendFunc = 'linear') {
-    const t = Date.now();
-    this.expr = { a: this.expr, b: finalValue, aTime: t, bTime: t + duration, blend: blendFunc };
-}*/
-
-
-function DiscreteRampFloat(property, keys, values, defaultValue) {
-    //TODO
-}
-
-
-
-function DiscreteRampColor(property, keys, values, defaultValue) {
-    defaultValue = defaultValue.map(x => 255 * x);
-    this.property = property;
-    this.keys = keys;
-    this.values = values;
-    this.defaultValue = defaultValue;
-    this.texture = gl.createTexture();
-
-}
-DiscreteRampColor.prototype._applyToShaderSource = function (uniformIDMaker) {
-    this._uniformID = uniformIDMaker();
-    return {
-        preface: `uniform sampler2D texRamp${this._uniformID};\n`,
-        inline: `texture2D(texRamp${this._uniformID}, vec2((p0), 0.5)).rgba`
-    };
-}
-DiscreteRampColor.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `texRamp${this._uniformID}`);
-}
-function evalColor(color, time) {
-    if (Array.isArray(color)) {
-        return color;
-    }
-    var a = evalColor(color.a, time);
-    var b = evalColor(color.b, time);
-    var m = (time - color.aTime) / (color.bTime - color.aTime);
-    return a.map((va, index) => {
-        return (1 - m) * va + m * b[index];//TODO non linear functions
-    });
-}
-function simplifyColorExpr(color, time) {
-    if (Array.isArray(color)) {
-        return color;
-    }
-    var m = (time - color.aTime) / (color.bTime - color.aTime);
-    if (m >= 1) {
-        return color.b;
-    }
-    return color;
-}
-DiscreteRampColor.prototype._preDraw = function (layer) {
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    const level = 0;
-    const internalFormat = gl.RGBA;
-    const width = 256;
-    const height = 1;
-    const border = 0;
-    const srcFormat = gl.RGBA;
-    const srcType = gl.UNSIGNED_BYTE;
-    const pixel = new Uint8Array(4 * width);
-    for (var i = 0; i < width; i++) {
-        pixel[4 * i + 0] = this.defaultValue[0];
-        pixel[4 * i + 1] = this.defaultValue[1];
-        pixel[4 * i + 2] = this.defaultValue[2];
-        pixel[4 * i + 3] = 255;
-    }
-
-    var keys = this.keys;
-    if (!Number.isFinite(this.keys[0])) {
-        keys = this.keys.map(k => layer.categoryMap[this.property][k]);
-    }
-
-    keys.forEach((k, index) => {
-        pixel[k * 4 + 0] = 255 * this.values[index][0];
-        pixel[k * 4 + 1] = 255 * this.values[index][1];
-        pixel[k * 4 + 2] = 255 * this.values[index][2];
-        pixel[k * 4 + 3] = 255 * this.values[index][3];
-    });
-
-    console.log(this.keys, keys, pixel, layer.categoryMap[this.property])
-
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-        width, height, border, srcFormat, srcType,
-        pixel);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-
-    gl.activeTexture(gl.TEXTURE10);
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.uniform1i(this._uniformLocation, 10);
-}
-DiscreteRampColor.prototype.isAnimated = function () {
-    return false;
-}
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -641,14 +539,14 @@ function hexToRgb(hex) {
     width: exprNear(date, SIM_TIME, fullRegion, blendRegion, 0, 4)
 */
 
-function FloatFilter(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
+function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
     if ([property, center, threshold, falloff, outputOnNegative, outputOnPositive].some(x => x === undefined || x === null)) {
         return null;
     }
-    return new Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
+    return new _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
 }
 
-function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
+function _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
     this.property = property;
     this.center = center;
     this.outputOnNegative = outputOnNegative;
@@ -657,7 +555,7 @@ function Near(property, center, threshold, falloff, outputOnNegative, outputOnPo
     this.falloff = falloff;
 }
 
-Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
+_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
     this._UID = uniformIDMaker();
     const propertyID = propertyIDs[this.property];
     return {
@@ -673,7 +571,7 @@ Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
                             0., 1.))/25.`
     };
 }
-Near.prototype._postShaderCompile = function (program) {
+_Near.prototype._postShaderCompile = function (program) {
     this._centerLoc = gl.getUniformLocation(program, `center${this._UID}`);
     this._thresholdLoc = gl.getUniformLocation(program, `threshold${this._UID}`);
     this._falloffLoc = gl.getUniformLocation(program, `falloff${this._UID}`);
@@ -690,19 +588,19 @@ function evalFloatUniform(x) {
     return 0;
 }
 
-Near.prototype._preDraw = function () {
+_Near.prototype._preDraw = function () {
     gl.uniform1f(this._centerLoc, evalFloatUniform(this.center));
     gl.uniform1f(this._thresholdLoc, evalFloatUniform(this.threshold) / 2.);
     gl.uniform1f(this._falloffLoc, evalFloatUniform(this.falloff) / 2.);
     gl.uniform1f(this._positiveLoc, evalFloatUniform(this.outputOnPositive));
     gl.uniform1f(this._negativeLoc, evalFloatUniform(this.outputOnNegative));
 }
-Near.prototype.isAnimated = function () {
+_Near.prototype.isAnimated = function () {
     return typeof this.center === "function";
 }
 
 function RampColor(property, minKey, maxKey, values) {
-    //TODO contiunuos vs discrete should be a function applied to values
+    //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
     return new _RampColor(property, minKey, maxKey, values);
 }
 
