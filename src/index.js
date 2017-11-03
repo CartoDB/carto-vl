@@ -1,7 +1,11 @@
-"use strict";
 
-import Renderer from './renderer';
+import {Renderer, Near, Float, Color, RampColor} from './renderer';
 
+window.Near=Near;
+window.Float=Float;
+window.Color=Color;
+window.RampColor=RampColor;
+console.log("ASD", window, Near)
 var renderer;
 var layer;
 var oldtile;

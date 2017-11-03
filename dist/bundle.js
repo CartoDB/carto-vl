@@ -81,10 +81,15 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["start"] = start;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__renderer__);
 
 
 
-
+window.Near=__WEBPACK_IMPORTED_MODULE_0__renderer__["Near"];
+window.Float=__WEBPACK_IMPORTED_MODULE_0__renderer__["Float"];
+window.Color=__WEBPACK_IMPORTED_MODULE_0__renderer__["Color"];
+window.RampColor=__WEBPACK_IMPORTED_MODULE_0__renderer__["RampColor"];
+console.log("ASD", window, __WEBPACK_IMPORTED_MODULE_0__renderer__["Near"])
 var renderer;
 var layer;
 var oldtile;
@@ -142,7 +147,7 @@ function getData() {
     });
 }
 function start() {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* default */](document.getElementById('glCanvas'));
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__renderer__["Renderer"](document.getElementById('glCanvas'));
     layer = renderer.addLayer();
 
     getData();
@@ -191,9 +196,8 @@ function start() {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
 var gl;
 
 const RTT_WIDTH = 1024;
@@ -1146,7 +1150,13 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (Renderer);
+module.exports = {
+    Renderer: Renderer,
+    Near: Near,
+    Float: Float,
+    Color: Color,
+    RampColor: RampColor
+};
 
 /***/ })
 /******/ ]);

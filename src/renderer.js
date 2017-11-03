@@ -950,4 +950,10 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
-export default Renderer;
+module.exports = {
+    Renderer: Renderer,
+    Near: Near,
+    Float: Float,
+    Color: Color,
+    RampColor: RampColor
+};
