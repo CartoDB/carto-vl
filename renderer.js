@@ -272,9 +272,9 @@ function refresh(timestamp) {
     });
 }
 
-function Color(color){
+function Color(color) {
     color = color.filter(x => true);
-    if (color.length!=4 || !color.every(Number.isFinite)){
+    if (color.length != 4 || !color.every(Number.isFinite)) {
         return null;
     }
     return new UniformColor(color);
@@ -477,6 +477,13 @@ FloatBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc =
     genericFloatBlend(this, finalValue, duration, blendFunc);
 }
 
+function Float(x) {
+    if (!Number.isFinite(x)) {
+        return null;
+    }
+    return new UniformFloat(x);
+}
+
 function UniformFloat(size) {
     this.expr = size;
 }
@@ -634,33 +641,64 @@ function hexToRgb(hex) {
     width: exprNear(date, SIM_TIME, fullRegion, blendRegion, 0, 4)
 */
 
-function Near(property, center, activatedRegion, blendRegion, minVal, maxVal) {
+function FloatFilter(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
+    if ([property, center, threshold, falloff, outputOnNegative, outputOnPositive].some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
+}
+
+function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
     this.property = property;
     this.center = center;
-    this.minVal = minVal;
-    this.maxVal = maxVal;
-    this.activatedRegion = activatedRegion;
-    this.blendRegion = blendRegion;
+    this.outputOnNegative = outputOnNegative;
+    this.outputOnPositive = outputOnPositive;
+    this.threshold = threshold;
+    this.falloff = falloff;
 }
 
 Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyIDs) {
-    this._uniformID = uniformIDMaker();
+    this._UID = uniformIDMaker();
     const propertyID = propertyIDs[this.property];
-    console.log("ASD", propertyIDs, propertyID, this.property)
     return {
-        preface: `uniform float near${this._uniformID};\n`,
-        inline: `mix(${this.maxVal}.,${this.minVal}., clamp((abs(p${propertyID}-near${this._uniformID})-${this.activatedRegion / 2.})/${this.blendRegion / 2.}, 0., 1.))/25.`
+        preface: `
+        uniform float center${this._UID};
+        uniform float threshold${this._UID};
+        uniform float falloff${this._UID};
+        uniform float positive${this._UID};
+        uniform float negative${this._UID};
+        `,
+        inline: `mix(positive${this._UID},negative${this._UID},
+                        clamp((abs(p${propertyID}-center${this._UID})-threshold${this._UID})/falloff${this._UID},
+                            0., 1.))/25.`
     };
 }
 Near.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `near${this._uniformID}`);
+    this._centerLoc = gl.getUniformLocation(program, `center${this._UID}`);
+    this._thresholdLoc = gl.getUniformLocation(program, `threshold${this._UID}`);
+    this._falloffLoc = gl.getUniformLocation(program, `falloff${this._UID}`);
+    this._positiveLoc = gl.getUniformLocation(program, `positive${this._UID}`);
+    this._negativeLoc = gl.getUniformLocation(program, `negative${this._UID}`);
 }
+function evalFloatUniform(x){
+    if (typeof x === "function") {
+        x = x();
+    }
+    if (Number.isFinite(x)){
+        return x;
+    }
+    return 0;
+}
+
 Near.prototype._preDraw = function () {
-    this.center = Date.now() * 0.01 % 4000;
-    gl.uniform1f(this._uniformLocation, this.center);
+    gl.uniform1f(this._centerLoc, evalFloatUniform(this.center));
+    gl.uniform1f(this._thresholdLoc, evalFloatUniform(this.threshold) / 2.);
+    gl.uniform1f(this._falloffLoc, evalFloatUniform(this.falloff) / 2.);
+    gl.uniform1f(this._positiveLoc, evalFloatUniform(this.outputOnPositive));
+    gl.uniform1f(this._negativeLoc, evalFloatUniform(this.outputOnNegative));
 }
 Near.prototype.isAnimated = function () {
-    return true;
+    return typeof this.center === "function";
 }
 
 //f applies f to the input (after being re-mapped to the [0-1] range defined by minKey/maxKey)
@@ -730,7 +768,7 @@ function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = new UniformFloat(3);
+    this._width = Float(3);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();

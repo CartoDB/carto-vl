@@ -33,7 +33,7 @@ function start() {
             }
         };
         layer.addTile(tile);
-        layer.style.setWidth(new Near('date', Date.now() * 0.1 % 4000, 1, 29, 1., 10.), 1000);
+        layer.style.setWidth(new Near('date', ()=>(Date.now() * 0.01 % 4000), 1, 29, 1., 10.), 1000);
     });
 
     window.onresize = function () { renderer.refresh(); };
@@ -72,7 +72,7 @@ function start() {
         }
     };
     layer.style.getColor().blendTo(new ContinuousRampColor('p0', 5, 30, ['#008080', '#70a494', '#b4c8a8', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c']), 1000);
-    layer.style.getWidth().blendTo(new UniformFloat(3.), 1000);
+    layer.style.getWidth().blendTo(Float(3.), 1000);
 
     document.onkeypress = function (event) {
         return;
@@ -93,7 +93,7 @@ function start() {
         }
         //        layer.style.getWidth().center=Math.random()*4000.;
         //layer.style.getWidth().notify();
-        layer.style.getWidth().blendTo(new UniformFloat(0. + 1. * 15. * Math.random()), 1000);
+        layer.style.getWidth().blendTo(Float(0. + 1. * 15. * Math.random()), 1000);
         //layer.style.getWidth().blendTo(8. * Math.random(), 1400);
     }
     document.onmouseup = function () {
