@@ -132,7 +132,6 @@ function getData() {
             console.log("MVT", tile);
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-
             var fieldMap = {};
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
@@ -144,9 +143,6 @@ function getData() {
                 points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
 
                 Object.keys(f.properties).map(name => {
-                    if (name!=='temp' && name!=='daten'){
-                        //return;
-                    }
                     if (fieldMap[name] === undefined) {
                         fieldMap[name] = Object.keys(fieldMap).length;
                     }
@@ -382,6 +378,8 @@ Renderer.prototype._initShaders = function () {
     gl.attachShader(this.finalRendererProgram, vertexShader);
     gl.attachShader(this.finalRendererProgram, fragmentShader);
     gl.linkProgram(this.finalRendererProgram);
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
     if (!gl.getProgramParameter(this.finalRendererProgram, gl.LINK_STATUS)) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.finalRendererProgram));
     }
@@ -908,6 +906,9 @@ function _RampColor(property, minKey, maxKey, values) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 }
 
+_RampColor.prototype._free = function () {
+    gl.deleteTexture(this.texture);
+}
 _RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     const tid = propertyTIDMaker(this.property);
     this._UID = uniformIDMaker();
@@ -1028,6 +1029,9 @@ Layer.prototype._compileColorShader = function () {
     source = source.replace('$COLOR', colorModifier.inline);
     //console.log(this, source);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
+    if (this.colorShader) {
+        gl.deleteProgram(this.colorShader);
+    }
     this.colorShader = gl.createProgram();
     gl.attachShader(this.colorShader, VS);
     gl.attachShader(this.colorShader, FS);
@@ -1041,6 +1045,8 @@ Layer.prototype._compileColorShader = function () {
     for (var i = 0; i < 8; i++) {
         this.colorShaderTex[i] = gl.getUniformLocation(this.colorShader, `property${i}`);
     }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
 }
 
 Layer.prototype._compileWidthShader = function () {
@@ -1061,6 +1067,9 @@ Layer.prototype._compileWidthShader = function () {
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
+    if (this.widthShader) {
+        gl.deleteProgram(this.colorShader);
+    }
     this.widthShader = gl.createProgram();
     gl.attachShader(this.widthShader, VS);
     gl.attachShader(this.widthShader, FS);
@@ -1074,12 +1083,17 @@ Layer.prototype._compileWidthShader = function () {
     for (var i = 0; i < 8; i++) {
         this.widthShaderTex[i] = gl.getUniformLocation(this.widthShader, `property${i}`);
     }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
 }
 
 Layer.prototype.removeTile = function (tile) {
     this.tiles = this.tiles.filter(t => t !== tile);
-    console.log("REM", this.tiles)
-    //TODO free GL resources
+    tile.propertyTex.map(tex => gl.deleteTexture(tex));
+    gl.deleteTexture(tile.texColor);
+    gl.deleteTexture(tile.texWidth);
+    gl.deleteBuffer(tile.vertexBuffer);
+    gl.deleteBuffer(tile.featureIDBuffer);
 }
 
 //TODO => setTileProperty (or geom)
