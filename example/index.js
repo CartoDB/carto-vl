@@ -58,7 +58,10 @@ function getData() {
                 points[2 * i + 0] = (geom[0][0].x) / 4096.0;
                 points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
 
-                Object.keys(f.properties).map(name => {
+                properties[0][i] = Number(f.properties.temp);
+                properties[1][i] = Number(f.properties.daten);
+                
+                /*Object.keys(f.properties).map(name => {
                     if (fieldMap[name] === undefined) {
                         fieldMap[name] = Object.keys(fieldMap).length;
                     }
@@ -67,7 +70,7 @@ function getData() {
                         properties[pid] = new Float32Array(mvtLayer.length);
                     }
                     properties[pid][i] = Number(f.properties[name]);
-                });
+                });*/
             }
             var tile = {
                 center: { x: 0, y: 0 },

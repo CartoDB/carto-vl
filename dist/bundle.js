@@ -70,23 +70,331 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var VectorTileFeature = __webpack_require__(1);
+
+module.exports = VectorTileLayer;
+
+function VectorTileLayer(pbf, end) {
+    // Public
+    this.version = 1;
+    this.name = null;
+    this.extent = 4096;
+    this.length = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._keys = [];
+    this._values = [];
+    this._features = [];
+
+    pbf.readFields(readLayer, this, end);
+
+    this.length = this._features.length;
+}
+
+function readLayer(tag, layer, pbf) {
+    if (tag === 15) layer.version = pbf.readVarint();
+    else if (tag === 1) layer.name = pbf.readString();
+    else if (tag === 5) layer.extent = pbf.readVarint();
+    else if (tag === 2) layer._features.push(pbf.pos);
+    else if (tag === 3) layer._keys.push(pbf.readString());
+    else if (tag === 4) layer._values.push(readValueMessage(pbf));
+}
+
+function readValueMessage(pbf) {
+    var value = null,
+        end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var tag = pbf.readVarint() >> 3;
+
+        value = tag === 1 ? pbf.readString() :
+            tag === 2 ? pbf.readFloat() :
+            tag === 3 ? pbf.readDouble() :
+            tag === 4 ? pbf.readVarint64() :
+            tag === 5 ? pbf.readVarint() :
+            tag === 6 ? pbf.readSVarint() :
+            tag === 7 ? pbf.readBoolean() : null;
+    }
+
+    return value;
+}
+
+// return feature `i` from this layer as a `VectorTileFeature`
+VectorTileLayer.prototype.feature = function(i) {
+    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');
+
+    this._pbf.pos = this._features[i];
+
+    var end = this._pbf.readVarint() + this._pbf.pos;
+    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Point = __webpack_require__(6);
+
+module.exports = VectorTileFeature;
+
+function VectorTileFeature(pbf, end, extent, keys, values) {
+    // Public
+    this.properties = {};
+    this.extent = extent;
+    this.type = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._geometry = -1;
+    this._keys = keys;
+    this._values = values;
+
+    pbf.readFields(readFeature, this, end);
+}
+
+function readFeature(tag, feature, pbf) {
+    if (tag == 1) feature.id = pbf.readVarint();
+    else if (tag == 2) readTag(pbf, feature);
+    else if (tag == 3) feature.type = pbf.readVarint();
+    else if (tag == 4) feature._geometry = pbf.pos;
+}
+
+function readTag(pbf, feature) {
+    var end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var key = feature._keys[pbf.readVarint()],
+            value = feature._values[pbf.readVarint()];
+        feature.properties[key] = value;
+    }
+}
+
+VectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];
+
+VectorTileFeature.prototype.loadGeometry = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        lines = [],
+        line;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+
+            if (cmd === 1) { // moveTo
+                if (line) lines.push(line);
+                line = [];
+            }
+
+            line.push(new Point(x, y));
+
+        } else if (cmd === 7) {
+
+            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90
+            if (line) {
+                line.push(line[0].clone()); // closePolygon
+            }
+
+        } else {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    if (line) lines.push(line);
+
+    return lines;
+};
+
+VectorTileFeature.prototype.bbox = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        x1 = Infinity,
+        x2 = -Infinity,
+        y1 = Infinity,
+        y2 = -Infinity;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+            if (x < x1) x1 = x;
+            if (x > x2) x2 = x;
+            if (y < y1) y1 = y;
+            if (y > y2) y2 = y;
+
+        } else if (cmd !== 7) {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    return [x1, y1, x2, y2];
+};
+
+VectorTileFeature.prototype.toGeoJSON = function(x, y, z) {
+    var size = this.extent * Math.pow(2, z),
+        x0 = this.extent * x,
+        y0 = this.extent * y,
+        coords = this.loadGeometry(),
+        type = VectorTileFeature.types[this.type],
+        i, j;
+
+    function project(line) {
+        for (var j = 0; j < line.length; j++) {
+            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;
+            line[j] = [
+                (p.x + x0) * 360 / size - 180,
+                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
+            ];
+        }
+    }
+
+    switch (this.type) {
+    case 1:
+        var points = [];
+        for (i = 0; i < coords.length; i++) {
+            points[i] = coords[i][0];
+        }
+        coords = points;
+        project(coords);
+        break;
+
+    case 2:
+        for (i = 0; i < coords.length; i++) {
+            project(coords[i]);
+        }
+        break;
+
+    case 3:
+        coords = classifyRings(coords);
+        for (i = 0; i < coords.length; i++) {
+            for (j = 0; j < coords[i].length; j++) {
+                project(coords[i][j]);
+            }
+        }
+        break;
+    }
+
+    if (coords.length === 1) {
+        coords = coords[0];
+    } else {
+        type = 'Multi' + type;
+    }
+
+    var result = {
+        type: "Feature",
+        geometry: {
+            type: type,
+            coordinates: coords
+        },
+        properties: this.properties
+    };
+
+    if ('id' in this) {
+        result.id = this.id;
+    }
+
+    return result;
+};
+
+// classifies an array of rings into polygons with outer rings and holes
+
+function classifyRings(rings) {
+    var len = rings.length;
+
+    if (len <= 1) return [rings];
+
+    var polygons = [],
+        polygon,
+        ccw;
+
+    for (var i = 0; i < len; i++) {
+        var area = signedArea(rings[i]);
+        if (area === 0) continue;
+
+        if (ccw === undefined) ccw = area < 0;
+
+        if (ccw === area < 0) {
+            if (polygon) polygons.push(polygon);
+            polygon = [rings[i]];
+
+        } else {
+            polygon.push(rings[i]);
+        }
+    }
+    if (polygon) polygons.push(polygon);
+
+    return polygons;
+}
+
+function signedArea(ring) {
+    var sum = 0;
+    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {
+        p1 = ring[i];
+        p2 = ring[j];
+        sum += (p2.x - p1.x) * (p1.y + p2.y);
+    }
+    return sum;
+}
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "start", function() { return start; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__src_index__);
 
 
 
-var VectorTile = __webpack_require__(5).VectorTile;
-var Protobuf = __webpack_require__(8);
+var VectorTile = __webpack_require__(4).VectorTile;
+var Protobuf = __webpack_require__(7);
 
 var renderer;
 var layer;
@@ -142,7 +450,10 @@ function getData() {
                 points[2 * i + 0] = (geom[0][0].x) / 4096.0;
                 points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
 
-                Object.keys(f.properties).map(name => {
+                properties[0][i] = Number(f.properties.temp);
+                properties[1][i] = Number(f.properties.daten);
+                
+                /*Object.keys(f.properties).map(name => {
                     if (fieldMap[name] === undefined) {
                         fieldMap[name] = Object.keys(fieldMap).length;
                     }
@@ -151,7 +462,7 @@ function getData() {
                         properties[pid] = new Float32Array(mvtLayer.length);
                     }
                     properties[pid][i] = Number(f.properties[name]);
-                });
+                });*/
             }
             var tile = {
                 center: { x: 0, y: 0 },
@@ -255,8 +566,7 @@ function start() {
 
 
 /***/ }),
-/* 1 */,
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 var gl;
@@ -1260,330 +1570,22 @@ module.exports = {
 };
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var VectorTileFeature = __webpack_require__(4);
-
-module.exports = VectorTileLayer;
-
-function VectorTileLayer(pbf, end) {
-    // Public
-    this.version = 1;
-    this.name = null;
-    this.extent = 4096;
-    this.length = 0;
-
-    // Private
-    this._pbf = pbf;
-    this._keys = [];
-    this._values = [];
-    this._features = [];
-
-    pbf.readFields(readLayer, this, end);
-
-    this.length = this._features.length;
-}
-
-function readLayer(tag, layer, pbf) {
-    if (tag === 15) layer.version = pbf.readVarint();
-    else if (tag === 1) layer.name = pbf.readString();
-    else if (tag === 5) layer.extent = pbf.readVarint();
-    else if (tag === 2) layer._features.push(pbf.pos);
-    else if (tag === 3) layer._keys.push(pbf.readString());
-    else if (tag === 4) layer._values.push(readValueMessage(pbf));
-}
-
-function readValueMessage(pbf) {
-    var value = null,
-        end = pbf.readVarint() + pbf.pos;
-
-    while (pbf.pos < end) {
-        var tag = pbf.readVarint() >> 3;
-
-        value = tag === 1 ? pbf.readString() :
-            tag === 2 ? pbf.readFloat() :
-            tag === 3 ? pbf.readDouble() :
-            tag === 4 ? pbf.readVarint64() :
-            tag === 5 ? pbf.readVarint() :
-            tag === 6 ? pbf.readSVarint() :
-            tag === 7 ? pbf.readBoolean() : null;
-    }
-
-    return value;
-}
-
-// return feature `i` from this layer as a `VectorTileFeature`
-VectorTileLayer.prototype.feature = function(i) {
-    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');
-
-    this._pbf.pos = this._features[i];
-
-    var end = this._pbf.readVarint() + this._pbf.pos;
-    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);
-};
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-var Point = __webpack_require__(7);
-
-module.exports = VectorTileFeature;
-
-function VectorTileFeature(pbf, end, extent, keys, values) {
-    // Public
-    this.properties = {};
-    this.extent = extent;
-    this.type = 0;
-
-    // Private
-    this._pbf = pbf;
-    this._geometry = -1;
-    this._keys = keys;
-    this._values = values;
-
-    pbf.readFields(readFeature, this, end);
-}
-
-function readFeature(tag, feature, pbf) {
-    if (tag == 1) feature.id = pbf.readVarint();
-    else if (tag == 2) readTag(pbf, feature);
-    else if (tag == 3) feature.type = pbf.readVarint();
-    else if (tag == 4) feature._geometry = pbf.pos;
-}
-
-function readTag(pbf, feature) {
-    var end = pbf.readVarint() + pbf.pos;
-
-    while (pbf.pos < end) {
-        var key = feature._keys[pbf.readVarint()],
-            value = feature._values[pbf.readVarint()];
-        feature.properties[key] = value;
-    }
-}
-
-VectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];
-
-VectorTileFeature.prototype.loadGeometry = function() {
-    var pbf = this._pbf;
-    pbf.pos = this._geometry;
-
-    var end = pbf.readVarint() + pbf.pos,
-        cmd = 1,
-        length = 0,
-        x = 0,
-        y = 0,
-        lines = [],
-        line;
-
-    while (pbf.pos < end) {
-        if (!length) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 0x7;
-            length = cmdLen >> 3;
-        }
-
-        length--;
-
-        if (cmd === 1 || cmd === 2) {
-            x += pbf.readSVarint();
-            y += pbf.readSVarint();
-
-            if (cmd === 1) { // moveTo
-                if (line) lines.push(line);
-                line = [];
-            }
-
-            line.push(new Point(x, y));
-
-        } else if (cmd === 7) {
-
-            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90
-            if (line) {
-                line.push(line[0].clone()); // closePolygon
-            }
-
-        } else {
-            throw new Error('unknown command ' + cmd);
-        }
-    }
-
-    if (line) lines.push(line);
-
-    return lines;
-};
-
-VectorTileFeature.prototype.bbox = function() {
-    var pbf = this._pbf;
-    pbf.pos = this._geometry;
-
-    var end = pbf.readVarint() + pbf.pos,
-        cmd = 1,
-        length = 0,
-        x = 0,
-        y = 0,
-        x1 = Infinity,
-        x2 = -Infinity,
-        y1 = Infinity,
-        y2 = -Infinity;
-
-    while (pbf.pos < end) {
-        if (!length) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 0x7;
-            length = cmdLen >> 3;
-        }
-
-        length--;
-
-        if (cmd === 1 || cmd === 2) {
-            x += pbf.readSVarint();
-            y += pbf.readSVarint();
-            if (x < x1) x1 = x;
-            if (x > x2) x2 = x;
-            if (y < y1) y1 = y;
-            if (y > y2) y2 = y;
-
-        } else if (cmd !== 7) {
-            throw new Error('unknown command ' + cmd);
-        }
-    }
-
-    return [x1, y1, x2, y2];
-};
-
-VectorTileFeature.prototype.toGeoJSON = function(x, y, z) {
-    var size = this.extent * Math.pow(2, z),
-        x0 = this.extent * x,
-        y0 = this.extent * y,
-        coords = this.loadGeometry(),
-        type = VectorTileFeature.types[this.type],
-        i, j;
-
-    function project(line) {
-        for (var j = 0; j < line.length; j++) {
-            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;
-            line[j] = [
-                (p.x + x0) * 360 / size - 180,
-                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
-            ];
-        }
-    }
-
-    switch (this.type) {
-    case 1:
-        var points = [];
-        for (i = 0; i < coords.length; i++) {
-            points[i] = coords[i][0];
-        }
-        coords = points;
-        project(coords);
-        break;
-
-    case 2:
-        for (i = 0; i < coords.length; i++) {
-            project(coords[i]);
-        }
-        break;
-
-    case 3:
-        coords = classifyRings(coords);
-        for (i = 0; i < coords.length; i++) {
-            for (j = 0; j < coords[i].length; j++) {
-                project(coords[i][j]);
-            }
-        }
-        break;
-    }
-
-    if (coords.length === 1) {
-        coords = coords[0];
-    } else {
-        type = 'Multi' + type;
-    }
-
-    var result = {
-        type: "Feature",
-        geometry: {
-            type: type,
-            coordinates: coords
-        },
-        properties: this.properties
-    };
-
-    if ('id' in this) {
-        result.id = this.id;
-    }
-
-    return result;
-};
-
-// classifies an array of rings into polygons with outer rings and holes
-
-function classifyRings(rings) {
-    var len = rings.length;
-
-    if (len <= 1) return [rings];
-
-    var polygons = [],
-        polygon,
-        ccw;
-
-    for (var i = 0; i < len; i++) {
-        var area = signedArea(rings[i]);
-        if (area === 0) continue;
-
-        if (ccw === undefined) ccw = area < 0;
-
-        if (ccw === area < 0) {
-            if (polygon) polygons.push(polygon);
-            polygon = [rings[i]];
-
-        } else {
-            polygon.push(rings[i]);
-        }
-    }
-    if (polygon) polygons.push(polygon);
-
-    return polygons;
-}
-
-function signedArea(ring) {
-    var sum = 0;
-    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {
-        p1 = ring[i];
-        p2 = ring[j];
-        sum += (p2.x - p1.x) * (p1.y + p2.y);
-    }
-    return sum;
-}
+module.exports.VectorTile = __webpack_require__(5);
+module.exports.VectorTileFeature = __webpack_require__(1);
+module.exports.VectorTileLayer = __webpack_require__(0);
 
 
 /***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(6);
-module.exports.VectorTileFeature = __webpack_require__(4);
-module.exports.VectorTileLayer = __webpack_require__(3);
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(3);
+var VectorTileLayer = __webpack_require__(0);
 
 module.exports = VectorTile;
 
@@ -1601,7 +1603,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1920,7 +1922,7 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1928,7 +1930,7 @@ Point.convert = function (a) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(9);
+var ieee754 = __webpack_require__(8);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -2545,7 +2547,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
