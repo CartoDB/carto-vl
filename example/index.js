@@ -46,13 +46,10 @@ function getData() {
         if (arrayBuffer) {
             var tile = new VectorTile(new Protobuf(arrayBuffer));
             console.log("MVT", tile);
+            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-            const mvtLayer = tile.layers["98b8a116-acfe-4d6c-94cb-3cadc6ba917c"];
 
-
-            //const fields = Object.keys(data.fields).filter(name => name != 'st_asgeojson');
-            var fields = ['temp', 'date'];
-            //var properties = fields.map(_ => new Float32Array(data.rows.length));
+            var fieldMap = {};
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
             for (var i = 0; i < mvtLayer.length; i++) {
@@ -61,13 +58,20 @@ function getData() {
                 //console.log(mvtLayer.feature(i).toGeoJSON(0,0,0))
                 points[2 * i + 0] = (geom[0][0].x) / 4096.0;
                 points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
-                /*fields.map((name, pid) => {
-                    properties[pid][index] = Number(e[name]);
-                });*/
-                //properties[0][i] = Math.random() * 30;
-                //properties[1][i] = Math.random() * 1000;
-                properties[0][i] = Number(f.properties.temp);
-                properties[1][i] = f.properties.daten;
+
+                Object.keys(f.properties).map(name => {
+                    if (name!=='temp' && name!=='daten'){
+                        //return;
+                    }
+                    if (fieldMap[name] === undefined) {
+                        fieldMap[name] = Object.keys(fieldMap).length;
+                    }
+                    var pid = fieldMap[name];
+                    if (properties[pid] === undefined) {
+                        properties[pid] = new Float32Array(mvtLayer.length);
+                    }
+                    properties[pid][i] = Number(f.properties[name]);
+                });
             }
             var tile = {
                 center: { x: 0, y: 0 },
@@ -76,7 +80,7 @@ function getData() {
                 geom: points,
                 properties: {}
             };
-            fields.map((name, pid) => {
+            Object.keys(fieldMap).map((name, pid) => {
                 tile.properties[name] = properties[pid];
             })
             console.log("Tile", tile);
