@@ -440,7 +440,10 @@ function getData() {
             console.log("MVT", tile);
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-            var fieldMap = {};
+            var fieldMap = {
+                temp: 0,
+                daten: 1
+            };
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
             for (var i = 0; i < mvtLayer.length; i++) {
