@@ -48,7 +48,6 @@ function getData() {
             console.log("MVT", tile);
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-
             var fieldMap = {};
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
@@ -60,9 +59,6 @@ function getData() {
                 points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
 
                 Object.keys(f.properties).map(name => {
-                    if (name!=='temp' && name!=='daten'){
-                        //return;
-                    }
                     if (fieldMap[name] === undefined) {
                         fieldMap[name] = Object.keys(fieldMap).length;
                     }
