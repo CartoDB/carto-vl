@@ -1,11 +1,6 @@
 
-import {Renderer, Near, Float, Color, RampColor} from './renderer';
+import R from './renderer';
 
-window.Near=Near;
-window.Float=Float;
-window.Color=Color;
-window.RampColor=RampColor;
-console.log("ASD", window, Near)
 var renderer;
 var layer;
 var oldtile;
@@ -13,6 +8,10 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
+    const Near=R.Style.Near;
+    const Float=R.Style.Float;
+    const Color=R.Style.Color;
+    const RampColor=R.Style.RampColor;
     const width = eval(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
@@ -20,6 +19,10 @@ function styleWidth(e) {
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
+    const Near=R.Style.Near;
+    const Float=R.Style.Float;
+    const Color=R.Style.Color;
+    const RampColor=R.Style.RampColor;
     const color = eval(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
@@ -63,7 +66,7 @@ function getData() {
     });
 }
 export function start() {
-    renderer = new Renderer(document.getElementById('glCanvas'));
+    renderer = new R.Renderer(document.getElementById('glCanvas'));
     layer = renderer.addLayer();
 
     getData();

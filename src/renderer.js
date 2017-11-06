@@ -952,8 +952,10 @@ Renderer.prototype.setZoom = function (zoom) {
 
 module.exports = {
     Renderer: Renderer,
-    Near: Near,
-    Float: Float,
-    Color: Color,
-    RampColor: RampColor
+    Style: {
+        Near: Near,
+        Float: Float,
+        Color: Color,
+        RampColor: RampColor
+    }
 };

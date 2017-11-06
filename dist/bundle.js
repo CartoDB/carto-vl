@@ -85,11 +85,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-window.Near=__WEBPACK_IMPORTED_MODULE_0__renderer__["Near"];
-window.Float=__WEBPACK_IMPORTED_MODULE_0__renderer__["Float"];
-window.Color=__WEBPACK_IMPORTED_MODULE_0__renderer__["Color"];
-window.RampColor=__WEBPACK_IMPORTED_MODULE_0__renderer__["RampColor"];
-console.log("ASD", window, __WEBPACK_IMPORTED_MODULE_0__renderer__["Near"])
 var renderer;
 var layer;
 var oldtile;
@@ -97,6 +92,10 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
+    const Near=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Near;
+    const Float=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Float;
+    const Color=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Color;
+    const RampColor=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.RampColor;
     const width = eval(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
@@ -104,6 +103,10 @@ function styleWidth(e) {
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
+    const Near=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Near;
+    const Float=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Float;
+    const Color=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.Color;
+    const RampColor=__WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Style.RampColor;
     const color = eval(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
@@ -147,7 +150,7 @@ function getData() {
     });
 }
 function start() {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__renderer__["Renderer"](document.getElementById('glCanvas'));
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__renderer___default.a.Renderer(document.getElementById('glCanvas'));
     layer = renderer.addLayer();
 
     getData();
@@ -1152,10 +1155,12 @@ Renderer.prototype.setZoom = function (zoom) {
 
 module.exports = {
     Renderer: Renderer,
-    Near: Near,
-    Float: Float,
-    Color: Color,
-    RampColor: RampColor
+    Style: {
+        Near: Near,
+        Float: Float,
+        Color: Color,
+        RampColor: RampColor
+    }
 };
 
 /***/ })
