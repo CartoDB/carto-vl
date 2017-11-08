@@ -2,6 +2,199 @@ var gl;
 
 const RTT_WIDTH = 1024;
 
+var jsep = require("jsep");
+
+function implicitCast(value){
+    if (Number.isFinite(value)){
+        return Float(node.value);
+    }
+    return value;
+}
+
+function parseNode(node) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNode(arg));
+        switch (node.callee.name) {
+            case 'RampColor':
+                return RampColor(...args);
+            case 'Near':
+                return Near(...args);
+            case 'Now':
+                return Now(...args);
+            default:
+                break;
+        }
+    } else if (node.type == 'Literal') {
+        return node.value;
+    } else if (node.type == 'ArrayExpression') {
+        return node.elements.map(e => parseNode(e));
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNode(node.left);
+        const right = parseNode(node.right);
+        switch (node.operator) {
+            case "*":
+                //TODO check left & right types => float
+                return FloatMul(left, right);
+            case "+":
+                return FloatAdd(left, right);
+            case "-":
+                return FloatSub(left, right);
+            case "^":
+                return FloatPow(left, right);
+            default:
+                break;
+        }
+    }
+    console.warn(node);
+    return null;
+}
+
+jsep.addBinaryOp("^", 10);
+function parseStyle(str) {
+    const tree = jsep(str);
+    console.log(tree)
+    const e = parseNode(tree);
+    console.log(e)
+    return e;
+}
+
+function Now() {
+    return new _Now();
+}
+function _Now() {
+    this.float = Float(100);
+}
+_Now.prototype._applyToShaderSource = function (uniformIDMaker) {
+    return this.float._applyToShaderSource(uniformIDMaker);
+}
+_Now.prototype._postShaderCompile = function (program) {
+    return this.float._postShaderCompile(program);
+}
+_Now.prototype._preDraw = function () {
+    this.float.expr = Date.now() * 0.1 % 400;
+    this.float._preDraw();
+}
+_Now.prototype.isAnimated = function () {
+    return true;
+}
+
+const FloatMul = genFloatBinaryOperation((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+const FloatMul = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatAdd = genFloatBinaryOperation((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+
+function genFloatBinaryOperation(jsFn, glsl) {
+    function Op(a, b) {
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            return Float(jsFn(a, b));
+        }
+        if (Number.isFinite(b)) {
+            b = Float(b);
+        }
+        return new _Op(a, b);
+    }
+    function _Op(a, b) {
+        this.a = a;
+        this.b = b;
+        a.parent = this;
+        b.parent = this;
+    }
+    _Op.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: a.preface + b.preface,
+            inline: glsl(a.inline, b.inline)
+        };
+    }
+    _Op.prototype._postShaderCompile = function (program) {
+        this.a._postShaderCompile(program);
+        this.b._postShaderCompile(program);
+    }
+    _Op.prototype._preDraw = function (l) {
+        this.a._preDraw(l);
+        this.b._preDraw(l);
+    }
+    _Op.prototype.isAnimated = function () {
+        return this.a.isAnimated() || this.b.isAnimated();
+    }
+    _Op.prototype.replaceChild = function (toReplace, replacer) {
+        if (this.a = toReplace) {
+            this.a = replacer;
+        } else {
+            this.b = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    return Op;
+}
+
+
+
+function FloatBlend(a, b, mix) {
+    this.a = a;
+    this.b = b;
+    a.parent = this;
+    b.parent = this;
+    if (mix.indexOf('ms') >= 0) {
+        duration = Number(mix.replace('ms', ''));
+        this.aTime = Date.now();
+        this.bTime = this.aTime + duration;
+        mix = 'anim';
+    }
+    this.mix = mix;
+}
+FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    this._uniformID = uniformIDMaker();
+    const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    return {
+        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
+        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
+    };
+}
+FloatBlend.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
+    this.a._postShaderCompile(program);
+    this.b._postShaderCompile(program);
+}
+FloatBlend.prototype._preDraw = function (l) {
+    var mix = this.mix;
+    if (mix == 'anim') {
+        const time = Date.now();
+        mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (mix >= 1.) {
+            mix = 1.;
+            this.mix = 1.;
+            //TODO free A, free blend
+            this.parent.replaceChild(this, this.b);
+        }
+    }
+    gl.uniform1f(this._uniformLocation, mix);
+    this.a._preDraw(l);
+    this.b._preDraw(l);
+}
+FloatBlend.prototype.isAnimated = function () {
+    return this.mix === 'anim';
+}
+FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
+    if (this.a = toReplace) {
+        this.a = replacer;
+    } else {
+        this.b = replacer;
+    }
+    replacer.parent = this;
+    replacer.notify = toReplace.notify;
+}
+function genericFloatBlend(initial, final, duration, blendFunc) {
+    const parent = initial.parent;
+    const blend = new FloatBlend(initial, final, `${duration}ms`);
+    parent.replaceChild(initial, blend);
+    blend.notify();
+}
+
 const renderVS = `
 
 precision highp float;
@@ -36,6 +229,9 @@ void main(void) {
     vec4 c = color;
     float l = length(p);
     c.a *=  1. - smoothstep(0.9, 1.1, l);
+    if (c.a==0.){
+        discard;
+    }
     gl_FragColor = c;
 }`;
 
@@ -143,7 +339,18 @@ function compileShader(sourceCode, type) {
     }
     return shader;
 }
-
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_EXT = EARTH_RADIUS * Math.PI * 2;
+const TILE_SIZE = 256;
+// Webmercator projection
+function Wmxy(latLng) {
+    let lat = latLng.lat() * DEG2RAD;
+    let lng = latLng.lng() * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x: x, y: y };
+}
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
     // Don't re-render more than once per animation frame
@@ -151,6 +358,27 @@ function refresh(timestamp) {
         return;
     }
     this.lastFrame = timestamp;
+    /*console.timeStamp("MyRENDER");
+    var r = this;
+    function getZoom() {
+        var b = map.getBounds();
+        var c = map.getCenter();
+        var nw = b.getNorthEast();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
+        r.setCenter(c.lng() / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        return z;
+    }
+    function move(a, b, c) {
+        var b = map.getBounds();
+        var nw = b.getNorthEast();
+        var c = map.getCenter();
+
+        r.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        r.setZoom(getZoom());
+        // console.log(renderer.getCenter(), renderer.getZoom(), c)
+    }
+    move();*/
 
     //console.log('Re-render')
 
@@ -403,68 +631,6 @@ _RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc =
 }
 
 
-
-function FloatBlend(a, b, mix) {
-    this.a = a;
-    this.b = b;
-    a.parent = this;
-    b.parent = this;
-    if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
-        this.aTime = Date.now();
-        this.bTime = this.aTime + duration;
-        mix = 'anim';
-    }
-    this.mix = mix;
-}
-FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._uniformID = uniformIDMaker();
-    const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    return {
-        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
-        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
-    };
-}
-FloatBlend.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
-    this.a._postShaderCompile(program);
-    this.b._postShaderCompile(program);
-}
-FloatBlend.prototype._preDraw = function (l) {
-    var mix = this.mix;
-    if (mix == 'anim') {
-        const time = Date.now();
-        mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (mix >= 1.) {
-            mix = 1.;
-            this.mix = 1.;
-            //TODO free A, free blend
-            this.parent.replaceChild(this, this.b);
-        }
-    }
-    gl.uniform1f(this._uniformLocation, mix);
-    this.a._preDraw(l);
-    this.b._preDraw(l);
-}
-FloatBlend.prototype.isAnimated = function () {
-    return this.mix === 'anim';
-}
-FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
-    if (this.a = toReplace) {
-        this.a = replacer;
-    } else {
-        this.b = replacer;
-    }
-    replacer.parent = this;
-    replacer.notify = toReplace.notify;
-}
-function genericFloatBlend(initial, final, duration, blendFunc) {
-    const parent = initial.parent;
-    const blend = new FloatBlend(initial, final, `${duration}ms`);
-    parent.replaceChild(initial, blend);
-    blend.notify();
-}
 _Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericFloatBlend(this, finalValue, duration, blendFunc);
 }
@@ -489,7 +655,7 @@ UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float float${this._uniformID};\n`,
-        inline: `float${this._uniformID}/25.`
+        inline: `float${this._uniformID}`
     };
 }
 UniformFloat.prototype._postShaderCompile = function (program) {
@@ -541,7 +707,8 @@ function hexToRgb(hex) {
 */
 
 function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    if ([property, center, threshold, falloff, outputOnNegative, outputOnPositive].some(x => x === undefined || x === null)) {
+    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCastValue);
+    if (args.some(x => x === undefined || x === null)) {
         return null;
     }
     return new _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
@@ -559,25 +726,25 @@ function _Near(property, center, threshold, falloff, outputOnNegative, outputOnP
 _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._UID = uniformIDMaker();
     const tid = propertyTIDMaker(this.property);
+    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const positive = this.outputOnPositive._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
-        preface: `
-        uniform float center${this._UID};
-        uniform float threshold${this._UID};
-        uniform float falloff${this._UID};
-        uniform float positive${this._UID};
-        uniform float negative${this._UID};
-        `,
-        inline: `mix(positive${this._UID},negative${this._UID},
-                        clamp((abs(p${tid}-center${this._UID})-threshold${this._UID})/falloff${this._UID},
+        preface:
+        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
+        inline: `mix(${positive.inline},${negative.inline},
+                        clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
                             0., 1.))/25.`
     };
 }
 _Near.prototype._postShaderCompile = function (program) {
-    this._centerLoc = gl.getUniformLocation(program, `center${this._UID}`);
-    this._thresholdLoc = gl.getUniformLocation(program, `threshold${this._UID}`);
-    this._falloffLoc = gl.getUniformLocation(program, `falloff${this._UID}`);
-    this._positiveLoc = gl.getUniformLocation(program, `positive${this._UID}`);
-    this._negativeLoc = gl.getUniformLocation(program, `negative${this._UID}`);
+    this.center._postShaderCompile(program);
+    this.outputOnNegative._postShaderCompile(program);
+    this.outputOnPositive._postShaderCompile(program);
+    this.threshold._postShaderCompile(program);
+    this.falloff._postShaderCompile(program);
 }
 function evalFloatUniform(x) {
     if (typeof x === "function") {
@@ -590,14 +757,14 @@ function evalFloatUniform(x) {
 }
 
 _Near.prototype._preDraw = function () {
-    gl.uniform1f(this._centerLoc, evalFloatUniform(this.center));
-    gl.uniform1f(this._thresholdLoc, evalFloatUniform(this.threshold) / 2.);
-    gl.uniform1f(this._falloffLoc, evalFloatUniform(this.falloff) / 2.);
-    gl.uniform1f(this._positiveLoc, evalFloatUniform(this.outputOnPositive));
-    gl.uniform1f(this._negativeLoc, evalFloatUniform(this.outputOnNegative));
+    this.center._preDraw();
+    this.outputOnNegative._preDraw();
+    this.outputOnPositive._preDraw();
+    this.threshold._preDraw();
+    this.falloff._preDraw();
 }
 _Near.prototype.isAnimated = function () {
-    return typeof this.center === "function";
+    return this.center.isAnimated();
 }
 
 function RampColor(property, minKey, maxKey, values) {
@@ -607,8 +774,8 @@ function RampColor(property, minKey, maxKey, values) {
 
 function _RampColor(property, minKey, maxKey, values) {
     this.property = property;
-    this.minKey = minKey;
-    this.maxKey = maxKey;
+    this.minKey = minKey.expr;
+    this.maxKey = maxKey.expr;
     this.values = values;
 
     this.texture = gl.createTexture();
@@ -749,7 +916,6 @@ function Layer(renderer, geometryType) {
 }
 
 Layer.prototype._compileColorShader = function () {
-    console.log("Recompile color")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
@@ -765,6 +931,7 @@ Layer.prototype._compileColorShader = function () {
     var source = colorStylerFS;
     source = source.replace('$PREFACE', colorModifier.preface);
     source = source.replace('$COLOR', colorModifier.inline);
+    console.log("Recompile color", source);
     //console.log(this, source);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     if (this.colorShader) {
@@ -788,7 +955,6 @@ Layer.prototype._compileColorShader = function () {
 }
 
 Layer.prototype._compileWidthShader = function () {
-    console.log("Recompile width", this)
     var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
@@ -804,6 +970,7 @@ Layer.prototype._compileWidthShader = function () {
     var source = widthStylerFS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
+    console.log("Recompile width", source)
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     if (this.widthShader) {
         gl.deleteProgram(this.widthShader);
@@ -938,7 +1105,7 @@ Layer.prototype.addTile = function (tile) {
 }
 
 function Renderer(canvas) {
-    this.canvas=canvas;
+    this.canvas = canvas;
     if (!gl) {
         gl = canvas.getContext('webgl');
         var ext = gl.getExtension("OES_texture_float");
@@ -989,6 +1156,7 @@ Renderer.prototype.setZoom = function (zoom) {
 
 module.exports = {
     Renderer: Renderer,
+    parseStyle: parseStyle,
     Style: {
         Near: Near,
         Float: Float,

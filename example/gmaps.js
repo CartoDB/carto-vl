@@ -14,7 +14,7 @@ function styleWidth(e) {
     const Float = R.Style.Float;
     const Color = R.Style.Color;
     const RampColor = R.Style.RampColor;
-    const width = R.parseStyle(v);
+    const width = eval(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
     }
@@ -25,7 +25,7 @@ function styleColor(e) {
     const Float = R.Style.Float;
     const Color = R.Style.Color;
     const RampColor = R.Style.RampColor;
-    const color =  R.parseStyle(v);
+    const color = eval(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
     }
@@ -96,34 +96,79 @@ const WM_EXT = EARTH_RADIUS * Math.PI * 2;
 const TILE_SIZE = 256;
 // Webmercator projection
 function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
+    let lat = latLng.lat() * DEG2RAD;
+    let lng = latLng.lng() * DEG2RAD;
     let x = lng * EARTH_RADIUS;
     let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
     return { x: x, y: y };
 }
 
+function initMap() {
+    // Create a map object and specify the DOM element for display.
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 8
+    });
 
+    var cont = map.getDiv();
+    var canvas = document.createElement('canvas')
+    canvas.id = 'good';
+    cont.appendChild(canvas)
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    console.log(cont, cont.style.width, cont.getClientRects()[0].width, canvas.style.width);
+    function getZoom() {
+        var b = map.getBounds();
+        var c = map.getCenter();
+        var nw = b.getNorthEast();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
+        renderer.setCenter(c.lng() / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        return z;
+    }
+    function move(a, b, c) {
+        var b = map.getBounds();
+        var nw = b.getNorthEast();
+        var c = map.getCenter();
 
-var mapboxgl = window.mapboxgl;
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
-var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'mapbox://styles/mapbox/basic-v9', // stylesheet location
-    center: [-74.50, 40], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
-});
-map.repaint = false;
-function getZoom() {
-    var b = map.getBounds();
-    var c = map.getCenter();
-    var nw = b.getNorthWest();
-    var sw = b.getSouthWest();
-    var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
-    renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
-    return z;
+        renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        renderer.setZoom(getZoom());
+        // console.log(renderer.getCenter(), renderer.getZoom(), c)
+    }
+    start(canvas);
+    // move();
+    window.map = map;
+
+var attatched = false;
+   /* map.addListener('drag', function () {
+        // debugger;
+        if (!attatched) {
+            var target = cont.querySelector('div.gm-style div div');
+
+            // create an observer instance
+            var observer = new MutationObserver(function (mutations) {
+                //move();
+            });
+
+            // configuration of the observer:
+            var config = { attributes: true, childList: true, characterData: true };
+
+            // pass in the target node, as well as the observer options
+            observer.observe(target, config);
+        }
+    });
+
+    map.addListener('dragend', move);
+    map.addListener('dragstart', move);
+     map.addListener('drag', move);*/
+    /*cont.addEventListener('mousemove', move);
+    cont.addEventListener('mousestart', move);
+    cont.addEventListener('mouseleave', move);
+    cont.addEventListener('mouseover', move);
+    cont.addEventListener('mousemove', move);*/
 }
-
+window.initMap = initMap;
+/*
 map.on('load', _ => {
     var cont = map.getCanvasContainer();
     var canvas = document.createElement('canvas')
@@ -131,12 +176,6 @@ map.on('load', _ => {
     cont.appendChild(canvas)
     canvas.style.width = map.getCanvas().style.width;
     canvas.style.height = map.getCanvas().style.height;
-
-    var isDragging = false;
-    var draggOffset = {
-        x: 0.,
-        y: 0.
-    };
 
     function move(a, b, c) {
         var b = map.getBounds();
@@ -160,3 +199,4 @@ map.on('load', _ => {
     map.on('zoomend', move);
 
 });
+*/
