@@ -373,11 +373,204 @@ function signedArea(ring) {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 var gl;
 
 const RTT_WIDTH = 1024;
+
+var jsep = __webpack_require__(11);
+
+function implicitCast(value){
+    if (Number.isFinite(value)){
+        return Float(node.value);
+    }
+    return value;
+}
+
+function parseNode(node) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNode(arg));
+        switch (node.callee.name) {
+            case 'RampColor':
+                return RampColor(...args);
+            case 'Near':
+                return Near(...args);
+            case 'Now':
+                return Now(...args);
+            default:
+                break;
+        }
+    } else if (node.type == 'Literal') {
+        return node.value;
+    } else if (node.type == 'ArrayExpression') {
+        return node.elements.map(e => parseNode(e));
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNode(node.left);
+        const right = parseNode(node.right);
+        switch (node.operator) {
+            case "*":
+                //TODO check left & right types => float
+                return FloatMul(left, right);
+            case "+":
+                return FloatAdd(left, right);
+            case "-":
+                return FloatSub(left, right);
+            case "^":
+                return FloatPow(left, right);
+            default:
+                break;
+        }
+    }
+    console.warn(node);
+    return null;
+}
+
+jsep.addBinaryOp("^", 10);
+function parseStyle(str) {
+    const tree = jsep(str);
+    console.log(tree)
+    const e = parseNode(tree);
+    console.log(e)
+    return e;
+}
+
+function Now() {
+    return new _Now();
+}
+function _Now() {
+    this.float = Float(100);
+}
+_Now.prototype._applyToShaderSource = function (uniformIDMaker) {
+    return this.float._applyToShaderSource(uniformIDMaker);
+}
+_Now.prototype._postShaderCompile = function (program) {
+    return this.float._postShaderCompile(program);
+}
+_Now.prototype._preDraw = function () {
+    this.float.expr = Date.now() * 0.1 % 400;
+    this.float._preDraw();
+}
+_Now.prototype.isAnimated = function () {
+    return true;
+}
+
+const FloatMul = genFloatBinaryOperation((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+const FloatMul = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatAdd = genFloatBinaryOperation((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+
+function genFloatBinaryOperation(jsFn, glsl) {
+    function Op(a, b) {
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            return Float(jsFn(a, b));
+        }
+        if (Number.isFinite(b)) {
+            b = Float(b);
+        }
+        return new _Op(a, b);
+    }
+    function _Op(a, b) {
+        this.a = a;
+        this.b = b;
+        a.parent = this;
+        b.parent = this;
+    }
+    _Op.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: a.preface + b.preface,
+            inline: glsl(a.inline, b.inline)
+        };
+    }
+    _Op.prototype._postShaderCompile = function (program) {
+        this.a._postShaderCompile(program);
+        this.b._postShaderCompile(program);
+    }
+    _Op.prototype._preDraw = function (l) {
+        this.a._preDraw(l);
+        this.b._preDraw(l);
+    }
+    _Op.prototype.isAnimated = function () {
+        return this.a.isAnimated() || this.b.isAnimated();
+    }
+    _Op.prototype.replaceChild = function (toReplace, replacer) {
+        if (this.a = toReplace) {
+            this.a = replacer;
+        } else {
+            this.b = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    return Op;
+}
+
+
+
+function FloatBlend(a, b, mix) {
+    this.a = a;
+    this.b = b;
+    a.parent = this;
+    b.parent = this;
+    if (mix.indexOf('ms') >= 0) {
+        duration = Number(mix.replace('ms', ''));
+        this.aTime = Date.now();
+        this.bTime = this.aTime + duration;
+        mix = 'anim';
+    }
+    this.mix = mix;
+}
+FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    this._uniformID = uniformIDMaker();
+    const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    return {
+        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
+        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
+    };
+}
+FloatBlend.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
+    this.a._postShaderCompile(program);
+    this.b._postShaderCompile(program);
+}
+FloatBlend.prototype._preDraw = function (l) {
+    var mix = this.mix;
+    if (mix == 'anim') {
+        const time = Date.now();
+        mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (mix >= 1.) {
+            mix = 1.;
+            this.mix = 1.;
+            //TODO free A, free blend
+            this.parent.replaceChild(this, this.b);
+        }
+    }
+    gl.uniform1f(this._uniformLocation, mix);
+    this.a._preDraw(l);
+    this.b._preDraw(l);
+}
+FloatBlend.prototype.isAnimated = function () {
+    return this.mix === 'anim';
+}
+FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
+    if (this.a = toReplace) {
+        this.a = replacer;
+    } else {
+        this.b = replacer;
+    }
+    replacer.parent = this;
+    replacer.notify = toReplace.notify;
+}
+function genericFloatBlend(initial, final, duration, blendFunc) {
+    const parent = initial.parent;
+    const blend = new FloatBlend(initial, final, `${duration}ms`);
+    parent.replaceChild(initial, blend);
+    blend.notify();
+}
 
 const renderVS = `
 
@@ -413,6 +606,9 @@ void main(void) {
     vec4 c = color;
     float l = length(p);
     c.a *=  1. - smoothstep(0.9, 1.1, l);
+    if (c.a==0.){
+        discard;
+    }
     gl_FragColor = c;
 }`;
 
@@ -520,7 +716,18 @@ function compileShader(sourceCode, type) {
     }
     return shader;
 }
-
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_EXT = EARTH_RADIUS * Math.PI * 2;
+const TILE_SIZE = 256;
+// Webmercator projection
+function Wmxy(latLng) {
+    let lat = latLng.lat() * DEG2RAD;
+    let lng = latLng.lng() * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x: x, y: y };
+}
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
     // Don't re-render more than once per animation frame
@@ -528,6 +735,27 @@ function refresh(timestamp) {
         return;
     }
     this.lastFrame = timestamp;
+    /*console.timeStamp("MyRENDER");
+    var r = this;
+    function getZoom() {
+        var b = map.getBounds();
+        var c = map.getCenter();
+        var nw = b.getNorthEast();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
+        r.setCenter(c.lng() / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        return z;
+    }
+    function move(a, b, c) {
+        var b = map.getBounds();
+        var nw = b.getNorthEast();
+        var c = map.getCenter();
+
+        r.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        r.setZoom(getZoom());
+        // console.log(renderer.getCenter(), renderer.getZoom(), c)
+    }
+    move();*/
 
     //console.log('Re-render')
 
@@ -780,68 +1008,6 @@ _RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc =
 }
 
 
-
-function FloatBlend(a, b, mix) {
-    this.a = a;
-    this.b = b;
-    a.parent = this;
-    b.parent = this;
-    if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
-        this.aTime = Date.now();
-        this.bTime = this.aTime + duration;
-        mix = 'anim';
-    }
-    this.mix = mix;
-}
-FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._uniformID = uniformIDMaker();
-    const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    return {
-        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
-        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
-    };
-}
-FloatBlend.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
-    this.a._postShaderCompile(program);
-    this.b._postShaderCompile(program);
-}
-FloatBlend.prototype._preDraw = function (l) {
-    var mix = this.mix;
-    if (mix == 'anim') {
-        const time = Date.now();
-        mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (mix >= 1.) {
-            mix = 1.;
-            this.mix = 1.;
-            //TODO free A, free blend
-            this.parent.replaceChild(this, this.b);
-        }
-    }
-    gl.uniform1f(this._uniformLocation, mix);
-    this.a._preDraw(l);
-    this.b._preDraw(l);
-}
-FloatBlend.prototype.isAnimated = function () {
-    return this.mix === 'anim';
-}
-FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
-    if (this.a = toReplace) {
-        this.a = replacer;
-    } else {
-        this.b = replacer;
-    }
-    replacer.parent = this;
-    replacer.notify = toReplace.notify;
-}
-function genericFloatBlend(initial, final, duration, blendFunc) {
-    const parent = initial.parent;
-    const blend = new FloatBlend(initial, final, `${duration}ms`);
-    parent.replaceChild(initial, blend);
-    blend.notify();
-}
 _Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericFloatBlend(this, finalValue, duration, blendFunc);
 }
@@ -866,7 +1032,7 @@ UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float float${this._uniformID};\n`,
-        inline: `float${this._uniformID}/25.`
+        inline: `float${this._uniformID}`
     };
 }
 UniformFloat.prototype._postShaderCompile = function (program) {
@@ -918,7 +1084,8 @@ function hexToRgb(hex) {
 */
 
 function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    if ([property, center, threshold, falloff, outputOnNegative, outputOnPositive].some(x => x === undefined || x === null)) {
+    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCastValue);
+    if (args.some(x => x === undefined || x === null)) {
         return null;
     }
     return new _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
@@ -936,25 +1103,25 @@ function _Near(property, center, threshold, falloff, outputOnNegative, outputOnP
 _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._UID = uniformIDMaker();
     const tid = propertyTIDMaker(this.property);
+    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const positive = this.outputOnPositive._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
-        preface: `
-        uniform float center${this._UID};
-        uniform float threshold${this._UID};
-        uniform float falloff${this._UID};
-        uniform float positive${this._UID};
-        uniform float negative${this._UID};
-        `,
-        inline: `mix(positive${this._UID},negative${this._UID},
-                        clamp((abs(p${tid}-center${this._UID})-threshold${this._UID})/falloff${this._UID},
+        preface:
+        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
+        inline: `mix(${positive.inline},${negative.inline},
+                        clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
                             0., 1.))/25.`
     };
 }
 _Near.prototype._postShaderCompile = function (program) {
-    this._centerLoc = gl.getUniformLocation(program, `center${this._UID}`);
-    this._thresholdLoc = gl.getUniformLocation(program, `threshold${this._UID}`);
-    this._falloffLoc = gl.getUniformLocation(program, `falloff${this._UID}`);
-    this._positiveLoc = gl.getUniformLocation(program, `positive${this._UID}`);
-    this._negativeLoc = gl.getUniformLocation(program, `negative${this._UID}`);
+    this.center._postShaderCompile(program);
+    this.outputOnNegative._postShaderCompile(program);
+    this.outputOnPositive._postShaderCompile(program);
+    this.threshold._postShaderCompile(program);
+    this.falloff._postShaderCompile(program);
 }
 function evalFloatUniform(x) {
     if (typeof x === "function") {
@@ -967,14 +1134,14 @@ function evalFloatUniform(x) {
 }
 
 _Near.prototype._preDraw = function () {
-    gl.uniform1f(this._centerLoc, evalFloatUniform(this.center));
-    gl.uniform1f(this._thresholdLoc, evalFloatUniform(this.threshold) / 2.);
-    gl.uniform1f(this._falloffLoc, evalFloatUniform(this.falloff) / 2.);
-    gl.uniform1f(this._positiveLoc, evalFloatUniform(this.outputOnPositive));
-    gl.uniform1f(this._negativeLoc, evalFloatUniform(this.outputOnNegative));
+    this.center._preDraw();
+    this.outputOnNegative._preDraw();
+    this.outputOnPositive._preDraw();
+    this.threshold._preDraw();
+    this.falloff._preDraw();
 }
 _Near.prototype.isAnimated = function () {
-    return typeof this.center === "function";
+    return this.center.isAnimated();
 }
 
 function RampColor(property, minKey, maxKey, values) {
@@ -984,8 +1151,8 @@ function RampColor(property, minKey, maxKey, values) {
 
 function _RampColor(property, minKey, maxKey, values) {
     this.property = property;
-    this.minKey = minKey;
-    this.maxKey = maxKey;
+    this.minKey = minKey.expr;
+    this.maxKey = maxKey.expr;
     this.values = values;
 
     this.texture = gl.createTexture();
@@ -1126,7 +1293,6 @@ function Layer(renderer, geometryType) {
 }
 
 Layer.prototype._compileColorShader = function () {
-    console.log("Recompile color")
     var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
@@ -1142,6 +1308,7 @@ Layer.prototype._compileColorShader = function () {
     var source = colorStylerFS;
     source = source.replace('$PREFACE', colorModifier.preface);
     source = source.replace('$COLOR', colorModifier.inline);
+    console.log("Recompile color", source);
     //console.log(this, source);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     if (this.colorShader) {
@@ -1165,7 +1332,6 @@ Layer.prototype._compileColorShader = function () {
 }
 
 Layer.prototype._compileWidthShader = function () {
-    console.log("Recompile width", this)
     var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
@@ -1181,6 +1347,7 @@ Layer.prototype._compileWidthShader = function () {
     var source = widthStylerFS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
+    console.log("Recompile width", source)
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     if (this.widthShader) {
         gl.deleteProgram(this.widthShader);
@@ -1315,7 +1482,7 @@ Layer.prototype.addTile = function (tile) {
 }
 
 function Renderer(canvas) {
-    this.canvas=canvas;
+    this.canvas = canvas;
     if (!gl) {
         gl = canvas.getContext('webgl');
         var ext = gl.getExtension("OES_texture_float");
@@ -1366,6 +1533,7 @@ Renderer.prototype.setZoom = function (zoom) {
 
 module.exports = {
     Renderer: Renderer,
+    parseStyle: parseStyle,
     Style: {
         Near: Near,
         Float: Float,
@@ -2466,7 +2634,7 @@ function styleWidth(e) {
     const Float = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.Float;
     const Color = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.Color;
     const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.RampColor;
-    const width = eval(v);
+    const width = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.parseStyle(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
     }
@@ -2477,7 +2645,7 @@ function styleColor(e) {
     const Float = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.Float;
     const Color = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.Color;
     const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.RampColor;
-    const color = eval(v);
+    const color =  __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.parseStyle(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
     }
@@ -2565,7 +2733,7 @@ var map = new mapboxgl.Map({
     center: [-74.50, 40], // starting position [lng, lat]
     zoom: 0, // starting zoom,
 });
-map.repaint = true;
+map.repaint = false;
 function getZoom() {
     var b = map.getBounds();
     var c = map.getCenter();
@@ -2612,6 +2780,692 @@ map.on('load', _ => {
     map.on('zoomend', move);
 
 });
+
+
+/***/ }),
+/* 10 */,
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+//     JavaScript Expression Parser (JSEP) 0.3.2
+//     JSEP may be freely distributed under the MIT License
+//     http://jsep.from.so/
+
+/*global module: true, exports: true, console: true */
+(function (root) {
+	'use strict';
+	// Node Types
+	// ----------
+
+	// This is the full set of types that any JSEP node can be.
+	// Store them here to save space when minified
+	var COMPOUND = 'Compound',
+		IDENTIFIER = 'Identifier',
+		MEMBER_EXP = 'MemberExpression',
+		LITERAL = 'Literal',
+		THIS_EXP = 'ThisExpression',
+		CALL_EXP = 'CallExpression',
+		UNARY_EXP = 'UnaryExpression',
+		BINARY_EXP = 'BinaryExpression',
+		LOGICAL_EXP = 'LogicalExpression',
+		CONDITIONAL_EXP = 'ConditionalExpression',
+		ARRAY_EXP = 'ArrayExpression',
+
+		PERIOD_CODE = 46, // '.'
+		COMMA_CODE  = 44, // ','
+		SQUOTE_CODE = 39, // single quote
+		DQUOTE_CODE = 34, // double quotes
+		OPAREN_CODE = 40, // (
+		CPAREN_CODE = 41, // )
+		OBRACK_CODE = 91, // [
+		CBRACK_CODE = 93, // ]
+		QUMARK_CODE = 63, // ?
+		SEMCOL_CODE = 59, // ;
+		COLON_CODE  = 58, // :
+
+		throwError = function(message, index) {
+			var error = new Error(message + ' at character ' + index);
+			error.index = index;
+			error.description = message;
+			throw error;
+		},
+
+	// Operations
+	// ----------
+
+	// Set `t` to `true` to save space (when minified, not gzipped)
+		t = true,
+	// Use a quickly-accessible map to store all of the unary operators
+	// Values are set to `true` (it really doesn't matter)
+		unary_ops = {'-': t, '!': t, '~': t, '+': t},
+	// Also use a map for the binary operations but set their values to their
+	// binary precedence for quick reference:
+	// see [Order of operations](http://en.wikipedia.org/wiki/Order_of_operations#Programming_language)
+		binary_ops = {
+			'||': 1, '&&': 2, '|': 3,  '^': 4,  '&': 5,
+			'==': 6, '!=': 6, '===': 6, '!==': 6,
+			'<': 7,  '>': 7,  '<=': 7,  '>=': 7,
+			'<<':8,  '>>': 8, '>>>': 8,
+			'+': 9, '-': 9,
+			'*': 10, '/': 10, '%': 10
+		},
+	// Get return the longest key length of any object
+		getMaxKeyLen = function(obj) {
+			var max_len = 0, len;
+			for(var key in obj) {
+				if((len = key.length) > max_len && obj.hasOwnProperty(key)) {
+					max_len = len;
+				}
+			}
+			return max_len;
+		},
+		max_unop_len = getMaxKeyLen(unary_ops),
+		max_binop_len = getMaxKeyLen(binary_ops),
+	// Literals
+	// ----------
+	// Store the values to return for the various literals we may encounter
+		literals = {
+			'true': true,
+			'false': false,
+			'null': null
+		},
+	// Except for `this`, which is special. This could be changed to something like `'self'` as well
+		this_str = 'this',
+	// Returns the precedence of a binary operator or `0` if it isn't a binary operator
+		binaryPrecedence = function(op_val) {
+			return binary_ops[op_val] || 0;
+		},
+	// Utility function (gets called from multiple places)
+	// Also note that `a && b` and `a || b` are *logical* expressions, not binary expressions
+		createBinaryExpression = function (operator, left, right) {
+			var type = (operator === '||' || operator === '&&') ? LOGICAL_EXP : BINARY_EXP;
+			return {
+				type: type,
+				operator: operator,
+				left: left,
+				right: right
+			};
+		},
+		// `ch` is a character code in the next three functions
+		isDecimalDigit = function(ch) {
+			return (ch >= 48 && ch <= 57); // 0...9
+		},
+		isIdentifierStart = function(ch) {
+			return (ch === 36) || (ch === 95) || // `$` and `_`
+					(ch >= 65 && ch <= 90) || // A...Z
+					(ch >= 97 && ch <= 122) || // a...z
+                    (ch >= 128 && !binary_ops[String.fromCharCode(ch)]); // any non-ASCII that is not an operator
+		},
+		isIdentifierPart = function(ch) {
+			return (ch === 36) || (ch === 95) || // `$` and `_`
+					(ch >= 65 && ch <= 90) || // A...Z
+					(ch >= 97 && ch <= 122) || // a...z
+					(ch >= 48 && ch <= 57) || // 0...9
+                    (ch >= 128 && !binary_ops[String.fromCharCode(ch)]); // any non-ASCII that is not an operator
+		},
+
+		// Parsing
+		// -------
+		// `expr` is a string with the passed in expression
+		jsep = function(expr) {
+			// `index` stores the character number we are currently at while `length` is a constant
+			// All of the gobbles below will modify `index` as we move along
+			var index = 0,
+				charAtFunc = expr.charAt,
+				charCodeAtFunc = expr.charCodeAt,
+				exprI = function(i) { return charAtFunc.call(expr, i); },
+				exprICode = function(i) { return charCodeAtFunc.call(expr, i); },
+				length = expr.length,
+
+				// Push `index` up to the next non-space character
+				gobbleSpaces = function() {
+					var ch = exprICode(index);
+					// space or tab
+					while(ch === 32 || ch === 9 || ch === 10 || ch === 13) {
+						ch = exprICode(++index);
+					}
+				},
+
+				// The main parsing function. Much of this code is dedicated to ternary expressions
+				gobbleExpression = function() {
+					var test = gobbleBinaryExpression(),
+						consequent, alternate;
+					gobbleSpaces();
+					if(exprICode(index) === QUMARK_CODE) {
+						// Ternary expression: test ? consequent : alternate
+						index++;
+						consequent = gobbleExpression();
+						if(!consequent) {
+							throwError('Expected expression', index);
+						}
+						gobbleSpaces();
+						if(exprICode(index) === COLON_CODE) {
+							index++;
+							alternate = gobbleExpression();
+							if(!alternate) {
+								throwError('Expected expression', index);
+							}
+							return {
+								type: CONDITIONAL_EXP,
+								test: test,
+								consequent: consequent,
+								alternate: alternate
+							};
+						} else {
+							throwError('Expected :', index);
+						}
+					} else {
+						return test;
+					}
+				},
+
+				// Search for the operation portion of the string (e.g. `+`, `===`)
+				// Start by taking the longest possible binary operations (3 characters: `===`, `!==`, `>>>`)
+				// and move down from 3 to 2 to 1 character until a matching binary operation is found
+				// then, return that binary operation
+				gobbleBinaryOp = function() {
+					gobbleSpaces();
+					var biop, to_check = expr.substr(index, max_binop_len), tc_len = to_check.length;
+					while(tc_len > 0) {
+						if(binary_ops.hasOwnProperty(to_check)) {
+							index += tc_len;
+							return to_check;
+						}
+						to_check = to_check.substr(0, --tc_len);
+					}
+					return false;
+				},
+
+				// This function is responsible for gobbling an individual expression,
+				// e.g. `1`, `1+2`, `a+(b*2)-Math.sqrt(2)`
+				gobbleBinaryExpression = function() {
+					var ch_i, node, biop, prec, stack, biop_info, left, right, i;
+
+					// First, try to get the leftmost thing
+					// Then, check to see if there's a binary operator operating on that leftmost thing
+					left = gobbleToken();
+					biop = gobbleBinaryOp();
+
+					// If there wasn't a binary operator, just return the leftmost node
+					if(!biop) {
+						return left;
+					}
+
+					// Otherwise, we need to start a stack to properly place the binary operations in their
+					// precedence structure
+					biop_info = { value: biop, prec: binaryPrecedence(biop)};
+
+					right = gobbleToken();
+					if(!right) {
+						throwError("Expected expression after " + biop, index);
+					}
+					stack = [left, biop_info, right];
+
+					// Properly deal with precedence using [recursive descent](http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm)
+					while((biop = gobbleBinaryOp())) {
+						prec = binaryPrecedence(biop);
+
+						if(prec === 0) {
+							break;
+						}
+						biop_info = { value: biop, prec: prec };
+
+						// Reduce: make a binary expression from the three topmost entries.
+						while ((stack.length > 2) && (prec <= stack[stack.length - 2].prec)) {
+							right = stack.pop();
+							biop = stack.pop().value;
+							left = stack.pop();
+							node = createBinaryExpression(biop, left, right);
+							stack.push(node);
+						}
+
+						node = gobbleToken();
+						if(!node) {
+							throwError("Expected expression after " + biop, index);
+						}
+						stack.push(biop_info, node);
+					}
+
+					i = stack.length - 1;
+					node = stack[i];
+					while(i > 1) {
+						node = createBinaryExpression(stack[i - 1].value, stack[i - 2], node);
+						i -= 2;
+					}
+					return node;
+				},
+
+				// An individual part of a binary expression:
+				// e.g. `foo.bar(baz)`, `1`, `"abc"`, `(a % 2)` (because it's in parenthesis)
+				gobbleToken = function() {
+					var ch, to_check, tc_len;
+
+					gobbleSpaces();
+					ch = exprICode(index);
+
+					if(isDecimalDigit(ch) || ch === PERIOD_CODE) {
+						// Char code 46 is a dot `.` which can start off a numeric literal
+						return gobbleNumericLiteral();
+					} else if(ch === SQUOTE_CODE || ch === DQUOTE_CODE) {
+						// Single or double quotes
+						return gobbleStringLiteral();
+					} else if(isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
+						// `foo`, `bar.baz`
+						return gobbleVariable();
+					} else if (ch === OBRACK_CODE) {
+						return gobbleArray();
+					} else {
+						to_check = expr.substr(index, max_unop_len);
+						tc_len = to_check.length;
+						while(tc_len > 0) {
+							if(unary_ops.hasOwnProperty(to_check)) {
+								index += tc_len;
+								return {
+									type: UNARY_EXP,
+									operator: to_check,
+									argument: gobbleToken(),
+									prefix: true
+								};
+							}
+							to_check = to_check.substr(0, --tc_len);
+						}
+
+						return false;
+					}
+				},
+				// Parse simple numeric literals: `12`, `3.4`, `.5`. Do this by using a string to
+				// keep track of everything in the numeric literal and then calling `parseFloat` on that string
+				gobbleNumericLiteral = function() {
+					var number = '', ch, chCode;
+					while(isDecimalDigit(exprICode(index))) {
+						number += exprI(index++);
+					}
+
+					if(exprICode(index) === PERIOD_CODE) { // can start with a decimal marker
+						number += exprI(index++);
+
+						while(isDecimalDigit(exprICode(index))) {
+							number += exprI(index++);
+						}
+					}
+
+					ch = exprI(index);
+					if(ch === 'e' || ch === 'E') { // exponent marker
+						number += exprI(index++);
+						ch = exprI(index);
+						if(ch === '+' || ch === '-') { // exponent sign
+							number += exprI(index++);
+						}
+						while(isDecimalDigit(exprICode(index))) { //exponent itself
+							number += exprI(index++);
+						}
+						if(!isDecimalDigit(exprICode(index-1)) ) {
+							throwError('Expected exponent (' + number + exprI(index) + ')', index);
+						}
+					}
+
+
+					chCode = exprICode(index);
+					// Check to make sure this isn't a variable name that start with a number (123abc)
+					if(isIdentifierStart(chCode)) {
+						throwError('Variable names cannot start with a number (' +
+									number + exprI(index) + ')', index);
+					} else if(chCode === PERIOD_CODE) {
+						throwError('Unexpected period', index);
+					}
+
+					return {
+						type: LITERAL,
+						value: parseFloat(number),
+						raw: number
+					};
+				},
+
+				// Parses a string literal, staring with single or double quotes with basic support for escape codes
+				// e.g. `"hello world"`, `'this is\nJSEP'`
+				gobbleStringLiteral = function() {
+					var str = '', quote = exprI(index++), closed = false, ch;
+
+					while(index < length) {
+						ch = exprI(index++);
+						if(ch === quote) {
+							closed = true;
+							break;
+						} else if(ch === '\\') {
+							// Check for all of the common escape codes
+							ch = exprI(index++);
+							switch(ch) {
+								case 'n': str += '\n'; break;
+								case 'r': str += '\r'; break;
+								case 't': str += '\t'; break;
+								case 'b': str += '\b'; break;
+								case 'f': str += '\f'; break;
+								case 'v': str += '\x0B'; break;
+								default : str += '\\' + ch;
+							}
+						} else {
+							str += ch;
+						}
+					}
+
+					if(!closed) {
+						throwError('Unclosed quote after "'+str+'"', index);
+					}
+
+					return {
+						type: LITERAL,
+						value: str,
+						raw: quote + str + quote
+					};
+				},
+
+				// Gobbles only identifiers
+				// e.g.: `foo`, `_value`, `$x1`
+				// Also, this function checks if that identifier is a literal:
+				// (e.g. `true`, `false`, `null`) or `this`
+				gobbleIdentifier = function() {
+					var ch = exprICode(index), start = index, identifier;
+
+					if(isIdentifierStart(ch)) {
+						index++;
+					} else {
+						throwError('Unexpected ' + exprI(index), index);
+					}
+
+					while(index < length) {
+						ch = exprICode(index);
+						if(isIdentifierPart(ch)) {
+							index++;
+						} else {
+							break;
+						}
+					}
+					identifier = expr.slice(start, index);
+
+					if(literals.hasOwnProperty(identifier)) {
+						return {
+							type: LITERAL,
+							value: literals[identifier],
+							raw: identifier
+						};
+					} else if(identifier === this_str) {
+						return { type: THIS_EXP };
+					} else {
+						return {
+							type: IDENTIFIER,
+							name: identifier
+						};
+					}
+				},
+
+				// Gobbles a list of arguments within the context of a function call
+				// or array literal. This function also assumes that the opening character
+				// `(` or `[` has already been gobbled, and gobbles expressions and commas
+				// until the terminator character `)` or `]` is encountered.
+				// e.g. `foo(bar, baz)`, `my_func()`, or `[bar, baz]`
+				gobbleArguments = function(termination) {
+					var ch_i, args = [], node, closed = false;
+					while(index < length) {
+						gobbleSpaces();
+						ch_i = exprICode(index);
+						if(ch_i === termination) { // done parsing
+							closed = true;
+							index++;
+							break;
+						} else if (ch_i === COMMA_CODE) { // between expressions
+							index++;
+						} else {
+							node = gobbleExpression();
+							if(!node || node.type === COMPOUND) {
+								throwError('Expected comma', index);
+							}
+							args.push(node);
+						}
+					}
+					if (!closed) {
+						throwError('Expected ' + String.fromCharCode(termination), index);
+					}
+					return args;
+				},
+
+				// Gobble a non-literal variable name. This variable name may include properties
+				// e.g. `foo`, `bar.baz`, `foo['bar'].baz`
+				// It also gobbles function calls:
+				// e.g. `Math.acos(obj.angle)`
+				gobbleVariable = function() {
+					var ch_i, node;
+					ch_i = exprICode(index);
+
+					if(ch_i === OPAREN_CODE) {
+						node = gobbleGroup();
+					} else {
+						node = gobbleIdentifier();
+					}
+					gobbleSpaces();
+					ch_i = exprICode(index);
+					while(ch_i === PERIOD_CODE || ch_i === OBRACK_CODE || ch_i === OPAREN_CODE) {
+						index++;
+						if(ch_i === PERIOD_CODE) {
+							gobbleSpaces();
+							node = {
+								type: MEMBER_EXP,
+								computed: false,
+								object: node,
+								property: gobbleIdentifier()
+							};
+						} else if(ch_i === OBRACK_CODE) {
+							node = {
+								type: MEMBER_EXP,
+								computed: true,
+								object: node,
+								property: gobbleExpression()
+							};
+							gobbleSpaces();
+							ch_i = exprICode(index);
+							if(ch_i !== CBRACK_CODE) {
+								throwError('Unclosed [', index);
+							}
+							index++;
+						} else if(ch_i === OPAREN_CODE) {
+							// A function call is being made; gobble all the arguments
+							node = {
+								type: CALL_EXP,
+								'arguments': gobbleArguments(CPAREN_CODE),
+								callee: node
+							};
+						}
+						gobbleSpaces();
+						ch_i = exprICode(index);
+					}
+					return node;
+				},
+
+				// Responsible for parsing a group of things within parentheses `()`
+				// This function assumes that it needs to gobble the opening parenthesis
+				// and then tries to gobble everything within that parenthesis, assuming
+				// that the next thing it should see is the close parenthesis. If not,
+				// then the expression probably doesn't have a `)`
+				gobbleGroup = function() {
+					index++;
+					var node = gobbleExpression();
+					gobbleSpaces();
+					if(exprICode(index) === CPAREN_CODE) {
+						index++;
+						return node;
+					} else {
+						throwError('Unclosed (', index);
+					}
+				},
+
+				// Responsible for parsing Array literals `[1, 2, 3]`
+				// This function assumes that it needs to gobble the opening bracket
+				// and then tries to gobble the expressions as arguments.
+				gobbleArray = function() {
+					index++;
+					return {
+						type: ARRAY_EXP,
+						elements: gobbleArguments(CBRACK_CODE)
+					};
+				},
+
+				nodes = [], ch_i, node;
+
+			while(index < length) {
+				ch_i = exprICode(index);
+
+				// Expressions can be separated by semicolons, commas, or just inferred without any
+				// separators
+				if(ch_i === SEMCOL_CODE || ch_i === COMMA_CODE) {
+					index++; // ignore separators
+				} else {
+					// Try to gobble each expression individually
+					if((node = gobbleExpression())) {
+						nodes.push(node);
+					// If we weren't able to find a binary expression and are out of room, then
+					// the expression passed in probably has too much
+					} else if(index < length) {
+						throwError('Unexpected "' + exprI(index) + '"', index);
+					}
+				}
+			}
+
+			// If there's only one expression just try returning the expression
+			if(nodes.length === 1) {
+				return nodes[0];
+			} else {
+				return {
+					type: COMPOUND,
+					body: nodes
+				};
+			}
+		};
+
+	// To be filled in by the template
+	jsep.version = '0.3.2';
+	jsep.toString = function() { return 'JavaScript Expression Parser (JSEP) v' + jsep.version; };
+
+	/**
+	 * @method jsep.addUnaryOp
+	 * @param {string} op_name The name of the unary op to add
+	 * @return jsep
+	 */
+	jsep.addUnaryOp = function(op_name) {
+		max_unop_len = Math.max(op_name.length, max_unop_len);
+		unary_ops[op_name] = t; return this;
+	};
+
+	/**
+	 * @method jsep.addBinaryOp
+	 * @param {string} op_name The name of the binary op to add
+	 * @param {number} precedence The precedence of the binary op (can be a float)
+	 * @return jsep
+	 */
+	jsep.addBinaryOp = function(op_name, precedence) {
+		max_binop_len = Math.max(op_name.length, max_binop_len);
+		binary_ops[op_name] = precedence;
+		return this;
+	};
+
+	/**
+	 * @method jsep.addLiteral
+	 * @param {string} literal_name The name of the literal to add
+	 * @param {*} literal_value The value of the literal
+	 * @return jsep
+	 */
+	jsep.addLiteral = function(literal_name, literal_value) {
+		literals[literal_name] = literal_value;
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeUnaryOp
+	 * @param {string} op_name The name of the unary op to remove
+	 * @return jsep
+	 */
+	jsep.removeUnaryOp = function(op_name) {
+		delete unary_ops[op_name];
+		if(op_name.length === max_unop_len) {
+			max_unop_len = getMaxKeyLen(unary_ops);
+		}
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeAllUnaryOps
+	 * @return jsep
+	 */
+	jsep.removeAllUnaryOps = function() {
+		unary_ops = {};
+		max_unop_len = 0;
+		
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeBinaryOp
+	 * @param {string} op_name The name of the binary op to remove
+	 * @return jsep
+	 */
+	jsep.removeBinaryOp = function(op_name) {
+		delete binary_ops[op_name];
+		if(op_name.length === max_binop_len) {
+			max_binop_len = getMaxKeyLen(binary_ops);
+		}
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeAllBinaryOps
+	 * @return jsep
+	 */
+	jsep.removeAllBinaryOps = function() {
+		binary_ops = {};
+		max_binop_len = 0;
+		
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeLiteral
+	 * @param {string} literal_name The name of the literal to remove
+	 * @return jsep
+	 */
+	jsep.removeLiteral = function(literal_name) {
+		delete literals[literal_name];
+		return this;
+	};
+
+	/**
+	 * @method jsep.removeAllLiterals
+	 * @return jsep
+	 */
+	jsep.removeAllLiterals = function() {
+		literals = {};
+		
+		return this;
+	};
+
+	// In desktop environments, have a way to restore the old value for `jsep`
+	if (false) {
+		var old_jsep = root.jsep;
+		// The star of the show! It's a function!
+		root.jsep = jsep;
+		// And a courteous function willing to move out of the way for other similarly-named objects!
+		jsep.noConflict = function() {
+			if(root.jsep === jsep) {
+				root.jsep = old_jsep;
+			}
+			return jsep;
+		};
+	} else {
+		// In Node.JS environments
+		if (typeof module !== 'undefined' && module.exports) {
+			exports = module.exports = jsep;
+		} else {
+			exports.parse = jsep;
+		}
+	}
+}(this));
 
 
 /***/ })

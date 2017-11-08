@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2610,14 +2610,15 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 8 */
+/* 8 */,
+/* 9 */,
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__src_index__);
-
 
 
 var VectorTile = __webpack_require__(3).VectorTile;
@@ -2661,38 +2662,25 @@ function getData() {
     oReq.responseType = "arraybuffer";
     oReq.onload = function (oEvent) {
         var arrayBuffer = oReq.response;
-        console.log("MVT1", arrayBuffer, oEvent, oReq);
         if (arrayBuffer) {
             var tile = new VectorTile(new Protobuf(arrayBuffer));
-            console.log("MVT", tile);
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
             var fieldMap = {
                 temp: 0,
                 daten: 1
             };
+            //mvtLayer.length=1000;
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
             for (var i = 0; i < mvtLayer.length; i++) {
                 const f = mvtLayer.feature(i);
                 const geom = f.loadGeometry();
-                //console.log(mvtLayer.feature(i).toGeoJSON(0,0,0))
-                points[2 * i + 0] = (geom[0][0].x) / 4096.0;
-                points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
+                points[2 * i + 0] = 2 * (geom[0][0].x) / 4096.0 - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / 4096.0) - 1.;
 
                 properties[0][i] = Number(f.properties.temp);
                 properties[1][i] = Number(f.properties.daten);
-
-                /*Object.keys(f.properties).map(name => {
-                    if (fieldMap[name] === undefined) {
-                        fieldMap[name] = Object.keys(fieldMap).length;
-                    }
-                    var pid = fieldMap[name];
-                    if (properties[pid] === undefined) {
-                        properties[pid] = new Float32Array(mvtLayer.length);
-                    }
-                    properties[pid][i] = Number(f.properties[name]);
-                });*/
             }
             var tile = {
                 center: { x: 0, y: 0 },
@@ -2704,7 +2692,6 @@ function getData() {
             Object.keys(fieldMap).map((name, pid) => {
                 tile.properties[name] = properties[pid];
             })
-            console.log("Tile", tile);
             oldtile = layer.addTile(tile);
             styleWidth();
             styleColor();
@@ -2712,92 +2699,130 @@ function getData() {
     };
 
     oReq.send(null);
-    /*
-        ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
-            if (oldtile) {
-                layer.removeTile(oldtile);
-            }
-            console.log("Downloaded", data);
-            const fields = Object.keys(data.fields).filter(name => name != 'st_asgeojson');
-            var properties = fields.map(_ => new Float32Array(data.rows.length));
-            var points = new Float32Array(data.rows.length * 2);
-            data.rows.forEach((e, index) => {
-                var point = $.parseJSON(e.st_asgeojson).coordinates;
-                points[2 * index + 0] = (point[0]) + Math.random() * 1000;
-                points[2 * index + 1] = (point[1]) + Math.random() * 1000;
-                fields.map((name, pid) => {
-                    properties[pid][index] = Number(e[name]);
-                });
-            });
-            var tile = {
-                center: { x: 0, y: 0 },
-                scale: 1 / 10000000.,
-                count: data.rows.length,
-                geom: points,
-                properties: {}
-            };
-            fields.map((name, pid) => {
-                tile.properties[name] = properties[pid];
-            })
-            console.log("Tile", tile);
-            oldtile = layer.addTile(tile);
-            styleWidth();
-            styleColor();
-        });*/
 }
-function start() {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Renderer(document.getElementById('glCanvas'));
+function start(element) {
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Renderer(element);
     layer = renderer.addLayer();
 
     getData();
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    $('#sqlEntry').on('input', getData);
+    //$('#sqlEntry').on('input', getData);
 
-    // Pan and zoom
-    window.onresize = function () { renderer.refresh(); };
-    $(window).bind('mousewheel DOMMouseScroll', function (event) {
-        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-            renderer.setZoom(renderer.getZoom() * 0.8);
-        } else {
-            renderer.setZoom(renderer.getZoom() / 0.8);
-        }
-    });
-    var isDragging = false;
-    var draggOffset = {
-        x: 0.,
-        y: 0.
-    };
-    document.onmousedown = function (event) {
-        isDragging = true;
-        draggOffset = {
-            x: event.clientX,
-            y: event.clientY
-        };
-    };
-    document.onmousemove = function (event) {
-        if (isDragging) {
-            var c = renderer.getCenter();
-            var k = renderer.getZoom() / document.body.clientHeight * 2.;
-            c.x += (draggOffset.x - event.clientX) * k;
-            c.y += -(draggOffset.y - event.clientY) * k;
-            renderer.setCenter(c.x, c.y);
-            draggOffset = {
-                x: event.clientX,
-                y: event.clientY
-            };
-        }
-    };
-    document.onmouseup = function () {
-        isDragging = false;
-    };
+    //window.onresize = function () { renderer.refresh(); };
+}
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_EXT = EARTH_RADIUS * Math.PI * 2;
+const TILE_SIZE = 256;
+// Webmercator projection
+function Wmxy(latLng) {
+    let lat = latLng.lat() * DEG2RAD;
+    let lng = latLng.lng() * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x: x, y: y };
 }
 
-start();
+function initMap() {
+    // Create a map object and specify the DOM element for display.
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 8
+    });
+
+    var cont = map.getDiv();
+    var canvas = document.createElement('canvas')
+    canvas.id = 'good';
+    cont.appendChild(canvas)
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    console.log(cont, cont.style.width, cont.getClientRects()[0].width, canvas.style.width);
+    function getZoom() {
+        var b = map.getBounds();
+        var c = map.getCenter();
+        var nw = b.getNorthEast();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
+        renderer.setCenter(c.lng() / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        return z;
+    }
+    function move(a, b, c) {
+        var b = map.getBounds();
+        var nw = b.getNorthEast();
+        var c = map.getCenter();
+
+        renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        renderer.setZoom(getZoom());
+        // console.log(renderer.getCenter(), renderer.getZoom(), c)
+    }
+    start(canvas);
+    // move();
+    window.map = map;
+
+var attatched = false;
+   /* map.addListener('drag', function () {
+        // debugger;
+        if (!attatched) {
+            var target = cont.querySelector('div.gm-style div div');
+
+            // create an observer instance
+            var observer = new MutationObserver(function (mutations) {
+                //move();
+            });
+
+            // configuration of the observer:
+            var config = { attributes: true, childList: true, characterData: true };
+
+            // pass in the target node, as well as the observer options
+            observer.observe(target, config);
+        }
+    });
+
+    map.addListener('dragend', move);
+    map.addListener('dragstart', move);
+     map.addListener('drag', move);*/
+    /*cont.addEventListener('mousemove', move);
+    cont.addEventListener('mousestart', move);
+    cont.addEventListener('mouseleave', move);
+    cont.addEventListener('mouseover', move);
+    cont.addEventListener('mousemove', move);*/
+}
+window.initMap = initMap;
+/*
+map.on('load', _ => {
+    var cont = map.getCanvasContainer();
+    var canvas = document.createElement('canvas')
+    canvas.id = 'good';
+    cont.appendChild(canvas)
+    canvas.style.width = map.getCanvas().style.width;
+    canvas.style.height = map.getCanvas().style.height;
+
+    function move(a, b, c) {
+        var b = map.getBounds();
+        var nw = b.getNorthWest();
+        var c = map.getCenter();
+
+        renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        renderer.setZoom(getZoom());
+    }
+    start(canvas);
+    move();
+    map.on('movestart', move);
+    map.on('move', move);
+    map.on('moveend', move);
+    map.on('dragstart', move);
+    map.on('drag', move);
+    map.on('dragstart', move);
+    map.on('dragend', move);
+    map.on('zoomstart', move);
+    map.on('zoom', move);
+    map.on('zoomend', move);
+
+});
+*/
 
 /***/ }),
-/* 9 */,
-/* 10 */,
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
