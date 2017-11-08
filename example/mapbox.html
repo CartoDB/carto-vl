@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Display a map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #good {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+        }
+
+        textarea {
+            position: absolute;
+            width: 600px;
+            height: 100px;
+            opacity: 0.75;
+        }
+
+        #widthStyleEntry {
+            top: 0;
+            left: 0;
+
+        }
+
+        #colorStyleEntry {
+            top: 120px;
+            left: 0;
+        }
+
+        #sqlEntry {
+            top: 240px;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="mycanvas" width="400" height="300" style="display: none;"></canvas>
+
+    <div id='map'></div>
+
+    <textarea id="widthStyleEntry">
+            Near('daten', ()=>Date.now() * 0.1 % 4000, 0, 30, 1., 10.)
+                </textarea>
+    <textarea id="colorStyleEntry">
+            RampColor('temp', 5, 30, ['#008080', '#70a494', '#b4c8a8', '#f6edbd', '#edbb8a', '#de8a5a', '#ca562c'])
+                </textarea>
+    <textarea id="sqlEntry">
+            SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS daten FROM wwi_ships  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1100999</textarea>
+
+
+</body>
+<script src="../dist/mapbox.js"></script>
+
+</html>

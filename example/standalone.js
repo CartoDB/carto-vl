@@ -63,7 +63,7 @@ function getData() {
 
                 properties[0][i] = Number(f.properties.temp);
                 properties[1][i] = Number(f.properties.daten);
-                
+
                 /*Object.keys(f.properties).map(name => {
                     if (fieldMap[name] === undefined) {
                         fieldMap[name] = Object.keys(fieldMap).length;
@@ -174,4 +174,4 @@ function start() {
     };
 }
 
-export { start };
+start();

@@ -155,7 +155,7 @@ function refresh(timestamp) {
     //console.log('Re-render')
 
 
-    var canvas = document.getElementById('glCanvas');//TODO this should be a renderer property
+    var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
     if (gl.canvas.width != width ||
@@ -163,7 +163,6 @@ function refresh(timestamp) {
         gl.canvas.width = width;
         gl.canvas.height = height;
     }
-
     var aspect = canvas.clientWidth / canvas.clientHeight;
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -807,7 +806,7 @@ Layer.prototype._compileWidthShader = function () {
     source = source.replace('$WIDTH', widthModifier.inline);
     var FS = compileShader(source, gl.FRAGMENT_SHADER);
     if (this.widthShader) {
-        gl.deleteProgram(this.colorShader);
+        gl.deleteProgram(this.widthShader);
     }
     this.widthShader = gl.createProgram();
     gl.attachShader(this.widthShader, VS);
@@ -939,8 +938,8 @@ Layer.prototype.addTile = function (tile) {
 }
 
 function Renderer(canvas) {
+    this.canvas=canvas;
     if (!gl) {
-        //TODO use webgl 1
         gl = canvas.getContext('webgl');
         var ext = gl.getExtension("OES_texture_float");
         if (!ext) {

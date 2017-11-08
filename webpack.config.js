@@ -1,11 +1,13 @@
 const path = require('path');
 
-module.exports = {
-  entry: './example/index.js',
-  output: {
-    library: "main",
-    libraryTarget: "umd",
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
-  }
-};
+module.exports =
+  {
+    entry: {
+      standalone: "./example/standalone.js",
+      mapbox: "./example/mapbox.js",
+    },
+    output: {
+      path: path.join(__dirname, "dist"),
+      filename: "[name].js"
+    }
+  };
