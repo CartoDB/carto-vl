@@ -10,22 +10,14 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    const Near = R.Style.Near;
-    const Float = R.Style.Float;
-    const Color = R.Style.Color;
-    const RampColor = R.Style.RampColor;
-    const width = R.parseStyle(v);
+    const width = R.Style.parseStyle(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
     }
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    const Near = R.Style.Near;
-    const Float = R.Style.Float;
-    const Color = R.Style.Color;
-    const RampColor = R.Style.RampColor;
-    const color =  R.parseStyle(v);
+    const color =  R.Style.parseStyle(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
     }
