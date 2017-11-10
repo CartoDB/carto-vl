@@ -1,2 +1,3 @@
-exports.color = require("./color.js");
-exports.width = require("./width.js");
+import * as color from './color';
+import * as width from './width';
+export { color, width };

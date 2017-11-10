@@ -65,10 +65,16 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-exports.color = __webpack_require__(7);
-exports.width = __webpack_require__(8);
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(8);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "color", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "width", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
+
+
 
 
 /***/ }),
@@ -824,17 +830,23 @@ exports.renderer = {
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-exports.point = __webpack_require__(6);
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(6);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "point", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
+
 
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
-module.exports.VS = `
+const VS = `
 
 precision highp float;
 
@@ -856,8 +868,10 @@ void main(void) {
     gl_PointSize = size*25.;
     color = texture2D(colorTex, featureID);
 }`;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
 
-module.exports.FS = `
+
+const FS = `
 precision lowp float;
 
 varying lowp vec4 color;
@@ -873,12 +887,16 @@ void main(void) {
     }
     gl_FragColor = c;
 }`;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports.VS = `
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+const VS = `
 
 precision highp float;
 attribute vec2 vertex;
@@ -890,8 +908,10 @@ void main(void) {
     gl_Position  = vec4(vertex, 0.5, 1.);
 }
 `;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
 
-module.exports.FS = `
+
+const FS = `
 
 precision highp float;
 
@@ -912,13 +932,17 @@ void main(void) {
     gl_FragColor = $INLINE;
 }
 `;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
 
 
 /***/ }),
 /* 8 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports.VS = `
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+const VS = `
 
 precision highp float;
 attribute vec2 vertex;
@@ -930,8 +954,10 @@ void main(void) {
     gl_Position  = vec4(vertex, 0.5, 1.);
 }
 `;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
 
-module.exports.FS = `
+
+const FS = `
 
 precision highp float;
 
@@ -952,6 +978,8 @@ void main(void) {
     gl_FragColor = vec4($INLINE);
 }
 `;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
 
 /***/ }),
 /* 9 */

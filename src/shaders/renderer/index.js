@@ -1,1 +1,2 @@
-exports.point = require("./point.js");
+import * as point from './point';
+export { point };

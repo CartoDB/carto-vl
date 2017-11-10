@@ -1,5 +1,5 @@
 
-module.exports.VS = `
+export const VS = `
 
 precision highp float;
 
@@ -22,7 +22,7 @@ void main(void) {
     color = texture2D(colorTex, featureID);
 }`;
 
-module.exports.FS = `
+export const FS = `
 precision lowp float;
 
 varying lowp vec4 color;

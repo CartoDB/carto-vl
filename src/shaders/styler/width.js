@@ -1,4 +1,4 @@
-module.exports.VS = `
+export const VS = `
 
 precision highp float;
 attribute vec2 vertex;
@@ -11,7 +11,7 @@ void main(void) {
 }
 `;
 
-module.exports.FS = `
+export const FS = `
 
 precision highp float;
 
