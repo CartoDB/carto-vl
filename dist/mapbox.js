@@ -376,15 +376,19 @@ function signedArea(ring) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(9);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 var gl;
 
 const RTT_WIDTH = 1024;
 
-const shaders = __webpack_require__(3);
-var style = __webpack_require__(9);
+
+
 
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(gl);
 }
 function compileShader( sourceCode, type) {
     var shader = gl.createShader(type);
@@ -409,7 +413,7 @@ Layer.prototype._compileColorShader = function () {
     });
     //TODO check tid table size
     this.propertyColorTID = tid;
-    this.colorShader = shaders.styler.createColorShader(gl, colorModifier.preface, colorModifier.inline);
+    this.colorShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createColorShader(gl, colorModifier.preface, colorModifier.inline);
     this.style._color._postShaderCompile(this.colorShader.program);
 }
 Layer.prototype._compileWidthShader = function () {
@@ -424,7 +428,7 @@ Layer.prototype._compileWidthShader = function () {
     });
     //TODO check tid table size
     this.propertyWidthTID = tid;
-    this.widthShader = shaders.styler.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
+    this.widthShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createWidthShader(gl, widthModifier.preface, widthModifier.inline);
     this.style._width._postShaderCompile(this.widthShader.program);
 }
 
@@ -559,7 +563,7 @@ function refresh(timestamp) {
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
     this.geometryType = geometryType;
-    this.style = new style.Style(this);
+    this.style = new __WEBPACK_IMPORTED_MODULE_1__style__["Style"](this);
     this.tiles = [];
     this._compileColorShader();
     this._compileWidthShader();
@@ -687,7 +691,7 @@ function Renderer(canvas) {
     this.canvas = canvas;
     if (!gl) {
         gl = canvas.getContext('webgl');
-        style.setGL(gl);
+        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
         var ext = gl.getExtension("OES_texture_float");
         if (!ext) {
             console.error("this machine or browser does not support OES_texture_float");
@@ -734,19 +738,15 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
-module.exports = {
-    Renderer: Renderer,
-    Style: style
-};
+
 
 /***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderer", function() { return renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "styler", function() { return styler; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(6);
 
@@ -3370,7 +3370,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__src_index__);
 
 
 var VectorTile = __webpack_require__(11).VectorTile;
@@ -3383,14 +3382,14 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    const width = __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.parseStyle(v);
+    const width = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyle(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
     }
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    const color =  __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Style.parseStyle(v);
+    const color =  __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyle(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
     }
@@ -3445,7 +3444,7 @@ function getData() {
     oReq.send(null);
 }
 function start(element) {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index___default.a.Renderer(element);
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](element);
     layer = renderer.addLayer();
 
     getData();

@@ -1,4 +1,4 @@
-import R from '../src/index';
+import * as R from '../src/index';
 
 var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');

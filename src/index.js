@@ -2,8 +2,8 @@ var gl;
 
 const RTT_WIDTH = 1024;
 
-const shaders = require("./shaders");
-var style = require("./style");
+import * as shaders from './shaders';
+import * as Style from './style';
 
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(gl);
@@ -181,7 +181,7 @@ function refresh(timestamp) {
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
     this.geometryType = geometryType;
-    this.style = new style.Style(this);
+    this.style = new Style.Style(this);
     this.tiles = [];
     this._compileColorShader();
     this._compileWidthShader();
@@ -309,7 +309,7 @@ function Renderer(canvas) {
     this.canvas = canvas;
     if (!gl) {
         gl = canvas.getContext('webgl');
-        style.setGL(gl);
+        Style.setGL(gl);
         var ext = gl.getExtension("OES_texture_float");
         if (!ext) {
             console.error("this machine or browser does not support OES_texture_float");
@@ -356,7 +356,4 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
-module.exports = {
-    Renderer: Renderer,
-    Style: style
-};
+export {Renderer, Style};
