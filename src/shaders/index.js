@@ -1,8 +1,10 @@
 import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
 
+const NUM_TEXTURE_LOCATIONS = 32;
+
 function compileShader(gl, sourceCode, type) {
-    var shader = gl.createShader(type);
+    const shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -44,7 +46,7 @@ function GenericStyler(gl, glsl, preface, inline) {
     compileProgram.call(this, gl, VS, FS);
     this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
     this.textureLocations = [];
-    for (var i = 0; i < 8; i++) {
+    for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
         this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
     }
 }
