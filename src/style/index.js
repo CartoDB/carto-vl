@@ -1,15 +1,21 @@
-
-var jsep = require("jsep");
 var gl = null;
-module.exports = {
-    parseStyle: parseStyle,
-    Now: Now,
-    Float: Float,
-    Color: Color,
-    RampColor: RampColor,
-    Style: Style,
-    setGL: _gl => gl = _gl,
+
+import jsep from 'jsep';
+
+export {
+    parseStyle,
+    Now,
+    Float,
+    Color,
+    RampColor,
+    Style,
+    setGL,
 };
+
+function setGL(_gl) {
+    gl = _gl;
+}
+
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -146,7 +152,7 @@ function FloatBlend(a, b, mix) {
     a.parent = this;
     b.parent = this;
     if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
+        const duration = Number(mix.replace('ms', ''));
         this.aTime = Date.now();
         this.bTime = this.aTime + duration;
         mix = 'anim';
@@ -264,7 +270,7 @@ function ColorBlend(a, b, mix) {
     a.parent = this;
     b.parent = this;
     if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
+        const duration = Number(mix.replace('ms', ''));
         this.aTime = Date.now();
         this.bTime = this.aTime + duration;
         mix = 'anim';
@@ -408,7 +414,7 @@ function hexToRgb(hex) {
 */
 
 function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
+    const args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }
@@ -434,7 +440,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
     const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
         preface:
-        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
+            center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
         inline: `mix(${positive.inline},${negative.inline},
                         clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
                             0., 1.))/25.`
@@ -470,7 +476,7 @@ _Near.prototype.isAnimated = function () {
 
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
-    args = [property, minKey, maxKey, values].map(implicitCast);
+    const args = [property, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }

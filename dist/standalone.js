@@ -65,26 +65,12 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(8);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "color", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "width", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
-
-
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(2);
+var VectorTileFeature = __webpack_require__(1);
 
 module.exports = VectorTileLayer;
 
@@ -146,7 +132,7 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -386,14 +372,15 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 var gl;
 
 const RTT_WIDTH = 1024;
 
-const shaders = __webpack_require__(4);
+const shaders = __webpack_require__(3);
 var style = __webpack_require__(9);
 
 Renderer.prototype._initShaders = function () {
@@ -422,7 +409,7 @@ Layer.prototype._compileColorShader = function () {
     });
     //TODO check tid table size
     this.propertyColorTID = tid;
-    this.colorShader = shaders.renderer.createColorShader(gl, colorModifier.preface, colorModifier.inline);
+    this.colorShader = shaders.styler.createColorShader(gl, colorModifier.preface, colorModifier.inline);
     this.style._color._postShaderCompile(this.colorShader.program);
 }
 Layer.prototype._compileWidthShader = function () {
@@ -437,7 +424,7 @@ Layer.prototype._compileWidthShader = function () {
     });
     //TODO check tid table size
     this.propertyWidthTID = tid;
-    this.widthShader = shaders.renderer.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
+    this.widthShader = shaders.styler.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
     this.style._width._postShaderCompile(this.widthShader.program);
 }
 
@@ -753,12 +740,15 @@ module.exports = {
 };
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-const renderer = __webpack_require__(5);
-const styler = __webpack_require__(0);
-exports.styler = __webpack_require__(0);
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderer", function() { return renderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "styler", function() { return styler; });
+const rendererGLSL = __webpack_require__(4);
+const stylerGLSL = __webpack_require__(6);
 
 function compileShader(gl, sourceCode, type) {
     var shader = gl.createShader(type);
@@ -787,7 +777,7 @@ function compileProgram(gl, glslVS, glslFS) {
 }
 
 function Point(gl) {
-    compileProgram.call(this, gl, renderer.point.VS, renderer.point.FS);
+    compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
     this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
     this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
@@ -795,7 +785,6 @@ function Point(gl) {
     this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
 }
-
 function GenericStyler(gl, glsl, preface, inline) {
     const VS = glsl.VS;
     let FS = glsl.FS;
@@ -808,39 +797,44 @@ function GenericStyler(gl, glsl, preface, inline) {
         this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
     }
 }
-
 function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, styler.color, preface, inline);
+    GenericStyler.call(this, gl, stylerGLSL.color, preface, inline);
 }
 function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, styler.width, preface, inline);
+    GenericStyler.call(this, gl, stylerGLSL.width, preface, inline);
 }
 
-exports.renderer = {
+const renderer = {
     createPointShader: function (gl) {
         return new Point(gl);
-    },
+    }
+};
+
+const styler = {
     createColorShader: function (gl, preface, inline) {
         return new Color(gl, preface, inline);
     },
     createWidthShader: function (gl, preface, inline) {
         return new Width(gl, preface, inline);
-    },
-}
+    }
+};
+
+
+
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(5);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "point", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -888,6 +882,20 @@ void main(void) {
     gl_FragColor = c;
 }`;
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(8);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "color", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "width", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
+
+
 
 
 /***/ }),
@@ -983,20 +991,29 @@ void main(void) {
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-
-var jsep = __webpack_require__(10);
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return parseStyle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return Now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return Color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 var gl = null;
-module.exports = {
-    parseStyle: parseStyle,
-    Now: Now,
-    Float: Float,
-    Color: Color,
-    RampColor: RampColor,
-    Style: Style,
-    setGL: _gl => gl = _gl,
-};
+
+
+
+
+
+function setGL(_gl) {
+    gl = _gl;
+}
+
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -1043,9 +1060,9 @@ function parseNode(node) {
     return null;
 }
 
-jsep.addBinaryOp("^", 10);
+__WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
 function parseStyle(str) {
-    const tree = jsep(str);
+    const tree = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
     console.log(tree)
     const e = parseNode(tree);
     console.log(e)
@@ -1133,7 +1150,7 @@ function FloatBlend(a, b, mix) {
     a.parent = this;
     b.parent = this;
     if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
+        const duration = Number(mix.replace('ms', ''));
         this.aTime = Date.now();
         this.bTime = this.aTime + duration;
         mix = 'anim';
@@ -1251,7 +1268,7 @@ function ColorBlend(a, b, mix) {
     a.parent = this;
     b.parent = this;
     if (mix.indexOf('ms') >= 0) {
-        duration = Number(mix.replace('ms', ''));
+        const duration = Number(mix.replace('ms', ''));
         this.aTime = Date.now();
         this.bTime = this.aTime + duration;
         mix = 'anim';
@@ -1395,7 +1412,7 @@ function hexToRgb(hex) {
 */
 
 function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
+    const args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }
@@ -1421,7 +1438,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
     const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
         preface:
-        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
+            center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
         inline: `mix(${positive.inline},${negative.inline},
                         clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
                             0., 1.))/25.`
@@ -1457,7 +1474,7 @@ _Near.prototype.isAnimated = function () {
 
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
-    args = [property, minKey, maxKey, values].map(implicitCast);
+    const args = [property, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }
@@ -2283,8 +2300,8 @@ Style.prototype.getColor = function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports.VectorTile = __webpack_require__(12);
-module.exports.VectorTileFeature = __webpack_require__(2);
-module.exports.VectorTileLayer = __webpack_require__(1);
+module.exports.VectorTileFeature = __webpack_require__(1);
+module.exports.VectorTileLayer = __webpack_require__(0);
 
 
 /***/ }),
@@ -2294,7 +2311,7 @@ module.exports.VectorTileLayer = __webpack_require__(1);
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(1);
+var VectorTileLayer = __webpack_require__(0);
 
 module.exports = VectorTile;
 
@@ -3351,7 +3368,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__src_index__);
 
 

@@ -31,7 +31,7 @@ Layer.prototype._compileColorShader = function () {
     });
     //TODO check tid table size
     this.propertyColorTID = tid;
-    this.colorShader = shaders.renderer.createColorShader(gl, colorModifier.preface, colorModifier.inline);
+    this.colorShader = shaders.styler.createColorShader(gl, colorModifier.preface, colorModifier.inline);
     this.style._color._postShaderCompile(this.colorShader.program);
 }
 Layer.prototype._compileWidthShader = function () {
@@ -46,7 +46,7 @@ Layer.prototype._compileWidthShader = function () {
     });
     //TODO check tid table size
     this.propertyWidthTID = tid;
-    this.widthShader = shaders.renderer.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
+    this.widthShader = shaders.styler.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
     this.style._width._postShaderCompile(this.widthShader.program);
 }
 
