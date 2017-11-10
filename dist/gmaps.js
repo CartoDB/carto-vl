@@ -60,962 +60,25 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var VectorTileFeature = __webpack_require__(1);
-
-module.exports = VectorTileLayer;
-
-function VectorTileLayer(pbf, end) {
-    // Public
-    this.version = 1;
-    this.name = null;
-    this.extent = 4096;
-    this.length = 0;
-
-    // Private
-    this._pbf = pbf;
-    this._keys = [];
-    this._values = [];
-    this._features = [];
-
-    pbf.readFields(readLayer, this, end);
-
-    this.length = this._features.length;
-}
-
-function readLayer(tag, layer, pbf) {
-    if (tag === 15) layer.version = pbf.readVarint();
-    else if (tag === 1) layer.name = pbf.readString();
-    else if (tag === 5) layer.extent = pbf.readVarint();
-    else if (tag === 2) layer._features.push(pbf.pos);
-    else if (tag === 3) layer._keys.push(pbf.readString());
-    else if (tag === 4) layer._values.push(readValueMessage(pbf));
-}
-
-function readValueMessage(pbf) {
-    var value = null,
-        end = pbf.readVarint() + pbf.pos;
-
-    while (pbf.pos < end) {
-        var tag = pbf.readVarint() >> 3;
-
-        value = tag === 1 ? pbf.readString() :
-            tag === 2 ? pbf.readFloat() :
-            tag === 3 ? pbf.readDouble() :
-            tag === 4 ? pbf.readVarint64() :
-            tag === 5 ? pbf.readVarint() :
-            tag === 6 ? pbf.readSVarint() :
-            tag === 7 ? pbf.readBoolean() : null;
-    }
-
-    return value;
-}
-
-// return feature `i` from this layer as a `VectorTileFeature`
-VectorTileLayer.prototype.feature = function(i) {
-    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');
-
-    this._pbf.pos = this._features[i];
-
-    var end = this._pbf.readVarint() + this._pbf.pos;
-    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);
-};
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Point = __webpack_require__(13);
-
-module.exports = VectorTileFeature;
-
-function VectorTileFeature(pbf, end, extent, keys, values) {
-    // Public
-    this.properties = {};
-    this.extent = extent;
-    this.type = 0;
-
-    // Private
-    this._pbf = pbf;
-    this._geometry = -1;
-    this._keys = keys;
-    this._values = values;
-
-    pbf.readFields(readFeature, this, end);
-}
-
-function readFeature(tag, feature, pbf) {
-    if (tag == 1) feature.id = pbf.readVarint();
-    else if (tag == 2) readTag(pbf, feature);
-    else if (tag == 3) feature.type = pbf.readVarint();
-    else if (tag == 4) feature._geometry = pbf.pos;
-}
-
-function readTag(pbf, feature) {
-    var end = pbf.readVarint() + pbf.pos;
-
-    while (pbf.pos < end) {
-        var key = feature._keys[pbf.readVarint()],
-            value = feature._values[pbf.readVarint()];
-        feature.properties[key] = value;
-    }
-}
-
-VectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];
-
-VectorTileFeature.prototype.loadGeometry = function() {
-    var pbf = this._pbf;
-    pbf.pos = this._geometry;
-
-    var end = pbf.readVarint() + pbf.pos,
-        cmd = 1,
-        length = 0,
-        x = 0,
-        y = 0,
-        lines = [],
-        line;
-
-    while (pbf.pos < end) {
-        if (!length) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 0x7;
-            length = cmdLen >> 3;
-        }
-
-        length--;
-
-        if (cmd === 1 || cmd === 2) {
-            x += pbf.readSVarint();
-            y += pbf.readSVarint();
-
-            if (cmd === 1) { // moveTo
-                if (line) lines.push(line);
-                line = [];
-            }
-
-            line.push(new Point(x, y));
-
-        } else if (cmd === 7) {
-
-            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90
-            if (line) {
-                line.push(line[0].clone()); // closePolygon
-            }
-
-        } else {
-            throw new Error('unknown command ' + cmd);
-        }
-    }
-
-    if (line) lines.push(line);
-
-    return lines;
-};
-
-VectorTileFeature.prototype.bbox = function() {
-    var pbf = this._pbf;
-    pbf.pos = this._geometry;
-
-    var end = pbf.readVarint() + pbf.pos,
-        cmd = 1,
-        length = 0,
-        x = 0,
-        y = 0,
-        x1 = Infinity,
-        x2 = -Infinity,
-        y1 = Infinity,
-        y2 = -Infinity;
-
-    while (pbf.pos < end) {
-        if (!length) {
-            var cmdLen = pbf.readVarint();
-            cmd = cmdLen & 0x7;
-            length = cmdLen >> 3;
-        }
-
-        length--;
-
-        if (cmd === 1 || cmd === 2) {
-            x += pbf.readSVarint();
-            y += pbf.readSVarint();
-            if (x < x1) x1 = x;
-            if (x > x2) x2 = x;
-            if (y < y1) y1 = y;
-            if (y > y2) y2 = y;
-
-        } else if (cmd !== 7) {
-            throw new Error('unknown command ' + cmd);
-        }
-    }
-
-    return [x1, y1, x2, y2];
-};
-
-VectorTileFeature.prototype.toGeoJSON = function(x, y, z) {
-    var size = this.extent * Math.pow(2, z),
-        x0 = this.extent * x,
-        y0 = this.extent * y,
-        coords = this.loadGeometry(),
-        type = VectorTileFeature.types[this.type],
-        i, j;
-
-    function project(line) {
-        for (var j = 0; j < line.length; j++) {
-            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;
-            line[j] = [
-                (p.x + x0) * 360 / size - 180,
-                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
-            ];
-        }
-    }
-
-    switch (this.type) {
-    case 1:
-        var points = [];
-        for (i = 0; i < coords.length; i++) {
-            points[i] = coords[i][0];
-        }
-        coords = points;
-        project(coords);
-        break;
-
-    case 2:
-        for (i = 0; i < coords.length; i++) {
-            project(coords[i]);
-        }
-        break;
-
-    case 3:
-        coords = classifyRings(coords);
-        for (i = 0; i < coords.length; i++) {
-            for (j = 0; j < coords[i].length; j++) {
-                project(coords[i][j]);
-            }
-        }
-        break;
-    }
-
-    if (coords.length === 1) {
-        coords = coords[0];
-    } else {
-        type = 'Multi' + type;
-    }
-
-    var result = {
-        type: "Feature",
-        geometry: {
-            type: type,
-            coordinates: coords
-        },
-        properties: this.properties
-    };
-
-    if ('id' in this) {
-        result.id = this.id;
-    }
-
-    return result;
-};
-
-// classifies an array of rings into polygons with outer rings and holes
-
-function classifyRings(rings) {
-    var len = rings.length;
-
-    if (len <= 1) return [rings];
-
-    var polygons = [],
-        polygon,
-        ccw;
-
-    for (var i = 0; i < len; i++) {
-        var area = signedArea(rings[i]);
-        if (area === 0) continue;
-
-        if (ccw === undefined) ccw = area < 0;
-
-        if (ccw === area < 0) {
-            if (polygon) polygons.push(polygon);
-            polygon = [rings[i]];
-
-        } else {
-            polygon.push(rings[i]);
-        }
-    }
-    if (polygon) polygons.push(polygon);
-
-    return polygons;
-}
-
-function signedArea(ring) {
-    var sum = 0;
-    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {
-        p1 = ring[i];
-        p2 = ring[j];
-        sum += (p2.x - p1.x) * (p1.y + p2.y);
-    }
-    return sum;
-}
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(9);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
-var gl;
-
-const RTT_WIDTH = 1024;
-
-
-
-
-Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(gl);
-}
-function compileShader( sourceCode, type) {
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    return shader;
-}
-Layer.prototype._compileColorShader = function () {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyColorTID = tid;
-    this.colorShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createColorShader(gl, colorModifier.preface, colorModifier.inline);
-    this.style._color._postShaderCompile(this.colorShader.program);
-}
-Layer.prototype._compileWidthShader = function () {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyWidthTID = tid;
-    this.widthShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createWidthShader(gl, widthModifier.preface, widthModifier.inline);
-    this.style._width._postShaderCompile(this.widthShader.program);
-}
-
-Renderer.prototype.refresh = refresh;
-function refresh(timestamp) {
-    // Don't re-render more than once per animation frame
-    if (this.lastFrame == timestamp) {
-        return;
-    }
-    this.lastFrame = timestamp;
-
-    var canvas = this.canvas;
-    var width = gl.canvas.clientWidth;
-    var height = gl.canvas.clientHeight;
-    if (gl.canvas.width != width ||
-        gl.canvas.height != height) {
-        gl.canvas.width = width;
-        gl.canvas.height = height;
-    }
-    var aspect = canvas.clientWidth / canvas.clientHeight;
-    gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gl.enable(gl.CULL_FACE);
-
-    this.layers.forEach(layer => {
-        if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
-            //TODO refactor condition
-            gl.disable(gl.BLEND);
-            gl.disable(gl.DEPTH_TEST);
-
-            if (!this.auxFB) {
-                this.auxFB = gl.createFramebuffer();
-            }
-            gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-            //console.log("Restyle", timestamp)
-            // Render To Texture
-            // COLOR
-            layer.tiles.forEach(tile => {
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-                gl.viewport(0, 0, RTT_WIDTH, tile.height);
-                gl.clear(gl.COLOR_BUFFER_BIT);
-
-                gl.useProgram(layer.colorShader.program);
-
-                layer.style._color._preDraw(layer);
-
-                Object.keys(layer.propertyColorTID).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE0 + i);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
-                });
-
-                gl.enableVertexAttribArray(this.colorShaderVertex);
-                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-                gl.drawArrays(gl.TRIANGLES, 0, 3);
-            });
-
-            //WIDTH
-            layer.tiles.forEach(tile => {
-                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-                gl.useProgram(layer.widthShader.program);
-                gl.viewport(0, 0, RTT_WIDTH, tile.height);
-                gl.clear(gl.COLOR_BUFFER_BIT);
-
-                layer.style._width._preDraw(layer);
-                Object.keys(layer.propertyWidthTID).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE0 + i);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
-                });
-
-                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
-                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-                gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-                layer.style.updated = false;
-                tile.initialized = true;
-            });
-
-        }
-
-        gl.enable(gl.DEPTH_TEST);
-
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        gl.enable(gl.BLEND);
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        gl.useProgram(this.finalRendererProgram.program);
-        var s = 1. / this._zoom;
-
-
-        layer.tiles.forEach(tile => {
-            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
-            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
-
-            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-
-
-            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
-
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
-
-            gl.activeTexture(gl.TEXTURE1);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
-
-            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-
-        });
-
-        if (layer.style._color.isAnimated() || layer.style._width.isAnimated()) {
-            window.requestAnimationFrame(refresh.bind(this));
-        }
-    });
-}
-
-
-
-function Layer(renderer, geometryType) {
-    this.renderer = renderer;
-    this.geometryType = geometryType;
-    this.style = new __WEBPACK_IMPORTED_MODULE_1__style__["Style"](this);
-    this.tiles = [];
-    this._compileColorShader();
-    this._compileWidthShader();
-    this.propertyCount = 0;
-    this.propertyID = {}; //Name => PID
-    this.propertyWidthTID = {}; //Name => Texture image unit ID
-    this.propertyColorTID = {}; //Name => Texture image unit ID
-    this.categoryMap = {};
-}
-
-
-Layer.prototype.removeTile = function (tile) {
-    this.tiles = this.tiles.filter(t => t !== tile);
-    tile.propertyTex.map(tex => gl.deleteTexture(tex));
-    gl.deleteTexture(tile.texColor);
-    gl.deleteTexture(tile.texWidth);
-    gl.deleteBuffer(tile.vertexBuffer);
-    gl.deleteBuffer(tile.featureIDBuffer);
-}
-
-//TODO => setTileProperty (or geom)
-
-Layer.prototype.addTile = function (tile) {
-    this.tiles.push(tile);
-    tile.propertyTex = [];
-
-    var points = tile.geom;
-    const level = 0;
-    const width = RTT_WIDTH;
-    tile.numVertex = points.length / 2;
-    const height = Math.ceil(tile.numVertex / width);
-    const border = 0;
-    const srcFormat = gl.RED;
-    const srcType = gl.FLOAT;
-    tile.height = height;
-
-
-    for (var k in tile.properties) {
-        if (tile.properties.hasOwnProperty(k) && tile.properties[k].length > 0) {
-            const isCategory = !Number.isFinite(tile.properties[k][0]);
-            const property = tile.properties[k];
-            var propertyID = this.propertyID[k];
-            if (propertyID === undefined) {
-                propertyID = this.propertyCount;
-                this.propertyCount++;
-                this.propertyID[k] = propertyID;
-            }
-            tile.propertyTex[propertyID] = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
-            const pixel = new Float32Array(width * height);
-            for (var i = 0; i < property.length; i++) {
-                pixel[i] = property[i];
-            }
-            if (isCategory) {
-                var map = this.categoryMap[k];
-                if (!map) {
-                    map = {};
-                    this.categoryMap[k] = map;
-                }
-                for (var i = 0; i < property.length; i++) {
-                    var catID = map[property[i]];
-                    if (catID === undefined) {
-                        map[property[i]] = Object.keys(map).length;
-                        catID = map[property[i]];
-                    }
-                    pixel[i] = catID / 256.;
-                }
-            }
-            gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-                width, height, 0, gl.ALPHA, srcType,
-                pixel);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-    }
-
-    tile.vertexBuffer = gl.createBuffer();
-    tile.featureIDBuffer = gl.createBuffer();
-
-
-    tile.texColor = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
-        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width * height).fill(255));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    tile.texWidth = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
-        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width * height).fill(100));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-
-
-    var ids = new Float32Array(points.length);
-    for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / width;
-        ids[i + 1] = Math.floor((i / 2) / width) / height;
-    }
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    window.requestAnimationFrame(refresh.bind(this.renderer));
-
-    return tile;
-}
-
-function Renderer(canvas) {
-    this.canvas = canvas;
-    if (!gl) {
-        gl = canvas.getContext('webgl');
-        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
-        var ext = gl.getExtension("OES_texture_float");
-        if (!ext) {
-            console.error("this machine or browser does not support OES_texture_float");
-        }
-        if (!gl) {
-            console.warn('Unable to initialize WebGL2. Your browser may not support it.');
-            return null
-        }
-        this._initShaders();
-        this._center = { x: 0, y: 0 };
-        this._zoom = 1;
-    }
-    this.layers = [];
-    this.squareBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-    var vertices = [
-        10.0, -10.0,
-        0.0, 10.0,
-        -10.0, -10.0,
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-}
-
-Renderer.prototype.addLayer = function () {
-    var layer = new Layer(this, 'points');
-    this.layers.push(layer);
-    return layer;
-}
-
-Renderer.prototype.getCenter = function () {
-    return { x: this._center.x, y: this._center.y };
-}
-Renderer.prototype.setCenter = function (x, y) {
-    this._center.x = x;
-    this._center.y = y;
-    window.requestAnimationFrame(refresh.bind(this));
-}
-
-Renderer.prototype.getZoom = function () {
-    return this._zoom;
-}
-Renderer.prototype.setZoom = function (zoom) {
-    this._zoom = zoom;
-    window.requestAnimationFrame(refresh.bind(this));
-}
-
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(6);
-
-
-
-const NUM_TEXTURE_LOCATIONS = 32;
-
-function compileShader(gl, sourceCode, type) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    return shader;
-}
-
-function compileProgram(gl, glslVS, glslFS) {
-    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
-    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-}
-
-function Point(gl) {
-    compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].FS);
-    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-}
-function GenericStyler(gl, glsl, preface, inline) {
-    const VS = glsl.VS;
-    let FS = glsl.FS;
-    FS = FS.replace('$PREFACE', preface);
-    FS = FS.replace('$INLINE', inline);
-    compileProgram.call(this, gl, VS, FS);
-    this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-    this.textureLocations = [];
-    for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-        this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
-    }
-}
-function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["a" /* color */], preface, inline);
-}
-function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["b" /* width */], preface, inline);
-}
-
-const renderer = {
-    createPointShader: function (gl) {
-        return new Point(gl);
-    }
-};
-
-const styler = {
-    createColorShader: function (gl, preface, inline) {
-        return new Color(gl, preface, inline);
-    },
-    createWidthShader: function (gl, preface, inline) {
-        return new Width(gl, preface, inline);
-    }
-};
-
-
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(5);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
-
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-
-const VS = `
-
-precision highp float;
-
-attribute vec2 vertexPosition;
-attribute vec2 featureID;
-
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
-
-uniform sampler2D colorTex;
-uniform sampler2D widthTex;
-
-varying lowp vec4 color;
-
-void main(void) {
-    float size = texture2D(widthTex, featureID).a;
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
-    gl_Position  = p;
-    gl_PointSize = size*25.;
-    color = texture2D(colorTex, featureID);
-}`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-precision lowp float;
-
-varying lowp vec4 color;
-
-void main(void) {
-    //TODO fix AA (use point size)
-    vec2 p = 2.*gl_PointCoord-vec2(1.);
-    vec4 c = color;
-    float l = length(p);
-    c.a *=  1. - smoothstep(0.9, 1.1, l);
-    if (c.a==0.){
-        discard;
-    }
-    gl_FragColor = c;
-}`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(8);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
-
-
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-const VS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-
-precision highp float;
-
-varying  vec2 uv;
-
-$PREFACE
-
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
-void main(void) {
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
-    gl_FragColor = $INLINE;
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
-
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-const VS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-
-precision highp float;
-
-varying  vec2 uv;
-
-$PREFACE
-
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
-void main(void) {
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
-    gl_FragColor = vec4($INLINE);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return parseStyle; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return Now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return Color; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return RampColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-var gl = null;
-
-
-
-
-
-function setGL(_gl) {
-    gl = _gl;
-}
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return Near; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return setGL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatMul; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatDiv; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return FloatAdd; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return FloatSub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return FloatPow; });
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -1023,53 +86,11 @@ function implicitCast(value) {
     }
     return value;
 }
-
-function parseNode(node) {
-    if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg));
-        switch (node.callee.name) {
-            case 'RampColor':
-                return RampColor(...args);
-            case 'Near':
-                return Near(...args);
-            case 'Now':
-                return Now(...args);
-            default:
-                break;
-        }
-    } else if (node.type == 'Literal') {
-        return node.value;
-    } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e));
-    } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left);
-        const right = parseNode(node.right);
-        switch (node.operator) {
-            case "*":
-                //TODO check left & right types => float
-                return FloatMul(left, right);
-            case "+":
-                return FloatAdd(left, right);
-            case "-":
-                return FloatSub(left, right);
-            case "^":
-                return FloatPow(left, right);
-            default:
-                break;
-        }
-    }
-    console.warn(node);
-    return null;
+var gl = null;
+function setGL(_gl) {
+    gl = _gl;
 }
 
-__WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
-function parseStyle(str) {
-    const tree = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
-    console.log(tree)
-    const e = parseNode(tree);
-    console.log(e)
-    return e;
-}
 
 function Now() {
     return new _Now();
@@ -1554,17 +575,1032 @@ _RampColor.prototype.isAnimated = function () {
 }
 
 
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var VectorTileFeature = __webpack_require__(2);
+
+module.exports = VectorTileLayer;
+
+function VectorTileLayer(pbf, end) {
+    // Public
+    this.version = 1;
+    this.name = null;
+    this.extent = 4096;
+    this.length = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._keys = [];
+    this._values = [];
+    this._features = [];
+
+    pbf.readFields(readLayer, this, end);
+
+    this.length = this._features.length;
+}
+
+function readLayer(tag, layer, pbf) {
+    if (tag === 15) layer.version = pbf.readVarint();
+    else if (tag === 1) layer.name = pbf.readString();
+    else if (tag === 5) layer.extent = pbf.readVarint();
+    else if (tag === 2) layer._features.push(pbf.pos);
+    else if (tag === 3) layer._keys.push(pbf.readString());
+    else if (tag === 4) layer._values.push(readValueMessage(pbf));
+}
+
+function readValueMessage(pbf) {
+    var value = null,
+        end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var tag = pbf.readVarint() >> 3;
+
+        value = tag === 1 ? pbf.readString() :
+            tag === 2 ? pbf.readFloat() :
+            tag === 3 ? pbf.readDouble() :
+            tag === 4 ? pbf.readVarint64() :
+            tag === 5 ? pbf.readVarint() :
+            tag === 6 ? pbf.readSVarint() :
+            tag === 7 ? pbf.readBoolean() : null;
+    }
+
+    return value;
+}
+
+// return feature `i` from this layer as a `VectorTileFeature`
+VectorTileLayer.prototype.feature = function(i) {
+    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');
+
+    this._pbf.pos = this._features[i];
+
+    var end = this._pbf.readVarint() + this._pbf.pos;
+    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Point = __webpack_require__(14);
+
+module.exports = VectorTileFeature;
+
+function VectorTileFeature(pbf, end, extent, keys, values) {
+    // Public
+    this.properties = {};
+    this.extent = extent;
+    this.type = 0;
+
+    // Private
+    this._pbf = pbf;
+    this._geometry = -1;
+    this._keys = keys;
+    this._values = values;
+
+    pbf.readFields(readFeature, this, end);
+}
+
+function readFeature(tag, feature, pbf) {
+    if (tag == 1) feature.id = pbf.readVarint();
+    else if (tag == 2) readTag(pbf, feature);
+    else if (tag == 3) feature.type = pbf.readVarint();
+    else if (tag == 4) feature._geometry = pbf.pos;
+}
+
+function readTag(pbf, feature) {
+    var end = pbf.readVarint() + pbf.pos;
+
+    while (pbf.pos < end) {
+        var key = feature._keys[pbf.readVarint()],
+            value = feature._values[pbf.readVarint()];
+        feature.properties[key] = value;
+    }
+}
+
+VectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];
+
+VectorTileFeature.prototype.loadGeometry = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        lines = [],
+        line;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+
+            if (cmd === 1) { // moveTo
+                if (line) lines.push(line);
+                line = [];
+            }
+
+            line.push(new Point(x, y));
+
+        } else if (cmd === 7) {
+
+            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90
+            if (line) {
+                line.push(line[0].clone()); // closePolygon
+            }
+
+        } else {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    if (line) lines.push(line);
+
+    return lines;
+};
+
+VectorTileFeature.prototype.bbox = function() {
+    var pbf = this._pbf;
+    pbf.pos = this._geometry;
+
+    var end = pbf.readVarint() + pbf.pos,
+        cmd = 1,
+        length = 0,
+        x = 0,
+        y = 0,
+        x1 = Infinity,
+        x2 = -Infinity,
+        y1 = Infinity,
+        y2 = -Infinity;
+
+    while (pbf.pos < end) {
+        if (!length) {
+            var cmdLen = pbf.readVarint();
+            cmd = cmdLen & 0x7;
+            length = cmdLen >> 3;
+        }
+
+        length--;
+
+        if (cmd === 1 || cmd === 2) {
+            x += pbf.readSVarint();
+            y += pbf.readSVarint();
+            if (x < x1) x1 = x;
+            if (x > x2) x2 = x;
+            if (y < y1) y1 = y;
+            if (y > y2) y2 = y;
+
+        } else if (cmd !== 7) {
+            throw new Error('unknown command ' + cmd);
+        }
+    }
+
+    return [x1, y1, x2, y2];
+};
+
+VectorTileFeature.prototype.toGeoJSON = function(x, y, z) {
+    var size = this.extent * Math.pow(2, z),
+        x0 = this.extent * x,
+        y0 = this.extent * y,
+        coords = this.loadGeometry(),
+        type = VectorTileFeature.types[this.type],
+        i, j;
+
+    function project(line) {
+        for (var j = 0; j < line.length; j++) {
+            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;
+            line[j] = [
+                (p.x + x0) * 360 / size - 180,
+                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90
+            ];
+        }
+    }
+
+    switch (this.type) {
+    case 1:
+        var points = [];
+        for (i = 0; i < coords.length; i++) {
+            points[i] = coords[i][0];
+        }
+        coords = points;
+        project(coords);
+        break;
+
+    case 2:
+        for (i = 0; i < coords.length; i++) {
+            project(coords[i]);
+        }
+        break;
+
+    case 3:
+        coords = classifyRings(coords);
+        for (i = 0; i < coords.length; i++) {
+            for (j = 0; j < coords[i].length; j++) {
+                project(coords[i][j]);
+            }
+        }
+        break;
+    }
+
+    if (coords.length === 1) {
+        coords = coords[0];
+    } else {
+        type = 'Multi' + type;
+    }
+
+    var result = {
+        type: "Feature",
+        geometry: {
+            type: type,
+            coordinates: coords
+        },
+        properties: this.properties
+    };
+
+    if ('id' in this) {
+        result.id = this.id;
+    }
+
+    return result;
+};
+
+// classifies an array of rings into polygons with outer rings and holes
+
+function classifyRings(rings) {
+    var len = rings.length;
+
+    if (len <= 1) return [rings];
+
+    var polygons = [],
+        polygon,
+        ccw;
+
+    for (var i = 0; i < len; i++) {
+        var area = signedArea(rings[i]);
+        if (area === 0) continue;
+
+        if (ccw === undefined) ccw = area < 0;
+
+        if (ccw === area < 0) {
+            if (polygon) polygons.push(polygon);
+            polygon = [rings[i]];
+
+        } else {
+            polygon.push(rings[i]);
+        }
+    }
+    if (polygon) polygons.push(polygon);
+
+    return polygons;
+}
+
+function signedArea(ring) {
+    var sum = 0;
+    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {
+        p1 = ring[i];
+        p2 = ring[j];
+        sum += (p2.x - p1.x) * (p1.y + p2.y);
+    }
+    return sum;
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(10);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+var gl;
+
+const RTT_WIDTH = 1024;
+
+
+
+
+Renderer.prototype._initShaders = function () {
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(gl);
+}
+function compileShader( sourceCode, type) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+    }
+    return shader;
+}
+Layer.prototype._compileColorShader = function () {
+    var uniformIDcounter = 0;
+    var tid = {};
+    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    //TODO check tid table size
+    this.propertyColorTID = tid;
+    this.colorShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createColorShader(gl, colorModifier.preface, colorModifier.inline);
+    this.style._color._postShaderCompile(this.colorShader.program);
+}
+Layer.prototype._compileWidthShader = function () {
+    var uniformIDcounter = 0;
+    var tid = {};
+    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    //TODO check tid table size
+    this.propertyWidthTID = tid;
+    this.widthShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createWidthShader(gl, widthModifier.preface, widthModifier.inline);
+    this.style._width._postShaderCompile(this.widthShader.program);
+}
+
+Renderer.prototype.refresh = refresh;
+function refresh(timestamp) {
+    // Don't re-render more than once per animation frame
+    if (this.lastFrame == timestamp) {
+        return;
+    }
+    this.lastFrame = timestamp;
+
+    var canvas = this.canvas;
+    var width = gl.canvas.clientWidth;
+    var height = gl.canvas.clientHeight;
+    if (gl.canvas.width != width ||
+        gl.canvas.height != height) {
+        gl.canvas.width = width;
+        gl.canvas.height = height;
+    }
+    var aspect = canvas.clientWidth / canvas.clientHeight;
+    gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.enable(gl.CULL_FACE);
+
+    this.layers.forEach(layer => {
+        if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
+            //TODO refactor condition
+            gl.disable(gl.BLEND);
+            gl.disable(gl.DEPTH_TEST);
+
+            if (!this.auxFB) {
+                this.auxFB = gl.createFramebuffer();
+            }
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+            //console.log("Restyle", timestamp)
+            // Render To Texture
+            // COLOR
+            layer.tiles.forEach(tile => {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+                gl.viewport(0, 0, RTT_WIDTH, tile.height);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                gl.useProgram(layer.colorShader.program);
+
+                layer.style._color._preDraw(layer);
+
+                Object.keys(layer.propertyColorTID).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
+                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
+                });
+
+                gl.enableVertexAttribArray(this.colorShaderVertex);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+            });
+
+            //WIDTH
+            layer.tiles.forEach(tile => {
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+                gl.useProgram(layer.widthShader.program);
+                gl.viewport(0, 0, RTT_WIDTH, tile.height);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                layer.style._width._preDraw(layer);
+                Object.keys(layer.propertyWidthTID).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
+                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
+                });
+
+                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+                layer.style.updated = false;
+                tile.initialized = true;
+            });
+
+        }
+
+        gl.enable(gl.DEPTH_TEST);
+
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        gl.useProgram(this.finalRendererProgram.program);
+        var s = 1. / this._zoom;
+
+
+        layer.tiles.forEach(tile => {
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
+
+            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+
+            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+
+            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+        });
+
+        if (layer.style._color.isAnimated() || layer.style._width.isAnimated()) {
+            window.requestAnimationFrame(refresh.bind(this));
+        }
+    });
+}
+
+
+
+function Layer(renderer, geometryType) {
+    this.renderer = renderer;
+    this.geometryType = geometryType;
+    this.style = new __WEBPACK_IMPORTED_MODULE_1__style__["Style"](this);
+    this.tiles = [];
+    this._compileColorShader();
+    this._compileWidthShader();
+    this.propertyCount = 0;
+    this.propertyID = {}; //Name => PID
+    this.propertyWidthTID = {}; //Name => Texture image unit ID
+    this.propertyColorTID = {}; //Name => Texture image unit ID
+    this.categoryMap = {};
+}
+
+
+Layer.prototype.removeTile = function (tile) {
+    this.tiles = this.tiles.filter(t => t !== tile);
+    tile.propertyTex.map(tex => gl.deleteTexture(tex));
+    gl.deleteTexture(tile.texColor);
+    gl.deleteTexture(tile.texWidth);
+    gl.deleteBuffer(tile.vertexBuffer);
+    gl.deleteBuffer(tile.featureIDBuffer);
+}
+
+//TODO => setTileProperty (or geom)
+
+Layer.prototype.addTile = function (tile) {
+    this.tiles.push(tile);
+    tile.propertyTex = [];
+
+    var points = tile.geom;
+    const level = 0;
+    const width = RTT_WIDTH;
+    tile.numVertex = points.length / 2;
+    const height = Math.ceil(tile.numVertex / width);
+    const border = 0;
+    const srcFormat = gl.RED;
+    const srcType = gl.FLOAT;
+    tile.height = height;
+
+
+    for (var k in tile.properties) {
+        if (tile.properties.hasOwnProperty(k) && tile.properties[k].length > 0) {
+            const isCategory = !Number.isFinite(tile.properties[k][0]);
+            const property = tile.properties[k];
+            var propertyID = this.propertyID[k];
+            if (propertyID === undefined) {
+                propertyID = this.propertyCount;
+                this.propertyCount++;
+                this.propertyID[k] = propertyID;
+            }
+            tile.propertyTex[propertyID] = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
+            const pixel = new Float32Array(width * height);
+            for (var i = 0; i < property.length; i++) {
+                pixel[i] = property[i];
+            }
+            if (isCategory) {
+                var map = this.categoryMap[k];
+                if (!map) {
+                    map = {};
+                    this.categoryMap[k] = map;
+                }
+                for (var i = 0; i < property.length; i++) {
+                    var catID = map[property[i]];
+                    if (catID === undefined) {
+                        map[property[i]] = Object.keys(map).length;
+                        catID = map[property[i]];
+                    }
+                    pixel[i] = catID / 256.;
+                }
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
+                width, height, 0, gl.ALPHA, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
+    }
+
+    tile.vertexBuffer = gl.createBuffer();
+    tile.featureIDBuffer = gl.createBuffer();
+
+
+    tile.texColor = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
+        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array(4 * width * height).fill(255));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    tile.texWidth = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
+        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array(4 * width * height).fill(100));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+
+
+    var ids = new Float32Array(points.length);
+    for (var i = 0; i < points.length; i += 2) {
+        ids[i + 0] = ((i / 2) % width) / width;
+        ids[i + 1] = Math.floor((i / 2) / width) / height;
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    window.requestAnimationFrame(refresh.bind(this.renderer));
+
+    return tile;
+}
+
+function Renderer(canvas) {
+    this.canvas = canvas;
+    if (!gl) {
+        gl = canvas.getContext('webgl');
+        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
+        var ext = gl.getExtension("OES_texture_float");
+        if (!ext) {
+            console.error("this machine or browser does not support OES_texture_float");
+        }
+        if (!gl) {
+            console.warn('Unable to initialize WebGL2. Your browser may not support it.');
+            return null
+        }
+        this._initShaders();
+        this._center = { x: 0, y: 0 };
+        this._zoom = 1;
+    }
+    this.layers = [];
+    this.squareBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+    var vertices = [
+        10.0, -10.0,
+        0.0, 10.0,
+        -10.0, -10.0,
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+}
+
+Renderer.prototype.addLayer = function () {
+    var layer = new Layer(this, 'points');
+    this.layers.push(layer);
+    return layer;
+}
+
+Renderer.prototype.getCenter = function () {
+    return { x: this._center.x, y: this._center.y };
+}
+Renderer.prototype.setCenter = function (x, y) {
+    this._center.x = x;
+    this._center.y = y;
+    window.requestAnimationFrame(refresh.bind(this));
+}
+
+Renderer.prototype.getZoom = function () {
+    return this._zoom;
+}
+Renderer.prototype.setZoom = function (zoom) {
+    this._zoom = zoom;
+    window.requestAnimationFrame(refresh.bind(this));
+}
+
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(7);
+
+
+
+const NUM_TEXTURE_LOCATIONS = 32;
+
+function compileShader(gl, sourceCode, type) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+    }
+    return shader;
+}
+
+function compileProgram(gl, glslVS, glslFS) {
+    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, VS);
+    gl.attachShader(this.program, FS);
+    gl.linkProgram(this.program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+}
+
+function Point(gl) {
+    compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].FS);
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+}
+function GenericStyler(gl, glsl, preface, inline) {
+    const VS = glsl.VS;
+    let FS = glsl.FS;
+    FS = FS.replace('$PREFACE', preface);
+    FS = FS.replace('$INLINE', inline);
+    compileProgram.call(this, gl, VS, FS);
+    this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+    this.textureLocations = [];
+    for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
+        this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+    }
+}
+function Color(gl, preface, inline) {
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["a" /* color */], preface, inline);
+}
+function Width(gl, preface, inline) {
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["b" /* width */], preface, inline);
+}
+
+const renderer = {
+    createPointShader: function (gl) {
+        return new Point(gl);
+    }
+};
+
+const styler = {
+    createColorShader: function (gl, preface, inline) {
+        return new Color(gl, preface, inline);
+    },
+    createWidthShader: function (gl, preface, inline) {
+        return new Width(gl, preface, inline);
+    }
+};
+
+
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(6);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
+
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
+const VS = `
+
+precision highp float;
+
+attribute vec2 vertexPosition;
+attribute vec2 featureID;
+
+uniform vec2 vertexScale;
+uniform vec2 vertexOffset;
+
+uniform sampler2D colorTex;
+uniform sampler2D widthTex;
+
+varying lowp vec4 color;
+
+void main(void) {
+    float size = texture2D(widthTex, featureID).a;
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
+    gl_Position  = p;
+    gl_PointSize = size*25.;
+    color = texture2D(colorTex, featureID);
+}`;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
+
+
+const FS = `
+precision lowp float;
+
+varying lowp vec4 color;
+
+void main(void) {
+    //TODO fix AA (use point size)
+    vec2 p = 2.*gl_PointCoord-vec2(1.);
+    vec4 c = color;
+    float l = length(p);
+    c.a *=  1. - smoothstep(0.9, 1.1, l);
+    if (c.a==0.){
+        discard;
+    }
+    gl_FragColor = c;
+}`;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(9);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
+
+
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+const VS = `
+
+precision highp float;
+attribute vec2 vertex;
+
+varying  vec2 uv;
+
+void main(void) {
+    uv = vertex*0.5+vec2(0.5);
+    gl_Position  = vec4(vertex, 0.5, 1.);
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
+
+
+const FS = `
+
+precision highp float;
+
+varying  vec2 uv;
+
+$PREFACE
+
+uniform sampler2D property0;
+uniform sampler2D property1;
+uniform sampler2D property2;
+uniform sampler2D property3;
+
+void main(void) {
+    float p0=texture2D(property0, uv).a;
+    float p1=texture2D(property1, uv).a;
+    //float p2=texture2D(property2, uv).a;
+    //float p3=texture2D(property3, uv).a;
+    gl_FragColor = $INLINE;
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+const VS = `
+
+precision highp float;
+attribute vec2 vertex;
+
+varying  vec2 uv;
+
+void main(void) {
+    uv = vertex*0.5+vec2(0.5);
+    gl_Position  = vec4(vertex, 0.5, 1.);
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
+
+
+const FS = `
+
+precision highp float;
+
+varying  vec2 uv;
+
+$PREFACE
+
+uniform sampler2D property0;
+uniform sampler2D property1;
+uniform sampler2D property2;
+uniform sampler2D property3;
+
+void main(void) {
+    float p0=texture2D(property0, uv).a;
+    float p1=texture2D(property1, uv).a;
+    //float p2=texture2D(property2, uv).a;
+    //float p3=texture2D(property3, uv).a;
+    gl_FragColor = vec4($INLINE);
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return parseStyle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["i"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["h"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["j"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["e"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["d"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
+var gl = null;
+
+
+
+
+
+
+
+
+function setGL(_gl) {
+    gl = _gl;
+    __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* setGL */](gl);
+}
+
+
+
+function parseNode(node) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNode(arg));
+        switch (node.callee.name) {
+            case 'RampColor':
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["j" /* RampColor */](...args);
+            case 'Near':
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["h" /* Near */](...args);
+            case 'Now':
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Now */](...args);
+            default:
+                break;
+        }
+    } else if (node.type == 'Literal') {
+        return node.value;
+    } else if (node.type == 'ArrayExpression') {
+        return node.elements.map(e => parseNode(e));
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNode(node.left);
+        const right = parseNode(node.right);
+        switch (node.operator) {
+            case "*":
+                //TODO check left & right types => float
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatMul */](left, right);
+            case "/":
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatDiv */](left, right);
+            case "+":
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["c" /* FloatAdd */](left, right);
+            case "-":
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["g" /* FloatSub */](left, right);
+            case "^":
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatPow */](left, right);
+            default:
+                break;
+        }
+    }
+    console.warn(node);
+    return null;
+}
+
+__WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+function parseStyle(str) {
+    const tree = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    console.log(tree)
+    const e = parseNode(tree);
+    console.log(e)
+    return e;
+}
+
 function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = Float(3);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["b" /* Float */](3);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = Color([0, 1, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["a" /* Color */]([0, 1, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();
@@ -1613,7 +1649,7 @@ Style.prototype.getColor = function () {
 }
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.2
@@ -2298,22 +2334,22 @@ Style.prototype.getColor = function () {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(12);
-module.exports.VectorTileFeature = __webpack_require__(1);
-module.exports.VectorTileLayer = __webpack_require__(0);
+module.exports.VectorTile = __webpack_require__(13);
+module.exports.VectorTileFeature = __webpack_require__(2);
+module.exports.VectorTileLayer = __webpack_require__(1);
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(0);
+var VectorTileLayer = __webpack_require__(1);
 
 module.exports = VectorTile;
 
@@ -2331,7 +2367,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2650,7 +2686,7 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2658,7 +2694,7 @@ Point.convert = function (a) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(15);
+var ieee754 = __webpack_require__(16);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -3275,7 +3311,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -3365,18 +3401,18 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 16 */,
 /* 17 */,
-/* 18 */
+/* 18 */,
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(3);
 
 
-var VectorTile = __webpack_require__(11).VectorTile;
-var Protobuf = __webpack_require__(14);
+var VectorTile = __webpack_require__(12).VectorTile;
+var Protobuf = __webpack_require__(15);
 
 var renderer;
 var layer;
