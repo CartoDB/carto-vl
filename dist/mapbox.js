@@ -67,10 +67,18 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+exports.color = __webpack_require__(7);
+exports.width = __webpack_require__(8);
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(1);
+var VectorTileFeature = __webpack_require__(2);
 
 module.exports = VectorTileLayer;
 
@@ -132,7 +140,7 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -372,14 +380,14 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var gl;
 
 const RTT_WIDTH = 1024;
 
-const shaders = __webpack_require__(3);
+const shaders = __webpack_require__(4);
 var style = __webpack_require__(9);
 
 Renderer.prototype._initShaders = function () {
@@ -739,12 +747,12 @@ module.exports = {
 };
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const renderer = __webpack_require__(4);
-const styler = __webpack_require__(6);
-exports.styler = __webpack_require__(6);
+const renderer = __webpack_require__(5);
+const styler = __webpack_require__(0);
+exports.styler = __webpack_require__(0);
 
 function compileShader(gl, sourceCode, type) {
     var shader = gl.createShader(type);
@@ -815,14 +823,14 @@ exports.renderer = {
 }
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.point = __webpack_require__(5);
+exports.point = __webpack_require__(6);
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 
@@ -865,14 +873,6 @@ void main(void) {
     }
     gl_FragColor = c;
 }`;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports.color = __webpack_require__(7);
-exports.width = __webpack_require__(8);
-
 
 /***/ }),
 /* 7 */
@@ -2255,8 +2255,8 @@ Style.prototype.getColor = function () {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports.VectorTile = __webpack_require__(12);
-module.exports.VectorTileFeature = __webpack_require__(1);
-module.exports.VectorTileLayer = __webpack_require__(0);
+module.exports.VectorTileFeature = __webpack_require__(2);
+module.exports.VectorTileLayer = __webpack_require__(1);
 
 
 /***/ }),
@@ -2266,7 +2266,7 @@ module.exports.VectorTileLayer = __webpack_require__(0);
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(0);
+var VectorTileLayer = __webpack_require__(1);
 
 module.exports = VectorTile;
 
@@ -3324,7 +3324,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__src_index__);
 
 

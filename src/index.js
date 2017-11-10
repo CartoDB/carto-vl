@@ -2,7 +2,7 @@ var gl;
 
 const RTT_WIDTH = 1024;
 
-const shaders = require("./shader");
+const shaders = require("./shaders");
 var style = require("./style");
 
 Renderer.prototype._initShaders = function () {
