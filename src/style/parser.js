@@ -21,7 +21,7 @@ function parseNode(node) {
             case 'Now':
                 return functions.Now(...args);
             default:
-                break;
+                throw new Error(`Invalid function name '${node.callee.name}'`);
         }
     } else if (node.type == 'Literal') {
         return node.value;
@@ -32,7 +32,6 @@ function parseNode(node) {
         const right = parseNode(node.right);
         switch (node.operator) {
             case "*":
-                //TODO check left & right types => float
                 return functions.FloatMul(left, right);
             case "/":
                 return functions.FloatDiv(left, right);
@@ -43,11 +42,19 @@ function parseNode(node) {
             case "^":
                 return functions.FloatPow(left, right);
             default:
-                break;
+                throw new Error(`Invalid binary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return functions.FloatMul(-1, parseNode(node.argument));
+            case '+':
+                return parseNode(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     }
-    console.warn(node);
-    return null;
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
 

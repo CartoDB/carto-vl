@@ -1,5 +1,5 @@
 //TODO fix AA (use point size)
-//TODO change size scaling constant to better value
+//TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 //TODO profile discard performance impact
 export const VS = `
 
@@ -20,7 +20,7 @@ void main(void) {
     float size = texture2D(widthTex, featureID).a;
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
     gl_Position  = p;
-    gl_PointSize = size*25.;
+    gl_PointSize = size*64.;
     color = texture2D(colorTex, featureID);
 }`;
 

@@ -804,22 +804,25 @@ const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y
 const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
 function genFloatBinaryOperation(jsFn, glsl) {
-    function Op(a, b) {
+    function BinaryOp(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
             return Float(jsFn(a, b));
+        }
+        if (Number.isFinite(a)) {
+            a = Float(a);
         }
         if (Number.isFinite(b)) {
             b = Float(b);
         }
-        return new _Op(a, b);
+        return new _BinaryOp(a, b);
     }
-    function _Op(a, b) {
+    function _BinaryOp(a, b) {
         this.a = a;
         this.b = b;
         a.parent = this;
         b.parent = this;
     }
-    _Op.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    _BinaryOp.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
@@ -827,18 +830,18 @@ function genFloatBinaryOperation(jsFn, glsl) {
             inline: glsl(a.inline, b.inline)
         };
     }
-    _Op.prototype._postShaderCompile = function (program) {
+    _BinaryOp.prototype._postShaderCompile = function (program) {
         this.a._postShaderCompile(program);
         this.b._postShaderCompile(program);
     }
-    _Op.prototype._preDraw = function (l) {
+    _BinaryOp.prototype._preDraw = function (l) {
         this.a._preDraw(l);
         this.b._preDraw(l);
     }
-    _Op.prototype.isAnimated = function () {
+    _BinaryOp.prototype.isAnimated = function () {
         return this.a.isAnimated() || this.b.isAnimated();
     }
-    _Op.prototype.replaceChild = function (toReplace, replacer) {
+    _BinaryOp.prototype.replaceChild = function (toReplace, replacer) {
         if (this.a = toReplace) {
             this.a = replacer;
         } else {
@@ -847,7 +850,10 @@ function genFloatBinaryOperation(jsFn, glsl) {
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     }
-    return Op;
+    _BinaryOp.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+        genericFloatBlend(this, finalValue, duration, blendFunc);
+    }
+    return BinaryOp;
 }
 
 
@@ -1149,7 +1155,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
             center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
         inline: `mix(${positive.inline},${negative.inline},
                         clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
-                            0., 1.))/25.`
+                            0., 1.))`
     };
 }
 _Near.prototype._postShaderCompile = function (program) {
@@ -2040,7 +2046,7 @@ const styler = {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //TODO fix AA (use point size)
-//TODO change size scaling constant to better value
+//TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 //TODO profile discard performance impact
 const VS = `
 
@@ -2061,7 +2067,7 @@ void main(void) {
     float size = texture2D(widthTex, featureID).a;
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
     gl_Position  = p;
-    gl_PointSize = size*25.;
+    gl_PointSize = size*64.;
     color = texture2D(colorTex, featureID);
 }`;
 /* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
@@ -2183,7 +2189,7 @@ void main(void) {
     float p1=texture2D(property1, uv).a;
     float p2=texture2D(property2, uv).a;
     float p3=texture2D(property3, uv).a;
-    gl_FragColor = vec4($INLINE);
+    gl_FragColor = vec4(($INLINE)/64.);
 }
 `;
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
@@ -2317,7 +2323,7 @@ function parseNode(node) {
             case 'Now':
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Now */](...args);
             default:
-                break;
+                throw new Error(`Invalid function name '${node.callee.name}'`);
         }
     } else if (node.type == 'Literal') {
         return node.value;
@@ -2328,7 +2334,6 @@ function parseNode(node) {
         const right = parseNode(node.right);
         switch (node.operator) {
             case "*":
-                //TODO check left & right types => float
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatMul */](left, right);
             case "/":
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatDiv */](left, right);
@@ -2339,11 +2344,19 @@ function parseNode(node) {
             case "^":
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatPow */](left, right);
             default:
-                break;
+                throw new Error(`Invalid binary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatMul */](-1, parseNode(node.argument));
+            case '+':
+                return parseNode(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     }
-    console.warn(node);
-    return null;
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
 

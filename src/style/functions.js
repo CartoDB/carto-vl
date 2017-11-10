@@ -38,22 +38,25 @@ const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y
 const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
 function genFloatBinaryOperation(jsFn, glsl) {
-    function Op(a, b) {
+    function BinaryOp(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
             return Float(jsFn(a, b));
+        }
+        if (Number.isFinite(a)) {
+            a = Float(a);
         }
         if (Number.isFinite(b)) {
             b = Float(b);
         }
-        return new _Op(a, b);
+        return new _BinaryOp(a, b);
     }
-    function _Op(a, b) {
+    function _BinaryOp(a, b) {
         this.a = a;
         this.b = b;
         a.parent = this;
         b.parent = this;
     }
-    _Op.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    _BinaryOp.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
@@ -61,18 +64,18 @@ function genFloatBinaryOperation(jsFn, glsl) {
             inline: glsl(a.inline, b.inline)
         };
     }
-    _Op.prototype._postShaderCompile = function (program) {
+    _BinaryOp.prototype._postShaderCompile = function (program) {
         this.a._postShaderCompile(program);
         this.b._postShaderCompile(program);
     }
-    _Op.prototype._preDraw = function (l) {
+    _BinaryOp.prototype._preDraw = function (l) {
         this.a._preDraw(l);
         this.b._preDraw(l);
     }
-    _Op.prototype.isAnimated = function () {
+    _BinaryOp.prototype.isAnimated = function () {
         return this.a.isAnimated() || this.b.isAnimated();
     }
-    _Op.prototype.replaceChild = function (toReplace, replacer) {
+    _BinaryOp.prototype.replaceChild = function (toReplace, replacer) {
         if (this.a = toReplace) {
             this.a = replacer;
         } else {
@@ -81,7 +84,10 @@ function genFloatBinaryOperation(jsFn, glsl) {
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     }
-    return Op;
+    _BinaryOp.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+        genericFloatBlend(this, finalValue, duration, blendFunc);
+    }
+    return BinaryOp;
 }
 
 
@@ -383,7 +389,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
             center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
         inline: `mix(${positive.inline},${negative.inline},
                         clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
-                            0., 1.))/25.`
+                            0., 1.))`
     };
 }
 _Near.prototype._postShaderCompile = function (program) {

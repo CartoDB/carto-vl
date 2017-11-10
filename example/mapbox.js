@@ -10,16 +10,18 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    const width = R.Style.parseStyle(v);
-    if (width) {
-        layer.style.getWidth().blendTo(width, 1000);
+    try {
+        layer.style.getWidth().blendTo(R.Style.parseStyle(v), 1000);
+    } catch (error) {
+        console.warn(`Invalid width expression: ${error}`);
     }
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    const color =  R.Style.parseStyle(v);
-    if (color) {
-        layer.style.getColor().blendTo(color, 1000);
+    try {
+        layer.style.getColor().blendTo(R.Style.parseStyle(v), 1000);
+    } catch (error) {
+        console.warn(`Invalid color expression: ${error}`);
     }
 }
 
