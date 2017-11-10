@@ -11,6 +11,8 @@ export {
 export * from './functions';
 export * from './parser';
 
+// TODO removed global gl context
+// TODO document API
 function setGL(_gl) {
     gl = _gl;
     functions.setGL(gl);

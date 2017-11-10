@@ -2,6 +2,8 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 
+//TODO document style expressions
+//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */

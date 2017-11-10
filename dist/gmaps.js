@@ -790,6 +790,17 @@ function setGL(_gl) {
         - Have a type property declaring the GLSL output type: 'float', 'color'
 */
 
+/*
+    TODO
+        - Type checking. Types: float, category, RGB, RGBA, HSV, HSVA
+        - Dead code removal. Blending should be done with FloatBlend / ColorBlend. anything else is historical code
+        - HSV
+        - Integrated color palettes
+        - Now() with speed parameter
+        - Think about "Date" type.
+        - Heatmaps (renderer should be improved to accommodate this)
+*/
+
 function Now() {
     return new _Now();
 }
@@ -1582,28 +1593,21 @@ function signedArea(ring) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(11);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+
+
+
+// TODO remove
 var gl;
 
+// The maximum number of features per tile is RTT_WIDTH^2, large RTT_WIDTH values can be unsupported by the hardware,
+// they imply a small waste of resources too
 const RTT_WIDTH = 1024;
-
-
-
 
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(gl);
 }
-function compileShader( sourceCode, type) {
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    return shader;
-}
 Layer.prototype._compileColorShader = function () {
+    // TODO refactor to extract common functionality regarding _compileWidthShader
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -1760,7 +1764,7 @@ function refresh(timestamp) {
     });
 }
 
-
+//TODO document API
 
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
@@ -1785,8 +1789,6 @@ Layer.prototype.removeTile = function (tile) {
     gl.deleteBuffer(tile.vertexBuffer);
     gl.deleteBuffer(tile.featureIDBuffer);
 }
-
-//TODO => setTileProperty (or geom)
 
 Layer.prototype.addTile = function (tile) {
     this.tiles.push(tile);
@@ -2227,6 +2229,8 @@ var gl = null;
 
 
 
+// TODO removed global gl context
+// TODO document API
 function setGL(_gl) {
     gl = _gl;
     __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* setGL */](gl);
@@ -2303,6 +2307,8 @@ Style.prototype.getColor = function () {
 
 
 
+//TODO document style expressions
+//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */

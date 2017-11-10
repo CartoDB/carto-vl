@@ -24,6 +24,17 @@ export { Now, Near, Color, Float, RampColor, setGL, FloatMul, FloatDiv, FloatAdd
         - Have a type property declaring the GLSL output type: 'float', 'color'
 */
 
+/*
+    TODO
+        - Type checking. Types: float, category, RGB, RGBA, HSV, HSVA
+        - Dead code removal. Blending should be done with FloatBlend / ColorBlend. anything else is historical code
+        - HSV
+        - Integrated color palettes
+        - Now() with speed parameter
+        - Think about "Date" type.
+        - Heatmaps (renderer should be improved to accommodate this)
+*/
+
 function Now() {
     return new _Now();
 }

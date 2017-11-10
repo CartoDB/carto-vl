@@ -1,25 +1,18 @@
-var gl;
-
-const RTT_WIDTH = 1024;
-
 import * as shaders from './shaders';
 import * as Style from './style';
+
+// TODO remove
+var gl;
+
+// The maximum number of features per tile is RTT_WIDTH^2, large RTT_WIDTH values can be unsupported by the hardware,
+// they imply a small waste of resources too
+const RTT_WIDTH = 1024;
 
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(gl);
 }
-function compileShader( sourceCode, type) {
-    var shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    return shader;
-}
 Layer.prototype._compileColorShader = function () {
+    // TODO refactor to extract common functionality regarding _compileWidthShader
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -176,7 +169,7 @@ function refresh(timestamp) {
     });
 }
 
-
+//TODO document API
 
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
@@ -201,8 +194,6 @@ Layer.prototype.removeTile = function (tile) {
     gl.deleteBuffer(tile.vertexBuffer);
     gl.deleteBuffer(tile.featureIDBuffer);
 }
-
-//TODO => setTileProperty (or geom)
 
 Layer.prototype.addTile = function (tile) {
     this.tiles.push(tile);
