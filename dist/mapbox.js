@@ -379,11 +379,11 @@ var gl;
 
 const RTT_WIDTH = 1024;
 
-const shader = __webpack_require__(3);
+const shaders = __webpack_require__(3);
 var style = __webpack_require__(9);
 
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = shader.renderer.createPointShader(gl);
+    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
 }
 function compileShader( sourceCode, type) {
     var shader = gl.createShader(type);
@@ -397,7 +397,6 @@ function compileShader( sourceCode, type) {
     return shader;
 }
 Layer.prototype._compileColorShader = function () {
-    var VS = compileShader(shader.styler.color.VS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -409,33 +408,10 @@ Layer.prototype._compileColorShader = function () {
     });
     //TODO check tid table size
     this.propertyColorTID = tid;
-    var source = shader.styler.color.FS;
-    source = source.replace('$PREFACE', colorModifier.preface);
-    source = source.replace('$COLOR', colorModifier.inline);
-    console.log("Recompile color", source);
-    var FS = compileShader(source, gl.FRAGMENT_SHADER);
-    if (this.colorShader) {
-        gl.deleteProgram(this.colorShader);
-    }
-    this.colorShader = gl.createProgram();
-    gl.attachShader(this.colorShader, VS);
-    gl.attachShader(this.colorShader, FS);
-    gl.linkProgram(this.colorShader);
-    if (!gl.getProgramParameter(this.colorShader, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.colorShader));
-    }
-    this.style._color._postShaderCompile(this.colorShader);
-    this.colorShaderVertex = gl.getAttribLocation(this.colorShader, 'vertex');
-    this.colorShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.colorShaderTex[i] = gl.getUniformLocation(this.colorShader, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
+    this.colorShader = shaders.renderer.createColorShader(gl, colorModifier.preface, colorModifier.inline);
+    this.style._color._postShaderCompile(this.colorShader.program);
 }
-
 Layer.prototype._compileWidthShader = function () {
-    var VS = compileShader(shader.styler.width.VS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
     const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -447,29 +423,8 @@ Layer.prototype._compileWidthShader = function () {
     });
     //TODO check tid table size
     this.propertyWidthTID = tid;
-    var source = shader.styler.width.FS;
-    source = source.replace('$PREFACE', widthModifier.preface);
-    source = source.replace('$WIDTH', widthModifier.inline);
-    console.log("Recompile width", source)
-    var FS = compileShader(source, gl.FRAGMENT_SHADER);
-    if (this.widthShader) {
-        gl.deleteProgram(this.widthShader);
-    }
-    this.widthShader = gl.createProgram();
-    gl.attachShader(this.widthShader, VS);
-    gl.attachShader(this.widthShader, FS);
-    gl.linkProgram(this.widthShader);
-    if (!gl.getProgramParameter(this.widthShader, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.widthShader));
-    }
-    this.style._width._postShaderCompile(this.widthShader);
-    this.widthShaderVertex = gl.getAttribLocation(this.widthShader, 'vertex');
-    this.widthShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.widthShaderTex[i] = gl.getUniformLocation(this.widthShader, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
+    this.widthShader = shaders.renderer.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
+    this.style._width._postShaderCompile(this.widthShader.program);
 }
 
 Renderer.prototype.refresh = refresh;
@@ -512,19 +467,19 @@ function refresh(timestamp) {
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
-                gl.useProgram(layer.colorShader);
+                gl.useProgram(layer.colorShader.program);
 
                 layer.style._color._preDraw(layer);
 
                 Object.keys(layer.propertyColorTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShaderTex[i], i);
+                    gl.uniform1i(layer.colorShader.colorShaderTex[i], i);
                 });
 
                 gl.enableVertexAttribArray(this.colorShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.colorShader.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
             });
@@ -532,7 +487,7 @@ function refresh(timestamp) {
             //WIDTH
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-                gl.useProgram(layer.widthShader);
+                gl.useProgram(layer.widthShader.program);
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -540,12 +495,12 @@ function refresh(timestamp) {
                 Object.keys(layer.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShaderTex[i], i);
+                    gl.uniform1i(layer.widthShader.widthShaderTex[i], i);
                 });
 
-                gl.enableVertexAttribArray(layer.widthShaderVertex);
+                gl.enableVertexAttribArray(layer.widthShader.widthShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.widthShader.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -788,6 +743,7 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 const renderer = __webpack_require__(4);
+const styler = __webpack_require__(6);
 exports.styler = __webpack_require__(6);
 
 function compileShader(gl, sourceCode, type) {
@@ -824,10 +780,68 @@ function Point(gl) {
     this.rendererWidthTex = gl.getUniformLocation(this.program, 'widthTex');
 }
 
-exports.renderer = {
-    createPointShader: function(gl){
-        return new Point(gl);
+function Color(gl, preface, inline) {
+    var VS = compileShader(gl, styler.color.VS, gl.VERTEX_SHADER);
+    var source = styler.color.FS;
+    source = source.replace('$PREFACE', preface);
+    source = source.replace('$COLOR', inline);
+    console.log("Recompilation of\n", source);
+    var FS = compileShader(gl, source, gl.FRAGMENT_SHADER);
+    if (this.program) {
+        gl.deleteProgram(this.program);
     }
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, VS);
+    gl.attachShader(this.program, FS);
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+    this.colorShaderVertex = gl.getAttribLocation(this.program, 'vertex');
+    this.colorShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.colorShaderTex[i] = gl.getUniformLocation(this.program, `property${i}`);
+    }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+}
+
+function Width(gl, preface, inline) {
+    var VS = compileShader(gl, styler.width.VS, gl.VERTEX_SHADER);
+    var source = styler.width.FS;
+    source = source.replace('$PREFACE', preface);
+    source = source.replace('$WIDTH', inline);
+    console.log("Recompilation of\n", source);
+    var FS = compileShader(gl, source, gl.FRAGMENT_SHADER);
+    if (this.program) {
+        gl.deleteProgram(this.program);
+    }
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, VS);
+    gl.attachShader(this.program, FS);
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+    this.widthShaderVertex = gl.getAttribLocation(this.program, 'vertex');
+    this.widthShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.widthShaderTex[i] = gl.getUniformLocation(this.program, `property${i}`);
+    }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+}
+
+exports.renderer = {
+    createPointShader: function (gl) {
+        return new Point(gl);
+    },
+    createColorShader: function (gl, preface, inline) {
+        return new Color(gl, preface, inline);
+    },
+    createWidthShader: function (gl, preface, inline) {
+        return new Width(gl, preface, inline);
+    },
 }
 
 /***/ }),
