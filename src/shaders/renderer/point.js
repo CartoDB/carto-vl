@@ -1,4 +1,6 @@
-
+//TODO fix AA (use point size)
+//TODO change size scaling constant to better value
+//TODO profile discard performance impact
 export const VS = `
 
 precision highp float;
@@ -28,7 +30,6 @@ precision lowp float;
 varying lowp vec4 color;
 
 void main(void) {
-    //TODO fix AA (use point size)
     vec2 p = 2.*gl_PointCoord-vec2(1.);
     vec4 c = color;
     float l = length(p);

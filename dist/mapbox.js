@@ -1949,7 +1949,7 @@ Renderer.prototype.setZoom = function (zoom) {
 
 
 
-const NUM_TEXTURE_LOCATIONS = 32;
+const NUM_TEXTURE_LOCATIONS = 4;
 
 function compileShader(gl, sourceCode, type) {
     const shader = gl.createShader(type);
@@ -2039,7 +2039,9 @@ const styler = {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-
+//TODO fix AA (use point size)
+//TODO change size scaling constant to better value
+//TODO profile discard performance impact
 const VS = `
 
 precision highp float;
@@ -2071,7 +2073,6 @@ precision lowp float;
 varying lowp vec4 color;
 
 void main(void) {
-    //TODO fix AA (use point size)
     vec2 p = 2.*gl_PointCoord-vec2(1.);
     vec4 c = color;
     float l = length(p);
@@ -2112,7 +2113,7 @@ varying  vec2 uv;
 
 void main(void) {
     uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
+    gl_Position = vec4(vertex, 0.5, 1.);
 }
 `;
 /* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
@@ -2134,8 +2135,8 @@ uniform sampler2D property3;
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
+    float p2=texture2D(property2, uv).a;
+    float p3=texture2D(property3, uv).a;
     gl_FragColor = $INLINE;
 }
 `;
@@ -2180,8 +2181,8 @@ uniform sampler2D property3;
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
+    float p2=texture2D(property2, uv).a;
+    float p3=texture2D(property3, uv).a;
     gl_FragColor = vec4($INLINE);
 }
 `;
@@ -2297,9 +2298,12 @@ Style.prototype.getColor = function () {
 
 
 
-__WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
 function parseStyle(str) {
-    return parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str));
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str));
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
+    return r;
 }
 
 function parseNode(node) {

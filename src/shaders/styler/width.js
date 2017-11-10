@@ -27,8 +27,8 @@ uniform sampler2D property3;
 void main(void) {
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
+    float p2=texture2D(property2, uv).a;
+    float p3=texture2D(property3, uv).a;
     gl_FragColor = vec4($INLINE);
 }
 `;

@@ -1,7 +1,7 @@
 import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
 
-const NUM_TEXTURE_LOCATIONS = 32;
+const NUM_TEXTURE_LOCATIONS = 4;
 
 function compileShader(gl, sourceCode, type) {
     const shader = gl.createShader(type);

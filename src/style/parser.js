@@ -2,9 +2,12 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 
-jsep.addBinaryOp("^", 10);
 export default function parseStyle(str) {
-    return parseNode(jsep(str));
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    jsep.addBinaryOp("^", 10);
+    const r = parseNode(jsep(str));
+    jsep.removeBinaryOp("^");
+    return r;
 }
 
 function parseNode(node) {
