@@ -2,7 +2,10 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 
-export default function parseStyle(str) {
+/*
+  Returns a valid style expression or throws an exception upon invalid inputs.
+*/
+export function parseStyleExpression(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp("^", 10);
     const r = parseNode(jsep(str));

@@ -777,11 +777,24 @@ function setGL(_gl) {
 }
 
 
+
+/*
+    Each styling function should:
+        - Create their own objects, i.e.: be used without "new"
+        - Check input validity on user input (constructor and exposed functions).
+        - Have certain functions that never fail:
+            - _applyToShaderSource should use uniformIDMaker and propertyTIDMaker to get unique uniform IDs and property IDs as needed
+            - _postShaderCompile should get uniform location after program compilation as needed
+            - _preDraw should set any program's uniforms as needed
+            - isAnimated should return true if the function output could change depending on the timestamp
+        - Have a type property declaring the GLSL output type: 'float', 'color'
+*/
+
 function Now() {
     return new _Now();
 }
 function _Now() {
-    this.float = Float(100);
+    this.float = Float(0);
 }
 _Now.prototype._applyToShaderSource = function (uniformIDMaker) {
     return this.float._applyToShaderSource(uniformIDMaker);
@@ -1084,25 +1097,20 @@ function evalFloatExpr(expr, time) {
     if (Number.isFinite(expr)) {
         return expr;
     }
-    var a = evalFloatExpr(expr.a, time);
-    var b = evalFloatExpr(expr.b, time);
-    var m = (time - expr.aTime) / (expr.bTime - expr.aTime);
-    return (1 - m) * a + m * b; //TODO non linear functions
+    if (typeof expr === "function") {
+        return x(time);
+    }
+    return expr.eval();
 }
 function simplifyFloatExpr(expr, time) {
     if (Number.isFinite(expr)) {
         return expr;
     }
-    var m = (time - expr.aTime) / (expr.bTime - expr.aTime);
-    if (m >= 1) {
-        return expr.b;
-    }
-    return expr;
+    return expr.simplify();
 }
-UniformFloat.prototype._preDraw = function () {
-    const t = Date.now();
-    this.expr = simplifyFloatExpr(this.expr, t);
-    const v = evalFloatExpr(this.expr, t);
+UniformFloat.prototype._preDraw = function (time) {
+    this.expr = simplifyFloatExpr(this.expr, time);
+    const v = evalFloatExpr(this.expr, time);
     gl.uniform1f(this._uniformLocation, v);
 }
 UniformFloat.prototype.isAnimated = function () {
@@ -1164,15 +1172,6 @@ _Near.prototype._postShaderCompile = function (program) {
     this.outputOnPositive._postShaderCompile(program);
     this.threshold._postShaderCompile(program);
     this.falloff._postShaderCompile(program);
-}
-function evalFloatUniform(x) {
-    if (typeof x === "function") {
-        x = x();
-    }
-    if (Number.isFinite(x)) {
-        return x;
-    }
-    return 0;
 }
 
 _Near.prototype._preDraw = function () {
@@ -1258,8 +1257,8 @@ _RampColor.prototype._preDraw = function () {
     gl.activeTexture(gl.TEXTURE12);//TODO remove hardcode
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this._texLoc, 12);
-    gl.uniform1f(this._keyMinLoc, evalFloatUniform(this.minKey));
-    gl.uniform1f(this._keyWidthLoc, evalFloatUniform(this.maxKey) - evalFloatUniform(this.minKey));
+    gl.uniform1f(this._keyMinLoc, evalFloatExpr(this.minKey));
+    gl.uniform1f(this._keyWidthLoc, evalFloatExpr(this.maxKey) - evalFloatExpr(this.minKey));
 }
 _RampColor.prototype.isAnimated = function () {
     return false;
@@ -2217,7 +2216,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
 
@@ -2296,7 +2295,7 @@ Style.prototype.getColor = function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
+/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleExpression;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
@@ -2304,7 +2303,10 @@ Style.prototype.getColor = function () {
 
 
 
-function parseStyle(str) {
+/*
+  Returns a valid style expression or throws an exception upon invalid inputs.
+*/
+function parseStyleExpression(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
     const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str));

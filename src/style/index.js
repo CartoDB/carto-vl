@@ -2,14 +2,14 @@ var gl = null;
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import parseStyle from './parser';
+import parseStyleExpression from './parser';
 
 export {
     Style,
     setGL,
 };
 export * from './functions';
-export {default as parseStyle} from './parser';
+export * from './parser';
 
 function setGL(_gl) {
     gl = _gl;
