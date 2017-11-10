@@ -4,9 +4,12 @@ const RTT_WIDTH = 1024;
 
 var jsep = require("jsep");
 
-function implicitCast(value){
-    if (Number.isFinite(value)){
-        return Float(node.value);
+const shader = require("./shader");
+
+
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return Float(value);
     }
     return value;
 }
@@ -79,7 +82,7 @@ _Now.prototype.isAnimated = function () {
 }
 
 const FloatMul = genFloatBinaryOperation((x, y) => x * y, (x, y) => `(${x} * ${y})`);
-const FloatMul = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatDiv = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genFloatBinaryOperation((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y})`);
 const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
@@ -195,120 +198,11 @@ function genericFloatBlend(initial, final, duration, blendFunc) {
     blend.notify();
 }
 
-const renderVS = `
 
-precision highp float;
-
-attribute vec2 vertexPosition;
-attribute vec2 featureID;
-
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
-
-uniform sampler2D colorTex;
-uniform sampler2D widthTex;
-
-varying lowp vec4 color;
-
-void main(void) {
-    float size = texture2D(widthTex, featureID).a;
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
-    gl_Position  = p;
-    gl_PointSize = size*25.;
-    color = texture2D(colorTex, featureID);
-}`;
-
-const renderFS = `
-precision lowp float;
-
-varying lowp vec4 color;
-
-void main(void) {
-    //TODO fix AA (use point size)
-    vec2 p = 2.*gl_PointCoord-vec2(1.);
-    vec4 c = color;
-    float l = length(p);
-    c.a *=  1. - smoothstep(0.9, 1.1, l);
-    if (c.a==0.){
-        discard;
-    }
-    gl_FragColor = c;
-}`;
-
-
-const colorStylerVS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
-}
-`;
-
-const colorStylerFS = `
-
-precision highp float;
-
-varying  vec2 uv;
-
-$PREFACE
-
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
-void main(void) {
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
-    gl_FragColor = $COLOR;
-}
-`;
-
-const widthStylerVS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
-}
-`;
-
-const widthStylerFS = `
-
-precision highp float;
-
-varying  vec2 uv;
-
-$PREFACE
-
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
-void main(void) {
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    //float p2=texture2D(property2, uv).a;
-    //float p3=texture2D(property3, uv).a;
-    gl_FragColor = vec4($WIDTH);
-}
-`;
 
 Renderer.prototype._initShaders = function () {
-    var fragmentShader = compileShader(renderFS, gl.FRAGMENT_SHADER);
-    var vertexShader = compileShader(renderVS, gl.VERTEX_SHADER);
+    var fragmentShader = compileShader(shader.renderer.point.FS, gl.FRAGMENT_SHADER);
+    var vertexShader = compileShader(shader.renderer.   point.VS, gl.VERTEX_SHADER);
     this.finalRendererProgram = gl.createProgram();
     gl.attachShader(this.finalRendererProgram, vertexShader);
     gl.attachShader(this.finalRendererProgram, fragmentShader);
@@ -707,11 +601,11 @@ function hexToRgb(hex) {
 */
 
 function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCastValue);
+    args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }
-    return new _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive);
+    return new _Near(...args);
 }
 
 function _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
@@ -769,7 +663,11 @@ _Near.prototype.isAnimated = function () {
 
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
-    return new _RampColor(property, minKey, maxKey, values);
+    args = [property, minKey, maxKey, values].map(implicitCast);
+    if (args.some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new _RampColor(...args);
 }
 
 function _RampColor(property, minKey, maxKey, values) {
@@ -916,7 +814,7 @@ function Layer(renderer, geometryType) {
 }
 
 Layer.prototype._compileColorShader = function () {
-    var VS = compileShader(colorStylerVS, gl.VERTEX_SHADER);
+    var VS = compileShader(shader.styler.color.VS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -928,7 +826,7 @@ Layer.prototype._compileColorShader = function () {
     });
     //TODO check tid table size
     this.propertyColorTID = tid;
-    var source = colorStylerFS;
+    var source = shader.styler.color.FS;
     source = source.replace('$PREFACE', colorModifier.preface);
     source = source.replace('$COLOR', colorModifier.inline);
     console.log("Recompile color", source);
@@ -955,7 +853,7 @@ Layer.prototype._compileColorShader = function () {
 }
 
 Layer.prototype._compileWidthShader = function () {
-    var VS = compileShader(widthStylerVS, gl.VERTEX_SHADER);
+    var VS = compileShader(shader.styler.width.VS, gl.VERTEX_SHADER);
     var uniformIDcounter = 0;
     var tid = {};
     const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -967,7 +865,7 @@ Layer.prototype._compileWidthShader = function () {
     });
     //TODO check tid table size
     this.propertyWidthTID = tid;
-    var source = widthStylerFS;
+    var source = shader.styler.width.FS;
     source = source.replace('$PREFACE', widthModifier.preface);
     source = source.replace('$WIDTH', widthModifier.inline);
     console.log("Recompile width", source)
