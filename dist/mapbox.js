@@ -383,37 +383,93 @@ const shader = __webpack_require__(3);
 var style = __webpack_require__(9);
 
 Renderer.prototype._initShaders = function () {
-    var fragmentShader = compileShader(shader.renderer.point.FS, gl.FRAGMENT_SHADER);
-    var vertexShader = compileShader(shader.renderer.point.VS, gl.VERTEX_SHADER);
-    this.finalRendererProgram = gl.createProgram();
-    gl.attachShader(this.finalRendererProgram, vertexShader);
-    gl.attachShader(this.finalRendererProgram, fragmentShader);
-    gl.linkProgram(this.finalRendererProgram);
-    gl.deleteShader(vertexShader);
-    gl.deleteShader(fragmentShader);
-    if (!gl.getProgramParameter(this.finalRendererProgram, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.finalRendererProgram));
-    }
-    this.vertexPositionAttribute = gl.getAttribLocation(this.finalRendererProgram, 'vertexPosition');
-    this.FeatureIdAttr = gl.getAttribLocation(this.finalRendererProgram, 'featureID');
-    gl.enableVertexAttribArray(this.vertexPositionAttribute);
-
-    this.vertexScaleUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.finalRendererProgram, 'vertexOffset');
-    this.rendererColorTex = gl.getUniformLocation(this.finalRendererProgram, 'colorTex');
-    this.rendererWidthTex = gl.getUniformLocation(this.finalRendererProgram, 'widthTex');
+    this.finalRendererProgram = shader.renderer.createPointShader(gl);
 }
-
-//TODO to utils.js
-function compileShader(sourceCode, type) {
+function compileShader( sourceCode, type) {
     var shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader) + sourceCode);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
     }
     return shader;
+}
+Layer.prototype._compileColorShader = function () {
+    var VS = compileShader(shader.styler.color.VS, gl.VERTEX_SHADER);
+    var uniformIDcounter = 0;
+    var tid = {};
+    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    //TODO check tid table size
+    this.propertyColorTID = tid;
+    var source = shader.styler.color.FS;
+    source = source.replace('$PREFACE', colorModifier.preface);
+    source = source.replace('$COLOR', colorModifier.inline);
+    console.log("Recompile color", source);
+    var FS = compileShader(source, gl.FRAGMENT_SHADER);
+    if (this.colorShader) {
+        gl.deleteProgram(this.colorShader);
+    }
+    this.colorShader = gl.createProgram();
+    gl.attachShader(this.colorShader, VS);
+    gl.attachShader(this.colorShader, FS);
+    gl.linkProgram(this.colorShader);
+    if (!gl.getProgramParameter(this.colorShader, gl.LINK_STATUS)) {
+        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.colorShader));
+    }
+    this.style._color._postShaderCompile(this.colorShader);
+    this.colorShaderVertex = gl.getAttribLocation(this.colorShader, 'vertex');
+    this.colorShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.colorShaderTex[i] = gl.getUniformLocation(this.colorShader, `property${i}`);
+    }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+}
+
+Layer.prototype._compileWidthShader = function () {
+    var VS = compileShader(shader.styler.width.VS, gl.VERTEX_SHADER);
+    var uniformIDcounter = 0;
+    var tid = {};
+    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    //TODO check tid table size
+    this.propertyWidthTID = tid;
+    var source = shader.styler.width.FS;
+    source = source.replace('$PREFACE', widthModifier.preface);
+    source = source.replace('$WIDTH', widthModifier.inline);
+    console.log("Recompile width", source)
+    var FS = compileShader(source, gl.FRAGMENT_SHADER);
+    if (this.widthShader) {
+        gl.deleteProgram(this.widthShader);
+    }
+    this.widthShader = gl.createProgram();
+    gl.attachShader(this.widthShader, VS);
+    gl.attachShader(this.widthShader, FS);
+    gl.linkProgram(this.widthShader);
+    if (!gl.getProgramParameter(this.widthShader, gl.LINK_STATUS)) {
+        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.widthShader));
+    }
+    this.style._width._postShaderCompile(this.widthShader);
+    this.widthShaderVertex = gl.getAttribLocation(this.widthShader, 'vertex');
+    this.widthShaderTex = [];
+    for (var i = 0; i < 8; i++) {
+        this.widthShaderTex[i] = gl.getUniformLocation(this.widthShader, `property${i}`);
+    }
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
 }
 
 Renderer.prototype.refresh = refresh;
@@ -423,30 +479,6 @@ function refresh(timestamp) {
         return;
     }
     this.lastFrame = timestamp;
-    /*console.timeStamp("MyRENDER");
-    var r = this;
-    function getZoom() {
-        var b = map.getBounds();
-        var c = map.getCenter();
-        var nw = b.getNorthEast();
-        var sw = b.getSouthWest();
-        var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
-        r.setCenter(c.lng() / 180., Wmxy(c).y / 40075019.834677525 * 2.);
-        return z;
-    }
-    function move(a, b, c) {
-        var b = map.getBounds();
-        var nw = b.getNorthEast();
-        var c = map.getCenter();
-
-        r.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
-        r.setZoom(getZoom());
-        // console.log(renderer.getCenter(), renderer.getZoom(), c)
-    }
-    move();*/
-
-    //console.log('Re-render')
-
 
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
@@ -531,22 +563,22 @@ function refresh(timestamp) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        gl.useProgram(this.finalRendererProgram);
+        gl.useProgram(this.finalRendererProgram.program);
         var s = 1. / this._zoom;
 
 
         layer.tiles.forEach(tile => {
-            gl.uniform2f(this.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
-            gl.uniform2f(this.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
 
-            gl.enableVertexAttribArray(this.vertexPositionAttribute);
+            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-            gl.vertexAttribPointer(this.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-            gl.enableVertexAttribArray(this.FeatureIdAttr);
+            gl.enableVertexAttribArray(this.finalRendererProgram.FeatureIdAttr);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.FeatureIdAttr, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(this.finalRendererProgram.FeatureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
@@ -582,82 +614,6 @@ function Layer(renderer, geometryType) {
     this.categoryMap = {};
 }
 
-Layer.prototype._compileColorShader = function () {
-    var VS = compileShader(shader.styler.color.VS, gl.VERTEX_SHADER);
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyColorTID = tid;
-    var source = shader.styler.color.FS;
-    source = source.replace('$PREFACE', colorModifier.preface);
-    source = source.replace('$COLOR', colorModifier.inline);
-    console.log("Recompile color", source);
-    //console.log(this, source);
-    var FS = compileShader(source, gl.FRAGMENT_SHADER);
-    if (this.colorShader) {
-        gl.deleteProgram(this.colorShader);
-    }
-    this.colorShader = gl.createProgram();
-    gl.attachShader(this.colorShader, VS);
-    gl.attachShader(this.colorShader, FS);
-    gl.linkProgram(this.colorShader);
-    if (!gl.getProgramParameter(this.colorShader, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.colorShader));
-    }
-    this.style._color._postShaderCompile(this.colorShader);
-    this.colorShaderVertex = gl.getAttribLocation(this.colorShader, 'vertex');
-    this.colorShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.colorShaderTex[i] = gl.getUniformLocation(this.colorShader, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-}
-
-Layer.prototype._compileWidthShader = function () {
-    var VS = compileShader(shader.styler.width.VS, gl.VERTEX_SHADER);
-    var uniformIDcounter = 0;
-    var tid = {};
-    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyWidthTID = tid;
-    var source = shader.styler.width.FS;
-    source = source.replace('$PREFACE', widthModifier.preface);
-    source = source.replace('$WIDTH', widthModifier.inline);
-    console.log("Recompile width", source)
-    var FS = compileShader(source, gl.FRAGMENT_SHADER);
-    if (this.widthShader) {
-        gl.deleteProgram(this.widthShader);
-    }
-    this.widthShader = gl.createProgram();
-    gl.attachShader(this.widthShader, VS);
-    gl.attachShader(this.widthShader, FS);
-    gl.linkProgram(this.widthShader);
-    if (!gl.getProgramParameter(this.widthShader, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.widthShader));
-    }
-    this.style._width._postShaderCompile(this.widthShader);
-    this.widthShaderVertex = gl.getAttribLocation(this.widthShader, 'vertex');
-    this.widthShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.widthShaderTex[i] = gl.getUniformLocation(this.widthShader, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-}
 
 Layer.prototype.removeTile = function (tile) {
     this.tiles = this.tiles.filter(t => t !== tile);
@@ -831,9 +787,48 @@ module.exports = {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.renderer = __webpack_require__(4);
+const renderer = __webpack_require__(4);
 exports.styler = __webpack_require__(6);
 
+function compileShader(gl, sourceCode, type) {
+    var shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+    }
+    return shader;
+}
+
+function Point(gl) {
+    const VS = compileShader(gl, renderer.point.VS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, renderer.point.FS, gl.FRAGMENT_SHADER);
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, VS);
+    gl.attachShader(this.program, FS);
+    gl.linkProgram(this.program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.FeatureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+    gl.enableVertexAttribArray(this.vertexPositionAttribute);
+
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+    this.rendererColorTex = gl.getUniformLocation(this.program, 'colorTex');
+    this.rendererWidthTex = gl.getUniformLocation(this.program, 'widthTex');
+}
+
+exports.renderer = {
+    createPointShader: function(gl){
+        return new Point(gl);
+    }
+}
 
 /***/ }),
 /* 4 */
