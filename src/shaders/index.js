@@ -1,5 +1,5 @@
-const rendererGLSL = require("./renderer");
-const stylerGLSL = require("./styler");
+import * as rendererGLSL from './renderer';
+import * as stylerGLSL from './styler';
 
 function compileShader(gl, sourceCode, type) {
     var shader = gl.createShader(type);

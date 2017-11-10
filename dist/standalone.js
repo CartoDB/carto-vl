@@ -747,8 +747,10 @@ module.exports = {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderer", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "styler", function() { return styler; });
-const rendererGLSL = __webpack_require__(4);
-const stylerGLSL = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(6);
+
+
 
 function compileShader(gl, sourceCode, type) {
     var shader = gl.createShader(type);
@@ -777,7 +779,7 @@ function compileProgram(gl, glslVS, glslFS) {
 }
 
 function Point(gl) {
-    compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
+    compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* point */].FS);
     this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
     this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
@@ -798,10 +800,10 @@ function GenericStyler(gl, glsl, preface, inline) {
     }
 }
 function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL.color, preface, inline);
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["a" /* color */], preface, inline);
 }
 function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL.width, preface, inline);
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["b" /* width */], preface, inline);
 }
 
 const renderer = {
@@ -827,9 +829,8 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(5);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "point", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 
 
 
@@ -889,11 +890,10 @@ void main(void) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(8);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "color", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "width", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
 
 
 
