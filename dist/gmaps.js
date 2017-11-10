@@ -582,11 +582,11 @@ function refresh(timestamp) {
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.rendererColorTex, 0);
+            gl.uniform1i(this.finalRendererProgram.rendererColorTex, 0);
 
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.rendererWidthTex, 1);
+            gl.uniform1i(this.finalRendererProgram.rendererWidthTex, 1);
 
             gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
