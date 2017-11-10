@@ -474,12 +474,12 @@ function refresh(timestamp) {
                 Object.keys(layer.propertyColorTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShader.colorShaderTex[i], i);
+                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
                 });
 
                 gl.enableVertexAttribArray(this.colorShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShader.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
             });
@@ -495,12 +495,12 @@ function refresh(timestamp) {
                 Object.keys(layer.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShader.widthShaderTex[i], i);
+                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
                 });
 
-                gl.enableVertexAttribArray(layer.widthShader.widthShaderVertex);
+                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShader.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -531,17 +531,17 @@ function refresh(timestamp) {
             gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.FeatureIdAttr);
+            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.FeatureIdAttr, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.finalRendererProgram.rendererColorTex, 0);
+            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
 
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.finalRendererProgram.rendererWidthTex, 1);
+            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
 
             gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
@@ -758,9 +758,9 @@ function compileShader(gl, sourceCode, type) {
     return shader;
 }
 
-function Point(gl) {
-    const VS = compileShader(gl, renderer.point.VS, gl.VERTEX_SHADER);
-    const FS = compileShader(gl, renderer.point.FS, gl.FRAGMENT_SHADER);
+function compileProgram(gl, glslVS, glslFS) {
+    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
     this.program = gl.createProgram();
     gl.attachShader(this.program, VS);
     gl.attachShader(this.program, FS);
@@ -770,66 +770,36 @@ function Point(gl) {
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
     }
-    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-    this.FeatureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-    gl.enableVertexAttribArray(this.vertexPositionAttribute);
+}
 
+function Point(gl) {
+    compileProgram.call(this, gl, renderer.point.VS, renderer.point.FS);
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
     this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-    this.rendererColorTex = gl.getUniformLocation(this.program, 'colorTex');
-    this.rendererWidthTex = gl.getUniformLocation(this.program, 'widthTex');
+    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+}
+
+function GenericStyler(gl, glsl, preface, inline) {
+    const VS = glsl.VS;
+    let FS = glsl.FS;
+    FS = FS.replace('$PREFACE', preface);
+    FS = FS.replace('$INLINE', inline);
+    compileProgram.call(this, gl, VS, FS);
+    this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+    this.textureLocations = [];
+    for (var i = 0; i < 8; i++) {
+        this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+    }
 }
 
 function Color(gl, preface, inline) {
-    var VS = compileShader(gl, styler.color.VS, gl.VERTEX_SHADER);
-    var source = styler.color.FS;
-    source = source.replace('$PREFACE', preface);
-    source = source.replace('$COLOR', inline);
-    console.log("Recompilation of\n", source);
-    var FS = compileShader(gl, source, gl.FRAGMENT_SHADER);
-    if (this.program) {
-        gl.deleteProgram(this.program);
-    }
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-    this.colorShaderVertex = gl.getAttribLocation(this.program, 'vertex');
-    this.colorShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.colorShaderTex[i] = gl.getUniformLocation(this.program, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
+    GenericStyler.call(this, gl, styler.color, preface, inline);
 }
-
 function Width(gl, preface, inline) {
-    var VS = compileShader(gl, styler.width.VS, gl.VERTEX_SHADER);
-    var source = styler.width.FS;
-    source = source.replace('$PREFACE', preface);
-    source = source.replace('$WIDTH', inline);
-    console.log("Recompilation of\n", source);
-    var FS = compileShader(gl, source, gl.FRAGMENT_SHADER);
-    if (this.program) {
-        gl.deleteProgram(this.program);
-    }
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        console.warn('Unable to initialize the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-    this.widthShaderVertex = gl.getAttribLocation(this.program, 'vertex');
-    this.widthShaderTex = [];
-    for (var i = 0; i < 8; i++) {
-        this.widthShaderTex[i] = gl.getUniformLocation(this.program, `property${i}`);
-    }
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
+    GenericStyler.call(this, gl, styler.width, preface, inline);
 }
 
 exports.renderer = {
@@ -939,7 +909,7 @@ void main(void) {
     float p1=texture2D(property1, uv).a;
     //float p2=texture2D(property2, uv).a;
     //float p3=texture2D(property3, uv).a;
-    gl_FragColor = $COLOR;
+    gl_FragColor = $INLINE;
 }
 `;
 
@@ -979,7 +949,7 @@ void main(void) {
     float p1=texture2D(property1, uv).a;
     //float p2=texture2D(property2, uv).a;
     //float p3=texture2D(property3, uv).a;
-    gl_FragColor = vec4($WIDTH);
+    gl_FragColor = vec4($INLINE);
 }
 `;
 

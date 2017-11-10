@@ -97,12 +97,12 @@ function refresh(timestamp) {
                 Object.keys(layer.propertyColorTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShader.colorShaderTex[i], i);
+                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
                 });
 
                 gl.enableVertexAttribArray(this.colorShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShader.colorShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
             });
@@ -118,12 +118,12 @@ function refresh(timestamp) {
                 Object.keys(layer.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShader.widthShaderTex[i], i);
+                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
                 });
 
-                gl.enableVertexAttribArray(layer.widthShader.widthShaderVertex);
+                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShader.widthShaderVertex, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -154,17 +154,17 @@ function refresh(timestamp) {
             gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.FeatureIdAttr);
+            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.FeatureIdAttr, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.finalRendererProgram.rendererColorTex, 0);
+            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
 
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.finalRendererProgram.rendererWidthTex, 1);
+            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
 
             gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
