@@ -109,9 +109,9 @@ function setGL(_gl) {
 /*
     TODO
         - Type checking. Types: float, category, RGB, RGBA, HSV, HSVA
-        - Allow multiplication, division and pow() to color expressions
-        - Dead code removal. Blending should be done with FloatBlend / ColorBlend. anything else is historical code
+        - Allow multiplication, division and pow() to color expressions and literals
         - HSV
+        - Property access function
         - Integrated color palettes
         - Now() with speed parameter
         - Think about "Date" type.
