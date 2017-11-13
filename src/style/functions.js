@@ -9,8 +9,7 @@ var gl = null;
 function setGL(_gl) {
     gl = _gl;
 }
-export { Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
-
+export { Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
 
 /*
     Each styling function should:
@@ -35,6 +34,30 @@ export { Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd
         - Think about "Date" type.
         - Heatmaps (renderer should be improved to accommodate this)
 */
+
+function Property(name) {
+    return new _Property(name);
+}
+function _Property(name) {
+    if (typeof name !== 'string' || name == '') {
+        throw new Error(`Invalid property name '${name}'`);
+    }
+    this.name = name;
+    this.type = 'float';
+}
+_Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    return {
+        preface: '',
+        inline: `p${propertyTIDMaker(this.name)}`
+    };
+}
+_Property.prototype._postShaderCompile = function (program) {
+}
+_Property.prototype._preDraw = function () {
+}
+_Property.prototype.isAnimated = function () {
+    return false;
+}
 
 function Now() {
     return new _Now();
@@ -127,7 +150,7 @@ function Animation(duration) {
     return new _Animation(duration);
 }
 function _Animation(duration) {
-    if (!Number.isFinite(duration)){
+    if (!Number.isFinite(duration)) {
         throw new Error("Animation only supports number literals");
     }
     this.type = 'float';
@@ -165,12 +188,12 @@ function Near(property, center, threshold, falloff) {
     return new _Near(...args);
 }
 
-function _Near(property, center, threshold, falloff) {
-    if (center.type!='float'||threshold.type!='float' || falloff.type!='float'){
+function _Near(input, center, threshold, falloff) {
+    if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
         throw new Error('Near(): invalid parameter type');
     }
     this.type = 'float';
-    this.property = property;
+    this.input = input;
     this.center = center;
     this.threshold = threshold;
     this.falloff = falloff;
@@ -178,13 +201,14 @@ function _Near(property, center, threshold, falloff) {
 _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._UID = uniformIDMaker();
     const tid = propertyTIDMaker(this.property);
+    const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
         preface:
-        center.preface + threshold.preface + falloff.preface,
-        inline: `1.-clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
+        input.preface + center.preface + threshold.preface + falloff.preface,
+        inline: `1.-clamp((abs(${input.inline}-${center.inline})-${threshold.inline})/${falloff.inline},
                         0., 1.)`
     };
 }
@@ -192,11 +216,13 @@ _Near.prototype._postShaderCompile = function (program) {
     this.center._postShaderCompile(program);
     this.threshold._postShaderCompile(program);
     this.falloff._postShaderCompile(program);
+    this.input._postShaderCompile(program);
 }
 _Near.prototype._preDraw = function () {
     this.center._preDraw();
     this.threshold._preDraw();
     this.falloff._preDraw();
+    this.input._preDraw();
 }
 _Near.prototype.isAnimated = function () {
     return this.center.isAnimated();
@@ -392,18 +418,18 @@ function hexToRgb(hex) {
 }
 
 
-function RampColor(property, minKey, maxKey, values) {
-    //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
-    const args = [property, minKey, maxKey, values].map(implicitCast);
+function RampColor(input, minKey, maxKey, values) {
+    //TODO contiunuos vs discrete should be decided based on input type => cartegory vs float
+    const args = [input, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         return null;
     }
     return new _RampColor(...args);
 }
 
-function _RampColor(property, minKey, maxKey, values) {
+function _RampColor(input, minKey, maxKey, values) {
     this.type = 'color';
-    this.property = property;
+    this.input = input;
     this.minKey = minKey.expr;
     this.maxKey = maxKey.expr;
     this.values = values;
@@ -445,23 +471,25 @@ _RampColor.prototype._free = function () {
     gl.deleteTexture(this.texture);
 }
 _RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    const tid = propertyTIDMaker(this.property);
     this._UID = uniformIDMaker();
+    const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
-        preface: `
+        preface: input.preface + `
         uniform sampler2D texRamp${this._UID};
         uniform float keyMin${this._UID};
         uniform float keyWidth${this._UID};
         `,
-        inline: `texture2D(texRamp${this._UID}, vec2((p${tid}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
+        inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
     };
 }
 _RampColor.prototype._postShaderCompile = function (program) {
+    this.input._postShaderCompile(program);
     this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
     this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
     this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
 }
-_RampColor.prototype._preDraw = function () {
+_RampColor.prototype._preDraw = function (l) {
+    this.input._preDraw(l);
     gl.activeTexture(gl.TEXTURE12);//TODO remove hardcode
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this._texLoc, 12);

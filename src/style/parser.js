@@ -60,6 +60,10 @@ function parseNode(node) {
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
+    } else if (node.type == 'Identifier') {
+        if (node.name[0] == '$') {
+            return functions.Property(node.name.substring(1));
+        }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
