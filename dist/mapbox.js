@@ -226,15 +226,18 @@ _Animation.prototype.isAnimated = function () {
     return !this.mix || this.mix <= 1.;
 }
 
-function FloatBlend(a, b, mix) {
+function Blend(a, b, mix) {
+    return new _Blend(a, b, mix);
+}
+function _Blend(a, b, mix) {
     this.a = a;
     this.b = b;
-    this.mix = mix;    
+    this.mix = mix;
     a.parent = this;
     b.parent = this;
     mix.parent = this;
 }
-FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+_Blend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const mix = this.mix._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
@@ -243,82 +246,20 @@ FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTI
         inline: `mix(${a.inline}, ${b.inline}, ${mix.inline})`
     };
 }
-FloatBlend.prototype._postShaderCompile = function (program) {
+_Blend.prototype._postShaderCompile = function (program) {
     this.a._postShaderCompile(program);
     this.b._postShaderCompile(program);
     this.mix._postShaderCompile(program);
 }
-FloatBlend.prototype._preDraw = function (l) {
+_Blend.prototype._preDraw = function (l) {
     this.a._preDraw(l);
     this.b._preDraw(l);
     this.mix._preDraw(l);
 }
-FloatBlend.prototype.isAnimated = function () {
+_Blend.prototype.isAnimated = function () {
     return this.a.isAnimated() || this.b.isAnimated() || this.mix.isAnimated();
 }
-FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
-    if (this.a = toReplace) {
-        this.a = replacer;
-    } else {
-        this.b = replacer;
-    }
-    replacer.parent = this;
-    replacer.notify = toReplace.notify;
-}
-function genericFloatBlend(initial, final, duration, blendFunc) {
-    const parent = initial.parent;
-    const blend = new FloatBlend(initial, final, Animation(duration));
-    parent.replaceChild(initial, blend);
-    blend.notify();
-}
-
-function ColorBlend(a, b, mix) {
-    this.a = a;
-    this.b = b;
-    a.parent = this;
-    b.parent = this;
-    if (mix.indexOf('ms') >= 0) {
-        const duration = Number(mix.replace('ms', ''));
-        this.aTime = Date.now();
-        this.bTime = this.aTime + duration;
-        mix = 'anim';
-    }
-    this.mix = mix;
-}
-ColorBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._uniformID = uniformIDMaker();
-    const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    return {
-        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
-        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
-    };
-}
-ColorBlend.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
-    this.a._postShaderCompile(program);
-    this.b._postShaderCompile(program);
-}
-ColorBlend.prototype._preDraw = function (l) {
-    var mix = this.mix;
-    if (mix == 'anim') {
-        const time = Date.now();
-        mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (mix >= 1.) {
-            mix = 1.;
-            this.mix = 1.;
-            //TODO free A, free blend
-            this.parent.replaceChild(this, this.b);
-        }
-    }
-    gl.uniform1f(this._uniformLocation, mix);
-    this.a._preDraw(l);
-    this.b._preDraw(l);
-}
-ColorBlend.prototype.isAnimated = function () {
-    return this.mix === 'anim';
-}
-ColorBlend.prototype.replaceChild = function (toReplace, replacer) {
+_Blend.prototype.replaceChild = function (toReplace, replacer) {
     if (this.a = toReplace) {
         this.a = replacer;
     } else {
@@ -328,32 +269,27 @@ ColorBlend.prototype.replaceChild = function (toReplace, replacer) {
     replacer.notify = toReplace.notify;
 }
 
-function genericColorBlend(initial, final, duration, blendFunc) {
+function genericBlend(initial, final, duration, blendFunc) {
     const parent = initial.parent;
-    const blend = new ColorBlend(initial, final, `${duration}ms`);
+    const blend = Blend(initial, final, Animation(duration));
     parent.replaceChild(initial, blend);
     blend.notify();
 }
-
 UniformColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericColorBlend(this, finalValue, duration, blendFunc);
-}
-ColorBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericColorBlend(this, finalValue, duration, blendFunc);
+    genericBlend(this, finalValue, duration, blendFunc);
 }
 _RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericColorBlend(this, finalValue, duration, blendFunc);
+    genericBlend(this, finalValue, duration, blendFunc);
 }
-
 
 _Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericFloatBlend(this, finalValue, duration, blendFunc);
+    genericBlend(this, finalValue, duration, blendFunc);
 }
 UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericFloatBlend(this, finalValue, duration, blendFunc);
+    genericBlend(this, finalValue, duration, blendFunc);
 }
-FloatBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericFloatBlend(this, finalValue, duration, blendFunc);
+_Blend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
 }
 
 function Color(color) {
@@ -3471,7 +3407,7 @@ function styleWidth(e) {
     try {
         layer.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
     } catch (error) {
-        console.warn(`Invalid width expression: ${error}`);
+        console.warn(`Invalid width expression: ${error}:${error.stack}`);
     }
 }
 function styleColor(e) {
@@ -3479,7 +3415,7 @@ function styleColor(e) {
     try {
         layer.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
     } catch (error) {
-        console.warn(`Invalid color expression: ${error}`);
+        console.warn(`Invalid color expression: ${error}:${error.stack}`);
     }
 }
 

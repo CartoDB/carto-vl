@@ -13,7 +13,7 @@ function styleWidth(e) {
     try {
         layer.style.getWidth().blendTo(R.Style.parseStyleExpression(v), 1000);
     } catch (error) {
-        console.warn(`Invalid width expression: ${error}`);
+        console.warn(`Invalid width expression: ${error}:${error.stack}`);
     }
 }
 function styleColor(e) {
@@ -21,7 +21,7 @@ function styleColor(e) {
     try {
         layer.style.getColor().blendTo(R.Style.parseStyleExpression(v), 1000);
     } catch (error) {
-        console.warn(`Invalid color expression: ${error}`);
+        console.warn(`Invalid color expression: ${error}:${error.stack}`);
     }
 }
 
