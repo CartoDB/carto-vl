@@ -1,3 +1,4 @@
+import * as cartocolor from 'cartocolor';
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -10,6 +11,14 @@ function setGL(_gl) {
     gl = _gl;
 }
 export { Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
+
+export function Burg() {
+    return cartocolor.Burg['7'];
+}
+export function Geyser() {
+    return cartocolor.Geyser['7'];
+}
+
 
 /*
     Each styling function should:
@@ -183,7 +192,7 @@ _Animation.prototype.isAnimated = function () {
 function Near(property, center, threshold, falloff) {
     const args = [property, center, threshold, falloff].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to Near(): ${args}`);
     }
     return new _Near(...args);
 }
@@ -233,7 +242,7 @@ _Near.prototype.isAnimated = function () {
 function Blend(a, b, mix) {
     const args = [a, b, mix].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to Blend(): ${args}`);
     }
     return new _Blend(...args);
 }
@@ -312,11 +321,11 @@ function Color(color) {
     if (Array.isArray(color)) {
         color = color.filter(x => true);
         if (color.length != 4 || !color.every(Number.isFinite)) {
-            return null;
+            throw new Error(`Invalid arguments to Color(): ${args}`);
         }
         return new UniformColor(color);
     }
-    return null;
+    throw new Error(`Invalid arguments to Color(): ${args}`);
 }
 function UniformColor(color) {
     this.type = 'color';
@@ -365,7 +374,7 @@ UniformColor.prototype.isAnimated = function () {
 
 function Float(x) {
     if (!Number.isFinite(x)) {
-        return null;
+        throw new Error(`Invalid arguments to Float(): ${args}`);
     }
     return new UniformFloat(x);
 }
@@ -422,7 +431,7 @@ function RampColor(input, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on input type => cartegory vs float
     const args = [input, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to RampColor(): ${args}`);
     }
     return new _RampColor(...args);
 }

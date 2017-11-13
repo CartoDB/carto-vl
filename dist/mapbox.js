@@ -68,19 +68,25 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return Property; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Blend; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return Now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Near; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Color; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return RampColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return FloatMul; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatDiv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatAdd; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return FloatSub; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return FloatPow; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return setGL; });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return Now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return Near; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return Color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return FloatMul; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return FloatDiv; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return FloatAdd; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return FloatSub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return FloatPow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
+/* harmony export (immutable) */ __webpack_exports__["Burg"] = Burg;
+/* harmony export (immutable) */ __webpack_exports__["Geyser"] = Geyser;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
+
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -91,6 +97,14 @@ function implicitCast(value) {
 var gl = null;
 function setGL(_gl) {
     gl = _gl;
+}
+
+
+function Burg() {
+    return __WEBPACK_IMPORTED_MODULE_0_cartocolor__["Burg"]['7'];
+}
+function Geyser() {
+    return __WEBPACK_IMPORTED_MODULE_0_cartocolor__["Geyser"]['7'];
 }
 
 
@@ -266,7 +280,7 @@ _Animation.prototype.isAnimated = function () {
 function Near(property, center, threshold, falloff) {
     const args = [property, center, threshold, falloff].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to Near(): ${args}`);
     }
     return new _Near(...args);
 }
@@ -316,7 +330,7 @@ _Near.prototype.isAnimated = function () {
 function Blend(a, b, mix) {
     const args = [a, b, mix].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to Blend(): ${args}`);
     }
     return new _Blend(...args);
 }
@@ -395,11 +409,11 @@ function Color(color) {
     if (Array.isArray(color)) {
         color = color.filter(x => true);
         if (color.length != 4 || !color.every(Number.isFinite)) {
-            return null;
+            throw new Error(`Invalid arguments to Color(): ${args}`);
         }
         return new UniformColor(color);
     }
-    return null;
+    throw new Error(`Invalid arguments to Color(): ${args}`);
 }
 function UniformColor(color) {
     this.type = 'color';
@@ -448,7 +462,7 @@ UniformColor.prototype.isAnimated = function () {
 
 function Float(x) {
     if (!Number.isFinite(x)) {
-        return null;
+        throw new Error(`Invalid arguments to Float(): ${args}`);
     }
     return new UniformFloat(x);
 }
@@ -505,7 +519,7 @@ function RampColor(input, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on input type => cartegory vs float
     const args = [input, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
-        return null;
+        throw new Error(`Invalid arguments to RampColor(): ${args}`);
     }
     return new _RampColor(...args);
 }
@@ -1300,13 +1314,13 @@ function parseNode(node) {
         const args = node.arguments.map(arg => parseNode(arg));
         switch (node.callee.name) {
             case 'RampColor':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["l" /* RampColor */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["RampColor"](...args);
             case 'Near':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Near */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["Near"](...args);
             case 'Now':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["j" /* Now */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["Now"](...args);
             case 'Blend':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["a" /* Blend */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["Blend"](...args);
             default:
                 throw new Error(`Invalid function name '${node.callee.name}'`);
         }
@@ -1319,22 +1333,22 @@ function parseNode(node) {
         const right = parseNode(node.right);
         switch (node.operator) {
             case "*":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](left, right);
             case "/":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatDiv */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"](left, right);
             case "+":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatAdd */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"](left, right);
             case "-":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["h" /* FloatSub */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"](left, right);
             case "^":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["g" /* FloatPow */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"](left, right);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](-1, parseNode(node.argument));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](-1, parseNode(node.argument));
             case '+':
                 return parseNode(node.argument);
             default:
@@ -1342,7 +1356,9 @@ function parseNode(node) {
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* Property */](node.name.substring(1));
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"](node.name.substring(1));
+        }else if(__WEBPACK_IMPORTED_MODULE_1__functions__[node.name]){
+            return __WEBPACK_IMPORTED_MODULE_1__functions__[node.name]();
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
@@ -2283,18 +2299,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(2);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["k"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["j"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["i"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["l"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["h"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Blend"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Now"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Near"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Float"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["RampColor"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Burg", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Burg"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Geyser", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Geyser"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
@@ -2310,20 +2328,20 @@ var gl = null;
 // TODO document API
 function setGL(_gl) {
     gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["m" /* setGL */](gl);
+    __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
 }
 
 function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["c" /* Float */](3);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](3);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["b" /* Color */]([0, 1, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 1, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();
@@ -3602,6 +3620,2232 @@ map.on('load', _ => {
     map.on('zoomend', move);
 
 });
+
+
+/***/ }),
+/* 20 */,
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(22);
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
+
+var cartocolor = {
+    "Burg": {
+        "2": [
+            "#ffc6c4",
+            "#672044"
+        ],
+        "3": [
+            "#ffc6c4",
+            "#cc607d",
+            "#672044"
+        ],
+        "4": [
+            "#ffc6c4",
+            "#e38191",
+            "#ad466c",
+            "#672044"
+        ],
+        "5": [
+            "#ffc6c4",
+            "#ee919b",
+            "#cc607d",
+            "#9e3963",
+            "#672044"
+        ],
+        "6": [
+            "#ffc6c4",
+            "#f29ca3",
+            "#da7489",
+            "#b95073",
+            "#93345d",
+            "#672044"
+        ],
+        "7": [
+            "#ffc6c4",
+            "#f4a3a8",
+            "#e38191",
+            "#cc607d",
+            "#ad466c",
+            "#8b3058",
+            "#672044"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "BurgYl": {
+        "2": [
+            "#fbe6c5",
+            "#70284a"
+        ],
+        "3": [
+            "#fbe6c5",
+            "#dc7176",
+            "#70284a"
+        ],
+        "4": [
+            "#fbe6c5",
+            "#ee8a82",
+            "#c8586c",
+            "#70284a"
+        ],
+        "5": [
+            "#fbe6c5",
+            "#f2a28a",
+            "#dc7176",
+            "#b24b65",
+            "#70284a"
+        ],
+        "6": [
+            "#fbe6c5",
+            "#f4b191",
+            "#e7807d",
+            "#d06270",
+            "#a44360",
+            "#70284a"
+        ],
+        "7": [
+            "#fbe6c5",
+            "#f5ba98",
+            "#ee8a82",
+            "#dc7176",
+            "#c8586c",
+            "#9c3f5d",
+            "#70284a"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "RedOr": {
+        "2": [
+            "#f6d2a9",
+            "#b13f64"
+        ],
+        "3": [
+            "#f6d2a9",
+            "#ea8171",
+            "#b13f64"
+        ],
+        "4": [
+            "#f6d2a9",
+            "#f19c7c",
+            "#dd686c",
+            "#b13f64"
+        ],
+        "5": [
+            "#f6d2a9",
+            "#f3aa84",
+            "#ea8171",
+            "#d55d6a",
+            "#b13f64"
+        ],
+        "6": [
+            "#f6d2a9",
+            "#f4b28a",
+            "#ef9177",
+            "#e3726d",
+            "#cf5669",
+            "#b13f64"
+        ],
+        "7": [
+            "#f6d2a9",
+            "#f5b78e",
+            "#f19c7c",
+            "#ea8171",
+            "#dd686c",
+            "#ca5268",
+            "#b13f64"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "OrYel": {
+        "2": [
+            "#ecda9a",
+            "#ee4d5a"
+        ],
+        "3": [
+            "#ecda9a",
+            "#f7945d",
+            "#ee4d5a"
+        ],
+        "4": [
+            "#ecda9a",
+            "#f3ad6a",
+            "#f97b57",
+            "#ee4d5a"
+        ],
+        "5": [
+            "#ecda9a",
+            "#f1b973",
+            "#f7945d",
+            "#f86f56",
+            "#ee4d5a"
+        ],
+        "6": [
+            "#ecda9a",
+            "#f0c079",
+            "#f5a363",
+            "#f98558",
+            "#f76856",
+            "#ee4d5a"
+        ],
+        "7": [
+            "#ecda9a",
+            "#efc47e",
+            "#f3ad6a",
+            "#f7945d",
+            "#f97b57",
+            "#f66356",
+            "#ee4d5a"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Peach": {
+        "2": [
+            "#fde0c5",
+            "#eb4a40"
+        ],
+        "3": [
+            "#fde0c5",
+            "#f59e72",
+            "#eb4a40"
+        ],
+        "4": [
+            "#fde0c5",
+            "#f8b58b",
+            "#f2855d",
+            "#eb4a40"
+        ],
+        "5": [
+            "#fde0c5",
+            "#f9c098",
+            "#f59e72",
+            "#f17854",
+            "#eb4a40"
+        ],
+        "6": [
+            "#fde0c5",
+            "#fac7a1",
+            "#f7ac80",
+            "#f38f65",
+            "#f0704f",
+            "#eb4a40"
+        ],
+        "7": [
+            "#fde0c5",
+            "#facba6",
+            "#f8b58b",
+            "#f59e72",
+            "#f2855d",
+            "#ef6a4c",
+            "#eb4a40"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "PinkYl": {
+        "2": [
+            "#fef6b5",
+            "#e15383"
+        ],
+        "3": [
+            "#fef6b5",
+            "#ffa679",
+            "#e15383"
+        ],
+        "4": [
+            "#fef6b5",
+            "#ffc285",
+            "#fa8a76",
+            "#e15383"
+        ],
+        "5": [
+            "#fef6b5",
+            "#ffd08e",
+            "#ffa679",
+            "#f67b77",
+            "#e15383"
+        ],
+        "6": [
+            "#fef6b5",
+            "#ffd795",
+            "#ffb77f",
+            "#fd9576",
+            "#f37378",
+            "#e15383"
+        ],
+        "7": [
+            "#fef6b5",
+            "#ffdd9a",
+            "#ffc285",
+            "#ffa679",
+            "#fa8a76",
+            "#f16d7a",
+            "#e15383"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Mint": {
+        "2": [
+            "#e4f1e1",
+            "#0d585f"
+        ],
+        "3": [
+            "#e4f1e1",
+            "#63a6a0",
+            "#0d585f"
+        ],
+        "4": [
+            "#e4f1e1",
+            "#89c0b6",
+            "#448c8a",
+            "#0d585f"
+        ],
+        "5": [
+            "#E4F1E1",
+            "#9CCDC1",
+            "#63A6A0",
+            "#337F7F",
+            "#0D585F"
+        ],
+        "6": [
+            "#e4f1e1",
+            "#abd4c7",
+            "#7ab5ad",
+            "#509693",
+            "#2c7778",
+            "#0d585f"
+        ],
+        "7": [
+            "#e4f1e1",
+            "#b4d9cc",
+            "#89c0b6",
+            "#63a6a0",
+            "#448c8a",
+            "#287274",
+            "#0d585f"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "BluGrn": {
+        "2": [
+            "#c4e6c3",
+            "#1d4f60"
+        ],
+        "3": [
+            "#c4e6c3",
+            "#4da284",
+            "#1d4f60"
+        ],
+        "4": [
+            "#c4e6c3",
+            "#6dbc90",
+            "#36877a",
+            "#1d4f60"
+        ],
+        "5": [
+            "#c4e6c3",
+            "#80c799",
+            "#4da284",
+            "#2d7974",
+            "#1d4f60"
+        ],
+        "6": [
+            "#c4e6c3",
+            "#8dce9f",
+            "#5fb28b",
+            "#3e927e",
+            "#297071",
+            "#1d4f60"
+        ],
+        "7": [
+            "#c4e6c3",
+            "#96d2a4",
+            "#6dbc90",
+            "#4da284",
+            "#36877a",
+            "#266b6e",
+            "#1d4f60"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "DarkMint": {
+        "2": [
+            "#d2fbd4",
+            "#123f5a"
+        ],
+        "3": [
+            "#d2fbd4",
+            "#559c9e",
+            "#123f5a"
+        ],
+        "4": [
+            "#d2fbd4",
+            "#7bbcb0",
+            "#3a7c89",
+            "#123f5a"
+        ],
+        "5": [
+            "#d2fbd4",
+            "#8eccb9",
+            "#559c9e",
+            "#2b6c7f",
+            "#123f5a"
+        ],
+        "6": [
+            "#d2fbd4",
+            "#9cd5be",
+            "#6cafa9",
+            "#458892",
+            "#266377",
+            "#123f5a"
+        ],
+        "7": [
+            "#d2fbd4",
+            "#a5dbc2",
+            "#7bbcb0",
+            "#559c9e",
+            "#3a7c89",
+            "#235d72",
+            "#123f5a"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Emrld": {
+        "2": [
+            "#d3f2a3",
+            "#074050"
+        ],
+        "3": [
+            "#d3f2a3",
+            "#4c9b82",
+            "#074050"
+        ],
+        "4": [
+            "#d3f2a3",
+            "#6cc08b",
+            "#217a79",
+            "#074050"
+        ],
+        "5": [
+            "#d3f2a3",
+            "#82d091",
+            "#4c9b82",
+            "#19696f",
+            "#074050"
+        ],
+        "6": [
+            "#d3f2a3",
+            "#8fda94",
+            "#60b187",
+            "#35877d",
+            "#145f69",
+            "#074050"
+        ],
+        "7": [
+            "#d3f2a3",
+            "#97e196",
+            "#6cc08b",
+            "#4c9b82",
+            "#217a79",
+            "#105965",
+            "#074050"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "ag_GrnYl": {
+        "2": [
+            "#245668",
+            "#EDEF5D"
+        ],
+        "3": [
+            "#245668",
+            "#39AB7E",
+            "#EDEF5D"
+        ],
+        "4": [
+            "#245668",
+            "#0D8F81",
+            "#6EC574",
+            "#EDEF5D"
+        ],
+        "5": [
+            "#245668",
+            "#04817E",
+            "#39AB7E",
+            "#8BD16D",
+            "#EDEF5D"
+        ],
+        "6": [
+            "#245668",
+            "#09787C",
+            "#1D9A81",
+            "#58BB79",
+            "#9DD869",
+            "#EDEF5D"
+        ],
+        "7": [
+            "#245668",
+            "#0F7279",
+            "#0D8F81",
+            "#39AB7E",
+            "#6EC574",
+            "#A9DC67",
+            "#EDEF5D"
+        ],
+        "tags": [
+            "aggregation"
+        ]
+    },
+    "BluYl": {
+        "2": [
+            "#f7feae",
+            "#045275"
+        ],
+        "3": [
+            "#f7feae",
+            "#46aea0",
+            "#045275"
+        ],
+        "4": [
+            "#f7feae",
+            "#7ccba2",
+            "#089099",
+            "#045275"
+        ],
+        "5": [
+            "#f7feae",
+            "#9bd8a4",
+            "#46aea0",
+            "#058092",
+            "#045275"
+        ],
+        "6": [
+            "#f7feae",
+            "#ace1a4",
+            "#68bfa1",
+            "#2a9c9c",
+            "#02778e",
+            "#045275"
+        ],
+        "7": [
+            "#f7feae",
+            "#b7e6a5",
+            "#7ccba2",
+            "#46aea0",
+            "#089099",
+            "#00718b",
+            "#045275"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Teal": {
+        "2": [
+            "#d1eeea",
+            "#2a5674"
+        ],
+        "3": [
+            "#d1eeea",
+            "#68abb8",
+            "#2a5674"
+        ],
+        "4": [
+            "#d1eeea",
+            "#85c4c9",
+            "#4f90a6",
+            "#2a5674"
+        ],
+        "5": [
+            "#d1eeea",
+            "#96d0d1",
+            "#68abb8",
+            "#45829b",
+            "#2a5674"
+        ],
+        "6": [
+            "#d1eeea",
+            "#a1d7d6",
+            "#79bbc3",
+            "#599bae",
+            "#3f7994",
+            "#2a5674"
+        ],
+        "7": [
+            "#d1eeea",
+            "#a8dbd9",
+            "#85c4c9",
+            "#68abb8",
+            "#4f90a6",
+            "#3b738f",
+            "#2a5674"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "TealGrn": {
+        "2": [
+            "#b0f2bc",
+            "#257d98"
+        ],
+        "3": [
+            "#b0f2bc",
+            "#4cc8a3",
+            "#257d98"
+        ],
+        "4": [
+            "#b0f2bc",
+            "#67dba5",
+            "#38b2a3",
+            "#257d98"
+        ],
+        "5": [
+            "#b0f2bc",
+            "#77e2a8",
+            "#4cc8a3",
+            "#31a6a2",
+            "#257d98"
+        ],
+        "6": [
+            "#b0f2bc",
+            "#82e6aa",
+            "#5bd4a4",
+            "#3fbba3",
+            "#2e9ea1",
+            "#257d98"
+        ],
+        "7": [
+            "#b0f2bc",
+            "#89e8ac",
+            "#67dba5",
+            "#4cc8a3",
+            "#38b2a3",
+            "#2c98a0",
+            "#257d98"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Purp": {
+        "2": [
+            "#f3e0f7",
+            "#63589f"
+        ],
+        "3": [
+            "#f3e0f7",
+            "#b998dd",
+            "#63589f"
+        ],
+        "4": [
+            "#f3e0f7",
+            "#d1afe8",
+            "#9f82ce",
+            "#63589f"
+        ],
+        "5": [
+            "#f3e0f7",
+            "#dbbaed",
+            "#b998dd",
+            "#9178c4",
+            "#63589f"
+        ],
+        "6": [
+            "#f3e0f7",
+            "#e0c2ef",
+            "#c8a5e4",
+            "#aa8bd4",
+            "#8871be",
+            "#63589f"
+        ],
+        "7": [
+            "#f3e0f7",
+            "#e4c7f1",
+            "#d1afe8",
+            "#b998dd",
+            "#9f82ce",
+            "#826dba",
+            "#63589f"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "PurpOr": {
+        "3": [
+            "#f9ddda",
+            "#ce78b3",
+            "#573b88"
+        ],
+        "4": [
+            "#f9ddda",
+            "#e597b9",
+            "#ad5fad",
+            "#573b88"
+        ],
+        "5": [
+            "#f9ddda",
+            "#eda8bd",
+            "#ce78b3",
+            "#9955a8",
+            "#573b88"
+        ],
+        "6": [
+            "#f9ddda",
+            "#f0b2c1",
+            "#dd8ab6",
+            "#bb69b0",
+            "#8c4fa4",
+            "#573b88"
+        ],
+        "7": [
+            "#f9ddda",
+            "#f2b9c4",
+            "#e597b9",
+            "#ce78b3",
+            "#ad5fad",
+            "#834ba0",
+            "#573b88"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Sunset": {
+        "2": [
+            "#f3e79b",
+            "#5c53a5"
+        ],
+        "3": [
+            "#f3e79b",
+            "#eb7f86",
+            "#5c53a5"
+        ],
+        "4": [
+            "#f3e79b",
+            "#f8a07e",
+            "#ce6693",
+            "#5c53a5"
+        ],
+        "5": [
+            "#f3e79b",
+            "#fab27f",
+            "#eb7f86",
+            "#b95e9a",
+            "#5c53a5"
+        ],
+        "6": [
+            "#f3e79b",
+            "#fabc82",
+            "#f59280",
+            "#dc6f8e",
+            "#ab5b9e",
+            "#5c53a5"
+        ],
+        "7": [
+            "#f3e79b",
+            "#fac484",
+            "#f8a07e",
+            "#eb7f86",
+            "#ce6693",
+            "#a059a0",
+            "#5c53a5"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "Magenta": {
+        "2": [
+            "#f3cbd3",
+            "#6c2167"
+        ],
+        "3": [
+            "#f3cbd3",
+            "#ca699d",
+            "#6c2167"
+        ],
+        "4": [
+            "#f3cbd3",
+            "#dd88ac",
+            "#b14d8e",
+            "#6c2167"
+        ],
+        "5": [
+            "#f3cbd3",
+            "#e498b4",
+            "#ca699d",
+            "#a24186",
+            "#6c2167"
+        ],
+        "6": [
+            "#f3cbd3",
+            "#e7a2b9",
+            "#d67ba5",
+            "#bc5894",
+            "#983a81",
+            "#6c2167"
+        ],
+        "7": [
+            "#f3cbd3",
+            "#eaa9bd",
+            "#dd88ac",
+            "#ca699d",
+            "#b14d8e",
+            "#91357d",
+            "#6c2167"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "SunsetDark": {
+        "2": [
+            "#fcde9c",
+            "#7c1d6f"
+        ],
+        "3": [
+            "#fcde9c",
+            "#e34f6f",
+            "#7c1d6f"
+        ],
+        "4": [
+            "#fcde9c",
+            "#f0746e",
+            "#dc3977",
+            "#7c1d6f"
+        ],
+        "5": [
+            "#fcde9c",
+            "#f58670",
+            "#e34f6f",
+            "#d72d7c",
+            "#7c1d6f"
+        ],
+        "6": [
+            "#fcde9c",
+            "#f89872",
+            "#ec666d",
+            "#df4273",
+            "#c5287b",
+            "#7c1d6f"
+        ],
+        "7": [
+            "#fcde9c",
+            "#faa476",
+            "#f0746e",
+            "#e34f6f",
+            "#dc3977",
+            "#b9257a",
+            "#7c1d6f"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "ag_Sunset": {
+        "2": [
+            "#4b2991",
+            "#edd9a3"
+        ],
+        "3": [
+            "#4b2991",
+            "#ea4f88",
+            "#edd9a3"
+        ],
+        "4": [
+            "#4b2991",
+            "#c0369d",
+            "#fa7876",
+            "#edd9a3"
+        ],
+        "5": [
+            "#4b2991",
+            "#a52fa2",
+            "#ea4f88",
+            "#fa9074",
+            "#edd9a3"
+        ],
+        "6": [
+            "#4b2991",
+            "#932da3",
+            "#d43f96",
+            "#f7667c",
+            "#f89f77",
+            "#edd9a3"
+        ],
+        "7": [
+            "#4b2991",
+            "#872ca2",
+            "#c0369d",
+            "#ea4f88",
+            "#fa7876",
+            "#f6a97a",
+            "#edd9a3"
+        ],
+        "tags": [
+            "aggregation"
+        ]
+    },
+    "BrwnYl": {
+        "2": [
+            "#ede5cf",
+            "#541f3f"
+        ],
+        "3": [
+            "#ede5cf",
+            "#c1766f",
+            "#541f3f"
+        ],
+        "4": [
+            "#ede5cf",
+            "#d39c83",
+            "#a65461",
+            "#541f3f"
+        ],
+        "5": [
+            "#ede5cf",
+            "#daaf91",
+            "#c1766f",
+            "#95455a",
+            "#541f3f"
+        ],
+        "6": [
+            "#ede5cf",
+            "#ddba9b",
+            "#cd8c7a",
+            "#b26166",
+            "#8a3c56",
+            "#541f3f"
+        ],
+        "7": [
+            "#ede5cf",
+            "#e0c2a2",
+            "#d39c83",
+            "#c1766f",
+            "#a65461",
+            "#813753",
+            "#541f3f"
+        ],
+        "tags": [
+            "quantitative"
+        ]
+    },
+    "ArmyRose": {
+        "2": [
+            "#929b4f",
+            "#db8195"
+        ],
+        "3": [
+            "#a3ad62",
+            "#fdfbe4",
+            "#df91a3"
+        ],
+        "4": [
+            "#929b4f",
+            "#d9dbaf",
+            "#f3d1ca",
+            "#db8195"
+        ],
+        "5": [
+            "#879043",
+            "#c1c68c",
+            "#fdfbe4",
+            "#ebb4b8",
+            "#d8758b"
+        ],
+        "6": [
+            "#7f883b",
+            "#b0b874",
+            "#e3e4be",
+            "#f6ddd1",
+            "#e4a0ac",
+            "#d66d85"
+        ],
+        "7": [
+            "#798234",
+            "#a3ad62",
+            "#d0d3a2",
+            "#fdfbe4",
+            "#f0c6c3",
+            "#df91a3",
+            "#d46780"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Fall": {
+        "2": [
+            "#3d5941",
+            "#ca562c"
+        ],
+        "3": [
+            "#3d5941",
+            "#f6edbd",
+            "#ca562c"
+        ],
+        "4": [
+            "#3d5941",
+            "#b5b991",
+            "#edbb8a",
+            "#ca562c"
+        ],
+        "5": [
+            "#3d5941",
+            "#96a07c",
+            "#f6edbd",
+            "#e6a272",
+            "#ca562c"
+        ],
+        "6": [
+            "#3d5941",
+            "#839170",
+            "#cecea2",
+            "#f1cf9e",
+            "#e19464",
+            "#ca562c"
+        ],
+        "7": [
+            "#3d5941",
+            "#778868",
+            "#b5b991",
+            "#f6edbd",
+            "#edbb8a",
+            "#de8a5a",
+            "#ca562c"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Geyser": {
+        "2": [
+            "#008080",
+            "#ca562c"
+        ],
+        "3": [
+            "#008080",
+            "#f6edbd",
+            "#ca562c"
+        ],
+        "4": [
+            "#008080",
+            "#b4c8a8",
+            "#edbb8a",
+            "#ca562c"
+        ],
+        "5": [
+            "#008080",
+            "#92b69e",
+            "#f6edbd",
+            "#e6a272",
+            "#ca562c"
+        ],
+        "6": [
+            "#008080",
+            "#7eab98",
+            "#ced7b1",
+            "#f1cf9e",
+            "#e19464",
+            "#ca562c"
+        ],
+        "7": [
+            "#008080",
+            "#70a494",
+            "#b4c8a8",
+            "#f6edbd",
+            "#edbb8a",
+            "#de8a5a",
+            "#ca562c"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Temps": {
+        "2": [
+            "#009392",
+            "#cf597e"
+        ],
+        "3": [
+            "#009392",
+            "#e9e29c",
+            "#cf597e"
+        ],
+        "4": [
+            "#009392",
+            "#9ccb86",
+            "#eeb479",
+            "#cf597e"
+        ],
+        "5": [
+            "#009392",
+            "#71be83",
+            "#e9e29c",
+            "#ed9c72",
+            "#cf597e"
+        ],
+        "6": [
+            "#009392",
+            "#52b684",
+            "#bcd48c",
+            "#edc783",
+            "#eb8d71",
+            "#cf597e"
+        ],
+        "7": [
+            "#009392",
+            "#39b185",
+            "#9ccb86",
+            "#e9e29c",
+            "#eeb479",
+            "#e88471",
+            "#cf597e"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "TealRose": {
+        "2": [
+            "#009392",
+            "#d0587e"
+        ],
+        "3": [
+            "#009392",
+            "#f1eac8",
+            "#d0587e"
+        ],
+        "4": [
+            "#009392",
+            "#91b8aa",
+            "#f1eac8",
+            "#dfa0a0",
+            "#d0587e"
+        ],
+        "5": [
+            "#009392",
+            "#91b8aa",
+            "#f1eac8",
+            "#dfa0a0",
+            "#d0587e"
+        ],
+        "6": [
+            "#009392",
+            "#72aaa1",
+            "#b1c7b3",
+            "#e5b9ad",
+            "#d98994",
+            "#d0587e"
+        ],
+        "7": [
+            "#009392",
+            "#72aaa1",
+            "#b1c7b3",
+            "#f1eac8",
+            "#e5b9ad",
+            "#d98994",
+            "#d0587e"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Tropic": {
+        "2": [
+            "#009B9E",
+            "#C75DAB"
+        ],
+        "3": [
+            "#009B9E",
+            "#F1F1F1",
+            "#C75DAB"
+        ],
+        "4": [
+            "#009B9E",
+            "#A7D3D4",
+            "#E4C1D9",
+            "#C75DAB"
+        ],
+        "5": [
+            "#009B9E",
+            "#7CC5C6",
+            "#F1F1F1",
+            "#DDA9CD",
+            "#C75DAB"
+        ],
+        "6": [
+            "#009B9E",
+            "#5DBCBE",
+            "#C6DFDF",
+            "#E9D4E2",
+            "#D99BC6",
+            "#C75DAB"
+        ],
+        "7": [
+            "#009B9E",
+            "#42B7B9",
+            "#A7D3D4",
+            "#F1F1F1",
+            "#E4C1D9",
+            "#D691C1",
+            "#C75DAB"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Earth": {
+        "2": [
+            "#A16928",
+            "#2887a1"
+        ],
+        "3": [
+            "#A16928",
+            "#edeac2",
+            "#2887a1"
+        ],
+        "4": [
+            "#A16928",
+            "#d6bd8d",
+            "#b5c8b8",
+            "#2887a1"
+        ],
+        "5": [
+            "#A16928",
+            "#caa873",
+            "#edeac2",
+            "#98b7b2",
+            "#2887a1"
+        ],
+        "6": [
+            "#A16928",
+            "#c29b64",
+            "#e0cfa2",
+            "#cbd5bc",
+            "#85adaf",
+            "#2887a1"
+        ],
+        "7": [
+            "#A16928",
+            "#bd925a",
+            "#d6bd8d",
+            "#edeac2",
+            "#b5c8b8",
+            "#79a7ac",
+            "#2887a1"
+        ],
+        "tags": [
+            "diverging"
+        ]
+    },
+    "Antique": {
+        "2": [
+            "#855C75",
+            "#D9AF6B",
+            "#7C7C7C"
+        ],
+        "3": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#7C7C7C"
+        ],
+        "4": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#7C7C7C"
+        ],
+        "5": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#7C7C7C"
+        ],
+        "6": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#7C7C7C"
+        ],
+        "7": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#68855C",
+            "#7C7C7C"
+        ],
+        "8": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#68855C",
+            "#9C9C5E",
+            "#7C7C7C"
+        ],
+        "9": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#68855C",
+            "#9C9C5E",
+            "#A06177",
+            "#7C7C7C"
+        ],
+        "10": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#68855C",
+            "#9C9C5E",
+            "#A06177",
+            "#8C785D",
+            "#7C7C7C"
+        ],
+        "11": [
+            "#855C75",
+            "#D9AF6B",
+            "#AF6458",
+            "#736F4C",
+            "#526A83",
+            "#625377",
+            "#68855C",
+            "#9C9C5E",
+            "#A06177",
+            "#8C785D",
+            "#467378",
+            "#7C7C7C"
+        ],
+        "tags": [
+            "qualitative"
+        ]
+    },
+    "Bold": {
+        "2": [
+            "#7F3C8D",
+            "#11A579",
+            "#A5AA99"
+        ],
+        "3": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#A5AA99"
+        ],
+        "4": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#A5AA99"
+        ],
+        "5": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#A5AA99"
+        ],
+        "6": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#A5AA99"
+        ],
+        "7": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#E68310",
+            "#A5AA99"
+        ],
+        "8": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#E68310",
+            "#008695",
+            "#A5AA99"
+        ],
+        "9": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#E68310",
+            "#008695",
+            "#CF1C90",
+            "#A5AA99"
+        ],
+        "10": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#E68310",
+            "#008695",
+            "#CF1C90",
+            "#f97b72",
+            "#A5AA99"
+        ],
+        "11": [
+            "#7F3C8D",
+            "#11A579",
+            "#3969AC",
+            "#F2B701",
+            "#E73F74",
+            "#80BA5A",
+            "#E68310",
+            "#008695",
+            "#CF1C90",
+            "#f97b72",
+            "#4b4b8f",
+            "#A5AA99"
+        ],
+        "tags": [
+            "qualitative"
+        ]
+    },
+    "Pastel": {
+        "2": [
+            "#66C5CC",
+            "#F6CF71",
+            "#B3B3B3"
+        ],
+        "3": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#B3B3B3"
+        ],
+        "4": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#B3B3B3"
+        ],
+        "5": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#B3B3B3"
+        ],
+        "6": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#B3B3B3"
+        ],
+        "7": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#FE88B1",
+            "#B3B3B3"
+        ],
+        "8": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#FE88B1",
+            "#C9DB74",
+            "#B3B3B3"
+        ],
+        "9": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#FE88B1",
+            "#C9DB74",
+            "#8BE0A4",
+            "#B3B3B3"
+        ],
+        "10": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#FE88B1",
+            "#C9DB74",
+            "#8BE0A4",
+            "#B497E7",
+            "#B3B3B3"
+        ],
+        "11": [
+            "#66C5CC",
+            "#F6CF71",
+            "#F89C74",
+            "#DCB0F2",
+            "#87C55F",
+            "#9EB9F3",
+            "#FE88B1",
+            "#C9DB74",
+            "#8BE0A4",
+            "#B497E7",
+            "#D3B484",
+            "#B3B3B3"
+        ],
+        "tags": [
+            "qualitative"
+        ]
+    },
+    "Prism": {
+        "2": [
+            "#5F4690",
+            "#1D6996",
+            "#666666"
+        ],
+        "3": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#666666"
+        ],
+        "4": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#666666"
+        ],
+        "5": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#666666"
+        ],
+        "6": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#666666"
+        ],
+        "7": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#E17C05",
+            "#666666"
+        ],
+        "8": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#E17C05",
+            "#CC503E",
+            "#666666"
+        ],
+        "9": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#E17C05",
+            "#CC503E",
+            "#94346E",
+            "#666666"
+        ],
+        "10": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#E17C05",
+            "#CC503E",
+            "#94346E",
+            "#6F4070",
+            "#666666"
+        ],
+        "11": [
+            "#5F4690",
+            "#1D6996",
+            "#38A6A5",
+            "#0F8554",
+            "#73AF48",
+            "#EDAD08",
+            "#E17C05",
+            "#CC503E",
+            "#94346E",
+            "#6F4070",
+            "#994E95",
+            "#666666"
+        ],
+        "tags": [
+            "qualitative"
+        ]
+    },
+    "Safe": {
+        "2": [
+            "#88CCEE",
+            "#CC6677",
+            "#888888"
+        ],
+        "3": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#888888"
+        ],
+        "4": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#888888"
+        ],
+        "5": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#888888"
+        ],
+        "6": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#888888"
+        ],
+        "7": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#44AA99",
+            "#888888"
+        ],
+        "8": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#44AA99",
+            "#999933",
+            "#888888"
+        ],
+        "9": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#44AA99",
+            "#999933",
+            "#882255",
+            "#888888"
+        ],
+        "10": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#44AA99",
+            "#999933",
+            "#882255",
+            "#661100",
+            "#888888"
+        ],
+        "11": [
+            "#88CCEE",
+            "#CC6677",
+            "#DDCC77",
+            "#117733",
+            "#332288",
+            "#AA4499",
+            "#44AA99",
+            "#999933",
+            "#882255",
+            "#661100",
+            "#6699CC",
+            "#888888"
+        ],
+        "tags": [
+            "qualitative",
+            "colorblind"
+        ]
+    },
+    "Vivid": {
+        "2": [
+            "#E58606",
+            "#5D69B1",
+            "#A5AA99"
+        ],
+        "3": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#A5AA99"
+        ],
+        "4": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#A5AA99"
+        ],
+        "5": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#A5AA99"
+        ],
+        "6": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#A5AA99"
+        ],
+        "7": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#DAA51B",
+            "#A5AA99"
+        ],
+        "8": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#DAA51B",
+            "#2F8AC4",
+            "#A5AA99"
+        ],
+        "9": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#DAA51B",
+            "#2F8AC4",
+            "#764E9F",
+            "#A5AA99"
+        ],
+        "10": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#DAA51B",
+            "#2F8AC4",
+            "#764E9F",
+            "#ED645A",
+            "#A5AA99"
+        ],
+        "11": [
+            "#E58606",
+            "#5D69B1",
+            "#52BCA3",
+            "#99C945",
+            "#CC61B0",
+            "#24796C",
+            "#DAA51B",
+            "#2F8AC4",
+            "#764E9F",
+            "#ED645A",
+            "#CC3A8E",
+            "#A5AA99"
+        ],
+        "tags": [
+            "qualitative"
+        ]
+    }
+};
+
+var colorbrewer_tags = {
+  "Blues": { "tags": ["quantitative"] },
+  "BrBG": { "tags": ["diverging"] },
+  "Greys": { "tags": ["quantitative"] },
+  "PiYG": { "tags": ["diverging"] },
+  "PRGn": { "tags": ["diverging"] },
+  "Purples": { "tags": ["quantitative"] },
+  "RdYlGn": { "tags": ["diverging"] },
+  "Spectral": { "tags": ["diverging"] },
+  "YlOrBr": { "tags": ["quantitative"] },
+  "YlGn": { "tags": ["quantitative"] },
+  "YlGnBu": { "tags": ["quantitative"] },
+  "YlOrRd": { "tags": ["quantitative"] }
+}
+
+var colorbrewer = __webpack_require__(23);
+
+// augment colorbrewer with tags
+for (var r in colorbrewer) {
+  var ramps = colorbrewer[r];
+  var augmentedRamps = {};
+  for (var i in ramps) {
+    augmentedRamps[i] = ramps[i];
+  }
+
+  if (r in colorbrewer_tags) {
+    augmentedRamps.tags = colorbrewer_tags[r].tags;
+  }
+
+  cartocolor['cb_' + r] = augmentedRamps;
+}
+
+if (true) {
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (cartocolor),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+} else if (typeof module === "object" && module.exports) {
+    module.exports = cartocolor;
+} else {
+    this.colorbrewer = cartocolor;
+}
+
+}();
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(24);
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
+// JavaScript specs as packaged in the D3 library (d3js.org). Please see license at http://colorbrewer.org/export/LICENSE.txt
+!function() {
+
+var colorbrewer = {YlGn: {
+3: ["#f7fcb9","#addd8e","#31a354"],
+4: ["#ffffcc","#c2e699","#78c679","#238443"],
+5: ["#ffffcc","#c2e699","#78c679","#31a354","#006837"],
+6: ["#ffffcc","#d9f0a3","#addd8e","#78c679","#31a354","#006837"],
+7: ["#ffffcc","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#005a32"],
+8: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#005a32"],
+9: ["#ffffe5","#f7fcb9","#d9f0a3","#addd8e","#78c679","#41ab5d","#238443","#006837","#004529"]
+},YlGnBu: {
+3: ["#edf8b1","#7fcdbb","#2c7fb8"],
+4: ["#ffffcc","#a1dab4","#41b6c4","#225ea8"],
+5: ["#ffffcc","#a1dab4","#41b6c4","#2c7fb8","#253494"],
+6: ["#ffffcc","#c7e9b4","#7fcdbb","#41b6c4","#2c7fb8","#253494"],
+7: ["#ffffcc","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#0c2c84"],
+8: ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#0c2c84"],
+9: ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"]
+},GnBu: {
+3: ["#e0f3db","#a8ddb5","#43a2ca"],
+4: ["#f0f9e8","#bae4bc","#7bccc4","#2b8cbe"],
+5: ["#f0f9e8","#bae4bc","#7bccc4","#43a2ca","#0868ac"],
+6: ["#f0f9e8","#ccebc5","#a8ddb5","#7bccc4","#43a2ca","#0868ac"],
+7: ["#f0f9e8","#ccebc5","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#08589e"],
+8: ["#f7fcf0","#e0f3db","#ccebc5","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#08589e"],
+9: ["#f7fcf0","#e0f3db","#ccebc5","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#0868ac","#084081"]
+},BuGn: {
+3: ["#e5f5f9","#99d8c9","#2ca25f"],
+4: ["#edf8fb","#b2e2e2","#66c2a4","#238b45"],
+5: ["#edf8fb","#b2e2e2","#66c2a4","#2ca25f","#006d2c"],
+6: ["#edf8fb","#ccece6","#99d8c9","#66c2a4","#2ca25f","#006d2c"],
+7: ["#edf8fb","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"],
+8: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#005824"],
+9: ["#f7fcfd","#e5f5f9","#ccece6","#99d8c9","#66c2a4","#41ae76","#238b45","#006d2c","#00441b"]
+},PuBuGn: {
+3: ["#ece2f0","#a6bddb","#1c9099"],
+4: ["#f6eff7","#bdc9e1","#67a9cf","#02818a"],
+5: ["#f6eff7","#bdc9e1","#67a9cf","#1c9099","#016c59"],
+6: ["#f6eff7","#d0d1e6","#a6bddb","#67a9cf","#1c9099","#016c59"],
+7: ["#f6eff7","#d0d1e6","#a6bddb","#67a9cf","#3690c0","#02818a","#016450"],
+8: ["#fff7fb","#ece2f0","#d0d1e6","#a6bddb","#67a9cf","#3690c0","#02818a","#016450"],
+9: ["#fff7fb","#ece2f0","#d0d1e6","#a6bddb","#67a9cf","#3690c0","#02818a","#016c59","#014636"]
+},PuBu: {
+3: ["#ece7f2","#a6bddb","#2b8cbe"],
+4: ["#f1eef6","#bdc9e1","#74a9cf","#0570b0"],
+5: ["#f1eef6","#bdc9e1","#74a9cf","#2b8cbe","#045a8d"],
+6: ["#f1eef6","#d0d1e6","#a6bddb","#74a9cf","#2b8cbe","#045a8d"],
+7: ["#f1eef6","#d0d1e6","#a6bddb","#74a9cf","#3690c0","#0570b0","#034e7b"],
+8: ["#fff7fb","#ece7f2","#d0d1e6","#a6bddb","#74a9cf","#3690c0","#0570b0","#034e7b"],
+9: ["#fff7fb","#ece7f2","#d0d1e6","#a6bddb","#74a9cf","#3690c0","#0570b0","#045a8d","#023858"]
+},BuPu: {
+3: ["#e0ecf4","#9ebcda","#8856a7"],
+4: ["#edf8fb","#b3cde3","#8c96c6","#88419d"],
+5: ["#edf8fb","#b3cde3","#8c96c6","#8856a7","#810f7c"],
+6: ["#edf8fb","#bfd3e6","#9ebcda","#8c96c6","#8856a7","#810f7c"],
+7: ["#edf8fb","#bfd3e6","#9ebcda","#8c96c6","#8c6bb1","#88419d","#6e016b"],
+8: ["#f7fcfd","#e0ecf4","#bfd3e6","#9ebcda","#8c96c6","#8c6bb1","#88419d","#6e016b"],
+9: ["#f7fcfd","#e0ecf4","#bfd3e6","#9ebcda","#8c96c6","#8c6bb1","#88419d","#810f7c","#4d004b"]
+},RdPu: {
+3: ["#fde0dd","#fa9fb5","#c51b8a"],
+4: ["#feebe2","#fbb4b9","#f768a1","#ae017e"],
+5: ["#feebe2","#fbb4b9","#f768a1","#c51b8a","#7a0177"],
+6: ["#feebe2","#fcc5c0","#fa9fb5","#f768a1","#c51b8a","#7a0177"],
+7: ["#feebe2","#fcc5c0","#fa9fb5","#f768a1","#dd3497","#ae017e","#7a0177"],
+8: ["#fff7f3","#fde0dd","#fcc5c0","#fa9fb5","#f768a1","#dd3497","#ae017e","#7a0177"],
+9: ["#fff7f3","#fde0dd","#fcc5c0","#fa9fb5","#f768a1","#dd3497","#ae017e","#7a0177","#49006a"]
+},PuRd: {
+3: ["#e7e1ef","#c994c7","#dd1c77"],
+4: ["#f1eef6","#d7b5d8","#df65b0","#ce1256"],
+5: ["#f1eef6","#d7b5d8","#df65b0","#dd1c77","#980043"],
+6: ["#f1eef6","#d4b9da","#c994c7","#df65b0","#dd1c77","#980043"],
+7: ["#f1eef6","#d4b9da","#c994c7","#df65b0","#e7298a","#ce1256","#91003f"],
+8: ["#f7f4f9","#e7e1ef","#d4b9da","#c994c7","#df65b0","#e7298a","#ce1256","#91003f"],
+9: ["#f7f4f9","#e7e1ef","#d4b9da","#c994c7","#df65b0","#e7298a","#ce1256","#980043","#67001f"]
+},OrRd: {
+3: ["#fee8c8","#fdbb84","#e34a33"],
+4: ["#fef0d9","#fdcc8a","#fc8d59","#d7301f"],
+5: ["#fef0d9","#fdcc8a","#fc8d59","#e34a33","#b30000"],
+6: ["#fef0d9","#fdd49e","#fdbb84","#fc8d59","#e34a33","#b30000"],
+7: ["#fef0d9","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#990000"],
+8: ["#fff7ec","#fee8c8","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#990000"],
+9: ["#fff7ec","#fee8c8","#fdd49e","#fdbb84","#fc8d59","#ef6548","#d7301f","#b30000","#7f0000"]
+},YlOrRd: {
+3: ["#ffeda0","#feb24c","#f03b20"],
+4: ["#ffffb2","#fecc5c","#fd8d3c","#e31a1c"],
+5: ["#ffffb2","#fecc5c","#fd8d3c","#f03b20","#bd0026"],
+6: ["#ffffb2","#fed976","#feb24c","#fd8d3c","#f03b20","#bd0026"],
+7: ["#ffffb2","#fed976","#feb24c","#fd8d3c","#fc4e2a","#e31a1c","#b10026"],
+8: ["#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#e31a1c","#b10026"],
+9: ["#ffffcc","#ffeda0","#fed976","#feb24c","#fd8d3c","#fc4e2a","#e31a1c","#bd0026","#800026"]
+},YlOrBr: {
+3: ["#fff7bc","#fec44f","#d95f0e"],
+4: ["#ffffd4","#fed98e","#fe9929","#cc4c02"],
+5: ["#ffffd4","#fed98e","#fe9929","#d95f0e","#993404"],
+6: ["#ffffd4","#fee391","#fec44f","#fe9929","#d95f0e","#993404"],
+7: ["#ffffd4","#fee391","#fec44f","#fe9929","#ec7014","#cc4c02","#8c2d04"],
+8: ["#ffffe5","#fff7bc","#fee391","#fec44f","#fe9929","#ec7014","#cc4c02","#8c2d04"],
+9: ["#ffffe5","#fff7bc","#fee391","#fec44f","#fe9929","#ec7014","#cc4c02","#993404","#662506"]
+},Purples: {
+3: ["#efedf5","#bcbddc","#756bb1"],
+4: ["#f2f0f7","#cbc9e2","#9e9ac8","#6a51a3"],
+5: ["#f2f0f7","#cbc9e2","#9e9ac8","#756bb1","#54278f"],
+6: ["#f2f0f7","#dadaeb","#bcbddc","#9e9ac8","#756bb1","#54278f"],
+7: ["#f2f0f7","#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#4a1486"],
+8: ["#fcfbfd","#efedf5","#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#4a1486"],
+9: ["#fcfbfd","#efedf5","#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"]
+},Blues: {
+3: ["#deebf7","#9ecae1","#3182bd"],
+4: ["#eff3ff","#bdd7e7","#6baed6","#2171b5"],
+5: ["#eff3ff","#bdd7e7","#6baed6","#3182bd","#08519c"],
+6: ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#3182bd","#08519c"],
+7: ["#eff3ff","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"],
+8: ["#f7fbff","#deebf7","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#084594"],
+9: ["#f7fbff","#deebf7","#c6dbef","#9ecae1","#6baed6","#4292c6","#2171b5","#08519c","#08306b"]
+},Greens: {
+3: ["#e5f5e0","#a1d99b","#31a354"],
+4: ["#edf8e9","#bae4b3","#74c476","#238b45"],
+5: ["#edf8e9","#bae4b3","#74c476","#31a354","#006d2c"],
+6: ["#edf8e9","#c7e9c0","#a1d99b","#74c476","#31a354","#006d2c"],
+7: ["#edf8e9","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#005a32"],
+8: ["#f7fcf5","#e5f5e0","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#005a32"],
+9: ["#f7fcf5","#e5f5e0","#c7e9c0","#a1d99b","#74c476","#41ab5d","#238b45","#006d2c","#00441b"]
+},Oranges: {
+3: ["#fee6ce","#fdae6b","#e6550d"],
+4: ["#feedde","#fdbe85","#fd8d3c","#d94701"],
+5: ["#feedde","#fdbe85","#fd8d3c","#e6550d","#a63603"],
+6: ["#feedde","#fdd0a2","#fdae6b","#fd8d3c","#e6550d","#a63603"],
+7: ["#feedde","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#8c2d04"],
+8: ["#fff5eb","#fee6ce","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#8c2d04"],
+9: ["#fff5eb","#fee6ce","#fdd0a2","#fdae6b","#fd8d3c","#f16913","#d94801","#a63603","#7f2704"]
+},Reds: {
+3: ["#fee0d2","#fc9272","#de2d26"],
+4: ["#fee5d9","#fcae91","#fb6a4a","#cb181d"],
+5: ["#fee5d9","#fcae91","#fb6a4a","#de2d26","#a50f15"],
+6: ["#fee5d9","#fcbba1","#fc9272","#fb6a4a","#de2d26","#a50f15"],
+7: ["#fee5d9","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#99000d"],
+8: ["#fff5f0","#fee0d2","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#99000d"],
+9: ["#fff5f0","#fee0d2","#fcbba1","#fc9272","#fb6a4a","#ef3b2c","#cb181d","#a50f15","#67000d"]
+},Greys: {
+3: ["#f0f0f0","#bdbdbd","#636363"],
+4: ["#f7f7f7","#cccccc","#969696","#525252"],
+5: ["#f7f7f7","#cccccc","#969696","#636363","#252525"],
+6: ["#f7f7f7","#d9d9d9","#bdbdbd","#969696","#636363","#252525"],
+7: ["#f7f7f7","#d9d9d9","#bdbdbd","#969696","#737373","#525252","#252525"],
+8: ["#ffffff","#f0f0f0","#d9d9d9","#bdbdbd","#969696","#737373","#525252","#252525"],
+9: ["#ffffff","#f0f0f0","#d9d9d9","#bdbdbd","#969696","#737373","#525252","#252525","#000000"]
+},PuOr: {
+3: ["#f1a340","#f7f7f7","#998ec3"],
+4: ["#e66101","#fdb863","#b2abd2","#5e3c99"],
+5: ["#e66101","#fdb863","#f7f7f7","#b2abd2","#5e3c99"],
+6: ["#b35806","#f1a340","#fee0b6","#d8daeb","#998ec3","#542788"],
+7: ["#b35806","#f1a340","#fee0b6","#f7f7f7","#d8daeb","#998ec3","#542788"],
+8: ["#b35806","#e08214","#fdb863","#fee0b6","#d8daeb","#b2abd2","#8073ac","#542788"],
+9: ["#b35806","#e08214","#fdb863","#fee0b6","#f7f7f7","#d8daeb","#b2abd2","#8073ac","#542788"],
+10: ["#7f3b08","#b35806","#e08214","#fdb863","#fee0b6","#d8daeb","#b2abd2","#8073ac","#542788","#2d004b"],
+11: ["#7f3b08","#b35806","#e08214","#fdb863","#fee0b6","#f7f7f7","#d8daeb","#b2abd2","#8073ac","#542788","#2d004b"]
+},BrBG: {
+3: ["#d8b365","#f5f5f5","#5ab4ac"],
+4: ["#a6611a","#dfc27d","#80cdc1","#018571"],
+5: ["#a6611a","#dfc27d","#f5f5f5","#80cdc1","#018571"],
+6: ["#8c510a","#d8b365","#f6e8c3","#c7eae5","#5ab4ac","#01665e"],
+7: ["#8c510a","#d8b365","#f6e8c3","#f5f5f5","#c7eae5","#5ab4ac","#01665e"],
+8: ["#8c510a","#bf812d","#dfc27d","#f6e8c3","#c7eae5","#80cdc1","#35978f","#01665e"],
+9: ["#8c510a","#bf812d","#dfc27d","#f6e8c3","#f5f5f5","#c7eae5","#80cdc1","#35978f","#01665e"],
+10: ["#543005","#8c510a","#bf812d","#dfc27d","#f6e8c3","#c7eae5","#80cdc1","#35978f","#01665e","#003c30"],
+11: ["#543005","#8c510a","#bf812d","#dfc27d","#f6e8c3","#f5f5f5","#c7eae5","#80cdc1","#35978f","#01665e","#003c30"]
+},PRGn: {
+3: ["#af8dc3","#f7f7f7","#7fbf7b"],
+4: ["#7b3294","#c2a5cf","#a6dba0","#008837"],
+5: ["#7b3294","#c2a5cf","#f7f7f7","#a6dba0","#008837"],
+6: ["#762a83","#af8dc3","#e7d4e8","#d9f0d3","#7fbf7b","#1b7837"],
+7: ["#762a83","#af8dc3","#e7d4e8","#f7f7f7","#d9f0d3","#7fbf7b","#1b7837"],
+8: ["#762a83","#9970ab","#c2a5cf","#e7d4e8","#d9f0d3","#a6dba0","#5aae61","#1b7837"],
+9: ["#762a83","#9970ab","#c2a5cf","#e7d4e8","#f7f7f7","#d9f0d3","#a6dba0","#5aae61","#1b7837"],
+10: ["#40004b","#762a83","#9970ab","#c2a5cf","#e7d4e8","#d9f0d3","#a6dba0","#5aae61","#1b7837","#00441b"],
+11: ["#40004b","#762a83","#9970ab","#c2a5cf","#e7d4e8","#f7f7f7","#d9f0d3","#a6dba0","#5aae61","#1b7837","#00441b"]
+},PiYG: {
+3: ["#e9a3c9","#f7f7f7","#a1d76a"],
+4: ["#d01c8b","#f1b6da","#b8e186","#4dac26"],
+5: ["#d01c8b","#f1b6da","#f7f7f7","#b8e186","#4dac26"],
+6: ["#c51b7d","#e9a3c9","#fde0ef","#e6f5d0","#a1d76a","#4d9221"],
+7: ["#c51b7d","#e9a3c9","#fde0ef","#f7f7f7","#e6f5d0","#a1d76a","#4d9221"],
+8: ["#c51b7d","#de77ae","#f1b6da","#fde0ef","#e6f5d0","#b8e186","#7fbc41","#4d9221"],
+9: ["#c51b7d","#de77ae","#f1b6da","#fde0ef","#f7f7f7","#e6f5d0","#b8e186","#7fbc41","#4d9221"],
+10: ["#8e0152","#c51b7d","#de77ae","#f1b6da","#fde0ef","#e6f5d0","#b8e186","#7fbc41","#4d9221","#276419"],
+11: ["#8e0152","#c51b7d","#de77ae","#f1b6da","#fde0ef","#f7f7f7","#e6f5d0","#b8e186","#7fbc41","#4d9221","#276419"]
+},RdBu: {
+3: ["#ef8a62","#f7f7f7","#67a9cf"],
+4: ["#ca0020","#f4a582","#92c5de","#0571b0"],
+5: ["#ca0020","#f4a582","#f7f7f7","#92c5de","#0571b0"],
+6: ["#b2182b","#ef8a62","#fddbc7","#d1e5f0","#67a9cf","#2166ac"],
+7: ["#b2182b","#ef8a62","#fddbc7","#f7f7f7","#d1e5f0","#67a9cf","#2166ac"],
+8: ["#b2182b","#d6604d","#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac"],
+9: ["#b2182b","#d6604d","#f4a582","#fddbc7","#f7f7f7","#d1e5f0","#92c5de","#4393c3","#2166ac"],
+10: ["#67001f","#b2182b","#d6604d","#f4a582","#fddbc7","#d1e5f0","#92c5de","#4393c3","#2166ac","#053061"],
+11: ["#67001f","#b2182b","#d6604d","#f4a582","#fddbc7","#f7f7f7","#d1e5f0","#92c5de","#4393c3","#2166ac","#053061"]
+},RdGy: {
+3: ["#ef8a62","#ffffff","#999999"],
+4: ["#ca0020","#f4a582","#bababa","#404040"],
+5: ["#ca0020","#f4a582","#ffffff","#bababa","#404040"],
+6: ["#b2182b","#ef8a62","#fddbc7","#e0e0e0","#999999","#4d4d4d"],
+7: ["#b2182b","#ef8a62","#fddbc7","#ffffff","#e0e0e0","#999999","#4d4d4d"],
+8: ["#b2182b","#d6604d","#f4a582","#fddbc7","#e0e0e0","#bababa","#878787","#4d4d4d"],
+9: ["#b2182b","#d6604d","#f4a582","#fddbc7","#ffffff","#e0e0e0","#bababa","#878787","#4d4d4d"],
+10: ["#67001f","#b2182b","#d6604d","#f4a582","#fddbc7","#e0e0e0","#bababa","#878787","#4d4d4d","#1a1a1a"],
+11: ["#67001f","#b2182b","#d6604d","#f4a582","#fddbc7","#ffffff","#e0e0e0","#bababa","#878787","#4d4d4d","#1a1a1a"]
+},RdYlBu: {
+3: ["#fc8d59","#ffffbf","#91bfdb"],
+4: ["#d7191c","#fdae61","#abd9e9","#2c7bb6"],
+5: ["#d7191c","#fdae61","#ffffbf","#abd9e9","#2c7bb6"],
+6: ["#d73027","#fc8d59","#fee090","#e0f3f8","#91bfdb","#4575b4"],
+7: ["#d73027","#fc8d59","#fee090","#ffffbf","#e0f3f8","#91bfdb","#4575b4"],
+8: ["#d73027","#f46d43","#fdae61","#fee090","#e0f3f8","#abd9e9","#74add1","#4575b4"],
+9: ["#d73027","#f46d43","#fdae61","#fee090","#ffffbf","#e0f3f8","#abd9e9","#74add1","#4575b4"],
+10: ["#a50026","#d73027","#f46d43","#fdae61","#fee090","#e0f3f8","#abd9e9","#74add1","#4575b4","#313695"],
+11: ["#a50026","#d73027","#f46d43","#fdae61","#fee090","#ffffbf","#e0f3f8","#abd9e9","#74add1","#4575b4","#313695"]
+},Spectral: {
+3: ["#fc8d59","#ffffbf","#99d594"],
+4: ["#d7191c","#fdae61","#abdda4","#2b83ba"],
+5: ["#d7191c","#fdae61","#ffffbf","#abdda4","#2b83ba"],
+6: ["#d53e4f","#fc8d59","#fee08b","#e6f598","#99d594","#3288bd"],
+7: ["#d53e4f","#fc8d59","#fee08b","#ffffbf","#e6f598","#99d594","#3288bd"],
+8: ["#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd"],
+9: ["#d53e4f","#f46d43","#fdae61","#fee08b","#ffffbf","#e6f598","#abdda4","#66c2a5","#3288bd"],
+10: ["#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"],
+11: ["#9e0142","#d53e4f","#f46d43","#fdae61","#fee08b","#ffffbf","#e6f598","#abdda4","#66c2a5","#3288bd","#5e4fa2"]
+},RdYlGn: {
+3: ["#fc8d59","#ffffbf","#91cf60"],
+4: ["#d7191c","#fdae61","#a6d96a","#1a9641"],
+5: ["#d7191c","#fdae61","#ffffbf","#a6d96a","#1a9641"],
+6: ["#d73027","#fc8d59","#fee08b","#d9ef8b","#91cf60","#1a9850"],
+7: ["#d73027","#fc8d59","#fee08b","#ffffbf","#d9ef8b","#91cf60","#1a9850"],
+8: ["#d73027","#f46d43","#fdae61","#fee08b","#d9ef8b","#a6d96a","#66bd63","#1a9850"],
+9: ["#d73027","#f46d43","#fdae61","#fee08b","#ffffbf","#d9ef8b","#a6d96a","#66bd63","#1a9850"],
+10: ["#a50026","#d73027","#f46d43","#fdae61","#fee08b","#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"],
+11: ["#a50026","#d73027","#f46d43","#fdae61","#fee08b","#ffffbf","#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"]
+},Accent: {
+3: ["#7fc97f","#beaed4","#fdc086"],
+4: ["#7fc97f","#beaed4","#fdc086","#ffff99"],
+5: ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0"],
+6: ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f"],
+7: ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f","#bf5b17"],
+8: ["#7fc97f","#beaed4","#fdc086","#ffff99","#386cb0","#f0027f","#bf5b17","#666666"]
+},Dark2: {
+3: ["#1b9e77","#d95f02","#7570b3"],
+4: ["#1b9e77","#d95f02","#7570b3","#e7298a"],
+5: ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e"],
+6: ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02"],
+7: ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d"],
+8: ["#1b9e77","#d95f02","#7570b3","#e7298a","#66a61e","#e6ab02","#a6761d","#666666"]
+},Paired: {
+3: ["#a6cee3","#1f78b4","#b2df8a"],
+4: ["#a6cee3","#1f78b4","#b2df8a","#33a02c"],
+5: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99"],
+6: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c"],
+7: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f"],
+8: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00"],
+9: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6"],
+10: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a"],
+11: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99"],
+12: ["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]
+},Pastel1: {
+3: ["#fbb4ae","#b3cde3","#ccebc5"],
+4: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4"],
+5: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4","#fed9a6"],
+6: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4","#fed9a6","#ffffcc"],
+7: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4","#fed9a6","#ffffcc","#e5d8bd"],
+8: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4","#fed9a6","#ffffcc","#e5d8bd","#fddaec"],
+9: ["#fbb4ae","#b3cde3","#ccebc5","#decbe4","#fed9a6","#ffffcc","#e5d8bd","#fddaec","#f2f2f2"]
+},Pastel2: {
+3: ["#b3e2cd","#fdcdac","#cbd5e8"],
+4: ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4"],
+5: ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9"],
+6: ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9","#fff2ae"],
+7: ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9","#fff2ae","#f1e2cc"],
+8: ["#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9","#fff2ae","#f1e2cc","#cccccc"]
+},Set1: {
+3: ["#e41a1c","#377eb8","#4daf4a"],
+4: ["#e41a1c","#377eb8","#4daf4a","#984ea3"],
+5: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00"],
+6: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33"],
+7: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628"],
+8: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628","#f781bf"],
+9: ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628","#f781bf","#999999"]
+},Set2: {
+3: ["#66c2a5","#fc8d62","#8da0cb"],
+4: ["#66c2a5","#fc8d62","#8da0cb","#e78ac3"],
+5: ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854"],
+6: ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f"],
+7: ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494"],
+8: ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"]
+},Set3: {
+3: ["#8dd3c7","#ffffb3","#bebada"],
+4: ["#8dd3c7","#ffffb3","#bebada","#fb8072"],
+5: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3"],
+6: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462"],
+7: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69"],
+8: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5"],
+9: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9"],
+10: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd"],
+11: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5"],
+12: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"]
+}};
+
+if (true) {
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (colorbrewer),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+} else if (typeof module === "object" && module.exports) {
+    module.exports = colorbrewer;
+} else {
+    this.colorbrewer = colorbrewer;
+}
+
+}();
 
 
 /***/ })
