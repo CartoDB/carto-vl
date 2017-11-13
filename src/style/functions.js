@@ -74,6 +74,12 @@ function genFloatBinaryOperation(jsFn, glsl) {
         if (Number.isFinite(b)) {
             b = Float(b);
         }
+        if (a.type == 'float' && b.type == 'float') {
+            this.type = 'float';
+        } else {
+            console.warn(a, b);
+            throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
+        }
         return new _BinaryOp(a, b);
     }
     function _BinaryOp(a, b) {
@@ -121,6 +127,9 @@ function Animation(duration) {
     return new _Animation(duration);
 }
 function _Animation(duration) {
+    if (!Number.isFinite(duration)){
+        throw new Error("Animation only supports number literals");
+    }
     this.type = 'float';
     this.aTime = Date.now();
     this.bTime = this.aTime + Number(duration);
@@ -157,6 +166,9 @@ function Near(property, center, threshold, falloff) {
 }
 
 function _Near(property, center, threshold, falloff) {
+    if (center.type!='float'||threshold.type!='float' || falloff.type!='float'){
+        throw new Error('Near(): invalid parameter type');
+    }
     this.type = 'float';
     this.property = property;
     this.center = center;
