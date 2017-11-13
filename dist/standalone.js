@@ -68,17 +68,18 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return Near; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Color; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return RampColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return setGL; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatMul; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatDiv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return FloatAdd; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return FloatSub; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return FloatPow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Blend; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return Now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Near; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return FloatMul; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatDiv; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatAdd; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return FloatSub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return FloatPow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return setGL; });
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -229,8 +230,56 @@ _Animation.prototype.isAnimated = function () {
     return !this.mix || this.mix <= 1.;
 }
 
+function Near(property, center, threshold, falloff) {
+    const args = [property, center, threshold, falloff].map(implicitCast);
+    if (args.some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new _Near(...args);
+}
+
+function _Near(property, center, threshold, falloff) {
+    this.type = 'float';
+    this.property = property;
+    this.center = center;
+    this.threshold = threshold;
+    this.falloff = falloff;
+}
+_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    this._UID = uniformIDMaker();
+    const tid = propertyTIDMaker(this.property);
+    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    return {
+        preface:
+        center.preface + threshold.preface + falloff.preface,
+        inline: `1.-clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
+                        0., 1.)`
+    };
+}
+_Near.prototype._postShaderCompile = function (program) {
+    this.center._postShaderCompile(program);
+    this.threshold._postShaderCompile(program);
+    this.falloff._postShaderCompile(program);
+}
+_Near.prototype._preDraw = function () {
+    this.center._preDraw();
+    this.threshold._preDraw();
+    this.falloff._preDraw();
+}
+_Near.prototype.isAnimated = function () {
+    return this.center.isAnimated();
+}
+
+
+
 function Blend(a, b, mix) {
-    return new _Blend(a, b, mix);
+    const args = [a, b, mix].map(implicitCast);
+    if (args.some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new _Blend(...args);
 }
 function _Blend(a, b, mix) {
     if (a.type == 'float' && b.type == 'float') {
@@ -238,6 +287,7 @@ function _Blend(a, b, mix) {
     } else if (a.type == 'color' && b.type == 'color') {
         this.type = 'color';
     } else {
+        console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
     this.a = a;
@@ -365,11 +415,11 @@ function Float(x) {
 }
 
 function UniformFloat(size) {
+    this.type = 'float';
     this.expr = size;
 }
 UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
-    this.type = 'float';
     return {
         preface: `uniform float float${this._uniformID};\n`,
         inline: `float${this._uniformID}`
@@ -411,65 +461,6 @@ function hexToRgb(hex) {
     } : null;
 }
 
-
-
-/*
-    color: ramp(temp, 0º, 30º, carto-color)
-    width: exprNear(date, SIM_TIME, fullRegion, blendRegion, 0, 4)
-*/
-
-function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    const args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
-    if (args.some(x => x === undefined || x === null)) {
-        return null;
-    }
-    return new _Near(...args);
-}
-
-function _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    this.type = 'float';    
-    this.property = property;
-    this.center = center;
-    this.outputOnNegative = outputOnNegative;
-    this.outputOnPositive = outputOnPositive;
-    this.threshold = threshold;
-    this.falloff = falloff;
-}
-
-_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._UID = uniformIDMaker();
-    const tid = propertyTIDMaker(this.property);
-    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const positive = this.outputOnPositive._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    return {
-        preface:
-        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
-        inline: `mix(${positive.inline},${negative.inline},
-                        clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
-                            0., 1.))`
-    };
-}
-_Near.prototype._postShaderCompile = function (program) {
-    this.center._postShaderCompile(program);
-    this.outputOnNegative._postShaderCompile(program);
-    this.outputOnPositive._postShaderCompile(program);
-    this.threshold._postShaderCompile(program);
-    this.falloff._postShaderCompile(program);
-}
-
-_Near.prototype._preDraw = function () {
-    this.center._preDraw();
-    this.outputOnNegative._preDraw();
-    this.outputOnPositive._preDraw();
-    this.threshold._preDraw();
-    this.falloff._preDraw();
-}
-_Near.prototype.isAnimated = function () {
-    return this.center.isAnimated();
-}
 
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
@@ -1268,11 +1259,13 @@ function parseNode(node) {
         const args = node.arguments.map(arg => parseNode(arg));
         switch (node.callee.name) {
             case 'RampColor':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["j" /* RampColor */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* RampColor */](...args);
             case 'Near':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["h" /* Near */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Near */](...args);
             case 'Now':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Now */](...args);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["j" /* Now */](...args);
+            case 'Blend':
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["a" /* Blend */](...args);
             default:
                 throw new Error(`Invalid function name '${node.callee.name}'`);
         }
@@ -1285,22 +1278,22 @@ function parseNode(node) {
         const right = parseNode(node.right);
         switch (node.operator) {
             case "*":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatMul */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](left, right);
             case "/":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatDiv */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatDiv */](left, right);
             case "+":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["c" /* FloatAdd */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatAdd */](left, right);
             case "-":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["g" /* FloatSub */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["h" /* FloatSub */](left, right);
             case "^":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatPow */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["g" /* FloatPow */](left, right);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatMul */](-1, parseNode(node.argument));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](-1, parseNode(node.argument));
             case '+':
                 return parseNode(node.argument);
             default:
@@ -2245,16 +2238,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(2);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["i"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["h"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["j"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["j"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["i"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["k"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["e"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["d"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["h"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
@@ -2270,20 +2264,20 @@ var gl = null;
 // TODO document API
 function setGL(_gl) {
     gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* setGL */](gl);
+    __WEBPACK_IMPORTED_MODULE_1__functions__["l" /* setGL */](gl);
 }
 
 function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["b" /* Float */](3);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["c" /* Float */](3);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["a" /* Color */]([0, 1, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["b" /* Color */]([0, 1, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();

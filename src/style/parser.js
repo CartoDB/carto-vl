@@ -25,6 +25,8 @@ function parseNode(node) {
                 return functions.Near(...args);
             case 'Now':
                 return functions.Now(...args);
+            case 'Blend':
+                return functions.Blend(...args);
             default:
                 throw new Error(`Invalid function name '${node.callee.name}'`);
         }

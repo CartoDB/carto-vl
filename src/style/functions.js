@@ -9,7 +9,7 @@ var gl = null;
 function setGL(_gl) {
     gl = _gl;
 }
-export { Now, Near, Color, Float, RampColor, setGL, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow };
+export { Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
 
 
 /*
@@ -148,8 +148,56 @@ _Animation.prototype.isAnimated = function () {
     return !this.mix || this.mix <= 1.;
 }
 
+function Near(property, center, threshold, falloff) {
+    const args = [property, center, threshold, falloff].map(implicitCast);
+    if (args.some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new _Near(...args);
+}
+
+function _Near(property, center, threshold, falloff) {
+    this.type = 'float';
+    this.property = property;
+    this.center = center;
+    this.threshold = threshold;
+    this.falloff = falloff;
+}
+_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    this._UID = uniformIDMaker();
+    const tid = propertyTIDMaker(this.property);
+    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    return {
+        preface:
+        center.preface + threshold.preface + falloff.preface,
+        inline: `1.-clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
+                        0., 1.)`
+    };
+}
+_Near.prototype._postShaderCompile = function (program) {
+    this.center._postShaderCompile(program);
+    this.threshold._postShaderCompile(program);
+    this.falloff._postShaderCompile(program);
+}
+_Near.prototype._preDraw = function () {
+    this.center._preDraw();
+    this.threshold._preDraw();
+    this.falloff._preDraw();
+}
+_Near.prototype.isAnimated = function () {
+    return this.center.isAnimated();
+}
+
+
+
 function Blend(a, b, mix) {
-    return new _Blend(a, b, mix);
+    const args = [a, b, mix].map(implicitCast);
+    if (args.some(x => x === undefined || x === null)) {
+        return null;
+    }
+    return new _Blend(...args);
 }
 function _Blend(a, b, mix) {
     if (a.type == 'float' && b.type == 'float') {
@@ -157,6 +205,7 @@ function _Blend(a, b, mix) {
     } else if (a.type == 'color' && b.type == 'color') {
         this.type = 'color';
     } else {
+        console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
     this.a = a;
@@ -284,11 +333,11 @@ function Float(x) {
 }
 
 function UniformFloat(size) {
+    this.type = 'float';
     this.expr = size;
 }
 UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
-    this.type = 'float';
     return {
         preface: `uniform float float${this._uniformID};\n`,
         inline: `float${this._uniformID}`
@@ -330,65 +379,6 @@ function hexToRgb(hex) {
     } : null;
 }
 
-
-
-/*
-    color: ramp(temp, 0º, 30º, carto-color)
-    width: exprNear(date, SIM_TIME, fullRegion, blendRegion, 0, 4)
-*/
-
-function Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    const args = [property, center, threshold, falloff, outputOnNegative, outputOnPositive].map(implicitCast);
-    if (args.some(x => x === undefined || x === null)) {
-        return null;
-    }
-    return new _Near(...args);
-}
-
-function _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
-    this.type = 'float';    
-    this.property = property;
-    this.center = center;
-    this.outputOnNegative = outputOnNegative;
-    this.outputOnPositive = outputOnPositive;
-    this.threshold = threshold;
-    this.falloff = falloff;
-}
-
-_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._UID = uniformIDMaker();
-    const tid = propertyTIDMaker(this.property);
-    const center = this.center._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const positive = this.outputOnPositive._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const threshold = this.threshold._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-    return {
-        preface:
-        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
-        inline: `mix(${positive.inline},${negative.inline},
-                        clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
-                            0., 1.))`
-    };
-}
-_Near.prototype._postShaderCompile = function (program) {
-    this.center._postShaderCompile(program);
-    this.outputOnNegative._postShaderCompile(program);
-    this.outputOnPositive._postShaderCompile(program);
-    this.threshold._postShaderCompile(program);
-    this.falloff._postShaderCompile(program);
-}
-
-_Near.prototype._preDraw = function () {
-    this.center._preDraw();
-    this.outputOnNegative._preDraw();
-    this.outputOnPositive._preDraw();
-    this.threshold._preDraw();
-    this.falloff._preDraw();
-}
-_Near.prototype.isAnimated = function () {
-    return this.center.isAnimated();
-}
 
 function RampColor(property, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on property type => cartegory vs float
