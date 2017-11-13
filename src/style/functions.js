@@ -114,53 +114,66 @@ function genFloatBinaryOperation(jsFn, glsl) {
     return BinaryOp;
 }
 
-
+function Animation(duration) {
+    return new _Animation(duration);
+}
+function _Animation(duration) {
+    duration = Number(duration);
+    this.aTime = Date.now();
+    this.bTime = this.aTime + duration;
+}
+_Animation.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+    this._uniformID = uniformIDMaker();
+    return {
+        preface: `uniform float anim${this._uniformID};\n`,
+        inline: `anim${this._uniformID}`
+    };
+}
+_Animation.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+}
+_Animation.prototype._preDraw = function (l) {
+    const time = Date.now();
+    this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+    if (this.mix > 1.) {
+        gl.uniform1f(this._uniformLocation, 1);
+    } else {
+        gl.uniform1f(this._uniformLocation, this.mix);
+    }
+}
+_Animation.prototype.isAnimated = function () {
+    return !this.mix || this.mix <= 1.;
+}
 
 function FloatBlend(a, b, mix) {
     this.a = a;
     this.b = b;
+    this.mix = mix;    
     a.parent = this;
     b.parent = this;
-    if (mix.indexOf('ms') >= 0) {
-        const duration = Number(mix.replace('ms', ''));
-        this.aTime = Date.now();
-        this.bTime = this.aTime + duration;
-        mix = 'anim';
-    }
-    this.mix = mix;
+    mix.parent = this;
 }
 FloatBlend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-    this._uniformID = uniformIDMaker();
     const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+    const mix = this.mix._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
-        preface: `uniform float mix${this._uniformID};\n${a.preface}${b.preface}`,
-        inline: `mix(${a.inline}, ${b.inline}, mix${this._uniformID})`
+        preface: `${a.preface}${b.preface}${mix.preface}`,
+        inline: `mix(${a.inline}, ${b.inline}, ${mix.inline})`
     };
 }
 FloatBlend.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `mix${this._uniformID}`);
     this.a._postShaderCompile(program);
     this.b._postShaderCompile(program);
+    this.mix._postShaderCompile(program);
 }
 FloatBlend.prototype._preDraw = function (l) {
-    var mix = this.mix;
-    if (mix == 'anim') {
-        const time = Date.now();
-        mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (mix >= 1.) {
-            mix = 1.;
-            this.mix = 1.;
-            //TODO free A, free blend
-            this.parent.replaceChild(this, this.b);
-        }
-    }
-    gl.uniform1f(this._uniformLocation, mix);
     this.a._preDraw(l);
     this.b._preDraw(l);
+    this.mix._preDraw(l);
 }
 FloatBlend.prototype.isAnimated = function () {
-    return this.mix === 'anim';
+    return this.a.isAnimated() || this.b.isAnimated() || this.mix.isAnimated();
 }
 FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
     if (this.a = toReplace) {
@@ -173,7 +186,7 @@ FloatBlend.prototype.replaceChild = function (toReplace, replacer) {
 }
 function genericFloatBlend(initial, final, duration, blendFunc) {
     const parent = initial.parent;
-    const blend = new FloatBlend(initial, final, `${duration}ms`);
+    const blend = new FloatBlend(initial, final, Animation(duration));
     parent.replaceChild(initial, blend);
     blend.notify();
 }
@@ -405,7 +418,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
     const negative = this.outputOnNegative._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
         preface:
-            center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
+        center.preface + positive.preface + threshold.preface + falloff.preface + negative.preface,
         inline: `mix(${positive.inline},${negative.inline},
                         clamp((abs(p${tid}-${center.inline})-${threshold.inline})/${falloff.inline},
                             0., 1.))`
