@@ -108,6 +108,7 @@ function setGL(_gl) {
 /*
     TODO
         - Type checking. Types: float, category, RGB, RGBA, HSV, HSVA
+        - Allow multiplication, division and pow() to color expressions
         - Dead code removal. Blending should be done with FloatBlend / ColorBlend. anything else is historical code
         - HSV
         - Integrated color palettes
@@ -120,6 +121,7 @@ function Now() {
     return new _Now();
 }
 function _Now() {
+    this.type = 'float';
     this.float = Float(0);
 }
 _Now.prototype._applyToShaderSource = function (uniformIDMaker) {
@@ -156,6 +158,7 @@ function genFloatBinaryOperation(jsFn, glsl) {
         return new _BinaryOp(a, b);
     }
     function _BinaryOp(a, b) {
+        this.type = 'float';
         this.a = a;
         this.b = b;
         a.parent = this;
@@ -199,9 +202,9 @@ function Animation(duration) {
     return new _Animation(duration);
 }
 function _Animation(duration) {
-    duration = Number(duration);
+    this.type = 'float';
     this.aTime = Date.now();
-    this.bTime = this.aTime + duration;
+    this.bTime = this.aTime + Number(duration);
 }
 _Animation.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._uniformID = uniformIDMaker();
@@ -230,6 +233,13 @@ function Blend(a, b, mix) {
     return new _Blend(a, b, mix);
 }
 function _Blend(a, b, mix) {
+    if (a.type == 'float' && b.type == 'float') {
+        this.type = 'float';
+    } else if (a.type == 'color' && b.type == 'color') {
+        this.type = 'color';
+    } else {
+        throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
+    }
     this.a = a;
     this.b = b;
     this.mix = mix;
@@ -303,6 +313,7 @@ function Color(color) {
     return null;
 }
 function UniformColor(color) {
+    this.type = 'color';
     this.color = color;
 }
 UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
@@ -358,6 +369,7 @@ function UniformFloat(size) {
 }
 UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
+    this.type = 'float';
     return {
         preface: `uniform float float${this._uniformID};\n`,
         inline: `float${this._uniformID}`
@@ -415,6 +427,7 @@ function Near(property, center, threshold, falloff, outputOnNegative, outputOnPo
 }
 
 function _Near(property, center, threshold, falloff, outputOnNegative, outputOnPositive) {
+    this.type = 'float';    
     this.property = property;
     this.center = center;
     this.outputOnNegative = outputOnNegative;
@@ -468,6 +481,7 @@ function RampColor(property, minKey, maxKey, values) {
 }
 
 function _RampColor(property, minKey, maxKey, values) {
+    this.type = 'color';
     this.property = property;
     this.minKey = minKey.expr;
     this.maxKey = maxKey.expr;
