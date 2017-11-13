@@ -272,62 +272,6 @@ function genericFloatBlend(initial, final, duration, blendFunc) {
     blend.notify();
 }
 
-
-function Color(color) {
-    if (Array.isArray(color)) {
-        color = color.filter(x => true);
-        if (color.length != 4 || !color.every(Number.isFinite)) {
-            return null;
-        }
-        return new UniformColor(color);
-    }
-    return null;
-}
-function UniformColor(color) {
-    this.color = color;
-}
-UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
-    this._uniformID = uniformIDMaker();
-    return {
-        preface: `uniform vec4 color${this._uniformID};\n`,
-        inline: `color${this._uniformID}`
-    };
-}
-UniformColor.prototype._postShaderCompile = function (program) {
-    this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
-}
-function evalColor(color, time) {
-    if (Array.isArray(color)) {
-        return color;
-    }
-    var a = evalColor(color.a, time);
-    var b = evalColor(color.b, time);
-    var m = (time - color.aTime) / (color.bTime - color.aTime);
-    return a.map((va, index) => {
-        return (1 - m) * va + m * b[index];//TODO non linear functions
-    });
-}
-function simplifyColorExpr(color, time) {
-    if (Array.isArray(color)) {
-        return color;
-    }
-    var m = (time - color.aTime) / (color.bTime - color.aTime);
-    if (m >= 1) {
-        return color.b;
-    }
-    return color;
-}
-UniformColor.prototype._preDraw = function () {
-    const t = Date.now();
-    this.color = simplifyColorExpr(this.color, t);
-    const color = evalColor(this.color, t);
-    gl.uniform4f(this._uniformLocation, color[0], color[1], color[2], color[3]);
-}
-UniformColor.prototype.isAnimated = function () {
-    return false;
-}
-
-
 function ColorBlend(a, b, mix) {
     this.a = a;
     this.b = b;
@@ -410,6 +354,60 @@ UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc
 }
 FloatBlend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericFloatBlend(this, finalValue, duration, blendFunc);
+}
+
+function Color(color) {
+    if (Array.isArray(color)) {
+        color = color.filter(x => true);
+        if (color.length != 4 || !color.every(Number.isFinite)) {
+            return null;
+        }
+        return new UniformColor(color);
+    }
+    return null;
+}
+function UniformColor(color) {
+    this.color = color;
+}
+UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
+    this._uniformID = uniformIDMaker();
+    return {
+        preface: `uniform vec4 color${this._uniformID};\n`,
+        inline: `color${this._uniformID}`
+    };
+}
+UniformColor.prototype._postShaderCompile = function (program) {
+    this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
+}
+function evalColor(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var a = evalColor(color.a, time);
+    var b = evalColor(color.b, time);
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    return a.map((va, index) => {
+        return (1 - m) * va + m * b[index];//TODO non linear functions
+    });
+}
+function simplifyColorExpr(color, time) {
+    if (Array.isArray(color)) {
+        return color;
+    }
+    var m = (time - color.aTime) / (color.bTime - color.aTime);
+    if (m >= 1) {
+        return color.b;
+    }
+    return color;
+}
+UniformColor.prototype._preDraw = function () {
+    const t = Date.now();
+    this.color = simplifyColorExpr(this.color, t);
+    const color = evalColor(this.color, t);
+    gl.uniform4f(this._uniformLocation, color[0], color[1], color[2], color[3]);
+}
+UniformColor.prototype.isAnimated = function () {
+    return false;
 }
 
 function Float(x) {
