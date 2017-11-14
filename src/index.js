@@ -84,7 +84,7 @@ function refresh(timestamp) {
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
                 gl.useProgram(layer.colorShader.program);
-
+                layer.freeTexUnit = 4;
                 layer.style._color._preDraw(layer);
 
                 Object.keys(layer.propertyColorTID).forEach((name, i) => {
@@ -106,7 +106,7 @@ function refresh(timestamp) {
                 gl.useProgram(layer.widthShader.program);
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-
+                layer.freeTexUnit = 4;
                 layer.style._width._preDraw(layer);
                 Object.keys(layer.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);

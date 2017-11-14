@@ -603,11 +603,12 @@ _RampColor.prototype._postShaderCompile = function (program) {
 }
 _RampColor.prototype._preDraw = function (l) {
     this.input._preDraw(l);
-    gl.activeTexture(gl.TEXTURE12);//TODO remove hardcode
+    gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);//TODO remove hardcode
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.uniform1i(this._texLoc, 12);
+    gl.uniform1i(this._texLoc, l.freeTexUnit);
     gl.uniform1f(this._keyMinLoc, evalFloatExpr(this.minKey));
     gl.uniform1f(this._keyWidthLoc, evalFloatExpr(this.maxKey) - evalFloatExpr(this.minKey));
+    l.freeTexUnit++;
 }
 _RampColor.prototype.isAnimated = function () {
     return false;
@@ -1786,7 +1787,7 @@ function refresh(timestamp) {
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
                 gl.useProgram(layer.colorShader.program);
-
+                layer.freeTexUnit = 4;
                 layer.style._color._preDraw(layer);
 
                 Object.keys(layer.propertyColorTID).forEach((name, i) => {
@@ -1808,7 +1809,7 @@ function refresh(timestamp) {
                 gl.useProgram(layer.widthShader.program);
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-
+                layer.freeTexUnit = 4;
                 layer.style._width._preDraw(layer);
                 Object.keys(layer.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
