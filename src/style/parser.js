@@ -7,17 +7,17 @@ import * as functions from './functions';
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
-export function parseStyleExpression(str) {
+export function parseStyleExpression(str, meta) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp("^", 10);
-    const r = parseNode(jsep(str));
+    const r = parseNode(jsep(str), meta);
     jsep.removeBinaryOp("^");
     return r;
 }
 
-function parseNode(node) {
+function parseNode(node, meta) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg));
+        const args = node.arguments.map(arg => parseNode(arg, meta));
         switch (node.callee.name) {
             case 'RampColor':
                 return functions.RampColor(...args);
@@ -33,10 +33,10 @@ function parseNode(node) {
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e));
+        return node.elements.map(e => parseNode(e, meta));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left);
-        const right = parseNode(node.right);
+        const left = parseNode(node.left, meta);
+        const right = parseNode(node.right, meta);
         switch (node.operator) {
             case "*":
                 return functions.FloatMul(left, right);
@@ -54,15 +54,15 @@ function parseNode(node) {
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return functions.FloatMul(-1, parseNode(node.argument));
+                return functions.FloatMul(-1, parseNode(node.argument, meta));
             case '+':
-                return parseNode(node.argument);
+                return parseNode(node.argument, meta);
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return functions.Property(node.name.substring(1));
+            return functions.Property(node.name.substring(1), meta);
         }else if(functions.schemes[node.name.toLowerCase()]){
             return functions.schemes[node.name.toLowerCase()]();
         }

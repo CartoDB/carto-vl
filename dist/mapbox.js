@@ -138,12 +138,15 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
         - Heatmaps (renderer should be improved to accommodate this)
 */
 
-function Property(name) {
-    return new _Property(name);
+function Property(name, meta) {
+    return new _Property(name, meta);
 }
-function _Property(name) {
+function _Property(name, meta) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
+    }
+    if (!meta.properties[name]) {
+        throw new Error(`Property name not found`);
     }
     this.name = name;
     this.type = 'float';
@@ -1314,17 +1317,17 @@ _RampColor.prototype.isAnimated = function () {
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
-function parseStyleExpression(str) {
+function parseStyleExpression(str, meta) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
-    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str));
+    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), meta);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     return r;
 }
 
-function parseNode(node) {
+function parseNode(node, meta) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg));
+        const args = node.arguments.map(arg => parseNode(arg, meta));
         switch (node.callee.name) {
             case 'RampColor':
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["l" /* RampColor */](...args);
@@ -1340,10 +1343,10 @@ function parseNode(node) {
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e));
+        return node.elements.map(e => parseNode(e, meta));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left);
-        const right = parseNode(node.right);
+        const left = parseNode(node.left, meta);
+        const right = parseNode(node.right, meta);
         switch (node.operator) {
             case "*":
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](left, right);
@@ -1361,15 +1364,15 @@ function parseNode(node) {
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](-1, parseNode(node.argument));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](-1, parseNode(node.argument, meta));
             case '+':
-                return parseNode(node.argument);
+                return parseNode(node.argument, meta);
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* Property */](node.name.substring(1));
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* Property */](node.name.substring(1), meta);
         }else if(__WEBPACK_IMPORTED_MODULE_1__functions__["m" /* schemes */][node.name.toLowerCase()]){
             return __WEBPACK_IMPORTED_MODULE_1__functions__["m" /* schemes */][node.name.toLowerCase()]();
         }
@@ -5711,10 +5714,17 @@ var layer;
 var oldtile;
 var ajax;
 
+var meta = {
+    properties: {
+        temp: true,
+        daten: true
+    }
+};
+
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
-        layer.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
+        layer.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -5725,7 +5735,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        layer.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
+        layer.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;

@@ -8,10 +8,17 @@ var layer;
 var oldtile;
 var ajax;
 
+var meta = {
+    properties: {
+        temp: true,
+        daten: true
+    }
+};
+
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
-        layer.style.getWidth().blendTo(R.Style.parseStyleExpression(v), 1000);
+        layer.style.getWidth().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -22,7 +29,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        layer.style.getColor().blendTo(R.Style.parseStyleExpression(v), 1000);
+        layer.style.getColor().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;

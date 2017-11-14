@@ -52,12 +52,15 @@ export { schemes };
         - Heatmaps (renderer should be improved to accommodate this)
 */
 
-function Property(name) {
-    return new _Property(name);
+function Property(name, meta) {
+    return new _Property(name, meta);
 }
-function _Property(name) {
+function _Property(name, meta) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
+    }
+    if (!meta.properties[name]) {
+        throw new Error(`Property name not found`);
     }
     this.name = name;
     this.type = 'float';
