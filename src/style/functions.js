@@ -158,7 +158,7 @@ function genFloatBinaryOperation(jsFn, glsl) {
         replacer.notify = toReplace.notify;
     }
     _BinaryOp.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-        genericFloatBlend(this, finalValue, duration, blendFunc);
+        genericBlend(this, finalValue, duration, blendFunc);
     }
     return BinaryOp;
 }
@@ -327,6 +327,10 @@ UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc
 _Blend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericBlend(this, finalValue, duration, blendFunc);
 }
+_Property.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
+}
+
 
 function Color(color) {
     if (Array.isArray(color)) {
