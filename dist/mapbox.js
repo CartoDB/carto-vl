@@ -374,6 +374,9 @@ _Blend.prototype._preDraw = function (l) {
     this.a._preDraw(l);
     this.b._preDraw(l);
     this.mix._preDraw(l);
+    if (this.mix instanceof _Animation && !this.mix.isAnimated()) {
+        this.parent.replaceChild(this, this.b);
+    }
 }
 _Blend.prototype.isAnimated = function () {
     return this.a.isAnimated() || this.b.isAnimated() || this.mix.isAnimated();
