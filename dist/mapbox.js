@@ -5711,16 +5711,22 @@ function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
         layer.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
+        document.getElementById("feedback").value = 'ok';
     } catch (error) {
-        console.warn(`Invalid width expression: ${error}:${error.stack}`);
+        const err = `Invalid width expression: ${error}:${error.stack}`;
+        console.warn(err);
+        document.getElementById("feedback").value = err;
     }
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
         layer.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v), 1000);
+        document.getElementById("feedback").value = 'ok';
     } catch (error) {
-        console.warn(`Invalid color expression: ${error}:${error.stack}`);
+        const err = `Invalid color expression: ${error}:${error.stack}`;
+        console.warn(err);
+        document.getElementById("feedback").value = err;
     }
 }
 
