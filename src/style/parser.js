@@ -63,8 +63,8 @@ function parseNode(node) {
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
             return functions.Property(node.name.substring(1));
-        }else if(functions[node.name]){
-            return functions[node.name]();
+        }else if(functions.schemes[node.name.toLowerCase()]){
+            return functions.schemes[node.name.toLowerCase()]();
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);

@@ -12,13 +12,21 @@ function setGL(_gl) {
 }
 export { Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
 
-export function Burg() {
-    return cartocolor.Burg['7'];
-}
-export function Geyser() {
-    return cartocolor.Geyser['7'];
-}
-
+const schemes = {};
+Object.keys(cartocolor).map(name => {
+    const s = cartocolor[name];
+    var defaultFound = false;
+    for (let i = 20; i >= 0; i--) {
+        if (s[i]) {
+            if (!defaultFound) {
+                schemes[name.toLowerCase()] = () => s[i];
+                defaultFound = true;
+            }
+            schemes[`${name.toLowerCase()}_${i}`] = () => s[i];
+        }
+    }
+});
+export { schemes };
 
 /*
     Each styling function should:
@@ -216,7 +224,7 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
     const falloff = this.falloff._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
         preface:
-        input.preface + center.preface + threshold.preface + falloff.preface,
+            input.preface + center.preface + threshold.preface + falloff.preface,
         inline: `1.-clamp((abs(${input.inline}-${center.inline})-${threshold.inline})/${falloff.inline},
                         0., 1.)`
     };
