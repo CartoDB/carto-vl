@@ -66,7 +66,7 @@ function getData() {
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / 4096.0) - 1.;
 
                 properties[0][i] = Number(f.properties.temp);
-                properties[1][i] = Number(f.properties.daten);
+                properties[1][i] = Number(f.properties.daten) / 4000.;
             }
             var tile = {
                 center: { x: 0, y: 0 },

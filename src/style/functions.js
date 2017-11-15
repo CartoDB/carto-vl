@@ -42,14 +42,14 @@ export { schemes };
 
 /*
     TODO
-        - Type checking. Types: float, category, RGB, RGBA, HSV, HSVA
-        - Allow multiplication, division and pow() to color expressions and literals
-        - HSV
-        - Property access function
         - Integrated color palettes
+        - Type checking for color palettes
+        - Allow multiplication, division and pow() to color expressions and color literals
+        - Add SetOpacity(colorExpr, opacityFloatOverride)
+        - HSV
         - Now() with speed parameter
-        - Think about "Date" type.
-        - Heatmaps (renderer should be improved to accommodate this)
+        - Think about "Date" and "string" types.
+        - Heatmaps (renderer should be improved too to accommodate this)
 */
 
 function Property(name, meta) {
@@ -79,10 +79,17 @@ _Property.prototype.isAnimated = function () {
     return false;
 }
 
-function Now() {
-    return new _Now();
+function Now(speed) {
+    return new _Now(speed);
 }
-function _Now() {
+function _Now(speed) {
+    if (speed == undefined) {
+        speed = 1;
+    }
+    if (!Number.isFinite(Number(speed))) {
+        throw new Error('Now() only accepts number literals');
+    }
+    this.speed = Number(speed);
     this.type = 'float';
     this.float = Float(0);
 }
@@ -93,7 +100,7 @@ _Now.prototype._postShaderCompile = function (program) {
     return this.float._postShaderCompile(program);
 }
 _Now.prototype._preDraw = function () {
-    this.float.expr = Date.now() * 0.1 % 400;
+    this.float.expr = (Date.now() * this.speed / 1000.) % 1;
     this.float._preDraw();
 }
 _Now.prototype.isAnimated = function () {
@@ -454,6 +461,7 @@ function RampColor(input, minKey, maxKey, values) {
     return new _RampColor(...args);
 }
 
+//Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
 function _RampColor(input, minKey, maxKey, values) {
     this.type = 'color';
     this.input = input;
