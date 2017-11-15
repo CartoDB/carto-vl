@@ -68,20 +68,21 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return Property; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Blend; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return Now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Near; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Color; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return RampColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return FloatMul; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatDiv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatAdd; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return FloatSub; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return FloatPow; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return setGL; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return schemes; });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return Now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return Near; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return Color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return FloatMul; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return FloatDiv; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return FloatAdd; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return FloatSub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return FloatPow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemes", function() { return schemes; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 
@@ -133,7 +134,7 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
         - Allow multiplication, division and pow() to color expressions and color literals
         - Add SetOpacity(colorExpr, opacityFloatOverride)
         - HSV
-        - Now() with speed parameter
+        - Think about uniform-only types / parameters
         - Think about "Date" and "string" types.
         - Heatmaps (renderer should be improved too to accommodate this)
 */
@@ -1326,6 +1327,11 @@ _RampColor.prototype.isAnimated = function () {
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
+var lowerCaseFunctions = {};
+Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).map(name => {
+    lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
+});
+
 function parseStyleExpression(str, meta) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
@@ -1337,18 +1343,11 @@ function parseStyleExpression(str, meta) {
 function parseNode(node, meta) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNode(arg, meta));
-        switch (node.callee.name) {
-            case 'RampColor':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["l" /* RampColor */](...args);
-            case 'Near':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["i" /* Near */](...args);
-            case 'Now':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["j" /* Now */](...args);
-            case 'Blend':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["a" /* Blend */](...args);
-            default:
-                throw new Error(`Invalid function name '${node.callee.name}'`);
+        const name = node.callee.name.toLowerCase();
+        if (lowerCaseFunctions[name]) {
+            return lowerCaseFunctions[name](...args);
         }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
@@ -1358,22 +1357,22 @@ function parseNode(node, meta) {
         const right = parseNode(node.right, meta);
         switch (node.operator) {
             case "*":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](left, right);
             case "/":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["e" /* FloatDiv */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"](left, right);
             case "+":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["d" /* FloatAdd */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"](left, right);
             case "-":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["h" /* FloatSub */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"](left, right);
             case "^":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["g" /* FloatPow */](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"](left, right);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["f" /* FloatMul */](-1, parseNode(node.argument, meta));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](-1, parseNode(node.argument, meta));
             case '+':
                 return parseNode(node.argument, meta);
             default:
@@ -1381,9 +1380,9 @@ function parseNode(node, meta) {
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["k" /* Property */](node.name.substring(1), meta);
-        }else if(__WEBPACK_IMPORTED_MODULE_1__functions__["m" /* schemes */][node.name.toLowerCase()]){
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["m" /* schemes */][node.name.toLowerCase()]();
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"](node.name.substring(1), meta);
+        } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemes"][node.name.toLowerCase()]) {
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["schemes"][node.name.toLowerCase()]();
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
@@ -2324,19 +2323,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(2);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["k"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["j"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["i"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["l"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["f"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["h"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["g"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemes", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["m"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Blend"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Now"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Near"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Float"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["RampColor"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemes", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemes"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
@@ -2352,20 +2351,20 @@ var gl = null;
 // TODO document API
 function setGL(_gl) {
     gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["n" /* setGL */](gl);
+    __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
 }
 
 function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["c" /* Float */](3);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](3);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["b" /* Color */]([0, 1, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 1, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();

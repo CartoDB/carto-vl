@@ -47,7 +47,7 @@ export { schemes };
         - Allow multiplication, division and pow() to color expressions and color literals
         - Add SetOpacity(colorExpr, opacityFloatOverride)
         - HSV
-        - Now() with speed parameter
+        - Think about uniform-only types / parameters
         - Think about "Date" and "string" types.
         - Heatmaps (renderer should be improved too to accommodate this)
 */

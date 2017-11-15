@@ -66,8 +66,8 @@
 
     <div id='map'></div>
 
-    <textarea id="widthStyleEntry">Blend(0, 12, Near($daten, Now(0.01), 0, 0.01))</textarea>
-    <textarea id="colorStyleEntry">RampColor($temp, 5, 30, Geyser)</textarea>
+    <textarea id="widthStyleEntry">blend(0, 12, near($daten, now(0.01), 0, 0.01))</textarea>
+    <textarea id="colorStyleEntry">rampColor($temp, 5, 30, Geyser)</textarea>
     <textarea id="sqlEntry">
             SELECT ST_AsGeoJSON(the_geom_webmercator), temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS daten FROM wwi_ships  WHERE the_geom_webmercator IS NOT NULL  LIMIT 1100999</textarea>
     <textarea id="feedback">¿?</textarea>

@@ -7,6 +7,11 @@ import * as functions from './functions';
 /*
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
+var lowerCaseFunctions = {};
+Object.keys(functions).map(name => {
+    lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
+});
+
 export function parseStyleExpression(str, meta) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp("^", 10);
@@ -18,18 +23,11 @@ export function parseStyleExpression(str, meta) {
 function parseNode(node, meta) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNode(arg, meta));
-        switch (node.callee.name) {
-            case 'RampColor':
-                return functions.RampColor(...args);
-            case 'Near':
-                return functions.Near(...args);
-            case 'Now':
-                return functions.Now(...args);
-            case 'Blend':
-                return functions.Blend(...args);
-            default:
-                throw new Error(`Invalid function name '${node.callee.name}'`);
+        const name = node.callee.name.toLowerCase();
+        if (lowerCaseFunctions[name]) {
+            return lowerCaseFunctions[name](...args);
         }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
@@ -63,7 +61,7 @@ function parseNode(node, meta) {
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
             return functions.Property(node.name.substring(1), meta);
-        }else if(functions.schemes[node.name.toLowerCase()]){
+        } else if (functions.schemes[node.name.toLowerCase()]) {
             return functions.schemes[node.name.toLowerCase()]();
         }
     }
