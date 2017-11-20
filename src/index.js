@@ -139,8 +139,17 @@ function refresh(timestamp) {
 
 
         layer.tiles.forEach(tile => {
-            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
-            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
+            /*console.log((s / aspect) * tile.scale,
+                s * tile.scale,
+                (s / aspect) * this._center.x - tile.center.x,
+                s * this._center.y - tile.center.y
+            );*/
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
 
             gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -347,4 +356,4 @@ Renderer.prototype.setZoom = function (zoom) {
     window.requestAnimationFrame(refresh.bind(this));
 }
 
-export {Renderer, Style};
+export { Renderer, Style };

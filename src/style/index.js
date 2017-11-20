@@ -22,13 +22,13 @@ function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = functions.Float(3);
+    this._width = functions.Float(5);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = functions.Color([0, 1, 0, 1]);
+    this._color = functions.Color([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();

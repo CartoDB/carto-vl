@@ -16,7 +16,8 @@ var meta = {
 };
 
 function styleWidth(e) {
-    const v = document.getElementById("widthStyleEntry").value;
+    // const v = document.getElementById("widthStyleEntry").value;
+    const v = "blend(8, 8, near($daten, now(0.01), 0, 0.01))  ";
     try {
         layer.style.getWidth().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
@@ -27,7 +28,8 @@ function styleWidth(e) {
     }
 }
 function styleColor(e) {
-    const v = document.getElementById("colorStyleEntry").value;
+    // const v = document.getElementById("colorStyleEntry").value;
+    const v = "rampColor($temp, 0, 1, tealrose)";
     try {
         layer.style.getColor().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
@@ -38,15 +40,107 @@ function styleColor(e) {
     }
 }
 
+/*
+TODO
+    SQL API
+    Tiling (copy query from Windshaft - MVT) & center&scale
+    St_AsMVT
+    Metadata with SQL API
+    Agg
+*/
+
+
+function getTile(c, z) {
+    var z = Math.round(Math.log2(1. / z) - 2);
+    var x = c.x * 0.5 + 0.5;
+    var y = 1. - (c.y * 0.5 + 0.5);
+    console.log(x, y, z);
+    return {
+        x: Math.floor(Math.pow(2, z) * x),
+        y: Math.floor(Math.pow(2, z) * y),
+        z: z,
+    };
+}
+var numpoints = 0;
+var max = 0;
 function getData() {
     if (ajax) {
         ajax.abort();
     }
+    var k = Math.random();
 
     var oReq = new XMLHttpRequest();
-    oReq.open("GET", "https://dmanzanares.carto.com/api/v1/map/dmanzanares@789cad67@92456f0655aac0322b2572f4e05088e7:1509358508954/mapnik/0/0/0.mvt", true);
-    oReq.responseType = "arraybuffer";
+    //document.getElementById("sqlEntry").value
+    const t = getTile(renderer.getCenter(), renderer.getZoom());
+    const x = t.x;
+    const y = t.y;
+    const z = t.z;
+    const mvt_extent = 1024 * 1024 * 1024;
+    const subpixelBufferSize = 0;
+    //, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS daten, temp
+    const query =
+        // `select 'ST_AsMVTGeom'::regproc;`
+        `(select st_asmvt(geom, 'lid'), MAX(rand) FROM
+        (
+            SELECT
+                ST_AsMVTGeom(
+                    the_geom_webmercator, CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, true
+                ),
+                rand
+            FROM nytx AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z}) AND rand > ${Math.random()} ORDER BY rand LIMIT 10000
+        )AS geom
+    )`;
+    console.log(query);
+    oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "&api_key=94221530e644bd478c662e5a402618b1ddd62704", true);
     oReq.onload = function (oEvent) {
+        const json = JSON.parse(oReq.response);
+        max = Math.max(max, json.rows[0].max);
+        var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
+        console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
+        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+        numpoints += mvtLayer.length;
+        console.log("numpoints", numpoints);
+        var fieldMap = {
+            temp: 0,
+            daten: 1
+        };
+        //mvtLayer.length=1000;
+        var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+        var points = new Float32Array(mvtLayer.length * 2);
+        const r = Math.random();
+        for (var i = 0; i < mvtLayer.length; i++) {
+            const f = mvtLayer.feature(i);
+            const geom = f.loadGeometry();
+            points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+            points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+
+            // properties[0][i] = Number(f.properties.temp);
+            // properties[1][i] = Number(f.properties.daten) / 4000.;
+            properties[0][i] = Number(r);
+            properties[1][i] = Number(Math.random());
+        }
+
+        var tile = {
+            center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
+            scale: 1 / Math.pow(2, z),
+            count: mvtLayer.length,
+            geom: points,
+            properties: {}
+        };
+        console.log(tile.center, tile.scale);
+
+        Object.keys(fieldMap).map((name, pid) => {
+            tile.properties[name] = properties[pid];
+        })
+        if (oldtile) {
+            //layer.removeTile(oldtile);
+        }
+        oldtile = layer.addTile(tile);
+        styleWidth();
+        styleColor();
+    };
+    /*oReq.onload = function (oEvent) {
         var arrayBuffer = oReq.response;
         if (arrayBuffer) {
             var tile = new VectorTile(new Protobuf(arrayBuffer));
@@ -82,7 +176,7 @@ function getData() {
             styleWidth();
             styleColor();
         }
-    };
+    };*/
 
     oReq.send(null);
 }
@@ -93,7 +187,7 @@ function start(element) {
     getData();
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    //$('#sqlEntry').on('input', getData);
+    $('#sqlEntry').on('input', getData);
 
     //window.onresize = function () { renderer.refresh(); };
 }
@@ -131,6 +225,8 @@ function getZoom() {
     return z;
 }
 
+
+
 map.on('load', _ => {
     var cont = map.getCanvasContainer();
     var canvas = document.createElement('canvas')
@@ -152,18 +248,26 @@ map.on('load', _ => {
 
         renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
         renderer.setZoom(getZoom());
+
+        c = renderer.getCenter();
+        var z = renderer.getZoom();
+        // console.log(c, z, 1 / z, getTile(c, z));
     }
     start(canvas);
     move();
+    const f = () => {
+        move();
+        getData();
+    };
     map.on('movestart', move);
     map.on('move', move);
-    map.on('moveend', move);
+    map.on('moveend', f);
     map.on('dragstart', move);
     map.on('drag', move);
     map.on('dragstart', move);
-    map.on('dragend', move);
+    map.on('dragend', f);
     map.on('zoomstart', move);
     map.on('zoom', move);
-    map.on('zoomend', move);
+    map.on('zoomend', f);
 
 });

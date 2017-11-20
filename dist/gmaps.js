@@ -1849,8 +1849,17 @@ function refresh(timestamp) {
 
 
         layer.tiles.forEach(tile => {
-            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation, s / aspect * tile.scale, s * tile.scale);
-            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation, s / aspect * this._center.x + tile.center.x, s * this._center.y + tile.center.y);
+            /*console.log((s / aspect) * tile.scale,
+                s * tile.scale,
+                (s / aspect) * this._center.x - tile.center.x,
+                s * this._center.y - tile.center.y
+            );*/
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
 
             gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -2358,13 +2367,13 @@ function Style(layer) {
     this.layer = layer;
     this.updated = true;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](3);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](5);
     this._width.parent = this;
     this._width.notify = () => {
         this.layer._compileWidthShader();
         window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 1, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this.layer._compileColorShader();
