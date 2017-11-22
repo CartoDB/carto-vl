@@ -5728,7 +5728,7 @@ var Protobuf = __webpack_require__(20);
 
 var renderer;
 var layer;
-var oldtile;
+var oldtiles = [];
 var ajax;
 
 var meta = {
@@ -5784,91 +5784,70 @@ function getTile(c, z) {
         z: z,
     };
 }
-var numpoints = 0;
-var max = 0;
-function getData() {
-    if (ajax) {
-        ajax.abort();
+function getTileList(c, iz) {
+    var list = [];
+    var z = Math.ceil(Math.log2(1. / iz));
+    var x = c.x;
+    var y = c.y;
+    const numTiles = Math.pow(2, z);
+    function saturate(x) {
+        return Math.min(Math.max(x, 0), 1);
     }
-    var k = Math.random();
-
-    var oReq = new XMLHttpRequest();
-    //document.getElementById("sqlEntry").value
-    const t = getTile(renderer.getCenter(), renderer.getZoom());
-    const x = t.x;
-    const y = t.y;
-    const z = t.z;
-    const mvt_extent = 1024 * 1024 * 1024;
-    const subpixelBufferSize = 0;
-    //, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp ) AS daten, temp
-    const query =
-        // `select 'ST_AsMVTGeom'::regproc;`
-        `(select st_asmvt(geom, 'lid'), MAX(rand) FROM
+    const minx = Math.floor(numTiles * saturate((x - iz) * 0.5 + 0.5));
+    const maxx = Math.ceil(numTiles * saturate((x + iz) * 0.5 + 0.5));
+    const miny = Math.floor(numTiles * saturate(1. - ((y + iz) * 0.5 + 0.5)));
+    const maxy = Math.ceil(numTiles * saturate(1. - ((y - iz) * 0.5 + 0.5)));
+    console.log("MM", minx, maxx, miny, maxy)
+    for (let i = minx; i < maxx; i++) {
+        for (let j = miny; j < maxy; j++) {
+            list.push({
+                x: i,
+                y: j,
+                z: z
+            });
+        }
+    }
+    console.log(x, y, z, iz);
+    console.log(list)
+    return list;
+}
+var numpoints = 0;
+function getData() {
+    const tiles = getTileList(renderer.getCenter(), renderer.getZoom());
+    var completedTiles = [];
+    var needToComplete = tiles.length;
+    tiles.forEach(t => {
+        const x = t.x;
+        const y = t.y;
+        const z = t.z;
+        const mvt_extent = 1024 * 1024 * 1024;
+        const subpixelBufferSize = 0;
+        const query =
+            `(select st_asmvt(geom, 'lid') FROM
         (
             SELECT
                 ST_AsMVTGeom(
-                    the_geom_webmercator, CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, true
-                ),
-                rand
-            FROM nytx AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z}) AND rand > ${Math.random()} ORDER BY rand LIMIT 10000
+                    St_SnapToGrid(the_geom_webmercator,CDB_XYZ_Resolution(${z})*2.), CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
+                )
+            FROM tx_0125_copy_copy AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*2.)
         )AS geom
     )`;
-    console.log(query);
-    oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "&api_key=94221530e644bd478c662e5a402618b1ddd62704", true);
-    oReq.onload = function (oEvent) {
-        const json = JSON.parse(oReq.response);
-        max = Math.max(max, json.rows[0].max);
-        var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-        console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
-        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-        numpoints += mvtLayer.length;
-        console.log("numpoints", numpoints);
-        var fieldMap = {
-            temp: 0,
-            daten: 1
-        };
-        //mvtLayer.length=1000;
-        var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
-        var points = new Float32Array(mvtLayer.length * 2);
-        const r = Math.random();
-        for (var i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            const geom = f.loadGeometry();
-            points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-            points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-
-            // properties[0][i] = Number(f.properties.temp);
-            // properties[1][i] = Number(f.properties.daten) / 4000.;
-            properties[0][i] = Number(r);
-            properties[1][i] = Number(Math.random());
-        }
-
-        var tile = {
-            center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
-            scale: 1 / Math.pow(2, z),
-            count: mvtLayer.length,
-            geom: points,
-            properties: {}
-        };
-        console.log(tile.center, tile.scale);
-
-        Object.keys(fieldMap).map((name, pid) => {
-            tile.properties[name] = properties[pid];
-        })
-        if (oldtile) {
-            //layer.removeTile(oldtile);
-        }
-        oldtile = layer.addTile(tile);
-        styleWidth();
-        styleColor();
-    };
-    /*oReq.onload = function (oEvent) {
-        var arrayBuffer = oReq.response;
-        if (arrayBuffer) {
-            var tile = new VectorTile(new Protobuf(arrayBuffer));
+        console.log(query);
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "&api_key=94221530e644bd478c662e5a402618b1ddd62704", true);
+        oReq.onload = function (oEvent) {
+            const json = JSON.parse(oReq.response);
+            if (json.rows[0].st_asmvt.data.length == 0) {
+                needToComplete--;
+                return;
+            }
+            var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
+            console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-
+            numpoints += mvtLayer.length;
+            console.log("numpoints", numpoints);
             var fieldMap = {
                 temp: 0,
                 daten: 1
@@ -5876,32 +5855,42 @@ function getData() {
             //mvtLayer.length=1000;
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
+            const r = Math.random();
             for (var i = 0; i < mvtLayer.length; i++) {
                 const f = mvtLayer.feature(i);
                 const geom = f.loadGeometry();
-                points[2 * i + 0] = 2 * (geom[0][0].x) / 4096.0 - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / 4096.0) - 1.;
+                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
 
-                properties[0][i] = Number(f.properties.temp);
-                properties[1][i] = Number(f.properties.daten) / 4000.;
+                // properties[0][i] = Number(f.properties.temp);
+                // properties[1][i] = Number(f.properties.daten) / 4000.;
+                properties[0][i] = Number(r);
+                properties[1][i] = Number(Math.random());
             }
+
             var tile = {
-                center: { x: 0, y: 0 },
-                scale: 1 / 1.,
+                center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
+                scale: 1 / Math.pow(2, z),
                 count: mvtLayer.length,
                 geom: points,
                 properties: {}
             };
+            console.log(tile.center, tile.scale);
+
             Object.keys(fieldMap).map((name, pid) => {
                 tile.properties[name] = properties[pid];
             })
-            oldtile = layer.addTile(tile);
-            styleWidth();
-            styleColor();
-        }
-    };*/
-
-    oReq.send(null);
+            completedTiles.push(tile);
+            if (completedTiles.length == needToComplete) {
+                oldtiles.forEach(t => layer.removeTile(t));
+                completedTiles.forEach(t => layer.addTile(t));
+                oldtiles = completedTiles;
+                styleWidth();
+                styleColor();
+            }
+        };
+        oReq.send(null);
+    });
 }
 function start(element) {
     renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](element);
@@ -5933,7 +5922,7 @@ var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/mapbox/basic-v9', // stylesheet location
+    style: 'mapbox://styles/dmanzanares/cj9qx712c0l7u2rpix0913d5g', // stylesheet location
     center: [-74.50, 40], // starting position [lng, lat]
     zoom: 0, // starting zoom,
 });
@@ -5980,6 +5969,7 @@ map.on('load', _ => {
     move();
     const f = () => {
         move();
+        //getTileList(renderer.getCenter(), renderer.getZoom());
         getData();
     };
     map.on('movestart', move);
