@@ -5807,7 +5807,7 @@ function getTileList(c, iz) {
             });
         }
     }
-    console.log(x, y, z, iz);
+    //console.log(x, y, z, iz);
     console.log(list)
     return list;
 }
@@ -5820,18 +5820,19 @@ function getData() {
         const x = t.x;
         const y = t.y;
         const z = t.z;
-        const mvt_extent = 1024 * 1024 * 1024;
+        const mvt_extent = 1024;
         const subpixelBufferSize = 0;
         const query =
             `(select st_asmvt(geom, 'lid') FROM
         (
             SELECT
                 ST_AsMVTGeom(
-                    St_SnapToGrid(the_geom_webmercator,CDB_XYZ_Resolution(${z})*2.), CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
+                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
                 )
             FROM tx_0125_copy_copy AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*2.)
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
         )AS geom
     )`;
         console.log(query);
@@ -5844,10 +5845,10 @@ function getData() {
                 return;
             }
             var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-            console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
+            //console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
             numpoints += mvtLayer.length;
-            console.log("numpoints", numpoints);
+            //console.log("numpoints", numpoints);
             var fieldMap = {
                 temp: 0,
                 daten: 1
