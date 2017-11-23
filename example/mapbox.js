@@ -4,7 +4,6 @@ var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
 
 var renderer;
-var layer;
 var style;
 var oldtiles = [];
 var ajax;
@@ -123,8 +122,8 @@ function getData(aspect) {
             })
             completedTiles.push(tile);
             if (completedTiles.length == needToComplete) {
-                oldtiles.forEach(t => layer.removeTile(t));
-                completedTiles.forEach(t => layer.addTile(t));
+                oldtiles.forEach(t => renderer.removeTile(t));
+                completedTiles.forEach(t => renderer.addTile(t));
                 oldtiles = completedTiles;
                 styleWidth();
                 styleColor();
@@ -198,7 +197,6 @@ map.on('load', _ => {
     renderer = new R.Renderer(canvas);
     style = new R.Style.Style(renderer);
     renderer.style = style;
-    layer = renderer.addLayer();
     const aspect = canvas.clientWidth / canvas.clientHeight;
     getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);
