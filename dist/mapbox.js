@@ -1763,7 +1763,6 @@ function refresh(timestamp) {
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
-    console.log(timestamp, width, height)
     if (gl.canvas.width != width ||
         gl.canvas.height != height) {
         gl.canvas.width = width;
@@ -5855,14 +5854,6 @@ function getData(aspect) {
         oReq.send(null);
     });
 }
-function start(element) {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](element);
-    layer = renderer.addLayer();
-    const aspect = element.clientWidth / element.clientHeight;
-    getData(aspect);
-    $('#widthStyleEntry').on('input', styleWidth);
-    $('#colorStyleEntry').on('input', styleColor);
-}
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -5904,7 +5895,7 @@ map.on('load', _ => {
     canvas.style.width = map.getCanvas().style.width;
     canvas.style.height = map.getCanvas().style.height;
 
-    function move(a, b, c) {
+    function move() {
         var b = map.getBounds();
         var nw = b.getNorthWest();
         var c = map.getCenter();
@@ -5915,27 +5906,35 @@ map.on('load', _ => {
         c = renderer.getCenter();
         var z = renderer.getZoom();
     }
-    start(canvas);
-    move();
-    const f = () => {
+    function moveEnd() {
         move();
         getData(canvas.clientWidth / canvas.clientHeight);
     };
-    map.on('resize', () => {
+    function resize(){
         canvas.style.width = map.getCanvas().style.width;
         canvas.style.height = map.getCanvas().style.height;
         move();
-    });
+    }
+
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](canvas);
+    layer = renderer.addLayer();
+    const aspect = canvas.clientWidth / canvas.clientHeight;
+    getData(aspect);
+    $('#widthStyleEntry').on('input', styleWidth);
+    $('#colorStyleEntry').on('input', styleColor);
+    move();
+
+    map.on('resize', resize);
     map.on('movestart', move);
     map.on('move', move);
-    map.on('moveend', f);
+    map.on('moveend', moveEnd);
     map.on('dragstart', move);
     map.on('drag', move);
     map.on('dragstart', move);
-    map.on('dragend', f);
+    map.on('dragend', moveEnd);
     map.on('zoomstart', move);
     map.on('zoom', move);
-    map.on('zoomend', f);
+    map.on('zoomend', moveEnd);
 });
 
 
