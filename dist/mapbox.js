@@ -5796,7 +5796,7 @@ function getData(aspect) {
         const mvt_extent = 1024;
         const subpixelBufferSize = 0;
         const query =
-            `(select st_asmvt(geom, 'lid') FROM
+            `select st_asmvt(geom, 'lid') FROM
         (
             SELECT
                 ST_AsMVTGeom(
@@ -5807,7 +5807,7 @@ function getData(aspect) {
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
         )AS geom
-    )`;
+    `;
         var oReq = new XMLHttpRequest();
         oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
         oReq.onload = function (oEvent) {
@@ -5862,8 +5862,8 @@ function start(element) {
     getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    //window.onresize = function () { renderer.refresh(); };
 }
+
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_EXT = EARTH_RADIUS * Math.PI * 2;
@@ -5876,8 +5876,6 @@ function Wmxy(latLng) {
     let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
     return { x: x, y: y };
 }
-
-
 
 var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
@@ -5897,8 +5895,6 @@ function getZoom() {
     renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
     return z;
 }
-
-
 
 map.on('load', _ => {
     var cont = map.getCanvasContainer();
@@ -5940,7 +5936,6 @@ map.on('load', _ => {
     map.on('zoomstart', move);
     map.on('zoom', move);
     map.on('zoomend', f);
-
 });
 
 
