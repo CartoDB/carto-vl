@@ -1,5 +1,6 @@
 import * as shaders from './shaders';
 import * as Style from './style';
+import * as scheme from './scheme';
 
 // TODO remove
 var gl;
@@ -33,69 +34,67 @@ function refresh(timestamp) {
 
     gl.enable(gl.CULL_FACE);
 
-    if ((this.style._color.isAnimated() || this.style._width.isAnimated() || this.style.updated)) {
-        //TODO refactor condition
-        gl.disable(gl.BLEND);
-        gl.disable(gl.DEPTH_TEST);
+    //TODO refactor condition
+    gl.disable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
 
-        if (!this.auxFB) {
-            this.auxFB = gl.createFramebuffer();
-        }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-        //console.log("Restyle", timestamp)
-        // Render To Texture
-        // COLOR
-        this.tiles.forEach(tile => {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-
-            gl.useProgram(this.style.colorShader.program);
-            var obj = {
-                freeTexUnit: 4
-            }
-            this.style._color._preDraw(obj);
-
-            Object.keys(this.style.propertyColorTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(this.style.colorShader.textureLocations[i], i);
-            });
-
-            gl.enableVertexAttribArray(this.colorShaderVertex);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(this.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-        });
-
-        //WIDTH
-        this.tiles.forEach(tile => {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-            gl.useProgram(this.style.widthShader.program);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            var obj = {
-                freeTexUnit: 4
-            }
-            this.style._width._preDraw(obj);
-            Object.keys(this.style.propertyWidthTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(this.style.widthShader.textureLocations[i], i);
-            });
-
-            gl.enableVertexAttribArray(this.style.widthShader.vertexAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(this.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-            this.style.updated = false;
-            tile.initialized = true;
-        });
-
+    if (!this.auxFB) {
+        this.auxFB = gl.createFramebuffer();
     }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+    //console.log("Restyle", timestamp)
+    // Render To Texture
+    // COLOR
+    this.tiles.forEach(tile => {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(tile.style.colorShader.program);
+        var obj = {
+            freeTexUnit: 4
+        }
+        tile.style._color._preDraw(obj);
+
+        Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
+        });
+
+        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+    });
+
+    //WIDTH
+    this.tiles.forEach(tile => {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+        gl.useProgram(tile.style.widthShader.program);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        var obj = {
+            freeTexUnit: 4
+        }
+        tile.style._width._preDraw(obj);
+        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+        });
+
+        gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        tile.style.updated = false;
+        tile.initialized = true;
+    });
+
 
     gl.enable(gl.DEPTH_TEST);
 
@@ -143,9 +142,11 @@ function refresh(timestamp) {
 
     });
 
-    if (this.style._color.isAnimated() || this.style._width.isAnimated()) {
-        window.requestAnimationFrame(refresh.bind(this));
-    }
+    this.tiles.forEach(t => {
+        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+            window.requestAnimationFrame(refresh.bind(this));
+        }
+    });
 }
 
 Renderer.prototype.removeTile = function (tile) {
@@ -199,6 +200,12 @@ Renderer.prototype.addTile = function (tile) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
     }
+
+    tile.setStyle = function (style) {
+        scheme.checkSchemeMatch(style.scheme, tile.scheme);
+        this.style = style;
+    }
+    tile.style = null;
 
     tile.vertexBuffer = gl.createBuffer();
     tile.featureIDBuffer = gl.createBuffer();
@@ -291,3 +298,4 @@ Renderer.prototype.setZoom = function (zoom) {
 }
 
 export { Renderer, Style };
+export { Scheme } from './scheme';

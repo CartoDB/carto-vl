@@ -1,4 +1,5 @@
 import * as cartocolor from 'cartocolor';
+import * as scheme from '../scheme';
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -52,18 +53,19 @@ export { schemes };
         - Heatmaps (renderer should be improved too to accommodate this)
 */
 
-function Property(name, meta) {
-    return new _Property(name, meta);
+function Property(name, scheme) {
+    return new _Property(name, scheme);
 }
-function _Property(name, meta) {
+function _Property(name, scheme) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
     }
-    if (!meta.properties[name]) {
+    if (!scheme[name]) {
         throw new Error(`Property name not found`);
     }
     this.name = name;
     this.type = 'float';
+    this.scheme = scheme;
 }
 _Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     return {
@@ -273,6 +275,10 @@ function _Blend(a, b, mix) {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
+    if (scheme.checkSchemeMatch(a.scheme, b.scheme)) {
+        throw new Error('Blend parameters schemes mismatch');
+    }
+    this.scheme = a.scheme;
     this.a = a;
     this.b = b;
     this.mix = mix;

@@ -4,21 +4,17 @@ var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
 
 var renderer;
-var style;
 var oldtiles = [];
 var ajax;
 
-var meta = {
-    properties: {
-        temp: true,
-        daten: true
-    }
-};
+var style;
+var scheme;
+
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
-        style.getWidth().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
+        style.getWidth().blendTo(R.Style.parseStyleExpression(v, scheme), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -29,7 +25,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        style.getColor().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
+        style.getColor().blendTo(R.Style.parseStyleExpression(v, scheme), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;
@@ -115,15 +111,17 @@ function getData(aspect) {
                 scale: 1 / Math.pow(2, z),
                 count: mvtLayer.length,
                 geom: points,
-                properties: {}
+                properties: {},
             };
             Object.keys(fieldMap).map((name, pid) => {
                 tile.properties[name] = properties[pid];
-            })
+            });
+            tile.scheme = new R.Scheme(Object.keys(tile.properties), Object.keys(tile.properties).map(() => 'float'));
+            console.log(Object.keys(tile.properties), Object.keys(tile.properties).map(() => 'float'), tile.scheme);
             completedTiles.push(tile);
             if (completedTiles.length == needToComplete) {
                 oldtiles.forEach(t => renderer.removeTile(t));
-                completedTiles.forEach(t => renderer.addTile(t));
+                completedTiles.forEach(t => renderer.addTile(t).setStyle(style));
                 oldtiles = completedTiles;
                 styleWidth();
                 styleColor();
@@ -195,8 +193,8 @@ map.on('load', _ => {
     }
 
     renderer = new R.Renderer(canvas);
-    style = new R.Style.Style(renderer);
-    renderer.style = style;
+    scheme = new R.Scheme(['temp', 'daten'], ['float', 'float']);
+    style = new R.Style.Style(renderer, scheme);
     const aspect = canvas.clientWidth / canvas.clientHeight;
     getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);

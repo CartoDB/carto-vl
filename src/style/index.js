@@ -20,7 +20,7 @@ function setGL(_gl) {
 }
 
 
-function compileShader(styleRootExpr, shaderCreator){
+function compileShader(styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -49,9 +49,10 @@ Style.prototype._compileWidthShader = function () {
 }
 
 
-function Style(renderer) {
+function Style(renderer, scheme) {
     this.renderer = renderer;
     this.updated = true;
+    this.scheme = scheme;
 
     this._width = functions.Float(5);
     this._width.parent = this;

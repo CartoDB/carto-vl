@@ -379,7 +379,10 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(20);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__scheme__ = __webpack_require__(25);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__scheme__["a"]; });
+
 
 
 
@@ -415,69 +418,67 @@ function refresh(timestamp) {
 
     gl.enable(gl.CULL_FACE);
 
-    if ((this.style._color.isAnimated() || this.style._width.isAnimated() || this.style.updated)) {
-        //TODO refactor condition
-        gl.disable(gl.BLEND);
-        gl.disable(gl.DEPTH_TEST);
+    //TODO refactor condition
+    gl.disable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
 
-        if (!this.auxFB) {
-            this.auxFB = gl.createFramebuffer();
-        }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-        //console.log("Restyle", timestamp)
-        // Render To Texture
-        // COLOR
-        this.tiles.forEach(tile => {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-
-            gl.useProgram(this.style.colorShader.program);
-            var obj = {
-                freeTexUnit: 4
-            }
-            this.style._color._preDraw(obj);
-
-            Object.keys(this.style.propertyColorTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(this.style.colorShader.textureLocations[i], i);
-            });
-
-            gl.enableVertexAttribArray(this.colorShaderVertex);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(this.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-        });
-
-        //WIDTH
-        this.tiles.forEach(tile => {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-            gl.useProgram(this.style.widthShader.program);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            var obj = {
-                freeTexUnit: 4
-            }
-            this.style._width._preDraw(obj);
-            Object.keys(this.style.propertyWidthTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(this.style.widthShader.textureLocations[i], i);
-            });
-
-            gl.enableVertexAttribArray(this.style.widthShader.vertexAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(this.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-            this.style.updated = false;
-            tile.initialized = true;
-        });
-
+    if (!this.auxFB) {
+        this.auxFB = gl.createFramebuffer();
     }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+    //console.log("Restyle", timestamp)
+    // Render To Texture
+    // COLOR
+    this.tiles.forEach(tile => {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(tile.style.colorShader.program);
+        var obj = {
+            freeTexUnit: 4
+        }
+        tile.style._color._preDraw(obj);
+
+        Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
+        });
+
+        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+    });
+
+    //WIDTH
+    this.tiles.forEach(tile => {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+        gl.useProgram(tile.style.widthShader.program);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        var obj = {
+            freeTexUnit: 4
+        }
+        tile.style._width._preDraw(obj);
+        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+        });
+
+        gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        tile.style.updated = false;
+        tile.initialized = true;
+    });
+
 
     gl.enable(gl.DEPTH_TEST);
 
@@ -525,9 +526,11 @@ function refresh(timestamp) {
 
     });
 
-    if (this.style._color.isAnimated() || this.style._width.isAnimated()) {
-        window.requestAnimationFrame(refresh.bind(this));
-    }
+    this.tiles.forEach(t => {
+        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+            window.requestAnimationFrame(refresh.bind(this));
+        }
+    });
 }
 
 Renderer.prototype.removeTile = function (tile) {
@@ -581,6 +584,12 @@ Renderer.prototype.addTile = function (tile) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
     }
+
+    tile.setStyle = function (style) {
+        __WEBPACK_IMPORTED_MODULE_2__scheme__["b" /* checkSchemeMatch */](style.scheme, tile.scheme);
+        this.style = style;
+    }
+    tile.style = null;
 
     tile.vertexBuffer = gl.createBuffer();
     tile.featureIDBuffer = gl.createBuffer();
@@ -671,6 +680,7 @@ Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
     window.requestAnimationFrame(refresh.bind(this));
 }
+
 
 
 
@@ -1762,10 +1772,10 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].RampColor;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
     const width = eval(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
@@ -1773,10 +1783,10 @@ function styleWidth(e) {
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].RampColor;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
     const color = eval(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);
@@ -1975,6 +1985,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemes", function() { return schemes; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__scheme__ = __webpack_require__(25);
+
 
 
 function implicitCast(value) {
@@ -2029,18 +2041,19 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
         - Heatmaps (renderer should be improved too to accommodate this)
 */
 
-function Property(name, meta) {
-    return new _Property(name, meta);
+function Property(name, scheme) {
+    return new _Property(name, scheme);
 }
-function _Property(name, meta) {
+function _Property(name, scheme) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
     }
-    if (!meta.properties[name]) {
+    if (!scheme[name]) {
         throw new Error(`Property name not found`);
     }
     this.name = name;
     this.type = 'float';
+    this.scheme = scheme;
 }
 _Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     return {
@@ -2250,6 +2263,10 @@ function _Blend(a, b, mix) {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
+    if (__WEBPACK_IMPORTED_MODULE_1__scheme__["b" /* checkSchemeMatch */](a.scheme, b.scheme)) {
+        throw new Error('Blend parameters schemes mismatch');
+    }
+    this.scheme = a.scheme;
     this.a = a;
     this.b = b;
     this.mix = mix;
@@ -3309,55 +3326,55 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
 });
 
-function parseStyleExpression(str, meta) {
+function parseStyleExpression(str, scheme) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
-    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), meta);
+    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), scheme);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     return r;
 }
 
-function parseNode(node, meta) {
+function parseNode(node, scheme) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, meta));
+        const args = node.arguments.map(arg => parseNode(arg, scheme));
         const name = node.callee.name.toLowerCase();
         if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args);
+            return lowerCaseFunctions[name](...args, scheme);
         }
         throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e, meta));
+        return node.elements.map(e => parseNode(e, scheme));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left, meta);
-        const right = parseNode(node.right, meta);
+        const left = parseNode(node.left, scheme);
+        const right = parseNode(node.right, scheme);
         switch (node.operator) {
             case "*":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](left, right, scheme);
             case "/":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"](left, right, scheme);
             case "+":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"](left, right, scheme);
             case "-":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"](left, right, scheme);
             case "^":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"](left, right);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"](left, right, scheme);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](-1, parseNode(node.argument, meta));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](-1, parseNode(node.argument, scheme));
             case '+':
-                return parseNode(node.argument, meta);
+                return parseNode(node.argument, scheme);
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"](node.name.substring(1), meta);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"](node.name.substring(1), scheme);
         } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemes"][node.name.toLowerCase()]) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["schemes"][node.name.toLowerCase()]();
         }
@@ -3580,7 +3597,7 @@ function setGL(_gl) {
 }
 
 
-function compileShader(styleRootExpr, shaderCreator){
+function compileShader(styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -3609,9 +3626,10 @@ Style.prototype._compileWidthShader = function () {
 }
 
 
-function Style(renderer) {
+function Style(renderer, scheme) {
     this.renderer = renderer;
     this.updated = true;
+    this.scheme = scheme;
 
     this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](5);
     this._width.parent = this;
@@ -5890,6 +5908,30 @@ if (true) {
 }
 
 }();
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Scheme; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemeMatch; });
+function Scheme(propertyNames, propertyTypes) {
+    if (propertyNames.length != propertyTypes.length) {
+        throw new Error("propertyNames and propertyTypes lengths mismatch");
+    }
+    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
+}
+function checkSchemeMatch(schemeA, schemeB) {
+    if (schemeA && schemeB) {
+        const equals = Object.keys(schemeA).map(name => schemeA[name] == schemeB[name]).reduce((a, b) => a && b);
+        if (!equals) {
+            throw new Error(`Scheme mismatch: ${JSON.stringify(schemeA)}, ${JSON.stringify(schemeB)}`);
+        }
+    }
+}
+
 
 
 /***/ })

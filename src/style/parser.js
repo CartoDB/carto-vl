@@ -12,55 +12,55 @@ Object.keys(functions).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
 
-export function parseStyleExpression(str, meta) {
+export function parseStyleExpression(str, scheme) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp("^", 10);
-    const r = parseNode(jsep(str), meta);
+    const r = parseNode(jsep(str), scheme);
     jsep.removeBinaryOp("^");
     return r;
 }
 
-function parseNode(node, meta) {
+function parseNode(node, scheme) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, meta));
+        const args = node.arguments.map(arg => parseNode(arg, scheme));
         const name = node.callee.name.toLowerCase();
         if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args);
+            return lowerCaseFunctions[name](...args, scheme);
         }
         throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e, meta));
+        return node.elements.map(e => parseNode(e, scheme));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left, meta);
-        const right = parseNode(node.right, meta);
+        const left = parseNode(node.left, scheme);
+        const right = parseNode(node.right, scheme);
         switch (node.operator) {
             case "*":
-                return functions.FloatMul(left, right);
+                return functions.FloatMul(left, right, scheme);
             case "/":
-                return functions.FloatDiv(left, right);
+                return functions.FloatDiv(left, right, scheme);
             case "+":
-                return functions.FloatAdd(left, right);
+                return functions.FloatAdd(left, right, scheme);
             case "-":
-                return functions.FloatSub(left, right);
+                return functions.FloatSub(left, right, scheme);
             case "^":
-                return functions.FloatPow(left, right);
+                return functions.FloatPow(left, right, scheme);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return functions.FloatMul(-1, parseNode(node.argument, meta));
+                return functions.FloatMul(-1, parseNode(node.argument, scheme));
             case '+':
-                return parseNode(node.argument, meta);
+                return parseNode(node.argument, scheme);
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return functions.Property(node.name.substring(1), meta);
+            return functions.Property(node.name.substring(1), scheme);
         } else if (functions.schemes[node.name.toLowerCase()]) {
             return functions.schemes[node.name.toLowerCase()]();
         }
