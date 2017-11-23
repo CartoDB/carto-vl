@@ -50,10 +50,10 @@ function refresh(timestamp) {
         return;
     }
     this.lastFrame = timestamp;
-
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
+    console.log(timestamp, width, height)
     if (gl.canvas.width != width ||
         gl.canvas.height != height) {
         gl.canvas.width = width;

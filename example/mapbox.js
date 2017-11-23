@@ -40,28 +40,7 @@ function styleColor(e) {
     }
 }
 
-/*
-TODO
-    SQL API
-    Tiling (copy query from Windshaft - MVT) & center&scale
-    St_AsMVT
-    Metadata with SQL API
-    Agg
-*/
-
-
-function getTile(c, z) {
-    var z = Math.round(Math.log2(1. / z) - 2);
-    var x = c.x * 0.5 + 0.5;
-    var y = 1. - (c.y * 0.5 + 0.5);
-    console.log(x, y, z);
-    return {
-        x: Math.floor(Math.pow(2, z) * x),
-        y: Math.floor(Math.pow(2, z) * y),
-        z: z,
-    };
-}
-function getTileList(c, iz) {
+function getTileList(c, iz, aspect) {
     var list = [];
     var z = Math.ceil(Math.log2(1. / iz));
     var x = c.x;
@@ -70,11 +49,10 @@ function getTileList(c, iz) {
     function saturate(x) {
         return Math.min(Math.max(x, 0), 1);
     }
-    const minx = Math.floor(numTiles * saturate((x - iz) * 0.5 + 0.5));
-    const maxx = Math.ceil(numTiles * saturate((x + iz) * 0.5 + 0.5));
+    const minx = Math.floor(numTiles * saturate((x - iz * aspect) * 0.5 + 0.5));
+    const maxx = Math.ceil(numTiles * saturate((x + iz * aspect) * 0.5 + 0.5));
     const miny = Math.floor(numTiles * saturate(1. - ((y + iz) * 0.5 + 0.5)));
     const maxy = Math.ceil(numTiles * saturate(1. - ((y - iz) * 0.5 + 0.5)));
-    console.log("MM", minx, maxx, miny, maxy)
     for (let i = minx; i < maxx; i++) {
         for (let j = miny; j < maxy; j++) {
             list.push({
@@ -84,13 +62,10 @@ function getTileList(c, iz) {
             });
         }
     }
-    //console.log(x, y, z, iz);
-    console.log(list)
     return list;
 }
-var numpoints = 0;
-function getData() {
-    const tiles = getTileList(renderer.getCenter(), renderer.getZoom());
+function getData(aspect) {
+    const tiles = getTileList(renderer.getCenter(), renderer.getZoom(), aspect);
     var completedTiles = [];
     var needToComplete = tiles.length;
     tiles.forEach(t => {
@@ -112,9 +87,8 @@ function getData() {
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
         )AS geom
     )`;
-        console.log(query);
         var oReq = new XMLHttpRequest();
-        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "&api_key=94221530e644bd478c662e5a402618b1ddd62704", true);
+        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
         oReq.onload = function (oEvent) {
             const json = JSON.parse(oReq.response);
             if (json.rows[0].st_asmvt.data.length == 0) {
@@ -122,15 +96,11 @@ function getData() {
                 return;
             }
             var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-            //console.log(json, tile, json.rows[0].st_asmvt.data, Object.keys(tile.layers))
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-            numpoints += mvtLayer.length;
-            //console.log("numpoints", numpoints);
             var fieldMap = {
                 temp: 0,
                 daten: 1
             };
-            //mvtLayer.length=1000;
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
             const r = Math.random();
@@ -139,13 +109,9 @@ function getData() {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-
-                // properties[0][i] = Number(f.properties.temp);
-                // properties[1][i] = Number(f.properties.daten) / 4000.;
                 properties[0][i] = Number(r);
                 properties[1][i] = Number(Math.random());
             }
-
             var tile = {
                 center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
                 scale: 1 / Math.pow(2, z),
@@ -153,8 +119,6 @@ function getData() {
                 geom: points,
                 properties: {}
             };
-            console.log(tile.center, tile.scale);
-
             Object.keys(fieldMap).map((name, pid) => {
                 tile.properties[name] = properties[pid];
             })
@@ -173,12 +137,10 @@ function getData() {
 function start(element) {
     renderer = new R.Renderer(element);
     layer = renderer.addLayer();
-
-    getData();
+    const aspect = element.clientWidth / element.clientHeight;
+    getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    $('#sqlEntry').on('input', getData);
-
     //window.onresize = function () { renderer.refresh(); };
 }
 const DEG2RAD = Math.PI / 180;
@@ -248,8 +210,13 @@ map.on('load', _ => {
     const f = () => {
         move();
         //getTileList(renderer.getCenter(), renderer.getZoom());
-        getData();
+        getData(canvas.clientWidth / canvas.clientHeight);
     };
+    map.on('resize', () => {
+        canvas.style.width = map.getCanvas().style.width;
+        canvas.style.height = map.getCanvas().style.height;
+        move();
+    });
     map.on('movestart', move);
     map.on('move', move);
     map.on('moveend', f);
