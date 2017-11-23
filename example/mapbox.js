@@ -5,6 +5,7 @@ var Protobuf = require('pbf');
 
 var renderer;
 var layer;
+var style;
 var oldtiles = [];
 var ajax;
 
@@ -18,7 +19,7 @@ var meta = {
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
-        layer.style.getWidth().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
+        style.getWidth().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -29,7 +30,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        layer.style.getColor().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
+        style.getColor().blendTo(R.Style.parseStyleExpression(v, meta), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;
@@ -188,13 +189,15 @@ map.on('load', _ => {
         move();
         getData(canvas.clientWidth / canvas.clientHeight);
     };
-    function resize(){
+    function resize() {
         canvas.style.width = map.getCanvas().style.width;
         canvas.style.height = map.getCanvas().style.height;
         move();
     }
 
     renderer = new R.Renderer(canvas);
+    style = new R.Style.Style(renderer);
+    renderer.style = style;
     layer = renderer.addLayer();
     const aspect = canvas.clientWidth / canvas.clientHeight;
     getData(aspect);

@@ -11,37 +11,6 @@ const RTT_WIDTH = 1024;
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(gl);
 }
-Layer.prototype._compileColorShader = function () {
-    // TODO refactor to extract common functionality regarding _compileWidthShader
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyColorTID = tid;
-    this.colorShader = shaders.styler.createColorShader(gl, colorModifier.preface, colorModifier.inline);
-    this.style._color._postShaderCompile(this.colorShader.program);
-}
-Layer.prototype._compileWidthShader = function () {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyWidthTID = tid;
-    this.widthShader = shaders.styler.createWidthShader(gl, widthModifier.preface, widthModifier.inline);
-    this.style._width._postShaderCompile(this.widthShader.program);
-}
 
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
@@ -65,7 +34,7 @@ function refresh(timestamp) {
     gl.enable(gl.CULL_FACE);
 
     this.layers.forEach(layer => {
-        if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
+        if ((this.style._color.isAnimated() || this.style._width.isAnimated() || this.style.updated)) {
             //TODO refactor condition
             gl.disable(gl.BLEND);
             gl.disable(gl.DEPTH_TEST);
@@ -82,19 +51,21 @@ function refresh(timestamp) {
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
-                gl.useProgram(layer.colorShader.program);
-                layer.freeTexUnit = 4;
-                layer.style._color._preDraw(layer);
+                gl.useProgram(this.style.colorShader.program);
+                var obj = {
+                    freeTexUnit: 4
+                }
+                this.style._color._preDraw(obj);
 
-                Object.keys(layer.propertyColorTID).forEach((name, i) => {
+                Object.keys(this.style.propertyColorTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
+                    gl.uniform1i(this.style.colorShader.textureLocations[i], i);
                 });
 
                 gl.enableVertexAttribArray(this.colorShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(this.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
             });
@@ -102,24 +73,26 @@ function refresh(timestamp) {
             //WIDTH
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-                gl.useProgram(layer.widthShader.program);
+                gl.useProgram(this.style.widthShader.program);
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-                layer.freeTexUnit = 4;
-                layer.style._width._preDraw(layer);
-                Object.keys(layer.propertyWidthTID).forEach((name, i) => {
+                var obj = {
+                    freeTexUnit: 4
+                }
+                this.style._width._preDraw(obj);
+                Object.keys(this.style.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
+                    gl.uniform1i(this.style.widthShader.textureLocations[i], i);
                 });
 
-                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
+                gl.enableVertexAttribArray(this.style.widthShader.vertexAttribute);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(this.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-                layer.style.updated = false;
+                this.style.updated = false;
                 tile.initialized = true;
             });
 
@@ -171,7 +144,7 @@ function refresh(timestamp) {
 
         });
 
-        if (layer.style._color.isAnimated() || layer.style._width.isAnimated()) {
+        if (this.style._color.isAnimated() || this.style._width.isAnimated()) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
@@ -182,14 +155,9 @@ function refresh(timestamp) {
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
     this.geometryType = geometryType;
-    this.style = new Style.Style(this);
     this.tiles = [];
-    this._compileColorShader();
-    this._compileWidthShader();
     this.propertyCount = 0;
     this.propertyID = {}; //Name => PID
-    this.propertyWidthTID = {}; //Name => Texture image unit ID
-    this.propertyColorTID = {}; //Name => Texture image unit ID
     this.categoryMap = {};
 }
 

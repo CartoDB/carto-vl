@@ -3,6 +3,7 @@ var gl = null;
 import jsep from 'jsep';
 import * as functions from './functions';
 import parseStyleExpression from './parser';
+import * as shaders from '../shaders';
 
 export {
     Style,
@@ -18,21 +19,51 @@ function setGL(_gl) {
     functions.setGL(gl);
 }
 
-function Style(layer) {
-    this.layer = layer;
+
+function compileShader(styleRootExpr, shaderCreator){
+    var uniformIDcounter = 0;
+    var tid = {};
+    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    styleRootExpr._postShaderCompile(shader.program);
+    return {
+        tid: tid,
+        shader: shader
+    };
+}
+Style.prototype._compileColorShader = function () {
+    const r = compileShader(this._color, shaders.styler.createColorShader);
+    this.propertyColorTID = r.tid;
+    this.colorShader = r.shader;
+}
+Style.prototype._compileWidthShader = function () {
+    const r = compileShader(this._width, shaders.styler.createWidthShader);
+    this.propertyWidthTID = r.tid;
+    this.widthShader = r.shader;
+}
+
+
+function Style(renderer) {
+    this.renderer = renderer;
     this.updated = true;
 
     this._width = functions.Float(5);
     this._width.parent = this;
     this._width.notify = () => {
-        this.layer._compileWidthShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     this._color = functions.Color([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
-        this.layer._compileColorShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
 }
 Style.prototype.setWidth = function (float) {
@@ -40,8 +71,8 @@ Style.prototype.setWidth = function (float) {
     this.updated = true;
     float.parent = this;
     float.notify = () => {
-        this.layer._compileWidthShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     float.notify();
 }
@@ -64,8 +95,8 @@ Style.prototype.setColor = function (color) {
     this.updated = true;
     color.parent = this;
     color.notify = () => {
-        this.layer._compileColorShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     color.notify();
 }

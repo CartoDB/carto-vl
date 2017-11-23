@@ -1721,37 +1721,6 @@ const RTT_WIDTH = 1024;
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(gl);
 }
-Layer.prototype._compileColorShader = function () {
-    // TODO refactor to extract common functionality regarding _compileWidthShader
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = this.style._color._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyColorTID = tid;
-    this.colorShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createColorShader(gl, colorModifier.preface, colorModifier.inline);
-    this.style._color._postShaderCompile(this.colorShader.program);
-}
-Layer.prototype._compileWidthShader = function () {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const widthModifier = this.style._width._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    //TODO check tid table size
-    this.propertyWidthTID = tid;
-    this.widthShader = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* styler */].createWidthShader(gl, widthModifier.preface, widthModifier.inline);
-    this.style._width._postShaderCompile(this.widthShader.program);
-}
 
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
@@ -1775,7 +1744,7 @@ function refresh(timestamp) {
     gl.enable(gl.CULL_FACE);
 
     this.layers.forEach(layer => {
-        if ((layer.style._color.isAnimated() || layer.style._width.isAnimated() || layer.style.updated)) {
+        if ((this.style._color.isAnimated() || this.style._width.isAnimated() || this.style.updated)) {
             //TODO refactor condition
             gl.disable(gl.BLEND);
             gl.disable(gl.DEPTH_TEST);
@@ -1792,19 +1761,21 @@ function refresh(timestamp) {
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
-                gl.useProgram(layer.colorShader.program);
-                layer.freeTexUnit = 4;
-                layer.style._color._preDraw(layer);
+                gl.useProgram(this.style.colorShader.program);
+                var obj = {
+                    freeTexUnit: 4
+                }
+                this.style._color._preDraw(obj);
 
-                Object.keys(layer.propertyColorTID).forEach((name, i) => {
+                Object.keys(this.style.propertyColorTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.colorShader.textureLocations[i], i);
+                    gl.uniform1i(this.style.colorShader.textureLocations[i], i);
                 });
 
                 gl.enableVertexAttribArray(this.colorShaderVertex);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(this.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
             });
@@ -1812,24 +1783,26 @@ function refresh(timestamp) {
             //WIDTH
             layer.tiles.forEach(tile => {
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-                gl.useProgram(layer.widthShader.program);
+                gl.useProgram(this.style.widthShader.program);
                 gl.viewport(0, 0, RTT_WIDTH, tile.height);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-                layer.freeTexUnit = 4;
-                layer.style._width._preDraw(layer);
-                Object.keys(layer.propertyWidthTID).forEach((name, i) => {
+                var obj = {
+                    freeTexUnit: 4
+                }
+                this.style._width._preDraw(obj);
+                Object.keys(this.style.propertyWidthTID).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE0 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[layer.propertyID[name]]);
-                    gl.uniform1i(layer.widthShader.textureLocations[i], i);
+                    gl.uniform1i(this.style.widthShader.textureLocations[i], i);
                 });
 
-                gl.enableVertexAttribArray(layer.widthShader.vertexAttribute);
+                gl.enableVertexAttribArray(this.style.widthShader.vertexAttribute);
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-                gl.vertexAttribPointer(layer.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(this.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-                layer.style.updated = false;
+                this.style.updated = false;
                 tile.initialized = true;
             });
 
@@ -1881,7 +1854,7 @@ function refresh(timestamp) {
 
         });
 
-        if (layer.style._color.isAnimated() || layer.style._width.isAnimated()) {
+        if (this.style._color.isAnimated() || this.style._width.isAnimated()) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
@@ -1892,14 +1865,9 @@ function refresh(timestamp) {
 function Layer(renderer, geometryType) {
     this.renderer = renderer;
     this.geometryType = geometryType;
-    this.style = new __WEBPACK_IMPORTED_MODULE_1__style__["Style"](this);
     this.tiles = [];
-    this._compileColorShader();
-    this._compileWidthShader();
     this.propertyCount = 0;
     this.propertyID = {}; //Name => PID
-    this.propertyWidthTID = {}; //Name => Texture image unit ID
-    this.propertyColorTID = {}; //Name => Texture image unit ID
     this.categoryMap = {};
 }
 
@@ -2121,6 +2089,7 @@ function GenericStyler(gl, glsl, preface, inline) {
     let FS = glsl.FS;
     FS = FS.replace('$PREFACE', preface);
     FS = FS.replace('$INLINE', inline);
+    console.log(FS)
     compileProgram.call(this, gl, VS, FS);
     this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
     this.textureLocations = [];
@@ -2331,6 +2300,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(6);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Now"]; });
@@ -2355,6 +2325,7 @@ var gl = null;
 
 
 
+
 // TODO removed global gl context
 // TODO document API
 function setGL(_gl) {
@@ -2362,21 +2333,51 @@ function setGL(_gl) {
     __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
 }
 
-function Style(layer) {
-    this.layer = layer;
+
+function compileShader(styleRootExpr, shaderCreator){
+    var uniformIDcounter = 0;
+    var tid = {};
+    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    styleRootExpr._postShaderCompile(shader.program);
+    return {
+        tid: tid,
+        shader: shader
+    };
+}
+Style.prototype._compileColorShader = function () {
+    const r = compileShader(this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["b" /* styler */].createColorShader);
+    this.propertyColorTID = r.tid;
+    this.colorShader = r.shader;
+}
+Style.prototype._compileWidthShader = function () {
+    const r = compileShader(this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["b" /* styler */].createWidthShader);
+    this.propertyWidthTID = r.tid;
+    this.widthShader = r.shader;
+}
+
+
+function Style(renderer) {
+    this.renderer = renderer;
     this.updated = true;
 
     this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](5);
     this._width.parent = this;
     this._width.notify = () => {
-        this.layer._compileWidthShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
-        this.layer._compileColorShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
 }
 Style.prototype.setWidth = function (float) {
@@ -2384,8 +2385,8 @@ Style.prototype.setWidth = function (float) {
     this.updated = true;
     float.parent = this;
     float.notify = () => {
-        this.layer._compileWidthShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     float.notify();
 }
@@ -2408,8 +2409,8 @@ Style.prototype.setColor = function (color) {
     this.updated = true;
     color.parent = this;
     color.notify = () => {
-        this.layer._compileColorShader();
-        window.requestAnimationFrame(this.layer.renderer.refresh.bind(this.layer.renderer));
+        this._compileColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     color.notify();
 }
