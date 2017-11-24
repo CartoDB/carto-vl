@@ -636,6 +636,11 @@ Renderer.prototype.addTile = function (tile) {
     return tile;
 }
 
+/**
+ * THIS IS A RENDERER.
+ * @constructor
+ * @param {HTMLElement} canvas
+ */
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
@@ -664,14 +669,21 @@ function Renderer(canvas) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 }
 
+/**
+ * Wadus qwuasdfdasfasd fsadfads
+ * @api Get Renderer center in Renderer coordinates
+ * @param {fff}
+ * @name Renderer#getCenter
+ */
 Renderer.prototype.getCenter = function () {
     return { x: this._center.x, y: this._center.y };
-}
+};
+
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
     window.requestAnimationFrame(refresh.bind(this));
-}
+};
 
 Renderer.prototype.getZoom = function () {
     return this._zoom;

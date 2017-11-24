@@ -9,10 +9,6 @@ var gl;
 // they imply a small waste of resources too
 const RTT_WIDTH = 1024;
 
-Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
-}
-
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
     // Don't re-render more than once per animation frame
@@ -252,6 +248,13 @@ Renderer.prototype.addTile = function (tile) {
     return tile;
 }
 
+/**
+ * THIS IS A RENDERER.
+ * @api
+ * @memberOf renderer
+ * @constructor
+ * @param {HTMLElement} canvas - adlfkajdsf
+ */
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
@@ -280,14 +283,40 @@ function Renderer(canvas) {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 }
 
+/**
+ * Initialize static shaders
+ */
+Renderer.prototype._initShaders = function () {
+    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+}
+
+
+/**
+ * @api
+ * @typedef {object} RPoint
+ * @property {number} x
+ * @property {number} y
+ */
+
+/**
+ * Get Renderer visualization center
+ * @api
+ * @return {RPoint}
+ */
 Renderer.prototype.getCenter = function () {
     return { x: this._center.x, y: this._center.y };
-}
+};
+/**
+ * Set Renderer visualization center
+ * @api
+ * @param {number} x
+ * @param {number} y
+ */
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
     window.requestAnimationFrame(refresh.bind(this));
-}
+};
 
 Renderer.prototype.getZoom = function () {
     return this._zoom;
