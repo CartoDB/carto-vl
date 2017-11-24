@@ -43,7 +43,7 @@ function GenericStyler(gl, glsl, preface, inline) {
     let FS = glsl.FS;
     FS = FS.replace('$PREFACE', preface);
     FS = FS.replace('$INLINE', inline);
-    console.log(FS)
+    //console.log(FS)
     compileProgram.call(this, gl, VS, FS);
     this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
     this.textureLocations = [];

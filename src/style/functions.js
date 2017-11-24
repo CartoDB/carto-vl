@@ -1,5 +1,5 @@
 import * as cartocolor from 'cartocolor';
-import * as scheme from '../scheme';
+import * as schema from '../schema';
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -13,21 +13,21 @@ function setGL(_gl) {
 }
 export { Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
 
-const schemes = {};
+const schemas = {};
 Object.keys(cartocolor).map(name => {
     const s = cartocolor[name];
     var defaultFound = false;
     for (let i = 20; i >= 0; i--) {
         if (s[i]) {
             if (!defaultFound) {
-                schemes[name.toLowerCase()] = () => s[i];
+                schemas[name.toLowerCase()] = () => s[i];
                 defaultFound = true;
             }
-            schemes[`${name.toLowerCase()}_${i}`] = () => s[i];
+            schemas[`${name.toLowerCase()}_${i}`] = () => s[i];
         }
     }
 });
-export { schemes };
+export { schemas };
 
 /*
     Each styling function should:
@@ -53,19 +53,19 @@ export { schemes };
         - Heatmaps (renderer should be improved too to accommodate this)
 */
 
-function Property(name, scheme) {
-    return new _Property(name, scheme);
+function Property(name, schema) {
+    return new _Property(name, schema);
 }
-function _Property(name, scheme) {
+function _Property(name, schema) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
     }
-    if (!scheme[name]) {
+    if (!schema[name]) {
         throw new Error(`Property name not found`);
     }
     this.name = name;
     this.type = 'float';
-    this.scheme = scheme;
+    this.schema = schema;
 }
 _Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     return {
@@ -275,10 +275,10 @@ function _Blend(a, b, mix) {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
-    if (scheme.checkSchemeMatch(a.scheme, b.scheme)) {
-        throw new Error('Blend parameters schemes mismatch');
+    if (schema.checkschemaMatch(a.schema, b.schema)) {
+        throw new Error('Blend parameters schemas mismatch');
     }
-    this.scheme = a.scheme;
+    this.schema = a.schema;
     this.a = a;
     this.b = b;
     this.mix = mix;

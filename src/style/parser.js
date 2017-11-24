@@ -12,57 +12,62 @@ Object.keys(functions).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
 
-export function parseStyleExpression(str, scheme) {
+/**
+ * @api
+ * @param {*} str
+ * @param {*} schema
+ */
+export function parseStyleExpression(str, schema) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp("^", 10);
-    const r = parseNode(jsep(str), scheme);
+    const r = parseNode(jsep(str), schema);
     jsep.removeBinaryOp("^");
     return r;
 }
 
-function parseNode(node, scheme) {
+function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, scheme));
+        const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
         if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args, scheme);
+            return lowerCaseFunctions[name](...args, schema);
         }
         throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e, scheme));
+        return node.elements.map(e => parseNode(e, schema));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left, scheme);
-        const right = parseNode(node.right, scheme);
+        const left = parseNode(node.left, schema);
+        const right = parseNode(node.right, schema);
         switch (node.operator) {
             case "*":
-                return functions.FloatMul(left, right, scheme);
+                return functions.FloatMul(left, right, schema);
             case "/":
-                return functions.FloatDiv(left, right, scheme);
+                return functions.FloatDiv(left, right, schema);
             case "+":
-                return functions.FloatAdd(left, right, scheme);
+                return functions.FloatAdd(left, right, schema);
             case "-":
-                return functions.FloatSub(left, right, scheme);
+                return functions.FloatSub(left, right, schema);
             case "^":
-                return functions.FloatPow(left, right, scheme);
+                return functions.FloatPow(left, right, schema);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return functions.FloatMul(-1, parseNode(node.argument, scheme));
+                return functions.FloatMul(-1, parseNode(node.argument, schema));
             case '+':
-                return parseNode(node.argument, scheme);
+                return parseNode(node.argument, schema);
             default:
                 throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return functions.Property(node.name.substring(1), scheme);
-        } else if (functions.schemes[node.name.toLowerCase()]) {
-            return functions.schemes[node.name.toLowerCase()]();
+            return functions.Property(node.name.substring(1), schema);
+        } else if (functions.schemas[node.name.toLowerCase()]) {
+            return functions.schemas[node.name.toLowerCase()]();
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);

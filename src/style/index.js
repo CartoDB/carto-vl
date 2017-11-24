@@ -48,11 +48,16 @@ Style.prototype._compileWidthShader = function () {
     this.widthShader = r.shader;
 }
 
-
-function Style(renderer, scheme) {
+/**
+ * @api
+ * @constructor
+ * @param {*} renderer
+ * @param {*} schema
+ */
+function Style(renderer, schema) {
     this.renderer = renderer;
     this.updated = true;
-    this.scheme = scheme;
+    this.schema = schema;
 
     this._width = functions.Float(5);
     this._width.parent = this;
@@ -67,6 +72,10 @@ function Style(renderer, scheme) {
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
 }
+/**
+ * @api
+ * @param {*} float
+ */
 Style.prototype.setWidth = function (float) {
     this._width = float;
     this.updated = true;
@@ -90,7 +99,10 @@ Style.prototype.replaceChild = function (toReplace, replacer) {
         console.warn('No child found');
     }
 }
-
+/**
+ * @api
+ * @param {*} color
+ */
 Style.prototype.setColor = function (color) {
     this._color = color;
     this.updated = true;
@@ -101,9 +113,15 @@ Style.prototype.setColor = function (color) {
     };
     color.notify();
 }
+/**
+ * @api
+ */
 Style.prototype.getWidth = function () {
     return this._width;
 }
+/**
+ * @api
+ */
 Style.prototype.getColor = function () {
     return this._color;
 }
