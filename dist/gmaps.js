@@ -87,6 +87,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return Cos; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return Tan; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return Sign; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return SetOpacity; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -105,6 +106,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return cos; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return tan; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return setOpacity; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
@@ -206,6 +208,7 @@ function Now(speed) {
     this.speed = Number(speed);
     this.type = 'float';
     this.float = float(0);
+    this.init = Date.now();
 }
 Now.prototype._applyToShaderSource = function (uniformIDMaker) {
     return this.float._applyToShaderSource(uniformIDMaker);
@@ -214,12 +217,62 @@ Now.prototype._postShaderCompile = function (program) {
     return this.float._postShaderCompile(program);
 }
 Now.prototype._preDraw = function () {
-    this.float.expr = (Date.now() * this.speed / 1000.) % 1;
+    this.float.expr = ((Date.now() - this.init) * this.speed / 1000.);
     this.float._preDraw();
 }
 Now.prototype.isAnimated = function () {
     return true;
 }
+
+class SetOpacity {
+    constructor(a, b) {
+        if (Number.isFinite(b)) {
+            b = float(b);
+        }
+        if (a.type == 'color' && b.type == 'float') {
+        } else {
+            console.warn(a, b);
+            throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
+        }
+        this.type = 'color';
+        this.a = a;
+        this.b = b;
+        a.parent = this;
+        b.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: a.preface + b.preface,
+            inline: `vec4((${a.inline}).rgb, ${b.inline})`
+        };
+    }
+    _postShaderCompile(program) {
+        this.a._postShaderCompile(program);
+        this.b._postShaderCompile(program);
+    }
+    _preDraw(l) {
+        this.a._preDraw(l);
+        this.b._preDraw(l);
+    }
+    isAnimated() {
+        return this.a.isAnimated() || this.b.isAnimated();
+    }
+    replaceChild(toReplace, replacer) {
+        if (this.a = toReplace) {
+            this.a = replacer;
+        } else {
+            this.b = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+};
+const setOpacity = (...args) => new SetOpacity(...args);
 
 const genBinaryOp = (jsFn, glsl) => class BinaryOperation {
     constructor(a, b) {
@@ -305,7 +358,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
-            preface: a.preface ,
+            preface: a.preface,
             inline: glsl(a.inline)
         };
     }
@@ -447,6 +500,9 @@ function Blend(a, b, mix) {
     } else {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
+    }
+    if (mix.type != 'float') {
+        throw new Error(`Blending cannot be performed by '${mix.type}'`);
     }
     if (__WEBPACK_IMPORTED_MODULE_1__schema__["b" /* checkschemaMatch */](a.schema, b.schema)) {
         throw new Error('Blend parameters schemas mismatch');
@@ -2575,6 +2631,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cos"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Tan"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sign"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["SetOpacity"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -2593,6 +2650,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cos"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["setOpacity"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
