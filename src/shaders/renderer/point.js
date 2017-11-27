@@ -74,6 +74,9 @@ void main(void) {
     float s = texture2D(widthTex, featureID).a;
     float size = ceil(s*64.);
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (s*0.9+0.05)*0.+0.5, 1.);
+    if (s==0.){
+        p.x=10000.;
+    }
     gl_Position  = p;
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
