@@ -12,8 +12,8 @@ function setGL(_gl) {
     gl = _gl;
 }
 export {
-    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign,
-    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign,
+    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity,
+    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity,
     setGL
 };
 
@@ -113,6 +113,56 @@ Now.prototype.isAnimated = function () {
     return true;
 }
 
+class SetOpacity {
+    constructor(a, b) {
+        if (Number.isFinite(b)) {
+            b = float(b);
+        }
+        if (a.type == 'color' && b.type == 'float') {
+        } else {
+            console.warn(a, b);
+            throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
+        }
+        this.type = 'color';
+        this.a = a;
+        this.b = b;
+        a.parent = this;
+        b.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: a.preface + b.preface,
+            inline: `vec4((${a.inline}).rgb, ${b.inline})`
+        };
+    }
+    _postShaderCompile(program) {
+        this.a._postShaderCompile(program);
+        this.b._postShaderCompile(program);
+    }
+    _preDraw(l) {
+        this.a._preDraw(l);
+        this.b._preDraw(l);
+    }
+    isAnimated() {
+        return this.a.isAnimated() || this.b.isAnimated();
+    }
+    replaceChild(toReplace, replacer) {
+        if (this.a = toReplace) {
+            this.a = replacer;
+        } else {
+            this.b = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+};
+const setOpacity = (...args) => new SetOpacity(...args);
+
 const genBinaryOp = (jsFn, glsl) => class BinaryOperation {
     constructor(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
@@ -197,7 +247,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
-            preface: a.preface ,
+            preface: a.preface,
             inline: glsl(a.inline)
         };
     }
