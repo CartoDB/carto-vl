@@ -111,7 +111,7 @@ function getData(aspect) {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(Math.random());
+                properties[0][i] = Number(Math.random())*0.;
                 //properties[1][i] = Number(Math.random());
                 properties[1][i] = Number(f.properties.amount);
                 //console.log(f);
@@ -159,9 +159,9 @@ var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/dmanzanares/cj9qx712c0l7u2rpix0913d5g', // stylesheet location
-    center: [-74.50, 40], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
+    style: 'mapbox://styles/mapbox/basic-v9', // stylesheet location
+    center: [2.17, 41.38], // starting position [lng, lat]
+    zoom: 14, // starting zoom,
 });
 map.repaint = false;
 function getZoom() {
@@ -206,11 +206,10 @@ map.on('load', _ => {
     renderer = new R.Renderer(canvas);
     schema = new R.Schema(['category', 'amount'], ['float', 'float']);
     style = new R.Style.Style(renderer, schema);
-    const aspect = canvas.clientWidth / canvas.clientHeight;
-    getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    move();
+    resize();
+    moveEnd();
 
     map.on('resize', resize);
     map.on('movestart', move);

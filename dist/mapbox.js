@@ -2330,9 +2330,61 @@ Renderer.prototype._initShaders = function () {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//TODO fix AA (use point size)
 //TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 //TODO profile discard performance impact
+
+/*
+    Z coordinate, Z test and blending
+
+    Correct blending results can only be done by ordering the points in JS.
+
+    However, without correct blending it's possible to set the Z coordinate in this shader,
+    and it's possible to base it on the point size.
+*/
+
+/*
+    Antialiasing
+
+    I think that the current antialiasing method is correct.
+    It is certainly fast since it uses the distance to the circumference.
+    The results have been checked against a reference 4x4 sampling method.
+
+    The vertex shader is responsible for the oversizing of the points to "enable" conservative rasterization.
+    See https://developer.nvidia.com/content/dont-be-conservative-conservative-rasterization
+    This oversizing requires a change of the coordinate space that must be reverted in the fragment shader.
+    This is done with `sizeNormalizer`.
+
+
+    Debugging antialiasing is hard. I'm gonna leave here a few helpers:
+
+    float referenceAntialias(vec2 p){
+        float alpha=0.;
+        for (float x=-0.75; x<1.; x+=0.5){
+            for (float y=-0.75; y<1.; y+=0.5){
+                vec2 p2 = p + vec2(x,y)*dp;
+                if (length(p2)<1.){
+                    alpha+=1.;
+                }
+            }
+        }
+        return alpha/16.;
+    }
+    float noAntialias(vec2 p){
+        if (length(p)<1.){
+            return 1.;
+        }
+        return 0.;
+    }
+
+    Use this to check that the affected antiliased pixels are ok:
+    
+    if (c.a==1.||c.a==0.){
+        gl_FragColor = vec4(1,0,0,1);
+        return;
+    }
+
+ */
+
 const VS = `
 
 precision highp float;
@@ -2347,30 +2399,37 @@ uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 
 varying lowp vec4 color;
+varying highp float dp;
+varying highp float sizeNormalizer;
 
 void main(void) {
-    float size = texture2D(widthTex, featureID).a;
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 1.-(size*0.9+0.05), 1.);
+    float size = ceil(texture2D(widthTex, featureID).a*64.);
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (size*0.9+0.05)*0.+0.5, 1.);
     gl_Position  = p;
-    gl_PointSize = size*64.;
+    gl_PointSize = size+2.;
+    dp = 1.0/(size+1.);
+    sizeNormalizer = (size+1.)/(size);
     color = texture2D(colorTex, featureID);
 }`;
 /* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
 
 
 const FS = `
-precision lowp float;
+precision highp float;
 
 varying lowp vec4 color;
+varying highp float dp;
+varying highp float sizeNormalizer;
+
+float distanceAntialias(vec2 p){
+    return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
+}
+
 
 void main(void) {
-    vec2 p = 2.*gl_PointCoord-vec2(1.);
+    vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
-    float l = length(p);
-    c.a *=  1. - smoothstep(0.9, 1.1, l);
-    if (c.a==0.){
-        discard;
-    }
+    c.a *= distanceAntialias(p);
     gl_FragColor = c;
 }`;
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
@@ -6069,7 +6128,7 @@ function getData(aspect) {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(Math.random());
+                properties[0][i] = Number(Math.random())*0.;
                 //properties[1][i] = Number(Math.random());
                 properties[1][i] = Number(f.properties.amount);
                 //console.log(f);
@@ -6117,9 +6176,9 @@ var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/dmanzanares/cj9qx712c0l7u2rpix0913d5g', // stylesheet location
-    center: [-74.50, 40], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
+    style: 'mapbox://styles/mapbox/basic-v9', // stylesheet location
+    center: [2.17, 41.38], // starting position [lng, lat]
+    zoom: 14, // starting zoom,
 });
 map.repaint = false;
 function getZoom() {
@@ -6164,11 +6223,10 @@ map.on('load', _ => {
     renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](canvas);
     schema = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Schema */](['category', 'amount'], ['float', 'float']);
     style = new __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Style(renderer, schema);
-    const aspect = canvas.clientWidth / canvas.clientHeight;
-    getData(aspect);
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
-    move();
+    resize();
+    moveEnd();
 
     map.on('resize', resize);
     map.on('movestart', move);
