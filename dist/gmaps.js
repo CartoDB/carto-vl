@@ -88,6 +88,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return Tan; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return Sign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return SetOpacity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HSV", function() { return HSV; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -107,6 +108,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return tan; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return setOpacity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return hsv; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
@@ -223,6 +225,77 @@ Now.prototype._preDraw = function () {
 Now.prototype.isAnimated = function () {
     return true;
 }
+
+
+
+class HSV {
+    constructor(h, s, v) {
+        h = implicitCast(h);
+        s = implicitCast(s);
+        v = implicitCast(v);
+
+        if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
+            console.warn(h, s, v);
+            throw new Error(`SetOpacity cannot be performed between `);
+        }
+        this.type = 'color';
+        this.h = h;
+        this.s = s;
+        this.v = v;
+        h.parent = this;
+        s.parent = this;
+        v.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const h = this.h._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const s = this.s._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const v = this.v._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: h.preface + s.preface + v.preface +
+                `
+                #ifndef HSV2RGB
+                #define HSV2RGB
+                vec3 hsv2rgb(vec3 c) {
+                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+              }
+              #endif
+              `,
+            inline: `vec4(hsv2rgb(vec3(${h.inline}, clamp(${s.inline}, 0.,1.), clamp(${v.inline}, 0.,1.))), 1)`
+        };
+    }
+    _postShaderCompile(program) {
+        this.h._postShaderCompile(program);
+        this.s._postShaderCompile(program);
+        this.v._postShaderCompile(program);
+    }
+    _preDraw(l) {
+        this.h._preDraw(l);
+        this.s._preDraw(l);
+        this.v._preDraw(l);
+    }
+    isAnimated() {
+        return this.h.isAnimated() || this.s.isAnimated() || this.v.isAnimated();
+    }
+    replaceChild(toReplace, replacer) {
+        if (this.h = toReplace) {
+            this.h = replacer;
+        } else if (this.s = toReplace) {
+            this.s = replacer;
+        } else {
+            this.v = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+};
+const hsv = (...args) => new HSV(...args);
+
+
 
 class SetOpacity {
     constructor(a, b) {
@@ -2632,6 +2705,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Tan"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sign"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["SetOpacity"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "HSV", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["HSV"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -2651,6 +2725,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["setOpacity"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["hsv"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;

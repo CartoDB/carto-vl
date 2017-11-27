@@ -52,6 +52,12 @@
             left: 0;
             pointer-events: none;
         }
+
+        #comments {
+            top: 180px;
+            left: 0;
+            height: 200px;
+        }
     </style>
 </head>
 
@@ -59,12 +65,16 @@
     <canvas id="mycanvas" width="400" height="300" style="display: none;"></canvas>
     <div id='map'></div>
     <textarea id="widthStyleEntry">10*($amount^0.5/100)+0.5</textarea>
-    <textarea id="colorStyleEntry">setOpacity(rampColor($category, 0, 1, Prism),
-        blend(0,1,
-            (sin(now(1.2))*0.5+0.5)*(log($amount+1)/4)^5
-        ))</textarea>
+    <textarea id="colorStyleEntry">hsv(0.07, ($amount/10000)^0.2,($amount/10000)^0.8) </textarea>
     <textarea id="feedback">¿?</textarea>
+    <textarea id="comments">Interesting expressions:
+        hsv(0.07, ($amount/10000)^0.2,($amount/10000)^0.8) 
 
+        setOpacity(rampColor($category, 0, 1, Prism),
+                blend(0,1,
+                    (sin(now(1.2))*0.5+0.5)*(log($amount+1)/4)^5
+                ))
+    </textarea>
 </body>
 <script src="../dist/mapbox.js"></script>
 

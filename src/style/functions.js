@@ -12,8 +12,8 @@ function setGL(_gl) {
     gl = _gl;
 }
 export {
-    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity,
-    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity,
+    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV,
+    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv,
     setGL
 };
 
@@ -113,6 +113,77 @@ Now.prototype._preDraw = function () {
 Now.prototype.isAnimated = function () {
     return true;
 }
+
+
+
+class HSV {
+    constructor(h, s, v) {
+        h = implicitCast(h);
+        s = implicitCast(s);
+        v = implicitCast(v);
+
+        if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
+            console.warn(h, s, v);
+            throw new Error(`SetOpacity cannot be performed between `);
+        }
+        this.type = 'color';
+        this.h = h;
+        this.s = s;
+        this.v = v;
+        h.parent = this;
+        s.parent = this;
+        v.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const h = this.h._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const s = this.s._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const v = this.v._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: h.preface + s.preface + v.preface +
+                `
+                #ifndef HSV2RGB
+                #define HSV2RGB
+                vec3 hsv2rgb(vec3 c) {
+                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+              }
+              #endif
+              `,
+            inline: `vec4(hsv2rgb(vec3(${h.inline}, clamp(${s.inline}, 0.,1.), clamp(${v.inline}, 0.,1.))), 1)`
+        };
+    }
+    _postShaderCompile(program) {
+        this.h._postShaderCompile(program);
+        this.s._postShaderCompile(program);
+        this.v._postShaderCompile(program);
+    }
+    _preDraw(l) {
+        this.h._preDraw(l);
+        this.s._preDraw(l);
+        this.v._preDraw(l);
+    }
+    isAnimated() {
+        return this.h.isAnimated() || this.s.isAnimated() || this.v.isAnimated();
+    }
+    replaceChild(toReplace, replacer) {
+        if (this.h = toReplace) {
+            this.h = replacer;
+        } else if (this.s = toReplace) {
+            this.s = replacer;
+        } else {
+            this.v = replacer;
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+};
+const hsv = (...args) => new HSV(...args);
+
+
 
 class SetOpacity {
     constructor(a, b) {
