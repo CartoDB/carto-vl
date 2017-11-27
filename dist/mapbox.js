@@ -6198,7 +6198,7 @@ function getData(aspect) {
                 //console.log(f);
                 //break;
             }
-            console.log(`dataframe feature count: ${mvtLayer.length}`);
+            console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
             var dataframe = {
                 center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
                 scale: 1 / Math.pow(2, z),
@@ -6296,13 +6296,6 @@ map.on('load', _ => {
     map.on('movestart', move);
     map.on('move', move);
     map.on('moveend', moveEnd);
-    map.on('dragstart', move);
-    map.on('drag', move);
-    map.on('dragstart', move);
-    map.on('dragend', moveEnd);
-    map.on('zoomstart', move);
-    map.on('zoom', move);
-    map.on('zoomend', moveEnd);
 });
 
 
