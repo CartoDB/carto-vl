@@ -197,14 +197,8 @@ _Now.prototype.isAnimated = function () {
     return true;
 }
 
-const FloatMul = genFloatBinaryOperation((x, y) => x * y, (x, y) => `(${x} * ${y})`);
-const FloatDiv = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
-const FloatAdd = genFloatBinaryOperation((x, y) => x + y, (x, y) => `(${x} + ${y})`);
-const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y})`);
-const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
-
-function genFloatBinaryOperation(jsFn, glsl) {
-    function BinaryOp(a, b) {
+const genBinaryOp = (jsFn, glsl) => class BinaryOperation{
+    constructor(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
             return Float(jsFn(a, b));
         }
@@ -220,16 +214,12 @@ function genFloatBinaryOperation(jsFn, glsl) {
             console.warn(a, b);
             throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
         }
-        return new _BinaryOp(a, b);
-    }
-    function _BinaryOp(a, b) {
         this.type = 'float';
         this.a = a;
         this.b = b;
         a.parent = this;
-        b.parent = this;
-    }
-    _BinaryOp.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+        b.parent = this;    }
+    _applyToShaderSource (uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
@@ -237,18 +227,18 @@ function genFloatBinaryOperation(jsFn, glsl) {
             inline: glsl(a.inline, b.inline)
         };
     }
-    _BinaryOp.prototype._postShaderCompile = function (program) {
+    _postShaderCompile (program) {
         this.a._postShaderCompile(program);
         this.b._postShaderCompile(program);
     }
-    _BinaryOp.prototype._preDraw = function (l) {
+    _preDraw  (l) {
         this.a._preDraw(l);
         this.b._preDraw(l);
     }
-    _BinaryOp.prototype.isAnimated = function () {
+    isAnimated () {
         return this.a.isAnimated() || this.b.isAnimated();
     }
-    _BinaryOp.prototype.replaceChild = function (toReplace, replacer) {
+    replaceChild (toReplace, replacer) {
         if (this.a = toReplace) {
             this.a = replacer;
         } else {
@@ -257,11 +247,22 @@ function genFloatBinaryOperation(jsFn, glsl) {
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     }
-    _BinaryOp.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    blendTo  (finalValue, duration = 500, blendFunc = 'linear') {
         genericBlend(this, finalValue, duration, blendFunc);
     }
-    return BinaryOp;
 }
+
+const FloatMulClass = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+const FloatDivClass = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatAddClass = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+const FloatSubClass = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatPowClass = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+
+const FloatMul = (...args) => new FloatMulClass(...args);
+const FloatDiv = (...args) => new FloatDivClass(...args);
+const FloatAdd = (...args) => new FloatAddClass(...args);
+const FloatSub = (...args) => new FloatSubClass(...args);
+const FloatPow = (...args) => new FloatPowClass(...args);
 
 function Animation(duration) {
     return new _Animation(duration);
@@ -295,6 +296,15 @@ _Animation.prototype._preDraw = function (l) {
 }
 _Animation.prototype.isAnimated = function () {
     return !this.mix || this.mix <= 1.;
+}
+
+
+function log(...args){
+    return new Log(...args);
+}
+
+class Log{
+    //TODO
 }
 
 function Near(property, center, threshold, falloff) {
