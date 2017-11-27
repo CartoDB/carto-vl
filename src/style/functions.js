@@ -98,6 +98,7 @@ function Now(speed) {
     this.speed = Number(speed);
     this.type = 'float';
     this.float = float(0);
+    this.init = Date.now();
 }
 Now.prototype._applyToShaderSource = function (uniformIDMaker) {
     return this.float._applyToShaderSource(uniformIDMaker);
@@ -106,7 +107,7 @@ Now.prototype._postShaderCompile = function (program) {
     return this.float._postShaderCompile(program);
 }
 Now.prototype._preDraw = function () {
-    this.float.expr = (Date.now() * this.speed / 1000.) % 1;
+    this.float.expr = ((Date.now() - this.init) * this.speed / 1000.);
     this.float._preDraw();
 }
 Now.prototype.isAnimated = function () {
@@ -389,6 +390,9 @@ function Blend(a, b, mix) {
     } else {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
+    }
+    if (mix.type != 'float') {
+        throw new Error(`Blending cannot be performed by '${mix.type}'`);
     }
     if (schema.checkschemaMatch(a.schema, b.schema)) {
         throw new Error('Blend parameters schemas mismatch');
