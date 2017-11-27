@@ -57,6 +57,7 @@ export { schemas };
         - Heatmaps (renderer should be improved too to accommodate this)
 */
 
+
 function property(name, schema) {
     return new Property(name, schema);
 }
@@ -114,6 +115,30 @@ Now.prototype.isAnimated = function () {
     return true;
 }
 
+
+//WIP, other classes should extend this
+const genExpr = (childrenNames, glslMaker) => class Expression {
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        //apply children
+        //append prefaces (child+this)
+        //gen inline by glsl(childInlines);
+    }
+    _postShaderCompile(program) {
+        //apply to children
+    }
+    _preDraw(l) {
+        //apply to children
+    }
+    isAnimated() {
+        //get from children
+    }
+    replaceChild(toReplace, replacer) {
+        //Check this[childName] to find
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+}
 
 
 class HSV {
@@ -182,8 +207,6 @@ class HSV {
     }
 };
 const hsv = (...args) => new HSV(...args);
-
-
 
 class SetOpacity {
     constructor(a, b) {
