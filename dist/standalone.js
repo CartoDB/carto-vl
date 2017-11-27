@@ -83,6 +83,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return FloatPow; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return Log; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return Sqrt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sin", function() { return Sin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return Cos; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return Tan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return Sign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -97,6 +101,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return floatPow; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log", function() { return log; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return sqrt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return sin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return cos; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return tan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
@@ -297,8 +305,8 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
-            preface: a.preface + b.preface,
-            inline: glsl(a.inline, b.inline)
+            preface: a.preface ,
+            inline: glsl(a.inline)
         };
     }
     _postShaderCompile(program) {
@@ -308,7 +316,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
         this.a._preDraw(l);
     }
     isAnimated() {
-        return this.a.isAnimated() || this.b.isAnimated();
+        return this.a.isAnimated();
     }
     replaceChild(toReplace, replacer) {
         if (this.a = toReplace) {
@@ -326,8 +334,17 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
 
 const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
 const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
+const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
+const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
+const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+
 const log = (...args) => new Log(...args);
-const sqrt = (...args) => new Log(...args);
+const sqrt = (...args) => new Sqrt(...args);
+const sin = (...args) => new Sin(...args);
+const cos = (...args) => new Cos(...args);
+const tan = (...args) => new Tan(...args);
+const sign = (...args) => new Sign(...args);
 
 function animation(duration) {
     return new Animation(duration);
@@ -695,7 +712,7 @@ RampColor.prototype._preDraw = function (l) {
     l.freeTexUnit++;
 }
 RampColor.prototype.isAnimated = function () {
-    return false;
+    return this.input.isAnimated();
 }
 
 
@@ -2490,6 +2507,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Log"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sqrt"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sin", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sin"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cos"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Tan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sign"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -2504,6 +2525,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["log"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sqrt"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sin"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cos"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;

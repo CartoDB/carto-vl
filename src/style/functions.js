@@ -12,8 +12,8 @@ function setGL(_gl) {
     gl = _gl;
 }
 export {
-    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt,
-    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt,
+    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign,
+    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign,
     setGL
 };
 
@@ -197,8 +197,8 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
-            preface: a.preface + b.preface,
-            inline: glsl(a.inline, b.inline)
+            preface: a.preface ,
+            inline: glsl(a.inline)
         };
     }
     _postShaderCompile(program) {
@@ -208,7 +208,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
         this.a._preDraw(l);
     }
     isAnimated() {
-        return this.a.isAnimated() || this.b.isAnimated();
+        return this.a.isAnimated();
     }
     replaceChild(toReplace, replacer) {
         if (this.a = toReplace) {
@@ -226,8 +226,17 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
 
 const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
 const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
+const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
+const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
+const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+
 const log = (...args) => new Log(...args);
-const sqrt = (...args) => new Log(...args);
+const sqrt = (...args) => new Sqrt(...args);
+const sin = (...args) => new Sin(...args);
+const cos = (...args) => new Cos(...args);
+const tan = (...args) => new Tan(...args);
+const sign = (...args) => new Sign(...args);
 
 function animation(duration) {
     return new Animation(duration);
@@ -595,5 +604,5 @@ RampColor.prototype._preDraw = function (l) {
     l.freeTexUnit++;
 }
 RampColor.prototype.isAnimated = function () {
-    return false;
+    return this.input.isAnimated();
 }
