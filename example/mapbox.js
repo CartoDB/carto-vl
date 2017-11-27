@@ -75,7 +75,8 @@ function getData(aspect) {
                 ST_AsMVTGeom(
                     ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
                     CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
-                )
+                ),
+                SUM(amount) AS amount
             FROM tx_0125_copy_copy AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
@@ -99,8 +100,8 @@ function getData(aspect) {
             var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
             const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
             var fieldMap = {
-                temp: 0,
-                daten: 1
+                category: 0,
+                amount: 1
             };
             var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
             var points = new Float32Array(mvtLayer.length * 2);
@@ -110,8 +111,11 @@ function getData(aspect) {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(r);
-                properties[1][i] = Number(Math.random());
+                properties[0][i] = Number(Math.random());
+                //properties[1][i] = Number(Math.random());
+                properties[1][i] = Number(f.properties.amount);
+                //console.log(f);
+                //break;
             }
             console.log(`dataframe feature count: ${mvtLayer.length}`);
             var dataframe = {
@@ -200,7 +204,7 @@ map.on('load', _ => {
     }
 
     renderer = new R.Renderer(canvas);
-    schema = new R.Schema(['temp', 'daten'], ['float', 'float']);
+    schema = new R.Schema(['category', 'amount'], ['float', 'float']);
     style = new R.Style.Style(renderer, schema);
     const aspect = canvas.clientWidth / canvas.clientHeight;
     getData(aspect);
