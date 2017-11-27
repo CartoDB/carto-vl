@@ -11,7 +11,12 @@ var gl = null;
 function setGL(_gl) {
     gl = _gl;
 }
-export { Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, setGL };
+export {
+    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow,
+    log, sqrt,
+    Log, Sqrt,
+    setGL
+};
 
 const schemas = {};
 Object.keys(cartocolor).map(name => {
@@ -109,7 +114,7 @@ _Now.prototype.isAnimated = function () {
     return true;
 }
 
-const genBinaryOp = (jsFn, glsl) => class BinaryOperation{
+const genBinaryOp = (jsFn, glsl) => class BinaryOperation {
     constructor(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
             return Float(jsFn(a, b));
@@ -130,8 +135,9 @@ const genBinaryOp = (jsFn, glsl) => class BinaryOperation{
         this.a = a;
         this.b = b;
         a.parent = this;
-        b.parent = this;    }
-    _applyToShaderSource (uniformIDMaker, propertyTIDMaker) {
+        b.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
         return {
@@ -139,18 +145,18 @@ const genBinaryOp = (jsFn, glsl) => class BinaryOperation{
             inline: glsl(a.inline, b.inline)
         };
     }
-    _postShaderCompile (program) {
+    _postShaderCompile(program) {
         this.a._postShaderCompile(program);
         this.b._postShaderCompile(program);
     }
-    _preDraw  (l) {
+    _preDraw(l) {
         this.a._preDraw(l);
         this.b._preDraw(l);
     }
-    isAnimated () {
+    isAnimated() {
         return this.a.isAnimated() || this.b.isAnimated();
     }
-    replaceChild (toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         if (this.a = toReplace) {
             this.a = replacer;
         } else {
@@ -159,10 +165,10 @@ const genBinaryOp = (jsFn, glsl) => class BinaryOperation{
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     }
-    blendTo  (finalValue, duration = 500, blendFunc = 'linear') {
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
         genericBlend(this, finalValue, duration, blendFunc);
     }
-}
+};
 
 const FloatMulClass = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
 const FloatDivClass = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
@@ -175,6 +181,54 @@ const FloatDiv = (...args) => new FloatDivClass(...args);
 const FloatAdd = (...args) => new FloatAddClass(...args);
 const FloatSub = (...args) => new FloatSubClass(...args);
 const FloatPow = (...args) => new FloatPowClass(...args);
+
+const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
+    constructor(a) {
+        if (Number.isFinite(a)) {
+            return Float(jsFn(a));
+        }
+        if (a.type != 'float') {
+            console.warn(a);
+            throw new Error(`Binary operation cannot be performed to '${a}'`);
+        }
+        this.type = 'float';
+        this.a = a;
+        a.parent = this;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: a.preface + b.preface,
+            inline: glsl(a.inline, b.inline)
+        };
+    }
+    _postShaderCompile(program) {
+        this.a._postShaderCompile(program);
+    }
+    _preDraw(l) {
+        this.a._preDraw(l);
+    }
+    isAnimated() {
+        return this.a.isAnimated() || this.b.isAnimated();
+    }
+    replaceChild(toReplace, replacer) {
+        if (this.a = toReplace) {
+            this.a = replacer;
+        } else {
+            throw new Error('toReplace element is not a child');
+        }
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+        genericBlend(this, finalValue, duration, blendFunc);
+    }
+}
+
+const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
+const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+const log = (...args) => new Log(...args);
+const sqrt = (...args) => new Log(...args);
 
 function Animation(duration) {
     return new _Animation(duration);
@@ -211,13 +265,6 @@ _Animation.prototype.isAnimated = function () {
 }
 
 
-function log(...args){
-    return new Log(...args);
-}
-
-class Log{
-    //TODO
-}
 
 function Near(property, center, threshold, falloff) {
     const args = [property, center, threshold, falloff].map(implicitCast);
