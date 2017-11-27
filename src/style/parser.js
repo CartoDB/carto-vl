@@ -8,7 +8,9 @@ import * as functions from './functions';
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
 var lowerCaseFunctions = {};
-Object.keys(functions).map(name => {
+Object.keys(functions).filter(
+    name => name[0] == name[0].toLowerCase()
+).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
 
@@ -42,22 +44,22 @@ function parseNode(node, schema) {
         const right = parseNode(node.right, schema);
         switch (node.operator) {
             case "*":
-                return functions.FloatMul(left, right, schema);
+                return functions.floatMul(left, right, schema);
             case "/":
-                return functions.FloatDiv(left, right, schema);
+                return functions.floatDiv(left, right, schema);
             case "+":
-                return functions.FloatAdd(left, right, schema);
+                return functions.floatAdd(left, right, schema);
             case "-":
-                return functions.FloatSub(left, right, schema);
+                return functions.floatSub(left, right, schema);
             case "^":
-                return functions.FloatPow(left, right, schema);
+                return functions.floatPow(left, right, schema);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return functions.FloatMul(-1, parseNode(node.argument, schema));
+                return functions.floatMul(-1, parseNode(node.argument, schema));
             case '+':
                 return parseNode(node.argument, schema);
             default:
@@ -65,7 +67,7 @@ function parseNode(node, schema) {
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return functions.Property(node.name.substring(1), schema);
+            return functions.property(node.name.substring(1), schema);
         } else if (functions.schemas[node.name.toLowerCase()]) {
             return functions.schemas[node.name.toLowerCase()]();
         }

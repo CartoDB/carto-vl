@@ -59,13 +59,13 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = functions.Float(5);
+    this._width = functions.float(5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._color = functions.Color([0, 0, 0, 1]);
+    this._color = functions.color([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this._compileColorShader();

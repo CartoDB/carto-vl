@@ -81,10 +81,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return FloatAdd; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return FloatSub; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return FloatPow; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log", function() { return log; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return sqrt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return Log; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return Sqrt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "near", function() { return near; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "color", function() { return color; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "float", function() { return float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rampColor", function() { return rampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return floatMul; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return floatDiv; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return floatAdd; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return floatSub; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return floatPow; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log", function() { return log; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return sqrt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
@@ -95,7 +107,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
-        return Float(value);
+        return float(value);
     }
     return value;
 }
@@ -145,10 +157,10 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
         - Heatmaps (renderer should be improved too to accommodate this)
 */
 
-function Property(name, schema) {
-    return new _Property(name, schema);
+function property(name, schema) {
+    return new Property(name, schema);
 }
-function _Property(name, schema) {
+function Property(name, schema) {
     if (typeof name !== 'string' || name == '') {
         throw new Error(`Invalid property name '${name}'`);
     }
@@ -159,24 +171,24 @@ function _Property(name, schema) {
     this.type = 'float';
     this.schema = schema;
 }
-_Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+Property.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     return {
         preface: '',
         inline: `p${propertyTIDMaker(this.name)}`
     };
 }
-_Property.prototype._postShaderCompile = function (program) {
+Property.prototype._postShaderCompile = function (program) {
 }
-_Property.prototype._preDraw = function () {
+Property.prototype._preDraw = function () {
 }
-_Property.prototype.isAnimated = function () {
+Property.prototype.isAnimated = function () {
     return false;
 }
 
-function Now(speed) {
-    return new _Now(speed);
+function now(speed) {
+    return new Now(speed);
 }
-function _Now(speed) {
+function Now(speed) {
     if (speed == undefined) {
         speed = 1;
     }
@@ -185,32 +197,32 @@ function _Now(speed) {
     }
     this.speed = Number(speed);
     this.type = 'float';
-    this.float = Float(0);
+    this.float = float(0);
 }
-_Now.prototype._applyToShaderSource = function (uniformIDMaker) {
+Now.prototype._applyToShaderSource = function (uniformIDMaker) {
     return this.float._applyToShaderSource(uniformIDMaker);
 }
-_Now.prototype._postShaderCompile = function (program) {
+Now.prototype._postShaderCompile = function (program) {
     return this.float._postShaderCompile(program);
 }
-_Now.prototype._preDraw = function () {
+Now.prototype._preDraw = function () {
     this.float.expr = (Date.now() * this.speed / 1000.) % 1;
     this.float._preDraw();
 }
-_Now.prototype.isAnimated = function () {
+Now.prototype.isAnimated = function () {
     return true;
 }
 
 const genBinaryOp = (jsFn, glsl) => class BinaryOperation {
     constructor(a, b) {
         if (Number.isFinite(a) && Number.isFinite(b)) {
-            return Float(jsFn(a, b));
+            return float(jsFn(a, b));
         }
         if (Number.isFinite(a)) {
-            a = Float(a);
+            a = float(a);
         }
         if (Number.isFinite(b)) {
-            b = Float(b);
+            b = float(b);
         }
         if (a.type == 'float' && b.type == 'float') {
             this.type = 'float';
@@ -257,22 +269,22 @@ const genBinaryOp = (jsFn, glsl) => class BinaryOperation {
     }
 };
 
-const FloatMulClass = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
-const FloatDivClass = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
-const FloatAddClass = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
-const FloatSubClass = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
-const FloatPowClass = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
-const FloatMul = (...args) => new FloatMulClass(...args);
-const FloatDiv = (...args) => new FloatDivClass(...args);
-const FloatAdd = (...args) => new FloatAddClass(...args);
-const FloatSub = (...args) => new FloatSubClass(...args);
-const FloatPow = (...args) => new FloatPowClass(...args);
+const floatMul = (...args) => new FloatMul(...args);
+const floatDiv = (...args) => new FloatDiv(...args);
+const floatAdd = (...args) => new FloatAdd(...args);
+const floatSub = (...args) => new FloatSub(...args);
+const floatPow = (...args) => new FloatPow(...args);
 
 const genUnaryOp = (jsFn, glsl) => class UnaryOperation {
     constructor(a) {
         if (Number.isFinite(a)) {
-            return Float(jsFn(a));
+            return float(jsFn(a));
         }
         if (a.type != 'float') {
             console.warn(a);
@@ -317,10 +329,10 @@ const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
 const log = (...args) => new Log(...args);
 const sqrt = (...args) => new Log(...args);
 
-function Animation(duration) {
-    return new _Animation(duration);
+function animation(duration) {
+    return new Animation(duration);
 }
-function _Animation(duration) {
+function Animation(duration) {
     if (!Number.isFinite(duration)) {
         throw new Error("Animation only supports number literals");
     }
@@ -328,17 +340,17 @@ function _Animation(duration) {
     this.aTime = Date.now();
     this.bTime = this.aTime + Number(duration);
 }
-_Animation.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+Animation.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float anim${this._uniformID};\n`,
         inline: `anim${this._uniformID}`
     };
 }
-_Animation.prototype._postShaderCompile = function (program) {
+Animation.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
 }
-_Animation.prototype._preDraw = function (l) {
+Animation.prototype._preDraw = function (l) {
     const time = Date.now();
     this.mix = (time - this.aTime) / (this.bTime - this.aTime);
     if (this.mix > 1.) {
@@ -347,21 +359,21 @@ _Animation.prototype._preDraw = function (l) {
         gl.uniform1f(this._uniformLocation, this.mix);
     }
 }
-_Animation.prototype.isAnimated = function () {
+Animation.prototype.isAnimated = function () {
     return !this.mix || this.mix <= 1.;
 }
 
 
 
-function Near(property, center, threshold, falloff) {
+function near(property, center, threshold, falloff) {
     const args = [property, center, threshold, falloff].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         throw new Error(`Invalid arguments to Near(): ${args}`);
     }
-    return new _Near(...args);
+    return new Near(...args);
 }
 
-function _Near(input, center, threshold, falloff) {
+function Near(input, center, threshold, falloff) {
     if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
         throw new Error('Near(): invalid parameter type');
     }
@@ -371,7 +383,7 @@ function _Near(input, center, threshold, falloff) {
     this.threshold = threshold;
     this.falloff = falloff;
 }
-_Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._UID = uniformIDMaker();
     const tid = propertyTIDMaker(this.property);
     const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
@@ -385,32 +397,32 @@ _Near.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMake
                         0., 1.)`
     };
 }
-_Near.prototype._postShaderCompile = function (program) {
+Near.prototype._postShaderCompile = function (program) {
     this.center._postShaderCompile(program);
     this.threshold._postShaderCompile(program);
     this.falloff._postShaderCompile(program);
     this.input._postShaderCompile(program);
 }
-_Near.prototype._preDraw = function () {
+Near.prototype._preDraw = function () {
     this.center._preDraw();
     this.threshold._preDraw();
     this.falloff._preDraw();
     this.input._preDraw();
 }
-_Near.prototype.isAnimated = function () {
+Near.prototype.isAnimated = function () {
     return this.center.isAnimated();
 }
 
 
 
-function Blend(a, b, mix) {
+function blend(a, b, mix) {
     const args = [a, b, mix].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         throw new Error(`Invalid arguments to Blend(): ${args}`);
     }
-    return new _Blend(...args);
+    return new Blend(...args);
 }
-function _Blend(a, b, mix) {
+function Blend(a, b, mix) {
     if (a.type == 'float' && b.type == 'float') {
         this.type = 'float';
     } else if (a.type == 'color' && b.type == 'color') {
@@ -430,7 +442,7 @@ function _Blend(a, b, mix) {
     b.parent = this;
     mix.parent = this;
 }
-_Blend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+Blend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     const mix = this.mix._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
@@ -439,23 +451,23 @@ _Blend.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMak
         inline: `mix(${a.inline}, ${b.inline}, ${mix.inline})`
     };
 }
-_Blend.prototype._postShaderCompile = function (program) {
+Blend.prototype._postShaderCompile = function (program) {
     this.a._postShaderCompile(program);
     this.b._postShaderCompile(program);
     this.mix._postShaderCompile(program);
 }
-_Blend.prototype._preDraw = function (l) {
+Blend.prototype._preDraw = function (l) {
     this.a._preDraw(l);
     this.b._preDraw(l);
     this.mix._preDraw(l);
-    if (this.mix instanceof _Animation && !this.mix.isAnimated()) {
+    if (this.mix instanceof Animation && !this.mix.isAnimated()) {
         this.parent.replaceChild(this, this.b);
     }
 }
-_Blend.prototype.isAnimated = function () {
+Blend.prototype.isAnimated = function () {
     return this.a.isAnimated() || this.b.isAnimated() || this.mix.isAnimated();
 }
-_Blend.prototype.replaceChild = function (toReplace, replacer) {
+Blend.prototype.replaceChild = function (toReplace, replacer) {
     if (this.a = toReplace) {
         this.a = replacer;
     } else {
@@ -467,53 +479,53 @@ _Blend.prototype.replaceChild = function (toReplace, replacer) {
 
 function genericBlend(initial, final, duration, blendFunc) {
     const parent = initial.parent;
-    const blend = Blend(initial, final, Animation(duration));
-    parent.replaceChild(initial, blend);
-    blend.notify();
+    const blender = blend(initial, final, animation(duration));
+    parent.replaceChild(initial, blender);
+    blender.notify();
 }
-UniformColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+Color.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericBlend(this, finalValue, duration, blendFunc);
 }
-_RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericBlend(this, finalValue, duration, blendFunc);
-}
-
-_Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericBlend(this, finalValue, duration, blendFunc);
-}
-UniformFloat.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericBlend(this, finalValue, duration, blendFunc);
-}
-_Blend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-    genericBlend(this, finalValue, duration, blendFunc);
-}
-_Property.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+RampColor.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
     genericBlend(this, finalValue, duration, blendFunc);
 }
 
+Near.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
+}
+Float.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
+}
+Blend.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
+}
+Property.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
+    genericBlend(this, finalValue, duration, blendFunc);
+}
 
-function Color(color) {
+
+function color(color) {
     if (Array.isArray(color)) {
         color = color.filter(x => true);
         if (color.length != 4 || !color.every(Number.isFinite)) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
-        return new UniformColor(color);
+        return new Color(color);
     }
     throw new Error(`Invalid arguments to Color(): ${args}`);
 }
-function UniformColor(color) {
+function Color(color) {
     this.type = 'color';
     this.color = color;
 }
-UniformColor.prototype._applyToShaderSource = function (uniformIDMaker) {
+Color.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform vec4 color${this._uniformID};\n`,
         inline: `color${this._uniformID}`
     };
 }
-UniformColor.prototype._postShaderCompile = function (program) {
+Color.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
 }
 function evalColor(color, time) {
@@ -537,35 +549,35 @@ function simplifyColorExpr(color, time) {
     }
     return color;
 }
-UniformColor.prototype._preDraw = function () {
+Color.prototype._preDraw = function () {
     const t = Date.now();
     this.color = simplifyColorExpr(this.color, t);
     const color = evalColor(this.color, t);
     gl.uniform4f(this._uniformLocation, color[0], color[1], color[2], color[3]);
 }
-UniformColor.prototype.isAnimated = function () {
+Color.prototype.isAnimated = function () {
     return false;
 }
 
-function Float(x) {
+function float(x) {
     if (!Number.isFinite(x)) {
         throw new Error(`Invalid arguments to Float(): ${args}`);
     }
-    return new UniformFloat(x);
+    return new Float(x);
 }
 
-function UniformFloat(size) {
+function Float(size) {
     this.type = 'float';
     this.expr = size;
 }
-UniformFloat.prototype._applyToShaderSource = function (uniformIDMaker) {
+Float.prototype._applyToShaderSource = function (uniformIDMaker) {
     this._uniformID = uniformIDMaker();
     return {
         preface: `uniform float float${this._uniformID};\n`,
         inline: `float${this._uniformID}`
     };
 }
-UniformFloat.prototype._postShaderCompile = function (program) {
+Float.prototype._postShaderCompile = function (program) {
     this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
 }
 function evalFloatExpr(expr, time) {
@@ -583,12 +595,12 @@ function simplifyFloatExpr(expr, time) {
     }
     return expr.simplify();
 }
-UniformFloat.prototype._preDraw = function (time) {
+Float.prototype._preDraw = function (time) {
     this.expr = simplifyFloatExpr(this.expr, time);
     const v = evalFloatExpr(this.expr, time);
     gl.uniform1f(this._uniformLocation, v);
 }
-UniformFloat.prototype.isAnimated = function () {
+Float.prototype.isAnimated = function () {
     return !Number.isFinite(this.expr);
 }
 
@@ -602,17 +614,17 @@ function hexToRgb(hex) {
 }
 
 
-function RampColor(input, minKey, maxKey, values) {
+function rampColor(input, minKey, maxKey, values) {
     //TODO contiunuos vs discrete should be decided based on input type => cartegory vs float
     const args = [input, minKey, maxKey, values].map(implicitCast);
     if (args.some(x => x === undefined || x === null)) {
         throw new Error(`Invalid arguments to RampColor(): ${args}`);
     }
-    return new _RampColor(...args);
+    return new RampColor(...args);
 }
 
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
-function _RampColor(input, minKey, maxKey, values) {
+function RampColor(input, minKey, maxKey, values) {
     this.type = 'color';
     this.input = input;
     this.minKey = minKey.expr;
@@ -652,10 +664,10 @@ function _RampColor(input, minKey, maxKey, values) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 }
 
-_RampColor.prototype._free = function () {
+RampColor.prototype._free = function () {
     gl.deleteTexture(this.texture);
 }
-_RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
+RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
     this._UID = uniformIDMaker();
     const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
     return {
@@ -667,13 +679,13 @@ _RampColor.prototype._applyToShaderSource = function (uniformIDMaker, propertyTI
         inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
     };
 }
-_RampColor.prototype._postShaderCompile = function (program) {
+RampColor.prototype._postShaderCompile = function (program) {
     this.input._postShaderCompile(program);
     this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
     this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
     this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
 }
-_RampColor.prototype._preDraw = function (l) {
+RampColor.prototype._preDraw = function (l) {
     this.input._preDraw(l);
     gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);//TODO remove hardcode
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -682,7 +694,7 @@ _RampColor.prototype._preDraw = function (l) {
     gl.uniform1f(this._keyWidthLoc, evalFloatExpr(this.maxKey) - evalFloatExpr(this.minKey));
     l.freeTexUnit++;
 }
-_RampColor.prototype.isAnimated = function () {
+RampColor.prototype.isAnimated = function () {
     return false;
 }
 
@@ -1514,7 +1526,9 @@ const styler = {
   Returns a valid style expression or throws an exception upon invalid inputs.
 */
 var lowerCaseFunctions = {};
-Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).map(name => {
+Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
+    name => name[0] == name[0].toLowerCase()
+).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
 });
 
@@ -1548,22 +1562,22 @@ function parseNode(node, schema) {
         const right = parseNode(node.right, schema);
         switch (node.operator) {
             case "*":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](left, right, schema);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right, schema);
             case "/":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"](left, right, schema);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right, schema);
             case "+":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"](left, right, schema);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right, schema);
             case "-":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"](left, right, schema);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right, schema);
             case "^":
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"](left, right, schema);
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right, schema);
             default:
                 throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
-                return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"](-1, parseNode(node.argument, schema));
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument, schema));
             case '+':
                 return parseNode(node.argument, schema);
             default:
@@ -1571,7 +1585,7 @@ function parseNode(node, schema) {
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"](node.name.substring(1), schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1), schema);
         } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]();
         }
@@ -2474,10 +2488,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatSub"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatPow"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["log"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sqrt"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Log"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Sqrt"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["near"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "color", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["color"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["float"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["rampColor"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["log"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sqrt"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
@@ -2538,13 +2564,13 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["Float"](5);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["Color"]([0, 0, 0, 1]);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["color"]([0, 0, 0, 1]);
     this._color.parent = this;
     this._color.notify = () => {
         this._compileColorShader();
