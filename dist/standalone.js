@@ -2253,9 +2253,9 @@ function refresh(timestamp) {
     });
 
 
-    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.DEPTH_TEST);
 
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2403,8 +2403,9 @@ varying highp float dp;
 varying highp float sizeNormalizer;
 
 void main(void) {
-    float size = ceil(texture2D(widthTex, featureID).a*64.);
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (size*0.9+0.05)*0.+0.5, 1.);
+    float s = texture2D(widthTex, featureID).a;
+    float size = ceil(s*64.);
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (s*0.9+0.05)*0.+0.5, 1.);
     gl_Position  = p;
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
@@ -2430,6 +2431,7 @@ void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
     c.a *= distanceAntialias(p);
+    c.rgb*=c.a;
     gl_FragColor = c;
 }`;
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;

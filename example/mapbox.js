@@ -80,6 +80,7 @@ function getData(aspect) {
             FROM tx_0125_copy_copy AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
+            ORDER BY amount DESC
         )AS geom
     `;
         var oReq = new XMLHttpRequest();
@@ -111,7 +112,7 @@ function getData(aspect) {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(Math.random())*0.;
+                properties[0][i] = Number(Math.random());
                 //properties[1][i] = Number(Math.random());
                 properties[1][i] = Number(f.properties.amount);
                 //console.log(f);
