@@ -11,11 +11,7 @@ var gl = null;
 function setGL(_gl) {
     gl = _gl;
 }
-export {
-    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV,
-    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv,
-    setGL
-};
+
 
 const schemas = {};
 Object.keys(cartocolor).map(name => {
@@ -56,8 +52,6 @@ export { schemas };
         - Think about "Date" and "string" types.
         - Heatmaps (renderer should be improved too to accommodate this)
 */
-
-//WIP, other classes should extend this
 class Expression {
     /**
      * @api
@@ -73,6 +67,11 @@ class Expression {
         Object.keys(children).map(name => this[name] = children[name]);
         this._getChildren().map(child => child.parent = this);
     }
+    /**
+     * Generate GLSL code
+     * @param {*} uniformIDMaker    fn to get unique IDs
+     * @param {*} propertyTIDMaker  fn to get property IDs and inform of used properties
+     */
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
         let childInlines = {};
@@ -82,16 +81,33 @@ class Expression {
             inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
         }
     }
+    /**
+     * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
+     * @param {*} program
+     */
     _postShaderCompile(program) {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
     }
+    /**
+     * Pre-rendering routine. Should establish related WebGL state as needed.
+     * @param {*} l
+     */
     _preDraw(l) {
         this.childrenNames.forEach(name => this[name]._preDraw(l));
     }
+    /**
+     * @api
+     * @returns true if the evaluation of the function at styling time won't be the same every time.
+     */
     isAnimated() {
         return this._getChildren().some(child => child.isAnimated());
     }
-    replaceChild(toReplace, replacer) {
+    /**
+     * Replace child *toReplace* by *replacer*
+     * @param {*} toReplace
+     * @param {*} replacer
+     */
+    _replaceChild(toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] == toReplace);
         this[name] = replacer;
         replacer.parent = this;
@@ -107,15 +123,23 @@ class Expression {
     blendTo(final, duration = 500, blendFunc = 'linear') {
         const parent = this.parent;
         const blender = blend(this, final, animation(duration));
-        parent.replaceChild(this, blender);
+        parent._replaceChild(this, blender);
         blender.notify();
     }
+    /**
+     * @returns a list with the expression children
+     */
     _getChildren() {
         return this.childrenNames.map(name => this[name]);
     }
 }
 
 class Property extends Expression {
+    /**
+     * @api
+     * @param {*} name
+     * @param {*} schema
+     */
     constructor(name, schema) {
         if (typeof name !== 'string' || name == '') {
             throw new Error(`Invalid property name '${name}'`);
@@ -129,9 +153,12 @@ class Property extends Expression {
         this.schema = schema;
     }
 }
-const property = (...args) => new Property(...args);
 
 class Now extends Expression {
+    /**
+     * @api
+     * @param {*} speed
+     */
     constructor(speed) {
         if (speed == undefined) {
             speed = 1;
@@ -155,8 +182,12 @@ class Now extends Expression {
 
 const now = (speed) => new Now(speed);
 
+//TODO convert to use uniformfloat class
 class Animation extends Expression {
-    //TODO convert to use uniformfloat class
+    /**
+     * @api
+     * @param {*} duration
+     */
     constructor(duration) {
         if (!Number.isFinite(duration)) {
             throw new Error("Animation only supports number literals");
@@ -189,10 +220,15 @@ class Animation extends Expression {
         return !this.mix || this.mix <= 1.;
     }
 }
-const animation = (...args) => new Animation(...args);
 
 
 class HSV extends Expression {
+    /**
+     * @api
+     * @param {*} h
+     * @param {*} s
+     * @param {*} v
+     */
     constructor(h, s, v) {
         h = implicitCast(h);
         s = implicitCast(s);
@@ -217,7 +253,6 @@ class HSV extends Expression {
         this.type = 'color';
     }
 };
-const hsv = (...args) => new HSV(...args);
 
 
 
@@ -255,6 +290,11 @@ const genBinaryOp = (jsFn, glsl) =>
 
 
 class SetOpacity extends Expression {
+    /**
+     * @api
+     * @param {*} a
+     * @param {*} b
+     */
     constructor(a, b) {
         if (Number.isFinite(b)) {
             b = float(b);
@@ -268,7 +308,6 @@ class SetOpacity extends Expression {
         this.type = 'color';
     }
 };
-const setOpacity = (...args) => new SetOpacity(...args);
 
 /**
 * @api
@@ -280,16 +319,6 @@ const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
-/**
- *
- * @api
- * @returns {FloatMul}
- */
-const floatMul = (...args) => new FloatMul(...args);
-const floatDiv = (...args) => new FloatDiv(...args);
-const floatAdd = (...args) => new FloatAdd(...args);
-const floatSub = (...args) => new FloatSub(...args);
-const floatPow = (...args) => new FloatPow(...args);
 
 const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
     constructor(a) {
@@ -312,17 +341,15 @@ const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
 const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
 const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 
-const log = (...args) => new Log(...args);
-const sqrt = (...args) => new Sqrt(...args);
-const sin = (...args) => new Sin(...args);
-const cos = (...args) => new Cos(...args);
-const tan = (...args) => new Tan(...args);
-const sign = (...args) => new Sign(...args);
-
-
-const near = (...args) => new Near(...args);
 
 class Near extends Expression {
+    /**
+     * @api
+     * @param {*} input
+     * @param {*} center
+     * @param {*} threshold
+     * @param {*} falloff
+     */
     constructor(input, center, threshold, falloff) {
         input = implicitCast(input);
         center = implicitCast(center);
@@ -343,6 +370,12 @@ class Near extends Expression {
 }
 
 class Blend extends Expression {
+    /**
+     * @api
+     * @param {*} a
+     * @param {*} b
+     * @param {*} mix
+     */
     constructor(a, b, mix) {
         a = implicitCast(a);
         b = implicitCast(b);
@@ -370,15 +403,17 @@ class Blend extends Expression {
     _preDraw(l) {
         super._preDraw(l);
         if (this.mix instanceof Animation && !this.mix.isAnimated()) {
-            this.parent.replaceChild(this, this.b);
+            this.parent._replaceChild(this, this.b);
         }
     }
 }
 
-const blend = (...args) => new Blend(...args);
-
 //TODO rename to uniformcolor, write color (plain, literal)
 class Color extends Expression {
+    /**
+     * @api
+     * @param {*} color
+     */
     constructor(color) {
         if (!Array.isArray(color)) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
@@ -408,8 +443,6 @@ class Color extends Expression {
         return false;
     }
 }
-const color = (...args) => new Color(...args);
-
 
 function float(x) {
     if (!Number.isFinite(x)) {
@@ -419,6 +452,10 @@ function float(x) {
 }
 
 class Float extends Expression {
+    /**
+     * @api
+     * @param {*} size
+     */
     constructor(size) {
         super({});
         this.type = 'float';
@@ -455,7 +492,21 @@ function hexToRgb(hex) {
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
 
 class RampColor extends Expression {
+    /**
+     * @api
+     * @param {*} input
+     * @param {*} minKey
+     * @param {*} maxKey
+     * @param {*} values
+     */
     constructor(input, minKey, maxKey, values) {
+        input = implicitCast(input);
+        minKey = implicitCast(minKey);
+        maxKey = implicitCast(maxKey);
+        values = implicitCast(values);
+        if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
+            throw new Error(`Invalid arguments to RampColor()`);
+        }
         super({ input: input });
         this.type = 'color';
         this.input = input;
@@ -527,11 +578,33 @@ class RampColor extends Expression {
     }
 }
 
-function rampColor(input, minKey, maxKey, values) {
-    //TODO contiunuos vs discrete should be decided based on input type => cartegory vs float
-    const args = [input, minKey, maxKey, values].map(implicitCast);
-    if (args.some(x => x === undefined || x === null)) {
-        throw new Error(`Invalid arguments to RampColor(): ${args}`);
-    }
-    return new RampColor(...args);
-}
+/**
+ *
+ * @api
+ * @returns {FloatMul}
+ */
+const floatMul = (...args) => new FloatMul(...args);
+const floatDiv = (...args) => new FloatDiv(...args);
+const floatAdd = (...args) => new FloatAdd(...args);
+const floatSub = (...args) => new FloatSub(...args);
+const floatPow = (...args) => new FloatPow(...args);
+const log = (...args) => new Log(...args);
+const sqrt = (...args) => new Sqrt(...args);
+const sin = (...args) => new Sin(...args);
+const cos = (...args) => new Cos(...args);
+const tan = (...args) => new Tan(...args);
+const sign = (...args) => new Sign(...args);
+const near = (...args) => new Near(...args);
+const blend = (...args) => new Blend(...args);
+const color = (...args) => new Color(...args);
+const property = (...args) => new Property(...args);
+const animation = (...args) => new Animation(...args);
+const hsv = (...args) => new HSV(...args);
+const setOpacity = (...args) => new SetOpacity(...args);
+const rampColor = (...args) => new RampColor(...args);
+
+export {
+    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV,
+    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv,
+    setGL
+};
