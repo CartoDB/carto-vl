@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 23);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -111,9 +111,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return hsv; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
 
 
 
@@ -198,126 +198,148 @@ Property.prototype.isAnimated = function () {
     return false;
 }
 
-function now(speed) {
-    return new Now(speed);
-}
-function Now(speed) {
-    if (speed == undefined) {
-        speed = 1;
-    }
-    if (!Number.isFinite(Number(speed))) {
-        throw new Error('Now() only accepts number literals');
-    }
-    this.speed = Number(speed);
-    this.type = 'float';
-    this.float = float(0);
-    this.init = Date.now();
-}
-Now.prototype._applyToShaderSource = function (uniformIDMaker) {
-    return this.float._applyToShaderSource(uniformIDMaker);
-}
-Now.prototype._postShaderCompile = function (program) {
-    return this.float._postShaderCompile(program);
-}
-Now.prototype._preDraw = function () {
-    this.float.expr = ((Date.now() - this.init) * this.speed / 1000.);
-    this.float._preDraw();
-}
-Now.prototype.isAnimated = function () {
-    return true;
-}
 
 //WIP, other classes should extend this
-const genExpr = (childrenNames, glslMaker) => class Expression {
+class Expression {
+    /**
+     * @api
+     * @hideconstructor
+     * @param {*} children
+     * @param {*} inlineMaker
+     * @param {*} preface
+     */
+    constructor(children, inlineMaker, preface) {
+        this.inlineMaker = inlineMaker;
+        this.preface = (preface ? preface : '');
+        this.childrenNames = Object.keys(children);
+        Object.keys(children).map(name => this[name] = children[name]);
+        this._getChildren().map(child => child.parent = this);
+    }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        //apply children
-        //append prefaces (child+this)
-        //gen inline by glsl(childInlines);
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
+            inline: this.inlineMaker(childInlines)
+        }
     }
     _postShaderCompile(program) {
-        //apply to children
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
     }
     _preDraw(l) {
-        //apply to children
+        this.childrenNames.forEach(name => this[name]._preDraw(l));
     }
     isAnimated() {
-        //get from children
+        return this._getChildren().some(child => child.isAnimated());
     }
     replaceChild(toReplace, replacer) {
-        //Check this[childName] to find
+        const name = this.childrenNames.find(name => this[name] == toReplace);
+        this[name] = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
     }
+    /**
+     * Linear interpolation between this and finalValue with the specified duration
+     * @api
+     * @param {Expression} finalValue
+     * @param {Expression} duration
+     * @param {Expression} blendFunc
+     */
     blendTo(finalValue, duration = 500, blendFunc = 'linear') {
         genericBlend(this, finalValue, duration, blendFunc);
     }
+    _getChildren() {
+        return this.childrenNames.map(name => this[name]);
+    }
 }
 
 
-class HSV {
+class Now extends Expression {
+    constructor(speed) {
+        if (speed == undefined) {
+            speed = 1;
+        }
+        if (!Number.isFinite(Number(speed))) {
+            throw new Error('Now() only accepts number literals');
+        }
+        super({ now: float(0) }, inline => inline.now);
+        this.type = 'float';
+        this.init = Date.now();
+        this.speed = speed;
+    }
+    _preDraw() {
+        this.now.expr = (Date.now() - this.init) * this.speed / 1000.;
+        this.now._preDraw();
+    }
+    isAnimated() {
+        return true;
+    }
+}
+
+const now = (speed) => new Now(speed);
+
+class HSV extends Expression {
     constructor(h, s, v) {
         h = implicitCast(h);
         s = implicitCast(s);
         v = implicitCast(v);
-
         if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
             console.warn(h, s, v);
             throw new Error(`SetOpacity cannot be performed between `);
         }
-        this.type = 'color';
-        this.h = h;
-        this.s = s;
-        this.v = v;
-        h.parent = this;
-        s.parent = this;
-        v.parent = this;
-    }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const h = this.h._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        const s = this.s._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        const v = this.v._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        return {
-            preface: h.preface + s.preface + v.preface +
-                `
-                #ifndef HSV2RGB
-                #define HSV2RGB
-                vec3 hsv2rgb(vec3 c) {
-                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-              }
-              #endif
-              `,
-            inline: `vec4(hsv2rgb(vec3(${h.inline}, clamp(${s.inline}, 0.,1.), clamp(${v.inline}, 0.,1.))), 1)`
-        };
-    }
-    _postShaderCompile(program) {
-        this.h._postShaderCompile(program);
-        this.s._postShaderCompile(program);
-        this.v._postShaderCompile(program);
-    }
-    _preDraw(l) {
-        this.h._preDraw(l);
-        this.s._preDraw(l);
-        this.v._preDraw(l);
-    }
-    isAnimated() {
-        return this.h.isAnimated() || this.s.isAnimated() || this.v.isAnimated();
-    }
-    replaceChild(toReplace, replacer) {
-        if (this.h = toReplace) {
-            this.h = replacer;
-        } else if (this.s = toReplace) {
-            this.s = replacer;
-        } else {
-            this.v = replacer;
+        super({ h: h, s: s, v: v }, inline =>
+            `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
+            ,
+            `
+        #ifndef HSV2RGB
+        #define HSV2RGB
+        vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
         }
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    }
-    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
-        genericBlend(this, finalValue, duration, blendFunc);
+        #endif
+        `);
+        this.type = 'color';
     }
 };
 const hsv = (...args) => new HSV(...args);
+
+
+
+const genBinaryOp = (jsFn, glsl) =>
+    class BinaryOperation extends Expression {
+        /**
+         * @api
+         * @name BinaryOperation
+         * @hideconstructor
+         * @augments Expression
+         * @constructor
+         * @param {*} a
+         * @param {*} b
+         */
+        constructor(a, b) {
+            if (Number.isFinite(a) && Number.isFinite(b)) {
+                return float(jsFn(a, b));
+            }
+            if (Number.isFinite(a)) {
+                a = float(a);
+            }
+            if (Number.isFinite(b)) {
+                b = float(b);
+            }
+            if (a.type == 'float' && b.type == 'float') {
+                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
+                this.type = 'float';
+            } else {
+                console.warn(a, b);
+                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
+            }
+        }
+    };
+
+
 
 class SetOpacity {
     constructor(a, b) {
@@ -369,84 +391,11 @@ class SetOpacity {
 };
 const setOpacity = (...args) => new SetOpacity(...args);
 
-const genBinaryOp = (jsFn, glsl) =>
-    class BinaryOperation {
-        /**
-         * @constructor
-         * @name BinaryOperation
-         * @param {*} a
-         * @param {*} b
-         */
-        constructor(a, b) {
-            if (Number.isFinite(a) && Number.isFinite(b)) {
-                return float(jsFn(a, b));
-            }
-            if (Number.isFinite(a)) {
-                a = float(a);
-            }
-            if (Number.isFinite(b)) {
-                b = float(b);
-            }
-            if (a.type == 'float' && b.type == 'float') {
-                this.type = 'float';
-            } else {
-                console.warn(a, b);
-                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
-            }
-            this.type = 'float';
-            this.a = a;
-            this.b = b;
-            a.parent = this;
-            b.parent = this;
-        }
-        /**
-         * @description apply shader to GLSL source code
-         * @name BinaryOperation#_applyToShaderSource
-         * @param {*} uniformIDMaker
-         * @param {*} propertyTIDMaker
-         */
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-            const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-            const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-            return {
-                preface: a.preface + b.preface,
-                inline: glsl(a.inline, b.inline)
-            };
-        }
-        _postShaderCompile(program) {
-            this.a._postShaderCompile(program);
-            this.b._postShaderCompile(program);
-        }
-        _preDraw(l) {
-            this.a._preDraw(l);
-            this.b._preDraw(l);
-        }
-        isAnimated() {
-            return this.a.isAnimated() || this.b.isAnimated();
-        }
-        replaceChild(toReplace, replacer) {
-            if (this.a = toReplace) {
-                this.a = replacer;
-            } else {
-                this.b = replacer;
-            }
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        }
-        /**
-     * @api
-     * @alias BinaryOp#blendTo
-     * @param {*} finalValue
-     * @param {*} duration
-     * @param {*} blendFunc
-     */
-        blendTo(finalValue, duration = 500, blendFunc = 'linear') {
-            genericBlend(this, finalValue, duration, blendFunc);
-        }
-    };
-
-
-const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+/**
+* @api
+* @augments {BinaryOperation}
+*/
+class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) { }
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
@@ -898,6 +847,48 @@ RampColor.prototype.isAnimated = function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemaMatch; });
+/**
+ * @api
+ * @constructor
+ * @description A schema is a list of properties with associated types.
+ *
+ * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
+ * @param {String[]} propertyNames
+ * @param {String[]} propertyTypes
+ */
+function Schema(propertyNames, propertyTypes) {
+    if (propertyNames.length != propertyTypes.length) {
+        throw new Error("propertyNames and propertyTypes lengths mismatch");
+    }
+    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
+}
+
+/**
+ * Assert that two schemas match.
+ *
+ * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
+ * @param {Schema} schemaA
+ * @param {Schema} schemaB
+ * @throws If the schemas don't match
+ */
+function checkSchemaMatch(schemaA, schemaB) {
+    if (schemaA != undefined && schemaB != undefined) {
+        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
+        if (!equals) {
+            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
+        }
+    }
+}
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(8);
@@ -981,7 +972,7 @@ const styler = {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.2
@@ -1666,15 +1657,14 @@ const styler = {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleExpression;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__functions__);
 
 
 
@@ -1756,48 +1746,6 @@ function parseNode(node, schema) {
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemaMatch; });
-/**
- * @api
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error("propertyNames and propertyTypes lengths mismatch");
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
-
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
-        }
-    }
-}
-
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1872,7 +1820,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(16);
+var Point = __webpack_require__(20);
 
 module.exports = VectorTileFeature;
 
@@ -2111,9 +2059,9 @@ function signedArea(ring) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__["a"]; });
 
@@ -2752,11 +2700,11 @@ void main(void) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Now"]; });
@@ -2936,1265 +2884,11 @@ Style.prototype.getColor = function () {
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(15);
-module.exports.VectorTileFeature = __webpack_require__(6);
-module.exports.VectorTileLayer = __webpack_require__(5);
+module.exports = __webpack_require__(15);
 
 
 /***/ }),
 /* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var VectorTileLayer = __webpack_require__(5);
-
-module.exports = VectorTile;
-
-function VectorTile(pbf, end) {
-    this.layers = pbf.readFields(readTile, {}, end);
-}
-
-function readTile(tag, layers, pbf) {
-    if (tag === 3) {
-        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
-        if (layer.length) layers[layer.name] = layer;
-    }
-}
-
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = Point;
-
-/**
- * A standalone point geometry with useful accessor, comparison, and
- * modification methods.
- *
- * @class Point
- * @param {Number} x the x-coordinate. this could be longitude or screen
- * pixels, or any other sort of unit.
- * @param {Number} y the y-coordinate. this could be latitude or screen
- * pixels, or any other sort of unit.
- * @example
- * var point = new Point(-77, 38);
- */
-function Point(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-Point.prototype = {
-
-    /**
-     * Clone this point, returning a new point that can be modified
-     * without affecting the old one.
-     * @return {Point} the clone
-     */
-    clone: function() { return new Point(this.x, this.y); },
-
-    /**
-     * Add this point's x & y coordinates to another point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    add:     function(p) { return this.clone()._add(p); },
-
-    /**
-     * Subtract this point's x & y coordinates to from point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    sub:     function(p) { return this.clone()._sub(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
-
-    /**
-     * Divide this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    mult:    function(k) { return this.clone()._mult(k); },
-
-    /**
-     * Divide this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    div:     function(k) { return this.clone()._div(k); },
-
-    /**
-     * Rotate this point around the 0, 0 origin by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @return {Point} output point
-     */
-    rotate:  function(a) { return this.clone()._rotate(a); },
-
-    /**
-     * Rotate this point around p point by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @param {Point} p Point to rotate around
-     * @return {Point} output point
-     */
-    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
-
-    /**
-     * Multiply this point by a 4x1 transformation matrix
-     * @param {Array<Number>} m transformation matrix
-     * @return {Point} output point
-     */
-    matMult: function(m) { return this.clone()._matMult(m); },
-
-    /**
-     * Calculate this point but as a unit vector from 0, 0, meaning
-     * that the distance from the resulting point to the 0, 0
-     * coordinate will be equal to 1 and the angle from the resulting
-     * point to the 0, 0 coordinate will be the same as before.
-     * @return {Point} unit vector point
-     */
-    unit:    function() { return this.clone()._unit(); },
-
-    /**
-     * Compute a perpendicular point, where the new y coordinate
-     * is the old x coordinate and the new x coordinate is the old y
-     * coordinate multiplied by -1
-     * @return {Point} perpendicular point
-     */
-    perp:    function() { return this.clone()._perp(); },
-
-    /**
-     * Return a version of this point with the x & y coordinates
-     * rounded to integers.
-     * @return {Point} rounded point
-     */
-    round:   function() { return this.clone()._round(); },
-
-    /**
-     * Return the magitude of this point: this is the Euclidean
-     * distance from the 0, 0 coordinate to this point's x and y
-     * coordinates.
-     * @return {Number} magnitude
-     */
-    mag: function() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    },
-
-    /**
-     * Judge whether this point is equal to another point, returning
-     * true or false.
-     * @param {Point} other the other point
-     * @return {boolean} whether the points are equal
-     */
-    equals: function(other) {
-        return this.x === other.x &&
-               this.y === other.y;
-    },
-
-    /**
-     * Calculate the distance from this point to another point
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    dist: function(p) {
-        return Math.sqrt(this.distSqr(p));
-    },
-
-    /**
-     * Calculate the distance from this point to another point,
-     * without the square root step. Useful if you're comparing
-     * relative distances.
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    distSqr: function(p) {
-        var dx = p.x - this.x,
-            dy = p.y - this.y;
-        return dx * dx + dy * dy;
-    },
-
-    /**
-     * Get the angle from the 0, 0 coordinate to this point, in radians
-     * coordinates.
-     * @return {Number} angle
-     */
-    angle: function() {
-        return Math.atan2(this.y, this.x);
-    },
-
-    /**
-     * Get the angle from this point to another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleTo: function(b) {
-        return Math.atan2(this.y - b.y, this.x - b.x);
-    },
-
-    /**
-     * Get the angle between this point and another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleWith: function(b) {
-        return this.angleWithSep(b.x, b.y);
-    },
-
-    /*
-     * Find the angle of the two vectors, solving the formula for
-     * the cross product a x b = |a||b|sin(θ) for θ.
-     * @param {Number} x the x-coordinate
-     * @param {Number} y the y-coordinate
-     * @return {Number} the angle in radians
-     */
-    angleWithSep: function(x, y) {
-        return Math.atan2(
-            this.x * y - this.y * x,
-            this.x * x + this.y * y);
-    },
-
-    _matMult: function(m) {
-        var x = m[0] * this.x + m[1] * this.y,
-            y = m[2] * this.x + m[3] * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _add: function(p) {
-        this.x += p.x;
-        this.y += p.y;
-        return this;
-    },
-
-    _sub: function(p) {
-        this.x -= p.x;
-        this.y -= p.y;
-        return this;
-    },
-
-    _mult: function(k) {
-        this.x *= k;
-        this.y *= k;
-        return this;
-    },
-
-    _div: function(k) {
-        this.x /= k;
-        this.y /= k;
-        return this;
-    },
-
-    _multByPoint: function(p) {
-        this.x *= p.x;
-        this.y *= p.y;
-        return this;
-    },
-
-    _divByPoint: function(p) {
-        this.x /= p.x;
-        this.y /= p.y;
-        return this;
-    },
-
-    _unit: function() {
-        this._div(this.mag());
-        return this;
-    },
-
-    _perp: function() {
-        var y = this.y;
-        this.y = this.x;
-        this.x = -y;
-        return this;
-    },
-
-    _rotate: function(angle) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = cos * this.x - sin * this.y,
-            y = sin * this.x + cos * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _rotateAround: function(angle, p) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
-            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _round: function() {
-        this.x = Math.round(this.x);
-        this.y = Math.round(this.y);
-        return this;
-    }
-};
-
-/**
- * Construct a point from an array if necessary, otherwise if the input
- * is already a Point, or an unknown type, return it unchanged
- * @param {Array<Number>|Point|*} a any kind of input value
- * @return {Point} constructed point, or passed-through value.
- * @example
- * // this
- * var point = Point.convert([0, 1]);
- * // is equivalent to
- * var point = new Point(0, 1);
- */
-Point.convert = function (a) {
-    if (a instanceof Point) {
-        return a;
-    }
-    if (Array.isArray(a)) {
-        return new Point(a[0], a[1]);
-    }
-    return a;
-};
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = Pbf;
-
-var ieee754 = __webpack_require__(18);
-
-function Pbf(buf) {
-    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
-    this.pos = 0;
-    this.type = 0;
-    this.length = this.buf.length;
-}
-
-Pbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum
-Pbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64
-Pbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields
-Pbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32
-
-var SHIFT_LEFT_32 = (1 << 16) * (1 << 16),
-    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
-
-Pbf.prototype = {
-
-    destroy: function() {
-        this.buf = null;
-    },
-
-    // === READING =================================================================
-
-    readFields: function(readField, result, end) {
-        end = end || this.length;
-
-        while (this.pos < end) {
-            var val = this.readVarint(),
-                tag = val >> 3,
-                startPos = this.pos;
-
-            this.type = val & 0x7;
-            readField(tag, result, this);
-
-            if (this.pos === startPos) this.skip(val);
-        }
-        return result;
-    },
-
-    readMessage: function(readField, result) {
-        return this.readFields(readField, result, this.readVarint() + this.pos);
-    },
-
-    readFixed32: function() {
-        var val = readUInt32(this.buf, this.pos);
-        this.pos += 4;
-        return val;
-    },
-
-    readSFixed32: function() {
-        var val = readInt32(this.buf, this.pos);
-        this.pos += 4;
-        return val;
-    },
-
-    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
-
-    readFixed64: function() {
-        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-        this.pos += 8;
-        return val;
-    },
-
-    readSFixed64: function() {
-        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-        this.pos += 8;
-        return val;
-    },
-
-    readFloat: function() {
-        var val = ieee754.read(this.buf, this.pos, true, 23, 4);
-        this.pos += 4;
-        return val;
-    },
-
-    readDouble: function() {
-        var val = ieee754.read(this.buf, this.pos, true, 52, 8);
-        this.pos += 8;
-        return val;
-    },
-
-    readVarint: function(isSigned) {
-        var buf = this.buf,
-            val, b;
-
-        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;
-        b = buf[this.pos];   val |= (b & 0x0f) << 28;
-
-        return readVarintRemainder(val, isSigned, this);
-    },
-
-    readVarint64: function() { // for compatibility with v2.0.1
-        return this.readVarint(true);
-    },
-
-    readSVarint: function() {
-        var num = this.readVarint();
-        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
-    },
-
-    readBoolean: function() {
-        return Boolean(this.readVarint());
-    },
-
-    readString: function() {
-        var end = this.readVarint() + this.pos,
-            str = readUtf8(this.buf, this.pos, end);
-        this.pos = end;
-        return str;
-    },
-
-    readBytes: function() {
-        var end = this.readVarint() + this.pos,
-            buffer = this.buf.subarray(this.pos, end);
-        this.pos = end;
-        return buffer;
-    },
-
-    // verbose for performance reasons; doesn't affect gzipped size
-
-    readPackedVarint: function(arr, isSigned) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readVarint(isSigned));
-        return arr;
-    },
-    readPackedSVarint: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSVarint());
-        return arr;
-    },
-    readPackedBoolean: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readBoolean());
-        return arr;
-    },
-    readPackedFloat: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFloat());
-        return arr;
-    },
-    readPackedDouble: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readDouble());
-        return arr;
-    },
-    readPackedFixed32: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFixed32());
-        return arr;
-    },
-    readPackedSFixed32: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSFixed32());
-        return arr;
-    },
-    readPackedFixed64: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFixed64());
-        return arr;
-    },
-    readPackedSFixed64: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSFixed64());
-        return arr;
-    },
-
-    skip: function(val) {
-        var type = val & 0x7;
-        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
-        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
-        else if (type === Pbf.Fixed32) this.pos += 4;
-        else if (type === Pbf.Fixed64) this.pos += 8;
-        else throw new Error('Unimplemented type: ' + type);
-    },
-
-    // === WRITING =================================================================
-
-    writeTag: function(tag, type) {
-        this.writeVarint((tag << 3) | type);
-    },
-
-    realloc: function(min) {
-        var length = this.length || 16;
-
-        while (length < this.pos + min) length *= 2;
-
-        if (length !== this.length) {
-            var buf = new Uint8Array(length);
-            buf.set(this.buf);
-            this.buf = buf;
-            this.length = length;
-        }
-    },
-
-    finish: function() {
-        this.length = this.pos;
-        this.pos = 0;
-        return this.buf.subarray(0, this.length);
-    },
-
-    writeFixed32: function(val) {
-        this.realloc(4);
-        writeInt32(this.buf, val, this.pos);
-        this.pos += 4;
-    },
-
-    writeSFixed32: function(val) {
-        this.realloc(4);
-        writeInt32(this.buf, val, this.pos);
-        this.pos += 4;
-    },
-
-    writeFixed64: function(val) {
-        this.realloc(8);
-        writeInt32(this.buf, val & -1, this.pos);
-        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-        this.pos += 8;
-    },
-
-    writeSFixed64: function(val) {
-        this.realloc(8);
-        writeInt32(this.buf, val & -1, this.pos);
-        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-        this.pos += 8;
-    },
-
-    writeVarint: function(val) {
-        val = +val || 0;
-
-        if (val > 0xfffffff || val < 0) {
-            writeBigVarint(val, this);
-            return;
-        }
-
-        this.realloc(4);
-
-        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] =   (val >>> 7) & 0x7f;
-    },
-
-    writeSVarint: function(val) {
-        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
-    },
-
-    writeBoolean: function(val) {
-        this.writeVarint(Boolean(val));
-    },
-
-    writeString: function(str) {
-        str = String(str);
-        this.realloc(str.length * 4);
-
-        this.pos++; // reserve 1 byte for short string length
-
-        var startPos = this.pos;
-        // write the string directly to the buffer and see how much was written
-        this.pos = writeUtf8(this.buf, str, this.pos);
-        var len = this.pos - startPos;
-
-        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
-
-        // finally, write the message length in the reserved place and restore the position
-        this.pos = startPos - 1;
-        this.writeVarint(len);
-        this.pos += len;
-    },
-
-    writeFloat: function(val) {
-        this.realloc(4);
-        ieee754.write(this.buf, val, this.pos, true, 23, 4);
-        this.pos += 4;
-    },
-
-    writeDouble: function(val) {
-        this.realloc(8);
-        ieee754.write(this.buf, val, this.pos, true, 52, 8);
-        this.pos += 8;
-    },
-
-    writeBytes: function(buffer) {
-        var len = buffer.length;
-        this.writeVarint(len);
-        this.realloc(len);
-        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];
-    },
-
-    writeRawMessage: function(fn, obj) {
-        this.pos++; // reserve 1 byte for short message length
-
-        // write the message directly to the buffer and see how much was written
-        var startPos = this.pos;
-        fn(obj, this);
-        var len = this.pos - startPos;
-
-        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
-
-        // finally, write the message length in the reserved place and restore the position
-        this.pos = startPos - 1;
-        this.writeVarint(len);
-        this.pos += len;
-    },
-
-    writeMessage: function(tag, fn, obj) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeRawMessage(fn, obj);
-    },
-
-    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },
-    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },
-    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },
-    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },
-    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },
-    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },
-    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },
-    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },
-    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },
-
-    writeBytesField: function(tag, buffer) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeBytes(buffer);
-    },
-    writeFixed32Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeFixed32(val);
-    },
-    writeSFixed32Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeSFixed32(val);
-    },
-    writeFixed64Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeFixed64(val);
-    },
-    writeSFixed64Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeSFixed64(val);
-    },
-    writeVarintField: function(tag, val) {
-        this.writeTag(tag, Pbf.Varint);
-        this.writeVarint(val);
-    },
-    writeSVarintField: function(tag, val) {
-        this.writeTag(tag, Pbf.Varint);
-        this.writeSVarint(val);
-    },
-    writeStringField: function(tag, str) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeString(str);
-    },
-    writeFloatField: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeFloat(val);
-    },
-    writeDoubleField: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeDouble(val);
-    },
-    writeBooleanField: function(tag, val) {
-        this.writeVarintField(tag, Boolean(val));
-    }
-};
-
-function readVarintRemainder(l, s, p) {
-    var buf = p.buf,
-        h, b;
-
-    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);
-
-    throw new Error('Expected varint not more than 10 bytes');
-}
-
-function readPackedEnd(pbf) {
-    return pbf.type === Pbf.Bytes ?
-        pbf.readVarint() + pbf.pos : pbf.pos + 1;
-}
-
-function toNum(low, high, isSigned) {
-    if (isSigned) {
-        return high * 0x100000000 + (low >>> 0);
-    }
-
-    return ((high >>> 0) * 0x100000000) + (low >>> 0);
-}
-
-function writeBigVarint(val, pbf) {
-    var low, high;
-
-    if (val >= 0) {
-        low  = (val % 0x100000000) | 0;
-        high = (val / 0x100000000) | 0;
-    } else {
-        low  = ~(-val % 0x100000000);
-        high = ~(-val / 0x100000000);
-
-        if (low ^ 0xffffffff) {
-            low = (low + 1) | 0;
-        } else {
-            low = 0;
-            high = (high + 1) | 0;
-        }
-    }
-
-    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {
-        throw new Error('Given varint doesn\'t fit into 10 bytes');
-    }
-
-    pbf.realloc(10);
-
-    writeBigVarintLow(low, high, pbf);
-    writeBigVarintHigh(high, pbf);
-}
-
-function writeBigVarintLow(low, high, pbf) {
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos]   = low & 0x7f;
-}
-
-function writeBigVarintHigh(high, pbf) {
-    var lsb = (high & 0x07) << 4;
-
-    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f;
-}
-
-function makeRoomForExtraLength(startPos, len, pbf) {
-    var extraLen =
-        len <= 0x3fff ? 1 :
-        len <= 0x1fffff ? 2 :
-        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
-
-    // if 1 byte isn't enough for encoding message length, shift the data to the right
-    pbf.realloc(extraLen);
-    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];
-}
-
-function writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }
-function writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }
-function writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }
-function writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }
-function writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }
-function writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }
-function writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }
-function writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }
-function writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }
-
-// Buffer code below from https://github.com/feross/buffer, MIT-licensed
-
-function readUInt32(buf, pos) {
-    return ((buf[pos]) |
-        (buf[pos + 1] << 8) |
-        (buf[pos + 2] << 16)) +
-        (buf[pos + 3] * 0x1000000);
-}
-
-function writeInt32(buf, val, pos) {
-    buf[pos] = val;
-    buf[pos + 1] = (val >>> 8);
-    buf[pos + 2] = (val >>> 16);
-    buf[pos + 3] = (val >>> 24);
-}
-
-function readInt32(buf, pos) {
-    return ((buf[pos]) |
-        (buf[pos + 1] << 8) |
-        (buf[pos + 2] << 16)) +
-        (buf[pos + 3] << 24);
-}
-
-function readUtf8(buf, pos, end) {
-    var str = '';
-    var i = pos;
-
-    while (i < end) {
-        var b0 = buf[i];
-        var c = null; // codepoint
-        var bytesPerSequence =
-            b0 > 0xEF ? 4 :
-            b0 > 0xDF ? 3 :
-            b0 > 0xBF ? 2 : 1;
-
-        if (i + bytesPerSequence > end) break;
-
-        var b1, b2, b3;
-
-        if (bytesPerSequence === 1) {
-            if (b0 < 0x80) {
-                c = b0;
-            }
-        } else if (bytesPerSequence === 2) {
-            b1 = buf[i + 1];
-            if ((b1 & 0xC0) === 0x80) {
-                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);
-                if (c <= 0x7F) {
-                    c = null;
-                }
-            }
-        } else if (bytesPerSequence === 3) {
-            b1 = buf[i + 1];
-            b2 = buf[i + 2];
-            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {
-                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);
-                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {
-                    c = null;
-                }
-            }
-        } else if (bytesPerSequence === 4) {
-            b1 = buf[i + 1];
-            b2 = buf[i + 2];
-            b3 = buf[i + 3];
-            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {
-                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);
-                if (c <= 0xFFFF || c >= 0x110000) {
-                    c = null;
-                }
-            }
-        }
-
-        if (c === null) {
-            c = 0xFFFD;
-            bytesPerSequence = 1;
-
-        } else if (c > 0xFFFF) {
-            c -= 0x10000;
-            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);
-            c = 0xDC00 | c & 0x3FF;
-        }
-
-        str += String.fromCharCode(c);
-        i += bytesPerSequence;
-    }
-
-    return str;
-}
-
-function writeUtf8(buf, str, pos) {
-    for (var i = 0, c, lead; i < str.length; i++) {
-        c = str.charCodeAt(i); // code point
-
-        if (c > 0xD7FF && c < 0xE000) {
-            if (lead) {
-                if (c < 0xDC00) {
-                    buf[pos++] = 0xEF;
-                    buf[pos++] = 0xBF;
-                    buf[pos++] = 0xBD;
-                    lead = c;
-                    continue;
-                } else {
-                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;
-                    lead = null;
-                }
-            } else {
-                if (c > 0xDBFF || (i + 1 === str.length)) {
-                    buf[pos++] = 0xEF;
-                    buf[pos++] = 0xBF;
-                    buf[pos++] = 0xBD;
-                } else {
-                    lead = c;
-                }
-                continue;
-            }
-        } else if (lead) {
-            buf[pos++] = 0xEF;
-            buf[pos++] = 0xBF;
-            buf[pos++] = 0xBD;
-            lead = null;
-        }
-
-        if (c < 0x80) {
-            buf[pos++] = c;
-        } else {
-            if (c < 0x800) {
-                buf[pos++] = c >> 0x6 | 0xC0;
-            } else {
-                if (c < 0x10000) {
-                    buf[pos++] = c >> 0xC | 0xE0;
-                } else {
-                    buf[pos++] = c >> 0x12 | 0xF0;
-                    buf[pos++] = c >> 0xC & 0x3F | 0x80;
-                }
-                buf[pos++] = c >> 0x6 & 0x3F | 0x80;
-            }
-            buf[pos++] = c & 0x3F | 0x80;
-        }
-    }
-    return pos;
-}
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
-
-
-
-var VectorTile = __webpack_require__(14).VectorTile;
-var Protobuf = __webpack_require__(17);
-
-var renderer;
-var layer;
-var oldtile;
-var ajax;
-
-function styleWidth(e) {
-    const v = document.getElementById("widthStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
-    const width = eval(v);
-    if (width) {
-        layer.style.getWidth().blendTo(width, 1000);
-    }
-}
-function styleColor(e) {
-    const v = document.getElementById("colorStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
-    const color = eval(v);
-    if (color) {
-        layer.style.getColor().blendTo(color, 1000);
-    }
-}
-
-function getData() {
-    if (ajax) {
-        ajax.abort();
-    }
-
-    var oReq = new XMLHttpRequest();
-    oReq.open("GET", "https://dmanzanares.carto.com/api/v1/map/dmanzanares@789cad67@92456f0655aac0322b2572f4e05088e7:1509358508954/mapnik/0/0/0.mvt", true);
-    oReq.responseType = "arraybuffer";
-    oReq.onload = function (oEvent) {
-        var arrayBuffer = oReq.response;
-        console.log("MVT1", arrayBuffer, oEvent, oReq);
-        if (arrayBuffer) {
-            var tile = new VectorTile(new Protobuf(arrayBuffer));
-            console.log("MVT", tile);
-            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-
-            var fieldMap = {
-                temp: 0,
-                daten: 1
-            };
-            var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
-            var points = new Float32Array(mvtLayer.length * 2);
-            for (var i = 0; i < mvtLayer.length; i++) {
-                const f = mvtLayer.feature(i);
-                const geom = f.loadGeometry();
-                //console.log(mvtLayer.feature(i).toGeoJSON(0,0,0))
-                points[2 * i + 0] = (geom[0][0].x) / 4096.0;
-                points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
-
-                properties[0][i] = Number(f.properties.temp);
-                properties[1][i] = Number(f.properties.daten);
-
-                /*Object.keys(f.properties).map(name => {
-                    if (fieldMap[name] === undefined) {
-                        fieldMap[name] = Object.keys(fieldMap).length;
-                    }
-                    var pid = fieldMap[name];
-                    if (properties[pid] === undefined) {
-                        properties[pid] = new Float32Array(mvtLayer.length);
-                    }
-                    properties[pid][i] = Number(f.properties[name]);
-                });*/
-            }
-            var tile = {
-                center: { x: 0, y: 0 },
-                scale: 1 / 1.,
-                count: mvtLayer.length,
-                geom: points,
-                properties: {}
-            };
-            Object.keys(fieldMap).map((name, pid) => {
-                tile.properties[name] = properties[pid];
-            })
-            console.log("Tile", tile);
-            oldtile = layer.addTile(tile);
-            styleWidth();
-            styleColor();
-        }
-    };
-
-    oReq.send(null);
-    /*
-        ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
-            if (oldtile) {
-                layer.removeTile(oldtile);
-            }
-            console.log("Downloaded", data);
-            const fields = Object.keys(data.fields).filter(name => name != 'st_asgeojson');
-            var properties = fields.map(_ => new Float32Array(data.rows.length));
-            var points = new Float32Array(data.rows.length * 2);
-            data.rows.forEach((e, index) => {
-                var point = $.parseJSON(e.st_asgeojson).coordinates;
-                points[2 * index + 0] = (point[0]) + Math.random() * 1000;
-                points[2 * index + 1] = (point[1]) + Math.random() * 1000;
-                fields.map((name, pid) => {
-                    properties[pid][index] = Number(e[name]);
-                });
-            });
-            var tile = {
-                center: { x: 0, y: 0 },
-                scale: 1 / 10000000.,
-                count: data.rows.length,
-                geom: points,
-                properties: {}
-            };
-            fields.map((name, pid) => {
-                tile.properties[name] = properties[pid];
-            })
-            console.log("Tile", tile);
-            oldtile = layer.addTile(tile);
-            styleWidth();
-            styleColor();
-        });*/
-}
-function start() {
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](document.getElementById('glCanvas'));
-    layer = renderer.addLayer();
-
-    getData();
-    $('#widthStyleEntry').on('input', styleWidth);
-    $('#colorStyleEntry').on('input', styleColor);
-    $('#sqlEntry').on('input', getData);
-
-    // Pan and zoom
-    window.onresize = function () { renderer.refresh(); };
-    $(window).bind('mousewheel DOMMouseScroll', function (event) {
-        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
-            renderer.setZoom(renderer.getZoom() * 0.8);
-        } else {
-            renderer.setZoom(renderer.getZoom() / 0.8);
-        }
-    });
-    var isDragging = false;
-    var draggOffset = {
-        x: 0.,
-        y: 0.
-    };
-    document.onmousedown = function (event) {
-        isDragging = true;
-        draggOffset = {
-            x: event.clientX,
-            y: event.clientY
-        };
-    };
-    document.onmousemove = function (event) {
-        if (isDragging) {
-            var c = renderer.getCenter();
-            var k = renderer.getZoom() / document.body.clientHeight * 2.;
-            c.x += (draggOffset.x - event.clientX) * k;
-            c.y += -(draggOffset.y - event.clientY) * k;
-            renderer.setCenter(c.x, c.y);
-            draggOffset = {
-                x: event.clientX,
-                y: event.clientY
-            };
-        }
-    };
-    document.onmouseup = function () {
-        isDragging = false;
-    };
-}
-
-start();
-
-/***/ }),
-/* 20 */,
-/* 21 */,
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(23);
-
-
-/***/ }),
-/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -6047,7 +4741,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(24);
+var colorbrewer = __webpack_require__(16);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -6080,14 +4774,14 @@ if (true) {
 
 
 /***/ }),
-/* 24 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(25);
+module.exports = __webpack_require__(17);
 
 
 /***/ }),
-/* 25 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -6410,6 +5104,1258 @@ if (true) {
 
 }();
 
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports.VectorTile = __webpack_require__(19);
+module.exports.VectorTileFeature = __webpack_require__(6);
+module.exports.VectorTileLayer = __webpack_require__(5);
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var VectorTileLayer = __webpack_require__(5);
+
+module.exports = VectorTile;
+
+function VectorTile(pbf, end) {
+    this.layers = pbf.readFields(readTile, {}, end);
+}
+
+function readTile(tag, layers, pbf) {
+    if (tag === 3) {
+        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
+        if (layer.length) layers[layer.name] = layer;
+    }
+}
+
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = Point;
+
+/**
+ * A standalone point geometry with useful accessor, comparison, and
+ * modification methods.
+ *
+ * @class Point
+ * @param {Number} x the x-coordinate. this could be longitude or screen
+ * pixels, or any other sort of unit.
+ * @param {Number} y the y-coordinate. this could be latitude or screen
+ * pixels, or any other sort of unit.
+ * @example
+ * var point = new Point(-77, 38);
+ */
+function Point(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+Point.prototype = {
+
+    /**
+     * Clone this point, returning a new point that can be modified
+     * without affecting the old one.
+     * @return {Point} the clone
+     */
+    clone: function() { return new Point(this.x, this.y); },
+
+    /**
+     * Add this point's x & y coordinates to another point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    add:     function(p) { return this.clone()._add(p); },
+
+    /**
+     * Subtract this point's x & y coordinates to from point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    sub:     function(p) { return this.clone()._sub(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
+
+    /**
+     * Divide this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    mult:    function(k) { return this.clone()._mult(k); },
+
+    /**
+     * Divide this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    div:     function(k) { return this.clone()._div(k); },
+
+    /**
+     * Rotate this point around the 0, 0 origin by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @return {Point} output point
+     */
+    rotate:  function(a) { return this.clone()._rotate(a); },
+
+    /**
+     * Rotate this point around p point by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @param {Point} p Point to rotate around
+     * @return {Point} output point
+     */
+    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
+
+    /**
+     * Multiply this point by a 4x1 transformation matrix
+     * @param {Array<Number>} m transformation matrix
+     * @return {Point} output point
+     */
+    matMult: function(m) { return this.clone()._matMult(m); },
+
+    /**
+     * Calculate this point but as a unit vector from 0, 0, meaning
+     * that the distance from the resulting point to the 0, 0
+     * coordinate will be equal to 1 and the angle from the resulting
+     * point to the 0, 0 coordinate will be the same as before.
+     * @return {Point} unit vector point
+     */
+    unit:    function() { return this.clone()._unit(); },
+
+    /**
+     * Compute a perpendicular point, where the new y coordinate
+     * is the old x coordinate and the new x coordinate is the old y
+     * coordinate multiplied by -1
+     * @return {Point} perpendicular point
+     */
+    perp:    function() { return this.clone()._perp(); },
+
+    /**
+     * Return a version of this point with the x & y coordinates
+     * rounded to integers.
+     * @return {Point} rounded point
+     */
+    round:   function() { return this.clone()._round(); },
+
+    /**
+     * Return the magitude of this point: this is the Euclidean
+     * distance from the 0, 0 coordinate to this point's x and y
+     * coordinates.
+     * @return {Number} magnitude
+     */
+    mag: function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    },
+
+    /**
+     * Judge whether this point is equal to another point, returning
+     * true or false.
+     * @param {Point} other the other point
+     * @return {boolean} whether the points are equal
+     */
+    equals: function(other) {
+        return this.x === other.x &&
+               this.y === other.y;
+    },
+
+    /**
+     * Calculate the distance from this point to another point
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    dist: function(p) {
+        return Math.sqrt(this.distSqr(p));
+    },
+
+    /**
+     * Calculate the distance from this point to another point,
+     * without the square root step. Useful if you're comparing
+     * relative distances.
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    distSqr: function(p) {
+        var dx = p.x - this.x,
+            dy = p.y - this.y;
+        return dx * dx + dy * dy;
+    },
+
+    /**
+     * Get the angle from the 0, 0 coordinate to this point, in radians
+     * coordinates.
+     * @return {Number} angle
+     */
+    angle: function() {
+        return Math.atan2(this.y, this.x);
+    },
+
+    /**
+     * Get the angle from this point to another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleTo: function(b) {
+        return Math.atan2(this.y - b.y, this.x - b.x);
+    },
+
+    /**
+     * Get the angle between this point and another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleWith: function(b) {
+        return this.angleWithSep(b.x, b.y);
+    },
+
+    /*
+     * Find the angle of the two vectors, solving the formula for
+     * the cross product a x b = |a||b|sin(θ) for θ.
+     * @param {Number} x the x-coordinate
+     * @param {Number} y the y-coordinate
+     * @return {Number} the angle in radians
+     */
+    angleWithSep: function(x, y) {
+        return Math.atan2(
+            this.x * y - this.y * x,
+            this.x * x + this.y * y);
+    },
+
+    _matMult: function(m) {
+        var x = m[0] * this.x + m[1] * this.y,
+            y = m[2] * this.x + m[3] * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _add: function(p) {
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    },
+
+    _sub: function(p) {
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    },
+
+    _mult: function(k) {
+        this.x *= k;
+        this.y *= k;
+        return this;
+    },
+
+    _div: function(k) {
+        this.x /= k;
+        this.y /= k;
+        return this;
+    },
+
+    _multByPoint: function(p) {
+        this.x *= p.x;
+        this.y *= p.y;
+        return this;
+    },
+
+    _divByPoint: function(p) {
+        this.x /= p.x;
+        this.y /= p.y;
+        return this;
+    },
+
+    _unit: function() {
+        this._div(this.mag());
+        return this;
+    },
+
+    _perp: function() {
+        var y = this.y;
+        this.y = this.x;
+        this.x = -y;
+        return this;
+    },
+
+    _rotate: function(angle) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = cos * this.x - sin * this.y,
+            y = sin * this.x + cos * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _rotateAround: function(angle, p) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
+            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+};
+
+/**
+ * Construct a point from an array if necessary, otherwise if the input
+ * is already a Point, or an unknown type, return it unchanged
+ * @param {Array<Number>|Point|*} a any kind of input value
+ * @return {Point} constructed point, or passed-through value.
+ * @example
+ * // this
+ * var point = Point.convert([0, 1]);
+ * // is equivalent to
+ * var point = new Point(0, 1);
+ */
+Point.convert = function (a) {
+    if (a instanceof Point) {
+        return a;
+    }
+    if (Array.isArray(a)) {
+        return new Point(a[0], a[1]);
+    }
+    return a;
+};
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = Pbf;
+
+var ieee754 = __webpack_require__(22);
+
+function Pbf(buf) {
+    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
+    this.pos = 0;
+    this.type = 0;
+    this.length = this.buf.length;
+}
+
+Pbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum
+Pbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64
+Pbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields
+Pbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32
+
+var SHIFT_LEFT_32 = (1 << 16) * (1 << 16),
+    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
+
+Pbf.prototype = {
+
+    destroy: function() {
+        this.buf = null;
+    },
+
+    // === READING =================================================================
+
+    readFields: function(readField, result, end) {
+        end = end || this.length;
+
+        while (this.pos < end) {
+            var val = this.readVarint(),
+                tag = val >> 3,
+                startPos = this.pos;
+
+            this.type = val & 0x7;
+            readField(tag, result, this);
+
+            if (this.pos === startPos) this.skip(val);
+        }
+        return result;
+    },
+
+    readMessage: function(readField, result) {
+        return this.readFields(readField, result, this.readVarint() + this.pos);
+    },
+
+    readFixed32: function() {
+        var val = readUInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    readSFixed32: function() {
+        var val = readInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
+
+    readFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readSFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readFloat: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 23, 4);
+        this.pos += 4;
+        return val;
+    },
+
+    readDouble: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 52, 8);
+        this.pos += 8;
+        return val;
+    },
+
+    readVarint: function(isSigned) {
+        var buf = this.buf,
+            val, b;
+
+        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;
+        b = buf[this.pos];   val |= (b & 0x0f) << 28;
+
+        return readVarintRemainder(val, isSigned, this);
+    },
+
+    readVarint64: function() { // for compatibility with v2.0.1
+        return this.readVarint(true);
+    },
+
+    readSVarint: function() {
+        var num = this.readVarint();
+        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
+    },
+
+    readBoolean: function() {
+        return Boolean(this.readVarint());
+    },
+
+    readString: function() {
+        var end = this.readVarint() + this.pos,
+            str = readUtf8(this.buf, this.pos, end);
+        this.pos = end;
+        return str;
+    },
+
+    readBytes: function() {
+        var end = this.readVarint() + this.pos,
+            buffer = this.buf.subarray(this.pos, end);
+        this.pos = end;
+        return buffer;
+    },
+
+    // verbose for performance reasons; doesn't affect gzipped size
+
+    readPackedVarint: function(arr, isSigned) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readVarint(isSigned));
+        return arr;
+    },
+    readPackedSVarint: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSVarint());
+        return arr;
+    },
+    readPackedBoolean: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readBoolean());
+        return arr;
+    },
+    readPackedFloat: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFloat());
+        return arr;
+    },
+    readPackedDouble: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readDouble());
+        return arr;
+    },
+    readPackedFixed32: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFixed32());
+        return arr;
+    },
+    readPackedSFixed32: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSFixed32());
+        return arr;
+    },
+    readPackedFixed64: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFixed64());
+        return arr;
+    },
+    readPackedSFixed64: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSFixed64());
+        return arr;
+    },
+
+    skip: function(val) {
+        var type = val & 0x7;
+        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
+        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
+        else if (type === Pbf.Fixed32) this.pos += 4;
+        else if (type === Pbf.Fixed64) this.pos += 8;
+        else throw new Error('Unimplemented type: ' + type);
+    },
+
+    // === WRITING =================================================================
+
+    writeTag: function(tag, type) {
+        this.writeVarint((tag << 3) | type);
+    },
+
+    realloc: function(min) {
+        var length = this.length || 16;
+
+        while (length < this.pos + min) length *= 2;
+
+        if (length !== this.length) {
+            var buf = new Uint8Array(length);
+            buf.set(this.buf);
+            this.buf = buf;
+            this.length = length;
+        }
+    },
+
+    finish: function() {
+        this.length = this.pos;
+        this.pos = 0;
+        return this.buf.subarray(0, this.length);
+    },
+
+    writeFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeSFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeSFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeVarint: function(val) {
+        val = +val || 0;
+
+        if (val > 0xfffffff || val < 0) {
+            writeBigVarint(val, this);
+            return;
+        }
+
+        this.realloc(4);
+
+        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] =   (val >>> 7) & 0x7f;
+    },
+
+    writeSVarint: function(val) {
+        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
+    },
+
+    writeBoolean: function(val) {
+        this.writeVarint(Boolean(val));
+    },
+
+    writeString: function(str) {
+        str = String(str);
+        this.realloc(str.length * 4);
+
+        this.pos++; // reserve 1 byte for short string length
+
+        var startPos = this.pos;
+        // write the string directly to the buffer and see how much was written
+        this.pos = writeUtf8(this.buf, str, this.pos);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeFloat: function(val) {
+        this.realloc(4);
+        ieee754.write(this.buf, val, this.pos, true, 23, 4);
+        this.pos += 4;
+    },
+
+    writeDouble: function(val) {
+        this.realloc(8);
+        ieee754.write(this.buf, val, this.pos, true, 52, 8);
+        this.pos += 8;
+    },
+
+    writeBytes: function(buffer) {
+        var len = buffer.length;
+        this.writeVarint(len);
+        this.realloc(len);
+        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];
+    },
+
+    writeRawMessage: function(fn, obj) {
+        this.pos++; // reserve 1 byte for short message length
+
+        // write the message directly to the buffer and see how much was written
+        var startPos = this.pos;
+        fn(obj, this);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeMessage: function(tag, fn, obj) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeRawMessage(fn, obj);
+    },
+
+    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },
+    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },
+    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },
+    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },
+    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },
+    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },
+    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },
+    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },
+    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },
+
+    writeBytesField: function(tag, buffer) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeBytes(buffer);
+    },
+    writeFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFixed32(val);
+    },
+    writeSFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeSFixed32(val);
+    },
+    writeFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeFixed64(val);
+    },
+    writeSFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeSFixed64(val);
+    },
+    writeVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeVarint(val);
+    },
+    writeSVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeSVarint(val);
+    },
+    writeStringField: function(tag, str) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeString(str);
+    },
+    writeFloatField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFloat(val);
+    },
+    writeDoubleField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeDouble(val);
+    },
+    writeBooleanField: function(tag, val) {
+        this.writeVarintField(tag, Boolean(val));
+    }
+};
+
+function readVarintRemainder(l, s, p) {
+    var buf = p.buf,
+        h, b;
+
+    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);
+
+    throw new Error('Expected varint not more than 10 bytes');
+}
+
+function readPackedEnd(pbf) {
+    return pbf.type === Pbf.Bytes ?
+        pbf.readVarint() + pbf.pos : pbf.pos + 1;
+}
+
+function toNum(low, high, isSigned) {
+    if (isSigned) {
+        return high * 0x100000000 + (low >>> 0);
+    }
+
+    return ((high >>> 0) * 0x100000000) + (low >>> 0);
+}
+
+function writeBigVarint(val, pbf) {
+    var low, high;
+
+    if (val >= 0) {
+        low  = (val % 0x100000000) | 0;
+        high = (val / 0x100000000) | 0;
+    } else {
+        low  = ~(-val % 0x100000000);
+        high = ~(-val / 0x100000000);
+
+        if (low ^ 0xffffffff) {
+            low = (low + 1) | 0;
+        } else {
+            low = 0;
+            high = (high + 1) | 0;
+        }
+    }
+
+    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {
+        throw new Error('Given varint doesn\'t fit into 10 bytes');
+    }
+
+    pbf.realloc(10);
+
+    writeBigVarintLow(low, high, pbf);
+    writeBigVarintHigh(high, pbf);
+}
+
+function writeBigVarintLow(low, high, pbf) {
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos]   = low & 0x7f;
+}
+
+function writeBigVarintHigh(high, pbf) {
+    var lsb = (high & 0x07) << 4;
+
+    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f;
+}
+
+function makeRoomForExtraLength(startPos, len, pbf) {
+    var extraLen =
+        len <= 0x3fff ? 1 :
+        len <= 0x1fffff ? 2 :
+        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
+
+    // if 1 byte isn't enough for encoding message length, shift the data to the right
+    pbf.realloc(extraLen);
+    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];
+}
+
+function writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }
+function writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }
+function writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }
+function writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }
+function writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }
+function writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }
+function writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }
+function writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }
+function writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }
+
+// Buffer code below from https://github.com/feross/buffer, MIT-licensed
+
+function readUInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] * 0x1000000);
+}
+
+function writeInt32(buf, val, pos) {
+    buf[pos] = val;
+    buf[pos + 1] = (val >>> 8);
+    buf[pos + 2] = (val >>> 16);
+    buf[pos + 3] = (val >>> 24);
+}
+
+function readInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] << 24);
+}
+
+function readUtf8(buf, pos, end) {
+    var str = '';
+    var i = pos;
+
+    while (i < end) {
+        var b0 = buf[i];
+        var c = null; // codepoint
+        var bytesPerSequence =
+            b0 > 0xEF ? 4 :
+            b0 > 0xDF ? 3 :
+            b0 > 0xBF ? 2 : 1;
+
+        if (i + bytesPerSequence > end) break;
+
+        var b1, b2, b3;
+
+        if (bytesPerSequence === 1) {
+            if (b0 < 0x80) {
+                c = b0;
+            }
+        } else if (bytesPerSequence === 2) {
+            b1 = buf[i + 1];
+            if ((b1 & 0xC0) === 0x80) {
+                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);
+                if (c <= 0x7F) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 3) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);
+                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 4) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            b3 = buf[i + 3];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);
+                if (c <= 0xFFFF || c >= 0x110000) {
+                    c = null;
+                }
+            }
+        }
+
+        if (c === null) {
+            c = 0xFFFD;
+            bytesPerSequence = 1;
+
+        } else if (c > 0xFFFF) {
+            c -= 0x10000;
+            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);
+            c = 0xDC00 | c & 0x3FF;
+        }
+
+        str += String.fromCharCode(c);
+        i += bytesPerSequence;
+    }
+
+    return str;
+}
+
+function writeUtf8(buf, str, pos) {
+    for (var i = 0, c, lead; i < str.length; i++) {
+        c = str.charCodeAt(i); // code point
+
+        if (c > 0xD7FF && c < 0xE000) {
+            if (lead) {
+                if (c < 0xDC00) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                    lead = c;
+                    continue;
+                } else {
+                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;
+                    lead = null;
+                }
+            } else {
+                if (c > 0xDBFF || (i + 1 === str.length)) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                } else {
+                    lead = c;
+                }
+                continue;
+            }
+        } else if (lead) {
+            buf[pos++] = 0xEF;
+            buf[pos++] = 0xBF;
+            buf[pos++] = 0xBD;
+            lead = null;
+        }
+
+        if (c < 0x80) {
+            buf[pos++] = c;
+        } else {
+            if (c < 0x800) {
+                buf[pos++] = c >> 0x6 | 0xC0;
+            } else {
+                if (c < 0x10000) {
+                    buf[pos++] = c >> 0xC | 0xE0;
+                } else {
+                    buf[pos++] = c >> 0x12 | 0xF0;
+                    buf[pos++] = c >> 0xC & 0x3F | 0x80;
+                }
+                buf[pos++] = c >> 0x6 & 0x3F | 0x80;
+            }
+            buf[pos++] = c & 0x3F | 0x80;
+        }
+    }
+    return pos;
+}
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
+
+
+
+var VectorTile = __webpack_require__(18).VectorTile;
+var Protobuf = __webpack_require__(21);
+
+var renderer;
+var layer;
+var oldtile;
+var ajax;
+
+function styleWidth(e) {
+    const v = document.getElementById("widthStyleEntry").value;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
+    const width = eval(v);
+    if (width) {
+        layer.style.getWidth().blendTo(width, 1000);
+    }
+}
+function styleColor(e) {
+    const v = document.getElementById("colorStyleEntry").value;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
+    const color = eval(v);
+    if (color) {
+        layer.style.getColor().blendTo(color, 1000);
+    }
+}
+
+function getData() {
+    if (ajax) {
+        ajax.abort();
+    }
+
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", "https://dmanzanares.carto.com/api/v1/map/dmanzanares@789cad67@92456f0655aac0322b2572f4e05088e7:1509358508954/mapnik/0/0/0.mvt", true);
+    oReq.responseType = "arraybuffer";
+    oReq.onload = function (oEvent) {
+        var arrayBuffer = oReq.response;
+        console.log("MVT1", arrayBuffer, oEvent, oReq);
+        if (arrayBuffer) {
+            var tile = new VectorTile(new Protobuf(arrayBuffer));
+            console.log("MVT", tile);
+            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+
+            var fieldMap = {
+                temp: 0,
+                daten: 1
+            };
+            var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+            var points = new Float32Array(mvtLayer.length * 2);
+            for (var i = 0; i < mvtLayer.length; i++) {
+                const f = mvtLayer.feature(i);
+                const geom = f.loadGeometry();
+                //console.log(mvtLayer.feature(i).toGeoJSON(0,0,0))
+                points[2 * i + 0] = (geom[0][0].x) / 4096.0;
+                points[2 * i + 1] = 1. - (geom[0][0].y) / 4096.0;
+
+                properties[0][i] = Number(f.properties.temp);
+                properties[1][i] = Number(f.properties.daten);
+
+                /*Object.keys(f.properties).map(name => {
+                    if (fieldMap[name] === undefined) {
+                        fieldMap[name] = Object.keys(fieldMap).length;
+                    }
+                    var pid = fieldMap[name];
+                    if (properties[pid] === undefined) {
+                        properties[pid] = new Float32Array(mvtLayer.length);
+                    }
+                    properties[pid][i] = Number(f.properties[name]);
+                });*/
+            }
+            var tile = {
+                center: { x: 0, y: 0 },
+                scale: 1 / 1.,
+                count: mvtLayer.length,
+                geom: points,
+                properties: {}
+            };
+            Object.keys(fieldMap).map((name, pid) => {
+                tile.properties[name] = properties[pid];
+            })
+            console.log("Tile", tile);
+            oldtile = layer.addTile(tile);
+            styleWidth();
+            styleColor();
+        }
+    };
+
+    oReq.send(null);
+    /*
+        ajax = $.getJSON("https://dmanzanares.carto.com/api/v2/sql?q=" + encodeURIComponent(document.getElementById("sqlEntry").value) + "&api_key=d9d686df65842a8fddbd186711255ce5d19aa9b8", function (data) {
+            if (oldtile) {
+                layer.removeTile(oldtile);
+            }
+            console.log("Downloaded", data);
+            const fields = Object.keys(data.fields).filter(name => name != 'st_asgeojson');
+            var properties = fields.map(_ => new Float32Array(data.rows.length));
+            var points = new Float32Array(data.rows.length * 2);
+            data.rows.forEach((e, index) => {
+                var point = $.parseJSON(e.st_asgeojson).coordinates;
+                points[2 * index + 0] = (point[0]) + Math.random() * 1000;
+                points[2 * index + 1] = (point[1]) + Math.random() * 1000;
+                fields.map((name, pid) => {
+                    properties[pid][index] = Number(e[name]);
+                });
+            });
+            var tile = {
+                center: { x: 0, y: 0 },
+                scale: 1 / 10000000.,
+                count: data.rows.length,
+                geom: points,
+                properties: {}
+            };
+            fields.map((name, pid) => {
+                tile.properties[name] = properties[pid];
+            })
+            console.log("Tile", tile);
+            oldtile = layer.addTile(tile);
+            styleWidth();
+            styleColor();
+        });*/
+}
+function start() {
+    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](document.getElementById('glCanvas'));
+    layer = renderer.addLayer();
+
+    getData();
+    $('#widthStyleEntry').on('input', styleWidth);
+    $('#colorStyleEntry').on('input', styleColor);
+    $('#sqlEntry').on('input', getData);
+
+    // Pan and zoom
+    window.onresize = function () { renderer.refresh(); };
+    $(window).bind('mousewheel DOMMouseScroll', function (event) {
+        if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) {
+            renderer.setZoom(renderer.getZoom() * 0.8);
+        } else {
+            renderer.setZoom(renderer.getZoom() / 0.8);
+        }
+    });
+    var isDragging = false;
+    var draggOffset = {
+        x: 0.,
+        y: 0.
+    };
+    document.onmousedown = function (event) {
+        isDragging = true;
+        draggOffset = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    };
+    document.onmousemove = function (event) {
+        if (isDragging) {
+            var c = renderer.getCenter();
+            var k = renderer.getZoom() / document.body.clientHeight * 2.;
+            c.x += (draggOffset.x - event.clientX) * k;
+            c.y += -(draggOffset.y - event.clientY) * k;
+            renderer.setCenter(c.x, c.y);
+            draggOffset = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        }
+    };
+    document.onmouseup = function () {
+        isDragging = false;
+    };
+}
+
+start();
 
 /***/ })
 /******/ ]);

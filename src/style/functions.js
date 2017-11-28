@@ -86,126 +86,148 @@ Property.prototype.isAnimated = function () {
     return false;
 }
 
-function now(speed) {
-    return new Now(speed);
-}
-function Now(speed) {
-    if (speed == undefined) {
-        speed = 1;
-    }
-    if (!Number.isFinite(Number(speed))) {
-        throw new Error('Now() only accepts number literals');
-    }
-    this.speed = Number(speed);
-    this.type = 'float';
-    this.float = float(0);
-    this.init = Date.now();
-}
-Now.prototype._applyToShaderSource = function (uniformIDMaker) {
-    return this.float._applyToShaderSource(uniformIDMaker);
-}
-Now.prototype._postShaderCompile = function (program) {
-    return this.float._postShaderCompile(program);
-}
-Now.prototype._preDraw = function () {
-    this.float.expr = ((Date.now() - this.init) * this.speed / 1000.);
-    this.float._preDraw();
-}
-Now.prototype.isAnimated = function () {
-    return true;
-}
 
 //WIP, other classes should extend this
-const genExpr = (childrenNames, glslMaker) => class Expression {
+class Expression {
+    /**
+     * @api
+     * @hideconstructor
+     * @param {*} children
+     * @param {*} inlineMaker
+     * @param {*} preface
+     */
+    constructor(children, inlineMaker, preface) {
+        this.inlineMaker = inlineMaker;
+        this.preface = (preface ? preface : '');
+        this.childrenNames = Object.keys(children);
+        Object.keys(children).map(name => this[name] = children[name]);
+        this._getChildren().map(child => child.parent = this);
+    }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        //apply children
-        //append prefaces (child+this)
-        //gen inline by glsl(childInlines);
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
+            inline: this.inlineMaker(childInlines)
+        }
     }
     _postShaderCompile(program) {
-        //apply to children
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
     }
     _preDraw(l) {
-        //apply to children
+        this.childrenNames.forEach(name => this[name]._preDraw(l));
     }
     isAnimated() {
-        //get from children
+        return this._getChildren().some(child => child.isAnimated());
     }
     replaceChild(toReplace, replacer) {
-        //Check this[childName] to find
+        const name = this.childrenNames.find(name => this[name] == toReplace);
+        this[name] = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
     }
+    /**
+     * Linear interpolation between this and finalValue with the specified duration
+     * @api
+     * @param {Expression} finalValue
+     * @param {Expression} duration
+     * @param {Expression} blendFunc
+     */
     blendTo(finalValue, duration = 500, blendFunc = 'linear') {
         genericBlend(this, finalValue, duration, blendFunc);
     }
+    _getChildren() {
+        return this.childrenNames.map(name => this[name]);
+    }
 }
 
 
-class HSV {
+class Now extends Expression {
+    constructor(speed) {
+        if (speed == undefined) {
+            speed = 1;
+        }
+        if (!Number.isFinite(Number(speed))) {
+            throw new Error('Now() only accepts number literals');
+        }
+        super({ now: float(0) }, inline => inline.now);
+        this.type = 'float';
+        this.init = Date.now();
+        this.speed = speed;
+    }
+    _preDraw() {
+        this.now.expr = (Date.now() - this.init) * this.speed / 1000.;
+        this.now._preDraw();
+    }
+    isAnimated() {
+        return true;
+    }
+}
+
+const now = (speed) => new Now(speed);
+
+class HSV extends Expression {
     constructor(h, s, v) {
         h = implicitCast(h);
         s = implicitCast(s);
         v = implicitCast(v);
-
         if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
             console.warn(h, s, v);
             throw new Error(`SetOpacity cannot be performed between `);
         }
-        this.type = 'color';
-        this.h = h;
-        this.s = s;
-        this.v = v;
-        h.parent = this;
-        s.parent = this;
-        v.parent = this;
-    }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const h = this.h._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        const s = this.s._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        const v = this.v._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        return {
-            preface: h.preface + s.preface + v.preface +
-                `
-                #ifndef HSV2RGB
-                #define HSV2RGB
-                vec3 hsv2rgb(vec3 c) {
-                vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-                vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-                return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-              }
-              #endif
-              `,
-            inline: `vec4(hsv2rgb(vec3(${h.inline}, clamp(${s.inline}, 0.,1.), clamp(${v.inline}, 0.,1.))), 1)`
-        };
-    }
-    _postShaderCompile(program) {
-        this.h._postShaderCompile(program);
-        this.s._postShaderCompile(program);
-        this.v._postShaderCompile(program);
-    }
-    _preDraw(l) {
-        this.h._preDraw(l);
-        this.s._preDraw(l);
-        this.v._preDraw(l);
-    }
-    isAnimated() {
-        return this.h.isAnimated() || this.s.isAnimated() || this.v.isAnimated();
-    }
-    replaceChild(toReplace, replacer) {
-        if (this.h = toReplace) {
-            this.h = replacer;
-        } else if (this.s = toReplace) {
-            this.s = replacer;
-        } else {
-            this.v = replacer;
+        super({ h: h, s: s, v: v }, inline =>
+            `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
+            ,
+            `
+        #ifndef HSV2RGB
+        #define HSV2RGB
+        vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
         }
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    }
-    blendTo(finalValue, duration = 500, blendFunc = 'linear') {
-        genericBlend(this, finalValue, duration, blendFunc);
+        #endif
+        `);
+        this.type = 'color';
     }
 };
 const hsv = (...args) => new HSV(...args);
+
+
+
+const genBinaryOp = (jsFn, glsl) =>
+    class BinaryOperation extends Expression {
+        /**
+         * @api
+         * @name BinaryOperation
+         * @hideconstructor
+         * @augments Expression
+         * @constructor
+         * @param {*} a
+         * @param {*} b
+         */
+        constructor(a, b) {
+            if (Number.isFinite(a) && Number.isFinite(b)) {
+                return float(jsFn(a, b));
+            }
+            if (Number.isFinite(a)) {
+                a = float(a);
+            }
+            if (Number.isFinite(b)) {
+                b = float(b);
+            }
+            if (a.type == 'float' && b.type == 'float') {
+                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
+                this.type = 'float';
+            } else {
+                console.warn(a, b);
+                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
+            }
+        }
+    };
+
+
 
 class SetOpacity {
     constructor(a, b) {
@@ -257,84 +279,11 @@ class SetOpacity {
 };
 const setOpacity = (...args) => new SetOpacity(...args);
 
-const genBinaryOp = (jsFn, glsl) =>
-    class BinaryOperation {
-        /**
-         * @constructor
-         * @name BinaryOperation
-         * @param {*} a
-         * @param {*} b
-         */
-        constructor(a, b) {
-            if (Number.isFinite(a) && Number.isFinite(b)) {
-                return float(jsFn(a, b));
-            }
-            if (Number.isFinite(a)) {
-                a = float(a);
-            }
-            if (Number.isFinite(b)) {
-                b = float(b);
-            }
-            if (a.type == 'float' && b.type == 'float') {
-                this.type = 'float';
-            } else {
-                console.warn(a, b);
-                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
-            }
-            this.type = 'float';
-            this.a = a;
-            this.b = b;
-            a.parent = this;
-            b.parent = this;
-        }
-        /**
-         * @description apply shader to GLSL source code
-         * @name BinaryOperation#_applyToShaderSource
-         * @param {*} uniformIDMaker
-         * @param {*} propertyTIDMaker
-         */
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-            const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-            const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-            return {
-                preface: a.preface + b.preface,
-                inline: glsl(a.inline, b.inline)
-            };
-        }
-        _postShaderCompile(program) {
-            this.a._postShaderCompile(program);
-            this.b._postShaderCompile(program);
-        }
-        _preDraw(l) {
-            this.a._preDraw(l);
-            this.b._preDraw(l);
-        }
-        isAnimated() {
-            return this.a.isAnimated() || this.b.isAnimated();
-        }
-        replaceChild(toReplace, replacer) {
-            if (this.a = toReplace) {
-                this.a = replacer;
-            } else {
-                this.b = replacer;
-            }
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        }
-        /**
-     * @api
-     * @alias BinaryOp#blendTo
-     * @param {*} finalValue
-     * @param {*} duration
-     * @param {*} blendFunc
-     */
-        blendTo(finalValue, duration = 500, blendFunc = 'linear') {
-            genericBlend(this, finalValue, duration, blendFunc);
-        }
-    };
-
-
-const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+/**
+* @api
+* @augments {BinaryOperation}
+*/
+class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) { }
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
