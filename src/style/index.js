@@ -91,7 +91,7 @@ Style.prototype.setWidth = function (float) {
     };
     float.notify();
 }
-Style.prototype.replaceChild = function (toReplace, replacer) {
+Style.prototype._replaceChild = function (toReplace, replacer) {
     if (toReplace == this._color) {
         this._color = replacer;
         replacer.parent = this;
