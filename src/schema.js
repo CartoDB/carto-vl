@@ -1,8 +1,11 @@
 /**
  * @api
  * @constructor
- * @param {*} propertyNames
- * @param {*} propertyTypes
+ * @description A schema is a list of properties with associated types.
+ *
+ * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
+ * @param {String[]} propertyNames
+ * @param {String[]} propertyTypes
  */
 function Schema(propertyNames, propertyTypes) {
     if (propertyNames.length != propertyTypes.length) {
@@ -12,12 +15,15 @@ function Schema(propertyNames, propertyTypes) {
 }
 
 /**
+ * Assert that two schemas match.
  *
- * @param {*} schemaA
- * @param {*} schemaB
+ * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
+ * @param {Schema} schemaA
+ * @param {Schema} schemaB
+ * @throws If the schemas don't match
  */
-function checkschemaMatch(schemaA, schemaB) {
-    if (schemaA && schemaB) {
+function checkSchemaMatch(schemaA, schemaB) {
+    if (schemaA != undefined && schemaB != undefined) {
         const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
         if (!equals) {
             throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
@@ -25,4 +31,4 @@ function checkschemaMatch(schemaA, schemaB) {
     }
 }
 
-export {Schema, checkschemaMatch};
+export { Schema, checkSchemaMatch };

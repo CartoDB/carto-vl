@@ -12,14 +12,14 @@ export { Schema } from './schema';
  * @property {number} y
  */
 
- /**
- * @api
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
- */
+/**
+* @api
+* @typedef {object} Dataframe - Point in renderer coordinates space
+* @property {RPoint} center
+* @property {number} scale
+* @property {geom} geometry
+* @property {Properties} properties
+*/
 
 
 // TODO remove
@@ -130,12 +130,28 @@ Renderer.prototype.removeDataframe = function (dataframe) {
 };
 
 /**
+ * @constructor
+ * @api
+ */
+function Dataframse() {
+}
+/**
+ * @api
+ * Aply a style
+ * @param style
+ */
+Dataframse.prototype.applyStyle = function (style) {
+
+}
+
+/**
  * @api
  * @description Adds a new dataframe to the renderer.
  *
  * Performance-intensive. The required allocation and copy of resources will happen synchronously.
  * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
  * @param {Dataframe} dataframe
+ * @returns {Dataframse} asd
  */
 Renderer.prototype.addDataframe = function (tile) {
     this.tiles.push(tile);
@@ -181,7 +197,7 @@ Renderer.prototype.addDataframe = function (tile) {
     }
 
     tile.setStyle = function (style) {
-        schema.checkschemaMatch(style.schema, tile.schema);
+        schema.checkSchemaMatch(style.schema, tile.schema);
         this.style = style;
     }
     tile.style = null;

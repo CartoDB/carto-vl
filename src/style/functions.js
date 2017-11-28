@@ -109,71 +109,104 @@ _Now.prototype.isAnimated = function () {
     return true;
 }
 
-const FloatMul = genFloatBinaryOperation((x, y) => x * y, (x, y) => `(${x} * ${y})`);
-const FloatDiv = genFloatBinaryOperation((x, y) => x / y, (x, y) => `(${x} / ${y})`);
-const FloatAdd = genFloatBinaryOperation((x, y) => x + y, (x, y) => `(${x} + ${y})`);
-const FloatSub = genFloatBinaryOperation((x, y) => x - y, (x, y) => `(${x} - ${y})`);
-const FloatPow = genFloatBinaryOperation((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
-function genFloatBinaryOperation(jsFn, glsl) {
-    function BinaryOp(a, b) {
-        if (Number.isFinite(a) && Number.isFinite(b)) {
-            return Float(jsFn(a, b));
-        }
-        if (Number.isFinite(a)) {
-            a = Float(a);
-        }
-        if (Number.isFinite(b)) {
-            b = Float(b);
-        }
-        if (a.type == 'float' && b.type == 'float') {
+var genBinOp = (jsFn, glsl) =>
+    class BinaryOperation {
+        /**
+         * @constructor
+         * @name BinaryOperation
+         * @param {*} a
+         * @param {*} b
+         */
+        constructor(a, b) {
+            if (Number.isFinite(a) && Number.isFinite(b)) {
+                return Float(jsFn(a, b));
+            }
+            if (Number.isFinite(a)) {
+                a = Float(a);
+            }
+            if (Number.isFinite(b)) {
+                b = Float(b);
+            }
+            if (a.type == 'float' && b.type == 'float') {
+                this.type = 'float';
+            } else {
+                console.warn(a, b);
+                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
+            }
             this.type = 'float';
-        } else {
-            console.warn(a, b);
-            throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
+            this.a = a;
+            this.b = b;
+            a.parent = this;
+            b.parent = this;
         }
-        return new _BinaryOp(a, b);
-    }
-    function _BinaryOp(a, b) {
-        this.type = 'float';
-        this.a = a;
-        this.b = b;
-        a.parent = this;
-        b.parent = this;
-    }
-    _BinaryOp.prototype._applyToShaderSource = function (uniformIDMaker, propertyTIDMaker) {
-        const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        return {
-            preface: a.preface + b.preface,
-            inline: glsl(a.inline, b.inline)
-        };
-    }
-    _BinaryOp.prototype._postShaderCompile = function (program) {
-        this.a._postShaderCompile(program);
-        this.b._postShaderCompile(program);
-    }
-    _BinaryOp.prototype._preDraw = function (l) {
-        this.a._preDraw(l);
-        this.b._preDraw(l);
-    }
-    _BinaryOp.prototype.isAnimated = function () {
-        return this.a.isAnimated() || this.b.isAnimated();
-    }
-    _BinaryOp.prototype.replaceChild = function (toReplace, replacer) {
-        if (this.a = toReplace) {
-            this.a = replacer;
-        } else {
-            this.b = replacer;
+        /**
+         * @description apply shader to GLSL source code
+         * @name BinaryOperation#_applyToShaderSource
+         * @param {*} uniformIDMaker
+         * @param {*} propertyTIDMaker
+         */
+        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+            const a = this.a._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+            const b = this.b._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+            return {
+                preface: a.preface + b.preface,
+                inline: glsl(a.inline, b.inline)
+            };
         }
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    }
-    _BinaryOp.prototype.blendTo = function (finalValue, duration = 500, blendFunc = 'linear') {
-        genericBlend(this, finalValue, duration, blendFunc);
-    }
-    return BinaryOp;
-}
+        _postShaderCompile(program) {
+            this.a._postShaderCompile(program);
+            this.b._postShaderCompile(program);
+        }
+        _preDraw(l) {
+            this.a._preDraw(l);
+            this.b._preDraw(l);
+        }
+        isAnimated() {
+            return this.a.isAnimated() || this.b.isAnimated();
+        }
+        replaceChild(toReplace, replacer) {
+            if (this.a = toReplace) {
+                this.a = replacer;
+            } else {
+                this.b = replacer;
+            }
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        }
+        /**
+         * @api
+         * @alias BinaryOp#blendTo
+         * @param {*} finalValue
+         * @param {*} duration
+         * @param {*} blendFunc
+         */
+        blendTo(finalValue, duration = 500, blendFunc = 'linear') {
+            genericBlend(this, finalValue, duration, blendFunc);
+        }
+    };
+
+/**
+ * @api
+ * @hideconstructor
+ * @augments BinaryOperation
+ */
+class FloatMulObj extends genBinOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) { }
+class FloatAddObj extends genBinOp((x, y) => x + y, (x, y) => `(${x} + ${y})`) { }
+class FloatSubObj extends genBinOp((x, y) => x - y, (x, y) => `(${x} - ${y})`) { }
+class FloatDivObj extends genBinOp((x, y) => x / y, (x, y) => `(${x} / ${y})`) { }
+class FloatPowObj extends genBinOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`) { }
+/**
+ *
+ * @api
+ * @returns {FloatMulObj}
+ */
+const FloatMul = (...args) => new FloatMulObj(...args);
+const FloatAdd = (...args) => new FloatAddObj(...args);
+const FloatSub = (...args) => new FloatSubObj(...args);
+const FloatDiv = (...args) => new FloatDivObj(...args);
+const FloatPow = (...args) => new FloatPowObj(...args);
+
 
 function Animation(duration) {
     return new _Animation(duration);
@@ -275,7 +308,7 @@ function _Blend(a, b, mix) {
         console.warn(a, b);
         throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
     }
-    if (schema.checkschemaMatch(a.schema, b.schema)) {
+    if (schema.checkSchemaMatch(a.schema, b.schema)) {
         throw new Error('Blend parameters schemas mismatch');
     }
     this.schema = a.schema;
