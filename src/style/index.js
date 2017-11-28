@@ -51,8 +51,12 @@ Style.prototype._compileWidthShader = function () {
 /**
  * @api
  * @constructor
- * @param {*} renderer
- * @param {*} schema
+ * @description A Style defines how associated dataframes of a particular renderer should be renderer.
+ *
+ * Styles are only compatible with dataframes that comply with the same schema.
+ * The schema is the interface that a dataframe must comply with.
+ * @param {Renderer.Renderer} renderer
+ * @param {Schema} schema
  */
 function Style(renderer, schema) {
     this.renderer = renderer;
@@ -73,6 +77,7 @@ function Style(renderer, schema) {
     };
 }
 /**
+ * Change the width of the style to a new style expression.
  * @api
  * @param {*} float
  */
@@ -100,6 +105,7 @@ Style.prototype.replaceChild = function (toReplace, replacer) {
     }
 }
 /**
+ * Change the color of the style to a new style expression.
  * @api
  * @param {*} color
  */
@@ -114,12 +120,14 @@ Style.prototype.setColor = function (color) {
     color.notify();
 }
 /**
+ * Get the width style expression
  * @api
  */
 Style.prototype.getWidth = function () {
     return this._width;
 }
 /**
+ * Get the color style expression
  * @api
  */
 Style.prototype.getColor = function () {
