@@ -428,6 +428,10 @@ function getFBstatus() {
     }
 }
 
+//TODO remove this hack :)
+import * as shaders from './shaders';
+import * as functions from './style/functions';
+
 Renderer.prototype._getMin = function (expression, callback) {
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
@@ -467,37 +471,49 @@ Renderer.prototype._getMin = function (expression, callback) {
     //TODO disable DEPTH WRITE
 
     //TODO Render with shader => color = float(EXPRESSION)
-    gl.useProgram(this.finalRendererProgram.program);
+
+    //Compile expression, use expression
+    //const expr = new functions.HSV(1., 0, 0.12);
+    const expr = functions.property('amount', {
+        'amount': 'float'
+    });
+    const r = Style.compileShader(expr, shaders.computer);
+    const shader = r.shader;
+    console.log('computer', shader)
+
+    gl.useProgram(shader.program);
 
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
     this.tiles.forEach(tile => {
+        var obj = {
+            freeTexUnit: 4
+        }
+        expr._preDraw(obj);
+
         //TODO redundant code with refresh => refactor
-        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+        gl.uniform2f(shader.vertexScaleUniformLocation,
             (s / aspect) * tile.scale,
             s * tile.scale);
-        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+        gl.uniform2f(shader.vertexOffsetUniformLocation,
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.enableVertexAttribArray(shader.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.enableVertexAttribArray(shader.featureIdAttr);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(shader.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-        //TODO put needed properties, like refresh width/color
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
-
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+        Object.keys(r.tid).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(shader.textureLocations[i], i);
+        });
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
     });
