@@ -59,6 +59,10 @@ function Renderer(canvas) {
         if (!ext) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
+        this.EXT_blend_minmax = gl.getExtension('EXT_blend_minmax');
+        if (!this.EXT_blend_minmax) {
+            throw new Error("WebGL extension EXT_blend_minmax is unsupported");
+        }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
@@ -187,7 +191,7 @@ Renderer.prototype.addDataframe = function (tile) {
                 pixel[i] = property[i];
             }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-                width, height, 0, gl.ALPHA, srcType,
+                width, height, 0, gl.ALPHA, gl.FLOAT,
                 pixel);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -268,12 +272,11 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
-    gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
+    gl.clearColor(0., 0., 0., 0.);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
-    //TODO refactor condition
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
@@ -381,6 +384,8 @@ function refresh(timestamp) {
 
     });
 
+    this._getMin(null, this.computePool[0]);
+
     this.tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
             window.requestAnimationFrame(refresh.bind(this));
@@ -393,4 +398,115 @@ function refresh(timestamp) {
  */
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+}
+
+Renderer.prototype.getMin = function (expression, callback) {
+    //Send work and callback to RAF
+    //Request RAF
+    this.computePool = [callback];
+}
+
+function getFBstatus() {
+    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    switch (status) {
+        case gl.FRAMEBUFFER_COMPLETE:
+            return 'FRAMEBUFFER_COMPLETE';
+        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            return 'FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
+        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            return 'FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
+        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            return 'FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
+        case gl.FRAMEBUFFER_UNSUPPORTED:
+            return 'FRAMEBUFFER_UNSUPPORTED';
+        case gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            return 'FRAMEBUFFER_INCOMPLETE_MULTISAMPLE';
+        case gl.RENDERBUFFER_SAMPLES:
+            return 'RENDERBUFFER_SAMPLES';
+        default:
+            return 'Unkown Framebuffer status';
+    }
+}
+
+Renderer.prototype._getMin = function (expression, callback) {
+    //Render to 1x1 FB
+    if (!this.aux1x1FB) {
+        this.aux1x1FB = gl.createFramebuffer();
+        this.aux1x1TEX = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            1, 1, 0, gl.RGBA, gl.FLOAT,
+            null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
+        //Check FB completeness
+        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+            //This is a very bad time to throw an exception, this code should never be executed,
+            //all checks should be done earlier to avoid problems here
+            //If this is still executed we'll warn and ignore
+            console.warn(getFBstatus());
+            return;
+        }
+    }
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
+
+    gl.viewport(0, 0, 1, 1);
+    //glclear to MAX_FP VALUE
+    gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    //TODO disable DEPTH WRITE
+
+    //TODO Render with shader => color = float(EXPRESSION)
+    gl.useProgram(this.finalRendererProgram.program);
+
+    var s = 1. / this._zoom;
+    var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
+    //For each tile
+    this.tiles.forEach(tile => {
+        //TODO redundant code with refresh => refactor
+        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+            (s / aspect) * tile.scale,
+            s * tile.scale);
+        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+            (s / aspect) * (this._center.x - tile.center.x),
+            s * (this._center.y - tile.center.y));
+
+        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+
+        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+        //TODO put needed properties, like refresh width/color
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+    });
+
+
+    //Readback!
+    var pixels = new Float32Array(4);
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+    callback(pixels);
+
+    gl.blendEquation(gl.FUNC_ADD);
 }

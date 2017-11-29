@@ -118,7 +118,7 @@ function getData(aspect) {
                 //console.log(f);
                 //break;
             }
-            console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
+            //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
             var dataframe = {
                 center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
                 scale: 1 / Math.pow(2, z),
@@ -129,7 +129,7 @@ function getData(aspect) {
                 dataframe.properties[name] = properties[pid];
             });
             dataframe.schema = new R.Schema(Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'));
-            console.log(Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'), dataframe.schema);
+            // console.log(Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'), dataframe.schema);
             completedTiles.push(dataframe);
             if (completedTiles.length == needToComplete) {
                 oldtiles.forEach(t => renderer.removeDataframe(t));
@@ -137,10 +137,14 @@ function getData(aspect) {
                 oldtiles = completedTiles;
                 styleWidth();
                 styleColor();
+
+                renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
             }
         };
         oReq.send(null);
     });
+
+
 }
 
 const DEG2RAD = Math.PI / 180;

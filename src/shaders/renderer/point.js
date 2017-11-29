@@ -45,7 +45,7 @@
     }
 
     Use this to check that the affected antiliased pixels are ok:
-    
+
     if (c.a==1.||c.a==0.){
         gl_FragColor = vec4(1,0,0,1);
         return;
@@ -99,7 +99,7 @@ float distanceAntialias(vec2 p){
 void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
-    c.a *= distanceAntialias(p);
-    c.rgb*=c.a;
+    //c.a *= distanceAntialias(p);
+    //c.rgb*=c.a;
     gl_FragColor = c;
 }`;
