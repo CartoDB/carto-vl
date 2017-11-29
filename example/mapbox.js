@@ -160,7 +160,7 @@ var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/mapbox/dark-v9', // stylesheet location
+    style: 'http://52.178.73.187/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 14, // starting zoom,
 });
