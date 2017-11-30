@@ -15,7 +15,7 @@ Object.keys(functions).filter(
 });
 
 /**
- * @api
+ * @jsapi
  * @param {*} str
  * @param {*} schema
  */

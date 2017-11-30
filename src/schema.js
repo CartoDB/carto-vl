@@ -1,5 +1,5 @@
 /**
- * @api
+ * @jsapi
  * @constructor
  * @description A schema is a list of properties with associated types.
  *

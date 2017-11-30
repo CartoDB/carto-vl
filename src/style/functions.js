@@ -58,7 +58,7 @@ export { schemas };
 
 class Expression {
     /**
-     * @api
+     * @jsapi
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker

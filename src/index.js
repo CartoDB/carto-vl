@@ -42,7 +42,7 @@ const RTT_WIDTH = 1024;
  * The function will fail in case that a WebGL context cannot be created this can happen because of the following reasons:
  *   * The provided canvas element is invalid
  *   * The browser or the machine doesn't support WebGL or the required WebGL extension and minimum parameter values
- * @api
+ * @jsapi
  * @memberOf renderer
  * @constructor
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
@@ -131,7 +131,7 @@ Renderer.prototype.removeDataframe = function (dataframe) {
 
 /**
  * @constructor
- * @api
+ * @jsapi
  */
 function Dataframe() {
 }
