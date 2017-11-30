@@ -176,7 +176,7 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
 
 class Expression {
     /**
-     * @api
+     * @jsapi
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker
@@ -738,7 +738,7 @@ const float = (...args) => new Float(...args);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Schema; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemaMatch; });
 /**
- * @api
+ * @jsapi
  * @constructor
  * @description A schema is a list of properties with associated types.
  *
@@ -1570,7 +1570,7 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
 });
 
 /**
- * @api
+ * @jsapi
  * @param {*} str
  * @param {*} schema
  */
@@ -1996,7 +1996,7 @@ const RTT_WIDTH = 1024;
  * The function will fail in case that a WebGL context cannot be created this can happen because of the following reasons:
  *   * The provided canvas element is invalid
  *   * The browser or the machine doesn't support WebGL or the required WebGL extension and minimum parameter values
- * @api
+ * @jsapi
  * @memberOf renderer
  * @constructor
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
@@ -2085,7 +2085,7 @@ Renderer.prototype.removeDataframe = function (dataframe) {
 
 /**
  * @constructor
- * @api
+ * @jsapi
  */
 function Dataframe() {
 }
@@ -2685,7 +2685,7 @@ Style.prototype._compileWidthShader = function () {
 }
 
 /**
- * @api
+ * @jsapi
  * @constructor
  * @description A Style defines how associated dataframes of a particular renderer should be renderer.
  *
@@ -2714,7 +2714,7 @@ function Style(renderer, schema) {
 }
 /**
  * Change the width of the style to a new style expression.
- * @api
+ * @jsapi
  * @param {*} float
  */
 Style.prototype.setWidth = function (float) {
@@ -2742,7 +2742,7 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
 }
 /**
  * Change the color of the style to a new style expression.
- * @api
+ * @jsapi
  * @param {*} color
  */
 Style.prototype.setColor = function (color) {
@@ -2757,14 +2757,14 @@ Style.prototype.setColor = function (color) {
 }
 /**
  * Get the width style expression
- * @api
+ * @jsapi
  */
 Style.prototype.getWidth = function () {
     return this._width;
 }
 /**
  * Get the color style expression
- * @api
+ * @jsapi
  */
 Style.prototype.getColor = function () {
     return this._color;
