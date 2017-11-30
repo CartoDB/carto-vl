@@ -13,13 +13,13 @@ export { Schema } from './schema';
  */
 
 /**
-* @api
-* @typedef {object} Dataframe - Point in renderer coordinates space
-* @property {RPoint} center
-* @property {number} scale
-* @property {geom} geometry
-* @property {Properties} properties
-*/
+ * @api
+ * @typedef {object} Dataframe - Point in renderer coordinates space
+ * @property {RPoint} center
+ * @property {number} scale
+ * @property {geom} geometry
+ * @property {Properties} properties
+ */
 
 
 // TODO remove
@@ -133,14 +133,14 @@ Renderer.prototype.removeDataframe = function (dataframe) {
  * @constructor
  * @api
  */
-function Dataframse() {
+function Dataframe() {
 }
 /**
  * @api
  * Aply a style
  * @param style
  */
-Dataframse.prototype.applyStyle = function (style) {
+Dataframe.prototype.applyStyle = function (style) {
 
 }
 

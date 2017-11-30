@@ -69,7 +69,7 @@ function Style(renderer, schema) {
         this._compileWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._color = functions.color([0, 0, 0, 1]);
+    this._color = functions.rgba(0, 0, 0, 1);
     this._color.parent = this;
     this._color.notify = () => {
         this._compileColorShader();
