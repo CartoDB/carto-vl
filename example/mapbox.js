@@ -145,7 +145,8 @@ function getData(aspect) {
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
-const WM_EXT = EARTH_RADIUS * Math.PI * 2;
+const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
+const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 const TILE_SIZE = 256;
 // Webmercator projection
 function Wmxy(latLng) {
@@ -170,8 +171,8 @@ function getZoom() {
     var c = map.getCenter();
     var nw = b.getNorthWest();
     var sw = b.getSouthWest();
-    var z = (Wmxy(nw).y - Wmxy(sw).y) / 40075019.834677525;
-    renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+    var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
+    renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
     return z;
 }
 
@@ -188,7 +189,7 @@ map.on('load', _ => {
         var nw = b.getNorthWest();
         var c = map.getCenter();
 
-        renderer.setCenter(c.lng / 180., Wmxy(c).y / 40075019.834677525 * 2.);
+        renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         renderer.setZoom(getZoom());
 
         c = renderer.getCenter();
