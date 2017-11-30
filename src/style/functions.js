@@ -52,7 +52,8 @@ export { schemas };
         - Think about "Date" and "string" types.
         - Heatmaps (renderer should be improved too to accommodate this)
 */
-class Expression {
+
+ class Expression {
     /**
      * @api
      * @hideconstructor
@@ -96,7 +97,7 @@ class Expression {
         this.childrenNames.forEach(name => this[name]._preDraw(l));
     }
     /**
-     * @api
+     * @jsapi
      * @returns true if the evaluation of the function at styling time won't be the same every time.
      */
     isAnimated() {
