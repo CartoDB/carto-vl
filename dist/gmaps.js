@@ -259,7 +259,6 @@ class Expression {
 class Property extends Expression {
     /**
      * @api
-     * @memberOf style.functions
      * @param {*} name Property/column name
      */
     constructor(name, schema) {
