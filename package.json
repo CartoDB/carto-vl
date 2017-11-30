@@ -7,7 +7,7 @@
     "build": "webpack",
     "build:watch": "webpack -w",
     "build-doc": "rm -rf docs/; node_modules/.bin/jsdoc --configure config/jsdoc/internal.json; node_modules/.bin/jsdoc --configure config/jsdoc/public.json",
-    "publish": "git checkout gh-pages && git merge master && npm run build && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   },
   "repository": {
     "type": "git",
