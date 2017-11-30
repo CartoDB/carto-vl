@@ -1,7 +1,56 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
 
-/** @module style/functions/ */
+/** @module style/functions/
+ * @api
+ * @description
+ * # Styling language overview
+ *
+ * A style has a fixed number of properties with default values.
+ * These properties are: color, width, stroke-color and stroke-width.
+ *
+ * Properties are styled by using styling expressions.
+ * A styling expression is a numeric literal, an identifier, a function call, or a built-in mathematic operation.
+ *
+ *
+ *
+ * ## Numeric literals:
+ * ```
+ * 5            //This IS a valid expression, a numeric literal
+ * 0.3          //This IS a valid expression too
+ * 'myString'   //This IS NOT a valid expression, strings are unsupported
+ * ```
+ * ## Identifiers.
+ * Identifiers can be used to refer to a feature property by prefixing the property name by '$'.
+ * Cartocolors schemes are identifiers too.
+ * ```
+ * $myAwesomeProperty   //This IS a valid expression
+ * Prism                //This IS a valid expression, Prism is a cartocolor palette
+ * wadusWadus           //This IS NOT a valid expression since wadusWadus is not a known palette nor it is prefixed by '$'
+ * ```
+ *
+ * ## Built-in mathematic operations
+ * Some basic mathematical operations are supported:
+ * ```
+ * 3+4       //This IS a valid expression
+ * 2^5       //This IS a valid expression, '^' is the power function, this resolves to 32
+ * 2<<3      //This IS NOT a valid expression (no, binary operators are unsupported)
+ * ```
+ *
+ *
+ * ## Function calling.
+ * Functions can be used to mix different expressions creating richer expressions.
+ * ```
+ * rgba(0.5,0.5,0.5, 1) //This IS a valid expression
+ * now()                //This IS a valid expression
+ *
+ * wadusWadus()         //This IS NOT a valid expression, wadusWadus is not a known function
+ * rgba(1)              //This IS NOT a valid expression since rgba() takes 4 parameters and only one was passed
+ *
+ * rgba(0,0,0, now())           //This IS a valid expression, now is a numeric expression and match the alpha parameter type of rgba()
+ * rgba(0,0,0, rgba(0,0,0,0))   //This IS NOT a valid expression, the alpha parameter of the first function call is of type color since rgba returns a color
+ * ```
+ */
 
 
 function implicitCast(value) {
@@ -140,7 +189,7 @@ class Expression {
 
 class Property extends Expression {
     /**
-     * @api
+     * @jsapi
      * @param {*} name Property/column name
      */
     constructor(name, schema) {
@@ -181,9 +230,9 @@ const now = (speed) => new Now(speed);
 //TODO convert to use uniformfloat class
 class Animate extends Expression {
     /**
-     * @api
-     * @description Animate returns a number between zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elpased number of milliseconds reach the animation's duration.
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
      * @param {*} duration animation duration in milliseconds
      */
     constructor(duration) {
@@ -345,7 +394,8 @@ const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 class Near extends Expression {
     /**
      * @api
-     * @description Near returns zero (filters out) for inputs that are far away from center
+     * @description Near returns zero for inputs that are far away from center.
+     * This can be useful for filtering out features by setting their size to zero.
      * @param {*} input
      * @param {*} center
      * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
@@ -373,9 +423,9 @@ class Near extends Expression {
 class Blend extends Expression {
     /**
      * @api
-     * @description Interpolate *a* and *b* based on *mix*
-     * @param {*} a
-     * @param {*} b
+     * @description Interpolate from *a* to *b* based on *mix*
+     * @param {*} a can be a color or a number
+     * @param {*} b type must match a's type
      * @param {*} mix interpolation parameter in the [0,1] range
      */
     constructor(a, b, mix) {
@@ -454,7 +504,7 @@ class RGBA extends Expression {
 
 class Float extends Expression {
     /**
-     * @api
+     * @jsapi
      * @param {*} x
      */
     constructor(x) {
@@ -502,13 +552,13 @@ class RampColor extends Expression {
      * @param {*} input
      * @param {*} minKey
      * @param {*} maxKey
-     * @param {*} values
+     * @param {*} palette
      */
-    constructor(input, minKey, maxKey, values) {
+    constructor(input, minKey, maxKey, palette) {
         input = implicitCast(input);
         minKey = implicitCast(minKey);
         maxKey = implicitCast(maxKey);
-        values = implicitCast(values);
+        var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
             throw new Error(`Invalid arguments to RampColor()`);
         }
@@ -583,11 +633,7 @@ class RampColor extends Expression {
     }
 }
 
-/**
- *
- * @api
- * @returns {FloatMul}
- */
+
 const floatMul = (...args) => new FloatMul(...args);
 const floatDiv = (...args) => new FloatDiv(...args);
 const floatAdd = (...args) => new FloatAdd(...args);
