@@ -54,7 +54,7 @@ function getData(renderer) {
                 _cdb_mode(category) AS category
             FROM tx_0125_copy_copy AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*1.)
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3)
             ORDER BY amount DESC
         )AS geom
     `;
