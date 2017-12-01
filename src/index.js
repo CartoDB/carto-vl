@@ -98,6 +98,17 @@ Renderer.prototype.setCenter = function (x, y) {
     window.requestAnimationFrame(refresh.bind(this));
 };
 /**
+ * Get Renderer visualization center
+ * @api
+ * @return {*}
+ */
+Renderer.prototype.getBounds = function () {
+    const center = this.getCenter();
+    const sx = this.getZoom() * 0.5 * this.getAspect();
+    const sy = this.getZoom() * 0.5;
+    return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
+}
+/**
  * Get Renderer visualization zoom
  * @api
  * @return {number}
@@ -246,6 +257,11 @@ Renderer.prototype.addDataframe = function (tile) {
 
     return tile;
 };
+
+Renderer.prototype.getAspect = function () {
+    return this.canvas.clientWidth / this.canvas.clientHeight;
+};
+
 
 /**
  * Refresh the canvas by redrawing everything needed.
