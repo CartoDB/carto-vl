@@ -3,7 +3,9 @@ import * as Style from './style';
 import * as schema from './schema';
 
 export { Renderer, Style };
-export { Schema } from './schema';
+
+import * as schema from './schema';
+export {schema};
 
 /**
  * @api

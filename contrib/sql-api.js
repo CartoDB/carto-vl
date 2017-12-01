@@ -8,7 +8,10 @@ export { getData, schema, init };
 
 var oldtiles = [];
 var ajax;
-var schema = new R.Schema(['category', 'amount'], ['float', 'float']);
+const names =['Moda y calzado',
+'Bares y restaurantes', 'Salud', 'Alimentación'];
+var schema = new R.schema.Schema(['category', 'amount'], [new R.schema.Category(names
+    , [33263, 24633, 17833, 16907], [0, 1, 2, 3]), new R.schema.Float(2, 100 * 1000)]);
 var style;
 
 function init(fixedStyle) {
@@ -17,6 +20,9 @@ function init(fixedStyle) {
 
 var catMap = {};
 function getCatID(catStr) {
+    const f = names.indexOf(catStr);
+    return f;
+
     if (catMap[catStr]) {
         return catMap[catStr];
     }
@@ -82,11 +88,9 @@ function getData(renderer) {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                 properties[0][i] = Number(getCatID(f.properties.category));
-                //properties[1][i] = Number(Math.random());
                 properties[1][i] = Number(f.properties.amount);
-                //console.log(f);
-                //break;
             }
+            console.log(catMap)
             //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
             var rs = rsys.getRsysFromTile(x, y, z);
             var dataframe = {
@@ -98,12 +102,11 @@ function getData(renderer) {
             Object.keys(fieldMap).map((name, pid) => {
                 dataframe.properties[name] = properties[pid];
             });
-            dataframe.schema = new R.Schema(Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'));
+            dataframe.schema = schema;
             completedTiles.push(dataframe);
             if (completedTiles.length == needToComplete) {
                 oldtiles.forEach(t => renderer.removeDataframe(t));
                 completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                console.log("ADDED");
                 oldtiles = completedTiles;
             }
         };

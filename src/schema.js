@@ -46,4 +46,4 @@ class Category {
     }
 }
 
-export { Schema, checkSchemaMatch };
+export { Schema, checkSchemaMatch, Float, Category};
