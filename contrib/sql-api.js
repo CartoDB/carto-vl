@@ -4,7 +4,7 @@ import * as R from '../src/index';
 var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
 
-export { getData, schema, init};
+export { getData, schema, init };
 
 var oldtiles = [];
 var ajax;
@@ -13,6 +13,15 @@ var style;
 
 function init(fixedStyle) {
     style = fixedStyle;
+}
+
+var catMap = {};
+function getCatID(catStr) {
+    if (catMap[catStr]) {
+        return catMap[catStr];
+    }
+    catMap[catStr] = Object.keys(catMap).length + 1;
+    return catMap[catStr];
 }
 
 function getData(renderer) {
@@ -35,13 +44,15 @@ function getData(renderer) {
                     ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
                     CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
                 ),
-                SUM(amount) AS amount
+                SUM(amount) AS amount,
+                _cdb_mode(category) AS category
             FROM tx_0125_copy_copy AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*1.)
             ORDER BY amount DESC
         )AS geom
     `;
+
         var oReq = new XMLHttpRequest();
         oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
         oReq.onload = function (oEvent) {
@@ -70,13 +81,13 @@ function getData(renderer) {
                 const geom = f.loadGeometry();
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(Math.random());
+                properties[0][i] = Number(getCatID(f.properties.category));
                 //properties[1][i] = Number(Math.random());
                 properties[1][i] = Number(f.properties.amount);
                 //console.log(f);
                 //break;
             }
-            console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
+            //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
             var rs = rsys.getRsysFromTile(x, y, z);
             var dataframe = {
                 center: rs.center,
