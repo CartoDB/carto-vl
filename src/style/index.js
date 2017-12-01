@@ -75,6 +75,9 @@ function Style(renderer, schema) {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+
+    this._compileWidthShader();
+    this._compileColorShader();
 }
 /**
  * Change the width of the style to a new style expression.

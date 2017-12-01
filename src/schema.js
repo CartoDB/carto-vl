@@ -31,4 +31,19 @@ function checkSchemaMatch(schemaA, schemaB) {
     }
 }
 
-export { Schema, checkSchemaMatch };
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
+    }
+}
+
+export { Schema, checkSchemaMatch, Float, Category};

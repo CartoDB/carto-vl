@@ -545,6 +545,25 @@ function hexToRgb(hex) {
 
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
 
+/*
+hsv(top($cat, 5), 0.5, 1.);
+ramp(top($cat, 7), Prism);
+
+hsv(localtop($cat, 5), 0.5, 1.);
+ramp(localtop($cat, 7), Prism);
+
+
+top/localtop returns  a normalized category number:
+For example:
+0.,0.2,0.4,0.6,0.8,1. (where 1 means 'others')
+Values are clamped to 1 (others)
+
+top computes them by ordering the metadata by their influence (histogram)
+localtop computes them by computing the histogram in-place filtering in the viewport region
+
+*/
+
+
 class RampColor extends Expression {
     /**
      * @api
