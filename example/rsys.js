@@ -79,25 +79,13 @@ function tileRsys(x, y, z) {
 }
 
 /**
- * World extents of an Rsys
- * i.e. [rToW(r, -1, -1).x, rToW(r, -1, -1).y, rToW(r, 1, 1).x, rToW(r, 1, 1).y]
- * @api
- * @param {RSys} r
- * @return {Arrray} - [minx, miny, maxx, maxy] in NWMC coordinates
- */
-function rBounds(r) {
-    const size = r.scale * 0.5;
-    return [r.center.x - size, r.center.y - size, r.center.x + size, r.center.y + size];
-}
-
-/**
  * Minimum zoom level for which tiles are no larger than the RSys rectangle
  * @api
  * @param {RSys} rsys
  * @return {number}
  */
-function rZoom(rsys) {
-    return Math.ceil(Math.log2(1. / rsys.scale));
+function rZoom(zoom) {
+    return Math.ceil(Math.log2(1. / zoom));
 }
 
 /**
@@ -106,9 +94,8 @@ function rZoom(rsys) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function rTiles(rsys) {
-    ext = rBounds(rsys);
-    return wRectangleTiles(rZoom(rsys), rBounds(rsys));
+function rTiles(bounds) {
+    return wRectangleTiles(rZoom(bounds[3]-bounds[1]), bounds);
 }
 
 /**
@@ -133,3 +120,5 @@ function wRectangleTiles(z, wr) {
     }
     return tiles;
 }
+
+export { rTiles };
