@@ -65,14 +65,14 @@
     <canvas id="mycanvas" width="400" height="300" style="display: none;"></canvas>
     <div id='map'></div>
     <textarea id="widthStyleEntry">10*($amount^0.5/100)+0.5</textarea>
-    <textarea id="colorStyleEntry">rampColor($category, -1,4, Prism) </textarea>
+    <textarea id="colorStyleEntry">ramp($category, Prism) </textarea>
     <textarea id="feedback">¿?</textarea>
     <textarea id="comments">Interesting expressions:
         hsv(0.07, ($amount/10000)^0.2,($amount/10000)^0.8)
 
         hsv(0.07, 0.8, Near($amount, 100, 100, 1000))
 
-        setOpacity(rampColor($category, 0, 1, Prism),
+        setOpacity(ramp($category, Prism),
                 blend(0,1,
                     (sin(now())*0.5+0.5)*(log($amount+1)/4)^5
                 ))
