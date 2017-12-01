@@ -96,9 +96,10 @@ function getData(aspect) {
                 //break;
             }
             console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
+            var rs = rsys.getRsysFromTile(x, y, z);
             var dataframe = {
-                center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
-                scale: 1 / Math.pow(2, z),
+                center: rs.center,
+                scale: rs.scale,
                 geom: points,
                 properties: {},
             };

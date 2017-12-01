@@ -95,7 +95,7 @@ function rZoom(zoom) {
  * @return {Array} - array of TC tiles {x, y, z}
  */
 function rTiles(bounds) {
-    return wRectangleTiles(rZoom(bounds[3]-bounds[1]), bounds);
+    return wRectangleTiles(rZoom(bounds[3] - bounds[1]), bounds);
 }
 
 /**
@@ -121,4 +121,22 @@ function wRectangleTiles(z, wr) {
     return tiles;
 }
 
-export { rTiles };
+/**
+ * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns {RSys}
+ */
+function getRsysFromTile(x, y, z) {
+    return {
+        center: {
+            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
+            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+        },
+        scale: 1 / Math.pow(2, z)
+    }
+}
+
+export { rTiles, getRsysFromTile };
+
