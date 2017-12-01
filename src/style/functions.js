@@ -208,6 +208,17 @@ class Property extends Expression {
     }
 }
 
+const metadataAccessGenerator = (metadataProperty) =>
+    class metadataAcessor extends Expression {
+        constructor(property, schema) {
+            super({ expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
+            this.name = name;
+            this.type = 'float';
+        }
+    };
+const Max = metadataAccessGenerator('globalMax');
+const Min = metadataAccessGenerator('globalMin');
+
 class Now extends Expression {
     /**
      * @api
@@ -688,9 +699,11 @@ const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
 const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
+const max = (...args) => new Max(...args);
+const min = (...args) => new Min(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min,
     setGL
 };
