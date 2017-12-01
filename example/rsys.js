@@ -7,7 +7,6 @@
   * @typedef {object} RSys - Renderer relative coordinate system
   * @property {RPoint} center - Position of the local system in external coordinates
   * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
-  * @property {number} aspect - X/Y Aspect ratio. The X-scale is aspect*scale
  */
 
  /*
@@ -25,7 +24,7 @@
   * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
   * by WM_R. (positive orientation: E,N)
   *
-  * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z
+  * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
   * (positive orientation: E,S)
   *
   * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
@@ -35,7 +34,7 @@
   * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
   *   Math.ceil(Math.log2(1 / r.scale));
   * * Maximum zoom level for which tiles are no smaller than the rectangle:
-  *   Math.ceil(Math.log2(1 / r.scale));
+  *   Math.floor(Math.log2(1 / r.scale));
   * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
   *
   * We'll use the term World coordinates below for the *external* reference system
@@ -51,7 +50,7 @@
  * @return {RPoint} World coordinates
  */
 function rToW(r, x, y) {
-    return { x: x*r.scale*r.aspect + r.center.x, y: y*r.scale + r.center.y };
+    return { x: x*r.scale + r.center.x, y: y*r.scale + r.center.y };
 }
 
 /**
@@ -63,7 +62,7 @@ function rToW(r, x, y) {
  * @return {RPoint} R coordinates
  */
 function wToR(x, y, r) {
-    return { x: (x - r.center.x)/(r.scale*r.aspect), y: (y - r.center.y)/r.scale };
+    return { x: (x - r.center.x)/r.scale, y: (y - r.center.y)/r.scale };
 }
 
 /**
@@ -76,7 +75,7 @@ function wToR(x, y, r) {
  */
 function tileRsys(x, y, z) {
     let max = Math.pow(2, z);
-    return { scale: 1/max, center: { x: 2*(x + 0.5)/max - 1, y : 1 - 2*(y + 0.5)/max}, aspect: 1 };
+    return { scale: 1/max, center: { x: 2*(x + 0.5)/max - 1, y : 1 - 2*(y + 0.5)/max}};
 }
 
 /**
@@ -84,12 +83,11 @@ function tileRsys(x, y, z) {
  * i.e. [rToW(r, -1, -1).x, rToW(r, -1, -1).y, rToW(r, 1, 1).x, rToW(r, 1, 1).y]
  * @api
  * @param {RSys} r
- * @return {Arrray} - [minx, miny, maxx, maxy] in W coordinates
+ * @return {Arrray} - [minx, miny, maxx, maxy] in NWMC coordinates
  */
 function rBounds(r) {
-    const sx = r.scale*r.aspect;
-    const sy = r.scale;
-    return [r.center.x - sx, r.center.y - sy, r.center.x + sx, r.center.y + sy];
+    const size = r.scale*0.5;
+    return [r.center.x - size, r.center.y - size, r.center.x + size, r.center.y + size];
 }
 
 /**
