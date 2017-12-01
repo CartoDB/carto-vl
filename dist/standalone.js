@@ -69,6 +69,66 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
+/**
+ * @jsapi
+ * @constructor
+ * @description A schema is a list of properties with associated types.
+ *
+ * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
+ * @param {String[]} propertyNames
+ * @param {String[]} propertyTypes
+ */
+function Schema(propertyNames, propertyTypes) {
+    if (propertyNames.length != propertyTypes.length) {
+        throw new Error("propertyNames and propertyTypes lengths mismatch");
+    }
+    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
+}
+
+/**
+ * Assert that two schemas match.
+ *
+ * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
+ * @param {Schema} schemaA
+ * @param {Schema} schemaB
+ * @throws If the schemas don't match
+ */
+function checkSchemaMatch(schemaA, schemaB) {
+    if (schemaA != undefined && schemaB != undefined) {
+        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
+        if (!equals) {
+            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
+        }
+    }
+}
+
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
+    }
+}
+
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
@@ -76,7 +136,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return Near; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RGBA", function() { return RGBA; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return RampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Ramp", function() { return Ramp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return FloatMul; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return FloatDiv; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return FloatAdd; });
@@ -97,7 +157,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "near", function() { return near; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return rgba; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "float", function() { return float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rampColor", function() { return rampColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return ramp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return floatMul; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return floatDiv; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return floatAdd; });
@@ -115,7 +175,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
+
 
 
 
@@ -321,6 +382,7 @@ class Property extends Expression {
         this.name = name;
         this.type = 'float';
         this.schema = schema;
+        this.schemaType = schema[name];
     }
 }
 
@@ -682,22 +744,33 @@ localtop computes them by computing the histogram in-place filtering in the view
 */
 
 
-class RampColor extends Expression {
+class Ramp extends Expression {
     /**
      * @api
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
-     * @param {*} minKey
-     * @param {*} maxKey
      * @param {*} palette
+     * @param {*} minKey Optional
+     * @param {*} maxKey Optional
      */
-    constructor(input, minKey, maxKey, palette) {
+    constructor(input, palette, minKey, maxKey, ) {
+        console.log("RAMP", input, input.schemaType);
+        if (maxKey == undefined) {
+            if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Float"]) {
+                minKey = input.schemaType.globalMin;
+                maxKey = input.schemaType.globalMax;
+            } else if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Category"]) {
+                minKey = -1;
+                maxKey = input.schemaType.categoryNames.length;
+            }
+        }
+
         input = implicitCast(input);
         minKey = implicitCast(minKey);
         maxKey = implicitCast(maxKey);
         var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to RampColor()`);
+            throw new Error(`Invalid arguments to Ramp()`);
         }
         super({ input: input });
         this.type = 'color';
@@ -705,6 +778,8 @@ class RampColor extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
+
+
 
         this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -789,68 +864,8 @@ const property = (...args) => new Property(...args);
 const animate = (...args) => new Animate(...args);
 const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
-const rampColor = (...args) => new RampColor(...args);
+const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
-
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
-/**
- * @jsapi
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error("propertyNames and propertyTypes lengths mismatch");
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
-
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
-        }
-    }
-}
-
-
-class Float {
-    constructor(globalMin, globalMax) {
-        this.globalMin = globalMin;
-        this.globalMax = globalMax;
-    }
-}
-class Category {
-    constructor(categoryNames, categoryCounts, categoryIDs) {
-        this.categoryNames = categoryNames;
-        this.categoryCounts = categoryCounts;
-        this.categoryIDs = categoryIDs;
-    }
-}
 
 
 
@@ -1634,7 +1649,7 @@ const styler = {
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleExpression;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
 
@@ -2031,7 +2046,7 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
 
@@ -2700,7 +2715,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
@@ -2710,7 +2725,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Near"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RGBA", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["RGBA"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Float"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["RampColor"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Ramp", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Ramp"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMul"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatDiv"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatAdd"]; });
@@ -2731,7 +2746,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["near"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["float"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rampColor", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["rampColor"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["ramp"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"]; });
