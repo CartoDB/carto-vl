@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -556,7 +556,7 @@ class Blend extends Expression {
         if (mix.type != 'float') {
             throw new Error(`Blending cannot be performed by '${mix.type}'`);
         }
-        if (__WEBPACK_IMPORTED_MODULE_1__schema__["b" /* checkSchemaMatch */](a.schema, b.schema)) {
+        if (__WEBPACK_IMPORTED_MODULE_1__schema__["checkSchemaMatch"](a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
@@ -662,6 +662,25 @@ function hexToRgb(hex) {
 
 
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
+
+/*
+hsv(top($cat, 5), 0.5, 1.);
+ramp(top($cat, 7), Prism);
+
+hsv(localtop($cat, 5), 0.5, 1.);
+ramp(localtop($cat, 7), Prism);
+
+
+top/localtop returns  a normalized category number:
+For example:
+0.,0.2,0.4,0.6,0.8,1. (where 1 means 'others')
+Values are clamped to 1 (others)
+
+top computes them by ordering the metadata by their influence (histogram)
+localtop computes them by computing the histogram in-place filtering in the viewport region
+
+*/
+
 
 class RampColor extends Expression {
     /**
@@ -780,8 +799,11 @@ const float = (...args) => new Float(...args);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemaMatch; });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
 /**
  * @jsapi
  * @constructor
@@ -812,6 +834,21 @@ function checkSchemaMatch(schemaA, schemaB) {
         if (!equals) {
             throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
         }
+    }
+}
+
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
     }
 }
 
@@ -1995,8 +2032,10 @@ function signedArea(ring) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__["a"]; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
+
+
 
 
 
@@ -2067,6 +2106,7 @@ function Renderer(canvas) {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
     var vertices = [
@@ -2096,6 +2136,17 @@ Renderer.prototype.setCenter = function (x, y) {
     this._center.y = y;
     window.requestAnimationFrame(refresh.bind(this));
 };
+/**
+ * Get Renderer visualization center
+ * @api
+ * @return {*}
+ */
+Renderer.prototype.getBounds = function () {
+    const center = this.getCenter();
+    const sx = this.getZoom() * this.getAspect();
+    const sy = this.getZoom();
+    return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
+}
 /**
  * Get Renderer visualization zoom
  * @api
@@ -2195,9 +2246,10 @@ Renderer.prototype.addDataframe = function (tile) {
         }
     }
 
-    tile.setStyle = function (style) {
-        __WEBPACK_IMPORTED_MODULE_2__schema__["b" /* checkSchemaMatch */](style.schema, tile.schema);
-        this.style = style;
+    tile.setStyle = (style) => {
+        __WEBPACK_IMPORTED_MODULE_2__schema__["checkSchemaMatch"](style.schema, tile.schema);
+        tile.style = style;
+        window.requestAnimationFrame(refresh.bind(this));
     }
     tile.style = null;
 
@@ -2246,6 +2298,11 @@ Renderer.prototype.addDataframe = function (tile) {
     return tile;
 };
 
+Renderer.prototype.getAspect = function () {
+    return this.canvas.clientWidth / this.canvas.clientHeight;
+};
+
+
 /**
  * Refresh the canvas by redrawing everything needed.
  * Should only be called by requestAnimationFrame
@@ -2267,22 +2324,21 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
-    //TODO refactor condition
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
-    if (!this.auxFB) {
-        this.auxFB = gl.createFramebuffer();
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-    //console.log("Restyle", timestamp)
+
     // Render To Texture
     // COLOR
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -2300,11 +2356,12 @@ function refresh(timestamp) {
             gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
         });
 
-        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
@@ -2328,6 +2385,9 @@ function refresh(timestamp) {
         gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
 
         tile.style.updated = false;
         tile.initialized = true;
@@ -2378,6 +2438,10 @@ function refresh(timestamp) {
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+
     });
 
     this.tiles.forEach(t => {
@@ -2385,6 +2449,7 @@ function refresh(timestamp) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
+
 }
 
 /**
@@ -2756,6 +2821,9 @@ function Style(renderer, schema) {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+
+    this._compileWidthShader();
+    this._compileColorShader();
 }
 /**
  * Change the width of the style to a new style expression.
@@ -6110,7 +6178,9 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 /***/ }),
 /* 23 */,
 /* 24 */,
-/* 25 */
+/* 25 */,
+/* 26 */,
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6128,10 +6198,10 @@ var ajax;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].RampColor;
     const width = eval(v);
     if (width) {
         layer.style.getWidth().blendTo(width, 1000);
@@ -6139,10 +6209,10 @@ function styleWidth(e) {
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Near;
-    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Float;
-    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Color;
-    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].RampColor;
+    const Near = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Near;
+    const Float = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Float;
+    const Color = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Color;
+    const RampColor = __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].RampColor;
     const color = eval(v);
     if (color) {
         layer.style.getColor().blendTo(color, 1000);

@@ -556,7 +556,7 @@ class Blend extends Expression {
         if (mix.type != 'float') {
             throw new Error(`Blending cannot be performed by '${mix.type}'`);
         }
-        if (__WEBPACK_IMPORTED_MODULE_1__schema__["b" /* checkSchemaMatch */](a.schema, b.schema)) {
+        if (__WEBPACK_IMPORTED_MODULE_1__schema__["checkSchemaMatch"](a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
@@ -662,6 +662,25 @@ function hexToRgb(hex) {
 
 
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
+
+/*
+hsv(top($cat, 5), 0.5, 1.);
+ramp(top($cat, 7), Prism);
+
+hsv(localtop($cat, 5), 0.5, 1.);
+ramp(localtop($cat, 7), Prism);
+
+
+top/localtop returns  a normalized category number:
+For example:
+0.,0.2,0.4,0.6,0.8,1. (where 1 means 'others')
+Values are clamped to 1 (others)
+
+top computes them by ordering the metadata by their influence (histogram)
+localtop computes them by computing the histogram in-place filtering in the viewport region
+
+*/
+
 
 class RampColor extends Expression {
     /**
@@ -780,8 +799,11 @@ const float = (...args) => new Float(...args);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return checkSchemaMatch; });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
 /**
  * @jsapi
  * @constructor
@@ -812,6 +834,21 @@ function checkSchemaMatch(schemaA, schemaB) {
         if (!equals) {
             throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
         }
+    }
+}
+
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
     }
 }
 
@@ -1995,8 +2032,10 @@ function signedArea(ring) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__["a"]; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
+
+
 
 
 
@@ -2067,6 +2106,7 @@ function Renderer(canvas) {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
     var vertices = [
@@ -2096,6 +2136,17 @@ Renderer.prototype.setCenter = function (x, y) {
     this._center.y = y;
     window.requestAnimationFrame(refresh.bind(this));
 };
+/**
+ * Get Renderer visualization center
+ * @api
+ * @return {*}
+ */
+Renderer.prototype.getBounds = function () {
+    const center = this.getCenter();
+    const sx = this.getZoom() * this.getAspect();
+    const sy = this.getZoom();
+    return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
+}
 /**
  * Get Renderer visualization zoom
  * @api
@@ -2195,9 +2246,10 @@ Renderer.prototype.addDataframe = function (tile) {
         }
     }
 
-    tile.setStyle = function (style) {
-        __WEBPACK_IMPORTED_MODULE_2__schema__["b" /* checkSchemaMatch */](style.schema, tile.schema);
-        this.style = style;
+    tile.setStyle = (style) => {
+        __WEBPACK_IMPORTED_MODULE_2__schema__["checkSchemaMatch"](style.schema, tile.schema);
+        tile.style = style;
+        window.requestAnimationFrame(refresh.bind(this));
     }
     tile.style = null;
 
@@ -2246,6 +2298,11 @@ Renderer.prototype.addDataframe = function (tile) {
     return tile;
 };
 
+Renderer.prototype.getAspect = function () {
+    return this.canvas.clientWidth / this.canvas.clientHeight;
+};
+
+
 /**
  * Refresh the canvas by redrawing everything needed.
  * Should only be called by requestAnimationFrame
@@ -2267,22 +2324,21 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
-    //TODO refactor condition
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
-    if (!this.auxFB) {
-        this.auxFB = gl.createFramebuffer();
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-    //console.log("Restyle", timestamp)
+
     // Render To Texture
     // COLOR
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -2300,11 +2356,12 @@ function refresh(timestamp) {
             gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
         });
 
-        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
@@ -2328,6 +2385,9 @@ function refresh(timestamp) {
         gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
 
         tile.style.updated = false;
         tile.initialized = true;
@@ -2378,6 +2438,10 @@ function refresh(timestamp) {
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+
     });
 
     this.tiles.forEach(t => {
@@ -2385,6 +2449,7 @@ function refresh(timestamp) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
+
 }
 
 /**
@@ -2756,6 +2821,9 @@ function Style(renderer, schema) {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+
+    this._compileWidthShader();
+    this._compileColorShader();
 }
 /**
  * Change the width of the style to a new style expression.
@@ -6115,23 +6183,20 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__ = __webpack_require__(25);
 
 
-var VectorTile = __webpack_require__(18).VectorTile;
-var Protobuf = __webpack_require__(21);
+function getData() {
+    __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["a" /* getData */](renderer);
+}
 
 var renderer;
-var oldtiles = [];
-var ajax;
-
 var style;
-var schema;
-
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
     try {
-        style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].parseStyleExpression(v, schema), 1000);
+        style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -6142,7 +6207,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].parseStyleExpression(v, schema), 1000);
+        style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]), 1000);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;
@@ -6151,114 +6216,7 @@ function styleColor(e) {
     }
 }
 
-function getTileList(c, iz, aspect) {
-    var list = [];
-    var z = Math.ceil(Math.log2(1. / iz));
-    var x = c.x;
-    var y = c.y;
-    const numTiles = Math.pow(2, z);
-    function saturate(x) {
-        return Math.min(Math.max(x, 0), 1);
-    }
-    const minx = Math.floor(numTiles * saturate((x - iz * aspect) * 0.5 + 0.5));
-    const maxx = Math.ceil(numTiles * saturate((x + iz * aspect) * 0.5 + 0.5));
-    const miny = Math.floor(numTiles * saturate(1. - ((y + iz) * 0.5 + 0.5)));
-    const maxy = Math.ceil(numTiles * saturate(1. - ((y - iz) * 0.5 + 0.5)));
-    for (let i = minx; i < maxx; i++) {
-        for (let j = miny; j < maxy; j++) {
-            list.push({
-                x: i,
-                y: j,
-                z: z
-            });
-        }
-    }
-    return list;
-}
-function getData(aspect) {
-    const tiles = getTileList(renderer.getCenter(), renderer.getZoom(), aspect);
-    var completedTiles = [];
-    var needToComplete = tiles.length;
-    tiles.forEach(t => {
-        const x = t.x;
-        const y = t.y;
-        const z = t.z;
-        const mvt_extent = 1024;
-        const subpixelBufferSize = 0;
-        const query =
-            `select st_asmvt(geom, 'lid') FROM
-        (
-            SELECT
-                ST_AsMVTGeom(
-                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
-                ),
-                SUM(amount) AS amount
-            FROM tx_0125_copy_copy AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*3.)
-            ORDER BY amount DESC
-        )AS geom
-    `;
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
-        oReq.onload = function (oEvent) {
-            const json = JSON.parse(oReq.response);
-            if (json.rows[0].st_asmvt.data.length == 0) {
-                needToComplete--;
-                if (completedTiles.length == needToComplete) {
-                    oldtiles.forEach(t => renderer.removeDataframe(t));
-                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                    oldtiles = completedTiles;
-                    styleWidth();
-                    styleColor();
-                }
-                return;
-            }
-            var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-            var fieldMap = {
-                category: 0,
-                amount: 1
-            };
-            var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
-            var points = new Float32Array(mvtLayer.length * 2);
-            const r = Math.random();
-            for (var i = 0; i < mvtLayer.length; i++) {
-                const f = mvtLayer.feature(i);
-                const geom = f.loadGeometry();
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(Math.random());
-                //properties[1][i] = Number(Math.random());
-                properties[1][i] = Number(f.properties.amount);
-                //console.log(f);
-                //break;
-            }
-            console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`);
-            var dataframe = {
-                center: { x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1, y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1. },
-                scale: 1 / Math.pow(2, z),
-                geom: points,
-                properties: {},
-            };
-            Object.keys(fieldMap).map((name, pid) => {
-                dataframe.properties[name] = properties[pid];
-            });
-            dataframe.schema = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Schema */](Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'));
-            console.log(Object.keys(dataframe.properties), Object.keys(dataframe.properties).map(() => 'float'), dataframe.schema);
-            completedTiles.push(dataframe);
-            if (completedTiles.length == needToComplete) {
-                oldtiles.forEach(t => renderer.removeDataframe(t));
-                completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                oldtiles = completedTiles;
-                styleWidth();
-                styleColor();
-            }
-        };
-        oReq.send(null);
-    });
-}
+
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -6323,10 +6281,12 @@ map.on('load', _ => {
     }
 
     renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["a" /* Renderer */](canvas);
-    schema = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Schema */](['category', 'amount'], ['float', 'float']);
-    style = new __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Style(renderer, schema);
+    style = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Style */].Style(renderer, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]);
+    __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["b" /* init */](style);
     $('#widthStyleEntry').on('input', styleWidth);
     $('#colorStyleEntry').on('input', styleColor);
+    styleWidth();
+    styleColor();
     resize();
     moveEnd();
 
@@ -6335,6 +6295,284 @@ map.on('load', _ => {
     map.on('move', move);
     map.on('moveend', moveEnd);
 });
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return init; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
+
+
+
+var VectorTile = __webpack_require__(18).VectorTile;
+var Protobuf = __webpack_require__(21);
+
+
+
+var oldtiles = [];
+var ajax;
+const names =['Moda y calzado',
+'Bares y restaurantes', 'Salud', 'Alimentación'];
+var schema = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* schema */].Schema(['category', 'amount'], [new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* schema */].Category(names
+    , [33263, 24633, 17833, 16907], [0, 1, 2, 3]), new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* schema */].Float(2, 100 * 1000)]);
+var style;
+
+function init(fixedStyle) {
+    style = fixedStyle;
+}
+
+var catMap = {};
+function getCatID(catStr) {
+    const f = names.indexOf(catStr);
+    return f;
+
+    if (catMap[catStr]) {
+        return catMap[catStr];
+    }
+    catMap[catStr] = Object.keys(catMap).length + 1;
+    return catMap[catStr];
+}
+
+function getData(renderer) {
+    const bounds = renderer.getBounds();
+    const aspect = renderer.getAspect();
+    const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
+    var completedTiles = [];
+    var needToComplete = tiles.length;
+    tiles.forEach(t => {
+        const x = t.x;
+        const y = t.y;
+        const z = t.z;
+        const mvt_extent = 1024;
+        const subpixelBufferSize = 0;
+        const query =
+            `select st_asmvt(geom, 'lid') FROM
+        (
+            SELECT
+                ST_AsMVTGeom(
+                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
+                ),
+                SUM(amount) AS amount,
+                _cdb_mode(category) AS category
+            FROM tx_0125_copy_copy AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*1.)
+            ORDER BY amount DESC
+        )AS geom
+    `;
+
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
+        oReq.onload = function (oEvent) {
+            const json = JSON.parse(oReq.response);
+            if (json.rows[0].st_asmvt.data.length == 0) {
+                needToComplete--;
+                if (completedTiles.length == needToComplete) {
+                    oldtiles.forEach(t => renderer.removeDataframe(t));
+                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
+                    console.log("ADDED");
+                    oldtiles = completedTiles;
+                }
+                return;
+            }
+            var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
+            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+            var fieldMap = {
+                category: 0,
+                amount: 1
+            };
+            var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+            var points = new Float32Array(mvtLayer.length * 2);
+            const r = Math.random();
+            for (var i = 0; i < mvtLayer.length; i++) {
+                const f = mvtLayer.feature(i);
+                const geom = f.loadGeometry();
+                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                properties[0][i] = Number(getCatID(f.properties.category));
+                properties[1][i] = Number(f.properties.amount);
+            }
+            console.log(catMap)
+            //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
+            var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
+            var dataframe = {
+                center: rs.center,
+                scale: rs.scale,
+                geom: points,
+                properties: {},
+            };
+            Object.keys(fieldMap).map((name, pid) => {
+                dataframe.properties[name] = properties[pid];
+            });
+            dataframe.schema = schema;
+            completedTiles.push(dataframe);
+            if (completedTiles.length == needToComplete) {
+                oldtiles.forEach(t => renderer.removeDataframe(t));
+                completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
+                oldtiles = completedTiles;
+            }
+        };
+        oReq.send(null);
+    });
+}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rTiles; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRsysFromTile; });
+/**
+ * An RSys defines a local coordinate system that maps the coordinates
+ * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
+ * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
+ * It is the combination of a translation and anisotropic scaling.
+ * @api
+ * @typedef {object} RSys - Renderer relative coordinate system
+ * @property {RPoint} center - Position of the local system in external coordinates
+ * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
+*/
+
+/*
+ * Random notes
+ *
+ * We can redefine Dataframe to use a Rsys instead of center, scale
+ * and we can use an Rsys for the Renderer's canvas.
+ *
+ * Some interesting World coordinate systems:
+ *
+ * WM (Webmercator): represents a part of the world (excluding polar regions)
+ * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)
+ *
+ * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*
+ * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
+ * by WM_R. (positive orientation: E,N)
+ *
+ * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
+ * (positive orientation: E,S)
+ *
+ * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
+ * the range +/-1.
+ *
+ * When an RSys external coordinate system is WM or NWMC, we can compute:
+ * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
+ *   Math.ceil(Math.log2(1 / r.scale));
+ * * Maximum zoom level for which tiles are no smaller than the rectangle:
+ *   Math.floor(Math.log2(1 / r.scale));
+ * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
+ *
+ * We'll use the term World coordinates below for the *external* reference system
+ * of an RSys (usually NWMC).
+ */
+
+/**
+ * R coordinates to World
+ * @api
+ * @param {RSys} r - ref. of the passed coordinates
+ * @param {number} x - x coordinate in r
+ * @param {number} y - y coordinate in r
+ * @return {RPoint} World coordinates
+ */
+function rToW(r, x, y) {
+    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
+}
+
+/**
+ * World coordinates to local RSys
+ * @api
+ * @param {number} x - x W-coordinate
+ * @param {number} y - y W-coordinate
+ * @param {RSys} r - target ref. system
+ * @return {RPoint} R coordinates
+ */
+function wToR(x, y, r) {
+    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
+}
+
+/**
+ * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
+ * @api
+ * @param {number} x - TC x coordinate
+ * @param {number} y - TC y coordinate
+ * @param {number} z - Tile zoom level
+ * @return {RSys}
+ */
+function tileRsys(x, y, z) {
+    let max = Math.pow(2, z);
+    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
+}
+
+/**
+ * Minimum zoom level for which tiles are no larger than the RSys rectangle
+ * @api
+ * @param {RSys} rsys
+ * @return {number}
+ */
+function rZoom(zoom) {
+    return Math.ceil(Math.log2(1. / zoom));
+}
+
+/**
+ * TC tiles that intersect the local rectangle of an RSys
+ * (with the largest tile size no larger than the rectangle)
+ * @param {RSys} rsys
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function rTiles(bounds) {
+    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
+}
+
+/**
+ * TC tiles of a given zoom level that intersect a W rectangle
+ * @param {number} z
+ * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function wRectangleTiles(z, wr) {
+    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
+    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
+
+    // compute tile coordinate ranges
+    const t_minx = Math.floor(n * (w_minx + 1) * 0.5);
+    const t_maxx = Math.ceil(n * (w_maxx + 1) * 0.5) - 1;
+    const t_miny = Math.floor(n * (1 - w_maxy) * 0.5);
+    const t_maxy = Math.ceil(n * (1 - w_miny) * 0.5) - 1;
+    let tiles = [];
+    for (let x = t_minx; x <= t_maxx; ++x) {
+        for (let y = t_miny; y <= t_maxy; ++y) {
+            tiles.push({ x: x, y: y, z: z });
+        }
+    }
+    return tiles;
+}
+
+/**
+ * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns {RSys}
+ */
+function getRsysFromTile(x, y, z) {
+    return {
+        center: {
+            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
+            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+        },
+        scale: 1 / Math.pow(2, z)
+    }
+}
+
+
+
 
 
 /***/ })
