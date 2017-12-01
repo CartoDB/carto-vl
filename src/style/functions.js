@@ -1,5 +1,6 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
+import { Schema } from '../schema';
 
 /** @module style/functions/
  * @api
@@ -203,6 +204,7 @@ class Property extends Expression {
         this.name = name;
         this.type = 'float';
         this.schema = schema;
+        this.schemaType = schema[name];
     }
 }
 
@@ -564,22 +566,33 @@ localtop computes them by computing the histogram in-place filtering in the view
 */
 
 
-class RampColor extends Expression {
+class Ramp extends Expression {
     /**
      * @api
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
-     * @param {*} minKey
-     * @param {*} maxKey
      * @param {*} palette
+     * @param {*} minKey Optional
+     * @param {*} maxKey Optional
      */
-    constructor(input, minKey, maxKey, palette) {
+    constructor(input, palette, minKey, maxKey, ) {
+        console.log("RAMP", input, input.schemaType);
+        if (maxKey == undefined) {
+            if (input.schemaType instanceof schema.Float) {
+                minKey = input.schemaType.globalMin;
+                maxKey = input.schemaType.globalMax;
+            } else if (input.schemaType instanceof schema.Category) {
+                minKey = -1;
+                maxKey = input.schemaType.categoryNames.length;
+            }
+        }
+
         input = implicitCast(input);
         minKey = implicitCast(minKey);
         maxKey = implicitCast(maxKey);
         var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to RampColor()`);
+            throw new Error(`Invalid arguments to Ramp()`);
         }
         super({ input: input });
         this.type = 'color';
@@ -587,6 +600,8 @@ class RampColor extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
+
+
 
         this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -671,11 +686,11 @@ const property = (...args) => new Property(...args);
 const animate = (...args) => new Animate(...args);
 const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
-const rampColor = (...args) => new RampColor(...args);
+const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate,
-    property, blend, now, near, rgba, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate,
     setGL
 };
