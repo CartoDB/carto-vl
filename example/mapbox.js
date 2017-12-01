@@ -1,4 +1,5 @@
 import * as R from '../src/index';
+import * as rsys from './rsys';
 
 var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
@@ -34,32 +35,8 @@ function styleColor(e) {
     }
 }
 
-function getTileList(c, iz, aspect) {
-    var list = [];
-    var z = Math.ceil(Math.log2(1. / iz));
-    var x = c.x;
-    var y = c.y;
-    const numTiles = Math.pow(2, z);
-    function saturate(x) {
-        return Math.min(Math.max(x, 0), 1);
-    }
-    const minx = Math.floor(numTiles * saturate((x - iz * aspect) * 0.5 + 0.5));
-    const maxx = Math.ceil(numTiles * saturate((x + iz * aspect) * 0.5 + 0.5));
-    const miny = Math.floor(numTiles * saturate(1. - ((y + iz) * 0.5 + 0.5)));
-    const maxy = Math.ceil(numTiles * saturate(1. - ((y - iz) * 0.5 + 0.5)));
-    for (let i = minx; i < maxx; i++) {
-        for (let j = miny; j < maxy; j++) {
-            list.push({
-                x: i,
-                y: j,
-                z: z
-            });
-        }
-    }
-    return list;
-}
 function getData(aspect) {
-    const tiles = getTileList(renderer.getCenter(), renderer.getZoom(), aspect);
+    const tiles = rsys.rTiles(renderer.getBounds());
     var completedTiles = [];
     var needToComplete = tiles.length;
     tiles.forEach(t => {
