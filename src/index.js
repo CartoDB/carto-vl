@@ -68,6 +68,7 @@ function Renderer(canvas) {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
     var vertices = [
@@ -104,8 +105,8 @@ Renderer.prototype.setCenter = function (x, y) {
  */
 Renderer.prototype.getBounds = function () {
     const center = this.getCenter();
-    const sx = this.getZoom() * 0.5 * this.getAspect();
-    const sy = this.getZoom() * 0.5;
+    const sx = this.getZoom() * this.getAspect();
+    const sy = this.getZoom();
     return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
 }
 /**
@@ -207,9 +208,10 @@ Renderer.prototype.addDataframe = function (tile) {
         }
     }
 
-    tile.setStyle = function (style) {
+    tile.setStyle = (style) => {
         schema.checkSchemaMatch(style.schema, tile.schema);
-        this.style = style;
+        tile.style = style;
+        window.requestAnimationFrame(refresh.bind(this));
     }
     tile.style = null;
 
@@ -284,22 +286,21 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
-    //TODO refactor condition
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
-    if (!this.auxFB) {
-        this.auxFB = gl.createFramebuffer();
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-    //console.log("Restyle", timestamp)
+
     // Render To Texture
     // COLOR
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -317,11 +318,12 @@ function refresh(timestamp) {
             gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
         });
 
-        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
@@ -345,6 +347,9 @@ function refresh(timestamp) {
         gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
 
         tile.style.updated = false;
         tile.initialized = true;
@@ -395,6 +400,10 @@ function refresh(timestamp) {
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+
     });
 
     this.tiles.forEach(t => {
@@ -402,6 +411,7 @@ function refresh(timestamp) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
+
 }
 
 /**

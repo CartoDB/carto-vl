@@ -95,7 +95,7 @@ function rZoom(zoom) {
  * @return {Array} - array of TC tiles {x, y, z}
  */
 function rTiles(bounds) {
-    return wRectangleTiles(rZoom(bounds[3] - bounds[1]), bounds);
+    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
 }
 
 /**
@@ -107,6 +107,7 @@ function rTiles(bounds) {
 function wRectangleTiles(z, wr) {
     const [w_minx, w_miny, w_maxx, w_maxy] = wr;
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
+
     // compute tile coordinate ranges
     const t_minx = Math.floor(n * (w_minx + 1) * 0.5);
     const t_maxx = Math.ceil(n * (w_maxx + 1) * 0.5) - 1;
