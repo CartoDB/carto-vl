@@ -159,15 +159,17 @@ function getData(renderer) {
             }
             //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
             var rs = rsys.getRsysFromTile(x, y, z);
-            var dataframe = {
-                center: rs.center,
-                scale: rs.scale,
-                geom: points,
-                properties: {},
-            };
+            let dataframeProperties = {};
             Object.keys(fieldMap).map((name, pid) => {
-                dataframe.properties[name] = properties[pid];
+                dataframeProperties[name] = properties[pid];
             });
+            var dataframe = new R.Dataframe(
+                rs.center,
+                rs.scale,
+                points,
+                dataframeProperties,
+            );
+
             dataframe.schema = schema;
             completedTiles.push(dataframe);
             if (completedTiles.length == needToComplete) {
