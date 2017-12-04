@@ -68,7 +68,6 @@ function getData(renderer) {
                 if (completedTiles.length == needToComplete) {
                     oldtiles.forEach(t => renderer.removeDataframe(t));
                     completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                    console.log("ADDED");
                     oldtiles = completedTiles;
                 }
                 return;
@@ -90,7 +89,6 @@ function getData(renderer) {
                 properties[0][i] = Number(getCatID(f.properties.category));
                 properties[1][i] = Number(f.properties.amount);
             }
-            console.log(catMap)
             //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
             var rs = rsys.getRsysFromTile(x, y, z);
             var dataframe = {
