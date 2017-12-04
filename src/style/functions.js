@@ -488,6 +488,7 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
         }
         super({ m: m }, inline => inlineMaker(inline.m), preface);
         this.schema = m.schema;
+        this.isInterpolator = true;
     }
 }
 class Linear extends genInterpolator(inner => inner) { }
@@ -527,7 +528,7 @@ class Blend extends Expression {
         if (schema.checkSchemaMatch(a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
         }
-        if (interpolator) {
+        if (interpolator && interpolator.isInterpolator) {
             mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
