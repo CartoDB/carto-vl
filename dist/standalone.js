@@ -94,6 +94,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Max", function() { return Max; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Min", function() { return Min; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return Top; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -118,6 +120,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "max", function() { return max; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "min", function() { return min; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "top", function() { return top; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
@@ -604,6 +608,33 @@ class Near extends Expression {
     }
 }
 
+const genInterpolator = (inlineMaker, preface) => class Interpolator extends Expression {
+    constructor(m) {
+        m = implicitCast(m);
+        if (m.type != 'float') {
+            throw new Error(`Blending cannot be performed by '${mix.type}'`);
+        }
+        super({ m: m }, inline => inlineMaker(inline.m), preface);
+        this.schema = m.schema;
+        this.isInterpolator = true;
+    }
+}
+class Linear extends genInterpolator(inner => inner) { }
+class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`) { }
+
 class Blend extends Expression {
     /**
      * @api
@@ -612,7 +643,7 @@ class Blend extends Expression {
      * @param {*} b type must match a's type
      * @param {*} mix interpolation parameter in the [0,1] range
      */
-    constructor(a, b, mix) {
+    constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
@@ -624,6 +655,9 @@ class Blend extends Expression {
         }
         if (__WEBPACK_IMPORTED_MODULE_1__schema__["checkSchemaMatch"](a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
+        }
+        if (interpolator && interpolator.isInterpolator) {
+            mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
         if (a.type == 'float' && b.type == 'float') {
@@ -873,6 +907,8 @@ const float = (...args) => new Float(...args);
 const max = (...args) => new Max(...args);
 const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
+const linear = (...args) => new Linear(...args);
+const cubic = (...args) => new Cubic(...args);
 
 
 
@@ -1812,6 +1848,8 @@ function parseNode(node, schema) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1), schema);
         } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]();
+        }else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return lowerCaseFunctions[node.name.toLowerCase()];
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
@@ -2560,7 +2598,7 @@ function refresh(timestamp) {
 
     });
 
-    this._getMin(null, this.computePool[0]);
+    //this._getMin(null, this.computePool[0]);
 
     this.tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -2656,7 +2694,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     });
     const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
-    console.log('computer', shader)
+    //console.log('computer', shader)
 
     gl.useProgram(shader.program);
 
@@ -3026,6 +3064,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Max", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Max"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Min", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Min"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Top"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Linear"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3050,6 +3090,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "max", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["max"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "min", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["min"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["top"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
