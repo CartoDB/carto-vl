@@ -31,7 +31,6 @@ function styleColor(e) {
 }
 
 
-
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference

@@ -1,5 +1,6 @@
 import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
+import * as computerGLSL from './computer';
 
 const NUM_TEXTURE_LOCATIONS = 4;
 
@@ -51,6 +52,26 @@ function GenericStyler(gl, glsl, preface, inline) {
         this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
     }
 }
+function Computer(gl, glsl, preface, inline){
+    let VS = glsl.VS;
+    let FS = glsl.FS;
+    VS = VS.replace('$PREFACE', preface);
+    VS = VS.replace('$INLINE', inline);
+    //console.log(VS)
+    //console.log(FS)
+    compileProgram.call(this, gl, VS, FS);
+    this.textureLocations = [];
+    for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
+        this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+    }
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+}
+function computer(gl, preface, inline){
+    return new Computer(gl, computerGLSL, preface, inline);
+}
 function Color(gl, preface, inline) {
     GenericStyler.call(this, gl, stylerGLSL.color, preface, inline);
 }
@@ -73,4 +94,4 @@ const styler = {
     }
 };
 
-export { renderer, styler };
+export { renderer, styler, computer };

@@ -45,7 +45,7 @@
     }
 
     Use this to check that the affected antiliased pixels are ok:
-    
+
     if (c.a==1.||c.a==0.){
         gl_FragColor = vec4(1,0,0,1);
         return;
