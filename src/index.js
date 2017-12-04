@@ -2,8 +2,10 @@ import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
 
-export { Renderer, Style };
-export { Schema } from './schema';
+export { Renderer, Style, Dataframe };
+
+import * as schema from './schema';
+export { schema };
 
 /**
  * @api
@@ -13,13 +15,13 @@ export { Schema } from './schema';
  */
 
 /**
-* @api
-* @typedef {object} Dataframe - Point in renderer coordinates space
-* @property {RPoint} center
-* @property {number} scale
-* @property {geom} geometry
-* @property {Properties} properties
-*/
+ * @api
+ * @typedef {object} Dataframe - Point in renderer coordinates space
+ * @property {RPoint} center
+ * @property {number} scale
+ * @property {geom} geometry
+ * @property {Properties} properties
+ */
 
 
 // TODO remove
@@ -42,7 +44,7 @@ const RTT_WIDTH = 1024;
  * The function will fail in case that a WebGL context cannot be created this can happen because of the following reasons:
  *   * The provided canvas element is invalid
  *   * The browser or the machine doesn't support WebGL or the required WebGL extension and minimum parameter values
- * @api
+ * @jsapi
  * @memberOf renderer
  * @constructor
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
@@ -72,6 +74,7 @@ function Renderer(canvas) {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
     var vertices = [
@@ -101,6 +104,17 @@ Renderer.prototype.setCenter = function (x, y) {
     this._center.y = y;
     window.requestAnimationFrame(refresh.bind(this));
 };
+/**
+ * Get Renderer visualization center
+ * @api
+ * @return {*}
+ */
+Renderer.prototype.getBounds = function () {
+    const center = this.getCenter();
+    const sx = this.getZoom() * this.getAspect();
+    const sy = this.getZoom();
+    return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
+}
 /**
  * Get Renderer visualization zoom
  * @api
@@ -133,59 +147,67 @@ Renderer.prototype.removeDataframe = function (dataframe) {
     gl.deleteBuffer(dataframe.featureIDBuffer);
 };
 
-/**
- * @constructor
- * @api
- */
-function Dataframse() {
-}
-/**
- * @api
- * Aply a style
- * @param style
- */
-Dataframse.prototype.applyStyle = function (style) {
 
+class Dataframe {
+    /**
+     * @constructor
+     * @jsapi
+     */
+    constructor(center, scale, geom, properties) {
+        this.center = center;
+        this.scale = scale;
+        this.geom = geom;
+        this.properties = properties;
+    }
+}
+
+class BoundDataframe extends Dataframe {
+    /**
+    * @jsapi
+    * Apply a style
+    * @name setStyle
+    * @param style
+    */
 }
 
 /**
- * @api
+ * @jsapi
  * @description Adds a new dataframe to the renderer.
  *
  * Performance-intensive. The required allocation and copy of resources will happen synchronously.
  * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
  * @param {Dataframe} dataframe
- * @returns {Dataframse} asd
+ * @returns {BoundDataframe}
  */
-Renderer.prototype.addDataframe = function (tile) {
-    this.tiles.push(tile);
-    tile.propertyTex = [];
+Renderer.prototype.addDataframe = function (dataframe) {
+    this.tiles.push(dataframe);
+    dataframe.propertyTex = [];
 
-    var points = tile.geom;
+    var points = dataframe.geom;
     const level = 0;
     const width = RTT_WIDTH;
-    tile.numVertex = points.length / 2;
-    const height = Math.ceil(tile.numVertex / width);
+    dataframe.numVertex = points.length / 2;
+    const height = Math.ceil(dataframe.numVertex / width);
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
-    tile.height = height;
-    tile.propertyID = {}; //Name => PID
-    tile.propertyCount = 0;
+    dataframe.height = height;
+    dataframe.propertyID = {}; //Name => PID
+    dataframe.propertyCount = 0;
 
 
-    for (var k in tile.properties) {
-        if (tile.properties.hasOwnProperty(k) && tile.properties[k].length > 0) {
-            const isCategory = !Number.isFinite(tile.properties[k][0]);
-            const property = tile.properties[k];
-            var propertyID = tile.propertyID[k];
+    for (var k in dataframe.properties) {
+        if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
+            const isCategory = !Number.isFinite(dataframe.properties[k][0]);
+            const property = dataframe.properties[k];
+            var propertyID = dataframe.propertyID[k];
             if (propertyID === undefined) {
-                propertyID = tile.propertyCount;
-                tile.propertyCount++;
-                tile.propertyID[k] = propertyID;
+                propertyID = dataframe.propertyCount;
+                dataframe.propertyCount++;
+                dataframe.propertyID[k] = propertyID;
             }
-            tile.propertyTex[propertyID] = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
+            dataframe.propertyTex[propertyID] = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
             const pixel = new Float32Array(width * height);
             for (var i = 0; i < property.length; i++) {
                 pixel[i] = property[i];
@@ -200,18 +222,19 @@ Renderer.prototype.addDataframe = function (tile) {
         }
     }
 
-    tile.setStyle = function (style) {
-        schema.checkSchemaMatch(style.schema, tile.schema);
-        this.style = style;
+    dataframe.setStyle = (style) => {
+        schema.checkSchemaMatch(style.schema, dataframe.schema);
+        dataframe.style = style;
+        window.requestAnimationFrame(refresh.bind(this));
     }
-    tile.style = null;
+    dataframe.style = null;
 
-    tile.vertexBuffer = gl.createBuffer();
-    tile.featureIDBuffer = gl.createBuffer();
+    dataframe.vertexBuffer = gl.createBuffer();
+    dataframe.featureIDBuffer = gl.createBuffer();
 
 
-    tile.texColor = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+    dataframe.texColor = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4 * width * height).fill(255));
@@ -220,8 +243,8 @@ Renderer.prototype.addDataframe = function (tile) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    tile.texWidth = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+    dataframe.texWidth = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4 * width * height).fill(100));
@@ -238,18 +261,23 @@ Renderer.prototype.addDataframe = function (tile) {
         ids[i + 1] = Math.floor((i / 2) / width) / height;
     }
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     window.requestAnimationFrame(refresh.bind(this));
 
-    return tile;
+    return dataframe;
 };
+
+Renderer.prototype.getAspect = function () {
+    return this.canvas.clientWidth / this.canvas.clientHeight;
+};
+
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -280,13 +308,10 @@ function refresh(timestamp) {
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
-    if (!this.auxFB) {
-        this.auxFB = gl.createFramebuffer();
-    }
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-    //console.log("Restyle", timestamp)
+
     // Render To Texture
     // COLOR
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -304,11 +329,12 @@ function refresh(timestamp) {
             gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
         });
 
-        gl.enableVertexAttribArray(this.colorShaderVertex);
+        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
         gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
@@ -332,6 +358,9 @@ function refresh(timestamp) {
         gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
 
         tile.style.updated = false;
         tile.initialized = true;
@@ -382,6 +411,10 @@ function refresh(timestamp) {
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+
     });
 
     this._getMin(null, this.computePool[0]);
@@ -391,6 +424,7 @@ function refresh(timestamp) {
             window.requestAnimationFrame(refresh.bind(this));
         }
     });
+
 }
 
 /**
@@ -516,6 +550,10 @@ Renderer.prototype._getMin = function (expression, callback) {
         });
 
         gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+        gl.disableVertexAttribArray(shader.vertexPositionAttribute);
+        gl.disableVertexAttribArray(shader.featureIdAttr);
+        
     });
 
 

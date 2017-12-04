@@ -99,7 +99,7 @@ float distanceAntialias(vec2 p){
 void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
-    //c.a *= distanceAntialias(p);
-    //c.rgb*=c.a;
+    c.a *= distanceAntialias(p);
+    c.rgb*=c.a;
     gl_FragColor = c;
 }`;

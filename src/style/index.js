@@ -50,7 +50,7 @@ Style.prototype._compileWidthShader = function () {
 }
 
 /**
- * @api
+ * @jsapi
  * @constructor
  * @description A Style defines how associated dataframes of a particular renderer should be renderer.
  *
@@ -70,16 +70,19 @@ function Style(renderer, schema) {
         this._compileWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._color = functions.color([0, 0, 0, 1]);
+    this._color = functions.rgba(0, 0, 0, 1);
     this._color.parent = this;
     this._color.notify = () => {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+
+    this._compileWidthShader();
+    this._compileColorShader();
 }
 /**
  * Change the width of the style to a new style expression.
- * @api
+ * @jsapi
  * @param {*} float
  */
 Style.prototype.setWidth = function (float) {
@@ -107,7 +110,7 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
 }
 /**
  * Change the color of the style to a new style expression.
- * @api
+ * @jsapi
  * @param {*} color
  */
 Style.prototype.setColor = function (color) {
@@ -122,14 +125,14 @@ Style.prototype.setColor = function (color) {
 }
 /**
  * Get the width style expression
- * @api
+ * @jsapi
  */
 Style.prototype.getWidth = function () {
     return this._width;
 }
 /**
  * Get the color style expression
- * @api
+ * @jsapi
  */
 Style.prototype.getColor = function () {
     return this._color;

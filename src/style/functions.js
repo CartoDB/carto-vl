@@ -1,5 +1,58 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
+import { Schema } from '../schema';
+
+/** @module style/functions/
+ * @api
+ * @description
+ * # Styling language overview
+ *
+ * A style has a fixed number of properties with default values.
+ * These properties are: color, width, stroke-color and stroke-width.
+ *
+ * Properties are styled by using styling expressions.
+ * A styling expression is a numeric literal, an identifier, a function call, or a built-in mathematic operation.
+ *
+ *
+ *
+ * ## Numeric literals:
+ * ```
+ * 5            //This IS a valid expression, a numeric literal
+ * 0.3          //This IS a valid expression too
+ * 'myString'   //This IS NOT a valid expression, strings are unsupported
+ * ```
+ * ## Identifiers.
+ * Identifiers can be used to refer to a feature property by prefixing the property name by '$'.
+ * Cartocolors schemes are identifiers too.
+ * ```
+ * $myAwesomeProperty   //This IS a valid expression
+ * Prism                //This IS a valid expression, Prism is a cartocolor palette
+ * wadusWadus           //This IS NOT a valid expression since wadusWadus is not a known palette nor it is prefixed by '$'
+ * ```
+ *
+ * ## Built-in mathematic operations
+ * Some basic mathematical operations are supported:
+ * ```
+ * 3+4       //This IS a valid expression
+ * 2^5       //This IS a valid expression, '^' is the power function, this resolves to 32
+ * 2<<3      //This IS NOT a valid expression (no, binary operators are unsupported)
+ * ```
+ *
+ *
+ * ## Function calling.
+ * Functions can be used to mix different expressions creating richer expressions.
+ * ```
+ * rgba(0.5,0.5,0.5, 1) //This IS a valid expression
+ * now()                //This IS a valid expression
+ *
+ * wadusWadus()         //This IS NOT a valid expression, wadusWadus is not a known function
+ * rgba(1)              //This IS NOT a valid expression since rgba() takes 4 parameters and only one was passed
+ *
+ * rgba(0,0,0, now())           //This IS a valid expression, now is a numeric expression and match the alpha parameter type of rgba()
+ * rgba(0,0,0, rgba(0,0,0,0))   //This IS NOT a valid expression, the alpha parameter of the first function call is of type color since rgba returns a color
+ * ```
+ */
+
 
 function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -52,9 +105,10 @@ export { schemas };
         - Think about "Date" and "string" types.
         - Heatmaps (renderer should be improved too to accommodate this)
 */
+
 class Expression {
     /**
-     * @api
+     * @jsapi
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker
@@ -96,7 +150,7 @@ class Expression {
         this.childrenNames.forEach(name => this[name]._preDraw(l));
     }
     /**
-     * @api
+     * @jsapi
      * @returns true if the evaluation of the function at styling time won't be the same every time.
      */
     isAnimated() {
@@ -115,14 +169,14 @@ class Expression {
     }
     /**
      * Linear interpolation between this and finalValue with the specified duration
-     * @api
+     * @jsapi
      * @param {Expression} final
      * @param {Expression} duration
      * @param {Expression} blendFunc
      */
     blendTo(final, duration = 500, blendFunc = 'linear') {
         const parent = this.parent;
-        const blender = blend(this, final, animation(duration));
+        const blender = blend(this, final, animate(duration));
         parent._replaceChild(this, blender);
         blender.notify();
     }
@@ -134,11 +188,11 @@ class Expression {
     }
 }
 
+
 class Property extends Expression {
     /**
-     * @api
-     * @param {*} name
-     * @param {*} schema
+     * @jsapi
+     * @param {*} name Property/column name
      */
     constructor(name, schema) {
         if (typeof name !== 'string' || name == '') {
@@ -151,28 +205,79 @@ class Property extends Expression {
         this.name = name;
         this.type = 'float';
         this.schema = schema;
+        this.schemaType = schema[name];
     }
+}
+
+const metadataAccessGenerator = (metadataProperty) =>
+    class metadataAcessor extends Expression {
+        constructor(property, schema) {
+            super({ expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
+            this.name = name;
+            this.type = 'float';
+        }
+    };
+const Max = metadataAccessGenerator('globalMax');
+const Min = metadataAccessGenerator('globalMin');
+
+
+
+class Top extends Expression {
+    constructor(property, buckets) {
+        // TODO validation
+        super({ property: property });
+        this.type = 'float';
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        const width = 1024;
+        let pixels = new Uint8Array(4 * width);
+
+        const schema = property.schemaType;
+        for (let i = 0; i < buckets - 1; i++) {
+            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
+        }
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            pixels);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        this._UID = uniformIDMaker();
+        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
+            inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
+        };
+    }
+    _postShaderCompile(program) {
+        this.property._postShaderCompile(program);
+        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
+    }
+    _preDraw(l) {
+        this.property._preDraw(l);
+        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.uniform1i(this._texLoc, l.freeTexUnit);
+        l.freeTexUnit++;
+    }
+    //TODO _free
 }
 
 class Now extends Expression {
     /**
      * @api
-     * @param {*} speed
+     * @description get the current timestamp
      */
-    constructor(speed) {
-        if (speed == undefined) {
-            speed = 1;
-        }
-        if (!Number.isFinite(Number(speed))) {
-            throw new Error('Now() only accepts number literals');
-        }
+    constructor() {
         super({ now: float(0) }, inline => inline.now);
         this.type = 'float';
         this.init = Date.now();
-        this.speed = speed;
     }
     _preDraw() {
-        this.now.expr = (Date.now() - this.init) * this.speed / 1000.;
+        this.now.expr = (Date.now() - this.init) / 1000.;
         this.now._preDraw();
     }
     isAnimated() {
@@ -183,14 +288,16 @@ class Now extends Expression {
 const now = (speed) => new Now(speed);
 
 //TODO convert to use uniformfloat class
-class Animation extends Expression {
+class Animate extends Expression {
     /**
-     * @api
-     * @param {*} duration
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
      */
     constructor(duration) {
         if (!Number.isFinite(duration)) {
-            throw new Error("Animation only supports number literals");
+            throw new Error("Animate only supports number literals");
         }
         super({});
         this.type = 'float';
@@ -225,9 +332,10 @@ class Animation extends Expression {
 class HSV extends Expression {
     /**
      * @api
-     * @param {*} h
-     * @param {*} s
-     * @param {*} v
+     * @description Color constructor for Hue Saturation Value (HSV) color space
+     * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
+     * @param {*} saturation saturation of the color in the [0,1] range
+     * @param {*} value value (brightness) of the color in the [0,1] range
      */
     constructor(h, s, v) {
         h = implicitCast(h);
@@ -259,7 +367,7 @@ class HSV extends Expression {
 const genBinaryOp = (jsFn, glsl) =>
     class BinaryOperation extends Expression {
         /**
-         * @api
+         * @jsapi
          * @name BinaryOperation
          * @hideconstructor
          * @augments Expression
@@ -292,8 +400,9 @@ const genBinaryOp = (jsFn, glsl) =>
 class SetOpacity extends Expression {
     /**
      * @api
-     * @param {*} a
-     * @param {*} b
+     * @description Override the input color opacity
+     * @param {*} color input color
+     * @param {*} opacity new opacity
      */
     constructor(a, b) {
         if (Number.isFinite(b)) {
@@ -310,7 +419,7 @@ class SetOpacity extends Expression {
 };
 
 /**
-* @api
+* @jsapi
 * @augments {BinaryOperation}
 */
 class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) { }
@@ -345,10 +454,12 @@ const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 class Near extends Expression {
     /**
      * @api
+     * @description Near returns zero for inputs that are far away from center.
+     * This can be useful for filtering out features by setting their size to zero.
      * @param {*} input
      * @param {*} center
-     * @param {*} threshold
-     * @param {*} falloff
+     * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
+     * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
      */
     constructor(input, center, threshold, falloff) {
         input = implicitCast(input);
@@ -372,9 +483,10 @@ class Near extends Expression {
 class Blend extends Expression {
     /**
      * @api
-     * @param {*} a
-     * @param {*} b
-     * @param {*} mix
+     * @description Interpolate from *a* to *b* based on *mix*
+     * @param {*} a can be a color or a number
+     * @param {*} b type must match a's type
+     * @param {*} mix interpolation parameter in the [0,1] range
      */
     constructor(a, b, mix) {
         a = implicitCast(a);
@@ -402,19 +514,24 @@ class Blend extends Expression {
     }
     _preDraw(l) {
         super._preDraw(l);
-        if (this.mix instanceof Animation && !this.mix.isAnimated()) {
+        if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
     }
 }
 
 //TODO rename to uniformcolor, write color (plain, literal)
-class Color extends Expression {
+class RGBA extends Expression {
     /**
      * @api
-     * @param {*} color
+     * @description RGBA color constructor
+     * @param {*} r red component in the [0,1] range
+     * @param {*} g green component in the [0,1] range
+     * @param {*} b blue component in the [0,1] range
+     * @param {*} a alpha/opacity component in the [0,1] range
      */
-    constructor(color) {
+    constructor(r, g, b, a) {
+        var color = [r, g, b, a];
         if (!Array.isArray(color)) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
@@ -444,22 +561,19 @@ class Color extends Expression {
     }
 }
 
-function float(x) {
-    if (!Number.isFinite(x)) {
-        throw new Error(`Invalid arguments to Float(): ${args}`);
-    }
-    return new Float(x);
-}
 
 class Float extends Expression {
     /**
-     * @api
-     * @param {*} size
+     * @jsapi
+     * @param {*} x
      */
-    constructor(size) {
+    constructor(x) {
+        if (!Number.isFinite(x)) {
+            throw new Error(`Invalid arguments to Float(): ${x}`);
+        }
         super({});
         this.type = 'float';
-        this.expr = size;
+        this.expr = x;
     }
     _applyToShaderSource(uniformIDMaker) {
         this._uniformID = uniformIDMaker();
@@ -491,21 +605,52 @@ function hexToRgb(hex) {
 
 //Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
 
-class RampColor extends Expression {
+/*
+hsv(top($cat, 5), 0.5, 1.);
+ramp(top($cat, 7), Prism);
+
+hsv(localtop($cat, 5), 0.5, 1.);
+ramp(localtop($cat, 7), Prism);
+
+
+top/localtop returns  a normalized category number:
+For example:
+0.,0.2,0.4,0.6,0.8,1. (where 1 means 'others')
+Values are clamped to 1 (others)
+
+top computes them by ordering the metadata by their influence (histogram)
+localtop computes them by computing the histogram in-place filtering in the viewport region
+
+*/
+
+
+class Ramp extends Expression {
     /**
      * @api
+     * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
-     * @param {*} minKey
-     * @param {*} maxKey
-     * @param {*} values
+     * @param {*} palette
+     * @param {*} minKey Optional
+     * @param {*} maxKey Optional
      */
-    constructor(input, minKey, maxKey, values) {
+    constructor(input, palette, minKey, maxKey, ) {
+        console.log("RAMP", input, input.schemaType);
+        if (maxKey == undefined) {
+            if (input.schemaType instanceof schema.Float) {
+                minKey = input.schemaType.globalMin;
+                maxKey = input.schemaType.globalMax;
+            } else if (input.schemaType instanceof schema.Category) {
+                minKey = -1;
+                maxKey = input.schemaType.categoryNames.length;
+            }
+        }
+
         input = implicitCast(input);
         minKey = implicitCast(minKey);
         maxKey = implicitCast(maxKey);
-        values = implicitCast(values);
+        var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to RampColor()`);
+            throw new Error(`Invalid arguments to Ramp()`);
         }
         super({ input: input });
         this.type = 'color';
@@ -513,6 +658,8 @@ class RampColor extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
+
+
 
         this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -578,11 +725,7 @@ class RampColor extends Expression {
     }
 }
 
-/**
- *
- * @api
- * @returns {FloatMul}
- */
+
 const floatMul = (...args) => new FloatMul(...args);
 const floatDiv = (...args) => new FloatDiv(...args);
 const floatAdd = (...args) => new FloatAdd(...args);
@@ -596,15 +739,19 @@ const tan = (...args) => new Tan(...args);
 const sign = (...args) => new Sign(...args);
 const near = (...args) => new Near(...args);
 const blend = (...args) => new Blend(...args);
-const color = (...args) => new Color(...args);
+const rgba = (...args) => new RGBA(...args);
 const property = (...args) => new Property(...args);
-const animation = (...args) => new Animation(...args);
+const animate = (...args) => new Animate(...args);
 const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
-const rampColor = (...args) => new RampColor(...args);
+const ramp = (...args) => new Ramp(...args);
+const float = (...args) => new Float(...args);
+const max = (...args) => new Max(...args);
+const min = (...args) => new Min(...args);
+const top = (...args) => new Top(...args);
 
 export {
-    Property, Blend, Now, Near, Color, Float, RampColor, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV,
-    property, blend, now, near, color, float, rampColor, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top,
     setGL
 };
