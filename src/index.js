@@ -417,7 +417,7 @@ function refresh(timestamp) {
 
     });
 
-    this._getMin(null, this.computePool[0]);
+    //this._getMin(null, this.computePool[0]);
 
     this.tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -513,7 +513,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     });
     const r = Style.compileShader(expr, shaders.computer);
     const shader = r.shader;
-    console.log('computer', shader)
+    //console.log('computer', shader)
 
     gl.useProgram(shader.program);
 

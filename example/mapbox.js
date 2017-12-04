@@ -21,7 +21,7 @@ function styleWidth(e) {
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
     try {
-        style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
+        style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 0);
         document.getElementById("feedback").value = 'ok';
     } catch (error) {
         const err = `Invalid color expression: ${error}:${error.stack}`;

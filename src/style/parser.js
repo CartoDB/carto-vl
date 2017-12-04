@@ -70,6 +70,8 @@ function parseNode(node, schema) {
             return functions.property(node.name.substring(1), schema);
         } else if (functions.schemas[node.name.toLowerCase()]) {
             return functions.schemas[node.name.toLowerCase()]();
+        }else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return lowerCaseFunctions[node.name.toLowerCase()];
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);

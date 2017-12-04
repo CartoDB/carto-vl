@@ -480,6 +480,32 @@ class Near extends Expression {
     }
 }
 
+const genInterpolator = (inlineMaker, preface) => class Interpolator extends Expression {
+    constructor(m) {
+        m = implicitCast(m);
+        if (m.type != 'float') {
+            throw new Error(`Blending cannot be performed by '${mix.type}'`);
+        }
+        super({ m: m }, inline => inlineMaker(inline.m), preface);
+        this.schema = m.schema;
+    }
+}
+class Linear extends genInterpolator(inner => inner) { }
+class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`) { }
+
 class Blend extends Expression {
     /**
      * @api
@@ -488,7 +514,7 @@ class Blend extends Expression {
      * @param {*} b type must match a's type
      * @param {*} mix interpolation parameter in the [0,1] range
      */
-    constructor(a, b, mix) {
+    constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
@@ -500,6 +526,9 @@ class Blend extends Expression {
         }
         if (schema.checkSchemaMatch(a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
+        }
+        if (interpolator) {
+            mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
         if (a.type == 'float' && b.type == 'float') {
@@ -749,9 +778,11 @@ const float = (...args) => new Float(...args);
 const max = (...args) => new Max(...args);
 const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
+const linear = (...args) => new Linear(...args);
+const cubic = (...args) => new Cubic(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic,
     setGL
 };
