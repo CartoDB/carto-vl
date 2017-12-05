@@ -98,46 +98,69 @@ async function getSchema() {
     return schema;
 }
 
-function getData(renderer) {
-    const bounds = renderer.getBounds();
-    const aspect = renderer.getAspect();
-    const tiles = rsys.rTiles(bounds);
-    var completedTiles = [];
-    var needToComplete = tiles.length;
-    tiles.forEach(t => {
-        const x = t.x;
-        const y = t.y;
-        const z = t.z;
+
+var LRU = require("lru-cache")
+    , options = {
+        max: 1000
+        , length: function (dataframe, key) { return 1; }
+        , dispose: function (key, promise) {
+            promise.then(dataframe => {
+                if (!dataframe.empty) {
+                    dataframe.free();
+                }
+            })
+        }
+        , maxAge: 1000 * 60 * 60
+    }
+    , cache = LRU(options)
+
+function getDataframe(x, y, z, callback) {
+    const id = `${x},${y},${z}`;
+    const c = cache.get(id);
+    if (c) {
+        c.then(callback);
+        return;
+    }
+    const promise = requestDataframe(x, y, z);
+    cache.set(id, promise);
+    promise.then(callback);
+    //See if it's on cache list
+    //if it is: add to renderer
+    //else
+    //get dataframe
+}
+
+function delDataframe(dataframe) {
+
+}
+
+function requestDataframe(x, y, z) {
+    return new Promise((callback, reject) => {
         const mvt_extent = 1024;
         const subpixelBufferSize = 0;
         const query =
             `select st_asmvt(geom, 'lid') FROM
-        (
-            SELECT
-                ST_AsMVTGeom(
-                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
-                ),
-                SUM(amount) AS amount,
-                _cdb_mode(category) AS category
-            FROM tx_0125_copy_copy AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-            ORDER BY amount DESC
-        )AS geom
-    `;
-        renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
+    (
+        SELECT
+            ST_AsMVTGeom(
+                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
+            ),
+            SUM(amount) AS amount,
+            _cdb_mode(category) AS category
+        FROM tx_0125_copy_copy AS cdbq
+        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+        ORDER BY amount DESC
+    )AS geom
+`;
+        //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
         var oReq = new XMLHttpRequest();
         oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
         oReq.onload = function (oEvent) {
             const json = JSON.parse(oReq.response);
             if (json.rows[0].st_asmvt.data.length == 0) {
-                needToComplete--;
-                if (completedTiles.length == needToComplete) {
-                    oldtiles.forEach(t => renderer.removeDataframe(t));
-                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                    oldtiles = completedTiles;
-                }
+                callback({ empty: true });
                 return;
             }
             var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
@@ -169,15 +192,36 @@ function getData(renderer) {
                 points,
                 dataframeProperties,
             );
-
             dataframe.schema = schema;
-            completedTiles.push(dataframe);
+            dataframe.size = mvtLayer.length;
+            callback(dataframe);
+        }
+        oReq.send(null);
+    });
+}
+
+function getData(renderer) {
+    const bounds = renderer.getBounds();
+    const aspect = renderer.getAspect();
+    const tiles = rsys.rTiles(bounds);
+    var completedTiles = [];
+    var needToComplete = tiles.length;
+    tiles.forEach(t => {
+        const x = t.x;
+        const y = t.y;
+        const z = t.z;
+        getDataframe(x, y, z, dataframe => {
+            if (dataframe.empty) {
+                needToComplete--;
+            } else {
+                completedTiles.push(dataframe);
+            }
             if (completedTiles.length == needToComplete) {
                 oldtiles.forEach(t => renderer.removeDataframe(t));
+                oldtiles.forEach(t => delDataframe(t));
                 completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
                 oldtiles = completedTiles;
             }
-        };
-        oReq.send(null);
+        });
     });
 }

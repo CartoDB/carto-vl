@@ -84,11 +84,9 @@ map.on('load', _ => {
 
         c = renderer.getCenter();
         var z = renderer.getZoom();
-    }
-    function moveEnd() {
-        move();
         getData(canvas.clientWidth / canvas.clientHeight);
-    };
+    }
+
     function resize() {
         canvas.style.width = map.getCanvas().style.width;
         canvas.style.height = map.getCanvas().style.height;
@@ -103,10 +101,10 @@ map.on('load', _ => {
     styleWidth();
     styleColor();
     resize();
-    moveEnd();
+    move();
 
     map.on('resize', resize);
     map.on('movestart', move);
     map.on('move', move);
-    map.on('moveend', moveEnd);
+    map.on('moveend', move);
 });
