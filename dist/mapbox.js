@@ -124,7 +124,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
@@ -190,11 +189,6 @@ function implicitCast(value) {
     }
     return value;
 }
-var gl = null;
-function setGL(_gl) {
-    gl = _gl;
-}
-
 
 const schemas = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
@@ -269,15 +263,15 @@ class Expression {
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
      * @param {*} program
      */
-    _postShaderCompile(program) {
-        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
+    _postShaderCompile(program, gl) {
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
     /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l));
+    _preDraw(l, gl) {
+        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
     }
     /**
      * @jsapi
@@ -357,22 +351,7 @@ class Top extends Expression {
         // TODO validation
         super({ property: property });
         this.type = 'float';
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const width = 1024;
-        let pixels = new Uint8Array(4 * width);
-
-        const schema = property.schemaType;
-        for (let i = 0; i < buckets - 1; i++) {
-            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
-        }
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            pixels);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -382,11 +361,30 @@ class Top extends Expression {
             inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const width = 1024;
+            let pixels = new Uint8Array(4 * width);
+
+            const schema = this.property.schemaType;
+            for (let i = 0; i < this.buckets - 1; i++) {
+                pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
+            }
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                pixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
         this.property._postShaderCompile(program);
         this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         this.property._preDraw(l);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -406,9 +404,9 @@ class Now extends Expression {
         this.type = 'float';
         this.init = Date.now();
     }
-    _preDraw() {
+    _preDraw(...args) {
         this.now.expr = (Date.now() - this.init) / 1000.;
-        this.now._preDraw();
+        this.now._preDraw(...args);
     }
     isAnimated() {
         return true;
@@ -424,9 +422,9 @@ class Zoom extends Expression {
         super({ zoom: float(0) }, inline => inline.zoom);
         this.type = 'float';
     }
-    _preDraw(o) {
+    _preDraw(o, gl) {
         this.zoom.expr = o.zoom;
-        this.zoom._preDraw();
+        this.zoom._preDraw(o, gl);
     }
 }
 
@@ -455,10 +453,10 @@ class Animate extends Expression {
             inline: `anim${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {
@@ -686,8 +684,8 @@ class Blend extends Expression {
         }
         this.schema = a.schema;
     }
-    _preDraw(l) {
-        super._preDraw(l);
+    _preDraw(l, gl) {
+        super._preDraw(l, gl);
         if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
@@ -724,10 +722,10 @@ class RGBA extends Expression {
             inline: `color${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
     }
     isAnimated() {
@@ -756,10 +754,10 @@ class Float extends Expression {
             inline: `float${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
     isAnimated() {
@@ -807,8 +805,7 @@ class Ramp extends Expression {
      * @param {*} minKey Optional
      * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey, ) {
-        console.log("RAMP", input, input.schemaType);
+    constructor(input, palette, minKey, maxKey) {
         if (maxKey == undefined) {
             if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Float"]) {
                 minKey = input.schemaType.globalMin;
@@ -816,8 +813,12 @@ class Ramp extends Expression {
             } else if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Category"]) {
                 minKey = -1;
                 maxKey = input.schemaType.categoryNames.length;
+            } else if (input instanceof Top) {
+                minKey = 0;
+                maxKey = 1;
             }
         }
+        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);
@@ -832,42 +833,8 @@ class Ramp extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
-
-
-
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const level = 0;
-        const internalFormat = gl.RGBA;
-        const width = 256;
-        const height = 1;
-        const border = 0;
-        const srcFormat = gl.RGBA;
-        const srcType = gl.UNSIGNED_BYTE;
-        const pixel = new Uint8Array(4 * width);
-        for (var i = 0; i < width; i++) {
-            const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-            const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
-            const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-            const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-            const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
-            const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-            pixel[4 * i + 0] = v[0];
-            pixel[4 * i + 1] = v[1];
-            pixel[4 * i + 2] = v[2];
-            pixel[4 * i + 3] = v[3];
-        }
-
-
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-            width, height, border, srcFormat, srcType,
-            pixel);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     }
-    _free() {
+    _free(gl) {
         gl.deleteTexture(this.texture);
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -882,14 +849,47 @@ class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
-    _postShaderCompile(program) {
-        this.input._postShaderCompile(program);
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 256;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            const pixel = new Uint8Array(4 * width);
+            const values = this.values;
+            for (var i = 0; i < width; i++) {
+                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                pixel[4 * i + 0] = v[0];
+                pixel[4 * i + 1] = v[1];
+                pixel[4 * i + 2] = v[2];
+                pixel[4 * i + 3] = v[3];
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        }
+        this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(l) {
-        this.input._preDraw(l);
+    _preDraw(l, gl) {
+        this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);
@@ -2222,10 +2222,6 @@ function signedArea(ring) {
  * @property {Properties} properties
  */
 
-
-// TODO remove
-var gl;
-
 /**
  * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
  *
@@ -2251,8 +2247,9 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    if (!gl) { //TODO remove hack: remove global context
-        gl = canvas.getContext('webgl');
+    if (!this.gl) { //TODO remove hack: remove global context
+        this.gl = canvas.getContext('webgl');
+        const gl = this.gl;
         if (!gl) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
@@ -2268,11 +2265,11 @@ function Renderer(canvas) {
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
-        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
         this._initShaders();
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    const gl = this.gl;
     this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -2355,6 +2352,7 @@ class Dataframe {
     }
     free() {
         if (this.propertyTex) {
+            const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
             gl.deleteTexture(this.texColor);
             gl.deleteTexture(this.texWidth);
@@ -2383,6 +2381,7 @@ class BoundDataframe extends Dataframe {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
+    const gl = this.gl;
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -2489,6 +2488,7 @@ Renderer.prototype.getAspect = function () {
  */
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    const gl = this.gl;
     // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
@@ -2525,7 +2525,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._color._preDraw(obj);
+        tile.style._color._preDraw(obj, gl);
 
         Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
@@ -2551,7 +2551,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._width._preDraw(obj);
+        tile.style._width._preDraw(obj, gl);
         Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
             gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
@@ -2636,7 +2636,7 @@ function refresh(timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(gl);
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -2645,7 +2645,7 @@ Renderer.prototype.getMin = function (expression, callback) {
     this.computePool = [callback];
 }
 
-function getFBstatus() {
+function getFBstatus(gl) {
     const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     switch (status) {
         case gl.FRAMEBUFFER_COMPLETE:
@@ -2672,6 +2672,7 @@ function getFBstatus() {
 
 
 Renderer.prototype._getMin = function (expression, callback) {
+    const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
         this.aux1x1FB = gl.createFramebuffer();
@@ -2687,7 +2688,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
         //Check FB completeness
-        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
             //This is a very bad time to throw an exception, this code should never be executed,
             //all checks should be done earlier to avoid problems here
             //If this is still executed we'll warn and ignore
@@ -2716,7 +2717,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["property"]('amount', {
         'amount': 'float'
     });
-    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
+    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](gl, expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
     //console.log('computer', shader)
 
@@ -2729,7 +2730,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         var obj = {
             freeTexUnit: 4
         }
-        expr._preDraw(obj);
+        expr._preDraw(obj, gl);
 
         //TODO redundant code with refresh => refactor
         gl.uniform2f(shader.vertexScaleUniformLocation,
@@ -3056,7 +3057,6 @@ void main(void) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
@@ -3119,7 +3119,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
-var gl = null;
 
 
 
@@ -3129,16 +3128,7 @@ var gl = null;
 
 
 
-
-// TODO removed global gl context
-// TODO document API
-function setGL(_gl) {
-    gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
-}
-
-
-function compileShader(styleRootExpr, shaderCreator) {
+function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -3149,19 +3139,19 @@ function compileShader(styleRootExpr, shaderCreator) {
         return tid[name];
     });
     const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-    styleRootExpr._postShaderCompile(shader.program);
+    styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
         shader: shader
     };
 }
 Style.prototype._compileColorShader = function () {
-    const r = compileShader(this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
+    const r = compileShader(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
 Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
+    const r = compileShader(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
 }
@@ -6744,56 +6734,8 @@ process.umask = function() { return 0; };
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(27);
 
-
-function getData() {
-    __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["a" /* getData */](renderer);
-}
-
-var renderer;
-var style;
-
-function styleWidth(e) {
-    const v = document.getElementById("widthStyleEntry").value;
-    try {
-        style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]), 1000);
-        document.getElementById("feedback").style.display = 'none';
-    } catch (error) {
-        const err = `Invalid width expression: ${error}:${error.stack}`;
-        console.warn(err);
-        document.getElementById("feedback").value = err;
-        document.getElementById("feedback").style.display = 'block';
-    }
-}
-function styleColor(e) {
-    const v = document.getElementById("colorStyleEntry").value;
-    try {
-        style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]), 0);
-        document.getElementById("feedback").style.display = 'none';
-    } catch (error) {
-        const err = `Invalid color expression: ${error}:${error.stack}`;
-        console.warn(err);
-        document.getElementById("feedback").value = err;
-        document.getElementById("feedback").style.display = 'block';
-    }
-}
-
-
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-const TILE_SIZE = 256;
-// Webmercator projection
-function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
-}
 
 var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
@@ -6804,58 +6746,16 @@ var map = new mapboxgl.Map({
     zoom: 14, // starting zoom,
 });
 map.repaint = false;
-function getZoom() {
-    var b = map.getBounds();
-    var c = map.getCenter();
-    var nw = b.getNorthWest();
-    var sw = b.getSouthWest();
-    var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
-    renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
-    return z;
-}
+var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map);
 
-map.on('load', _ => {
-    var cont = map.getCanvasContainer();
-    var canvas = document.createElement('canvas')
-    canvas.id = 'good';
-    cont.appendChild(canvas)
-    canvas.style.width = map.getCanvas().style.width;
-    canvas.style.height = map.getCanvas().style.height;
 
-    function move() {
-        var b = map.getBounds();
-        var nw = b.getNorthWest();
-        var c = map.getCenter();
-
-        renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
-        renderer.setZoom(getZoom());
-
-        c = renderer.getCenter();
-        var z = renderer.getZoom();
-        getData(canvas.clientWidth / canvas.clientHeight);
-    }
-
-    function resize() {
-        canvas.style.width = map.getCanvas().style.width;
-        canvas.style.height = map.getCanvas().style.height;
-        move();
-    }
-
-    renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */](canvas);
-    style = new __WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].Style(renderer, __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["c" /* schema */]);
-    __WEBPACK_IMPORTED_MODULE_1__contrib_sql_api__["b" /* init */](style);
-    $('#widthStyleEntry').on('input', styleWidth);
-    $('#colorStyleEntry').on('input', styleColor);
-    styleWidth();
-    styleColor();
-    resize();
-    move();
-
-    map.on('resize', resize);
-    map.on('movestart', move);
-    map.on('move', move);
-    map.on('moveend', move);
+var map2 = new mapboxgl.Map({
+    container: 'map2', // container id
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
+    center: [2.17, 41.38], // starting position [lng, lat]
+    zoom: 14, // starting zoom,
 });
+var mgl2 = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map2);
 
 
 /***/ }),
@@ -6863,45 +6763,284 @@ map.on('load', _ => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getData; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return init; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(28);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
+
+
+
+
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
+const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+const TILE_SIZE = 256;
+
+class MGLIntegrator {
+    constructor(map) {
+        this.map = map;
+        map.on('load', _ => {
+            var cont = map.getCanvasContainer();
+            var canvas = document.createElement('canvas')
+            this.canvas = canvas;
+            canvas.id = 'good';
+            cont.appendChild(canvas)
+            canvas.style.width = map.getCanvas().style.width;
+            canvas.style.height = map.getCanvas().style.height;
+
+
+
+            this.renderer = new __WEBPACK_IMPORTED_MODULE_1__src_index__["b" /* Renderer */](canvas);
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["b" /* schema */]);
+            this.provider = new __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["a" /* SQL_API */](this.renderer, this.style);
+            $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
+            $('#colorStyleEntry').on('input', this.styleColor.bind(this));
+            this.styleWidth();
+            this.styleColor();
+            this.resize();
+            this.move();
+
+            map.on('resize', this.resize.bind(this));
+            map.on('movestart', this.move.bind(this));
+            map.on('move', this.move.bind(this));
+            map.on('moveend', this.move.bind(this));
+        });
+    }
+    move() {
+        var b = this.map.getBounds();
+        var nw = b.getNorthWest();
+        var c = this.map.getCenter();
+
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setZoom(this.getZoom());
+
+        c = this.renderer.getCenter();
+        var z = this.renderer.getZoom();
+        this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+    }
+
+    resize() {
+        this.canvas.style.width = this.map.getCanvas().style.width;
+        this.canvas.style.height = this.map.getCanvas().style.height;
+        this.move();
+    }
+    getData() {
+        this.provider.getData();
+    }
+    styleWidth(e) {
+        const v = document.getElementById("widthStyleEntry").value;
+        const initial = this.style.getWidth();
+        try {
+            this.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["b" /* schema */]), 1000);
+            document.getElementById("feedback").style.display = 'none';
+        } catch (error) {
+            const err = `Invalid width expression: ${error}:${error.stack}`;
+            console.warn(err);
+            document.getElementById("feedback").value = err;
+            document.getElementById("feedback").style.display = 'block';
+            this.style.setWidth(initial);
+        }
+    }
+    styleColor(e) {
+        const v = document.getElementById("colorStyleEntry").value;
+        const initial = this.style.getColor();
+        try {
+            this.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyleExpression(v, __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["b" /* schema */]), 1000);
+            document.getElementById("feedback").style.display = 'none';
+        } catch (error) {
+            const err = `Invalid color expression: ${error}:${error.stack}`;
+            console.warn(err);
+            document.getElementById("feedback").value = err;
+            document.getElementById("feedback").style.display = 'block';
+            this.style.setColor(initial);
+        }
+    }
+    getZoom() {
+        var b = this.map.getBounds();
+        var c = this.map.getCenter();
+        var nw = b.getNorthWest();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        return z;
+    }
+}
+
+
+// Webmercator projection
+function Wmxy(latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x: x, y: y };
+}
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SQL_API; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return schema; });
+/* unused harmony export init */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
 
 
 
 var VectorTile = __webpack_require__(19).VectorTile;
 var Protobuf = __webpack_require__(22);
+var LRU = __webpack_require__(30);
 
 
 
-var oldtiles = [];
-var ajax;
 const names = ['Moda y calzado',
     'Bares y restaurantes', 'Salud', 'Alimentación'];
 var schema = new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Schema(['category', 'amount'], [new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category(names
     , [33263, 24633, 17833, 16907], [0, 1, 2, 3]), new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(2, 100 * 1000)]);
-getSchema();
+
+
 var style;
+var oldtiles = [];
 
-function init(fixedStyle) {
-    style = fixedStyle;
+class Provider {
 }
-
-var catMap = {};
-function getCatID(catStr) {
-    const f = names.indexOf(catStr);
-    return f;
-
-    if (catMap[catStr]) {
-        return catMap[catStr];
+class SQL_API extends Provider {
+    constructor(renderer, style) {
+        super();
+        this.renderer = renderer;
+        this.style = style;
+        this.catMap = {};
+        const options = {
+            max: 1000
+            , length: function (dataframe, key) { return 1; }
+            , dispose: function (key, promise) {
+                promise.then(dataframe => {
+                    if (!dataframe.empty) {
+                        dataframe.free();
+                    }
+                })
+            }
+            , maxAge: 1000 * 60 * 60
+        };
+        this.cache = LRU(options);
     }
-    catMap[catStr] = Object.keys(catMap).length + 1;
-    return catMap[catStr];
+    getCatID(catStr) {
+        const f = names.indexOf(catStr);
+        return f;
+
+        if (this.catMap[catStr]) {
+            return this.catMap[catStr];
+        }
+        this.catMap[catStr] = Object.keys(this.catMap).length + 1;
+        return this.catMap[catStr];
+    }
+    getDataframe(x, y, z, callback) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            c.then(callback);
+            return;
+        }
+        const promise = this.requestDataframe(x, y, z);
+        this.cache.set(id, promise);
+        promise.then(callback);
+    }
+    requestDataframe(x, y, z) {
+        return new Promise((callback, reject) => {
+            const mvt_extent = 1024;
+            const subpixelBufferSize = 0;
+            const query =
+                `select st_asmvt(geom, 'lid') FROM
+        (
+            SELECT
+                ST_AsMVTGeom(
+                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
+                ),
+                SUM(amount) AS amount,
+                _cdb_mode(category) AS category
+            FROM tx_0125_copy_copy AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+            ORDER BY amount DESC
+        )AS geom
+    `;
+            //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
+            var oReq = new XMLHttpRequest();
+            oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
+            oReq.onload = (oEvent) => {
+                const json = JSON.parse(oReq.response);
+                if (json.rows[0].st_asmvt.data.length == 0) {
+                    callback({ empty: true });
+                    return;
+                }
+                var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
+                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                var fieldMap = {
+                    category: 0,
+                    amount: 1
+                };
+                var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+                var points = new Float32Array(mvtLayer.length * 2);
+                const r = Math.random();
+                for (var i = 0; i < mvtLayer.length; i++) {
+                    const f = mvtLayer.feature(i);
+                    const geom = f.loadGeometry();
+                    points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                    points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                    properties[0][i] = Number(this.getCatID(f.properties.category));
+                    properties[1][i] = Number(f.properties.amount);
+                }
+                //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
+                var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
+                let dataframeProperties = {};
+                Object.keys(fieldMap).map((name, pid) => {
+                    dataframeProperties[name] = properties[pid];
+                });
+                var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
+                    rs.center,
+                    rs.scale,
+                    points,
+                    dataframeProperties,
+                );
+                dataframe.schema = schema;
+                dataframe.size = mvtLayer.length;
+                callback(dataframe);
+            }
+            oReq.send(null);
+        });
+    }
+    getData() {
+        const renderer = this.renderer;
+        const bounds = renderer.getBounds();
+        const aspect = renderer.getAspect();
+        const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
+        var completedTiles = [];
+        var needToComplete = tiles.length;
+        tiles.forEach(t => {
+            const x = t.x;
+            const y = t.y;
+            const z = t.z;
+            this.getDataframe(x, y, z, dataframe => {
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length == needToComplete) {
+                    oldtiles.forEach(t => renderer.removeDataframe(t));
+                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(this.style));
+                    oldtiles = completedTiles;
+                }
+            });
+        });
+    }
 }
 
-async function getColumnTypes() {
+/*async function getColumnTypes() {
     const columnListQuery = `select * from tx_0125_copy_copy limit 0;`;
     const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(columnListQuery));
     const json = await response.json();
@@ -6919,7 +7058,7 @@ async function getNumericTypes(names) {
     console.log(numericsQuery, json);
     // TODO avg, sum, count
     return names.map(name =>
-        new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
+        new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
     );
 }
 
@@ -6935,7 +7074,7 @@ async function getCategoryTypes(names) {
 
     return names.map(name => {
         console.log("ASD", json.rows[0][`${name}_min`])
-        return new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
+        return new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
     }
     );
 }
@@ -6963,141 +7102,13 @@ async function getSchema() {
     const numericsTypes = await getNumericTypes(numerics);
     const categoriesTypes = [];//await getCategoryTypes(categories);
 
-    const schema = new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Schema(numerics.concat([]), numericsTypes.concat(categoriesTypes));
+    const schema = new R.schema.Schema(numerics.concat([]), numericsTypes.concat(categoriesTypes));
     console.log(schema, numericsTypes);
     return schema;
-}
-
-
-var LRU = __webpack_require__(29)
-    , options = {
-        max: 1000
-        , length: function (dataframe, key) { return 1; }
-        , dispose: function (key, promise) {
-            promise.then(dataframe => {
-                if (!dataframe.empty) {
-                    dataframe.free();
-                }
-            })
-        }
-        , maxAge: 1000 * 60 * 60
-    }
-    , cache = LRU(options)
-
-function getDataframe(x, y, z, callback) {
-    const id = `${x},${y},${z}`;
-    const c = cache.get(id);
-    if (c) {
-        c.then(callback);
-        return;
-    }
-    const promise = requestDataframe(x, y, z);
-    cache.set(id, promise);
-    promise.then(callback);
-    //See if it's on cache list
-    //if it is: add to renderer
-    //else
-    //get dataframe
-}
-
-function delDataframe(dataframe) {
-
-}
-
-function requestDataframe(x, y, z) {
-    return new Promise((callback, reject) => {
-        const mvt_extent = 1024;
-        const subpixelBufferSize = 0;
-        const query =
-            `select st_asmvt(geom, 'lid') FROM
-    (
-        SELECT
-            ST_AsMVTGeom(
-                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
-            ),
-            SUM(amount) AS amount,
-            _cdb_mode(category) AS category
-        FROM tx_0125_copy_copy AS cdbq
-        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-        ORDER BY amount DESC
-    )AS geom
-`;
-        //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
-        oReq.onload = function (oEvent) {
-            const json = JSON.parse(oReq.response);
-            if (json.rows[0].st_asmvt.data.length == 0) {
-                callback({ empty: true });
-                return;
-            }
-            var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-            var fieldMap = {
-                category: 0,
-                amount: 1
-            };
-            var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
-            var points = new Float32Array(mvtLayer.length * 2);
-            const r = Math.random();
-            for (var i = 0; i < mvtLayer.length; i++) {
-                const f = mvtLayer.feature(i);
-                const geom = f.loadGeometry();
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                properties[0][i] = Number(getCatID(f.properties.category));
-                properties[1][i] = Number(f.properties.amount);
-            }
-            //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
-            var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
-            let dataframeProperties = {};
-            Object.keys(fieldMap).map((name, pid) => {
-                dataframeProperties[name] = properties[pid];
-            });
-            var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
-                rs.center,
-                rs.scale,
-                points,
-                dataframeProperties,
-            );
-            dataframe.schema = schema;
-            dataframe.size = mvtLayer.length;
-            callback(dataframe);
-        }
-        oReq.send(null);
-    });
-}
-
-function getData(renderer) {
-    const bounds = renderer.getBounds();
-    const aspect = renderer.getAspect();
-    const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
-    var completedTiles = [];
-    var needToComplete = tiles.length;
-    tiles.forEach(t => {
-        const x = t.x;
-        const y = t.y;
-        const z = t.z;
-        getDataframe(x, y, z, dataframe => {
-            if (dataframe.empty) {
-                needToComplete--;
-            } else {
-                completedTiles.push(dataframe);
-            }
-            if (completedTiles.length == needToComplete) {
-                oldtiles.forEach(t => renderer.removeDataframe(t));
-                oldtiles.forEach(t => delDataframe(t));
-                completedTiles.forEach(f => renderer.addDataframe(f).setStyle(style));
-                oldtiles = completedTiles;
-            }
-        });
-    });
-}
+}*/
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7249,7 +7260,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7259,11 +7270,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(30)
-var util = __webpack_require__(32)
+var Map = __webpack_require__(31)
+var util = __webpack_require__(33)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(36)
+var Yallist = __webpack_require__(37)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -7723,7 +7734,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -7733,13 +7744,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(31)
+  module.exports = __webpack_require__(32)
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -7858,7 +7869,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -8386,7 +8397,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(34);
+exports.isBuffer = __webpack_require__(35);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -8430,7 +8441,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(35);
+exports.inherits = __webpack_require__(36);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -8448,10 +8459,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33), __webpack_require__(24)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34), __webpack_require__(24)))
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 var g;
@@ -8478,7 +8489,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -8489,7 +8500,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -8518,7 +8529,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist

@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 37);
+/******/ 	return __webpack_require__(__webpack_require__.s = 38);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -124,7 +124,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
@@ -190,11 +189,6 @@ function implicitCast(value) {
     }
     return value;
 }
-var gl = null;
-function setGL(_gl) {
-    gl = _gl;
-}
-
 
 const schemas = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
@@ -269,15 +263,15 @@ class Expression {
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
      * @param {*} program
      */
-    _postShaderCompile(program) {
-        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
+    _postShaderCompile(program, gl) {
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
     /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l));
+    _preDraw(l, gl) {
+        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
     }
     /**
      * @jsapi
@@ -357,22 +351,7 @@ class Top extends Expression {
         // TODO validation
         super({ property: property });
         this.type = 'float';
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const width = 1024;
-        let pixels = new Uint8Array(4 * width);
-
-        const schema = property.schemaType;
-        for (let i = 0; i < buckets - 1; i++) {
-            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
-        }
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            pixels);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -382,11 +361,30 @@ class Top extends Expression {
             inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const width = 1024;
+            let pixels = new Uint8Array(4 * width);
+
+            const schema = this.property.schemaType;
+            for (let i = 0; i < this.buckets - 1; i++) {
+                pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
+            }
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                pixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
         this.property._postShaderCompile(program);
         this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         this.property._preDraw(l);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -406,9 +404,9 @@ class Now extends Expression {
         this.type = 'float';
         this.init = Date.now();
     }
-    _preDraw() {
+    _preDraw(...args) {
         this.now.expr = (Date.now() - this.init) / 1000.;
-        this.now._preDraw();
+        this.now._preDraw(...args);
     }
     isAnimated() {
         return true;
@@ -424,9 +422,9 @@ class Zoom extends Expression {
         super({ zoom: float(0) }, inline => inline.zoom);
         this.type = 'float';
     }
-    _preDraw(o) {
+    _preDraw(o, gl) {
         this.zoom.expr = o.zoom;
-        this.zoom._preDraw();
+        this.zoom._preDraw(o, gl);
     }
 }
 
@@ -455,10 +453,10 @@ class Animate extends Expression {
             inline: `anim${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {
@@ -686,8 +684,8 @@ class Blend extends Expression {
         }
         this.schema = a.schema;
     }
-    _preDraw(l) {
-        super._preDraw(l);
+    _preDraw(l, gl) {
+        super._preDraw(l, gl);
         if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
@@ -724,10 +722,10 @@ class RGBA extends Expression {
             inline: `color${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
     }
     isAnimated() {
@@ -756,10 +754,10 @@ class Float extends Expression {
             inline: `float${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
     isAnimated() {
@@ -807,8 +805,7 @@ class Ramp extends Expression {
      * @param {*} minKey Optional
      * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey, ) {
-        console.log("RAMP", input, input.schemaType);
+    constructor(input, palette, minKey, maxKey) {
         if (maxKey == undefined) {
             if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Float"]) {
                 minKey = input.schemaType.globalMin;
@@ -816,8 +813,12 @@ class Ramp extends Expression {
             } else if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Category"]) {
                 minKey = -1;
                 maxKey = input.schemaType.categoryNames.length;
+            } else if (input instanceof Top) {
+                minKey = 0;
+                maxKey = 1;
             }
         }
+        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);
@@ -832,42 +833,8 @@ class Ramp extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
-
-
-
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const level = 0;
-        const internalFormat = gl.RGBA;
-        const width = 256;
-        const height = 1;
-        const border = 0;
-        const srcFormat = gl.RGBA;
-        const srcType = gl.UNSIGNED_BYTE;
-        const pixel = new Uint8Array(4 * width);
-        for (var i = 0; i < width; i++) {
-            const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-            const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
-            const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-            const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-            const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
-            const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-            pixel[4 * i + 0] = v[0];
-            pixel[4 * i + 1] = v[1];
-            pixel[4 * i + 2] = v[2];
-            pixel[4 * i + 3] = v[3];
-        }
-
-
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-            width, height, border, srcFormat, srcType,
-            pixel);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     }
-    _free() {
+    _free(gl) {
         gl.deleteTexture(this.texture);
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -882,14 +849,47 @@ class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
-    _postShaderCompile(program) {
-        this.input._postShaderCompile(program);
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 256;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            const pixel = new Uint8Array(4 * width);
+            const values = this.values;
+            for (var i = 0; i < width; i++) {
+                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                pixel[4 * i + 0] = v[0];
+                pixel[4 * i + 1] = v[1];
+                pixel[4 * i + 2] = v[2];
+                pixel[4 * i + 3] = v[3];
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        }
+        this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(l) {
-        this.input._preDraw(l);
+    _preDraw(l, gl) {
+        this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);
@@ -2222,10 +2222,6 @@ function signedArea(ring) {
  * @property {Properties} properties
  */
 
-
-// TODO remove
-var gl;
-
 /**
  * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
  *
@@ -2251,8 +2247,9 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    if (!gl) { //TODO remove hack: remove global context
-        gl = canvas.getContext('webgl');
+    if (!this.gl) { //TODO remove hack: remove global context
+        this.gl = canvas.getContext('webgl');
+        const gl = this.gl;
         if (!gl) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
@@ -2268,11 +2265,11 @@ function Renderer(canvas) {
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
-        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
         this._initShaders();
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    const gl = this.gl;
     this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -2355,6 +2352,7 @@ class Dataframe {
     }
     free() {
         if (this.propertyTex) {
+            const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
             gl.deleteTexture(this.texColor);
             gl.deleteTexture(this.texWidth);
@@ -2383,6 +2381,7 @@ class BoundDataframe extends Dataframe {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
+    const gl = this.gl;
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -2489,6 +2488,7 @@ Renderer.prototype.getAspect = function () {
  */
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    const gl = this.gl;
     // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
@@ -2525,7 +2525,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._color._preDraw(obj);
+        tile.style._color._preDraw(obj, gl);
 
         Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
@@ -2551,7 +2551,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._width._preDraw(obj);
+        tile.style._width._preDraw(obj, gl);
         Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
             gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
@@ -2636,7 +2636,7 @@ function refresh(timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(gl);
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -2645,7 +2645,7 @@ Renderer.prototype.getMin = function (expression, callback) {
     this.computePool = [callback];
 }
 
-function getFBstatus() {
+function getFBstatus(gl) {
     const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     switch (status) {
         case gl.FRAMEBUFFER_COMPLETE:
@@ -2672,6 +2672,7 @@ function getFBstatus() {
 
 
 Renderer.prototype._getMin = function (expression, callback) {
+    const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
         this.aux1x1FB = gl.createFramebuffer();
@@ -2687,7 +2688,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
         //Check FB completeness
-        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
             //This is a very bad time to throw an exception, this code should never be executed,
             //all checks should be done earlier to avoid problems here
             //If this is still executed we'll warn and ignore
@@ -2716,7 +2717,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["property"]('amount', {
         'amount': 'float'
     });
-    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
+    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](gl, expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
     //console.log('computer', shader)
 
@@ -2729,7 +2730,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         var obj = {
             freeTexUnit: 4
         }
-        expr._preDraw(obj);
+        expr._preDraw(obj, gl);
 
         //TODO redundant code with refresh => refactor
         gl.uniform2f(shader.vertexScaleUniformLocation,
@@ -3056,7 +3057,6 @@ void main(void) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
@@ -3119,7 +3119,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
-var gl = null;
 
 
 
@@ -3129,16 +3128,7 @@ var gl = null;
 
 
 
-
-// TODO removed global gl context
-// TODO document API
-function setGL(_gl) {
-    gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
-}
-
-
-function compileShader(styleRootExpr, shaderCreator) {
+function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -3149,19 +3139,19 @@ function compileShader(styleRootExpr, shaderCreator) {
         return tid[name];
     });
     const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-    styleRootExpr._postShaderCompile(shader.program);
+    styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
         shader: shader
     };
 }
 Style.prototype._compileColorShader = function () {
-    const r = compileShader(this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
+    const r = compileShader(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
 Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
+    const r = compileShader(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
 }
@@ -6561,7 +6551,8 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 /* 34 */,
 /* 35 */,
 /* 36 */,
-/* 37 */
+/* 37 */,
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
