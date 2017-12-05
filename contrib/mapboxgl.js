@@ -24,7 +24,7 @@ class MGLIntegrator {
 
             this.renderer = new R.Renderer(canvas);
             this.style = new R.Style.Style(this.renderer, sql_api.schema);
-            sql_api.init(this.style);
+            this.provider = new sql_api.SQL_API(this.renderer, this.style);
             $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
             $('#colorStyleEntry').on('input', this.styleColor.bind(this));
             this.styleWidth();
@@ -57,7 +57,7 @@ class MGLIntegrator {
         this.move();
     }
     getData() {
-        sql_api.getData(this.renderer);
+        this.provider.getData();
     }
     styleWidth(e) {
         const v = document.getElementById("widthStyleEntry").value;
