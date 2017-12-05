@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 37);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2339,11 +2339,6 @@ Renderer.prototype.setZoom = function (zoom) {
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
     this.tiles = this.tiles.filter(t => t !== dataframe);
-    dataframe.propertyTex.map(tex => gl.deleteTexture(tex));
-    gl.deleteTexture(dataframe.texColor);
-    gl.deleteTexture(dataframe.texWidth);
-    gl.deleteBuffer(dataframe.vertexBuffer);
-    gl.deleteBuffer(dataframe.featureIDBuffer);
 };
 
 
@@ -2357,6 +2352,15 @@ class Dataframe {
         this.scale = scale;
         this.geom = geom;
         this.properties = properties;
+    }
+    free() {
+        if (this.propertyTex) {
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+        }
     }
 }
 
@@ -2456,8 +2460,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / (width-1);
-        ids[i + 1] = Math.floor((i / 2) / width) / (height-1);
+        ids[i + 0] = ((i / 2) % width) / (width - 1);
+        ids[i + 1] = Math.floor((i / 2) / width) / (height - 1);
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -6548,7 +6552,16 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 /* 25 */,
 /* 26 */,
 /* 27 */,
-/* 28 */
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
