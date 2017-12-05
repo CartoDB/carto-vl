@@ -23,10 +23,6 @@ export { schema };
  * @property {Properties} properties
  */
 
-
-// TODO remove
-var gl;
-
 /**
  * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
  *
@@ -52,8 +48,9 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    if (!gl) { //TODO remove hack: remove global context
-        gl = canvas.getContext('webgl');
+    if (!this.gl) { //TODO remove hack: remove global context
+        this.gl = canvas.getContext('webgl');
+        const gl = this.gl;
         if (!gl) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
@@ -69,11 +66,11 @@ function Renderer(canvas) {
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
-        Style.setGL(gl);
         this._initShaders();
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    const gl = this.gl;
     this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -156,6 +153,7 @@ class Dataframe {
     }
     free() {
         if (this.propertyTex) {
+            const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
             gl.deleteTexture(this.texColor);
             gl.deleteTexture(this.texWidth);
@@ -184,6 +182,7 @@ class BoundDataframe extends Dataframe {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
+    const gl = this.gl;
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -290,6 +289,7 @@ Renderer.prototype.getAspect = function () {
  */
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    const gl = this.gl;
     // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
@@ -326,7 +326,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._color._preDraw(obj);
+        tile.style._color._preDraw(obj, gl);
 
         Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
@@ -352,7 +352,7 @@ function refresh(timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         }
-        tile.style._width._preDraw(obj);
+        tile.style._width._preDraw(obj, gl);
         Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
             gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
@@ -437,7 +437,7 @@ function refresh(timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+    this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -446,7 +446,7 @@ Renderer.prototype.getMin = function (expression, callback) {
     this.computePool = [callback];
 }
 
-function getFBstatus() {
+function getFBstatus(gl) {
     const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     switch (status) {
         case gl.FRAMEBUFFER_COMPLETE:
@@ -473,6 +473,7 @@ import * as shaders from './shaders';
 import * as functions from './style/functions';
 
 Renderer.prototype._getMin = function (expression, callback) {
+    const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
         this.aux1x1FB = gl.createFramebuffer();
@@ -488,7 +489,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
         //Check FB completeness
-        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
             //This is a very bad time to throw an exception, this code should never be executed,
             //all checks should be done earlier to avoid problems here
             //If this is still executed we'll warn and ignore
@@ -517,7 +518,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     const expr = functions.property('amount', {
         'amount': 'float'
     });
-    const r = Style.compileShader(expr, shaders.computer);
+    const r = Style.compileShader(gl, expr, shaders.computer);
     const shader = r.shader;
     //console.log('computer', shader)
 
@@ -530,7 +531,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         var obj = {
             freeTexUnit: 4
         }
-        expr._preDraw(obj);
+        expr._preDraw(obj, gl);
 
         //TODO redundant code with refresh => refactor
         gl.uniform2f(shader.vertexScaleUniformLocation,

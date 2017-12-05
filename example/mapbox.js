@@ -9,27 +9,15 @@ var style;
 
 function styleWidth(e) {
     const v = document.getElementById("widthStyleEntry").value;
-    try {
         style.getWidth().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
         document.getElementById("feedback").style.display = 'none';
-    } catch (error) {
-        const err = `Invalid width expression: ${error}:${error.stack}`;
-        console.warn(err);
-        document.getElementById("feedback").value = err;
-        document.getElementById("feedback").style.display = 'block';
-    }
+
 }
 function styleColor(e) {
     const v = document.getElementById("colorStyleEntry").value;
-    try {
         style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 0);
         document.getElementById("feedback").style.display = 'none';
-    } catch (error) {
-        const err = `Invalid color expression: ${error}:${error.stack}`;
-        console.warn(err);
-        document.getElementById("feedback").value = err;
-        document.getElementById("feedback").style.display = 'block';
-    }
+
 }
 
 
