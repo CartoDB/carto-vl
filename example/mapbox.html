@@ -72,7 +72,7 @@
 
 <body>
     <div class='mapClass u-full-width'>
-        <textarea class="u-full-width" id="widthStyleEntry">40*(($amount/max($amount))^0.5)</textarea>
+        <textarea class="u-full-width" id="widthStyleEntry">40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)</textarea>
         <textarea class="u-full-width" id="colorStyleEntry">hsv(top($category, 3), 0.5, 1.)</textarea>
         <textarea class="u-full-width" id="feedback">¿?</textarea>
         <div id='map'></div>
@@ -82,6 +82,8 @@
             <div class="twelve columns">
                 <h4>Interesting expressions: </h4>
                 <pre><code>
+40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)
+
 hsv(top($category, 3), 0.5, blend(0,1,now(), cubic))
 
 hsv(top($category, 3), 0.5, 1.)
@@ -92,12 +94,12 @@ hsv(0.07, ($amount/10000)^0.2,($amount/10000)^0.8)
 
 hsv(0.07, 0.8, Near($amount, 100, 100, 1000))
 
- setOpacity(ramp($category, Prism),
+setOpacity(ramp($category, Prism),
      blend(0,1,
         (sin(now())*0.5+0.5)*(log($amount+1)/4)^5
 ))
 </code></pre>
-<h4>Ignore this</h4>
+                <h4>Ignore this</h4>
                 <br> dsfs
                 <br> dsfs
                 <br> dsfs
