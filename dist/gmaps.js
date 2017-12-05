@@ -2456,8 +2456,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / width;
-        ids[i + 1] = Math.floor((i / 2) / width) / height;
+        ids[i + 0] = ((i / 2) % width) / (width-1);
+        ids[i + 1] = Math.floor((i / 2) / width) / (height-1);
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -2518,7 +2518,8 @@ function refresh(timestamp) {
 
         gl.useProgram(tile.style.colorShader.program);
         var obj = {
-            freeTexUnit: 4
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
         }
         tile.style._color._preDraw(obj);
 
