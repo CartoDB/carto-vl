@@ -1,5 +1,3 @@
-var gl = null;
-
 import jsep from 'jsep';
 import * as functions from './functions';
 import parseStyleExpression from './parser';
@@ -7,21 +5,12 @@ import * as shaders from '../shaders';
 
 export {
     Style,
-    setGL,
     compileShader,
 };
 export * from './functions';
 export * from './parser';
 
-// TODO removed global gl context
-// TODO document API
-function setGL(_gl) {
-    gl = _gl;
-    functions.setGL(gl);
-}
-
-
-function compileShader(styleRootExpr, shaderCreator) {
+function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -32,19 +21,19 @@ function compileShader(styleRootExpr, shaderCreator) {
         return tid[name];
     });
     const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-    styleRootExpr._postShaderCompile(shader.program);
+    styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
         shader: shader
     };
 }
 Style.prototype._compileColorShader = function () {
-    const r = compileShader(this._color, shaders.styler.createColorShader);
+    const r = compileShader(this.renderer.gl, this._color, shaders.styler.createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
 Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this._width, shaders.styler.createWidthShader);
+    const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
 }
