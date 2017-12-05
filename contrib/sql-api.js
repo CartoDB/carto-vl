@@ -58,10 +58,6 @@ class SQL_API extends Provider {
         const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
         promise.then(callback);
-        //See if it's on cache list
-        //if it is: add to renderer
-        //else
-        //get dataframe
     }
     requestDataframe(x, y, z) {
         return new Promise((callback, reject) => {

@@ -684,8 +684,12 @@ class Ramp extends Expression {
             } else if (input.schemaType instanceof schema.Category) {
                 minKey = -1;
                 maxKey = input.schemaType.categoryNames.length;
+            } else if (input instanceof Top) {
+                minKey = 0;
+                maxKey = 1;
             }
         }
+        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);
@@ -750,13 +754,13 @@ class Ramp extends Expression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         }
-        this.input._postShaderCompile(program);
+        this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
     _preDraw(l, gl) {
-        this.input._preDraw(l);
+        this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);

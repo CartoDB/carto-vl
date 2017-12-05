@@ -61,6 +61,7 @@ class MGLIntegrator {
     }
     styleWidth(e) {
         const v = document.getElementById("widthStyleEntry").value;
+        const initial = this.style.getWidth();
         try {
             this.style.getWidth().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
             document.getElementById("feedback").style.display = 'none';
@@ -69,18 +70,21 @@ class MGLIntegrator {
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
+            this.style.setWidth(initial);
         }
     }
     styleColor(e) {
         const v = document.getElementById("colorStyleEntry").value;
+        const initial = this.style.getColor();
         try {
-            this.style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 0);
+            this.style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
             document.getElementById("feedback").style.display = 'none';
         } catch (error) {
             const err = `Invalid color expression: ${error}:${error.stack}`;
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
+            this.style.setColor(initial);
         }
     }
     getZoom() {
