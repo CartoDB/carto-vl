@@ -51,7 +51,7 @@ var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'mapbox://styles/mapbox/dark-v9', // stylesheet location
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 14, // starting zoom,
 });
@@ -84,11 +84,9 @@ map.on('load', _ => {
 
         c = renderer.getCenter();
         var z = renderer.getZoom();
-    }
-    function moveEnd() {
-        move();
         getData(canvas.clientWidth / canvas.clientHeight);
-    };
+    }
+
     function resize() {
         canvas.style.width = map.getCanvas().style.width;
         canvas.style.height = map.getCanvas().style.height;
@@ -103,10 +101,10 @@ map.on('load', _ => {
     styleWidth();
     styleColor();
     resize();
-    moveEnd();
+    move();
 
     map.on('resize', resize);
     map.on('movestart', move);
     map.on('move', move);
-    map.on('moveend', moveEnd);
+    map.on('moveend', move);
 });
