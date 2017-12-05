@@ -344,7 +344,8 @@ function refresh(timestamp) {
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
         var obj = {
-            freeTexUnit: 4
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
         }
         tile.style._width._preDraw(obj);
         Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
@@ -553,7 +554,7 @@ Renderer.prototype._getMin = function (expression, callback) {
 
         gl.disableVertexAttribArray(shader.vertexPositionAttribute);
         gl.disableVertexAttribArray(shader.featureIdAttr);
-        
+
     });
 
 

@@ -285,7 +285,21 @@ class Now extends Expression {
     }
 }
 
-const now = (speed) => new Now(speed);
+class Zoom extends Expression {
+    /**
+     * @api
+     * @description get the current zoom level
+     */
+    constructor() {
+        super({ zoom: float(0) }, inline => inline.zoom);
+        this.type = 'float';
+    }
+    _preDraw(o) {
+        this.zoom.expr = o.zoom;
+        this.zoom._preDraw();
+    }
+}
+
 
 //TODO convert to use uniformfloat class
 class Animate extends Expression {
@@ -781,9 +795,11 @@ const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
 const linear = (...args) => new Linear(...args);
 const cubic = (...args) => new Cubic(...args);
+const now = (speed) => new Now(speed);
+const zoom = (speed) => new Zoom(speed);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom,
     setGL
 };
