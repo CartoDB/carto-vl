@@ -8,6 +8,7 @@ import * as shaders from '../shaders';
 export {
     Style,
     setGL,
+    compileShader,
 };
 export * from './functions';
 export * from './parser';

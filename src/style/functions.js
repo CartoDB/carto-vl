@@ -188,6 +188,7 @@ class Expression {
     }
 }
 
+
 class Property extends Expression {
     /**
      * @jsapi
@@ -219,6 +220,52 @@ const metadataAccessGenerator = (metadataProperty) =>
 const Max = metadataAccessGenerator('globalMax');
 const Min = metadataAccessGenerator('globalMin');
 
+
+
+class Top extends Expression {
+    constructor(property, buckets) {
+        // TODO validation
+        super({ property: property });
+        this.type = 'float';
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        const width = 1024;
+        let pixels = new Uint8Array(4 * width);
+
+        const schema = property.schemaType;
+        for (let i = 0; i < buckets - 1; i++) {
+            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
+        }
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            pixels);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        this._UID = uniformIDMaker();
+        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
+            inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
+        };
+    }
+    _postShaderCompile(program) {
+        this.property._postShaderCompile(program);
+        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
+    }
+    _preDraw(l) {
+        this.property._preDraw(l);
+        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.uniform1i(this._texLoc, l.freeTexUnit);
+        l.freeTexUnit++;
+    }
+    //TODO _free
+}
+
 class Now extends Expression {
     /**
      * @api
@@ -238,7 +285,21 @@ class Now extends Expression {
     }
 }
 
-const now = (speed) => new Now(speed);
+class Zoom extends Expression {
+    /**
+     * @api
+     * @description get the current zoom level
+     */
+    constructor() {
+        super({ zoom: float(0) }, inline => inline.zoom);
+        this.type = 'float';
+    }
+    _preDraw(o) {
+        this.zoom.expr = o.zoom;
+        this.zoom._preDraw();
+    }
+}
+
 
 //TODO convert to use uniformfloat class
 class Animate extends Expression {
@@ -433,6 +494,33 @@ class Near extends Expression {
     }
 }
 
+const genInterpolator = (inlineMaker, preface) => class Interpolator extends Expression {
+    constructor(m) {
+        m = implicitCast(m);
+        if (m.type != 'float') {
+            throw new Error(`Blending cannot be performed by '${mix.type}'`);
+        }
+        super({ m: m }, inline => inlineMaker(inline.m), preface);
+        this.schema = m.schema;
+        this.isInterpolator = true;
+    }
+}
+class Linear extends genInterpolator(inner => inner) { }
+class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`) { }
+
 class Blend extends Expression {
     /**
      * @api
@@ -441,7 +529,7 @@ class Blend extends Expression {
      * @param {*} b type must match a's type
      * @param {*} mix interpolation parameter in the [0,1] range
      */
-    constructor(a, b, mix) {
+    constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
@@ -453,6 +541,9 @@ class Blend extends Expression {
         }
         if (schema.checkSchemaMatch(a.schema, b.schema)) {
             throw new Error('Blend parameters schemas mismatch');
+        }
+        if (interpolator && interpolator.isInterpolator) {
+            mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
         if (a.type == 'float' && b.type == 'float') {
@@ -701,9 +792,14 @@ const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
 const max = (...args) => new Max(...args);
 const min = (...args) => new Min(...args);
+const top = (...args) => new Top(...args);
+const linear = (...args) => new Linear(...args);
+const cubic = (...args) => new Cubic(...args);
+const now = (speed) => new Now(speed);
+const zoom = (speed) => new Zoom(speed);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom,
     setGL
 };

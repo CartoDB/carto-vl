@@ -2,10 +2,10 @@ import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
 
-export { Renderer, Style };
+export { Renderer, Style, Dataframe };
 
 import * as schema from './schema';
-export {schema};
+export { schema };
 
 /**
  * @api
@@ -60,6 +60,10 @@ function Renderer(canvas) {
         var ext = gl.getExtension("OES_texture_float");
         if (!ext) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
+        }
+        this.EXT_blend_minmax = gl.getExtension('EXT_blend_minmax');
+        if (!this.EXT_blend_minmax) {
+            throw new Error("WebGL extension EXT_blend_minmax is unsupported");
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
@@ -143,65 +147,73 @@ Renderer.prototype.removeDataframe = function (dataframe) {
     gl.deleteBuffer(dataframe.featureIDBuffer);
 };
 
+
+class Dataframe {
+    /**
+     * @constructor
+     * @jsapi
+     */
+    constructor(center, scale, geom, properties) {
+        this.center = center;
+        this.scale = scale;
+        this.geom = geom;
+        this.properties = properties;
+    }
+}
+
+class BoundDataframe extends Dataframe {
+    /**
+    * @jsapi
+    * Apply a style
+    * @name setStyle
+    * @param style
+    */
+}
+
 /**
- * @constructor
  * @jsapi
- */
-function Dataframe() {
-}
-/**
- * @api
- * Aply a style
- * @param style
- */
-Dataframe.prototype.applyStyle = function (style) {
-
-}
-
-/**
- * @api
  * @description Adds a new dataframe to the renderer.
  *
  * Performance-intensive. The required allocation and copy of resources will happen synchronously.
  * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
  * @param {Dataframe} dataframe
- * @returns {Dataframse} asd
+ * @returns {BoundDataframe}
  */
-Renderer.prototype.addDataframe = function (tile) {
-    this.tiles.push(tile);
-    tile.propertyTex = [];
+Renderer.prototype.addDataframe = function (dataframe) {
+    this.tiles.push(dataframe);
+    dataframe.propertyTex = [];
 
-    var points = tile.geom;
+    var points = dataframe.geom;
     const level = 0;
     const width = RTT_WIDTH;
-    tile.numVertex = points.length / 2;
-    const height = Math.ceil(tile.numVertex / width);
+    dataframe.numVertex = points.length / 2;
+    const height = Math.ceil(dataframe.numVertex / width);
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
-    tile.height = height;
-    tile.propertyID = {}; //Name => PID
-    tile.propertyCount = 0;
+    dataframe.height = height;
+    dataframe.propertyID = {}; //Name => PID
+    dataframe.propertyCount = 0;
 
 
-    for (var k in tile.properties) {
-        if (tile.properties.hasOwnProperty(k) && tile.properties[k].length > 0) {
-            const isCategory = !Number.isFinite(tile.properties[k][0]);
-            const property = tile.properties[k];
-            var propertyID = tile.propertyID[k];
+    for (var k in dataframe.properties) {
+        if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
+            const isCategory = !Number.isFinite(dataframe.properties[k][0]);
+            const property = dataframe.properties[k];
+            var propertyID = dataframe.propertyID[k];
             if (propertyID === undefined) {
-                propertyID = tile.propertyCount;
-                tile.propertyCount++;
-                tile.propertyID[k] = propertyID;
+                propertyID = dataframe.propertyCount;
+                dataframe.propertyCount++;
+                dataframe.propertyID[k] = propertyID;
             }
-            tile.propertyTex[propertyID] = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[propertyID]);
+            dataframe.propertyTex[propertyID] = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
             const pixel = new Float32Array(width * height);
             for (var i = 0; i < property.length; i++) {
                 pixel[i] = property[i];
             }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-                width, height, 0, gl.ALPHA, srcType,
+                width, height, 0, gl.ALPHA, gl.FLOAT,
                 pixel);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -210,19 +222,19 @@ Renderer.prototype.addDataframe = function (tile) {
         }
     }
 
-    tile.setStyle = (style) => {
-        schema.checkSchemaMatch(style.schema, tile.schema);
-        tile.style = style;
+    dataframe.setStyle = (style) => {
+        schema.checkSchemaMatch(style.schema, dataframe.schema);
+        dataframe.style = style;
         window.requestAnimationFrame(refresh.bind(this));
     }
-    tile.style = null;
+    dataframe.style = null;
 
-    tile.vertexBuffer = gl.createBuffer();
-    tile.featureIDBuffer = gl.createBuffer();
+    dataframe.vertexBuffer = gl.createBuffer();
+    dataframe.featureIDBuffer = gl.createBuffer();
 
 
-    tile.texColor = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+    dataframe.texColor = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4 * width * height).fill(255));
@@ -231,8 +243,8 @@ Renderer.prototype.addDataframe = function (tile) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    tile.texWidth = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+    dataframe.texWidth = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
     gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
         width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4 * width * height).fill(100));
@@ -249,17 +261,17 @@ Renderer.prototype.addDataframe = function (tile) {
         ids[i + 1] = Math.floor((i / 2) / width) / height;
     }
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     window.requestAnimationFrame(refresh.bind(this));
 
-    return tile;
+    return dataframe;
 };
 
 Renderer.prototype.getAspect = function () {
@@ -288,10 +300,7 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-    gl.clearColor(0., 0., 0., 0.);//TODO this should be a renderer property
+    gl.clearColor(0., 0., 0., 0.);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
@@ -335,7 +344,8 @@ function refresh(timestamp) {
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
         var obj = {
-            freeTexUnit: 4
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
         }
         tile.style._width._preDraw(obj);
         Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
@@ -408,6 +418,8 @@ function refresh(timestamp) {
 
     });
 
+    //this._getMin(null, this.computePool[0]);
+
     this.tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
             window.requestAnimationFrame(refresh.bind(this));
@@ -421,4 +433,135 @@ function refresh(timestamp) {
  */
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+}
+
+Renderer.prototype.getMin = function (expression, callback) {
+    //Send work and callback to RAF
+    //Request RAF
+    this.computePool = [callback];
+}
+
+function getFBstatus() {
+    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    switch (status) {
+        case gl.FRAMEBUFFER_COMPLETE:
+            return 'FRAMEBUFFER_COMPLETE';
+        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            return 'FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
+        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            return 'FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
+        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            return 'FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
+        case gl.FRAMEBUFFER_UNSUPPORTED:
+            return 'FRAMEBUFFER_UNSUPPORTED';
+        case gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+            return 'FRAMEBUFFER_INCOMPLETE_MULTISAMPLE';
+        case gl.RENDERBUFFER_SAMPLES:
+            return 'RENDERBUFFER_SAMPLES';
+        default:
+            return 'Unkown Framebuffer status';
+    }
+}
+
+//TODO remove this hack :)
+import * as shaders from './shaders';
+import * as functions from './style/functions';
+
+Renderer.prototype._getMin = function (expression, callback) {
+    //Render to 1x1 FB
+    if (!this.aux1x1FB) {
+        this.aux1x1FB = gl.createFramebuffer();
+        this.aux1x1TEX = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            1, 1, 0, gl.RGBA, gl.FLOAT,
+            null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
+        //Check FB completeness
+        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+            //This is a very bad time to throw an exception, this code should never be executed,
+            //all checks should be done earlier to avoid problems here
+            //If this is still executed we'll warn and ignore
+            console.warn(getFBstatus());
+            return;
+        }
+    }
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
+
+    gl.viewport(0, 0, 1, 1);
+    //glclear to MAX_FP VALUE
+    gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    //TODO disable DEPTH WRITE
+
+    //TODO Render with shader => color = float(EXPRESSION)
+
+    //Compile expression, use expression
+    //const expr = new functions.HSV(1., 0, 0.12);
+    const expr = functions.property('amount', {
+        'amount': 'float'
+    });
+    const r = Style.compileShader(expr, shaders.computer);
+    const shader = r.shader;
+    //console.log('computer', shader)
+
+    gl.useProgram(shader.program);
+
+    var s = 1. / this._zoom;
+    var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
+    //For each tile
+    this.tiles.forEach(tile => {
+        var obj = {
+            freeTexUnit: 4
+        }
+        expr._preDraw(obj);
+
+        //TODO redundant code with refresh => refactor
+        gl.uniform2f(shader.vertexScaleUniformLocation,
+            (s / aspect) * tile.scale,
+            s * tile.scale);
+        gl.uniform2f(shader.vertexOffsetUniformLocation,
+            (s / aspect) * (this._center.x - tile.center.x),
+            s * (this._center.y - tile.center.y));
+
+        gl.enableVertexAttribArray(shader.vertexPositionAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+
+        gl.enableVertexAttribArray(shader.featureIdAttr);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+        gl.vertexAttribPointer(shader.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+        Object.keys(r.tid).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(shader.textureLocations[i], i);
+        });
+
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+        gl.disableVertexAttribArray(shader.vertexPositionAttribute);
+        gl.disableVertexAttribArray(shader.featureIdAttr);
+
+    });
+
+
+    //Readback!
+    var pixels = new Float32Array(4);
+    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+    callback(pixels);
+
+    gl.blendEquation(gl.FUNC_ADD);
 }
