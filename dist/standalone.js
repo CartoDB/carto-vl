@@ -96,10 +96,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return Top; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
-<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return Zoom; });
-=======
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -126,10 +123,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "top", function() { return top; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
-<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
-=======
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
@@ -931,11 +925,8 @@ const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
 const linear = (...args) => new Linear(...args);
 const cubic = (...args) => new Cubic(...args);
-<<<<<<< HEAD
 const now = (speed) => new Now(speed);
 const zoom = (speed) => new Zoom(speed);
-=======
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 
 
 
@@ -2641,7 +2632,6 @@ function refresh(timestamp) {
  */
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(gl);
-<<<<<<< HEAD
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -2672,38 +2662,6 @@ function getFBstatus() {
     }
 }
 
-=======
-}
-
-Renderer.prototype.getMin = function (expression, callback) {
-    //Send work and callback to RAF
-    //Request RAF
-    this.computePool = [callback];
-}
-
-function getFBstatus() {
-    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-    switch (status) {
-        case gl.FRAMEBUFFER_COMPLETE:
-            return 'FRAMEBUFFER_COMPLETE';
-        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            return 'FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
-        case gl.FRAMEBUFFER_UNSUPPORTED:
-            return 'FRAMEBUFFER_UNSUPPORTED';
-        case gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            return 'FRAMEBUFFER_INCOMPLETE_MULTISAMPLE';
-        case gl.RENDERBUFFER_SAMPLES:
-            return 'RENDERBUFFER_SAMPLES';
-        default:
-            return 'Unkown Framebuffer status';
-    }
-}
-
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 //TODO remove this hack :)
 
 
@@ -2795,11 +2753,7 @@ Renderer.prototype._getMin = function (expression, callback) {
 
         gl.disableVertexAttribArray(shader.vertexPositionAttribute);
         gl.disableVertexAttribArray(shader.featureIdAttr);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
     });
 
 
@@ -3131,10 +3085,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Top"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cubic"]; });
-<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Zoom"]; });
-=======
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3161,10 +3112,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["top"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
-<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
-=======
->>>>>>> e31d71b89de9a5d7433f930a3be99c96387ca2a5
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 var gl = null;
 
