@@ -60,11 +60,6 @@ function implicitCast(value) {
     }
     return value;
 }
-var gl = null;
-function setGL(_gl) {
-    gl = _gl;
-}
-
 
 const schemas = {};
 Object.keys(cartocolor).map(name => {
@@ -139,15 +134,15 @@ class Expression {
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
      * @param {*} program
      */
-    _postShaderCompile(program) {
-        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
+    _postShaderCompile(program, gl) {
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
     /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l));
+    _preDraw(l, gl) {
+        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
     }
     /**
      * @jsapi
@@ -227,22 +222,7 @@ class Top extends Expression {
         // TODO validation
         super({ property: property });
         this.type = 'float';
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const width = 1024;
-        let pixels = new Uint8Array(4 * width);
-
-        const schema = property.schemaType;
-        for (let i = 0; i < buckets - 1; i++) {
-            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
-        }
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            pixels);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -252,11 +232,30 @@ class Top extends Expression {
             inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const width = 1024;
+            let pixels = new Uint8Array(4 * width);
+
+            const schema = this.property.schemaType;
+            for (let i = 0; i < this.buckets - 1; i++) {
+                pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
+            }
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                pixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
         this.property._postShaderCompile(program);
         this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         this.property._preDraw(l);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -276,16 +275,30 @@ class Now extends Expression {
         this.type = 'float';
         this.init = Date.now();
     }
-    _preDraw() {
+    _preDraw(...args) {
         this.now.expr = (Date.now() - this.init) / 1000.;
-        this.now._preDraw();
+        this.now._preDraw(...args);
     }
     isAnimated() {
         return true;
     }
 }
 
-const now = (speed) => new Now(speed);
+class Zoom extends Expression {
+    /**
+     * @api
+     * @description get the current zoom level
+     */
+    constructor() {
+        super({ zoom: float(0) }, inline => inline.zoom);
+        this.type = 'float';
+    }
+    _preDraw(o, gl) {
+        this.zoom.expr = o.zoom;
+        this.zoom._preDraw(o, gl);
+    }
+}
+
 
 //TODO convert to use uniformfloat class
 class Animate extends Expression {
@@ -311,10 +324,10 @@ class Animate extends Expression {
             inline: `anim${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {
@@ -426,6 +439,7 @@ class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) {
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
 
@@ -473,8 +487,8 @@ class Near extends Expression {
             throw new Error('Near(): invalid parameter type');
         }
         super({ input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
-            `1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-            0., 1.)`
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
+            0., 1.))`
         );
         this.type = 'float';
     }
@@ -542,8 +556,8 @@ class Blend extends Expression {
         }
         this.schema = a.schema;
     }
-    _preDraw(l) {
-        super._preDraw(l);
+    _preDraw(l, gl) {
+        super._preDraw(l, gl);
         if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
@@ -580,10 +594,10 @@ class RGBA extends Expression {
             inline: `color${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
     }
     isAnimated() {
@@ -612,10 +626,10 @@ class Float extends Expression {
             inline: `float${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
     isAnimated() {
@@ -663,8 +677,7 @@ class Ramp extends Expression {
      * @param {*} minKey Optional
      * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey, ) {
-        console.log("RAMP", input, input.schemaType);
+    constructor(input, palette, minKey, maxKey) {
         if (maxKey == undefined) {
             if (input.schemaType instanceof schema.Float) {
                 minKey = input.schemaType.globalMin;
@@ -672,6 +685,9 @@ class Ramp extends Expression {
             } else if (input.schemaType instanceof schema.Category) {
                 minKey = -1;
                 maxKey = input.schemaType.categoryNames.length;
+            } else if (input instanceof Top) {
+                minKey = 0;
+                maxKey = 1;
             }
         }
 
@@ -688,42 +704,8 @@ class Ramp extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
-
-
-
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const level = 0;
-        const internalFormat = gl.RGBA;
-        const width = 256;
-        const height = 1;
-        const border = 0;
-        const srcFormat = gl.RGBA;
-        const srcType = gl.UNSIGNED_BYTE;
-        const pixel = new Uint8Array(4 * width);
-        for (var i = 0; i < width; i++) {
-            const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-            const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
-            const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-            const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-            const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
-            const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-            pixel[4 * i + 0] = v[0];
-            pixel[4 * i + 1] = v[1];
-            pixel[4 * i + 2] = v[2];
-            pixel[4 * i + 3] = v[3];
-        }
-
-
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-            width, height, border, srcFormat, srcType,
-            pixel);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     }
-    _free() {
+    _free(gl) {
         gl.deleteTexture(this.texture);
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -738,14 +720,47 @@ class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
-    _postShaderCompile(program) {
-        this.input._postShaderCompile(program);
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 256;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            const pixel = new Uint8Array(4 * width);
+            const values = this.values;
+            for (var i = 0; i < width; i++) {
+                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                pixel[4 * i + 0] = v[0];
+                pixel[4 * i + 1] = v[1];
+                pixel[4 * i + 2] = v[2];
+                pixel[4 * i + 3] = v[3];
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        }
+        this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(l) {
-        this.input._preDraw(l);
+    _preDraw(l, gl) {
+        this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);
@@ -761,6 +776,7 @@ const floatDiv = (...args) => new FloatDiv(...args);
 const floatAdd = (...args) => new FloatAdd(...args);
 const floatSub = (...args) => new FloatSub(...args);
 const floatPow = (...args) => new FloatPow(...args);
+const floatMod = (...args) => new FloatMod(...args);
 const log = (...args) => new Log(...args);
 const sqrt = (...args) => new Sqrt(...args);
 const sin = (...args) => new Sin(...args);
@@ -781,9 +797,10 @@ const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
 const linear = (...args) => new Linear(...args);
 const cubic = (...args) => new Cubic(...args);
+const now = (speed) => new Now(speed);
+const zoom = (speed) => new Zoom(speed);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic,
-    setGL
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod
 };

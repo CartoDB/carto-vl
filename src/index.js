@@ -23,10 +23,6 @@ export { schema };
  * @property {Properties} properties
  */
 
-
-// TODO remove
-var gl;
-
 /**
  * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
  *
@@ -52,8 +48,9 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    if (!gl) { //TODO remove hack: remove global context
-        gl = canvas.getContext('webgl');
+    if (!this.gl) { //TODO remove hack: remove global context
+        this.gl = canvas.getContext('webgl');
+        const gl = this.gl;
         if (!gl) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
@@ -69,11 +66,11 @@ function Renderer(canvas) {
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
-        Style.setGL(gl);
         this._initShaders();
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    const gl = this.gl;
     this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -140,11 +137,6 @@ Renderer.prototype.setZoom = function (zoom) {
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
     this.tiles = this.tiles.filter(t => t !== dataframe);
-    dataframe.propertyTex.map(tex => gl.deleteTexture(tex));
-    gl.deleteTexture(dataframe.texColor);
-    gl.deleteTexture(dataframe.texWidth);
-    gl.deleteBuffer(dataframe.vertexBuffer);
-    gl.deleteBuffer(dataframe.featureIDBuffer);
 };
 
 
@@ -158,6 +150,16 @@ class Dataframe {
         this.scale = scale;
         this.geom = geom;
         this.properties = properties;
+    }
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+        }
     }
 }
 
@@ -180,6 +182,7 @@ class BoundDataframe extends Dataframe {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
+    const gl = this.gl;
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -208,13 +211,9 @@ Renderer.prototype.addDataframe = function (dataframe) {
             }
             dataframe.propertyTex[propertyID] = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
-            const pixel = new Float32Array(width * height);
-            for (var i = 0; i < property.length; i++) {
-                pixel[i] = property[i];
-            }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
                 width, height, 0, gl.ALPHA, gl.FLOAT,
-                pixel);
+                dataframe.properties[k]);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -223,8 +222,10 @@ Renderer.prototype.addDataframe = function (dataframe) {
     }
 
     dataframe.setStyle = (style) => {
-        schema.checkSchemaMatch(style.schema, dataframe.schema);
         dataframe.style = style;
+        if (style) {
+            schema.checkSchemaMatch(style.schema, dataframe.schema);
+        }
         window.requestAnimationFrame(refresh.bind(this));
     }
     dataframe.style = null;
@@ -257,8 +258,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / width;
-        ids[i + 1] = Math.floor((i / 2) / width) / height;
+        ids[i + 0] = ((i / 2) % width) / (width - 1);
+        ids[i + 1] = Math.floor((i / 2) / width) / (height - 1);
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -286,6 +287,7 @@ Renderer.prototype.getAspect = function () {
  */
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    const gl = this.gl;
     // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
@@ -313,57 +315,63 @@ function refresh(timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-        gl.viewport(0, 0, RTT_WIDTH, tile.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        if (tile.style) {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.useProgram(tile.style.colorShader.program);
-        var obj = {
-            freeTexUnit: 4
+            gl.useProgram(tile.style.colorShader.program);
+            var obj = {
+                freeTexUnit: 4,
+                zoom: 1. / this._zoom
+            }
+            tile.style._color._preDraw(obj, gl);
+
+            Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
+            });
+
+            gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+            gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         }
-        tile.style._color._preDraw(obj);
-
-        Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
-        });
-
-        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-        gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
     this.tiles.forEach(tile => {
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-        gl.useProgram(tile.style.widthShader.program);
-        gl.viewport(0, 0, RTT_WIDTH, tile.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        var obj = {
-            freeTexUnit: 4
+        if (tile.style) {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+            gl.useProgram(tile.style.widthShader.program);
+            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            var obj = {
+                freeTexUnit: 4,
+                zoom: 1. / this._zoom
+            }
+            tile.style._width._preDraw(obj, gl);
+            Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+            });
+
+            gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+            gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+            gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
+
+            tile.style.updated = false;
+            tile.initialized = true;
         }
-        tile.style._width._preDraw(obj);
-        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
-        });
-
-        gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-        gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-
-
-        tile.style.updated = false;
-        tile.initialized = true;
     });
 
 
@@ -380,48 +388,51 @@ function refresh(timestamp) {
 
 
     this.tiles.forEach(tile => {
-        /*console.log((s / aspect) * tile.scale,
-            s * tile.scale,
-            (s / aspect) * this._center.x - tile.center.x,
-            s * this._center.y - tile.center.y
-        );*/
-        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
-            (s / aspect) * tile.scale,
-            s * tile.scale);
-        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
-            (s / aspect) * (this._center.x - tile.center.x),
-            s * (this._center.y - tile.center.y));
+        if (tile.style) {
+            /*console.log((s / aspect) * tile.scale,
+                s * tile.scale,
+                (s / aspect) * this._center.x - tile.center.x,
+                s * this._center.y - tile.center.y
+            );*/
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-
-
-        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
-
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
-
-        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-
-        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
+            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+
+            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+            gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+            gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+        }
     });
 
     //this._getMin(null, this.computePool[0]);
 
     this.tiles.forEach(t => {
-        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-            window.requestAnimationFrame(refresh.bind(this));
+        if (t.style) {
+            if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+                window.requestAnimationFrame(refresh.bind(this));
+            }
         }
     });
 
@@ -431,7 +442,7 @@ function refresh(timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = shaders.renderer.createPointShader(gl);
+    this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -440,7 +451,7 @@ Renderer.prototype.getMin = function (expression, callback) {
     this.computePool = [callback];
 }
 
-function getFBstatus() {
+function getFBstatus(gl) {
     const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     switch (status) {
         case gl.FRAMEBUFFER_COMPLETE:
@@ -467,6 +478,7 @@ import * as shaders from './shaders';
 import * as functions from './style/functions';
 
 Renderer.prototype._getMin = function (expression, callback) {
+    const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
         this.aux1x1FB = gl.createFramebuffer();
@@ -482,7 +494,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
         //Check FB completeness
-        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
             //This is a very bad time to throw an exception, this code should never be executed,
             //all checks should be done earlier to avoid problems here
             //If this is still executed we'll warn and ignore
@@ -511,7 +523,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     const expr = functions.property('amount', {
         'amount': 'float'
     });
-    const r = Style.compileShader(expr, shaders.computer);
+    const r = Style.compileShader(gl, expr, shaders.computer);
     const shader = r.shader;
     //console.log('computer', shader)
 
@@ -524,7 +536,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         var obj = {
             freeTexUnit: 4
         }
-        expr._preDraw(obj);
+        expr._preDraw(obj, gl);
 
         //TODO redundant code with refresh => refactor
         gl.uniform2f(shader.vertexScaleUniformLocation,
@@ -553,7 +565,7 @@ Renderer.prototype._getMin = function (expression, callback) {
 
         gl.disableVertexAttribArray(shader.vertexPositionAttribute);
         gl.disableVertexAttribArray(shader.featureIdAttr);
-        
+
     });
 
 
