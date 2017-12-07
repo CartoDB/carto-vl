@@ -690,7 +690,6 @@ class Ramp extends Expression {
                 maxKey = 1;
             }
         }
-        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);

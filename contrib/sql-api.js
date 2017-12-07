@@ -71,12 +71,12 @@ class SQL_API extends Provider {
                     ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
                     CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
                 ),
-                SUM(amount) AS amount,
-                _cdb_mode(category) AS category
-            FROM tx_0125_copy_copy AS cdbq
+                AVG(temp::numeric) AS amount,
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS d
+            FROM wwi_ships AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-            ORDER BY amount DESC
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.5),
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
         )AS geom
     `;
             //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
@@ -94,7 +94,7 @@ class SQL_API extends Provider {
                     category: 0,
                     amount: 1
                 };
-                var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+                var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
                 var points = new Float32Array(mvtLayer.length * 2);
                 const r = Math.random();
                 for (var i = 0; i < mvtLayer.length; i++) {
@@ -102,7 +102,7 @@ class SQL_API extends Provider {
                     const geom = f.loadGeometry();
                     points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                     points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                    properties[0][i] = Number(this.getCatID(f.properties.category));
+                    properties[0][i] = Number(f.properties.d)//Number(this.getCatID(f.properties.category));
                     properties[1][i] = Number(f.properties.amount);
                 }
                 //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
@@ -119,6 +119,8 @@ class SQL_API extends Provider {
                 );
                 dataframe.schema = schema;
                 dataframe.size = mvtLayer.length;
+                this.renderer.addDataframe(dataframe).setStyle(this.style)
+                console.log(Date.now());
                 callback(dataframe);
             }
             oReq.send(null);
@@ -142,8 +144,8 @@ class SQL_API extends Provider {
                     completedTiles.push(dataframe);
                 }
                 if (completedTiles.length == needToComplete) {
-                    oldtiles.forEach(t => renderer.removeDataframe(t));
-                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(this.style));
+                    oldtiles.forEach(t => t.setStyle(null));
+                    completedTiles.map(t => t.setStyle(this.style));
                     oldtiles = completedTiles;
                 }
             });

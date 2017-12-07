@@ -6,12 +6,12 @@ var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 14, // starting zoom,
+    zoom: 0, // starting zoom,
 });
 map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map);
 
-
+/*
 var map2 = new mapboxgl.Map({
     container: 'map2', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
@@ -19,3 +19,4 @@ var map2 = new mapboxgl.Map({
     zoom: 14, // starting zoom,
 });
 var mgl2 = new MGL.MGLIntegrator(map2);
+*/
