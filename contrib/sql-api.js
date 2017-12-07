@@ -5,13 +5,7 @@ var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
 var LRU = require("lru-cache");
 
-export { SQL_API, schema, init };
-
-const names = ['Moda y calzado',
-    'Bares y restaurantes', 'Salud', 'Alimentación'];
-var schema = new R.schema.Schema(['category', 'amount'], [new R.schema.Category(names
-    , [33263, 24633, 17833, 16907], [0, 1, 2, 3]), new R.schema.Float(2, 100 * 1000)]);
-
+export { SQL_API, init };
 
 var style;
 var oldtiles = [];
@@ -38,10 +32,22 @@ class SQL_API extends Provider {
         };
         this.cache = LRU(options);
     }
+    setQueries(query, renderQueryMaker) {
+        this.cache.reset();
+        this.renderQueryMaker = renderQueryMaker;
+        this.schema = getSchema(query);
+        this.schema.then((schema) => {
+            if (this.style) {
+                this.style.schema = schema;
+                console.log("NS", this.style.schema)
+                this.getData()
+            }
+        });
+    }
+    async getSchema() {
+        return await this.schema;
+    }
     getCatID(catStr) {
-        const f = names.indexOf(catStr);
-        return f;
-
         if (this.catMap[catStr]) {
             return this.catMap[catStr];
         }
@@ -62,66 +68,60 @@ class SQL_API extends Provider {
     requestDataframe(x, y, z) {
         return new Promise((callback, reject) => {
             const mvt_extent = 1024;
-            const subpixelBufferSize = 0;
-            const query =
-                `select st_asmvt(geom, 'lid') FROM
-        (
-            SELECT
-                ST_AsMVTGeom(
-                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                    CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
-                ),
-                AVG(temp::numeric) AS amount,
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS d
-            FROM wwi_ships AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.5),
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
-        )AS geom
-    `;
+            const query = this.renderQueryMaker(x, y, z);
+
             //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
             var oReq = new XMLHttpRequest();
             oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
             oReq.onload = (oEvent) => {
-                const json = JSON.parse(oReq.response);
-                if (json.rows[0].st_asmvt.data.length == 0) {
-                    callback({ empty: true });
-                    return;
-                }
-                var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {
-                    category: 0,
-                    amount: 1
-                };
-                var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                var points = new Float32Array(mvtLayer.length * 2);
-                const r = Math.random();
-                for (var i = 0; i < mvtLayer.length; i++) {
-                    const f = mvtLayer.feature(i);
-                    const geom = f.loadGeometry();
-                    points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                    points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                    properties[0][i] = Number(f.properties.d)//Number(this.getCatID(f.properties.category));
-                    properties[1][i] = Number(f.properties.amount);
-                }
-                //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
-                var rs = rsys.getRsysFromTile(x, y, z);
-                let dataframeProperties = {};
-                Object.keys(fieldMap).map((name, pid) => {
-                    dataframeProperties[name] = properties[pid];
+                this.schema.then(schema => {
+                    const json = JSON.parse(oReq.response);
+                    if (json.rows[0].st_asmvt.data.length == 0) {
+                        callback({ empty: true });
+                        return;
+                    }
+                    var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
+                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                    var fieldMap = {
+                    };
+                    Object.keys(schema).map((name, i) => {
+                        fieldMap[name] = i;
+                    });
+                    var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+                    var points = new Float32Array(mvtLayer.length * 2);
+                    const r = Math.random();
+                    for (var i = 0; i < mvtLayer.length; i++) {
+                        const f = mvtLayer.feature(i);
+                        const geom = f.loadGeometry();
+                        points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                        points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                        Object.keys(schema).map((name, index) => {
+                            if (schema[name] instanceof R.schema.Category) {
+                                properties[index][i] = this.getCatID(f.properties[name]);
+                            } else {
+                                properties[index][i] = f.properties[name];
+                            }
+                        });
+                        //properties[0][i] = Number(f.properties[Object.keys(this.schema]))//Number(this.getCatID(f.properties.category));
+                        //properties[1][i] = Number(f.properties.temp);
+                    }
+                    //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
+                    var rs = rsys.getRsysFromTile(x, y, z);
+                    let dataframeProperties = {};
+                    Object.keys(fieldMap).map((name, pid) => {
+                        dataframeProperties[name] = properties[pid];
+                    });
+                    var dataframe = new R.Dataframe(
+                        rs.center,
+                        rs.scale,
+                        points,
+                        dataframeProperties,
+                    );
+                    dataframe.schema = schema;
+                    dataframe.size = mvtLayer.length;
+                    this.renderer.addDataframe(dataframe).setStyle(this.style)
+                    callback(dataframe);
                 });
-                var dataframe = new R.Dataframe(
-                    rs.center,
-                    rs.scale,
-                    points,
-                    dataframeProperties,
-                );
-                dataframe.schema = schema;
-                dataframe.size = mvtLayer.length;
-                this.renderer.addDataframe(dataframe).setStyle(this.style)
-                console.log(Date.now());
-                callback(dataframe);
             }
             oReq.send(null);
         });
@@ -153,19 +153,19 @@ class SQL_API extends Provider {
     }
 }
 
-/*async function getColumnTypes() {
-    const columnListQuery = `select * from tx_0125_copy_copy limit 0;`;
+async function getColumnTypes(query) {
+    const columnListQuery = `select * from ${query} limit 0;`;
     const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(columnListQuery));
     const json = await response.json();
     return json.fields;
 }
 
-async function getNumericTypes(names) {
+async function getNumericTypes(names, query) {
     const aggFns = ['min', 'max', 'sum', 'avg'];
     const numericsSelect = names.map(name =>
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
-    const numericsQuery = `SELECT ${numericsSelect} FROM tx_0125_copy_copy;`
+    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
     const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(numericsQuery));
     const json = await response.json();
     console.log(numericsQuery, json);
@@ -175,32 +175,33 @@ async function getNumericTypes(names) {
     );
 }
 
-async function getCategoryTypes(names) {
-    const aggFns = ['min', 'max', 'sum', 'avg'];
-    const numericsSelect = names.map(name =>
-        aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-    ).concat(['COUNT(*)']).join();
-    const numericsQuery = `SELECT ${numericsSelect} FROM tx_0125_copy_copy;`
-    const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(numericsQuery));
-    const json = await response.json();
-    console.log(numericsQuery, json);
-
-    return names.map(name => {
-        console.log("ASD", json.rows[0][`${name}_min`])
-        return new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
-    }
-    );
+async function getCategoryTypes(names, query) {
+    return Promise.all(names.map(async name => {
+        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
+        const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(catQuery));
+        const json = await response.json();
+        console.log(catQuery, json);
+        let counts = [];
+        let names = [];
+        let ids = [];
+        json.rows.map((row, id) => {
+            counts.push(row.count);
+            names.push(row.name);
+            ids.push(id);
+        })
+        return new R.schema.Category(names, counts, ids);
+    }));
 }
 
 
-async function getSchema() {
+async function getSchema(query) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type
     //Get category names and counts by grouping by
     //Assign ids
 
-    const fields = await getColumnTypes();
+    const fields = await getColumnTypes(query);
     let numerics = [];
     let categories = [];
     Object.keys(fields).map(name => {
@@ -212,10 +213,9 @@ async function getSchema() {
         }
     })
 
-    const numericsTypes = await getNumericTypes(numerics);
-    const categoriesTypes = [];//await getCategoryTypes(categories);
-
-    const schema = new R.schema.Schema(numerics.concat([]), numericsTypes.concat(categoriesTypes));
+    const numericsTypes = await getNumericTypes(numerics, query);
+    const categoriesTypes = await getCategoryTypes(categories, query);
+    const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
     console.log(schema, numericsTypes);
     return schema;
-}*/
+}
