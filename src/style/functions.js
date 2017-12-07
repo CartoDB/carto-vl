@@ -439,6 +439,7 @@ class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) {
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
 
@@ -486,8 +487,8 @@ class Near extends Expression {
             throw new Error('Near(): invalid parameter type');
         }
         super({ input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
-            `1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-            0., 1.)`
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
+            0., 1.))`
         );
         this.type = 'float';
     }
@@ -776,6 +777,7 @@ const floatDiv = (...args) => new FloatDiv(...args);
 const floatAdd = (...args) => new FloatAdd(...args);
 const floatSub = (...args) => new FloatSub(...args);
 const floatPow = (...args) => new FloatPow(...args);
+const floatMod = (...args) => new FloatMod(...args);
 const log = (...args) => new Log(...args);
 const sqrt = (...args) => new Sqrt(...args);
 const sin = (...args) => new Sin(...args);
@@ -800,6 +802,6 @@ const now = (speed) => new Now(speed);
 const zoom = (speed) => new Zoom(speed);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod
 };

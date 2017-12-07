@@ -51,6 +51,8 @@ function parseNode(node, schema) {
                 return functions.floatAdd(left, right, schema);
             case "-":
                 return functions.floatSub(left, right, schema);
+            case "%":
+                return functions.floatMod(left, right, schema);
             case "^":
                 return functions.floatPow(left, right, schema);
             default:
@@ -70,7 +72,7 @@ function parseNode(node, schema) {
             return functions.property(node.name.substring(1), schema);
         } else if (functions.schemas[node.name.toLowerCase()]) {
             return functions.schemas[node.name.toLowerCase()]();
-        }else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
             return lowerCaseFunctions[node.name.toLowerCase()];
         }
     }
