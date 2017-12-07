@@ -97,7 +97,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return Zoom; });
+<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return FloatMod; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -125,7 +128,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
+<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
@@ -821,6 +827,7 @@ class Ramp extends Expression {
                 maxKey = 1;
             }
         }
+        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);
@@ -2519,6 +2526,7 @@ function refresh(timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
+<<<<<<< HEAD
         if (tile.style) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -2530,6 +2538,18 @@ function refresh(timestamp) {
                 zoom: 1. / this._zoom
             }
             tile.style._color._preDraw(obj, gl);
+=======
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(tile.style.colorShader.program);
+        var obj = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
+        }
+        tile.style._color._preDraw(obj, gl);
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
             Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
@@ -2548,6 +2568,7 @@ function refresh(timestamp) {
 
     //WIDTH
     this.tiles.forEach(tile => {
+<<<<<<< HEAD
         if (tile.style) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
             gl.useProgram(tile.style.widthShader.program);
@@ -2563,6 +2584,22 @@ function refresh(timestamp) {
                 gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
                 gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
             });
+=======
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+        gl.useProgram(tile.style.widthShader.program);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        var obj = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
+        }
+        tile.style._width._preDraw(obj, gl);
+        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+        });
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
             gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -3101,7 +3138,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Zoom"]; });
+<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMod"]; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3129,10 +3169,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
+<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+=======
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 
 
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
 
 
@@ -3140,6 +3184,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
@@ -6760,15 +6809,24 @@ var map = new mapboxgl.Map({
 map.repaint = false;
 var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map);
 
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 var map2 = new mapboxgl.Map({
     container: 'map2', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 14, // starting zoom,
 });
+<<<<<<< HEAD
 var mgl2 = new MGL.MGLIntegrator(map2);
 */
+=======
+var mgl2 = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map2);
+
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
 /***/ }),
 /* 27 */
@@ -6972,12 +7030,21 @@ class SQL_API extends Provider {
                     ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
                     CDB_XYZ_Extent(${x},${y},${z}), ${mvt_extent}, ${subpixelBufferSize}, false
                 ),
+<<<<<<< HEAD
                 AVG(temp::numeric) AS amount,
                 DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS d
             FROM wwi_ships AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.5),
                 DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
+=======
+                SUM(amount) AS amount,
+                _cdb_mode(category) AS category
+            FROM tx_0125_copy_copy AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+            ORDER BY amount DESC
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
         )AS geom
     `;
             //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
@@ -6995,7 +7062,11 @@ class SQL_API extends Provider {
                     category: 0,
                     amount: 1
                 };
+<<<<<<< HEAD
                 var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+=======
+                var properties = [[new Float32Array(mvtLayer.length)], [new Float32Array(mvtLayer.length)]];
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
                 var points = new Float32Array(mvtLayer.length * 2);
                 const r = Math.random();
                 for (var i = 0; i < mvtLayer.length; i++) {
@@ -7003,7 +7074,11 @@ class SQL_API extends Provider {
                     const geom = f.loadGeometry();
                     points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                     points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+<<<<<<< HEAD
                     properties[0][i] = Number(f.properties.d)//Number(this.getCatID(f.properties.category));
+=======
+                    properties[0][i] = Number(this.getCatID(f.properties.category));
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
                     properties[1][i] = Number(f.properties.amount);
                 }
                 //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
@@ -7020,8 +7095,11 @@ class SQL_API extends Provider {
                 );
                 dataframe.schema = schema;
                 dataframe.size = mvtLayer.length;
+<<<<<<< HEAD
                 this.renderer.addDataframe(dataframe).setStyle(this.style)
                 console.log(Date.now());
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
                 callback(dataframe);
             }
             oReq.send(null);
@@ -7045,8 +7123,13 @@ class SQL_API extends Provider {
                     completedTiles.push(dataframe);
                 }
                 if (completedTiles.length == needToComplete) {
+<<<<<<< HEAD
                     oldtiles.forEach(t => t.setStyle(null));
                     completedTiles.map(t => t.setStyle(this.style));
+=======
+                    oldtiles.forEach(t => renderer.removeDataframe(t));
+                    completedTiles.forEach(f => renderer.addDataframe(f).setStyle(this.style));
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
                     oldtiles = completedTiles;
                 }
             });
@@ -8479,6 +8562,7 @@ function hasOwnProperty(obj, prop) {
 /* 34 */
 /***/ (function(module, exports) {
 
+<<<<<<< HEAD
 var g;
 
 // This works in non-strict mode
@@ -8500,6 +8584,29 @@ try {
 // easier to handle this case. if(!global) { ...}
 
 module.exports = g;
+=======
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
 
 /***/ }),

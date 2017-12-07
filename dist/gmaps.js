@@ -97,7 +97,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return Zoom; });
+<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return FloatMod; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -125,7 +128,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
+<<<<<<< HEAD
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
@@ -821,6 +827,7 @@ class Ramp extends Expression {
                 maxKey = 1;
             }
         }
+        console.log(input, minKey, maxKey)
 
         input = implicitCast(input);
         minKey = implicitCast(minKey);
@@ -2519,6 +2526,7 @@ function refresh(timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
+<<<<<<< HEAD
         if (tile.style) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -2530,6 +2538,18 @@ function refresh(timestamp) {
                 zoom: 1. / this._zoom
             }
             tile.style._color._preDraw(obj, gl);
+=======
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(tile.style.colorShader.program);
+        var obj = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
+        }
+        tile.style._color._preDraw(obj, gl);
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
             Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
@@ -2548,6 +2568,7 @@ function refresh(timestamp) {
 
     //WIDTH
     this.tiles.forEach(tile => {
+<<<<<<< HEAD
         if (tile.style) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
             gl.useProgram(tile.style.widthShader.program);
@@ -2563,6 +2584,22 @@ function refresh(timestamp) {
                 gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
                 gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
             });
+=======
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+        gl.useProgram(tile.style.widthShader.program);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        var obj = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
+        }
+        tile.style._width._preDraw(obj, gl);
+        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+        });
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
             gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -3101,7 +3138,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Zoom"]; });
+<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMod"]; });
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3129,8 +3169,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
+<<<<<<< HEAD
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+=======
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 
 
 
@@ -3139,7 +3184,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> bf737b94539f782dc553881d0fbc3faf5d1f5025
 function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
