@@ -72,8 +72,9 @@
 
 <body>
     <div class='mapClass u-full-width'>
-        <textarea class="u-full-width" id="widthStyleEntry">2*near($category, (50*now()) %1000, 30, 30)</textarea>
-        <textarea class="u-full-width" id="colorStyleEntry">ramp($amount, tealrose, 0, 30)</textarea>
+        <textarea class="u-full-width" id="widthStyleEntry">blend(1,2,near($category, (25*now()) %1000, 0, 10), cubic) *zoom()</textarea>
+        <textarea class="u-full-width" id="colorStyleEntry">setopacity(ramp($amount, tealrose, 0, 30), blend(0.005,1,near($category, (25*now()) %1000, 0, 10), cubic))            
+        </textarea>
         <textarea class="u-full-width" id="feedback">¿?</textarea>
         <div id='map'  class='map'></div>
     </div>
