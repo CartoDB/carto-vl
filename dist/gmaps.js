@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 38);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -96,6 +96,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return Top; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return Zoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return FloatMod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -122,7 +124,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "top", function() { return top; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
@@ -188,11 +191,6 @@ function implicitCast(value) {
     }
     return value;
 }
-var gl = null;
-function setGL(_gl) {
-    gl = _gl;
-}
-
 
 const schemas = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
@@ -267,15 +265,15 @@ class Expression {
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
      * @param {*} program
      */
-    _postShaderCompile(program) {
-        this.childrenNames.forEach(name => this[name]._postShaderCompile(program));
+    _postShaderCompile(program, gl) {
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
     /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l));
+    _preDraw(l, gl) {
+        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
     }
     /**
      * @jsapi
@@ -355,22 +353,7 @@ class Top extends Expression {
         // TODO validation
         super({ property: property });
         this.type = 'float';
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const width = 1024;
-        let pixels = new Uint8Array(4 * width);
-
-        const schema = property.schemaType;
-        for (let i = 0; i < buckets - 1; i++) {
-            pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (buckets);
-        }
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            pixels);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -380,11 +363,30 @@ class Top extends Expression {
             inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const width = 1024;
+            let pixels = new Uint8Array(4 * width);
+
+            const schema = this.property.schemaType;
+            for (let i = 0; i < this.buckets - 1; i++) {
+                pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
+            }
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                pixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
         this.property._postShaderCompile(program);
         this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         this.property._preDraw(l);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -404,16 +406,30 @@ class Now extends Expression {
         this.type = 'float';
         this.init = Date.now();
     }
-    _preDraw() {
+    _preDraw(...args) {
         this.now.expr = (Date.now() - this.init) / 1000.;
-        this.now._preDraw();
+        this.now._preDraw(...args);
     }
     isAnimated() {
         return true;
     }
 }
 
-const now = (speed) => new Now(speed);
+class Zoom extends Expression {
+    /**
+     * @api
+     * @description get the current zoom level
+     */
+    constructor() {
+        super({ zoom: float(0) }, inline => inline.zoom);
+        this.type = 'float';
+    }
+    _preDraw(o, gl) {
+        this.zoom.expr = o.zoom;
+        this.zoom._preDraw(o, gl);
+    }
+}
+
 
 //TODO convert to use uniformfloat class
 class Animate extends Expression {
@@ -439,10 +455,10 @@ class Animate extends Expression {
             inline: `anim${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(l) {
+    _preDraw(l, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {
@@ -554,6 +570,7 @@ class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) {
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
 
@@ -601,8 +618,8 @@ class Near extends Expression {
             throw new Error('Near(): invalid parameter type');
         }
         super({ input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
-            `1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-            0., 1.)`
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
+            0., 1.))`
         );
         this.type = 'float';
     }
@@ -670,8 +687,8 @@ class Blend extends Expression {
         }
         this.schema = a.schema;
     }
-    _preDraw(l) {
-        super._preDraw(l);
+    _preDraw(l, gl) {
+        super._preDraw(l, gl);
         if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
@@ -708,10 +725,10 @@ class RGBA extends Expression {
             inline: `color${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
     }
     isAnimated() {
@@ -740,10 +757,10 @@ class Float extends Expression {
             inline: `float${this._uniformID}`
         };
     }
-    _postShaderCompile(program) {
+    _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
-    _preDraw() {
+    _preDraw(l, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
     isAnimated() {
@@ -791,8 +808,7 @@ class Ramp extends Expression {
      * @param {*} minKey Optional
      * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey, ) {
-        console.log("RAMP", input, input.schemaType);
+    constructor(input, palette, minKey, maxKey) {
         if (maxKey == undefined) {
             if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Float"]) {
                 minKey = input.schemaType.globalMin;
@@ -800,6 +816,9 @@ class Ramp extends Expression {
             } else if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Category"]) {
                 minKey = -1;
                 maxKey = input.schemaType.categoryNames.length;
+            } else if (input instanceof Top) {
+                minKey = 0;
+                maxKey = 1;
             }
         }
 
@@ -816,42 +835,8 @@ class Ramp extends Expression {
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
         this.values = values;
-
-
-
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        const level = 0;
-        const internalFormat = gl.RGBA;
-        const width = 256;
-        const height = 1;
-        const border = 0;
-        const srcFormat = gl.RGBA;
-        const srcType = gl.UNSIGNED_BYTE;
-        const pixel = new Uint8Array(4 * width);
-        for (var i = 0; i < width; i++) {
-            const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-            const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
-            const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-            const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-            const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
-            const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-            pixel[4 * i + 0] = v[0];
-            pixel[4 * i + 1] = v[1];
-            pixel[4 * i + 2] = v[2];
-            pixel[4 * i + 3] = v[3];
-        }
-
-
-        gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-            width, height, border, srcFormat, srcType,
-            pixel);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     }
-    _free() {
+    _free(gl) {
         gl.deleteTexture(this.texture);
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -866,14 +851,47 @@ class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
-    _postShaderCompile(program) {
-        this.input._postShaderCompile(program);
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 256;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            const pixel = new Uint8Array(4 * width);
+            const values = this.values;
+            for (var i = 0; i < width; i++) {
+                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                pixel[4 * i + 0] = v[0];
+                pixel[4 * i + 1] = v[1];
+                pixel[4 * i + 2] = v[2];
+                pixel[4 * i + 3] = v[3];
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        }
+        this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(l) {
-        this.input._preDraw(l);
+    _preDraw(l, gl) {
+        this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);
@@ -889,6 +907,7 @@ const floatDiv = (...args) => new FloatDiv(...args);
 const floatAdd = (...args) => new FloatAdd(...args);
 const floatSub = (...args) => new FloatSub(...args);
 const floatPow = (...args) => new FloatPow(...args);
+const floatMod = (...args) => new FloatMod(...args);
 const log = (...args) => new Log(...args);
 const sqrt = (...args) => new Sqrt(...args);
 const sin = (...args) => new Sin(...args);
@@ -909,6 +928,8 @@ const min = (...args) => new Min(...args);
 const top = (...args) => new Top(...args);
 const linear = (...args) => new Linear(...args);
 const cubic = (...args) => new Cubic(...args);
+const now = (speed) => new Now(speed);
+const zoom = (speed) => new Zoom(speed);
 
 
 
@@ -1829,6 +1850,8 @@ function parseNode(node, schema) {
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right, schema);
             case "-":
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right, schema);
+            case "%":
+                return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right, schema);
             case "^":
                 return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right, schema);
             default:
@@ -1848,7 +1871,7 @@ function parseNode(node, schema) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1), schema);
         } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]();
-        }else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
             return lowerCaseFunctions[node.name.toLowerCase()];
         }
     }
@@ -2204,10 +2227,6 @@ function signedArea(ring) {
  * @property {Properties} properties
  */
 
-
-// TODO remove
-var gl;
-
 /**
  * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
  *
@@ -2233,8 +2252,9 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    if (!gl) { //TODO remove hack: remove global context
-        gl = canvas.getContext('webgl');
+    if (!this.gl) { //TODO remove hack: remove global context
+        this.gl = canvas.getContext('webgl');
+        const gl = this.gl;
         if (!gl) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
@@ -2250,11 +2270,11 @@ function Renderer(canvas) {
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
-        __WEBPACK_IMPORTED_MODULE_1__style__["setGL"](gl);
         this._initShaders();
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
     }
+    const gl = this.gl;
     this.auxFB = gl.createFramebuffer();
     this.squareBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
@@ -2321,11 +2341,6 @@ Renderer.prototype.setZoom = function (zoom) {
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
     this.tiles = this.tiles.filter(t => t !== dataframe);
-    dataframe.propertyTex.map(tex => gl.deleteTexture(tex));
-    gl.deleteTexture(dataframe.texColor);
-    gl.deleteTexture(dataframe.texWidth);
-    gl.deleteBuffer(dataframe.vertexBuffer);
-    gl.deleteBuffer(dataframe.featureIDBuffer);
 };
 
 
@@ -2339,6 +2354,16 @@ class Dataframe {
         this.scale = scale;
         this.geom = geom;
         this.properties = properties;
+    }
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+        }
     }
 }
 
@@ -2361,6 +2386,7 @@ class BoundDataframe extends Dataframe {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
+    const gl = this.gl;
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -2389,13 +2415,9 @@ Renderer.prototype.addDataframe = function (dataframe) {
             }
             dataframe.propertyTex[propertyID] = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
-            const pixel = new Float32Array(width * height);
-            for (var i = 0; i < property.length; i++) {
-                pixel[i] = property[i];
-            }
             gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
                 width, height, 0, gl.ALPHA, gl.FLOAT,
-                pixel);
+                dataframe.properties[k]);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -2404,8 +2426,10 @@ Renderer.prototype.addDataframe = function (dataframe) {
     }
 
     dataframe.setStyle = (style) => {
-        __WEBPACK_IMPORTED_MODULE_2__schema__["checkSchemaMatch"](style.schema, dataframe.schema);
         dataframe.style = style;
+        if (style) {
+            __WEBPACK_IMPORTED_MODULE_2__schema__["checkSchemaMatch"](style.schema, dataframe.schema);
+        }
         window.requestAnimationFrame(refresh.bind(this));
     }
     dataframe.style = null;
@@ -2438,8 +2462,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / width;
-        ids[i + 1] = Math.floor((i / 2) / width) / height;
+        ids[i + 0] = ((i / 2) % width) / (width - 1);
+        ids[i + 1] = Math.floor((i / 2) / width) / (height - 1);
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -2467,6 +2491,7 @@ Renderer.prototype.getAspect = function () {
  */
 Renderer.prototype.refresh = refresh;
 function refresh(timestamp) {
+    const gl = this.gl;
     // Don't re-render more than once per animation frame
     if (this.lastFrame == timestamp) {
         return;
@@ -2494,57 +2519,63 @@ function refresh(timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
     this.tiles.forEach(tile => {
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-        gl.viewport(0, 0, RTT_WIDTH, tile.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        if (tile.style) {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
+            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.useProgram(tile.style.colorShader.program);
-        var obj = {
-            freeTexUnit: 4
+            gl.useProgram(tile.style.colorShader.program);
+            var obj = {
+                freeTexUnit: 4,
+                zoom: 1. / this._zoom
+            }
+            tile.style._color._preDraw(obj, gl);
+
+            Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
+            });
+
+            gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+            gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
         }
-        tile.style._color._preDraw(obj);
-
-        Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
-        });
-
-        gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-        gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
     });
 
     //WIDTH
     this.tiles.forEach(tile => {
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-        gl.useProgram(tile.style.widthShader.program);
-        gl.viewport(0, 0, RTT_WIDTH, tile.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        var obj = {
-            freeTexUnit: 4
+        if (tile.style) {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
+            gl.useProgram(tile.style.widthShader.program);
+            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            var obj = {
+                freeTexUnit: 4,
+                zoom: 1. / this._zoom
+            }
+            tile.style._width._preDraw(obj, gl);
+            Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
+            });
+
+            gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+            gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+            gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
+
+
+            tile.style.updated = false;
+            tile.initialized = true;
         }
-        tile.style._width._preDraw(obj);
-        Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
-        });
-
-        gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-        gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-        gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-
-
-        tile.style.updated = false;
-        tile.initialized = true;
     });
 
 
@@ -2561,48 +2592,51 @@ function refresh(timestamp) {
 
 
     this.tiles.forEach(tile => {
-        /*console.log((s / aspect) * tile.scale,
-            s * tile.scale,
-            (s / aspect) * this._center.x - tile.center.x,
-            s * this._center.y - tile.center.y
-        );*/
-        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
-            (s / aspect) * tile.scale,
-            s * tile.scale);
-        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
-            (s / aspect) * (this._center.x - tile.center.x),
-            s * (this._center.y - tile.center.y));
+        if (tile.style) {
+            /*console.log((s / aspect) * tile.scale,
+                s * tile.scale,
+                (s / aspect) * this._center.x - tile.center.x,
+                s * this._center.y - tile.center.y
+            );*/
+            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-
-
-        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
-
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
-
-        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-
-        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
+            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+
+            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+
+            gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+            gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+
+        }
     });
 
     //this._getMin(null, this.computePool[0]);
 
     this.tiles.forEach(t => {
-        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-            window.requestAnimationFrame(refresh.bind(this));
+        if (t.style) {
+            if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+                window.requestAnimationFrame(refresh.bind(this));
+            }
         }
     });
 
@@ -2612,7 +2646,7 @@ function refresh(timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(gl);
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
 }
 
 Renderer.prototype.getMin = function (expression, callback) {
@@ -2621,7 +2655,7 @@ Renderer.prototype.getMin = function (expression, callback) {
     this.computePool = [callback];
 }
 
-function getFBstatus() {
+function getFBstatus(gl) {
     const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
     switch (status) {
         case gl.FRAMEBUFFER_COMPLETE:
@@ -2648,6 +2682,7 @@ function getFBstatus() {
 
 
 Renderer.prototype._getMin = function (expression, callback) {
+    const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
         this.aux1x1FB = gl.createFramebuffer();
@@ -2663,7 +2698,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
         //Check FB completeness
-        if (getFBstatus() != 'FRAMEBUFFER_COMPLETE') {
+        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
             //This is a very bad time to throw an exception, this code should never be executed,
             //all checks should be done earlier to avoid problems here
             //If this is still executed we'll warn and ignore
@@ -2692,7 +2727,7 @@ Renderer.prototype._getMin = function (expression, callback) {
     const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["property"]('amount', {
         'amount': 'float'
     });
-    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
+    const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](gl, expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
     //console.log('computer', shader)
 
@@ -2705,7 +2740,7 @@ Renderer.prototype._getMin = function (expression, callback) {
         var obj = {
             freeTexUnit: 4
         }
-        expr._preDraw(obj);
+        expr._preDraw(obj, gl);
 
         //TODO redundant code with refresh => refactor
         gl.uniform2f(shader.vertexScaleUniformLocation,
@@ -2734,7 +2769,7 @@ Renderer.prototype._getMin = function (expression, callback) {
 
         gl.disableVertexAttribArray(shader.vertexPositionAttribute);
         gl.disableVertexAttribArray(shader.featureIdAttr);
-        
+
     });
 
 
@@ -3032,7 +3067,6 @@ void main(void) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGL", function() { return setGL; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
@@ -3066,6 +3100,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Top"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Cubic"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Zoom"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3092,8 +3128,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["top"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
-var gl = null;
 
 
 
@@ -3103,16 +3140,7 @@ var gl = null;
 
 
 
-
-// TODO removed global gl context
-// TODO document API
-function setGL(_gl) {
-    gl = _gl;
-    __WEBPACK_IMPORTED_MODULE_1__functions__["setGL"](gl);
-}
-
-
-function compileShader(styleRootExpr, shaderCreator) {
+function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
@@ -3123,19 +3151,19 @@ function compileShader(styleRootExpr, shaderCreator) {
         return tid[name];
     });
     const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-    styleRootExpr._postShaderCompile(shader.program);
+    styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
         shader: shader
     };
 }
 Style.prototype._compileColorShader = function () {
-    const r = compileShader(this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
+    const r = compileShader(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
 Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
+    const r = compileShader(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
 }
@@ -6526,7 +6554,17 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 /* 25 */,
 /* 26 */,
 /* 27 */,
-/* 28 */
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
