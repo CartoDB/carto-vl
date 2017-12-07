@@ -265,7 +265,7 @@ class Top extends Expression {
     //TODO _free
 }
 
-const nowInit=Date.now();
+const nowInit = Date.now();
 class Now extends Expression {
     /**
      * @api

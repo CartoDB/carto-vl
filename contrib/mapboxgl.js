@@ -23,20 +23,96 @@ class MGLIntegrator {
 
 
             this.renderer = new R.Renderer(canvas);
-            this.style = new R.Style.Style(this.renderer, sql_api.schema);
             this.provider = new sql_api.SQL_API(this.renderer, this.style);
-            $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
-            $('#colorStyleEntry').on('input', this.styleColor.bind(this));
-            this.styleWidth();
-            this.styleColor();
-            this.resize();
-            this.move();
+            this.provider.setQueries(...this.ships_WWI());
+            this.provider.getSchema().then(schema => {
+                this.schema = schema;
+                console.log(schema);
+                this.style = new R.Style.Style(this.renderer, schema);
+                this.provider.style = this.style;
+                $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
+                $('#colorStyleEntry').on('input', this.styleColor.bind(this));
+                this.styleWidth();
+                this.styleColor();
+                this.resize();
+                this.move();
+
+
+                $('#barcelona').click(() => {
+                    document.getElementById("widthStyleEntry").value = '40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)';
+                    document.getElementById("colorStyleEntry").value = 'ramp($category, Prism)';                  
+                    this.provider.setQueries(...this.barcelona());
+                    this.provider.getSchema().then(schema => {
+                        this.schema = schema;                        
+                        this.styleWidth();
+                        this.styleColor();  
+                    });
+                });
+
+                $('#wwi').click(() => {
+                    document.getElementById("widthStyleEntry").value = 'blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()';
+                    document.getElementById("colorStyleEntry").value = 'setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic)) ';                  
+                    this.provider.setQueries(...this.ships_WWI());
+                    this.provider.getSchema().then(schema => {
+                        this.schema = schema;                        
+                        this.styleWidth();
+                        this.styleColor();  
+                    });
+                });
+                
+                
+            });
 
             map.on('resize', this.resize.bind(this));
             map.on('movestart', this.move.bind(this));
             map.on('move', this.move.bind(this));
             map.on('moveend', this.move.bind(this));
         });
+    }
+    barcelona() {
+        return [`(SELECT
+            the_geom_webmercator,
+            amount,
+           category
+        FROM tx_0125_copy_copy) AS tmp`
+            ,
+            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+    (
+        SELECT
+            ST_AsMVTGeom(
+                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+            ),
+            SUM(amount) AS amount,
+            _cdb_mode(category) AS category
+        FROM tx_0125_copy_copy AS cdbq
+        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)     
+        ORDER BY amount DESC    
+    )AS geom`];
+    }
+    ships_WWI() {
+        return [`(SELECT
+                the_geom_webmercator,
+                temp,
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
+            FROM wwi_ships) AS tmp`
+            ,
+            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+        (
+            SELECT
+                ST_AsMVTGeom(
+                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                    CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+                ),
+                AVG(temp)::numeric(3,1) AS temp,
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
+            FROM wwi_ships AS cdbq
+            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
+        )AS geom
+    `];
     }
     move() {
         var b = this.map.getBounds();
@@ -63,7 +139,7 @@ class MGLIntegrator {
         const v = document.getElementById("widthStyleEntry").value;
         const initial = this.style.getWidth();
         try {
-            this.style.getWidth().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
+            this.style.getWidth().blendTo(R.Style.parseStyleExpression(v, this.schema), 1000);
             document.getElementById("feedback").style.display = 'none';
         } catch (error) {
             const err = `Invalid width expression: ${error}:${error.stack}`;
@@ -77,7 +153,7 @@ class MGLIntegrator {
         const v = document.getElementById("colorStyleEntry").value;
         const initial = this.style.getColor();
         try {
-            this.style.getColor().blendTo(R.Style.parseStyleExpression(v, sql_api.schema), 1000);
+            this.style.getColor().blendTo(R.Style.parseStyleExpression(v, this.schema), 1000);
             document.getElementById("feedback").style.display = 'none';
         } catch (error) {
             const err = `Invalid color expression: ${error}:${error.stack}`;

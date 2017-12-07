@@ -197,7 +197,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.height = height;
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
-
+    dataframe.renderer = this;
 
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
