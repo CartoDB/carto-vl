@@ -265,6 +265,7 @@ class Top extends Expression {
     //TODO _free
 }
 
+const nowInit=Date.now();
 class Now extends Expression {
     /**
      * @api
@@ -273,10 +274,9 @@ class Now extends Expression {
     constructor() {
         super({ now: float(0) }, inline => inline.now);
         this.type = 'float';
-        this.init = Date.now();
     }
     _preDraw(...args) {
-        this.now.expr = (Date.now() - this.init) / 1000.;
+        this.now.expr = (Date.now() - nowInit) / 1000.;
         this.now._preDraw(...args);
     }
     isAnimated() {
