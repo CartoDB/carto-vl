@@ -27,6 +27,31 @@ export function parseStyleExpression(str, schema) {
     return r;
 }
 
+function parseStyleNamedExpr(style, node, schema) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    const value = parseNode(node.right, schema);
+    style[name] = value;
+}
+export function parseStyle(str, schema) {
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    jsep.addBinaryOp(":", 1);
+    jsep.addBinaryOp("^", 10);
+    const ast = jsep(str);
+    let style = {};
+    if (ast.type == "Compound") {
+        ast.body.map(node => parseStyleNamedExpr(style, node, schema));
+    } else {
+        parseStyleNamedExpr(style, node, schema);
+    }
+    console.log(style);
+    jsep.removeBinaryOp("^");
+    jsep.removeBinaryOp(":");
+    return style;
+}
+
 function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNode(arg, schema));

@@ -69,6 +69,12 @@ function Style(renderer, schema) {
     this._compileWidthShader();
     this._compileColorShader();
 }
+
+Style.prototype.set = function (s, duration) {
+    this.getWidth().blendTo(s.width, duration);
+    this.getColor().blendTo(s.color, duration);
+}
+
 /**
  * Change the width of the style to a new style expression.
  * @jsapi
