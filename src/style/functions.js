@@ -234,13 +234,16 @@ class Top extends Expression {
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {
+            const schema = this.property.schemaType;
+            if (this.buckets > schema.categoryIDs.length) {
+                this.buckets = schema.categoryIDs.length;
+            }
             this.init = true;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
 
-            const schema = this.property.schemaType;
             for (let i = 0; i < this.buckets - 1; i++) {
                 pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
             }
@@ -341,7 +344,7 @@ class Animate extends Expression {
     }
 }
 
-class XYZ extends Expression{
+class XYZ extends Expression {
     constructor(x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);
@@ -931,6 +934,6 @@ const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab,XYZ,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ,
     property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz,
 };

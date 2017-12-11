@@ -46,7 +46,9 @@ class SQL_API extends Provider {
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catName, catStr) {
+    getCatID(catName, catStr, schema) {
+        const index = schema[catName].categoryNames.indexOf(catStr);
+        return schema[catName].categoryIDs[index];
         this.catMap[catName] = this.catMap[catName] || {};
         let catMap = this.catMap[catName];
         if (catMap[catStr]) {
@@ -97,7 +99,7 @@ class SQL_API extends Provider {
                         points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                         Object.keys(schema).map((name, index) => {
                             if (schema[name] instanceof R.schema.Category) {
-                                properties[index][i] = this.getCatID(name, f.properties[name]);
+                                properties[index][i] = this.getCatID(name, f.properties[name], schema);
                             } else {
                                 properties[index][i] = f.properties[name];
                             }
