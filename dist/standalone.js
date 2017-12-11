@@ -369,13 +369,16 @@ class Top extends Expression {
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {
+            const schema = this.property.schemaType;
+            if (this.buckets > schema.categoryIDs.length) {
+                this.buckets = schema.categoryIDs.length;
+            }
             this.init = true;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
 
-            const schema = this.property.schemaType;
             for (let i = 0; i < this.buckets - 1; i++) {
                 pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
             }
@@ -476,7 +479,7 @@ class Animate extends Expression {
     }
 }
 
-class XYZ extends Expression{
+class XYZ extends Expression {
     constructor(x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);

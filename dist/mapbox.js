@@ -369,13 +369,16 @@ class Top extends Expression {
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {
+            const schema = this.property.schemaType;
+            if (this.buckets > schema.categoryIDs.length) {
+                this.buckets = schema.categoryIDs.length;
+            }
             this.init = true;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
 
-            const schema = this.property.schemaType;
             for (let i = 0; i < this.buckets - 1; i++) {
                 pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
             }
@@ -476,7 +479,7 @@ class Animate extends Expression {
     }
 }
 
-class XYZ extends Expression{
+class XYZ extends Expression {
     constructor(x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);
@@ -7235,7 +7238,9 @@ class SQL_API extends Provider {
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catName, catStr) {
+    getCatID(catName, catStr, schema) {
+        const index = schema[catName].categoryNames.indexOf(catStr);
+        return schema[catName].categoryIDs[index];
         this.catMap[catName] = this.catMap[catName] || {};
         let catMap = this.catMap[catName];
         if (catMap[catStr]) {
@@ -7286,7 +7291,7 @@ class SQL_API extends Provider {
                         points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                         Object.keys(schema).map((name, index) => {
                             if (schema[name] instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
-                                properties[index][i] = this.getCatID(name, f.properties[name]);
+                                properties[index][i] = this.getCatID(name, f.properties[name], schema);
                             } else {
                                 properties[index][i] = f.properties[name];
                             }
