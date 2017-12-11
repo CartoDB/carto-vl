@@ -1793,7 +1793,8 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
@@ -1824,6 +1825,31 @@ function parseStyleExpression(str, schema) {
     const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), schema);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     return r;
+}
+
+function parseStyleNamedExpr(style, node, schema) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    const value = parseNode(node.right, schema);
+    style[name] = value;
+}
+function parseStyle(str, schema) {
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(":", 1);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    let style = {};
+    if (ast.type == "Compound") {
+        ast.body.map(node => parseStyleNamedExpr(style, node, schema));
+    } else {
+        parseStyleNamedExpr(style, node, schema);
+    }
+    console.log(style);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
+    return style;
 }
 
 function parseNode(node, schema) {
@@ -3130,7 +3156,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 
 
 
@@ -3199,6 +3226,12 @@ function Style(renderer, schema) {
     this._compileWidthShader();
     this._compileColorShader();
 }
+
+Style.prototype.set = function (s, duration) {
+    this.getWidth().blendTo(s.width, duration);
+    this.getColor().blendTo(s.color, duration);
+}
+
 /**
  * Change the width of the style to a new style expression.
  * @jsapi
@@ -6800,47 +6833,38 @@ class MGLIntegrator {
             canvas.style.width = map.getCanvas().style.width;
             canvas.style.height = map.getCanvas().style.height;
 
-
-
             this.renderer = new __WEBPACK_IMPORTED_MODULE_1__src_index__["b" /* Renderer */](canvas);
             this.provider = new __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["a" /* SQL_API */](this.renderer, this.style);
             this.provider.setQueries(...this.ships_WWI());
             this.provider.getSchema().then(schema => {
                 this.schema = schema;
-                console.log(schema);
                 this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
                 this.provider.style = this.style;
-                $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
-                $('#colorStyleEntry').on('input', this.styleColor.bind(this));
-                this.styleWidth();
-                this.styleColor();
+                $('#styleEntry').on('input', this.updateStyle.bind(this));
+                this.updateStyle();
                 this.resize();
                 this.move();
 
 
                 $('#barcelona').click(() => {
-                    document.getElementById("widthStyleEntry").value = '40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)';
-                    document.getElementById("colorStyleEntry").value = 'ramp($category, Prism)';                  
+                    document.getElementById("styleEntry").value = 'width:    40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)\ncolor:    ramp($category, Prism)';
                     this.provider.setQueries(...this.barcelona());
                     this.provider.getSchema().then(schema => {
-                        this.schema = schema;                        
-                        this.styleWidth();
-                        this.styleColor();  
+                        this.schema = schema;
+                        this.updateStyle();
                     });
                 });
 
                 $('#wwi').click(() => {
-                    document.getElementById("widthStyleEntry").value = 'blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()';
-                    document.getElementById("colorStyleEntry").value = 'setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic)) ';                  
+                    document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
                     this.provider.setQueries(...this.ships_WWI());
                     this.provider.getSchema().then(schema => {
-                        this.schema = schema;                        
-                        this.styleWidth();
-                        this.styleColor();  
+                        this.schema = schema;
+                        this.updateStyle();
                     });
                 });
-                
-                
+
+
             });
 
             map.on('resize', this.resize.bind(this));
@@ -6867,8 +6891,8 @@ class MGLIntegrator {
             _cdb_mode(category) AS category
         FROM tx_0125_copy_copy AS cdbq
         WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)     
-        ORDER BY amount DESC    
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+        ORDER BY amount DESC
     )AS geom`];
     }
     ships_WWI() {
@@ -6890,7 +6914,7 @@ class MGLIntegrator {
             FROM wwi_ships AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
         )AS geom
     `];
     }
@@ -6915,32 +6939,17 @@ class MGLIntegrator {
     getData() {
         this.provider.getData();
     }
-    styleWidth(e) {
-        const v = document.getElementById("widthStyleEntry").value;
-        const initial = this.style.getWidth();
+    updateStyle(e) {
+        const v = document.getElementById("styleEntry").value;
         try {
-            this.style.getWidth().blendTo(__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyleExpression(v, this.schema), 1000);
+            const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, this.schema);
+            this.style.set(s, 1000);
             document.getElementById("feedback").style.display = 'none';
         } catch (error) {
             const err = `Invalid width expression: ${error}:${error.stack}`;
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
-            this.style.setWidth(initial);
-        }
-    }
-    styleColor(e) {
-        const v = document.getElementById("colorStyleEntry").value;
-        const initial = this.style.getColor();
-        try {
-            this.style.getColor().blendTo(__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyleExpression(v, this.schema), 1000);
-            document.getElementById("feedback").style.display = 'none';
-        } catch (error) {
-            const err = `Invalid color expression: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
-            this.style.setColor(initial);
         }
     }
     getZoom() {
@@ -7015,7 +7024,6 @@ class SQL_API extends Provider {
         this.schema.then((schema) => {
             if (this.style) {
                 this.style.schema = schema;
-                console.log("NS", this.style.schema)
                 this.getData()
             }
         });
@@ -7023,12 +7031,14 @@ class SQL_API extends Provider {
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catStr) {
-        if (this.catMap[catStr]) {
-            return this.catMap[catStr];
+    getCatID(catName, catStr) {
+        this.catMap[catName] = this.catMap[catName] || {};
+        let catMap = this.catMap[catName];
+        if (catMap[catStr]) {
+            return catMap[catStr];
         }
-        this.catMap[catStr] = Object.keys(this.catMap).length + 1;
-        return this.catMap[catStr];
+        catMap[catStr] = Object.keys(catMap).length + 1;
+        return catMap[catStr];
     }
     getDataframe(x, y, z, callback) {
         const id = `${x},${y},${z}`;
@@ -7058,8 +7068,7 @@ class SQL_API extends Provider {
                     }
                     var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
                     const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                    var fieldMap = {
-                    };
+                    var fieldMap = {};
                     Object.keys(schema).map((name, i) => {
                         fieldMap[name] = i;
                     });
@@ -7073,15 +7082,12 @@ class SQL_API extends Provider {
                         points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                         Object.keys(schema).map((name, index) => {
                             if (schema[name] instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
-                                properties[index][i] = this.getCatID(f.properties[name]);
+                                properties[index][i] = this.getCatID(name, f.properties[name]);
                             } else {
                                 properties[index][i] = f.properties[name];
                             }
                         });
-                        //properties[0][i] = Number(f.properties[Object.keys(this.schema]))//Number(this.getCatID(f.properties.category));
-                        //properties[1][i] = Number(f.properties.temp);
                     }
-                    //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
                     var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
                     let dataframeProperties = {};
                     Object.keys(fieldMap).map((name, pid) => {
@@ -7156,7 +7162,6 @@ async function getCategoryTypes(names, query) {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
         const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(catQuery));
         const json = await response.json();
-        console.log(catQuery, json);
         let counts = [];
         let names = [];
         let ids = [];
@@ -7192,7 +7197,6 @@ async function getSchema(query) {
     const numericsTypes = await getNumericTypes(numerics, query);
     const categoriesTypes = await getCategoryTypes(categories, query);
     const schema = new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    console.log(schema, numericsTypes);
     return schema;
 }
 

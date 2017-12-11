@@ -1793,7 +1793,8 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
@@ -1824,6 +1825,31 @@ function parseStyleExpression(str, schema) {
     const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), schema);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     return r;
+}
+
+function parseStyleNamedExpr(style, node, schema) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    const value = parseNode(node.right, schema);
+    style[name] = value;
+}
+function parseStyle(str, schema) {
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(":", 1);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    let style = {};
+    if (ast.type == "Compound") {
+        ast.body.map(node => parseStyleNamedExpr(style, node, schema));
+    } else {
+        parseStyleNamedExpr(style, node, schema);
+    }
+    console.log(style);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
+    return style;
 }
 
 function parseNode(node, schema) {
@@ -3130,7 +3156,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 
 
 
@@ -3199,6 +3226,12 @@ function Style(renderer, schema) {
     this._compileWidthShader();
     this._compileColorShader();
 }
+
+Style.prototype.set = function (s, duration) {
+    this.getWidth().blendTo(s.width, duration);
+    this.getColor().blendTo(s.color, duration);
+}
+
 /**
  * Change the width of the style to a new style expression.
  * @jsapi
