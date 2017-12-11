@@ -39,7 +39,6 @@ class SQL_API extends Provider {
         this.schema.then((schema) => {
             if (this.style) {
                 this.style.schema = schema;
-                console.log("NS", this.style.schema)
                 this.getData()
             }
         });
@@ -47,12 +46,14 @@ class SQL_API extends Provider {
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catStr) {
-        if (this.catMap[catStr]) {
-            return this.catMap[catStr];
+    getCatID(catName, catStr) {
+        this.catMap[catName] = this.catMap[catName] || {};
+        let catMap = this.catMap[catName];
+        if (catMap[catStr]) {
+            return catMap[catStr];
         }
-        this.catMap[catStr] = Object.keys(this.catMap).length + 1;
-        return this.catMap[catStr];
+        catMap[catStr] = Object.keys(catMap).length + 1;
+        return catMap[catStr];
     }
     getDataframe(x, y, z, callback) {
         const id = `${x},${y},${z}`;
@@ -82,8 +83,7 @@ class SQL_API extends Provider {
                     }
                     var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
                     const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                    var fieldMap = {
-                    };
+                    var fieldMap = {};
                     Object.keys(schema).map((name, i) => {
                         fieldMap[name] = i;
                     });
@@ -97,15 +97,12 @@ class SQL_API extends Provider {
                         points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                         Object.keys(schema).map((name, index) => {
                             if (schema[name] instanceof R.schema.Category) {
-                                properties[index][i] = this.getCatID(f.properties[name]);
+                                properties[index][i] = this.getCatID(name, f.properties[name]);
                             } else {
                                 properties[index][i] = f.properties[name];
                             }
                         });
-                        //properties[0][i] = Number(f.properties[Object.keys(this.schema]))//Number(this.getCatID(f.properties.category));
-                        //properties[1][i] = Number(f.properties.temp);
                     }
-                    //console.log(`dataframe feature count: ${mvtLayer.length} ${x},${y},${z}`+properties[0]);
                     var rs = rsys.getRsysFromTile(x, y, z);
                     let dataframeProperties = {};
                     Object.keys(fieldMap).map((name, pid) => {
@@ -180,7 +177,6 @@ async function getCategoryTypes(names, query) {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
         const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(catQuery));
         const json = await response.json();
-        console.log(catQuery, json);
         let counts = [];
         let names = [];
         let ids = [];
@@ -216,6 +212,5 @@ async function getSchema(query) {
     const numericsTypes = await getNumericTypes(numerics, query);
     const categoriesTypes = await getCategoryTypes(categories, query);
     const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    console.log(schema, numericsTypes);
     return schema;
 }

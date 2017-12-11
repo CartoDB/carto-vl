@@ -20,47 +20,38 @@ class MGLIntegrator {
             canvas.style.width = map.getCanvas().style.width;
             canvas.style.height = map.getCanvas().style.height;
 
-
-
             this.renderer = new R.Renderer(canvas);
             this.provider = new sql_api.SQL_API(this.renderer, this.style);
             this.provider.setQueries(...this.ships_WWI());
             this.provider.getSchema().then(schema => {
                 this.schema = schema;
-                console.log(schema);
                 this.style = new R.Style.Style(this.renderer, schema);
                 this.provider.style = this.style;
-                $('#widthStyleEntry').on('input', this.styleWidth.bind(this));
-                $('#colorStyleEntry').on('input', this.styleColor.bind(this));
-                this.styleWidth();
-                this.styleColor();
+                $('#styleEntry').on('input', this.updateStyle.bind(this));
+                this.updateStyle();
                 this.resize();
                 this.move();
 
 
                 $('#barcelona').click(() => {
-                    document.getElementById("widthStyleEntry").value = '40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)';
-                    document.getElementById("colorStyleEntry").value = 'ramp($category, Prism)';                  
+                    document.getElementById("styleEntry").value = 'width:    40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)\ncolor:    ramp($category, Prism)';
                     this.provider.setQueries(...this.barcelona());
                     this.provider.getSchema().then(schema => {
-                        this.schema = schema;                        
-                        this.styleWidth();
-                        this.styleColor();  
+                        this.schema = schema;
+                        this.updateStyle();
                     });
                 });
 
                 $('#wwi').click(() => {
-                    document.getElementById("widthStyleEntry").value = 'blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()';
-                    document.getElementById("colorStyleEntry").value = 'setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic)) ';                  
+                    document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
                     this.provider.setQueries(...this.ships_WWI());
                     this.provider.getSchema().then(schema => {
-                        this.schema = schema;                        
-                        this.styleWidth();
-                        this.styleColor();  
+                        this.schema = schema;
+                        this.updateStyle();
                     });
                 });
-                
-                
+
+
             });
 
             map.on('resize', this.resize.bind(this));
@@ -87,8 +78,8 @@ class MGLIntegrator {
             _cdb_mode(category) AS category
         FROM tx_0125_copy_copy AS cdbq
         WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)     
-        ORDER BY amount DESC    
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+        ORDER BY amount DESC
     )AS geom`];
     }
     ships_WWI() {
@@ -110,7 +101,7 @@ class MGLIntegrator {
             FROM wwi_ships AS cdbq
             WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
             GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )           
+                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
         )AS geom
     `];
     }
@@ -135,32 +126,17 @@ class MGLIntegrator {
     getData() {
         this.provider.getData();
     }
-    styleWidth(e) {
-        const v = document.getElementById("widthStyleEntry").value;
-        const initial = this.style.getWidth();
+    updateStyle(e) {
+        const v = document.getElementById("styleEntry").value;
         try {
-            this.style.getWidth().blendTo(R.Style.parseStyleExpression(v, this.schema), 1000);
+            const s = R.Style.parseStyle(v, this.schema);
+            this.style.set(s, 1000);
             document.getElementById("feedback").style.display = 'none';
         } catch (error) {
             const err = `Invalid width expression: ${error}:${error.stack}`;
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
-            this.style.setWidth(initial);
-        }
-    }
-    styleColor(e) {
-        const v = document.getElementById("colorStyleEntry").value;
-        const initial = this.style.getColor();
-        try {
-            this.style.getColor().blendTo(R.Style.parseStyleExpression(v, this.schema), 1000);
-            document.getElementById("feedback").style.display = 'none';
-        } catch (error) {
-            const err = `Invalid color expression: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
-            this.style.setColor(initial);
         }
     }
     getZoom() {
