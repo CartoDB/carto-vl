@@ -52,6 +52,10 @@
             font-weight: bold;
             display: none;
         }
+
+        .step{
+            height: 180px;
+        }
     </style>
 </head>
 
@@ -62,14 +66,21 @@
     </div>
     <div class="container">
         <div class="row">
-            <div class="twelve columns">
-                <button id='wwi'>WWI Ships</button>
-                <button id='barcelona'>Barcelona</button>
-                <textarea class="u-full-width" id="styleEntry">width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()
-color:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))
-                            </textarea>
-                <h4>Interesting expressions: </h4>
-                <pre><code>
+            <h3>Demo dataset</h3>
+            <button id='wwi'>WWI Ships</button>
+            <button id='barcelona'>Barcelona (with tutorial)</button>
+
+            <h3>Style</h3>
+
+            <div class='row'>
+                <button id='prev' class='two columns step'>Previous</button>
+                <textarea class="eight columns" id="styleEntry">width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()
+                                color:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))
+                                </textarea>
+                <button id='next' class='two columns step'>Next</button>
+            </div>
+            <h4>Interesting expressions: </h4>
+            <pre><code>
 40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)
 
 hsv(top($category, 3), 0.5, blend(0,1,now(), cubic))
@@ -87,165 +98,164 @@ setOpacity(ramp($category, Prism),
         (sin(now())*0.5+0.5)*(log($amount+1)/4)^5
 ))
 </code></pre>
-                <h4>Ignore this</h4>
-                <div class='mapClass u-full-width'>
-                    <div id='map2' class='map'></div>
-                </div>
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br> dsfs
-                <br>
-
+            <h4>Ignore this</h4>
+            <div class='mapClass u-full-width'>
+                <div id='map2' class='map'></div>
             </div>
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br> dsfs
+            <br>
+
         </div>
     </div>
 </body>
