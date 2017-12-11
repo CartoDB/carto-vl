@@ -31,27 +31,6 @@ class MGLIntegrator {
                 this.updateStyle();
                 this.resize();
                 this.move();
-
-
-                $('#barcelona').click(() => {
-                    document.getElementById("styleEntry").value = 'width:    40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)\ncolor:    ramp($category, Prism)';
-                    this.provider.setQueries(...this.barcelona());
-                    this.provider.getSchema().then(schema => {
-                        this.schema = schema;
-                        this.updateStyle();
-                    });
-                });
-
-                $('#wwi').click(() => {
-                    document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-                    this.provider.setQueries(...this.ships_WWI());
-                    this.provider.getSchema().then(schema => {
-                        this.schema = schema;
-                        this.updateStyle();
-                    });
-                });
-
-
             });
 
             map.on('resize', this.resize.bind(this));
@@ -126,7 +105,11 @@ class MGLIntegrator {
     getData() {
         this.provider.getData();
     }
-    updateStyle(e) {
+    setStyle(s) {
+        document.getElementById("styleEntry").value = s;
+        this.updateStyle();
+    }
+    updateStyle() {
         const v = document.getElementById("styleEntry").value;
         try {
             const s = R.Style.parseStyle(v, this.schema);
