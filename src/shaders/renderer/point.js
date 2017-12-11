@@ -78,6 +78,11 @@ void main(void) {
         p.x=10000.;
     }
     gl_Position  = p;
+
+    //upscale size by outer/2
+    //fillScale=size/inner
+    //strokesScale=size/(inner-outer/2)
+
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
@@ -99,7 +104,18 @@ float distanceAntialias(vec2 p){
 void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
-    c.a *= distanceAntialias(p);
+
+    vec4 stroke = vec4(0.,0.,1.,1.);
+    float pctFill = 1./0.8;
+
+    c.a *= distanceAntialias(p*pctFill);
     c.rgb*=c.a;
+
+    stroke.a *= distanceAntialias(p);
+    stroke.a *= 1.-distanceAntialias((pctFill)*p);
+    stroke.rgb*=stroke.a;
+
+    c=stroke+(1.-stroke.a)*c;
+
     gl_FragColor = c;
 }`;
