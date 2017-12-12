@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -130,7 +130,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return cielab; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
 
@@ -1140,7 +1140,7 @@ class Category {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return computer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__computer__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__computer__ = __webpack_require__(11);
 
 
 
@@ -1180,6 +1180,8 @@ function Point(gl) {
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
     this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
     this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
 }
 function GenericStyler(gl, glsl, preface, inline) {
@@ -1216,10 +1218,10 @@ function computer(gl, preface, inline){
     return new Computer(gl, __WEBPACK_IMPORTED_MODULE_2__computer__, preface, inline);
 }
 function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["a" /* color */], preface, inline);
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__, preface, inline);
 }
 function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__["b" /* width */], preface, inline);
+    GenericStyler.call(this, gl, __WEBPACK_IMPORTED_MODULE_1__styler__, preface, `vec4((${inline})/64.)`);
 }
 
 const renderer = {
@@ -2119,7 +2121,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(21);
+var Point = __webpack_require__(19);
 
 module.exports = VectorTileFeature;
 
@@ -2360,7 +2362,7 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Dataframe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
@@ -2523,7 +2525,9 @@ class Dataframe {
             const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
             gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
             gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
         }
@@ -2537,6 +2541,23 @@ class BoundDataframe extends Dataframe {
     * @name setStyle
     * @param style
     */
+}
+
+Renderer.prototype.createTileTexture = function (type, features) {
+    const gl = this.gl;
+    const width = RTT_WIDTH;
+    const height = Math.ceil(features / width);
+
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+        null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    return texture;
 }
 
 /**
@@ -2600,28 +2621,10 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.vertexBuffer = gl.createBuffer();
     dataframe.featureIDBuffer = gl.createBuffer();
 
-
-    dataframe.texColor = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
-        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width * height).fill(255));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    dataframe.texWidth = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
-    gl.texImage2D(gl.TEXTURE_2D, level, gl.RGBA,
-        width, height, border, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4 * width * height).fill(100));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-
+    dataframe.texColor = this.createTileTexture('color', dataframe.numVertex);
+    dataframe.texWidth = this.createTileTexture('color', dataframe.numVertex);
+    dataframe.texStrokeColor = this.createTileTexture('size', dataframe.numVertex);
+    dataframe.texStrokeWidth = this.createTileTexture('size', dataframe.numVertex);
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
@@ -2681,66 +2684,37 @@ function refresh(timestamp) {
     // Render To Texture
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-    this.tiles.forEach(tile => {
-        if (tile.style) {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texColor, 0);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
 
-            gl.useProgram(tile.style.colorShader.program);
-            var obj = {
-                freeTexUnit: 4,
-                zoom: 1. / this._zoom
-            }
-            tile.style._color._preDraw(obj, gl);
+    const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
+        gl.viewport(0, 0, RTT_WIDTH, tile.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
 
-            Object.keys(tile.style.propertyColorTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(tile.style.colorShader.textureLocations[i], i);
-            });
-
-            gl.enableVertexAttribArray(tile.style.colorShader.vertexAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(tile.style.colorShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-            gl.disableVertexAttribArray(tile.style.colorShader.vertexAttribute);
+        gl.useProgram(shader.program);
+        var obj = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom
         }
-    });
+        styleExpr._preDraw(obj, gl);
 
-    //WIDTH
-    this.tiles.forEach(tile => {
-        if (tile.style) {
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tile.texWidth, 0);
-            gl.useProgram(tile.style.widthShader.program);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            var obj = {
-                freeTexUnit: 4,
-                zoom: 1. / this._zoom
-            }
-            tile.style._width._preDraw(obj, gl);
-            Object.keys(tile.style.propertyWidthTID).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(tile.style.widthShader.textureLocations[i], i);
-            });
+        Object.keys(TID).forEach((name, i) => {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+            gl.uniform1i(shader.textureLocations[i], i);
+        });
 
-            gl.enableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
-            gl.vertexAttribPointer(tile.style.widthShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.vertexAttribPointer(shader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
-            gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-            gl.disableVertexAttribArray(tile.style.widthShader.vertexAttribute);
-
-
-            tile.style.updated = false;
-            tile.initialized = true;
-        }
-    });
-
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(shader.vertexAttribute);
+    }
+    const tiles = this.tiles.filter(tile => tile.style);
+    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
+    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
 
     gl.disable(gl.DEPTH_TEST);
 
@@ -2784,6 +2758,14 @@ function refresh(timestamp) {
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
             gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+            gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
+
+            gl.activeTexture(gl.TEXTURE3);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+            gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
 
             gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
@@ -2961,7 +2943,7 @@ Renderer.prototype._getMin = function (expression, callback) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //TODO Discuss size scaling constant, maybe we need to remap using an exponential map
-//TODO profile discard performance impact
+//TODO performance optimization: direct stroke/color/widths from uniform instead of texture read when possible
 
 /*
     Z coordinate, Z test and blending
@@ -3027,23 +3009,38 @@ uniform vec2 vertexOffset;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
+uniform sampler2D colorStrokeTex;
+uniform sampler2D strokeWidthTex;
 
 varying lowp vec4 color;
+varying lowp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
+varying highp float fillScale;
+varying highp float strokeScale;
 
 void main(void) {
-    float s = texture2D(widthTex, featureID).a;
-    float size = ceil(s*64.);
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (s*0.9+0.05)*0.+0.5, 1.);
-    if (s==0.){
-        p.x=10000.;
+    color = texture2D(colorTex, featureID);
+    stroke = texture2D(colorStrokeTex, featureID);
+
+    float size = 64.*texture2D(widthTex, featureID).a;
+    float fillSize = size;
+    float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
+    size+=strokeSize*0.5;
+    fillScale=size/fillSize;
+    strokeScale=size/max(0.001, (fillSize-strokeSize*0.5));
+    if (fillScale==strokeScale){
+        stroke.a=0.;
     }
-    gl_Position  = p;
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
-    color = texture2D(colorTex, featureID);
+
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
+    if (size==0. || (stroke.a==0. && color.a==0.)){
+        p.x=10000.;
+    }
+    gl_Position  = p;
 }`;
 /* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
 
@@ -3052,8 +3049,11 @@ const FS = `
 precision highp float;
 
 varying lowp vec4 color;
+varying lowp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
+varying highp float fillScale;
+varying highp float strokeScale;
 
 float distanceAntialias(vec2 p){
     return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
@@ -3063,8 +3063,18 @@ float distanceAntialias(vec2 p){
 void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
-    c.a *= distanceAntialias(p);
+
+    vec4 s = stroke;
+
+    c.a *= distanceAntialias(p*fillScale);
     c.rgb*=c.a;
+
+    s.a *= distanceAntialias(p);
+    s.a *= 1.-distanceAntialias((strokeScale)*p);
+    s.rgb*=s.a;
+
+    c=s+(1.-s.a)*c;
+
     gl_FragColor = c;
 }`;
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
@@ -3075,20 +3085,8 @@ void main(void) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__color__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__width__ = __webpack_require__(12);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_0__color__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__width__; });
-
-
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+
 const VS = `
 
 precision highp float;
@@ -3130,52 +3128,7 @@ void main(void) {
 
 
 /***/ }),
-/* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-const VS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position  = vec4(vertex, 0.5, 1.);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-
-precision highp float;
-
-varying  vec2 uv;
-
-$PREFACE
-
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
-void main(void) {
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    float p2=texture2D(property2, uv).a;
-    float p3=texture2D(property3, uv).a;
-    gl_FragColor = vec4(($INLINE)/64.);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
-
-
-/***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3223,8 +3176,10 @@ void main(void) {
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
 
 
+//TODO performance optimization? texture reads can be done at FS
+
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3330,6 +3285,16 @@ Style.prototype._compileColorShader = function () {
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
+Style.prototype._compileStrokeColorShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeColor, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createColorShader);
+    this.propertyStrokeColorTID = r.tid;
+    this.strokeColorShader = r.shader;
+}
+Style.prototype._compileStrokeWidthShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeWidth, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
+    this.propertyStrokeWidthTID = r.tid;
+    this.strokeWidthShader = r.shader;
+}
 Style.prototype._compileWidthShader = function () {
     const r = compileShader(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_3__shaders__["c" /* styler */].createWidthShader);
     this.propertyWidthTID = r.tid;
@@ -3363,14 +3328,34 @@ function Style(renderer, schema) {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+    this._strokeColor = __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 1, 0, 0.5);
+    this._strokeColor.parent = this;
+    this._strokeColor.notify = () => {
+        this._compileStrokeColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    this._strokeWidth = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
+    this._strokeWidth.parent = this;
+    this._strokeWidth.notify = () => {
+        this._compileStrokeWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
 
     this._compileWidthShader();
     this._compileColorShader();
+    this._compileStrokeColorShader();
+    this._compileStrokeWidthShader();
 }
 
 Style.prototype.set = function (s, duration) {
+    s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2,0.2,0.8,0.5);
+    s.width = s.width || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
+    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0,0,0,0);
+    s.strokeWidth = s.strokeWidth || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
+    this.getStrokeColor().blendTo(s.strokeColor, duration);
+    this.getStrokeWidth().blendTo(s.strokeWidth, duration);
 }
 
 /**
@@ -3388,6 +3373,16 @@ Style.prototype.setWidth = function (float) {
     };
     float.notify();
 }
+Style.prototype.setStrokeWidth = function (float) {
+    this._strokeWidth = float;
+    this.updated = true;
+    float.parent = this;
+    float.notify = () => {
+        this._compileStrokeWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    float.notify();
+}
 Style.prototype._replaceChild = function (toReplace, replacer) {
     if (toReplace == this._color) {
         this._color = replacer;
@@ -3395,6 +3390,14 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
         replacer.notify = toReplace.notify;
     } else if (toReplace == this._width) {
         this._width = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeColor) {
+        this._strokeColor = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeWidth) {
+        this._strokeWidth = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     } else {
@@ -3416,6 +3419,20 @@ Style.prototype.setColor = function (color) {
     };
     color.notify();
 }
+
+Style.prototype.setStrokeColor = function (color) {
+    this._strokeColor = color;
+    this.updated = true;
+    color.parent = this;
+    color.notify = () => {
+        this._compileStrokeColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    color.notify();
+}
+
+
+
 /**
  * Get the width style expression
  * @jsapi
@@ -3431,15 +3448,23 @@ Style.prototype.getColor = function () {
     return this._color;
 }
 
+Style.prototype.getStrokeColor = function () {
+    return this._strokeColor;
+}
+
+Style.prototype.getStrokeWidth = function () {
+    return this._strokeWidth;
+}
+
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(16);
+module.exports = __webpack_require__(14);
 
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -5292,7 +5317,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(17);
+var colorbrewer = __webpack_require__(15);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -5325,14 +5350,14 @@ if (true) {
 
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(16);
 
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -5657,16 +5682,16 @@ if (true) {
 
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(20);
+module.exports.VectorTile = __webpack_require__(18);
 module.exports.VectorTileFeature = __webpack_require__(6);
 module.exports.VectorTileLayer = __webpack_require__(5);
 
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5690,7 +5715,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6009,7 +6034,7 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6017,7 +6042,7 @@ Point.convert = function (a) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(23);
+var ieee754 = __webpack_require__(21);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -6634,7 +6659,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -6724,7 +6749,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -6914,13 +6939,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 25 */,
-/* 26 */
+/* 23 */,
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(25);
 
 
 var mapboxgl = window.mapboxgl;
@@ -7002,6 +7027,11 @@ color: ramp($category, Prism)`,
 
     `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)`,
+
+    `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp($category, Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`
 ];
 const texts = [
     `We can use RGBA colors`,
@@ -7027,25 +7057,27 @@ const texts = [
     `We can create a bubble map easily, and we can use the square root to make the circle's area proportional to the feature's property`,
 
     `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
+
+    `And, finally, let's put a nice stroke`
 ];
 
 let index = 0;
 
 $('#prev').click(() => {
-    $("#prev").attr("disabled",false);
-    $("#next").attr("disabled",false);
+    $("#prev").attr("disabled", false);
+    $("#next").attr("disabled", false);
     if (index > 0) {
         index--;
         mgl.setStyle(styles[index]);
         $('#tutorial').text(texts[index]);
     }
     if (index == 0) {
-        $("#prev").attr("disabled",true);
+        $("#prev").attr("disabled", true);
     }
 });
 $('#next').click(() => {
-    $("#prev").attr("disabled",false);
-    $("#next").attr("disabled",false);
+    $("#prev").attr("disabled", false);
+    $("#next").attr("disabled", false);
     if (index < styles.length - 1) {
         index++;
         mgl.setStyle(styles[index]);
@@ -7067,12 +7099,12 @@ var mgl2 = new MGL.MGLIntegrator(map2);
 */
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
 
 
@@ -7221,20 +7253,20 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SQL_API; });
 /* unused harmony export init */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
 
 
 
-var VectorTile = __webpack_require__(19).VectorTile;
-var Protobuf = __webpack_require__(22);
-var LRU = __webpack_require__(30);
+var VectorTile = __webpack_require__(17).VectorTile;
+var Protobuf = __webpack_require__(20);
+var LRU = __webpack_require__(28);
 
 
 
@@ -7449,7 +7481,7 @@ async function getSchema(query) {
 }
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7601,7 +7633,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7611,11 +7643,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(31)
-var util = __webpack_require__(33)
+var Map = __webpack_require__(29)
+var util = __webpack_require__(31)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(37)
+var Yallist = __webpack_require__(35)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -8075,7 +8107,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -8085,13 +8117,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(32)
+  module.exports = __webpack_require__(30)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -8210,7 +8242,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -8738,7 +8770,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(35);
+exports.isBuffer = __webpack_require__(33);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -8782,7 +8814,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(36);
+exports.inherits = __webpack_require__(34);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -8800,10 +8832,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34), __webpack_require__(24)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32), __webpack_require__(22)))
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports) {
 
 var g;
@@ -8830,7 +8862,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 35 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -8841,7 +8873,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 36 */
+/* 34 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -8870,7 +8902,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 37 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
