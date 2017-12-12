@@ -37,6 +37,8 @@ function Point(gl) {
     this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
     this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
     this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
 }
 function GenericStyler(gl, glsl, preface, inline) {
@@ -73,10 +75,10 @@ function computer(gl, preface, inline){
     return new Computer(gl, computerGLSL, preface, inline);
 }
 function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL.color, preface, inline);
+    GenericStyler.call(this, gl, stylerGLSL, preface, inline);
 }
 function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL.width, preface, inline);
+    GenericStyler.call(this, gl, stylerGLSL, preface, `vec4((${inline})/64.)`);
 }
 
 const renderer = {

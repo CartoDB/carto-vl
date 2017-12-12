@@ -32,6 +32,16 @@ Style.prototype._compileColorShader = function () {
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 }
+Style.prototype._compileStrokeColorShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeColor, shaders.styler.createColorShader);
+    this.propertyStrokeColorTID = r.tid;
+    this.strokeColorShader = r.shader;
+}
+Style.prototype._compileStrokeWidthShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeWidth, shaders.styler.createWidthShader);
+    this.propertyStrokeWidthTID = r.tid;
+    this.strokeWidthShader = r.shader;
+}
 Style.prototype._compileWidthShader = function () {
     const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
     this.propertyWidthTID = r.tid;
@@ -65,14 +75,34 @@ function Style(renderer, schema) {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
+    this._strokeColor = functions.rgba(0, 1, 0, 0.5);
+    this._strokeColor.parent = this;
+    this._strokeColor.notify = () => {
+        this._compileStrokeColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    this._strokeWidth = functions.float(0);
+    this._strokeWidth.parent = this;
+    this._strokeWidth.notify = () => {
+        this._compileStrokeWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
 
     this._compileWidthShader();
     this._compileColorShader();
+    this._compileStrokeColorShader();
+    this._compileStrokeWidthShader();
 }
 
 Style.prototype.set = function (s, duration) {
+    s.color = s.color || functions.rgba(0.2,0.2,0.8,0.5);
+    s.width = s.width || functions.float(4);
+    s.strokeColor = s.strokeColor || functions.rgba(0,0,0,0);
+    s.strokeWidth = s.strokeWidth || functions.float(0);
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
+    this.getStrokeColor().blendTo(s.strokeColor, duration);
+    this.getStrokeWidth().blendTo(s.strokeWidth, duration);
 }
 
 /**
@@ -90,6 +120,16 @@ Style.prototype.setWidth = function (float) {
     };
     float.notify();
 }
+Style.prototype.setStrokeWidth = function (float) {
+    this._strokeWidth = float;
+    this.updated = true;
+    float.parent = this;
+    float.notify = () => {
+        this._compileStrokeWidthShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    float.notify();
+}
 Style.prototype._replaceChild = function (toReplace, replacer) {
     if (toReplace == this._color) {
         this._color = replacer;
@@ -97,6 +137,14 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
         replacer.notify = toReplace.notify;
     } else if (toReplace == this._width) {
         this._width = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeColor) {
+        this._strokeColor = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeWidth) {
+        this._strokeWidth = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     } else {
@@ -118,6 +166,20 @@ Style.prototype.setColor = function (color) {
     };
     color.notify();
 }
+
+Style.prototype.setStrokeColor = function (color) {
+    this._strokeColor = color;
+    this.updated = true;
+    color.parent = this;
+    color.notify = () => {
+        this._compileStrokeColorShader();
+        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+    };
+    color.notify();
+}
+
+
+
 /**
  * Get the width style expression
  * @jsapi
@@ -131,4 +193,12 @@ Style.prototype.getWidth = function () {
  */
 Style.prototype.getColor = function () {
     return this._color;
+}
+
+Style.prototype.getStrokeColor = function () {
+    return this._strokeColor;
+}
+
+Style.prototype.getStrokeWidth = function () {
+    return this._strokeWidth;
 }
