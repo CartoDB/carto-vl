@@ -67,8 +67,11 @@ uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 
 varying lowp vec4 color;
+varying lowp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
+varying highp float fillScale;
+varying highp float strokeScale;
 
 void main(void) {
     float s = texture2D(widthTex, featureID).a;
@@ -79,9 +82,15 @@ void main(void) {
     }
     gl_Position  = p;
 
+    float fillSize = size;
+    float strokeSize = 18.;
+
     //upscale size by outer/2
+    size+=strokeSize*0.5;
     //fillScale=size/inner
-    //strokesScale=size/(inner-outer/2)
+    fillScale=size/fillSize;
+    strokeScale=size/(fillSize-strokeSize*0.5);
+    stroke = vec4(1,0,0,0.8);
 
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
@@ -93,8 +102,11 @@ export const FS = `
 precision highp float;
 
 varying lowp vec4 color;
+varying lowp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
+varying highp float fillScale;
+varying highp float strokeScale;
 
 float distanceAntialias(vec2 p){
     return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
@@ -105,17 +117,16 @@ void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
     vec4 c = color;
 
-    vec4 stroke = vec4(0.,0.,1.,1.);
-    float pctFill = 1./0.8;
+    vec4 s = stroke;
 
-    c.a *= distanceAntialias(p*pctFill);
+    c.a *= distanceAntialias(p*fillScale);
     c.rgb*=c.a;
 
-    stroke.a *= distanceAntialias(p);
-    stroke.a *= 1.-distanceAntialias((pctFill)*p);
-    stroke.rgb*=stroke.a;
+    s.a *= distanceAntialias(p);
+    s.a *= 1.-distanceAntialias((strokeScale)*p);
+    s.rgb*=s.a;
 
-    c=stroke+(1.-stroke.a)*c;
+    c=s+(1.-s.a)*c;
 
     gl_FragColor = c;
 }`;
