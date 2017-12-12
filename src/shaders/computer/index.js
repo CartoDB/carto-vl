@@ -36,3 +36,5 @@ void main(void) {
     vec4 c = color;
     gl_FragColor = c;
 }`;
+
+//TODO performance optimization? texture reads can be done at FS

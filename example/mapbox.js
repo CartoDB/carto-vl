@@ -79,6 +79,11 @@ color: ramp($category, Prism)`,
 
     `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)`,
+
+    `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp($category, Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`
 ];
 const texts = [
     `We can use RGBA colors`,
@@ -104,25 +109,27 @@ const texts = [
     `We can create a bubble map easily, and we can use the square root to make the circle's area proportional to the feature's property`,
 
     `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
+
+    `And, finally, let's put a nice stroke`
 ];
 
 let index = 0;
 
 $('#prev').click(() => {
-    $("#prev").attr("disabled",false);
-    $("#next").attr("disabled",false);
+    $("#prev").attr("disabled", false);
+    $("#next").attr("disabled", false);
     if (index > 0) {
         index--;
         mgl.setStyle(styles[index]);
         $('#tutorial').text(texts[index]);
     }
     if (index == 0) {
-        $("#prev").attr("disabled",true);
+        $("#prev").attr("disabled", true);
     }
 });
 $('#next').click(() => {
-    $("#prev").attr("disabled",false);
-    $("#next").attr("disabled",false);
+    $("#prev").attr("disabled", false);
+    $("#next").attr("disabled", false);
     if (index < styles.length - 1) {
         index++;
         mgl.setStyle(styles[index]);

@@ -1,5 +1,5 @@
 //TODO Discuss size scaling constant, maybe we need to remap using an exponential map
-//TODO profile discard performance impact
+//TODO performance optimization: direct stroke/color/widths from uniform instead of texture read when possible
 
 /*
     Z coordinate, Z test and blending
@@ -65,6 +65,8 @@ uniform vec2 vertexOffset;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
+uniform sampler2D colorStrokeTex;
+uniform sampler2D strokeWidthTex;
 
 varying lowp vec4 color;
 varying lowp vec4 stroke;
@@ -74,28 +76,27 @@ varying highp float fillScale;
 varying highp float strokeScale;
 
 void main(void) {
-    float s = texture2D(widthTex, featureID).a;
-    float size = ceil(s*64.);
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, (s*0.9+0.05)*0.+0.5, 1.);
-    if (s==0.){
-        p.x=10000.;
-    }
-    gl_Position  = p;
+    color = texture2D(colorTex, featureID);
+    stroke = texture2D(colorStrokeTex, featureID);
 
+    float size = 64.*texture2D(widthTex, featureID).a;
     float fillSize = size;
-    float strokeSize = 18.;
-
-    //upscale size by outer/2
+    float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
     size+=strokeSize*0.5;
-    //fillScale=size/inner
     fillScale=size/fillSize;
-    strokeScale=size/(fillSize-strokeSize*0.5);
-    stroke = vec4(1,0,0,0.8);
-
+    strokeScale=size/max(0.001, (fillSize-strokeSize*0.5));
+    if (fillScale==strokeScale){
+        stroke.a=0.;
+    }
     gl_PointSize = size+2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
-    color = texture2D(colorTex, featureID);
+
+    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
+    if (size==0. || (stroke.a==0. && color.a==0.)){
+        p.x=10000.;
+    }
+    gl_Position  = p;
 }`;
 
 export const FS = `
