@@ -2530,6 +2530,12 @@ class Dataframe {
             gl.deleteTexture(this.texStrokeWidth);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
+            this.texColor = 'freed';
+            this.texStrokeColor = 'freed';
+            this.texStrokeWidth = 'freed';
+            this.vertexBuffer = 'freed';
+            this.featureIDBuffer = 'freed';
+            this.propertyTex = null;
         }
     }
 }
@@ -2550,9 +2556,15 @@ Renderer.prototype.createTileTexture = function (type, features) {
 
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        null);
+    if (type == 'size') {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.UNSIGNED_BYTE,
+            null);
+    } else {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            null);
+    }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -2623,8 +2635,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.texColor = this.createTileTexture('color', dataframe.numVertex);
     dataframe.texWidth = this.createTileTexture('color', dataframe.numVertex);
-    dataframe.texStrokeColor = this.createTileTexture('size', dataframe.numVertex);
-    dataframe.texStrokeWidth = this.createTileTexture('size', dataframe.numVertex);
+    dataframe.texStrokeColor = this.createTileTexture('color', dataframe.numVertex);
+    dataframe.texStrokeWidth = this.createTileTexture('color', dataframe.numVertex);
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
@@ -2672,14 +2684,15 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clearColor(0., 0., 0., 0.);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
-
+    gl.depthMask(false);
 
     // Render To Texture
     // COLOR
@@ -2716,8 +2729,6 @@ function refresh(timestamp) {
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
 
-    gl.disable(gl.DEPTH_TEST);
-
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
@@ -2728,60 +2739,50 @@ function refresh(timestamp) {
     var s = 1. / this._zoom;
 
 
-    this.tiles.forEach(tile => {
-        if (tile.style) {
-            /*console.log((s / aspect) * tile.scale,
-                s * tile.scale,
-                (s / aspect) * this._center.x - tile.center.x,
-                s * this._center.y - tile.center.y
-            );*/
-            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
-                (s / aspect) * tile.scale,
-                s * tile.scale);
-            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
-                (s / aspect) * (this._center.x - tile.center.x),
-                s * (this._center.y - tile.center.y));
+    tiles.forEach(tile => {
+        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+            (s / aspect) * tile.scale,
+            s * tile.scale);
+        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+            (s / aspect) * (this._center.x - tile.center.x),
+            s * (this._center.y - tile.center.y));
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
 
-            gl.activeTexture(gl.TEXTURE1);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
 
-            gl.activeTexture(gl.TEXTURE2);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-            gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+        gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
 
-            gl.activeTexture(gl.TEXTURE3);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-            gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
+        gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+        gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
 
-            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
-            gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-            gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-
-        }
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
     });
 
     //this._getMin(null, this.computePool[0]);
 
-    this.tiles.forEach(t => {
-        if (t.style) {
-            if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-                window.requestAnimationFrame(refresh.bind(this));
-            }
+    tiles.forEach(t => {
+        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+            window.requestAnimationFrame(refresh.bind(this));
         }
     });
 
@@ -2827,6 +2828,7 @@ function getFBstatus(gl) {
 
 
 Renderer.prototype._getMin = function (expression, callback) {
+    return;
     const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {
@@ -3348,9 +3350,9 @@ function Style(renderer, schema) {
 }
 
 Style.prototype.set = function (s, duration) {
-    s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2,0.2,0.8,0.5);
+    s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2, 0.2, 0.8, 0.5);
     s.width = s.width || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
-    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0,0,0,0);
+    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 0);
     s.strokeWidth = s.strokeWidth || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
@@ -6948,45 +6950,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(25);
 
 
-var mapboxgl = window.mapboxgl;
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
-var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
-    center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
-});
-map.repaint = false;
-var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map);
-
-$('#barcelona').click(() => {
-    $('.step').css('display', 'inline');
-    $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
-    document.getElementById("styleEntry").value = 'width:    40*(($amount/max($amount))^0.5) * (zoom()/10000 + 0.01)\ncolor:    ramp($category, Prism)';
-    mgl.setStyle(styles[index]);
-    $('#tutorial').text(texts[index]);
-    mgl.provider.setQueries(...mgl.barcelona());
-    mgl.provider.getSchema().then(schema => {
-        mgl.schema = schema;
-        mgl.updateStyle();
-    });
-});
-
-$('#wwi').click(() => {
-    $('.step').css('display', 'none');
-    $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-    $('#tutorial').text('');
-    document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-    mgl.provider.setQueries(...mgl.ships_WWI());
-    mgl.provider.getSchema().then(schema => {
-        mgl.schema = schema;
-        mgl.updateStyle();
-    });
-});
-
-$('.step').css('display', 'none');
-$('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-
 
 const styles = [
     `width: 3
@@ -7033,6 +6996,8 @@ color: ramp($category, Prism)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`
 ];
+
+
 const texts = [
     `We can use RGBA colors`,
 
@@ -7061,42 +7026,129 @@ const texts = [
     `And, finally, let's put a nice stroke`
 ];
 
-let index = 0;
 
-$('#prev').click(() => {
-    $("#prev").attr("disabled", false);
-    $("#next").attr("disabled", false);
-    if (index > 0) {
-        index--;
-        mgl.setStyle(styles[index]);
-        $('#tutorial').text(texts[index]);
-    }
-    if (index == 0) {
-        $("#prev").attr("disabled", true);
-    }
-});
-$('#next').click(() => {
-    $("#prev").attr("disabled", false);
-    $("#next").attr("disabled", false);
-    if (index < styles.length - 1) {
-        index++;
-        mgl.setStyle(styles[index]);
-        $('#tutorial').text(texts[index]);
-    }
-    if (index == styles.length - 1) {
-        $("#next").prop("disabled", true);
-    }
-});
 
-/*
-var map2 = new mapboxgl.Map({
-    container: 'map2', // container id
+const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+
+const barcelonaQueries = [`(SELECT
+        the_geom_webmercator,
+        amount,
+       category
+    FROM tx_0125_copy_copy) AS tmp`
+    ,
+    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+(
+    SELECT
+        ST_AsMVTGeom(
+            ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+            CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+        ),
+        SUM(amount) AS amount,
+        _cdb_mode(category) AS category
+    FROM tx_0125_copy_copy AS cdbq
+    WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+    GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+    ORDER BY amount DESC
+)AS geom`];
+
+const ships_WWIQueries = [`(SELECT
+            the_geom_webmercator,
+            temp,
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
+        FROM wwi_ships) AS tmp`
+    ,
+    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+    (
+        SELECT
+            ST_AsMVTGeom(
+                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+            ),
+            AVG(temp)::numeric(3,1) AS temp,
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
+        FROM wwi_ships AS cdbq
+        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
+    )AS geom
+`];
+
+var mapboxgl = window.mapboxgl;
+mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
+var map = new mapboxgl.Map({
+    container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 14, // starting zoom,
+    zoom: 0, // starting zoom,
 });
-var mgl2 = new MGL.MGLIntegrator(map2);
-*/
+map.repaint = false;
+var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map);
+
+
+map.on('load', _ => {
+    $('#barcelona').click(barcelona);
+    $('#wwi').click(wwi);
+
+    $('.step').css('display', 'none');
+    $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
+    $('#styleEntry').on('input', mgl.updateStyle.bind(mgl));
+
+    wwi();
+
+    let index = 0;
+
+    function barcelona() {
+        mgl.provider.set(barcelonaQueries, styles[index]);
+        $('.step').css('display', 'inline');
+        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
+        document.getElementById("styleEntry").value = styles[index];
+        $('#tutorial').text(texts[index]);
+        mgl.provider.getSchema().then(schema => {
+            mgl.setStyle(styles[index]);
+            mgl.schema = schema;
+            mgl.updateStyle();
+        });
+    }
+    function wwi() {
+        mgl.provider.set(ships_WWIQueries, shipsStyle);
+        $('.step').css('display', 'none');
+        $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
+        $('#tutorial').text('');
+        document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+        mgl.provider.getSchema().then(schema => {
+            mgl.setStyle(document.getElementById("styleEntry").value);
+            mgl.schema = schema;
+            mgl.updateStyle();
+        });
+    }
+
+    $('#prev').click(() => {
+        $("#prev").attr("disabled", false);
+        $("#next").attr("disabled", false);
+        if (index > 0) {
+            index--;
+            mgl.setStyle(styles[index]);
+            $('#tutorial').text(texts[index]);
+        }
+        if (index == 0) {
+            $("#prev").attr("disabled", true);
+        }
+    });
+    $('#next').click(() => {
+        $("#prev").attr("disabled", false);
+        $("#next").attr("disabled", false);
+        if (index < styles.length - 1) {
+            index++;
+            mgl.setStyle(styles[index]);
+            $('#tutorial').text(texts[index]);
+        }
+        if (index == styles.length - 1) {
+            $("#next").prop("disabled", true);
+        }
+    });
+
+});
+
 
 /***/ }),
 /* 25 */
@@ -7130,16 +7182,6 @@ class MGLIntegrator {
 
             this.renderer = new __WEBPACK_IMPORTED_MODULE_1__src_index__["b" /* Renderer */](canvas);
             this.provider = new __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["a" /* SQL_API */](this.renderer, this.style);
-            this.provider.setQueries(...this.ships_WWI());
-            this.provider.getSchema().then(schema => {
-                this.schema = schema;
-                this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
-                this.provider.style = this.style;
-                $('#styleEntry').on('input', this.updateStyle.bind(this));
-                this.updateStyle();
-                this.resize();
-                this.move();
-            });
 
             map.on('resize', this.resize.bind(this));
             map.on('movestart', this.move.bind(this));
@@ -7147,50 +7189,8 @@ class MGLIntegrator {
             map.on('moveend', this.move.bind(this));
         });
     }
-    barcelona() {
-        return [`(SELECT
-            the_geom_webmercator,
-            amount,
-           category
-        FROM tx_0125_copy_copy) AS tmp`
-            ,
-            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-    (
-        SELECT
-            ST_AsMVTGeom(
-                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-            ),
-            SUM(amount) AS amount,
-            _cdb_mode(category) AS category
-        FROM tx_0125_copy_copy AS cdbq
-        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-        ORDER BY amount DESC
-    )AS geom`];
-    }
-    ships_WWI() {
-        return [`(SELECT
-                the_geom_webmercator,
-                temp,
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
-            FROM wwi_ships) AS tmp`
-            ,
-            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-        (
-            SELECT
-                ST_AsMVTGeom(
-                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                    CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-                ),
-                AVG(temp)::numeric(3,1) AS temp,
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
-            FROM wwi_ships AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
-        )AS geom
-    `];
+    set(queries, style) {
+        this.provider.set(queries, style);
     }
     move() {
         var b = this.map.getBounds();
@@ -7219,16 +7219,19 @@ class MGLIntegrator {
     }
     updateStyle() {
         const v = document.getElementById("styleEntry").value;
-        try {
-            const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, this.schema);
-            this.style.set(s, 1000);
-            document.getElementById("feedback").style.display = 'none';
-        } catch (error) {
-            const err = `Invalid width expression: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
-        }
+        this.provider.schema.then(schema => {
+            console.log(schema)
+            try {
+                const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, schema);
+                this.provider.style.set(s, 1000);
+                document.getElementById("feedback").style.display = 'none';
+            } catch (error) {
+                const err = `Invalid width expression: ${error}:${error.stack}`;
+                console.warn(err);
+                document.getElementById("feedback").value = err;
+                document.getElementById("feedback").style.display = 'block';
+            }
+        });
     }
     getZoom() {
         var b = this.map.getBounds();
@@ -7276,18 +7279,18 @@ var oldtiles = [];
 class Provider {
 }
 class SQL_API extends Provider {
-    constructor(renderer, style) {
+    constructor(renderer) {
         super();
         this.renderer = renderer;
-        this.style = style;
         this.catMap = {};
         const options = {
             max: 1000
             , length: function (dataframe, key) { return 1; }
-            , dispose: function (key, promise) {
+            , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
                         dataframe.free();
+                        this.renderer.removeDataframe(dataframe);
                     }
                 })
             }
@@ -7296,15 +7299,28 @@ class SQL_API extends Provider {
         this.cache = LRU(options);
     }
     setQueries(query, renderQueryMaker) {
-        this.cache.reset();
+        //block data acquisition
+        this.style = null;
         this.renderQueryMaker = renderQueryMaker;
-        this.schema = getSchema(query);
-        this.schema.then((schema) => {
-            if (this.style) {
-                this.style.schema = schema;
-                this.getData()
-            }
+        this.schema = getSchema(query).then(schema => {
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
+            return schema;
         });
+        this.cache.reset();
+        oldtiles.forEach(t => t.free());
+        oldtiles.forEach(t => this.renderer.removeDataframe(t));
+        oldtiles = [];
+    }
+    set(queries, style) {
+        this.setQueries(...queries);
+        //get schema
+        this.schema.then(schema => {
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
+            this.getData();
+        });
+        //when schema
+        //create style
+        //get data
     }
     async getSchema() {
         return await this.schema;
@@ -7389,6 +7405,9 @@ class SQL_API extends Provider {
         });
     }
     getData() {
+        if (!this.style) {
+            return;
+        }
         const renderer = this.renderer;
         const bounds = renderer.getBounds();
         const aspect = renderer.getAspect();
