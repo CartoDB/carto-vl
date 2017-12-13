@@ -181,9 +181,15 @@ Renderer.prototype.createTileTexture = function (type, features) {
 
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        null);
+    if (type == 'size') {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.UNSIGNED_BYTE,
+            null);
+    } else {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            null);
+    }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -304,7 +310,7 @@ function refresh(timestamp) {
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
     gl.clearColor(0., 0., 0., 0.);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.CULL_FACE);
 
@@ -347,8 +353,6 @@ function refresh(timestamp) {
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
 
-    gl.disable(gl.DEPTH_TEST);
-
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
 
@@ -359,60 +363,50 @@ function refresh(timestamp) {
     var s = 1. / this._zoom;
 
 
-    this.tiles.forEach(tile => {
-        if (tile.style) {
-            /*console.log((s / aspect) * tile.scale,
-                s * tile.scale,
-                (s / aspect) * this._center.x - tile.center.x,
-                s * this._center.y - tile.center.y
-            );*/
-            gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
-                (s / aspect) * tile.scale,
-                s * tile.scale);
-            gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
-                (s / aspect) * (this._center.x - tile.center.x),
-                s * (this._center.y - tile.center.y));
+    tiles.forEach(tile => {
+        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+            (s / aspect) * tile.scale,
+            s * tile.scale);
+        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+            (s / aspect) * (this._center.x - tile.center.x),
+            s * (this._center.y - tile.center.y));
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-            gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-            gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
 
-            gl.activeTexture(gl.TEXTURE1);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
 
-            gl.activeTexture(gl.TEXTURE2);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-            gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+        gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
 
-            gl.activeTexture(gl.TEXTURE3);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-            gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
+        gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+        gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
 
-            gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
 
-            gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-            gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
-
-        }
+        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
     });
 
     //this._getMin(null, this.computePool[0]);
 
-    this.tiles.forEach(t => {
-        if (t.style) {
-            if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-                window.requestAnimationFrame(refresh.bind(this));
-            }
+    tiles.forEach(t => {
+        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+            window.requestAnimationFrame(refresh.bind(this));
         }
     });
 
