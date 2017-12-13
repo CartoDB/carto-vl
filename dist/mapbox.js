@@ -6948,6 +6948,7 @@ process.umask = function() { return 0; };
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
 
 
 
@@ -6997,7 +6998,6 @@ strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`
 ];
 
-
 const texts = [
     `We can use RGBA colors`,
 
@@ -7025,8 +7025,6 @@ const texts = [
 
     `And, finally, let's put a nice stroke`
 ];
-
-
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
@@ -7086,40 +7084,40 @@ var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrat
 
 
 map.on('load', _ => {
-    $('#barcelona').click(barcelona);
-    $('#wwi').click(wwi);
-
-    $('.step').css('display', 'none');
-    $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-    $('#styleEntry').on('input', mgl.updateStyle.bind(mgl));
-
-    wwi();
-
     let index = 0;
 
-    function barcelona() {
-        mgl.provider.set(barcelonaQueries, styles[index]);
-        $('.step').css('display', 'inline');
-        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
-        document.getElementById("styleEntry").value = styles[index];
-        $('#tutorial').text(texts[index]);
-        mgl.provider.getSchema().then(schema => {
-            mgl.setStyle(styles[index]);
-            mgl.schema = schema;
-            mgl.updateStyle();
+    function updateStyle(v) {
+        v = v || document.getElementById("styleEntry").value;
+        document.getElementById("styleEntry").value = v;
+        mgl.provider.schema.then(schema => {
+            try {
+                const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, schema);
+                mgl.provider.style.set(s, 1000);
+                document.getElementById("feedback").style.display = 'none';
+            } catch (error) {
+                const err = `Invalid width expression: ${error}:${error.stack}`;
+                console.warn(err);
+                document.getElementById("feedback").value = err;
+                document.getElementById("feedback").style.display = 'block';
+            }
         });
     }
+
+    function barcelona() {
+        $('.step').css('display', 'inline');
+        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
+        $('#tutorial').text(texts[index]);
+
+        mgl.provider.setQueries(...barcelonaQueries);
+        updateStyle(styles[index]);
+    }
     function wwi() {
-        mgl.provider.set(ships_WWIQueries, shipsStyle);
         $('.step').css('display', 'none');
         $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
         $('#tutorial').text('');
-        document.getElementById("styleEntry").value = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-        mgl.provider.getSchema().then(schema => {
-            mgl.setStyle(document.getElementById("styleEntry").value);
-            mgl.schema = schema;
-            mgl.updateStyle();
-        });
+
+        mgl.provider.setQueries(...ships_WWIQueries);
+        updateStyle(shipsStyle);
     }
 
     $('#prev').click(() => {
@@ -7127,8 +7125,8 @@ map.on('load', _ => {
         $("#next").attr("disabled", false);
         if (index > 0) {
             index--;
-            mgl.setStyle(styles[index]);
             $('#tutorial').text(texts[index]);
+            updateStyle(styles[index]);
         }
         if (index == 0) {
             $("#prev").attr("disabled", true);
@@ -7139,14 +7137,19 @@ map.on('load', _ => {
         $("#next").attr("disabled", false);
         if (index < styles.length - 1) {
             index++;
-            mgl.setStyle(styles[index]);
             $('#tutorial').text(texts[index]);
+            updateStyle(styles[index]);
         }
         if (index == styles.length - 1) {
             $("#next").prop("disabled", true);
         }
     });
 
+    $('#barcelona').click(barcelona);
+    $('#wwi').click(wwi);
+    $('#styleEntry').on('input', () => updateStyle);
+
+    wwi();
 });
 
 
@@ -7166,7 +7169,6 @@ const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-const TILE_SIZE = 256;
 
 class MGLIntegrator {
     constructor(map) {
@@ -7189,9 +7191,6 @@ class MGLIntegrator {
             map.on('moveend', this.move.bind(this));
         });
     }
-    set(queries, style) {
-        this.provider.set(queries, style);
-    }
     move() {
         var b = this.map.getBounds();
         var nw = b.getNorthWest();
@@ -7212,26 +7211,6 @@ class MGLIntegrator {
     }
     getData() {
         this.provider.getData();
-    }
-    setStyle(s) {
-        document.getElementById("styleEntry").value = s;
-        this.updateStyle();
-    }
-    updateStyle() {
-        const v = document.getElementById("styleEntry").value;
-        this.provider.schema.then(schema => {
-            console.log(schema)
-            try {
-                const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, schema);
-                this.provider.style.set(s, 1000);
-                document.getElementById("feedback").style.display = 'none';
-            } catch (error) {
-                const err = `Invalid width expression: ${error}:${error.stack}`;
-                console.warn(err);
-                document.getElementById("feedback").value = err;
-                document.getElementById("feedback").style.display = 'block';
-            }
-        });
     }
     getZoom() {
         var b = this.map.getBounds();
@@ -7276,8 +7255,8 @@ var LRU = __webpack_require__(28);
 var style;
 var oldtiles = [];
 
-class Provider {
-}
+class Provider { }
+
 class SQL_API extends Provider {
     constructor(renderer) {
         super();
@@ -7310,17 +7289,10 @@ class SQL_API extends Provider {
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-    }
-    set(queries, style) {
-        this.setQueries(...queries);
-        //get schema
         this.schema.then(schema => {
             this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
             this.getData();
         });
-        //when schema
-        //create style
-        //get data
     }
     async getSchema() {
         return await this.schema;
