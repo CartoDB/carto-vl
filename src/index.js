@@ -316,7 +316,7 @@ function refresh(timestamp) {
 
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
-
+    gl.depthMask(false);
 
     // Render To Texture
     // COLOR
