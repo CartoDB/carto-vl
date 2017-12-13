@@ -10,8 +10,8 @@ export { SQL_API, init };
 var style;
 var oldtiles = [];
 
-class Provider {
-}
+class Provider { }
+
 class SQL_API extends Provider {
     constructor(renderer) {
         super();
@@ -44,17 +44,10 @@ class SQL_API extends Provider {
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-    }
-    set(queries, style) {
-        this.setQueries(...queries);
-        //get schema
         this.schema.then(schema => {
             this.style = new R.Style.Style(this.renderer, schema);
             this.getData();
         });
-        //when schema
-        //create style
-        //get data
     }
     async getSchema() {
         return await this.schema;
