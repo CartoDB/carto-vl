@@ -13,18 +13,18 @@ var oldtiles = [];
 class Provider {
 }
 class SQL_API extends Provider {
-    constructor(renderer, style) {
+    constructor(renderer) {
         super();
         this.renderer = renderer;
-        this.style = style;
         this.catMap = {};
         const options = {
             max: 1000
             , length: function (dataframe, key) { return 1; }
-            , dispose: function (key, promise) {
+            , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
                         dataframe.free();
+                        this.renderer.removeDataframe(dataframe);
                     }
                 })
             }
@@ -33,15 +33,28 @@ class SQL_API extends Provider {
         this.cache = LRU(options);
     }
     setQueries(query, renderQueryMaker) {
-        this.cache.reset();
+        //block data acquisition
+        this.style = null;
         this.renderQueryMaker = renderQueryMaker;
-        this.schema = getSchema(query);
-        this.schema.then((schema) => {
-            if (this.style) {
-                this.style.schema = schema;
-                this.getData()
-            }
+        this.schema = getSchema(query).then(schema => {
+            this.style = new R.Style.Style(this.renderer, schema);
+            return schema;
         });
+        this.cache.reset();
+        oldtiles.forEach(t => t.free());
+        oldtiles.forEach(t => this.renderer.removeDataframe(t));
+        oldtiles = [];
+    }
+    set(queries, style) {
+        this.setQueries(...queries);
+        //get schema
+        this.schema.then(schema => {
+            this.style = new R.Style.Style(this.renderer, schema);
+            this.getData();
+        });
+        //when schema
+        //create style
+        //get data
     }
     async getSchema() {
         return await this.schema;
@@ -126,6 +139,9 @@ class SQL_API extends Provider {
         });
     }
     getData() {
+        if (!this.style) {
+            return;
+        }
         const renderer = this.renderer;
         const bounds = renderer.getBounds();
         const aspect = renderer.getAspect();
