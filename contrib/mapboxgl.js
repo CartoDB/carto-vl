@@ -6,7 +6,6 @@ const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-const TILE_SIZE = 256;
 
 class MGLIntegrator {
     constructor(map) {
@@ -29,9 +28,6 @@ class MGLIntegrator {
             map.on('moveend', this.move.bind(this));
         });
     }
-    set(queries, style) {
-        this.provider.set(queries, style);
-    }
     move() {
         var b = this.map.getBounds();
         var nw = b.getNorthWest();
@@ -52,26 +48,6 @@ class MGLIntegrator {
     }
     getData() {
         this.provider.getData();
-    }
-    setStyle(s) {
-        document.getElementById("styleEntry").value = s;
-        this.updateStyle();
-    }
-    updateStyle() {
-        const v = document.getElementById("styleEntry").value;
-        this.provider.schema.then(schema => {
-            console.log(schema)
-            try {
-                const s = R.Style.parseStyle(v, schema);
-                this.provider.style.set(s, 1000);
-                document.getElementById("feedback").style.display = 'none';
-            } catch (error) {
-                const err = `Invalid width expression: ${error}:${error.stack}`;
-                console.warn(err);
-                document.getElementById("feedback").value = err;
-                document.getElementById("feedback").style.display = 'block';
-            }
-        });
     }
     getZoom() {
         var b = this.map.getBounds();
