@@ -161,6 +161,12 @@ class Dataframe {
             gl.deleteTexture(this.texStrokeWidth);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
+            this.texColor = 'freed';
+            this.texStrokeColor = 'freed';
+            this.texStrokeWidth = 'freed';
+            this.vertexBuffer = 'freed';
+            this.featureIDBuffer = 'freed';
+            this.propertyTex = null;
         }
     }
 }
@@ -260,8 +266,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.texColor = this.createTileTexture('color', dataframe.numVertex);
     dataframe.texWidth = this.createTileTexture('color', dataframe.numVertex);
-    dataframe.texStrokeColor = this.createTileTexture('size', dataframe.numVertex);
-    dataframe.texStrokeWidth = this.createTileTexture('size', dataframe.numVertex);
+    dataframe.texStrokeColor = this.createTileTexture('color', dataframe.numVertex);
+    dataframe.texStrokeWidth = this.createTileTexture('color', dataframe.numVertex);
 
     var ids = new Float32Array(points.length);
     for (var i = 0; i < points.length; i += 2) {
@@ -309,6 +315,7 @@ function refresh(timestamp) {
         gl.canvas.height = height;
     }
     var aspect = canvas.clientWidth / canvas.clientHeight;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clearColor(0., 0., 0., 0.);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -452,6 +459,7 @@ import * as shaders from './shaders';
 import * as functions from './style/functions';
 
 Renderer.prototype._getMin = function (expression, callback) {
+    return;
     const gl = this.gl;
     //Render to 1x1 FB
     if (!this.aux1x1FB) {

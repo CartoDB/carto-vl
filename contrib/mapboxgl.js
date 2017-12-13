@@ -22,16 +22,6 @@ class MGLIntegrator {
 
             this.renderer = new R.Renderer(canvas);
             this.provider = new sql_api.SQL_API(this.renderer, this.style);
-            this.provider.setQueries(...this.ships_WWI());
-            this.provider.getSchema().then(schema => {
-                this.schema = schema;
-                this.style = new R.Style.Style(this.renderer, schema);
-                this.provider.style = this.style;
-                $('#styleEntry').on('input', this.updateStyle.bind(this));
-                this.updateStyle();
-                this.resize();
-                this.move();
-            });
 
             map.on('resize', this.resize.bind(this));
             map.on('movestart', this.move.bind(this));
@@ -39,50 +29,8 @@ class MGLIntegrator {
             map.on('moveend', this.move.bind(this));
         });
     }
-    barcelona() {
-        return [`(SELECT
-            the_geom_webmercator,
-            amount,
-           category
-        FROM tx_0125_copy_copy) AS tmp`
-            ,
-            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-    (
-        SELECT
-            ST_AsMVTGeom(
-                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-            ),
-            SUM(amount) AS amount,
-            _cdb_mode(category) AS category
-        FROM tx_0125_copy_copy AS cdbq
-        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-        ORDER BY amount DESC
-    )AS geom`];
-    }
-    ships_WWI() {
-        return [`(SELECT
-                the_geom_webmercator,
-                temp,
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
-            FROM wwi_ships) AS tmp`
-            ,
-            (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-        (
-            SELECT
-                ST_AsMVTGeom(
-                    ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                    CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-                ),
-                AVG(temp)::numeric(3,1) AS temp,
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
-            FROM wwi_ships AS cdbq
-            WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-            GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-                DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
-        )AS geom
-    `];
+    set(queries, style) {
+        this.provider.set(queries, style);
     }
     move() {
         var b = this.map.getBounds();
@@ -111,16 +59,19 @@ class MGLIntegrator {
     }
     updateStyle() {
         const v = document.getElementById("styleEntry").value;
-        try {
-            const s = R.Style.parseStyle(v, this.schema);
-            this.style.set(s, 1000);
-            document.getElementById("feedback").style.display = 'none';
-        } catch (error) {
-            const err = `Invalid width expression: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
-        }
+        this.provider.schema.then(schema => {
+            console.log(schema)
+            try {
+                const s = R.Style.parseStyle(v, schema);
+                this.provider.style.set(s, 1000);
+                document.getElementById("feedback").style.display = 'none';
+            } catch (error) {
+                const err = `Invalid width expression: ${error}:${error.stack}`;
+                console.warn(err);
+                document.getElementById("feedback").value = err;
+                document.getElementById("feedback").style.display = 'block';
+            }
+        });
     }
     getZoom() {
         var b = this.map.getBounds();
