@@ -196,7 +196,7 @@ map.on('load', _ => {
 
     $('#barcelona').click(barcelona);
     $('#wwi').click(wwi);
-    $('#styleEntry').on('input', () => updateStyle);
+    $('#styleEntry').on('input', () => updateStyle());
 
     wwi();
 });
