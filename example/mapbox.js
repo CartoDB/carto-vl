@@ -1,4 +1,5 @@
 import * as MGL from '../contrib/mapboxgl';
+import WindshaftSQL from '../contrib/windshaft-sql';
 import * as R from '../src/index';
 
 const styles = [
@@ -129,7 +130,7 @@ var map = new mapboxgl.Map({
     zoom: 0, // starting zoom,
 });
 map.repaint = false;
-var mgl = new MGL.MGLIntegrator(map);
+var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
 
 map.on('load', _ => {
