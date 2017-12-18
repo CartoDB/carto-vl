@@ -31,6 +31,7 @@ const layerSubdomains = function subdomains(layergroup) {
 }
 
 class Provider { }
+
 export default class WindshaftSQL extends Provider {
     constructor(renderer) {
         super();
@@ -51,7 +52,35 @@ export default class WindshaftSQL extends Provider {
         };
         this.cache = LRU(options);
     }
-    setQueries(query, renderQueryMaker) {
+    setQueries(protoSchema) {
+
+        let agg = {
+            threshold: 1,
+            resolution: protoSchema.aggRes,
+            columns: {},
+            dimensions: {}
+        };
+        protoSchema.properties.map(p => {
+            const name = p.name;
+            const aggFN = p.aggFN;
+            if (aggFN) {
+                agg.columns[name] = {
+                    aggregate_function: aggFN,
+                    aggregated_column: name
+                };
+            }
+        });
+        protoSchema.properties.map(p => {
+            const name = p.name;
+            const aggFN = p.aggFN;
+            if (!aggFN) {
+                agg.dimensions[name] = name;
+            }
+        });
+        const aggSQL = `SELECT ${protoSchema.properties.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM tx_0125_copy_copy`;
+
+        console.log(aggSQL, agg);
+
         const sqls = `SELECT
         the_geom_webmercator, the_geom,
         temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
@@ -63,57 +92,20 @@ export default class WindshaftSQL extends Provider {
    category
 FROM tx_0125_copy_copy`;
 
-//TODO agg is param
+        //TODO agg is param
 
 
-        const mapConfigS = {
+        const mapConfigAgg = {
             layers: [
                 {
                     type: 'mapnik',
                     options: {
-                        sql: sqls,
-                        aggregation: {
-                            threshold: 1,
-                            resolution: 1,
-                            columns: {
-                                temp: {
-                                    aggregate_function: "avg",
-                                    aggregated_column: "temp::numeric"
-                                }
-                            },
-                            dimensions: {
-                                day: 'day'
-                            }
-                        }
+                        sql: aggSQL,
+                        aggregation: agg
                     }
                 }
             ]
         };
-        const mapConfig = {
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        sql,
-                        aggregation: {
-                            threshold: 1,
-                            resolution: 4,
-                            columns: {
-                                amount: {
-                                    aggregate_function: "sum",
-                                    aggregated_column: "amount"
-                                },
-                                category: {
-                                    aggregate_function: "mode",
-                                    aggregated_column: "category"
-                                }
-                            }
-                        }
-                    }
-                }
-            ]
-        };
-
 
         const promise = async () => {
             const response = await fetch(endpoint(user), {
@@ -122,7 +114,7 @@ FROM tx_0125_copy_copy`;
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(mapConfigS)
+                body: JSON.stringify(mapConfigAgg)
             });
             const layergroup = await response.json();
             console.log(layergroup);
@@ -133,8 +125,8 @@ FROM tx_0125_copy_copy`;
 
         //block data acquisition
         this.style = null;
-        this.renderQueryMaker = renderQueryMaker;
-        this.schema = getSchema(query).then(schema => {
+        this.schema = getSchema(`(${aggSQL}) AS tmp`).then(schema => {
+            console.log(schema);
             this.style = new R.Style.Style(this.renderer, schema);
             return schema;
         });
@@ -175,14 +167,13 @@ FROM tx_0125_copy_copy`;
     requestDataframe(x, y, z) {
         return new Promise((callback, reject) => {
             const mvt_extent = 4096;
-            const query = this.renderQueryMaker(x, y, z);
 
             this.url.then(url => {
                 //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = "arraybuffer";
                 const hack = `https://cartocdn-ashbu_a.global.ssl.fastly.net/dmanzanares/api/v1/map/dmanzanares@2d3b4521@81f53959cba25cbdde88e1b6e563989f:1510050059310/mapnik/${z}/${x}/${y}.mvt`;
-                console.log(url(x, y, z));
+                //console.log(url(x, y, z));
                 oReq.open("GET", url(x, y, z), true);
                 oReq.onload = (oEvent) => {
                     this.schema.then(schema => {

@@ -1,18 +1,116 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
+import * as schema from '../schema';
 
-//TODO document style expressions
-//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
-/*
-  Returns a valid style expression or throws an exception upon invalid inputs.
-*/
+const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
+
 var lowerCaseFunctions = {};
 Object.keys(functions).filter(
     name => name[0] == name[0].toLowerCase()
 ).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
+
+
+function parseNodeForSchema(node) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNodeForSchema(arg));
+        const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            return flattenArray(args).map(c => { c.aggFN = name; return c; });
+        } else if (lowerCaseFunctions[name]) {
+            return flattenArray(args);
+        }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
+    } else if (node.type == 'Literal') {
+        return [];
+    } else if (node.type == 'ArrayExpression') {
+        return flattenArray(node.elements.map(e => parseNodeForSchema(e)));
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNodeForSchema(node.left);
+        const right = parseNodeForSchema(node.right);
+        return left.concat(right);
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return parseNodeForSchema(node.argument);
+            case '+':
+                return parseNodeForSchema(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'Identifier') {
+        if (node.name[0] == '$') {
+            return [{ name: node.name.substring(1) }];
+        } else if (functions.schemas[node.name.toLowerCase()]) {
+            return [];
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return [];
+        }
+    }
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function parseStyleNamedExprForSchema(node, protoSchema) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
+    if (name == 'resolution') {
+        protoSchema.aggRes = node.right;
+    } else {
+        protoSchema.properties = protoSchema.properties.concat(parseNodeForSchema(node.right));
+    }
+}
+
+function flattenArray(x) {
+    return x.reduce((a, b) => a.concat(b), [])
+}
+
+export function protoSchemaIsEquals(a, b) {
+    console.log(a, b)
+    if (!a || !b) {
+        return false;
+    }
+    if (a.properties.length != b.properties.length) {
+        return false;
+    }
+    const l = a.properties.map((_, index) =>
+        a.properties[index].name == b.properties[index].name && a.properties[index].aggFN == b.properties[index].aggFN
+    );
+    return l.every(x => x) && a.aggRes == b.aggRes;
+}
+
+function compactProtoSchema(proto) {
+    proto.properties = proto.properties.filter(x =>
+        x == proto.properties.find(y => y.name == x.name && y.aggFN == x.aggFN)
+    );
+}
+
+export function getSchema(str) {
+    jsep.addBinaryOp(":", 1);
+    jsep.addBinaryOp("^", 10);
+    const ast = jsep(str);
+    let protoSchema = {
+        properties: []
+    };
+    console.log("AST", ast);
+    if (ast.type == "Compound") {
+        ast.body.map(node => parseStyleNamedExprForSchema(node, protoSchema));
+    } else {
+        parseStyleNamedExprForSchema(node, protoSchema);
+    }
+    jsep.removeBinaryOp("^");
+    jsep.removeBinaryOp(":");
+    compactProtoSchema(protoSchema);
+
+    console.log(protoSchema);
+    return protoSchema;
+}
 
 /**
  * @jsapi
@@ -32,6 +130,9 @@ function parseStyleNamedExpr(style, node, schema) {
         throw new Error('Invalid syntax');
     }
     const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
     const value = parseNode(node.right, schema);
     style[name] = value;
 }
@@ -56,6 +157,10 @@ function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            //args[0].name = args[0].name + '_' + name;
+            return args[0];
+        }
         if (lowerCaseFunctions[name]) {
             return lowerCaseFunctions[name](...args, schema);
         }

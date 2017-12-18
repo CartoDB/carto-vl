@@ -24,12 +24,13 @@ function Schema(propertyNames, propertyTypes) {
  */
 function checkSchemaMatch(schemaA, schemaB) {
     if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
+        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b, true);
         if (!equals) {
             throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
         }
     }
 }
+
 
 
 class Float {
