@@ -9,16 +9,20 @@ var LRU = require("lru-cache");
 var style;
 var oldtiles = [];
 
-const user = 'dmanzanares-ded13';
+let user = 'dmanzanares-ded13';
+let cartoURL = 'carto-staging.com';
+let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
+
 const endpoint = (username) => {
-    return `http://${user}.carto-staging.com/api/v1/map?api_key=8a174c451215cb8dca90264de342614087c4ef0c`
+    return `http://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
     return (x, y, z) => {
         if (layergroup.cdn_url && layergroup.cdn_url.templates) {
             const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=8a174c451215cb8dca90264de342614087c4ef0c`.replace('{s}', '1');
+            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
         }
+        debugger;
         return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', '1');
     }
 }
@@ -52,7 +56,19 @@ export default class WindshaftSQL extends Provider {
         };
         this.cache = LRU(options);
     }
-    setQueries(protoSchema) {
+    setUser(u) {
+        user = u;
+    }
+    setCartoURL(u) {
+        cartoURL = u;
+    }
+    setDataset(d) {
+        dataset = d;
+    }
+    setApiKey(k) {
+        apiKey = k;
+    }
+    setQueries(protoSchema, dataset) {
 
         let agg = {
             threshold: 1,
@@ -77,23 +93,9 @@ export default class WindshaftSQL extends Provider {
                 agg.dimensions[p.name] = p.name;
             }
         });
-        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM tx_0125_copy_copy`;
+        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
 
         console.log(aggSQL, agg);
-
-        const sqls = `SELECT
-        the_geom_webmercator, the_geom,
-        temp, DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
-    FROM wwi_ships_1`;
-
-        const sql = `SELECT
-    the_geom_webmercator,the_geom,
-    amount,
-   category
-FROM tx_0125_copy_copy`;
-
-        //TODO agg is param
-
 
         const mapConfigAgg = {
             layers: [
@@ -165,7 +167,6 @@ FROM tx_0125_copy_copy`;
                 //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = "arraybuffer";
-                const hack = `https://cartocdn-ashbu_a.global.ssl.fastly.net/dmanzanares/api/v1/map/dmanzanares@2d3b4521@81f53959cba25cbdde88e1b6e563989f:1510050059310/mapnik/${z}/${x}/${y}.mvt`;
                 //console.log(url(x, y, z));
                 oReq.open("GET", url(x, y, z), true);
                 oReq.onload = (oEvent) => {
@@ -270,7 +271,7 @@ FROM tx_0125_copy_copy`;
 
 async function getColumnTypes(query) {
     const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(columnListQuery));
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     return json.fields;
 }
@@ -281,7 +282,7 @@ async function getNumericTypes(names, query) {
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
-    const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(numericsQuery));
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
     console.log(numericsQuery, json);
     // TODO avg, sum, count
@@ -293,7 +294,7 @@ async function getNumericTypes(names, query) {
 async function getCategoryTypes(names, query) {
     return Promise.all(names.map(async name => {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
-        const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(catQuery));
+        const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
         const json = await response.json();
         let counts = [];
         let names = [];

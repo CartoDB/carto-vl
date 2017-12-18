@@ -137,6 +137,7 @@ map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
 let protoSchema = null;
+let dataset = 'tx_0125_copy_copy';
 
 map.on('load', _ => {
     let index = styles.length - 1;
@@ -149,7 +150,7 @@ map.on('load', _ => {
             const p = R.Style.getSchema(v);
             if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
                 protoSchema = p;
-                mgl.provider.setQueries(protoSchema);
+                mgl.provider.setQueries(protoSchema, dataset);
             }
             mgl.provider.schema.then(schema => {
                 try {
@@ -177,7 +178,7 @@ map.on('load', _ => {
         $('#tutorial').text(texts[index]);
 
         protoSchema = R.Style.getSchema(styles[index]);
-        mgl.provider.setQueries(protoSchema);
+        mgl.provider.setQueries(protoSchema, dataset);
         updateStyle(styles[index]);
     }
     function wwi() {
@@ -186,7 +187,7 @@ map.on('load', _ => {
         $('#tutorial').text('');
 
         protoSchema = R.Style.getSchema(shipsStyle);
-        mgl.provider.setQueries(protoSchema);
+        mgl.provider.setQueries(protoSchema, dataset);
         updateStyle(shipsStyle);
     }
 
@@ -219,5 +220,34 @@ map.on('load', _ => {
     $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateStyle());
 
-    barcelona();
+    const superRefresh = () => {
+
+        mgl.provider.setCartoURL($('#cartoURL').val());
+        mgl.provider.setUser($('#user').val());
+        mgl.provider.setApiKey($('#apikey').val());
+        dataset = $('#dataset').val();
+
+        localStorage.setItem('cartourl', $('#cartoURL').val());
+        localStorage.setItem('user', $('#user').val());
+        localStorage.setItem('apikey', $('#apikey').val());
+        localStorage.setItem('dataset', $('#dataset').val());
+
+        mgl.provider.setQueries(protoSchema, dataset);
+
+    };
+
+
+    $('#dataset').on('input', superRefresh);
+    $('#apikey').on('input', superRefresh);
+    $('#user').on('input', superRefresh);
+    $('#cartoURL').on('input', superRefresh);
+
+
+    if (localStorage.getItem("dataset")) {
+        $('#dataset').val(localStorage.getItem("dataset"));
+        $('#apikey').val(localStorage.getItem("apikey"));
+        $('#user').val(localStorage.getItem("user"));
+        $('#cartoURL').val(localStorage.getItem("cartoURL"));
+    }
+    //barcelona();
 });
