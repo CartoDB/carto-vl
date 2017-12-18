@@ -22,8 +22,7 @@ const layerUrl = function url(layergroup, layerIndex) {
             const urlTemplates = layergroup.cdn_url.templates.https;
             return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
         }
-        debugger;
-        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', '1');
+        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
     }
 }
 const layerSubdomains = function subdomains(layergroup) {

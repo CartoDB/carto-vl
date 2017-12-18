@@ -137,7 +137,6 @@ map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
 let protoSchema = null;
-let dataset = 'tx_0125_copy_copy';
 
 map.on('load', _ => {
     let index = styles.length - 1;
@@ -150,7 +149,7 @@ map.on('load', _ => {
             const p = R.Style.getSchema(v);
             if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
                 protoSchema = p;
-                mgl.provider.setQueries(protoSchema, dataset);
+                mgl.provider.setQueries(protoSchema, $('#dataset').val());
             }
             mgl.provider.schema.then(schema => {
                 try {
@@ -177,8 +176,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
         $('#tutorial').text(texts[index]);
 
-        protoSchema = R.Style.getSchema(styles[index]);
-        mgl.provider.setQueries(protoSchema, dataset);
+        $('#dataset').val('tx_0125_copy_copy');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(styles[index]);
     }
     function wwi() {
@@ -186,8 +189,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
         $('#tutorial').text('');
 
-        protoSchema = R.Style.getSchema(shipsStyle);
-        mgl.provider.setQueries(protoSchema, dataset);
+        $('#dataset').val('wwi');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(shipsStyle);
     }
 
@@ -225,15 +232,13 @@ map.on('load', _ => {
         mgl.provider.setCartoURL($('#cartoURL').val());
         mgl.provider.setUser($('#user').val());
         mgl.provider.setApiKey($('#apikey').val());
-        dataset = $('#dataset').val();
 
-        localStorage.setItem('cartourl', $('#cartoURL').val());
+        localStorage.setItem('cartoURL', $('#cartoURL').val());
         localStorage.setItem('user', $('#user').val());
         localStorage.setItem('apikey', $('#apikey').val());
         localStorage.setItem('dataset', $('#dataset').val());
-
-        mgl.provider.setQueries(protoSchema, dataset);
-
+        protoSchema = null;
+        updateStyle();
     };
 
 

@@ -41,7 +41,8 @@ function union(b) {
     if (!Array.isArray(b)) {
         b = [b];
     }
-    b.filter(x => x != null).map(
+    b = b.filter(x => x != null);
+    b.map(
         x => x.propertyList.map(
             p => {
                 p.aggFN.forEach(
@@ -50,6 +51,7 @@ function union(b) {
             }
         )
     );
+    newProto.aggRes = b.map(x => x.aggRes).reduce((x, y) => x || y, undefined);
     return newProto;
 }
 
@@ -103,7 +105,9 @@ function parseStyleNamedExprForSchema(node) {
         throw new Error('Invalid syntax');
     }
     if (name == 'resolution') {
-        //protoSchema.aggRes = node.right;
+        let p = new ProtoSchema();
+        p.aggRes = node.right.value;
+        return p;
     } else {
         return parseNodeForSchema(node.right);
     }
