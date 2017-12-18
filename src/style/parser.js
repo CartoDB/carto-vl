@@ -12,25 +12,67 @@ Object.keys(functions).filter(
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
 
+class ProtoSchema {
+    constructor(name, aggFN) {
+        this.properties = {};
+        this.propertyList = [];
+        if (name) {
+            this.addPropertyAccess(name, aggFN);
+        }
+    }
+    addPropertyAccess(name, aggFN) {
+        if (!this.properties[name]) {
+            this.properties[name] = {
+                name: name,
+                aggFN: new Set()
+            };
+            this.propertyList.push(this.properties[name]);
+        }
+        this.properties[name].aggFN.add(aggFN);
+    }
+    setAggFN(fn) {
+        this.propertyList.map(p => p.aggFN.delete('raw'));
+        this.propertyList.map(p => p.aggFN.add(fn));
+        return this;
+    }
+}
+function union(b) {
+    let newProto = new ProtoSchema();
+    if (!Array.isArray(b)) {
+        b = [b];
+    }
+    b.filter(x => x != null).map(
+        x => x.propertyList.map(
+            p => {
+                p.aggFN.forEach(
+                    fn => newProto.addPropertyAccess(p.name, fn)
+                );
+            }
+        )
+    );
+    return newProto;
+}
 
-function parseNodeForSchema(node) {
+//TODO SQL functions
+
+function parseNodeForSchema(node, proto) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNodeForSchema(arg));
         const name = node.callee.name.toLowerCase();
         if (aggFns.includes(name)) {
-            return flattenArray(args).map(c => { c.aggFN = name; return c; });
+            return args[0].setAggFN(name);
         } else if (lowerCaseFunctions[name]) {
-            return flattenArray(args);
+            return union(args);
         }
         throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
-        return [];
+        return null;
     } else if (node.type == 'ArrayExpression') {
-        return flattenArray(node.elements.map(e => parseNodeForSchema(e)));
+        return null;
     } else if (node.type == 'BinaryExpression') {
         const left = parseNodeForSchema(node.left);
         const right = parseNodeForSchema(node.right);
-        return left.concat(right);
+        return union([left, right]);
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
             case '-':
@@ -42,17 +84,17 @@ function parseNodeForSchema(node) {
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return [{ name: node.name.substring(1) }];
+            return new ProtoSchema(node.name.substring(1), 'raw');
         } else if (functions.schemas[node.name.toLowerCase()]) {
-            return [];
+            return null;
         } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-            return [];
+            return null;
         }
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
-function parseStyleNamedExprForSchema(node, protoSchema) {
+function parseStyleNamedExprForSchema(node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
@@ -61,9 +103,9 @@ function parseStyleNamedExprForSchema(node, protoSchema) {
         throw new Error('Invalid syntax');
     }
     if (name == 'resolution') {
-        protoSchema.aggRes = node.right;
+        //protoSchema.aggRes = node.right;
     } else {
-        protoSchema.properties = protoSchema.properties.concat(parseNodeForSchema(node.right));
+        return parseNodeForSchema(node.right);
     }
 }
 
@@ -71,44 +113,35 @@ function flattenArray(x) {
     return x.reduce((a, b) => a.concat(b), [])
 }
 
+const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
+
 export function protoSchemaIsEquals(a, b) {
-    console.log(a, b)
     if (!a || !b) {
         return false;
     }
-    if (a.properties.length != b.properties.length) {
+    if (a.propertyList.length != b.propertyList.length) {
         return false;
     }
-    const l = a.properties.map((_, index) =>
-        a.properties[index].name == b.properties[index].name && a.properties[index].aggFN == b.properties[index].aggFN
+    const l = a.propertyList.map((_, index) =>
+        a.propertyList[index].name == b.propertyList[index].name && isSetsEqual(a.propertyList[index].aggFN, b.propertyList[index].aggFN)
     );
     return l.every(x => x) && a.aggRes == b.aggRes;
-}
-
-function compactProtoSchema(proto) {
-    proto.properties = proto.properties.filter(x =>
-        x == proto.properties.find(y => y.name == x.name && y.aggFN == x.aggFN)
-    );
 }
 
 export function getSchema(str) {
     jsep.addBinaryOp(":", 1);
     jsep.addBinaryOp("^", 10);
     const ast = jsep(str);
-    let protoSchema = {
-        properties: []
-    };
-    console.log("AST", ast);
+    let protoSchema = null;
     if (ast.type == "Compound") {
-        ast.body.map(node => parseStyleNamedExprForSchema(node, protoSchema));
+        protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
     } else {
-        parseStyleNamedExprForSchema(node, protoSchema);
+        protoSchema = parseStyleNamedExprForSchema(node);
     }
     jsep.removeBinaryOp("^");
     jsep.removeBinaryOp(":");
-    compactProtoSchema(protoSchema);
 
-    console.log(protoSchema);
+    console.log("PROTOSCHEMA", protoSchema);
     return protoSchema;
 }
 
@@ -155,12 +188,13 @@ export function parseStyle(str, schema) {
 
 function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
         if (aggFns.includes(name)) {
-            //args[0].name = args[0].name + '_' + name;
+            //node.arguments[0].name += '_' + name;
+            const args = node.arguments.map(arg => parseNode(arg, schema));
             return args[0];
         }
+        const args = node.arguments.map(arg => parseNode(arg, schema));
         if (lowerCaseFunctions[name]) {
             return lowerCaseFunctions[name](...args, schema);
         }

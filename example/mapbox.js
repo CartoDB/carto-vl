@@ -85,9 +85,7 @@ const texts = [
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 const barcelonaQueries = [`(SELECT
-        the_geom_webmercator,
-        amount,
-       category
+        *
     FROM tx_0125_copy_copy) AS tmp`
     ,
     (x, y, z) => `select st_asmvt(geom, 'lid') FROM
@@ -141,7 +139,7 @@ var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 let protoSchema = null;
 
 map.on('load', _ => {
-    let index = 0;//styles.length - 1;
+    let index = styles.length - 1;
 
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;

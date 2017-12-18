@@ -60,24 +60,24 @@ export default class WindshaftSQL extends Provider {
             columns: {},
             dimensions: {}
         };
-        protoSchema.properties.map(p => {
+        protoSchema.propertyList.map(p => {
+            p.aggFN.forEach(fn => {
+                if (fn != 'raw') {
+                    agg.columns[p.name + '_' + fn] = {
+                        aggregate_function: fn,
+                        aggregated_column: p.name
+                    };
+                }
+            })
+        });
+        protoSchema.propertyList.map(p => {
             const name = p.name;
             const aggFN = p.aggFN;
-            if (aggFN) {
-                agg.columns[name] = {
-                    aggregate_function: aggFN,
-                    aggregated_column: name
-                };
+            if (aggFN.has('raw')) {
+                agg.dimensions[p.name] = p.name;
             }
         });
-        protoSchema.properties.map(p => {
-            const name = p.name;
-            const aggFN = p.aggFN;
-            if (!aggFN) {
-                agg.dimensions[name] = name;
-            }
-        });
-        const aggSQL = `SELECT ${protoSchema.properties.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM tx_0125_copy_copy`;
+        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM tx_0125_copy_copy`;
 
         console.log(aggSQL, agg);
 
@@ -125,7 +125,7 @@ FROM tx_0125_copy_copy`;
 
         //block data acquisition
         this.style = null;
-        this.schema = getSchema(`(${aggSQL}) AS tmp`).then(schema => {
+        this.schema = getSchema(`(${aggSQL}) AS tmp`, protoSchema).then(schema => {
             console.log(schema);
             this.style = new R.Style.Style(this.renderer, schema);
             return schema;
@@ -142,16 +142,9 @@ FROM tx_0125_copy_copy`;
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catName, catStr, schema) {
-        const index = schema[catName].categoryNames.indexOf(catStr);
-        return schema[catName].categoryIDs[index];
-        this.catMap[catName] = this.catMap[catName] || {};
-        let catMap = this.catMap[catName];
-        if (catMap[catStr]) {
-            return catMap[catStr];
-        }
-        catMap[catStr] = Object.keys(catMap).length + 1;
-        return catMap[catStr];
+    getCatID(catName, catStr, schema, pName) {
+        const index = schema.properties[pName].type.categoryNames.indexOf(catStr);
+        return schema.properties[pName].type.categoryIDs[index];
     }
     getDataframe(x, y, z, callback) {
         const id = `${x},${y},${z}`;
@@ -184,13 +177,32 @@ FROM tx_0125_copy_copy`;
                         var tile = new VectorTile(new Protobuf(oReq.response));
                         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
                         var fieldMap = {};
-                        Object.keys(schema).map((name, i) => {
-                            fieldMap[name] = i;
-                        });
+
+                        const numFields = [];
+                        const catFields = [];
+                        const catFieldsReal = [];
+                        const numFieldsReal = [];
+                        schema.propertyList.map(p =>
+                            p.aggFN.forEach(fn => {
+                                let name = p.name;
+                                if (fn != 'raw') {
+                                    name = p.name + '_' + fn;
+                                }
+                                if (p.type instanceof R.schema.Category) {
+                                    catFields.push(name);
+                                    catFieldsReal.push(p.name);
+                                } else {
+                                    numFields.push(name);
+                                    numFieldsReal.push(p.name);
+                                }
+                            })
+                        );
+                        catFieldsReal.map((name, i) => fieldMap[name] = i);
+                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
                         if (!mvtLayer) {
                             debugger;
                         }
-                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
                         var points = new Float32Array(mvtLayer.length * 2);
                         const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
@@ -198,12 +210,11 @@ FROM tx_0125_copy_copy`;
                             const geom = f.loadGeometry();
                             points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                             points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            Object.keys(schema).map((name, index) => {
-                                if (schema[name] instanceof R.schema.Category) {
-                                    properties[index][i] = this.getCatID(name, f.properties[name], schema);
-                                } else {
-                                    properties[index][i] = Number(f.properties[name]);
-                                }
+                            catFields.map((name, index) => {
+                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
+                            });
+                            numFields.map((name, index) => {
+                                properties[index + catFields.length][i] = Number(f.properties[name]);
                             });
                         }
                         var rs = rsys.getRsysFromTile(x, y, z);
@@ -297,7 +308,7 @@ async function getCategoryTypes(names, query) {
 }
 
 
-async function getSchema(query) {
+async function getSchema(query, proto) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type
@@ -311,13 +322,24 @@ async function getSchema(query) {
         const type = fields[name].type;
         if (type == 'number') {
             numerics.push(name);
+            //proto[name].type = 'number';
         } else if (type == 'string') {
             categories.push(name);
+            //proto[name].type = 'category';
         }
     })
 
     const numericsTypes = await getNumericTypes(numerics, query);
     const categoriesTypes = await getCategoryTypes(categories, query);
-    const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    return schema;
+
+    numerics.map((name, index) => {
+        const t = numericsTypes[index];
+        proto.properties[name].type = t;
+    });
+    categories.map((name, index) => {
+        const t = categoriesTypes[index];
+        proto.properties[name].type = t;
+    });
+    //const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
+    return proto;
 }

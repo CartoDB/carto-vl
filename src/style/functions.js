@@ -193,14 +193,14 @@ class Property extends Expression {
         if (typeof name !== 'string' || name == '') {
             throw new Error(`Invalid property name '${name}'`);
         }
-        if (!schema[name]) {
+        if (!schema.properties[name]) {
             throw new Error(`Property name not found`);
         }
         super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
         this.name = name;
         this.type = 'float';
         this.schema = schema;
-        this.schemaType = schema[name];
+        this.schemaType = schema.properties[name].type;
     }
 }
 
