@@ -2789,7 +2789,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     window.requestAnimationFrame(refresh.bind(this));
-
     return dataframe;
 };
 
@@ -2862,12 +2861,18 @@ function refresh(timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
+
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         gl.useProgram(shader.program);
+        for (let i = 0; i < 16; i++) {
+            gl.activeTexture(gl.TEXTURE0 + i);
+            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.uniform1i(shader.textureLocations[i], 0);
+        }
         var obj = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
@@ -7143,3 +7148,4 @@ start();
 
 /***/ })
 /******/ ]);
+//# sourceMappingURL=standalone.js.map
