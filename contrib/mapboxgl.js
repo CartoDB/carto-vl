@@ -25,6 +25,7 @@ class MGLIntegrator {
             map.on('movestart', this.move.bind(this));
             map.on('move', this.move.bind(this));
             map.on('moveend', this.move.bind(this));
+            this.move();
         });
     }
     move() {
