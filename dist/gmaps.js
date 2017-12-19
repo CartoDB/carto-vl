@@ -2071,7 +2071,7 @@ function getSchema(str) {
     if (ast.type == "Compound") {
         protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
     } else {
-        protoSchema = parseStyleNamedExprForSchema(node);
+        protoSchema = parseStyleNamedExprForSchema(ast);
     }
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
@@ -2113,9 +2113,8 @@ function parseStyle(str, schema) {
     if (ast.type == "Compound") {
         ast.body.map(node => parseStyleNamedExpr(style, node, schema));
     } else {
-        parseStyleNamedExpr(style, node, schema);
+        parseStyleNamedExpr(style, ast, schema);
     }
-    console.log(style);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
     return style;
@@ -3524,7 +3523,7 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5 );
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
