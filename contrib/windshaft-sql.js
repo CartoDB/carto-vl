@@ -210,7 +210,7 @@ export default class WindshaftSQL extends Provider {
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
-                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x<0 || geom[0][0].y <0) {
+                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x < 0 || geom[0][0].y < 0) {
                                 console.warn(geom[0][0]);
                             }
                             points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
@@ -266,6 +266,11 @@ export default class WindshaftSQL extends Provider {
                 if (completedTiles.length == needToComplete) {
                     oldtiles.forEach(t => t.setStyle(null));
                     completedTiles.map(t => t.setStyle(this.style));
+                    this.renderer.compute('sum',
+                        [R.Style.float(1)]
+                    ).then(
+                        result => $('#title').text('Demo dataset ~ ' + result + ' features')
+                        );
                     oldtiles = completedTiles;
                 }
             });
