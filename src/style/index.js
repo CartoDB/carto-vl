@@ -73,7 +73,7 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = functions.float(5);
+    this._width = functions.float(5 );
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
