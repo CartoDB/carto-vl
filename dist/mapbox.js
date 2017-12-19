@@ -69,6 +69,67 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
+/**
+ * @jsapi
+ * @constructor
+ * @description A schema is a list of properties with associated types.
+ *
+ * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
+ * @param {String[]} propertyNames
+ * @param {String[]} propertyTypes
+ */
+function Schema(propertyNames, propertyTypes) {
+    if (propertyNames.length != propertyTypes.length) {
+        throw new Error("propertyNames and propertyTypes lengths mismatch");
+    }
+    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
+}
+
+/**
+ * Assert that two schemas match.
+ *
+ * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
+ * @param {Schema} schemaA
+ * @param {Schema} schemaB
+ * @throws If the schemas don't match
+ */
+function checkSchemaMatch(schemaA, schemaB) {
+    if (schemaA != undefined && schemaB != undefined) {
+        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b, true);
+        if (!equals) {
+            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
+        }
+    }
+}
+
+
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
+    }
+}
+
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
@@ -132,7 +193,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
 
 
 
@@ -328,14 +389,14 @@ class Property extends Expression {
         if (typeof name !== 'string' || name == '') {
             throw new Error(`Invalid property name '${name}'`);
         }
-        if (!schema[name]) {
+        if (!schema.properties[name]) {
             throw new Error(`Property name not found`);
         }
         super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
         this.name = name;
         this.type = 'float';
         this.schema = schema;
-        this.schemaType = schema[name];
+        this.schemaType = schema.properties[name].type;
     }
 }
 
@@ -846,28 +907,16 @@ class RGBA extends Expression {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
         color = color.filter(x => true);
-        if (color.length != 4 || !color.every(Number.isFinite)) {
+        color = color.map(x => Number.isFinite(x) ? float(x) : x);
+        if (color.length != 4) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
-        super({});
+        r = color[0];
+        g = color[1];
+        b = color[2];
+        a = color[3];
+        super({ r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
         this.type = 'color';
-        this.color = color;
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform vec4 color${this._uniformID};\n`,
-            inline: `color${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
-    }
-    _preDraw(l, gl) {
-        gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
-    }
-    isAnimated() {
-        return false;
     }
 }
 
@@ -1067,66 +1116,6 @@ const now = (...args) => new Now(...args);
 const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
-
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
-/**
- * @jsapi
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error("propertyNames and propertyTypes lengths mismatch");
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
-
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
-        }
-    }
-}
-
-
-class Float {
-    constructor(globalMin, globalMax) {
-        this.globalMin = globalMin;
-        this.globalMax = globalMax;
-    }
-}
-class Category {
-    constructor(categoryNames, categoryCounts, categoryIDs) {
-        this.categoryNames = categoryNames;
-        this.categoryCounts = categoryCounts;
-        this.categoryIDs = categoryIDs;
-    }
-}
 
 
 
@@ -1932,26 +1921,164 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
+/* harmony export (immutable) */ __webpack_exports__["d"] = protoSchemaIsEquals;
+/* harmony export (immutable) */ __webpack_exports__["a"] = getSchema;
+/* harmony export (immutable) */ __webpack_exports__["c"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyle;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
 
 
 
 
-//TODO document style expressions
-//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
-/*
-  Returns a valid style expression or throws an exception upon invalid inputs.
-*/
+
+const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
+
 var lowerCaseFunctions = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
     name => name[0] == name[0].toLowerCase()
 ).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
 });
+
+class ProtoSchema {
+    constructor(name, aggFN) {
+        this.properties = {};
+        this.propertyList = [];
+        if (name) {
+            this.addPropertyAccess(name, aggFN);
+        }
+    }
+    addPropertyAccess(name, aggFN) {
+        if (!this.properties[name]) {
+            this.properties[name] = {
+                name: name,
+                aggFN: new Set()
+            };
+            this.propertyList.push(this.properties[name]);
+        }
+        this.properties[name].aggFN.add(aggFN);
+    }
+    setAggFN(fn) {
+        this.propertyList.map(p => p.aggFN.delete('raw'));
+        this.propertyList.map(p => p.aggFN.add(fn));
+        return this;
+    }
+}
+function union(b) {
+    let newProto = new ProtoSchema();
+    if (!Array.isArray(b)) {
+        b = [b];
+    }
+    b = b.filter(x => x != null);
+    b.map(
+        x => x.propertyList.map(
+            p => {
+                p.aggFN.forEach(
+                    fn => newProto.addPropertyAccess(p.name, fn)
+                );
+            }
+        )
+    );
+    newProto.aggRes = b.map(x => x.aggRes).reduce((x, y) => x || y, undefined);
+    return newProto;
+}
+
+//TODO SQL functions
+
+function parseNodeForSchema(node, proto) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNodeForSchema(arg));
+        const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            return args[0].setAggFN(name);
+        } else if (lowerCaseFunctions[name]) {
+            return union(args);
+        }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
+    } else if (node.type == 'Literal') {
+        return null;
+    } else if (node.type == 'ArrayExpression') {
+        return null;
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNodeForSchema(node.left);
+        const right = parseNodeForSchema(node.right);
+        return union([left, right]);
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return parseNodeForSchema(node.argument);
+            case '+':
+                return parseNodeForSchema(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'Identifier') {
+        if (node.name[0] == '$') {
+            return new ProtoSchema(node.name.substring(1), 'raw');
+        } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]) {
+            return null;
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return null;
+        }
+    }
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function parseStyleNamedExprForSchema(node) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
+    if (name == 'resolution') {
+        let p = new ProtoSchema();
+        p.aggRes = node.right.value;
+        return p;
+    } else {
+        return parseNodeForSchema(node.right);
+    }
+}
+
+function flattenArray(x) {
+    return x.reduce((a, b) => a.concat(b), [])
+}
+
+const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
+
+function protoSchemaIsEquals(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.propertyList.length != b.propertyList.length) {
+        return false;
+    }
+    const l = a.propertyList.map((_, index) =>
+        a.propertyList[index].name == b.propertyList[index].name && isSetsEqual(a.propertyList[index].aggFN, b.propertyList[index].aggFN)
+    );
+    return l.every(x => x) && a.aggRes == b.aggRes;
+}
+
+function getSchema(str) {
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(":", 1);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    let protoSchema = null;
+    if (ast.type == "Compound") {
+        protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
+    } else {
+        protoSchema = parseStyleNamedExprForSchema(node);
+    }
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
+
+    console.log("PROTOSCHEMA", protoSchema);
+    return protoSchema;
+}
 
 /**
  * @jsapi
@@ -1971,6 +2098,9 @@ function parseStyleNamedExpr(style, node, schema) {
         throw new Error('Invalid syntax');
     }
     const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
     const value = parseNode(node.right, schema);
     style[name] = value;
 }
@@ -1993,8 +2123,13 @@ function parseStyle(str, schema) {
 
 function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            //node.arguments[0].name += '_' + name;
+            const args = node.arguments.map(arg => parseNode(arg, schema));
+            return args[0];
+        }
+        const args = node.arguments.map(arg => parseNode(arg, schema));
         if (lowerCaseFunctions[name]) {
             return lowerCaseFunctions[name](...args, schema);
         }
@@ -2363,10 +2498,10 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Dataframe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(1);
 
 
 
@@ -2417,6 +2552,8 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
+    this.fbPool = [];
+    this.computePool = [];
     if (!this.gl) { //TODO remove hack: remove global context
         this.gl = canvas.getContext('webgl');
         const gl = this.gl;
@@ -2661,6 +2798,34 @@ Renderer.prototype.getAspect = function () {
     return this.canvas.clientWidth / this.canvas.clientHeight;
 };
 
+class ComputeJob {
+    constructor(type, expressions, resolve) {
+        this.type = type;
+        this.expressions = expressions;
+        this.resolve = resolve;
+        this.status = 'pending';
+    }
+    work(renderer) {
+        let sum = 0;
+        renderer.tiles.filter(t => t.style).map(t => {
+            /*for (let i=0; i<t.properties['temp'].length; i++){
+                sum+=t.properties['temp'][i];
+            }*/
+            sum += t.numVertex;
+        });
+        let a = [sum, 0, 0, 0];
+        this.resolve(a);
+        this.status = 'dispatched';
+        return;
+        if (this.status == 'pending') {
+            this.status = 'sent';
+            this.readback = renderer._compute(this.type, this.expressions);
+        } else if (this.status == 'sent') {
+            this.status = 'dispatched';
+            this.resolve(this.readback());
+        }
+    }
+}
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -2674,6 +2839,7 @@ function refresh(timestamp) {
     if (this.lastFrame == timestamp) {
         return;
     }
+
     this.lastFrame = timestamp;
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
@@ -2778,7 +2944,11 @@ function refresh(timestamp) {
         gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
     });
 
-    //this._getMin(null, this.computePool[0]);
+    this.computePool.map(job => job.work(this));
+    this.computePool = this.computePool.filter(j => j.status != 'dispatched');
+    if (this.computePool.length > 0) {
+        window.requestAnimationFrame(refresh.bind(this));
+    }
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -2795,10 +2965,12 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
 }
 
-Renderer.prototype.getMin = function (expression, callback) {
-    //Send work and callback to RAF
-    //Request RAF
-    this.computePool = [callback];
+Renderer.prototype.compute = function (type, expressions) {
+    window.requestAnimationFrame(refresh.bind(this));
+    const promise = new Promise((resolve, reject) => {
+        this.computePool.push(new ComputeJob(type, expressions, resolve));
+    });
+    return promise;
 }
 
 function getFBstatus(gl) {
@@ -2827,12 +2999,15 @@ function getFBstatus(gl) {
 
 
 
-Renderer.prototype._getMin = function (expression, callback) {
-    return;
+Renderer.prototype._compute = function (type, expressions) {
     const gl = this.gl;
     //Render to 1x1 FB
-    if (!this.aux1x1FB) {
+
+    let fb = this.fbPool.pop();
+    if (!fb) {
+        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
+        fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
@@ -2853,15 +3028,26 @@ Renderer.prototype._getMin = function (expression, callback) {
             return;
         }
     }
+    this.aux1x1FB = fb;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
 
     gl.viewport(0, 0, 1, 1);
-    //glclear to MAX_FP VALUE
-    gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+    if (type == 'sum') {
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.clearColor(0, 0, 0, 0);
+    } else if (type == 'min') {
+        gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+        gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
+    } else {
+        throw new Error("Invalid compute type");
+    }
+
+
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
@@ -2871,9 +3057,12 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     //Compile expression, use expression
     //const expr = new functions.HSV(1., 0, 0.12);
-    const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["property"]('amount', {
+    let rgba = [0, 0, 0, 0].map(() => __WEBPACK_IMPORTED_MODULE_3__style_functions__["float"](0));
+    expressions.map((e, i) => rgba[i] = e);
+    const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["rgba"](...rgba);
+    /*functions.property('amount', {
         'amount': 'float'
-    });
+    });*/
     const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](gl, expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
     //console.log('computer', shader)
@@ -2883,7 +3072,8 @@ Renderer.prototype._getMin = function (expression, callback) {
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
-    this.tiles.forEach(tile => {
+    const tiles = this.tiles.filter(tile => tile.style);
+    tiles.forEach(tile => {
         var obj = {
             freeTexUnit: 4
         }
@@ -2919,13 +3109,18 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     });
 
+    gl.blendEquation(gl.FUNC_ADD);
 
     //Readback!
-    var pixels = new Float32Array(4);
-    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
-    callback(pixels);
+    let pixels = new Float32Array(4);
 
-    gl.blendEquation(gl.FUNC_ADD);
+    const readback = () => {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+        this.fbPool.push(fb);
+        return Array.from(pixels);
+    }
+    return readback;
 }
 
 /***/ }),
@@ -3190,7 +3385,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
@@ -3254,8 +3449,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
 
 
 
@@ -3264,6 +3461,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+let cache = {};
 
 function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
@@ -3275,7 +3474,15 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
         tid[name] = Object.keys(tid).length;
         return tid[name];
     });
-    const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    let shader = null;
+    if (cache[JSON.stringify(colorModifier)]) {
+        shader = cache[JSON.stringify(colorModifier)];
+        console.log("HIT", shader)
+    } else {
+        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+        console.log("COMPILE", cache)
+        cache[JSON.stringify(colorModifier)] = shader;
+    }
     styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
@@ -6948,7 +7155,9 @@ process.umask = function() { return 0; };
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(7);
+
 
 
 
@@ -6981,7 +7190,7 @@ color: ramp($category, Prism)`,
 color: ramp(top($category, 4), Prism)`,
 
     `width: 3
-color: setOpacity( ramp($category, Prism), $amount/max($amount))`,
+color: setOpacity( ramp($category, Prism), $amount/50000)`,
 
     `width: 3
 color: ramp($category, Prism)`,
@@ -6995,7 +7204,12 @@ color: ramp($category, Prism)`,
     `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)
 strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`
+strokeWidth:      2*zoom()/50000`,
+
+    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp(MODE($category), Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`,
 ];
 
 const texts = [
@@ -7023,15 +7237,14 @@ const texts = [
 
     `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
 
-    `And, finally, let's put a nice stroke`
+    `And, finally, let's put a nice stroke`,
+    `bla bla bla`,
 ];
 
-const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 const barcelonaQueries = [`(SELECT
-        the_geom_webmercator,
-        amount,
-       category
+        *
     FROM tx_0125_copy_copy) AS tmp`
     ,
     (x, y, z) => `select st_asmvt(geom, 'lid') FROM
@@ -7077,30 +7290,44 @@ var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
+    zoom: 10, // starting zoom,
 });
 map.repaint = false;
-var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map);
+var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
 
+let protoSchema = null;
 
 map.on('load', _ => {
-    let index = 0;
+    let index = styles.length - 1;
 
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
-        mgl.provider.schema.then(schema => {
-            try {
-                const s = __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].parseStyle(v, schema);
-                mgl.provider.style.set(s, 1000);
-                document.getElementById("feedback").style.display = 'none';
-            } catch (error) {
-                const err = `Invalid width expression: ${error}:${error.stack}`;
-                console.warn(err);
-                document.getElementById("feedback").value = err;
-                document.getElementById("feedback").style.display = 'block';
+
+        try {
+            const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
+            if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
+                protoSchema = p;
+                mgl.provider.setQueries(protoSchema, $('#dataset').val());
             }
-        });
+            mgl.provider.schema.then(schema => {
+                try {
+                    const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v, schema);
+                    mgl.provider.style.set(s, 1000);
+                    document.getElementById("feedback").style.display = 'none';
+                } catch (error) {
+                    const err = `Invalid width expression: ${error}:${error.stack}`;
+                    console.warn(err);
+                    document.getElementById("feedback").value = err;
+                    document.getElementById("feedback").style.display = 'block';
+                }
+            });
+        } catch (error) {
+            const err = `Invalid width expression: ${error}:${error.stack}`;
+            console.warn(err);
+            document.getElementById("feedback").value = err;
+            document.getElementById("feedback").style.display = 'block';
+        }
     }
 
     function barcelona() {
@@ -7108,7 +7335,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
         $('#tutorial').text(texts[index]);
 
-        mgl.provider.setQueries(...barcelonaQueries);
+        $('#dataset').val('tx_0125_copy_copy');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(styles[index]);
     }
     function wwi() {
@@ -7116,7 +7348,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
         $('#tutorial').text('');
 
-        mgl.provider.setQueries(...ships_WWIQueries);
+        $('#dataset').val('wwi');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(shipsStyle);
     }
 
@@ -7149,7 +7386,34 @@ map.on('load', _ => {
     $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateStyle());
 
-    wwi();
+    const superRefresh = () => {
+
+        mgl.provider.setCartoURL($('#cartoURL').val());
+        mgl.provider.setUser($('#user').val());
+        mgl.provider.setApiKey($('#apikey').val());
+
+        localStorage.setItem('cartoURL', $('#cartoURL').val());
+        localStorage.setItem('user', $('#user').val());
+        localStorage.setItem('apikey', $('#apikey').val());
+        localStorage.setItem('dataset', $('#dataset').val());
+        protoSchema = null;
+        updateStyle();
+    };
+
+
+    $('#dataset').on('input', superRefresh);
+    $('#apikey').on('input', superRefresh);
+    $('#user').on('input', superRefresh);
+    $('#cartoURL').on('input', superRefresh);
+
+
+    if (localStorage.getItem("dataset")) {
+        $('#dataset').val(localStorage.getItem("dataset"));
+        $('#apikey').val(localStorage.getItem("apikey"));
+        $('#user').val(localStorage.getItem("user"));
+        $('#cartoURL').val(localStorage.getItem("cartoURL"));
+    }
+    //barcelona();
 });
 
 
@@ -7159,9 +7423,7 @@ map.on('load', _ => {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
 
 
 
@@ -7171,7 +7433,7 @@ const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth'
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
 class MGLIntegrator {
-    constructor(map) {
+    constructor(map, providerClass) {
         this.map = map;
         map.on('load', _ => {
             var cont = map.getCanvasContainer();
@@ -7182,8 +7444,8 @@ class MGLIntegrator {
             canvas.style.width = map.getCanvas().style.width;
             canvas.style.height = map.getCanvas().style.height;
 
-            this.renderer = new __WEBPACK_IMPORTED_MODULE_1__src_index__["b" /* Renderer */](canvas);
-            this.provider = new __WEBPACK_IMPORTED_MODULE_0__contrib_sql_api__["a" /* SQL_API */](this.renderer, this.style);
+            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */](canvas);
+            this.provider = new providerClass(this.renderer, this.style);
 
             map.on('resize', this.resize.bind(this));
             map.on('movestart', this.move.bind(this));
@@ -7202,6 +7464,22 @@ class MGLIntegrator {
         c = this.renderer.getCenter();
         var z = this.renderer.getZoom();
         this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.renderer.compute('sum',
+            [__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].float(1)]
+        ).then(
+            result => console.log("SUM", result)
+            );
+        /*
+        this.provider.schema.then(schema =>
+            this.renderer.compute('min',
+                [R.Style.float(1), R.Style.property('temp', schema), R.Style.floatMul(R.Style.property('temp', schema), R.Style.float(-1))]
+            ).then(
+                result => {
+                    result[2] *= -1;
+                    console.log("MIN", result)
+                }
+                )
+        );*/
     }
 
     resize() {
@@ -7239,8 +7517,6 @@ function Wmxy(latLng) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SQL_API; });
-/* unused harmony export init */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
 
@@ -7251,13 +7527,36 @@ var Protobuf = __webpack_require__(20);
 var LRU = __webpack_require__(28);
 
 
-
 var style;
 var oldtiles = [];
 
+let user = 'dmanzanares-ded13';
+let cartoURL = 'carto-staging.com';
+let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
+
+const endpoint = (username) => {
+    return `http://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
+}
+const layerUrl = function url(layergroup, layerIndex) {
+    return (x, y, z) => {
+        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+            const urlTemplates = layergroup.cdn_url.templates.https;
+            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+        }
+        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+    }
+}
+const layerSubdomains = function subdomains(layergroup) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return urlTemplates.subdomains;
+    }
+    return [];
+}
+
 class Provider { }
 
-class SQL_API extends Provider {
+class WindshaftSQL extends Provider {
     constructor(renderer) {
         super();
         this.renderer = renderer;
@@ -7277,11 +7576,82 @@ class SQL_API extends Provider {
         };
         this.cache = LRU(options);
     }
-    setQueries(query, renderQueryMaker) {
+    setUser(u) {
+        user = u;
+    }
+    setCartoURL(u) {
+        cartoURL = u;
+    }
+    setDataset(d) {
+        dataset = d;
+    }
+    setApiKey(k) {
+        apiKey = k;
+    }
+    setQueries(protoSchema, dataset) {
+
+        let agg = {
+            threshold: 1,
+            resolution: protoSchema.aggRes,
+            columns: {},
+            dimensions: {}
+        };
+        protoSchema.propertyList.map(p => {
+            p.aggFN.forEach(fn => {
+                if (fn != 'raw') {
+                    agg.columns[p.name + '_' + fn] = {
+                        aggregate_function: fn,
+                        aggregated_column: p.name
+                    };
+                }
+            })
+        });
+        protoSchema.propertyList.map(p => {
+            const name = p.name;
+            const aggFN = p.aggFN;
+            if (aggFN.has('raw')) {
+                agg.dimensions[p.name] = p.name;
+            }
+        });
+        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
+
+        console.log(aggSQL, agg);
+
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+
+        const promise = async () => {
+            const response = await fetch(endpoint(user), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mapConfigAgg)
+            });
+            const layergroup = await response.json();
+            console.log(layergroup);
+            return layerUrl(layergroup, 0);
+        };
+
+        this.url = promise();
+
         //block data acquisition
         this.style = null;
-        this.renderQueryMaker = renderQueryMaker;
-        this.schema = getSchema(query).then(schema => {
+        this.schema = getSchema(`(${aggSQL}) AS tmp`, protoSchema).then(schema => {
+            console.log(schema);
             this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
             return schema;
         });
@@ -7297,16 +7667,9 @@ class SQL_API extends Provider {
     async getSchema() {
         return await this.schema;
     }
-    getCatID(catName, catStr, schema) {
-        const index = schema[catName].categoryNames.indexOf(catStr);
-        return schema[catName].categoryIDs[index];
-        this.catMap[catName] = this.catMap[catName] || {};
-        let catMap = this.catMap[catName];
-        if (catMap[catStr]) {
-            return catMap[catStr];
-        }
-        catMap[catStr] = Object.keys(catMap).length + 1;
-        return catMap[catStr];
+    getCatID(catName, catStr, schema, pName) {
+        const index = schema.properties[pName].type.categoryNames.indexOf(catStr);
+        return schema.properties[pName].type.categoryIDs[index];
     }
     getDataframe(x, y, z, callback) {
         const id = `${x},${y},${z}`;
@@ -7321,59 +7684,84 @@ class SQL_API extends Provider {
     }
     requestDataframe(x, y, z) {
         return new Promise((callback, reject) => {
-            const mvt_extent = 1024;
-            const query = this.renderQueryMaker(x, y, z);
+            const mvt_extent = 4096;
 
-            //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
-            var oReq = new XMLHttpRequest();
-            oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
-            oReq.onload = (oEvent) => {
-                this.schema.then(schema => {
-                    const json = JSON.parse(oReq.response);
-                    if (json.rows[0].st_asmvt.data.length == 0) {
-                        callback({ empty: true });
-                        return;
-                    }
-                    var tile = new VectorTile(new Protobuf(new Uint8Array(json.rows[0].st_asmvt.data)));
-                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                    var fieldMap = {};
-                    Object.keys(schema).map((name, i) => {
-                        fieldMap[name] = i;
-                    });
-                    var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                    var points = new Float32Array(mvtLayer.length * 2);
-                    const r = Math.random();
-                    for (var i = 0; i < mvtLayer.length; i++) {
-                        const f = mvtLayer.feature(i);
-                        const geom = f.loadGeometry();
-                        points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                        points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                        Object.keys(schema).map((name, index) => {
-                            if (schema[name] instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
-                                properties[index][i] = this.getCatID(name, f.properties[name], schema);
-                            } else {
-                                properties[index][i] = f.properties[name];
+            this.url.then(url => {
+                var oReq = new XMLHttpRequest();
+                oReq.responseType = "arraybuffer";
+                //console.log(url(x, y, z));
+                oReq.open("GET", url(x, y, z), true);
+                oReq.onload = (oEvent) => {
+                    this.schema.then(schema => {
+                        if (oReq.response.byteLength == 0 || oReq.response == 'null') {
+                            callback({ empty: true });
+                            return;
+                        }
+                        var tile = new VectorTile(new Protobuf(oReq.response));
+                        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                        var fieldMap = {};
+
+                        const numFields = [];
+                        const catFields = [];
+                        const catFieldsReal = [];
+                        const numFieldsReal = [];
+                        schema.propertyList.map(p =>
+                            p.aggFN.forEach(fn => {
+                                let name = p.name;
+                                if (fn != 'raw') {
+                                    name = p.name + '_' + fn;
+                                }
+                                if (p.type instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
+                                    catFields.push(name);
+                                    catFieldsReal.push(p.name);
+                                } else {
+                                    numFields.push(name);
+                                    numFieldsReal.push(p.name);
+                                }
+                            })
+                        );
+                        catFieldsReal.map((name, i) => fieldMap[name] = i);
+                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+                        if (!mvtLayer) {
+                            debugger;
+                        }
+                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+                        var points = new Float32Array(mvtLayer.length * 2);
+                        const r = Math.random();
+                        for (var i = 0; i < mvtLayer.length; i++) {
+                            const f = mvtLayer.feature(i);
+                            const geom = f.loadGeometry();
+                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x<0 || geom[0][0].y <0) {
+                                console.warn(geom[0][0]);
                             }
+                            points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                            points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                            catFields.map((name, index) => {
+                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
+                            });
+                            numFields.map((name, index) => {
+                                properties[index + catFields.length][i] = Number(f.properties[name]);
+                            });
+                        }
+                        var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
+                        let dataframeProperties = {};
+                        Object.keys(fieldMap).map((name, pid) => {
+                            dataframeProperties[name] = properties[pid];
                         });
-                    }
-                    var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
-                    let dataframeProperties = {};
-                    Object.keys(fieldMap).map((name, pid) => {
-                        dataframeProperties[name] = properties[pid];
+                        var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
+                            rs.center,
+                            rs.scale,
+                            points,
+                            dataframeProperties,
+                        );
+                        dataframe.schema = schema;
+                        dataframe.size = mvtLayer.length;
+                        this.renderer.addDataframe(dataframe).setStyle(this.style)
+                        callback(dataframe);
                     });
-                    var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
-                        rs.center,
-                        rs.scale,
-                        points,
-                        dataframeProperties,
-                    );
-                    dataframe.schema = schema;
-                    dataframe.size = mvtLayer.length;
-                    this.renderer.addDataframe(dataframe).setStyle(this.style)
-                    callback(dataframe);
-                });
-            }
-            oReq.send(null);
+                }
+                oReq.send(null);
+            });
         });
     }
     getData() {
@@ -7405,10 +7793,12 @@ class SQL_API extends Provider {
         });
     }
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = WindshaftSQL;
+
 
 async function getColumnTypes(query) {
     const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(columnListQuery));
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     return json.fields;
 }
@@ -7419,7 +7809,7 @@ async function getNumericTypes(names, query) {
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
-    const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(numericsQuery));
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
     console.log(numericsQuery, json);
     // TODO avg, sum, count
@@ -7431,7 +7821,7 @@ async function getNumericTypes(names, query) {
 async function getCategoryTypes(names, query) {
     return Promise.all(names.map(async name => {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
-        const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(catQuery));
+        const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
         const json = await response.json();
         let counts = [];
         let names = [];
@@ -7446,7 +7836,7 @@ async function getCategoryTypes(names, query) {
 }
 
 
-async function getSchema(query) {
+async function getSchema(query, proto) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type
@@ -7460,16 +7850,28 @@ async function getSchema(query) {
         const type = fields[name].type;
         if (type == 'number') {
             numerics.push(name);
+            //proto[name].type = 'number';
         } else if (type == 'string') {
             categories.push(name);
+            //proto[name].type = 'category';
         }
     })
 
     const numericsTypes = await getNumericTypes(numerics, query);
     const categoriesTypes = await getCategoryTypes(categories, query);
-    const schema = new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    return schema;
+
+    numerics.map((name, index) => {
+        const t = numericsTypes[index];
+        proto.properties[name].type = t;
+    });
+    categories.map((name, index) => {
+        const t = categoriesTypes[index];
+        proto.properties[name].type = t;
+    });
+    //const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
+    return proto;
 }
+
 
 /***/ }),
 /* 27 */
@@ -7588,11 +7990,12 @@ function wRectangleTiles(z, wr) {
     const [w_minx, w_miny, w_maxx, w_maxy] = wr;
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
 
+    const clamp = x => Math.min(Math.max(x, 0), n - 1);
     // compute tile coordinate ranges
-    const t_minx = Math.floor(n * (w_minx + 1) * 0.5);
-    const t_maxx = Math.ceil(n * (w_maxx + 1) * 0.5) - 1;
-    const t_miny = Math.floor(n * (1 - w_maxy) * 0.5);
-    const t_maxy = Math.ceil(n * (1 - w_miny) * 0.5) - 1;
+    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
+    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
+    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
+    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
     let tiles = [];
     for (let x = t_minx; x <= t_maxx; ++x) {
         for (let y = t_miny; y <= t_maxy; ++y) {

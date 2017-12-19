@@ -69,6 +69,67 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
+/**
+ * @jsapi
+ * @constructor
+ * @description A schema is a list of properties with associated types.
+ *
+ * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
+ * @param {String[]} propertyNames
+ * @param {String[]} propertyTypes
+ */
+function Schema(propertyNames, propertyTypes) {
+    if (propertyNames.length != propertyTypes.length) {
+        throw new Error("propertyNames and propertyTypes lengths mismatch");
+    }
+    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
+}
+
+/**
+ * Assert that two schemas match.
+ *
+ * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
+ * @param {Schema} schemaA
+ * @param {Schema} schemaB
+ * @throws If the schemas don't match
+ */
+function checkSchemaMatch(schemaA, schemaB) {
+    if (schemaA != undefined && schemaB != undefined) {
+        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b, true);
+        if (!equals) {
+            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
+        }
+    }
+}
+
+
+
+class Float {
+    constructor(globalMin, globalMax) {
+        this.globalMin = globalMin;
+        this.globalMax = globalMax;
+    }
+}
+class Category {
+    constructor(categoryNames, categoryCounts, categoryIDs) {
+        this.categoryNames = categoryNames;
+        this.categoryCounts = categoryCounts;
+        this.categoryIDs = categoryIDs;
+    }
+}
+
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return schemas; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
@@ -132,7 +193,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
 
 
 
@@ -328,14 +389,14 @@ class Property extends Expression {
         if (typeof name !== 'string' || name == '') {
             throw new Error(`Invalid property name '${name}'`);
         }
-        if (!schema[name]) {
+        if (!schema.properties[name]) {
             throw new Error(`Property name not found`);
         }
         super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
         this.name = name;
         this.type = 'float';
         this.schema = schema;
-        this.schemaType = schema[name];
+        this.schemaType = schema.properties[name].type;
     }
 }
 
@@ -846,28 +907,16 @@ class RGBA extends Expression {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
         color = color.filter(x => true);
-        if (color.length != 4 || !color.every(Number.isFinite)) {
+        color = color.map(x => Number.isFinite(x) ? float(x) : x);
+        if (color.length != 4) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
-        super({});
+        r = color[0];
+        g = color[1];
+        b = color[2];
+        a = color[3];
+        super({ r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
         this.type = 'color';
-        this.color = color;
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform vec4 color${this._uniformID};\n`,
-            inline: `color${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
-    }
-    _preDraw(l, gl) {
-        gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
-    }
-    isAnimated() {
-        return false;
     }
 }
 
@@ -1067,66 +1116,6 @@ const now = (...args) => new Now(...args);
 const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
-
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
-/**
- * @jsapi
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error("propertyNames and propertyTypes lengths mismatch");
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
-
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
-        }
-    }
-}
-
-
-class Float {
-    constructor(globalMin, globalMax) {
-        this.globalMin = globalMin;
-        this.globalMax = globalMax;
-    }
-}
-class Category {
-    constructor(categoryNames, categoryCounts, categoryIDs) {
-        this.categoryNames = categoryNames;
-        this.categoryCounts = categoryCounts;
-        this.categoryIDs = categoryIDs;
-    }
-}
 
 
 
@@ -1932,26 +1921,164 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
+/* harmony export (immutable) */ __webpack_exports__["d"] = protoSchemaIsEquals;
+/* harmony export (immutable) */ __webpack_exports__["a"] = getSchema;
+/* harmony export (immutable) */ __webpack_exports__["c"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyle;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
 
 
 
 
-//TODO document style expressions
-//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
-/*
-  Returns a valid style expression or throws an exception upon invalid inputs.
-*/
+
+const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
+
 var lowerCaseFunctions = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
     name => name[0] == name[0].toLowerCase()
 ).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
 });
+
+class ProtoSchema {
+    constructor(name, aggFN) {
+        this.properties = {};
+        this.propertyList = [];
+        if (name) {
+            this.addPropertyAccess(name, aggFN);
+        }
+    }
+    addPropertyAccess(name, aggFN) {
+        if (!this.properties[name]) {
+            this.properties[name] = {
+                name: name,
+                aggFN: new Set()
+            };
+            this.propertyList.push(this.properties[name]);
+        }
+        this.properties[name].aggFN.add(aggFN);
+    }
+    setAggFN(fn) {
+        this.propertyList.map(p => p.aggFN.delete('raw'));
+        this.propertyList.map(p => p.aggFN.add(fn));
+        return this;
+    }
+}
+function union(b) {
+    let newProto = new ProtoSchema();
+    if (!Array.isArray(b)) {
+        b = [b];
+    }
+    b = b.filter(x => x != null);
+    b.map(
+        x => x.propertyList.map(
+            p => {
+                p.aggFN.forEach(
+                    fn => newProto.addPropertyAccess(p.name, fn)
+                );
+            }
+        )
+    );
+    newProto.aggRes = b.map(x => x.aggRes).reduce((x, y) => x || y, undefined);
+    return newProto;
+}
+
+//TODO SQL functions
+
+function parseNodeForSchema(node, proto) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNodeForSchema(arg));
+        const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            return args[0].setAggFN(name);
+        } else if (lowerCaseFunctions[name]) {
+            return union(args);
+        }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
+    } else if (node.type == 'Literal') {
+        return null;
+    } else if (node.type == 'ArrayExpression') {
+        return null;
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNodeForSchema(node.left);
+        const right = parseNodeForSchema(node.right);
+        return union([left, right]);
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return parseNodeForSchema(node.argument);
+            case '+':
+                return parseNodeForSchema(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'Identifier') {
+        if (node.name[0] == '$') {
+            return new ProtoSchema(node.name.substring(1), 'raw');
+        } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["schemas"][node.name.toLowerCase()]) {
+            return null;
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return null;
+        }
+    }
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function parseStyleNamedExprForSchema(node) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
+    if (name == 'resolution') {
+        let p = new ProtoSchema();
+        p.aggRes = node.right.value;
+        return p;
+    } else {
+        return parseNodeForSchema(node.right);
+    }
+}
+
+function flattenArray(x) {
+    return x.reduce((a, b) => a.concat(b), [])
+}
+
+const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
+
+function protoSchemaIsEquals(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.propertyList.length != b.propertyList.length) {
+        return false;
+    }
+    const l = a.propertyList.map((_, index) =>
+        a.propertyList[index].name == b.propertyList[index].name && isSetsEqual(a.propertyList[index].aggFN, b.propertyList[index].aggFN)
+    );
+    return l.every(x => x) && a.aggRes == b.aggRes;
+}
+
+function getSchema(str) {
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(":", 1);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp("^", 10);
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    let protoSchema = null;
+    if (ast.type == "Compound") {
+        protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
+    } else {
+        protoSchema = parseStyleNamedExprForSchema(node);
+    }
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
+
+    console.log("PROTOSCHEMA", protoSchema);
+    return protoSchema;
+}
 
 /**
  * @jsapi
@@ -1971,6 +2098,9 @@ function parseStyleNamedExpr(style, node, schema) {
         throw new Error('Invalid syntax');
     }
     const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
     const value = parseNode(node.right, schema);
     style[name] = value;
 }
@@ -1993,8 +2123,13 @@ function parseStyle(str, schema) {
 
 function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            //node.arguments[0].name += '_' + name;
+            const args = node.arguments.map(arg => parseNode(arg, schema));
+            return args[0];
+        }
+        const args = node.arguments.map(arg => parseNode(arg, schema));
         if (lowerCaseFunctions[name]) {
             return lowerCaseFunctions[name](...args, schema);
         }
@@ -2363,10 +2498,10 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Dataframe; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(1);
 
 
 
@@ -2417,6 +2552,8 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
+    this.fbPool = [];
+    this.computePool = [];
     if (!this.gl) { //TODO remove hack: remove global context
         this.gl = canvas.getContext('webgl');
         const gl = this.gl;
@@ -2661,6 +2798,34 @@ Renderer.prototype.getAspect = function () {
     return this.canvas.clientWidth / this.canvas.clientHeight;
 };
 
+class ComputeJob {
+    constructor(type, expressions, resolve) {
+        this.type = type;
+        this.expressions = expressions;
+        this.resolve = resolve;
+        this.status = 'pending';
+    }
+    work(renderer) {
+        let sum = 0;
+        renderer.tiles.filter(t => t.style).map(t => {
+            /*for (let i=0; i<t.properties['temp'].length; i++){
+                sum+=t.properties['temp'][i];
+            }*/
+            sum += t.numVertex;
+        });
+        let a = [sum, 0, 0, 0];
+        this.resolve(a);
+        this.status = 'dispatched';
+        return;
+        if (this.status == 'pending') {
+            this.status = 'sent';
+            this.readback = renderer._compute(this.type, this.expressions);
+        } else if (this.status == 'sent') {
+            this.status = 'dispatched';
+            this.resolve(this.readback());
+        }
+    }
+}
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -2674,6 +2839,7 @@ function refresh(timestamp) {
     if (this.lastFrame == timestamp) {
         return;
     }
+
     this.lastFrame = timestamp;
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
@@ -2778,7 +2944,11 @@ function refresh(timestamp) {
         gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
     });
 
-    //this._getMin(null, this.computePool[0]);
+    this.computePool.map(job => job.work(this));
+    this.computePool = this.computePool.filter(j => j.status != 'dispatched');
+    if (this.computePool.length > 0) {
+        window.requestAnimationFrame(refresh.bind(this));
+    }
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -2795,10 +2965,12 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
 }
 
-Renderer.prototype.getMin = function (expression, callback) {
-    //Send work and callback to RAF
-    //Request RAF
-    this.computePool = [callback];
+Renderer.prototype.compute = function (type, expressions) {
+    window.requestAnimationFrame(refresh.bind(this));
+    const promise = new Promise((resolve, reject) => {
+        this.computePool.push(new ComputeJob(type, expressions, resolve));
+    });
+    return promise;
 }
 
 function getFBstatus(gl) {
@@ -2827,12 +2999,15 @@ function getFBstatus(gl) {
 
 
 
-Renderer.prototype._getMin = function (expression, callback) {
-    return;
+Renderer.prototype._compute = function (type, expressions) {
     const gl = this.gl;
     //Render to 1x1 FB
-    if (!this.aux1x1FB) {
+
+    let fb = this.fbPool.pop();
+    if (!fb) {
+        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
+        fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
@@ -2853,15 +3028,26 @@ Renderer.prototype._getMin = function (expression, callback) {
             return;
         }
     }
+    this.aux1x1FB = fb;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
 
     gl.viewport(0, 0, 1, 1);
-    //glclear to MAX_FP VALUE
-    gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+    if (type == 'sum') {
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.clearColor(0, 0, 0, 0);
+    } else if (type == 'min') {
+        gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+        gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
+    } else {
+        throw new Error("Invalid compute type");
+    }
+
+
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
@@ -2871,9 +3057,12 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     //Compile expression, use expression
     //const expr = new functions.HSV(1., 0, 0.12);
-    const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["property"]('amount', {
+    let rgba = [0, 0, 0, 0].map(() => __WEBPACK_IMPORTED_MODULE_3__style_functions__["float"](0));
+    expressions.map((e, i) => rgba[i] = e);
+    const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["rgba"](...rgba);
+    /*functions.property('amount', {
         'amount': 'float'
-    });
+    });*/
     const r = __WEBPACK_IMPORTED_MODULE_1__style__["compileShader"](gl, expr, __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* computer */]);
     const shader = r.shader;
     //console.log('computer', shader)
@@ -2883,7 +3072,8 @@ Renderer.prototype._getMin = function (expression, callback) {
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
-    this.tiles.forEach(tile => {
+    const tiles = this.tiles.filter(tile => tile.style);
+    tiles.forEach(tile => {
         var obj = {
             freeTexUnit: 4
         }
@@ -2919,13 +3109,18 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     });
 
+    gl.blendEquation(gl.FUNC_ADD);
 
     //Readback!
-    var pixels = new Float32Array(4);
-    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
-    callback(pixels);
+    let pixels = new Float32Array(4);
 
-    gl.blendEquation(gl.FUNC_ADD);
+    const readback = () => {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+        this.fbPool.push(fb);
+        return Array.from(pixels);
+    }
+    return readback;
 }
 
 /***/ }),
@@ -3190,7 +3385,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shaders__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "schemas", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["schemas"]; });
@@ -3254,8 +3449,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
 
 
 
@@ -3264,6 +3461,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+let cache = {};
 
 function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
@@ -3275,7 +3474,15 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
         tid[name] = Object.keys(tid).length;
         return tid[name];
     });
-    const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    let shader = null;
+    if (cache[JSON.stringify(colorModifier)]) {
+        shader = cache[JSON.stringify(colorModifier)];
+        console.log("HIT", shader)
+    } else {
+        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+        console.log("COMPILE", cache)
+        cache[JSON.stringify(colorModifier)] = shader;
+    }
     styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
