@@ -38,6 +38,22 @@ class MGLIntegrator {
         c = this.renderer.getCenter();
         var z = this.renderer.getZoom();
         this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.renderer.compute('sum',
+            [R.Style.float(1)]
+        ).then(
+            result => console.log("SUM", result)
+            );
+        /*
+        this.provider.schema.then(schema =>
+            this.renderer.compute('min',
+                [R.Style.float(1), R.Style.property('temp', schema), R.Style.floatMul(R.Style.property('temp', schema), R.Style.float(-1))]
+            ).then(
+                result => {
+                    result[2] *= -1;
+                    console.log("MIN", result)
+                }
+                )
+        );*/
     }
 
     resize() {

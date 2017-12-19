@@ -48,6 +48,8 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
+    this.fbPool = [];
+    this.computePool = [];
     if (!this.gl) { //TODO remove hack: remove global context
         this.gl = canvas.getContext('webgl');
         const gl = this.gl;
@@ -292,6 +294,34 @@ Renderer.prototype.getAspect = function () {
     return this.canvas.clientWidth / this.canvas.clientHeight;
 };
 
+class ComputeJob {
+    constructor(type, expressions, resolve) {
+        this.type = type;
+        this.expressions = expressions;
+        this.resolve = resolve;
+        this.status = 'pending';
+    }
+    work(renderer) {
+        let sum = 0;
+        renderer.tiles.filter(t => t.style).map(t => {
+            /*for (let i=0; i<t.properties['temp'].length; i++){
+                sum+=t.properties['temp'][i];
+            }*/
+            sum += t.numVertex;
+        });
+        let a = [sum, 0, 0, 0];
+        this.resolve(a);
+        this.status = 'dispatched';
+        return;
+        if (this.status == 'pending') {
+            this.status = 'sent';
+            this.readback = renderer._compute(this.type, this.expressions);
+        } else if (this.status == 'sent') {
+            this.status = 'dispatched';
+            this.resolve(this.readback());
+        }
+    }
+}
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -305,6 +335,7 @@ function refresh(timestamp) {
     if (this.lastFrame == timestamp) {
         return;
     }
+
     this.lastFrame = timestamp;
     var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
@@ -409,7 +440,11 @@ function refresh(timestamp) {
         gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
     });
 
-    //this._getMin(null, this.computePool[0]);
+    this.computePool.map(job => job.work(this));
+    this.computePool = this.computePool.filter(j => j.status != 'dispatched');
+    if (this.computePool.length > 0) {
+        window.requestAnimationFrame(refresh.bind(this));
+    }
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -426,10 +461,12 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
 }
 
-Renderer.prototype.getMin = function (expression, callback) {
-    //Send work and callback to RAF
-    //Request RAF
-    this.computePool = [callback];
+Renderer.prototype.compute = function (type, expressions) {
+    window.requestAnimationFrame(refresh.bind(this));
+    const promise = new Promise((resolve, reject) => {
+        this.computePool.push(new ComputeJob(type, expressions, resolve));
+    });
+    return promise;
 }
 
 function getFBstatus(gl) {
@@ -458,12 +495,15 @@ function getFBstatus(gl) {
 import * as shaders from './shaders';
 import * as functions from './style/functions';
 
-Renderer.prototype._getMin = function (expression, callback) {
-    return;
+Renderer.prototype._compute = function (type, expressions) {
     const gl = this.gl;
     //Render to 1x1 FB
-    if (!this.aux1x1FB) {
+
+    let fb = this.fbPool.pop();
+    if (!fb) {
+        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
+        fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
@@ -484,15 +524,26 @@ Renderer.prototype._getMin = function (expression, callback) {
             return;
         }
     }
+    this.aux1x1FB = fb;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
 
     gl.viewport(0, 0, 1, 1);
-    //glclear to MAX_FP VALUE
-    gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
-    gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+    if (type == 'sum') {
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.ONE, gl.ONE);
+        gl.clearColor(0, 0, 0, 0);
+    } else if (type == 'min') {
+        gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
+        gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
+    } else {
+        throw new Error("Invalid compute type");
+    }
+
+
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
@@ -502,9 +553,12 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     //Compile expression, use expression
     //const expr = new functions.HSV(1., 0, 0.12);
-    const expr = functions.property('amount', {
+    let rgba = [0, 0, 0, 0].map(() => functions.float(0));
+    expressions.map((e, i) => rgba[i] = e);
+    const expr = functions.rgba(...rgba);
+    /*functions.property('amount', {
         'amount': 'float'
-    });
+    });*/
     const r = Style.compileShader(gl, expr, shaders.computer);
     const shader = r.shader;
     //console.log('computer', shader)
@@ -514,7 +568,8 @@ Renderer.prototype._getMin = function (expression, callback) {
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
-    this.tiles.forEach(tile => {
+    const tiles = this.tiles.filter(tile => tile.style);
+    tiles.forEach(tile => {
         var obj = {
             freeTexUnit: 4
         }
@@ -550,11 +605,16 @@ Renderer.prototype._getMin = function (expression, callback) {
 
     });
 
+    gl.blendEquation(gl.FUNC_ADD);
 
     //Readback!
-    var pixels = new Float32Array(4);
-    gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
-    callback(pixels);
+    let pixels = new Float32Array(4);
 
-    gl.blendEquation(gl.FUNC_ADD);
+    const readback = () => {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
+        this.fbPool.push(fb);
+        return Array.from(pixels);
+    }
+    return readback;
 }

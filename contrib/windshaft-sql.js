@@ -97,6 +97,9 @@ export default class WindshaftSQL extends Provider {
         console.log(aggSQL, agg);
 
         const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
             layers: [
                 {
                     type: 'mapnik',
@@ -163,7 +166,6 @@ export default class WindshaftSQL extends Provider {
             const mvt_extent = 4096;
 
             this.url.then(url => {
-                //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = "arraybuffer";
                 //console.log(url(x, y, z));
@@ -208,6 +210,9 @@ export default class WindshaftSQL extends Provider {
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
+                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x<0 || geom[0][0].y <0) {
+                                console.warn(geom[0][0]);
+                            }
                             points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                             points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             catFields.map((name, index) => {

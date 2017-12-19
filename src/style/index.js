@@ -10,6 +10,8 @@ export {
 export * from './functions';
 export * from './parser';
 
+let cache = {};
+
 function compileShader(gl, styleRootExpr, shaderCreator) {
     var uniformIDcounter = 0;
     var tid = {};
@@ -20,7 +22,15 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
         tid[name] = Object.keys(tid).length;
         return tid[name];
     });
-    const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    let shader = null;
+    if (cache[JSON.stringify(colorModifier)]) {
+        shader = cache[JSON.stringify(colorModifier)];
+        console.log("HIT", shader)
+    } else {
+        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+        console.log("COMPILE", cache)
+        cache[JSON.stringify(colorModifier)] = shader;
+    }
     styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
