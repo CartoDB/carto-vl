@@ -42,7 +42,7 @@ class MGLIntegrator {
         this.renderer.compute('sum',
             [R.Style.float(1)]
         ).then(
-            result => console.log("SUM", result)
+            result => $('#title').text('Demo dataset ~ ' + result + ' features')
             );
         /*
         this.provider.schema.then(schema =>
