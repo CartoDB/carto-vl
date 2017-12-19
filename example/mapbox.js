@@ -1,4 +1,5 @@
 import * as MGL from '../contrib/mapboxgl';
+import WindshaftSQL from '../contrib/windshaft-sql';
 import * as R from '../src/index';
 
 const styles = [
@@ -30,7 +31,7 @@ color: ramp($category, Prism)`,
 color: ramp(top($category, 4), Prism)`,
 
     `width: 3
-color: setOpacity( ramp($category, Prism), $amount/max($amount))`,
+color: setOpacity( ramp($category, Prism), $amount/50000)`,
 
     `width: 3
 color: ramp($category, Prism)`,
@@ -44,7 +45,12 @@ color: ramp($category, Prism)`,
     `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)
 strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`
+strokeWidth:      2*zoom()/50000`,
+
+    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp(MODE($category), Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`,
 ];
 
 const texts = [
@@ -72,15 +78,14 @@ const texts = [
 
     `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
 
-    `And, finally, let's put a nice stroke`
+    `And, finally, let's put a nice stroke`,
+    `bla bla bla`,
 ];
 
-const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 const barcelonaQueries = [`(SELECT
-        the_geom_webmercator,
-        amount,
-       category
+        *
     FROM tx_0125_copy_copy) AS tmp`
     ,
     (x, y, z) => `select st_asmvt(geom, 'lid') FROM
@@ -126,30 +131,44 @@ var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 0, // starting zoom,
+    zoom: 10, // starting zoom,
 });
 map.repaint = false;
-var mgl = new MGL.MGLIntegrator(map);
+var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
+let protoSchema = null;
 
 map.on('load', _ => {
-    let index = 0;
+    let index = styles.length - 1;
 
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
-        mgl.provider.schema.then(schema => {
-            try {
-                const s = R.Style.parseStyle(v, schema);
-                mgl.provider.style.set(s, 1000);
-                document.getElementById("feedback").style.display = 'none';
-            } catch (error) {
-                const err = `Invalid width expression: ${error}:${error.stack}`;
-                console.warn(err);
-                document.getElementById("feedback").value = err;
-                document.getElementById("feedback").style.display = 'block';
+
+        try {
+            const p = R.Style.getSchema(v);
+            if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
+                protoSchema = p;
+                mgl.provider.setQueries(protoSchema, $('#dataset').val());
             }
-        });
+            mgl.provider.schema.then(schema => {
+                try {
+                    const s = R.Style.parseStyle(v, schema);
+                    mgl.provider.style.set(s, 1000);
+                    document.getElementById("feedback").style.display = 'none';
+                } catch (error) {
+                    const err = `Invalid width expression: ${error}:${error.stack}`;
+                    console.warn(err);
+                    document.getElementById("feedback").value = err;
+                    document.getElementById("feedback").style.display = 'block';
+                }
+            });
+        } catch (error) {
+            const err = `Invalid width expression: ${error}:${error.stack}`;
+            console.warn(err);
+            document.getElementById("feedback").value = err;
+            document.getElementById("feedback").style.display = 'block';
+        }
     }
 
     function barcelona() {
@@ -157,7 +176,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
         $('#tutorial').text(texts[index]);
 
-        mgl.provider.setQueries(...barcelonaQueries);
+        $('#dataset').val('tx_0125_copy_copy');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(styles[index]);
     }
     function wwi() {
@@ -165,7 +189,12 @@ map.on('load', _ => {
         $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
         $('#tutorial').text('');
 
-        mgl.provider.setQueries(...ships_WWIQueries);
+        $('#dataset').val('wwi');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        superRefresh();
         updateStyle(shipsStyle);
     }
 
@@ -198,5 +227,32 @@ map.on('load', _ => {
     $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateStyle());
 
-    wwi();
+    const superRefresh = () => {
+
+        mgl.provider.setCartoURL($('#cartoURL').val());
+        mgl.provider.setUser($('#user').val());
+        mgl.provider.setApiKey($('#apikey').val());
+
+        localStorage.setItem('cartoURL', $('#cartoURL').val());
+        localStorage.setItem('user', $('#user').val());
+        localStorage.setItem('apikey', $('#apikey').val());
+        localStorage.setItem('dataset', $('#dataset').val());
+        protoSchema = null;
+        updateStyle();
+    };
+
+
+    $('#dataset').on('input', superRefresh);
+    $('#apikey').on('input', superRefresh);
+    $('#user').on('input', superRefresh);
+    $('#cartoURL').on('input', superRefresh);
+
+
+    if (localStorage.getItem("dataset")) {
+        $('#dataset').val(localStorage.getItem("dataset"));
+        $('#apikey').val(localStorage.getItem("apikey"));
+        $('#user').val(localStorage.getItem("user"));
+        $('#cartoURL').val(localStorage.getItem("cartoURL"));
+    }
+    //barcelona();
 });

@@ -1,5 +1,4 @@
 
-import * as sql_api from '../contrib/sql-api';
 import * as R from '../src/index';
 
 const DEG2RAD = Math.PI / 180;
@@ -8,7 +7,7 @@ const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth'
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
 class MGLIntegrator {
-    constructor(map) {
+    constructor(map, providerClass) {
         this.map = map;
         map.on('load', _ => {
             var cont = map.getCanvasContainer();
@@ -20,7 +19,7 @@ class MGLIntegrator {
             canvas.style.height = map.getCanvas().style.height;
 
             this.renderer = new R.Renderer(canvas);
-            this.provider = new sql_api.SQL_API(this.renderer, this.style);
+            this.provider = new providerClass(this.renderer, this.style);
 
             map.on('resize', this.resize.bind(this));
             map.on('movestart', this.move.bind(this));
@@ -39,6 +38,22 @@ class MGLIntegrator {
         c = this.renderer.getCenter();
         var z = this.renderer.getZoom();
         this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.renderer.compute('sum',
+            [R.Style.float(1)]
+        ).then(
+            result => console.log("SUM", result)
+            );
+        /*
+        this.provider.schema.then(schema =>
+            this.renderer.compute('min',
+                [R.Style.float(1), R.Style.property('temp', schema), R.Style.floatMul(R.Style.property('temp', schema), R.Style.float(-1))]
+            ).then(
+                result => {
+                    result[2] *= -1;
+                    console.log("MIN", result)
+                }
+                )
+        );*/
     }
 
     resize() {

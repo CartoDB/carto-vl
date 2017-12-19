@@ -1,18 +1,153 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
+import * as schema from '../schema';
 
-//TODO document style expressions
-//TODO create complete style API, a way to define a color and a width style at the same time, we just have style expressions now
-/*
-  Returns a valid style expression or throws an exception upon invalid inputs.
-*/
+const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
+
 var lowerCaseFunctions = {};
 Object.keys(functions).filter(
     name => name[0] == name[0].toLowerCase()
 ).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
 });
+
+class ProtoSchema {
+    constructor(name, aggFN) {
+        this.properties = {};
+        this.propertyList = [];
+        if (name) {
+            this.addPropertyAccess(name, aggFN);
+        }
+    }
+    addPropertyAccess(name, aggFN) {
+        if (!this.properties[name]) {
+            this.properties[name] = {
+                name: name,
+                aggFN: new Set()
+            };
+            this.propertyList.push(this.properties[name]);
+        }
+        this.properties[name].aggFN.add(aggFN);
+    }
+    setAggFN(fn) {
+        this.propertyList.map(p => p.aggFN.delete('raw'));
+        this.propertyList.map(p => p.aggFN.add(fn));
+        return this;
+    }
+}
+function union(b) {
+    let newProto = new ProtoSchema();
+    if (!Array.isArray(b)) {
+        b = [b];
+    }
+    b = b.filter(x => x != null);
+    b.map(
+        x => x.propertyList.map(
+            p => {
+                p.aggFN.forEach(
+                    fn => newProto.addPropertyAccess(p.name, fn)
+                );
+            }
+        )
+    );
+    newProto.aggRes = b.map(x => x.aggRes).reduce((x, y) => x || y, undefined);
+    return newProto;
+}
+
+//TODO SQL functions
+
+function parseNodeForSchema(node, proto) {
+    if (node.type == 'CallExpression') {
+        const args = node.arguments.map(arg => parseNodeForSchema(arg));
+        const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            return args[0].setAggFN(name);
+        } else if (lowerCaseFunctions[name]) {
+            return union(args);
+        }
+        throw new Error(`Invalid function name '${node.callee.name}'`);
+    } else if (node.type == 'Literal') {
+        return null;
+    } else if (node.type == 'ArrayExpression') {
+        return null;
+    } else if (node.type == 'BinaryExpression') {
+        const left = parseNodeForSchema(node.left);
+        const right = parseNodeForSchema(node.right);
+        return union([left, right]);
+    } else if (node.type == 'UnaryExpression') {
+        switch (node.operator) {
+            case '-':
+                return parseNodeForSchema(node.argument);
+            case '+':
+                return parseNodeForSchema(node.argument);
+            default:
+                throw new Error(`Invalid unary operator '${node.operator}'`);
+        }
+    } else if (node.type == 'Identifier') {
+        if (node.name[0] == '$') {
+            return new ProtoSchema(node.name.substring(1), 'raw');
+        } else if (functions.schemas[node.name.toLowerCase()]) {
+            return null;
+        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+            return null;
+        }
+    }
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function parseStyleNamedExprForSchema(node) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
+    if (name == 'resolution') {
+        let p = new ProtoSchema();
+        p.aggRes = node.right.value;
+        return p;
+    } else {
+        return parseNodeForSchema(node.right);
+    }
+}
+
+function flattenArray(x) {
+    return x.reduce((a, b) => a.concat(b), [])
+}
+
+const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
+
+export function protoSchemaIsEquals(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    if (a.propertyList.length != b.propertyList.length) {
+        return false;
+    }
+    const l = a.propertyList.map((_, index) =>
+        a.propertyList[index].name == b.propertyList[index].name && isSetsEqual(a.propertyList[index].aggFN, b.propertyList[index].aggFN)
+    );
+    return l.every(x => x) && a.aggRes == b.aggRes;
+}
+
+export function getSchema(str) {
+    jsep.addBinaryOp(":", 1);
+    jsep.addBinaryOp("^", 10);
+    const ast = jsep(str);
+    let protoSchema = null;
+    if (ast.type == "Compound") {
+        protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
+    } else {
+        protoSchema = parseStyleNamedExprForSchema(node);
+    }
+    jsep.removeBinaryOp("^");
+    jsep.removeBinaryOp(":");
+
+    console.log("PROTOSCHEMA", protoSchema);
+    return protoSchema;
+}
 
 /**
  * @jsapi
@@ -32,6 +167,9 @@ function parseStyleNamedExpr(style, node, schema) {
         throw new Error('Invalid syntax');
     }
     const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
     const value = parseNode(node.right, schema);
     style[name] = value;
 }
@@ -54,8 +192,13 @@ export function parseStyle(str, schema) {
 
 function parseNode(node, schema) {
     if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNode(arg, schema));
         const name = node.callee.name.toLowerCase();
+        if (aggFns.includes(name)) {
+            //node.arguments[0].name += '_' + name;
+            const args = node.arguments.map(arg => parseNode(arg, schema));
+            return args[0];
+        }
+        const args = node.arguments.map(arg => parseNode(arg, schema));
         if (lowerCaseFunctions[name]) {
             return lowerCaseFunctions[name](...args, schema);
         }

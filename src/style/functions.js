@@ -193,14 +193,14 @@ class Property extends Expression {
         if (typeof name !== 'string' || name == '') {
             throw new Error(`Invalid property name '${name}'`);
         }
-        if (!schema[name]) {
+        if (!schema.properties[name]) {
             throw new Error(`Property name not found`);
         }
         super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
         this.name = name;
         this.type = 'float';
         this.schema = schema;
-        this.schemaType = schema[name];
+        this.schemaType = schema.properties[name].type;
     }
 }
 
@@ -711,28 +711,16 @@ class RGBA extends Expression {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
         color = color.filter(x => true);
-        if (color.length != 4 || !color.every(Number.isFinite)) {
+        color = color.map(x => Number.isFinite(x) ? float(x) : x);
+        if (color.length != 4) {
             throw new Error(`Invalid arguments to Color(): ${args}`);
         }
-        super({});
+        r = color[0];
+        g = color[1];
+        b = color[2];
+        a = color[3];
+        super({ r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
         this.type = 'color';
-        this.color = color;
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform vec4 color${this._uniformID};\n`,
-            inline: `color${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `color${this._uniformID}`);
-    }
-    _preDraw(l, gl) {
-        gl.uniform4f(this._uniformLocation, this.color[0], this.color[1], this.color[2], this.color[3]);
-    }
-    isAnimated() {
-        return false;
     }
 }
 
