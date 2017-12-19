@@ -7535,7 +7535,7 @@ let cartoURL = 'carto-staging.com';
 let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
 
 const endpoint = (username) => {
-    return `http://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
+    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
     return (x, y, z) => {
