@@ -2813,8 +2813,7 @@ class ComputeJob {
             }*/
             sum += t.numVertex;
         });
-        let a = [sum, 0, 0, 0];
-        this.resolve(a);
+        this.resolve(sum);
         this.status = 'dispatched';
         return;
         if (this.status == 'pending') {
@@ -7298,7 +7297,7 @@ var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrat
 let protoSchema = null;
 
 map.on('load', _ => {
-    let index = styles.length - 1;
+    let index = 0;//styles.length - 1;
 
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;
@@ -7340,8 +7339,8 @@ map.on('load', _ => {
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
+        document.getElementById("styleEntry").value = styles[index];
         superRefresh();
-        updateStyle(styles[index]);
     }
     function wwi() {
         $('.step').css('display', 'none');
@@ -7353,8 +7352,8 @@ map.on('load', _ => {
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
+        document.getElementById("styleEntry").value = shipsStyle;
         superRefresh();
-        updateStyle(shipsStyle);
     }
 
     $('#prev').click(() => {
@@ -7413,7 +7412,7 @@ map.on('load', _ => {
         $('#user').val(localStorage.getItem("user"));
         $('#cartoURL').val(localStorage.getItem("cartoURL"));
     }
-    //barcelona();
+    barcelona();
 });
 
 
@@ -7451,6 +7450,7 @@ class MGLIntegrator {
             map.on('movestart', this.move.bind(this));
             map.on('move', this.move.bind(this));
             map.on('moveend', this.move.bind(this));
+            this.move();
         });
     }
     move() {

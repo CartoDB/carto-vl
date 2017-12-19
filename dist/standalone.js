@@ -2813,8 +2813,7 @@ class ComputeJob {
             }*/
             sum += t.numVertex;
         });
-        let a = [sum, 0, 0, 0];
-        this.resolve(a);
+        this.resolve(sum);
         this.status = 'dispatched';
         return;
         if (this.status == 'pending') {
