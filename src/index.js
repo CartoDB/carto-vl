@@ -82,6 +82,16 @@ function Renderer(canvas) {
         -10.0, -10.0,
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    this.zerotex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array(4));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 }
 
 /**
@@ -367,7 +377,7 @@ function refresh(timestamp) {
         gl.useProgram(shader.program);
         for (let i = 0; i < 16; i++) {
             gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
             gl.uniform1i(shader.textureLocations[i], 0);
         }
         var obj = {
