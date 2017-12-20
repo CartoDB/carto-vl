@@ -7203,18 +7203,18 @@ color: ramp($category, Prism)`,
 color: ramp(top($category, 4), Prism)`,
 
     `width: 3
-color: setOpacity( ramp($category, Prism), $amount/50000)`,
+color: setOpacity( ramp($category, Prism), $amount/5000)`,
 
     `width: 3
 color: ramp($category, Prism)`,
 
-    `width: sqrt($amount/50000)*20
+    `width: sqrt($amount/5000)*20
 color: ramp($category, Prism)`,
 
-    `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
+    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)`,
 
-    `width: sqrt($amount/50000)*20*(zoom()/4000+0.01)*1.5
+    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
 color: ramp($category, Prism)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`,
@@ -7250,8 +7250,8 @@ const texts = [
 
     `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
 
-    `And, finally, let's put a nice stroke`,
-    `bla bla bla`,
+    `And... let's put a nice stroke`,
+    `Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE`,
 ];
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
@@ -7303,7 +7303,7 @@ var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 10, // starting zoom,
+    zoom: 13, // starting zoom,
 });
 map.repaint = false;
 var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
