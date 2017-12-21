@@ -1235,7 +1235,7 @@ const styler = {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-//     JavaScript Expression Parser (JSEP) 0.3.2
+//     JavaScript Expression Parser (JSEP) 0.3.3
 //     JSEP may be freely distributed under the MIT License
 //     http://jsep.from.so/
 
@@ -1497,9 +1497,6 @@ const styler = {
 					} else if(ch === SQUOTE_CODE || ch === DQUOTE_CODE) {
 						// Single or double quotes
 						return gobbleStringLiteral();
-					} else if(isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
-						// `foo`, `bar.baz`
-						return gobbleVariable();
 					} else if (ch === OBRACK_CODE) {
 						return gobbleArray();
 					} else {
@@ -1518,8 +1515,13 @@ const styler = {
 							to_check = to_check.substr(0, --tc_len);
 						}
 
-						return false;
+						if (isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
+							// `foo`, `bar.baz`
+							return gobbleVariable();
+						}
 					}
+					
+					return false;
 				},
 				// Parse simple numeric literals: `12`, `3.4`, `.5`. Do this by using a string to
 				// keep track of everything in the numeric literal and then calling `parseFloat` on that string
@@ -1589,7 +1591,7 @@ const styler = {
 								case 'b': str += '\b'; break;
 								case 'f': str += '\f'; break;
 								case 'v': str += '\x0B'; break;
-								default : str += '\\' + ch;
+								default : str += ch;
 							}
 						} else {
 							str += ch;
@@ -1789,7 +1791,7 @@ const styler = {
 		};
 
 	// To be filled in by the template
-	jsep.version = '0.3.2';
+	jsep.version = '0.3.3';
 	jsep.toString = function() { return 'JavaScript Expression Parser (JSEP) v' + jsep.version; };
 
 	/**
@@ -1845,7 +1847,7 @@ const styler = {
 	jsep.removeAllUnaryOps = function() {
 		unary_ops = {};
 		max_unop_len = 0;
-		
+
 		return this;
 	};
 
@@ -1869,7 +1871,7 @@ const styler = {
 	jsep.removeAllBinaryOps = function() {
 		binary_ops = {};
 		max_binop_len = 0;
-		
+
 		return this;
 	};
 
@@ -1889,7 +1891,7 @@ const styler = {
 	 */
 	jsep.removeAllLiterals = function() {
 		literals = {};
-		
+
 		return this;
 	};
 
@@ -7316,7 +7318,8 @@ map.on('load', _ => {
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
-
+        location.hash = getConfig();
+        console.log(location.hash)
         try {
             const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
             if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
@@ -7398,8 +7401,34 @@ map.on('load', _ => {
     $('#barcelona').click(barcelona);
     $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateStyle());
+    function getConfig() {
+        return '#' + btoa(JSON.stringify({
+            a: $('#dataset').val(),
+            b: $('#apikey').val(),
+            c: $('#user').val(),
+            d: $('#cartoURL').val(),
+            e: $('#styleEntry').val(),
+            f: map.getCenter(),
+            g: map.getZoom(),
+        }));
+    }
+    function setConfig(input) {
+        const c = JSON.parse(atob(input));
+        debugger;
+        console.log("SC", c);
+        $('#dataset').val(c.a);
+        $('#apikey').val(c.b);
+        $('#user').val(c.c);
+        $('#cartoURL').val(c.d);
+        $('#styleEntry').val(c.e);
+        map.setCenter(c.f);
+        map.setZoom(c.g);
+
+        superRefresh();
+    }
 
     const superRefresh = () => {
+        location.hash = getConfig();
 
         mgl.provider.setCartoURL($('#cartoURL').val());
         mgl.provider.setUser($('#user').val());
@@ -7426,7 +7455,12 @@ map.on('load', _ => {
         $('#user').val(localStorage.getItem("user"));
         $('#cartoURL').val(localStorage.getItem("cartoURL"));
     }
-    barcelona();
+    if (location.hash.length > 1) {
+        console.log(location.hash)
+        setConfig(location.hash.substring(1));
+    } else {
+        barcelona();
+    }
 });
 
 
@@ -7483,17 +7517,6 @@ class MGLIntegrator {
         ).then(
             result => $('#title').text('Demo dataset ~ ' + result + ' features')
             );
-        /*
-        this.provider.schema.then(schema =>
-            this.renderer.compute('min',
-                [R.Style.float(1), R.Style.property('temp', schema), R.Style.floatMul(R.Style.property('temp', schema), R.Style.float(-1))]
-            ).then(
-                result => {
-                    result[2] *= -1;
-                    console.log("MIN", result)
-                }
-                )
-        );*/
     }
 
     resize() {
