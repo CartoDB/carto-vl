@@ -144,7 +144,8 @@ map.on('load', _ => {
     function updateStyle(v) {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
-
+        location.hash = getConfig();
+        console.log(location.hash)
         try {
             const p = R.Style.getSchema(v);
             if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
@@ -226,8 +227,34 @@ map.on('load', _ => {
     $('#barcelona').click(barcelona);
     $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateStyle());
+    function getConfig() {
+        return '#' + btoa(JSON.stringify({
+            a: $('#dataset').val(),
+            b: $('#apikey').val(),
+            c: $('#user').val(),
+            d: $('#cartoURL').val(),
+            e: $('#styleEntry').val(),
+            f: map.getCenter(),
+            g: map.getZoom(),
+        }));
+    }
+    function setConfig(input) {
+        const c = JSON.parse(atob(input));
+        debugger;
+        console.log("SC", c);
+        $('#dataset').val(c.a);
+        $('#apikey').val(c.b);
+        $('#user').val(c.c);
+        $('#cartoURL').val(c.d);
+        $('#styleEntry').val(c.e);
+        map.setCenter(c.f);
+        map.setZoom(c.g);
+
+        superRefresh();
+    }
 
     const superRefresh = () => {
+        location.hash = getConfig();
 
         mgl.provider.setCartoURL($('#cartoURL').val());
         mgl.provider.setUser($('#user').val());
@@ -254,5 +281,10 @@ map.on('load', _ => {
         $('#user').val(localStorage.getItem("user"));
         $('#cartoURL').val(localStorage.getItem("cartoURL"));
     }
-    barcelona();
+    if (location.hash.length > 1) {
+        console.log(location.hash)
+        setConfig(location.hash.substring(1));
+    } else {
+        barcelona();
+    }
 });

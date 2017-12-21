@@ -44,17 +44,6 @@ class MGLIntegrator {
         ).then(
             result => $('#title').text('Demo dataset ~ ' + result + ' features')
             );
-        /*
-        this.provider.schema.then(schema =>
-            this.renderer.compute('min',
-                [R.Style.float(1), R.Style.property('temp', schema), R.Style.floatMul(R.Style.property('temp', schema), R.Style.float(-1))]
-            ).then(
-                result => {
-                    result[2] *= -1;
-                    console.log("MIN", result)
-                }
-                )
-        );*/
     }
 
     resize() {
