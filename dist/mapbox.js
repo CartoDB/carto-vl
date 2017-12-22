@@ -2078,7 +2078,6 @@ function getSchema(str) {
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
 
-    console.log("PROTOSCHEMA", protoSchema);
     return protoSchema;
 }
 
@@ -3020,7 +3019,6 @@ Renderer.prototype._compute = function (type, expressions) {
 
     let fb = this.fbPool.pop();
     if (!fb) {
-        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
         fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();
@@ -3492,10 +3490,9 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
     let shader = null;
     if (cache[JSON.stringify(colorModifier)]) {
         shader = cache[JSON.stringify(colorModifier)];
-        console.log("HIT", shader)
     } else {
         shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        console.log("COMPILE", cache)
+        //console.log("COMPILE", cache)
         cache[JSON.stringify(colorModifier)] = shader;
     }
     styleRootExpr._postShaderCompile(shader.program, gl);
@@ -3540,7 +3537,7 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5 );
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
@@ -7319,7 +7316,6 @@ map.on('load', _ => {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
         location.hash = getConfig();
-        console.log(location.hash)
         try {
             const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
             if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
@@ -7332,14 +7328,14 @@ map.on('load', _ => {
                     mgl.provider.style.set(s, 1000);
                     document.getElementById("feedback").style.display = 'none';
                 } catch (error) {
-                    const err = `Invalid width expression: ${error}:${error.stack}`;
+                    const err = `Invalid style: ${error}:${error.stack}`;
                     console.warn(err);
                     document.getElementById("feedback").value = err;
                     document.getElementById("feedback").style.display = 'block';
                 }
             });
         } catch (error) {
-            const err = `Invalid width expression: ${error}:${error.stack}`;
+            const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
@@ -7414,8 +7410,6 @@ map.on('load', _ => {
     }
     function setConfig(input) {
         const c = JSON.parse(atob(input));
-        debugger;
-        console.log("SC", c);
         $('#dataset').val(c.a);
         $('#apikey').val(c.b);
         $('#user').val(c.c);
@@ -7456,7 +7450,6 @@ map.on('load', _ => {
         $('#cartoURL').val(localStorage.getItem("cartoURL"));
     }
     if (location.hash.length > 1) {
-        console.log(location.hash)
         setConfig(location.hash.substring(1));
     } else {
         barcelona();
@@ -7652,8 +7645,6 @@ class WindshaftSQL extends Provider {
         });
         const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
 
-        console.log(aggSQL, agg);
-
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
@@ -7679,7 +7670,6 @@ class WindshaftSQL extends Provider {
                 body: JSON.stringify(mapConfigAgg)
             });
             const layergroup = await response.json();
-            console.log(layergroup);
             return layerUrl(layergroup, 0);
         };
 
@@ -7688,7 +7678,6 @@ class WindshaftSQL extends Provider {
         //block data acquisition
         this.style = null;
         this.schema = getSchema(`(${aggSQL}) AS tmp`, protoSchema).then(schema => {
-            console.log(schema);
             this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
             return schema;
         });
@@ -7726,7 +7715,6 @@ class WindshaftSQL extends Provider {
             this.url.then(url => {
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = "arraybuffer";
-                //console.log(url(x, y, z));
                 oReq.open("GET", url(x, y, z), true);
                 oReq.onload = (oEvent) => {
                     this.schema.then(schema => {
@@ -7759,18 +7747,13 @@ class WindshaftSQL extends Provider {
                         );
                         catFieldsReal.map((name, i) => fieldMap[name] = i);
                         numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
-                        if (!mvtLayer) {
-                            debugger;
-                        }
+
                         var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
                         var points = new Float32Array(mvtLayer.length * 2);
                         const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
-                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x < 0 || geom[0][0].y < 0) {
-                                console.warn(geom[0][0]);
-                            }
                             points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                             points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             catFields.map((name, index) => {
@@ -7853,7 +7836,6 @@ async function getNumericTypes(names, query) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
     const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    console.log(numericsQuery, json);
     // TODO avg, sum, count
     return names.map(name =>
         new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])

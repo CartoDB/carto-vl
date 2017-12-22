@@ -2078,7 +2078,6 @@ function getSchema(str) {
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp("^");
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(":");
 
-    console.log("PROTOSCHEMA", protoSchema);
     return protoSchema;
 }
 
@@ -3020,7 +3019,6 @@ Renderer.prototype._compute = function (type, expressions) {
 
     let fb = this.fbPool.pop();
     if (!fb) {
-        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
         fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();
@@ -3492,10 +3490,9 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
     let shader = null;
     if (cache[JSON.stringify(colorModifier)]) {
         shader = cache[JSON.stringify(colorModifier)];
-        console.log("HIT", shader)
     } else {
         shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        console.log("COMPILE", cache)
+        //console.log("COMPILE", cache)
         cache[JSON.stringify(colorModifier)] = shader;
     }
     styleRootExpr._postShaderCompile(shader.program, gl);
@@ -3540,7 +3537,7 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5 );
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
