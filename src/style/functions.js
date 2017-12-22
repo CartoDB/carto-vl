@@ -598,6 +598,7 @@ const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
 const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
 const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
 const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
 
 
 class Near extends Expression {
@@ -926,8 +927,9 @@ const now = (...args) => new Now(...args);
 const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
+const abs = (...args) => new Abs(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz,
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs
 };
