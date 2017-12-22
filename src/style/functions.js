@@ -530,6 +530,12 @@ const genBinaryOp = (jsFn, glsl) =>
             if (a.type == 'float' && b.type == 'float') {
                 super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
                 this.type = 'float';
+            } else if (a.type == 'color' && b.type == 'color') {
+                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
+                this.type = 'color';
+            } else if (a.type == 'color' && b.type == 'float') {
+                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
+                this.type = 'color';
             } else {
                 console.warn(a, b);
                 throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
