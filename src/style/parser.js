@@ -145,7 +145,6 @@ export function getSchema(str) {
     jsep.removeBinaryOp("^");
     jsep.removeBinaryOp(":");
 
-    console.log("PROTOSCHEMA", protoSchema);
     return protoSchema;
 }
 

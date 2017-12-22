@@ -94,8 +94,6 @@ export default class WindshaftSQL extends Provider {
         });
         const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
 
-        console.log(aggSQL, agg);
-
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
@@ -121,7 +119,6 @@ export default class WindshaftSQL extends Provider {
                 body: JSON.stringify(mapConfigAgg)
             });
             const layergroup = await response.json();
-            console.log(layergroup);
             return layerUrl(layergroup, 0);
         };
 
@@ -130,7 +127,6 @@ export default class WindshaftSQL extends Provider {
         //block data acquisition
         this.style = null;
         this.schema = getSchema(`(${aggSQL}) AS tmp`, protoSchema).then(schema => {
-            console.log(schema);
             this.style = new R.Style.Style(this.renderer, schema);
             return schema;
         });
@@ -168,7 +164,6 @@ export default class WindshaftSQL extends Provider {
             this.url.then(url => {
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = "arraybuffer";
-                //console.log(url(x, y, z));
                 oReq.open("GET", url(x, y, z), true);
                 oReq.onload = (oEvent) => {
                     this.schema.then(schema => {
@@ -201,18 +196,13 @@ export default class WindshaftSQL extends Provider {
                         );
                         catFieldsReal.map((name, i) => fieldMap[name] = i);
                         numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
-                        if (!mvtLayer) {
-                            debugger;
-                        }
+
                         var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
                         var points = new Float32Array(mvtLayer.length * 2);
                         const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
-                            if (geom[0][0].x > 4096 || geom[0][0].y > 4096 || geom[0][0].x < 0 || geom[0][0].y < 0) {
-                                console.warn(geom[0][0]);
-                            }
                             points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                             points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             catFields.map((name, index) => {
@@ -293,7 +283,6 @@ async function getNumericTypes(names, query) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
     const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    console.log(numericsQuery, json);
     // TODO avg, sum, count
     return names.map(name =>
         new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])

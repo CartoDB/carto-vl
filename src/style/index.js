@@ -25,10 +25,9 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
     let shader = null;
     if (cache[JSON.stringify(colorModifier)]) {
         shader = cache[JSON.stringify(colorModifier)];
-        console.log("HIT", shader)
     } else {
         shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        console.log("COMPILE", cache)
+        //console.log("COMPILE", cache)
         cache[JSON.stringify(colorModifier)] = shader;
     }
     styleRootExpr._postShaderCompile(shader.program, gl);
@@ -73,7 +72,7 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = functions.float(5 );
+    this._width = functions.float(5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();

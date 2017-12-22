@@ -145,7 +145,6 @@ map.on('load', _ => {
         v = v || document.getElementById("styleEntry").value;
         document.getElementById("styleEntry").value = v;
         location.hash = getConfig();
-        console.log(location.hash)
         try {
             const p = R.Style.getSchema(v);
             if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
@@ -158,14 +157,14 @@ map.on('load', _ => {
                     mgl.provider.style.set(s, 1000);
                     document.getElementById("feedback").style.display = 'none';
                 } catch (error) {
-                    const err = `Invalid width expression: ${error}:${error.stack}`;
+                    const err = `Invalid style: ${error}:${error.stack}`;
                     console.warn(err);
                     document.getElementById("feedback").value = err;
                     document.getElementById("feedback").style.display = 'block';
                 }
             });
         } catch (error) {
-            const err = `Invalid width expression: ${error}:${error.stack}`;
+            const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
             document.getElementById("feedback").value = err;
             document.getElementById("feedback").style.display = 'block';
@@ -240,8 +239,6 @@ map.on('load', _ => {
     }
     function setConfig(input) {
         const c = JSON.parse(atob(input));
-        debugger;
-        console.log("SC", c);
         $('#dataset').val(c.a);
         $('#apikey').val(c.b);
         $('#user').val(c.c);
@@ -282,7 +279,6 @@ map.on('load', _ => {
         $('#cartoURL').val(localStorage.getItem("cartoURL"));
     }
     if (location.hash.length > 1) {
-        console.log(location.hash)
         setConfig(location.hash.substring(1));
     } else {
         barcelona();
