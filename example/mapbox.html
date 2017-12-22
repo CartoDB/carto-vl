@@ -13,10 +13,13 @@
     <link href='css/skeleton.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
     <style>
-        html, body, .map {
+        html,
+        body,
+        .map {
             width: 100%;
             height: 100%;
         }
+
         .mapClass {
             width: 100%;
             height: 70%;
@@ -73,10 +76,10 @@
     <div class="container">
         <div class="row">
             <h3 id='title'>Demo dataset</h3>
-            <button id='clean' onclick="location.hash='';location.reload();">Refresh</button>
-            <button id='wwi'>WWI Ships</button>
-            <button id='barcelona'>Barcelona (with tutorial)</button>
-
+            <div id='buttonlist'>
+                <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
+                <button id='barcelona'>Barcelona (with tutorial)</button>
+            </div>
             <h3>Style</h3>
 
             <h5 id='tutorial'></h5>
