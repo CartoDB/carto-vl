@@ -515,7 +515,6 @@ Renderer.prototype._compute = function (type, expressions) {
 
     let fb = this.fbPool.pop();
     if (!fb) {
-        console.log("C FB")
         this.aux1x1FB = gl.createFramebuffer();
         fb = this.aux1x1FB;
         this.aux1x1TEX = gl.createTexture();

@@ -79,7 +79,6 @@ class SQL_API extends Provider {
             const mvt_extent = 1024;
             const query = this.renderQueryMaker(x, y, z);
 
-            //renderer.getMin(null, (result) => console.log(`${JSON.stringify(result)} computed!`));
             var oReq = new XMLHttpRequest();
             oReq.open("GET", "https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(query) + "", true);
             oReq.onload = (oEvent) => {
@@ -176,7 +175,6 @@ async function getNumericTypes(names, query) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
     const response = await fetch("https://dmanzanares-core.carto.com/api/v2/sql?q=" + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    console.log(numericsQuery, json);
     // TODO avg, sum, count
     return names.map(name =>
         new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
