@@ -161,6 +161,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return FloatMod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return CIELab; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return XYZ; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return Abs; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -191,6 +192,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return cielab; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return abs; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
@@ -794,6 +796,7 @@ const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
 const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
 const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
 const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
 
 
 class Near extends Expression {
@@ -1122,6 +1125,7 @@ const now = (...args) => new Now(...args);
 const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
+const abs = (...args) => new Abs(...args);
 
 
 
@@ -3438,6 +3442,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["FloatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["CIELab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["XYZ"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Abs"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3468,6 +3473,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["abs"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
@@ -7470,7 +7476,7 @@ map.on('load', _ => {
         'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
     addButton('Population Density', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRkbi84MClcbmNvbG9yOiBzZXRPcGFjaXR5KGhzdigwLjg4LDEsKCRkbi8yNTQpKSwkZG4vMjU0KVxucmVzb2x1dGlvbjogMVxuXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOjI0Ljc4MjExMzgzOTQ1MDE3NiwibGF0IjoyMy41ODUzMDQ5MjcxOTQ0M30sImciOjEuMDkzMjIyOTcxOTUwOTI4M30=');
     addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
-    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS8xMDAqem9vbSgpLzRcblxucmVzb2x1dGlvbjogNFxuXG5jb2xvcjogcmdiYShzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpLFxuICAgICAgICAgICAgICBzdW0oJGhpc3BhbmljX28pLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKVxuLCAgICAgICAgICAgICAgMi41KnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSksMVxuKVxuc3Ryb2tlQ29sb3I6IHJnYmEoMSwxLDEsMC4zNSlcbnN0cm9rZVdpZHRoOiAxIiwiZiI6eyJsbmciOi05Ny4zNDc4Nzg4Njc5Nzc3OCwibGF0IjozOS4zMDQ0MzkzMDcxODI2MDV9LCJnIjozLjU5NDY2MTE4NTE3MTYyNH0=');
+    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
     if (localStorage.getItem("dataset")) {
         $('#dataset').val(localStorage.getItem("dataset"));
         $('#apikey').val(localStorage.getItem("apikey"));
