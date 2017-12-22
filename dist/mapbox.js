@@ -7447,6 +7447,9 @@ map.on('load', _ => {
         var button = document.createElement("button");
         button.innerText = name;
         button.onclick = () => {
+            $('.step').css('display', 'none');
+            $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
+            $('#tutorial').text('');
             setConfig(code);
         }
         document.getElementById("buttonlist").appendChild(button);
