@@ -93,7 +93,7 @@ export default class WindshaftSQL extends Provider {
             }
         });
         const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
-
+        agg.placement = 'centroid';
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
