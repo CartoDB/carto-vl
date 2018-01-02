@@ -233,7 +233,8 @@ Renderer.prototype.addDataframe = function (dataframe) {
     const level = 0;
     const width = RTT_WIDTH;
     dataframe.numVertex = points.length / 2;
-    const height = Math.ceil(dataframe.numVertex / width);
+    dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
+    const height = Math.ceil(dataframe.numFeatures / width);
     const border = 0;
     const srcFormat = gl.RED;
     const srcType = gl.FLOAT;
@@ -241,7 +242,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
-
+    dataframe.geomType = dataframe.breakpointList.length ? 'tri' : 'point';
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
             const isCategory = !Number.isFinite(dataframe.properties[k][0]);
@@ -276,17 +277,20 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.vertexBuffer = gl.createBuffer();
     dataframe.featureIDBuffer = gl.createBuffer();
 
-    dataframe.texColor = this.createTileTexture('color', dataframe.numVertex);
-    dataframe.texWidth = this.createTileTexture('color', dataframe.numVertex);
-    dataframe.texStrokeColor = this.createTileTexture('color', dataframe.numVertex);
-    dataframe.texStrokeWidth = this.createTileTexture('color', dataframe.numVertex);
+    dataframe.texColor = this.createTileTexture('color', dataframe.numFeatures);
+    dataframe.texWidth = this.createTileTexture('color', dataframe.numFeatures);
+    dataframe.texStrokeColor = this.createTileTexture('color', dataframe.numFeatures);
+    dataframe.texStrokeWidth = this.createTileTexture('color', dataframe.numFeatures);
 
     var ids = new Float32Array(points.length);
+    let index = 0;
     for (var i = 0; i < points.length; i += 2) {
-        ids[i + 0] = ((i / 2) % width) / (width - 1);
-        ids[i + 1] = Math.floor((i / 2) / width) / (height - 1);
+        if ((!dataframe.breakpointList.length && i > 0) || i == dataframe.breakpointList[index]) {
+            index++;
+        }
+        ids[i + 0] = ((index) % width) / (width - 1);
+        ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
     }
-
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
@@ -316,7 +320,7 @@ class ComputeJob {
             /*for (let i=0; i<t.properties['temp'].length; i++){
                 sum+=t.properties['temp'][i];
             }*/
-            sum += t.numVertex;
+            sum += t.numFeatures;
         });
         this.resolve(sum);
         this.status = 'dispatched';
@@ -411,47 +415,53 @@ function refresh(timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    gl.useProgram(this.finalRendererProgram.program);
     var s = 1. / this._zoom;
 
 
     tiles.forEach(tile => {
-        gl.uniform2f(this.finalRendererProgram.vertexScaleUniformLocation,
+        let renderer = null;
+        if (tile.geomType == 'point') {
+            renderer = this.finalRendererProgram;
+        } else {
+            renderer = this.triRendererProgram;
+        }
+        gl.useProgram(renderer.program);
+        gl.uniform2f(renderer.vertexScaleUniformLocation,
             (s / aspect) * tile.scale,
             s * tile.scale);
-        gl.uniform2f(this.finalRendererProgram.vertexOffsetUniformLocation,
+        gl.uniform2f(renderer.vertexOffsetUniformLocation,
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
+        gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-        gl.enableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.enableVertexAttribArray(renderer.featureIdAttr);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(this.finalRendererProgram.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(this.finalRendererProgram.colorTexture, 0);
+        gl.uniform1i(renderer.colorTexture, 0);
 
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(this.finalRendererProgram.widthTexture, 1);
+        gl.uniform1i(renderer.widthTexture, 1);
 
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-        gl.uniform1i(this.finalRendererProgram.colorStrokeTexture, 2);
+        gl.uniform1i(renderer.colorStrokeTexture, 2);
 
         gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-        gl.uniform1i(this.finalRendererProgram.strokeWidthTexture, 3);
+        gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
+        gl.drawArrays(tile.geomType == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
-        gl.disableVertexAttribArray(this.finalRendererProgram.vertexPositionAttribute);
-        gl.disableVertexAttribArray(this.finalRendererProgram.featureIdAttr);
+        gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
+        gl.disableVertexAttribArray(renderer.featureIdAttr);
     });
 
     this.computePool.map(job => job.work(this));
@@ -473,6 +483,7 @@ function refresh(timestamp) {
  */
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
+    this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
 }
 
 Renderer.prototype.compute = function (type, expressions) {

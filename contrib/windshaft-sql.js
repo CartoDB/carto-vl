@@ -1,5 +1,6 @@
 import * as rsys from './rsys';
 import * as R from '../src/index';
+import * as earcut from 'earcut';
 
 var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
@@ -13,8 +14,8 @@ let user = 'dmanzanares-ded13';
 let cartoURL = 'carto-staging.com';
 let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
 
-const endpoint = (username) => {
-    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
+const endpoint = (username, enable) => {
+    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}${enable ? '' : '&aggregation=false'}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
     return (x, y, z) => {
@@ -102,21 +103,25 @@ export default class WindshaftSQL extends Provider {
                 {
                     type: 'mapnik',
                     options: {
+                        cartocss: `#layer{}`,
+                        cartocss_version: '3.0.12',
                         sql: aggSQL,
                         aggregation: agg
                     }
                 }
             ]
         };
+        const query = `(${aggSQL}) AS tmp`;
 
         const promise = async () => {
-            const response = await fetch(endpoint(user), {
+            this.geomType = await getGeometryType(query);
+            const response = await fetch(endpoint(user, this.geomType == 'point'), {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(mapConfigAgg)
+                body: JSON.stringify(mapConfigAgg),
             });
             const layergroup = await response.json();
             return layerUrl(layergroup, 0);
@@ -126,7 +131,7 @@ export default class WindshaftSQL extends Provider {
 
         //block data acquisition
         this.style = null;
-        this.schema = getSchema(`(${aggSQL}) AS tmp`, protoSchema).then(schema => {
+        this.schema = getSchema(query, protoSchema).then(schema => {
             this.style = new R.Style.Style(this.renderer, schema);
             return schema;
         });
@@ -198,13 +203,44 @@ export default class WindshaftSQL extends Provider {
                         numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
                         var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                        var points = new Float32Array(mvtLayer.length * 2);
+                        if (this.geomType == 'point') {
+                            var points = new Float32Array(mvtLayer.length * 2);
+                        }
+                        var geometry = [];
+                        var breakpointList = [];
+
                         const r = Math.random();
+                        const ear = earcut;
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
-                            points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                            points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                            if (this.geomType == 'point') {
+                                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                            } else {
+                                let flat = [];
+                                let holes = [];
+                                for (let j = 0; j < geom.length; j++) {
+                                    if (j > 0) {
+                                        holes.push(flat.length / 2);
+                                    }
+                                    for (let k = 0; k < geom[j].length; k++) {
+                                        flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                                        flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                                    }
+                                }
+                                const tris = earcut(flat, holes);
+                                var deviation = earcut.deviation(flat, holes, 2, tris);
+                                if (deviation > 1) {
+                                    console.log('Earcut deviation:', deviation);
+                                }
+                                tris.map(index => {
+                                    geometry.push(flat[2 * index]);
+                                    geometry.push(flat[2 * index + 1]);
+                                });
+                                breakpointList.push(geometry.length);
+                            }
+
                             catFields.map((name, index) => {
                                 properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
                             });
@@ -212,6 +248,7 @@ export default class WindshaftSQL extends Provider {
                                 properties[index + catFields.length][i] = Number(f.properties[name]);
                             });
                         }
+
                         var rs = rsys.getRsysFromTile(x, y, z);
                         let dataframeProperties = {};
                         Object.keys(fieldMap).map((name, pid) => {
@@ -220,9 +257,10 @@ export default class WindshaftSQL extends Provider {
                         var dataframe = new R.Dataframe(
                             rs.center,
                             rs.scale,
-                            points,
+                            this.geomType == 'point' ? points : new Float32Array(geometry),
                             dataframeProperties,
                         );
+                        dataframe.breakpointList = breakpointList;
                         dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
                         this.renderer.addDataframe(dataframe).setStyle(this.style)
@@ -275,6 +313,21 @@ async function getColumnTypes(query) {
     return json.fields;
 }
 
+async function getGeometryType(query) {
+    const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const json = await response.json();
+    const type = json.rows[0].type;
+    switch (type) {
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
+    }
+}
+
 async function getNumericTypes(names, query) {
     const aggFns = ['min', 'max', 'sum', 'avg'];
     const numericsSelect = names.map(name =>
@@ -313,7 +366,6 @@ async function getSchema(query, proto) {
     //for each category type
     //Get category names and counts by grouping by
     //Assign ids
-
     const fields = await getColumnTypes(query);
     let numerics = [];
     let categories = [];

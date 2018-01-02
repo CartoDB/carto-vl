@@ -41,6 +41,17 @@ function Point(gl) {
     this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
 }
+function Tri(gl) {
+    compileProgram.call(this, gl, rendererGLSL.tris.VS, rendererGLSL.tris.FS);
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+}
 function GenericStyler(gl, glsl, preface, inline) {
     const VS = glsl.VS;
     let FS = glsl.FS;
@@ -84,6 +95,9 @@ function Width(gl, preface, inline) {
 const renderer = {
     createPointShader: function (gl) {
         return new Point(gl);
+    },
+    createTriShader: function (gl) {
+        return new Tri(gl);
     }
 };
 

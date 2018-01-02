@@ -1,2 +1,3 @@
 import * as point from './point';
-export { point };
+import * as tris from './tris';
+export { point, tris };
