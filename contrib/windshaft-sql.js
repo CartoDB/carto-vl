@@ -214,7 +214,7 @@ export default class WindshaftSQL extends Provider {
                             if (this.geomType == 'point') {
                                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            } else {
+                            } else if (this.geomType == 'polygon') {
                                 let polygon = {
                                     flat: [],
                                     holes: []
@@ -229,6 +229,16 @@ export default class WindshaftSQL extends Provider {
                                     }
                                 }
                                 geometry.push(polygon);
+                            } else if (this.geomType == 'line') {
+                                geom.map(l => {
+                                    let line = [];
+                                    l.map(point => {
+                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+                                    });
+                                    geometry.push(line);
+                                });
+                            } else {
+                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
                             }
 
                             catFields.map((name, index) => {
@@ -313,6 +323,8 @@ async function getGeometryType(query) {
             return 'polygon';
         case 'ST_Point':
             return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
         default:
             throw new Error(`Unimplemented geometry type ''${type}'`);
     }

@@ -232,6 +232,7 @@ Renderer.prototype.createTileTexture = function (type, features) {
             ]
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
+// The geom will be an array of coordinates in this case
 function decodeGeom(geomType, geom) {
     if (geomType == 'point') {
         return {
@@ -257,6 +258,17 @@ function decodeGeom(geomType, geom) {
             geometry: new Float32Array(vertexArray),
             breakpointList
         };
+    } else if (geomType == 'line') {
+        let geometry = [];
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(line => {
+            geometry = geometry.concat(line);
+            breakpointList.push(geometry.length);
+        });
+        return {
+            geometry: new Float32Array(geometry),
+            breakpointList
+        }
     } else {
         throw new Error(`Unimplemented geometry type: '${geomType}'`);
     }
@@ -293,7 +305,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
-    dataframe.geomType = dataframe.breakpointList.length ? 'tri' : 'point';
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
             const isCategory = !Number.isFinite(dataframe.properties[k][0]);
@@ -471,10 +482,10 @@ function refresh(timestamp) {
 
     tiles.forEach(tile => {
         let renderer = null;
-        if (tile.geomType == 'point') {
-            renderer = this.finalRendererProgram;
-        } else {
+        if (tile.type == 'polygon') {
             renderer = this.triRendererProgram;
+        } else {
+            renderer = this.finalRendererProgram;
         }
         gl.useProgram(renderer.program);
         gl.uniform2f(renderer.vertexScaleUniformLocation,
@@ -509,7 +520,7 @@ function refresh(timestamp) {
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
         gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(tile.geomType == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+        gl.drawArrays(tile.type == 'polygon' ? gl.TRIANGLES : gl.POINTS, 0, tile.numVertex);
 
         gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.disableVertexAttribArray(renderer.featureIdAttr);
