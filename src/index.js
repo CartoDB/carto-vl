@@ -267,6 +267,7 @@ function decodeGeom(geomType, geom) {
         };
     } else if (geomType == 'line') {
         let geometry = [];
+        let normals = [];
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
         geom.map(line => {
             // Create triangulation
@@ -283,7 +284,15 @@ function decodeGeom(geomType, geom) {
                 }
                 //Compute normal
                 let normal = getNormal(b, a);
-                normal = normal.map(x => x * 0.192);
+                normals.push(-normal[0], -normal[1]);
+                normals.push(normal[0], normal[1]);
+                normals.push(-normal[0], -normal[1]);
+
+                normals.push(normal[0], normal[1]);
+                normals.push(normal[0], normal[1]);
+                normals.push(-normal[0], -normal[1]);
+
+                normal = normal.map(x => x * 0.192 * 0);
 
                 //First triangle
                 geometry.push(a[0] - 0.01 * normal[0]);
@@ -310,7 +319,8 @@ function decodeGeom(geomType, geom) {
         });
         return {
             geometry: new Float32Array(geometry),
-            breakpointList
+            breakpointList,
+            normals: new Float32Array(normals)
         }
     } else {
         throw new Error(`Unimplemented geometry type: '${geomType}'`);
@@ -398,6 +408,12 @@ Renderer.prototype.addDataframe = function (dataframe) {
     }
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    if (decodedGeom.normals) {
+        dataframe.normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
@@ -527,6 +543,8 @@ function refresh(timestamp) {
         let renderer = null;
         if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
+        } else if (tile.type == 'line') {
+            renderer = this.lineRendererProgram;
         } else {
             renderer = this.triRendererProgram;
         }
@@ -546,6 +564,12 @@ function refresh(timestamp) {
         gl.enableVertexAttribArray(renderer.featureIdAttr);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
         gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+        if (tile.type == 'line') {
+            gl.enableVertexAttribArray(renderer.normalAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
+            gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
+        }
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
@@ -567,6 +591,9 @@ function refresh(timestamp) {
 
         gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.disableVertexAttribArray(renderer.featureIdAttr);
+        if (tile.type == 'line') {
+            gl.disableVertexAttribArray(renderer.normalAttr);
+        }
     });
 
     this.computePool.map(job => job.work(this));
@@ -589,6 +616,7 @@ function refresh(timestamp) {
 Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
     this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
+    this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
 }
 
 Renderer.prototype.compute = function (type, expressions) {

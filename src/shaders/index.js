@@ -52,6 +52,18 @@ function Tri(gl) {
     this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
 }
+function Line(gl) {
+    compileProgram.call(this, gl, rendererGLSL.line.VS, rendererGLSL.line.FS);
+    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+    this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+}
 function GenericStyler(gl, glsl, preface, inline) {
     const VS = glsl.VS;
     let FS = glsl.FS;
@@ -98,6 +110,9 @@ const renderer = {
     },
     createTriShader: function (gl) {
         return new Tri(gl);
+    },
+    createLineShader: function (gl) {
+        return new Line(gl);
     }
 };
 
