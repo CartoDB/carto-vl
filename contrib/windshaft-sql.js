@@ -229,7 +229,7 @@ export default class WindshaftSQL extends Provider {
                                 let polygon = null;
                                 /*
                                     All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-                                    In don't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+                                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
                                     See:
                                         https://github.com/mapbox/vector-tile-spec/tree/master/2.1
                                         https://en.wikipedia.org/wiki/Shoelace_formula
