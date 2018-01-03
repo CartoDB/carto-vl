@@ -2764,10 +2764,13 @@ Renderer.prototype.createTileTexture = function (type, features) {
 function getNormal(a, b) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
-    const s = Math.sqrt(dx * dx + dy * dy);
-    return [-dy / s, dx / s];
+    return normalize([-dy, dx]);
 }
 
+function normalize(v) {
+    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    return [v[0] / s, v[1] / s];
+}
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
@@ -2821,23 +2824,39 @@ function decodeGeom(geomType, geom) {
                 const b = [line[i + 2], line[i + 3]];
                 if (i > 0) {
                     var prev = [line[i + -2], line[i + -1]];
-                    var nprev = getNormal(prev, a);
+                    var nprev = getNormal(a, prev);
                 }
                 if (i < line.length - 4) {
                     var next = [line[i + 4], line[i + 5]];
-                    var nnext = getNormal(b, next);
+                    var nnext = getNormal(next, b);
                 }
                 //Compute normal
                 let normal = getNormal(b, a);
-                normals.push(-normal[0], -normal[1]);
-                normals.push(normal[0], normal[1]);
-                normals.push(-normal[0], -normal[1]);
+                let na = normal;
+                let nb = normal;
+                //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
+                if (prev) {
+                    na = normalize([
+                        normal[0] * 0.5 + nprev[0] * 0.5,
+                        normal[1] * 0.5 + nprev[1] * 0.5,
+                    ]);
+                }
+                if (next) {
+                    nb = normalize([
+                        normal[0] * 0.5 + nnext[0] * 0.5,
+                        normal[1] * 0.5 + nnext[1] * 0.5,
+                    ]);
+                }
+                normals.push(-na[0], -na[1]);
+                normals.push(na[0], na[1]);
+                normals.push(-nb[0], -nb[1]);
 
-                normals.push(normal[0], normal[1]);
-                normals.push(normal[0], normal[1]);
-                normals.push(-normal[0], -normal[1]);
+                normals.push(na[0], na[1]);
+                normals.push(nb[0], nb[1]);
+                normals.push(-nb[0], -nb[1]);
 
-                normal = normal.map(x => x * 0.192 * 0);
+                normal = [0, 0];
+
 
                 //First triangle
                 geometry.push(a[0] - 0.01 * normal[0]);
