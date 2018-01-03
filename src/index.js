@@ -216,6 +216,13 @@ Renderer.prototype.createTileTexture = function (type, features) {
     return texture;
 }
 
+function getNormal(a, b) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const s = Math.sqrt(dx * dx + dy * dy);
+    return [-dy / s, dx / s];
+}
+
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
@@ -262,7 +269,43 @@ function decodeGeom(geomType, geom) {
         let geometry = [];
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
         geom.map(line => {
-            geometry = geometry.concat(line);
+            // Create triangulation
+            for (let i = 0; i < line.length - 2; i += 2) {
+                const a = [line[i + 0], line[i + 1]];
+                const b = [line[i + 2], line[i + 3]];
+                if (i > 0) {
+                    var prev = [line[i + -2], line[i + -1]];
+                    var nprev = getNormal(prev, a);
+                }
+                if (i < line.length - 4) {
+                    var next = [line[i + 4], line[i + 5]];
+                    var nnext = getNormal(b, next);
+                }
+                //Compute normal
+                let normal = getNormal(b, a);
+                normal = normal.map(x => x * 0.192);
+
+                //First triangle
+                geometry.push(a[0] - 0.01 * normal[0]);
+                geometry.push(a[1] - 0.01 * normal[1]);
+
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+
+                //Second triangle
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] + 0.01 * normal[0]);
+                geometry.push(b[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+            }
+            //console.log("L", line, geometry)
             breakpointList.push(geometry.length);
         });
         return {
@@ -482,10 +525,10 @@ function refresh(timestamp) {
 
     tiles.forEach(tile => {
         let renderer = null;
-        if (tile.type == 'polygon') {
-            renderer = this.triRendererProgram;
-        } else {
+        if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
+        } else {
+            renderer = this.triRendererProgram;
         }
         gl.useProgram(renderer.program);
         gl.uniform2f(renderer.vertexScaleUniformLocation,
@@ -520,7 +563,7 @@ function refresh(timestamp) {
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
         gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(tile.type == 'polygon' ? gl.TRIANGLES : gl.POINTS, 0, tile.numVertex);
+        gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
         gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.disableVertexAttribArray(renderer.featureIdAttr);
