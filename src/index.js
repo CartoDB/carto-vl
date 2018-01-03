@@ -1,6 +1,7 @@
 import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
+import * as earcut from 'earcut';
 
 export { Renderer, Style, Dataframe };
 
@@ -215,6 +216,107 @@ Renderer.prototype.createTileTexture = function (type, features) {
     return texture;
 }
 
+function getNormal(a, b) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const s = Math.sqrt(dx * dx + dy * dy);
+    return [-dy / s, dx / s];
+}
+
+// Decode a tile geometry
+// If the geometry type is 'point' it will pass trough the geom (the vertex array)
+// If the geometry type is 'polygon' it will triangulate the polygon list (geom)
+//      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
+//      Example:
+/*         let geom = [
+                {
+                    flat: [
+                        0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
+                        0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
+                    ]
+                    holes: [5]
+                }
+            ]
+*/
+// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
+// The geom will be an array of coordinates in this case
+function decodeGeom(geomType, geom) {
+    if (geomType == 'point') {
+        return {
+            geometry: geom,
+            breakpointList: []
+        };
+    } else if (geomType == 'polygon') {
+        let vertexArray = []; //Array of triangle vertices
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(polygon => {
+            const triangles = earcut(polygon.flat, polygon.holes);
+            const deviation = earcut.deviation(polygon.flat, polygon.holes, 2, triangles);
+            if (deviation > 1) {
+                console.log('Earcut deviation:', deviation);
+            }
+            triangles.map(index => {
+                vertexArray.push(polygon.flat[2 * index]);
+                vertexArray.push(polygon.flat[2 * index + 1]);
+            });
+            breakpointList.push(vertexArray.length);
+        });
+        return {
+            geometry: new Float32Array(vertexArray),
+            breakpointList
+        };
+    } else if (geomType == 'line') {
+        let geometry = [];
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(line => {
+            // Create triangulation
+            for (let i = 0; i < line.length - 2; i += 2) {
+                const a = [line[i + 0], line[i + 1]];
+                const b = [line[i + 2], line[i + 3]];
+                if (i > 0) {
+                    var prev = [line[i + -2], line[i + -1]];
+                    var nprev = getNormal(prev, a);
+                }
+                if (i < line.length - 4) {
+                    var next = [line[i + 4], line[i + 5]];
+                    var nnext = getNormal(b, next);
+                }
+                //Compute normal
+                let normal = getNormal(b, a);
+                normal = normal.map(x => x * 0.192);
+
+                //First triangle
+                geometry.push(a[0] - 0.01 * normal[0]);
+                geometry.push(a[1] - 0.01 * normal[1]);
+
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+
+                //Second triangle
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] + 0.01 * normal[0]);
+                geometry.push(b[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+            }
+            //console.log("L", line, geometry)
+            breakpointList.push(geometry.length);
+        });
+        return {
+            geometry: new Float32Array(geometry),
+            breakpointList
+        }
+    } else {
+        throw new Error(`Unimplemented geometry type: '${geomType}'`);
+    }
+}
+
 /**
  * @jsapi
  * @description Adds a new dataframe to the renderer.
@@ -229,10 +331,14 @@ Renderer.prototype.addDataframe = function (dataframe) {
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
-    var points = dataframe.geom;
+    var points;
     const level = 0;
     const width = RTT_WIDTH;
+    const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
+    var points = decodedGeom.geometry;
     dataframe.numVertex = points.length / 2;
+    dataframe.breakpointList = decodedGeom.breakpointList;
+
     dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
     const height = Math.ceil(dataframe.numFeatures / width);
     const border = 0;
@@ -242,7 +348,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
-    dataframe.geomType = dataframe.breakpointList.length ? 'tri' : 'point';
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
             const isCategory = !Number.isFinite(dataframe.properties[k][0]);
@@ -420,7 +525,7 @@ function refresh(timestamp) {
 
     tiles.forEach(tile => {
         let renderer = null;
-        if (tile.geomType == 'point') {
+        if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
         } else {
             renderer = this.triRendererProgram;
@@ -458,7 +563,7 @@ function refresh(timestamp) {
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
         gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(tile.geomType == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+        gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
         gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.disableVertexAttribArray(renderer.featureIdAttr);

@@ -2523,9 +2523,12 @@ function signedArea(ring) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_earcut__);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__style_functions__ = __webpack_require__(1);
+
 
 
 
@@ -2743,6 +2746,107 @@ Renderer.prototype.createTileTexture = function (type, features) {
     return texture;
 }
 
+function getNormal(a, b) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const s = Math.sqrt(dx * dx + dy * dy);
+    return [-dy / s, dx / s];
+}
+
+// Decode a tile geometry
+// If the geometry type is 'point' it will pass trough the geom (the vertex array)
+// If the geometry type is 'polygon' it will triangulate the polygon list (geom)
+//      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
+//      Example:
+/*         let geom = [
+                {
+                    flat: [
+                        0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
+                        0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
+                    ]
+                    holes: [5]
+                }
+            ]
+*/
+// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
+// The geom will be an array of coordinates in this case
+function decodeGeom(geomType, geom) {
+    if (geomType == 'point') {
+        return {
+            geometry: geom,
+            breakpointList: []
+        };
+    } else if (geomType == 'polygon') {
+        let vertexArray = []; //Array of triangle vertices
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(polygon => {
+            const triangles = __WEBPACK_IMPORTED_MODULE_3_earcut__(polygon.flat, polygon.holes);
+            const deviation = __WEBPACK_IMPORTED_MODULE_3_earcut__["deviation"](polygon.flat, polygon.holes, 2, triangles);
+            if (deviation > 1) {
+                console.log('Earcut deviation:', deviation);
+            }
+            triangles.map(index => {
+                vertexArray.push(polygon.flat[2 * index]);
+                vertexArray.push(polygon.flat[2 * index + 1]);
+            });
+            breakpointList.push(vertexArray.length);
+        });
+        return {
+            geometry: new Float32Array(vertexArray),
+            breakpointList
+        };
+    } else if (geomType == 'line') {
+        let geometry = [];
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(line => {
+            // Create triangulation
+            for (let i = 0; i < line.length - 2; i += 2) {
+                const a = [line[i + 0], line[i + 1]];
+                const b = [line[i + 2], line[i + 3]];
+                if (i > 0) {
+                    var prev = [line[i + -2], line[i + -1]];
+                    var nprev = getNormal(prev, a);
+                }
+                if (i < line.length - 4) {
+                    var next = [line[i + 4], line[i + 5]];
+                    var nnext = getNormal(b, next);
+                }
+                //Compute normal
+                let normal = getNormal(b, a);
+                normal = normal.map(x => x * 0.192);
+
+                //First triangle
+                geometry.push(a[0] - 0.01 * normal[0]);
+                geometry.push(a[1] - 0.01 * normal[1]);
+
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+
+                //Second triangle
+                geometry.push(a[0] + 0.01 * normal[0]);
+                geometry.push(a[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] + 0.01 * normal[0]);
+                geometry.push(b[1] + 0.01 * normal[1]);
+
+                geometry.push(b[0] - 0.01 * normal[0]);
+                geometry.push(b[1] - 0.01 * normal[1]);
+            }
+            //console.log("L", line, geometry)
+            breakpointList.push(geometry.length);
+        });
+        return {
+            geometry: new Float32Array(geometry),
+            breakpointList
+        }
+    } else {
+        throw new Error(`Unimplemented geometry type: '${geomType}'`);
+    }
+}
+
 /**
  * @jsapi
  * @description Adds a new dataframe to the renderer.
@@ -2757,10 +2861,14 @@ Renderer.prototype.addDataframe = function (dataframe) {
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
-    var points = dataframe.geom;
+    var points;
     const level = 0;
     const width = RTT_WIDTH;
+    const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
+    var points = decodedGeom.geometry;
     dataframe.numVertex = points.length / 2;
+    dataframe.breakpointList = decodedGeom.breakpointList;
+
     dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
     const height = Math.ceil(dataframe.numFeatures / width);
     const border = 0;
@@ -2770,7 +2878,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
-    dataframe.geomType = dataframe.breakpointList.length ? 'tri' : 'point';
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
             const isCategory = !Number.isFinite(dataframe.properties[k][0]);
@@ -2948,7 +3055,7 @@ function refresh(timestamp) {
 
     tiles.forEach(tile => {
         let renderer = null;
-        if (tile.geomType == 'point') {
+        if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
         } else {
             renderer = this.triRendererProgram;
@@ -2986,7 +3093,7 @@ function refresh(timestamp) {
         gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
         gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(tile.geomType == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+        gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
         gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.disableVertexAttribArray(renderer.featureIdAttr);
@@ -3105,9 +3212,9 @@ Renderer.prototype._compute = function (type, expressions) {
 
     //Compile expression, use expression
     //const expr = new functions.HSV(1., 0, 0.12);
-    let rgba = [0, 0, 0, 0].map(() => __WEBPACK_IMPORTED_MODULE_3__style_functions__["float"](0));
+    let rgba = [0, 0, 0, 0].map(() => __WEBPACK_IMPORTED_MODULE_4__style_functions__["float"](0));
     expressions.map((e, i) => rgba[i] = e);
-    const expr = __WEBPACK_IMPORTED_MODULE_3__style_functions__["rgba"](...rgba);
+    const expr = __WEBPACK_IMPORTED_MODULE_4__style_functions__["rgba"](...rgba);
     /*functions.property('amount', {
         'amount': 'float'
     });*/
@@ -7650,6 +7757,7 @@ map.on('load', _ => {
     addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
     addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
     addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsb2coJG51bWZsb29ycyksIEVhcnRoLCAgMSwgNClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
+    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbiIsImYiOnsibG5nIjotMTIyLjQzOTgzNzM3NzEwMDI4LCJsYXQiOjM3Ljc2MjU5NTE0Nzc5MTAyfSwiZyI6MTMuMTY1NzE5NjE3NDcwNjc4fQ==');
     if (localStorage.getItem("dataset")) {
         $('#dataset').val(localStorage.getItem("dataset"));
         $('#apikey').val(localStorage.getItem("apikey"));
@@ -7756,9 +7864,6 @@ function Wmxy(latLng) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_earcut__);
-
 
 
 
@@ -7967,38 +8072,41 @@ class WindshaftSQL extends Provider {
                             var points = new Float32Array(mvtLayer.length * 2);
                         }
                         var geometry = [];
-                        var breakpointList = [];
 
                         const r = Math.random();
-                        const ear = __WEBPACK_IMPORTED_MODULE_2_earcut__;
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
                             if (this.geomType == 'point') {
                                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            } else {
-                                let flat = [];
-                                let holes = [];
+                            } else if (this.geomType == 'polygon') {
+                                let polygon = {
+                                    flat: [],
+                                    holes: []
+                                };
                                 for (let j = 0; j < geom.length; j++) {
                                     if (j > 0) {
-                                        holes.push(flat.length / 2);
+                                        polygon.holes.push(polygon.flat.length / 2);
                                     }
                                     for (let k = 0; k < geom[j].length; k++) {
-                                        flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                                        flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
                                 }
-                                const tris = __WEBPACK_IMPORTED_MODULE_2_earcut__(flat, holes);
-                                var deviation = __WEBPACK_IMPORTED_MODULE_2_earcut__["deviation"](flat, holes, 2, tris);
-                                if (deviation > 1) {
-                                    console.log('Earcut deviation:', deviation);
-                                }
-                                tris.map(index => {
-                                    geometry.push(flat[2 * index]);
-                                    geometry.push(flat[2 * index + 1]);
+                                geometry.push(polygon);
+                                //TODO bug, renderer cannot distinguish between features in multipolygon cases
+                            } else if (this.geomType == 'line') {
+                                geom.map(l => {
+                                    let line = [];
+                                    l.map(point => {
+                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+                                    });
+                                    geometry.push(line);
+                                    //TODO bug, renderer cannot distinguish between features in multiline cases
                                 });
-                                breakpointList.push(geometry.length);
+                            } else {
+                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
                             }
 
                             catFields.map((name, index) => {
@@ -8017,10 +8125,10 @@ class WindshaftSQL extends Provider {
                         var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
                             rs.center,
                             rs.scale,
-                            this.geomType == 'point' ? points : new Float32Array(geometry),
+                            this.geomType == 'point' ? points : geometry,
                             dataframeProperties,
                         );
-                        dataframe.breakpointList = breakpointList;
+                        dataframe.type = this.geomType;
                         dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
                         this.renderer.addDataframe(dataframe).setStyle(this.style)
@@ -8085,6 +8193,8 @@ async function getGeometryType(query) {
             return 'polygon';
         case 'ST_Point':
             return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
         default:
             throw new Error(`Unimplemented geometry type ''${type}'`);
     }
