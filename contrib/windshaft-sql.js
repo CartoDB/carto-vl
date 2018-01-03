@@ -1,6 +1,5 @@
 import * as rsys from './rsys';
 import * as R from '../src/index';
-import * as earcut from 'earcut';
 
 var VectorTile = require('@mapbox/vector-tile').VectorTile;
 var Protobuf = require('pbf');
@@ -207,10 +206,8 @@ export default class WindshaftSQL extends Provider {
                             var points = new Float32Array(mvtLayer.length * 2);
                         }
                         var geometry = [];
-                        var breakpointList = [];
 
                         const r = Math.random();
-                        const ear = earcut;
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
@@ -218,27 +215,20 @@ export default class WindshaftSQL extends Provider {
                                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             } else {
-                                let flat = [];
-                                let holes = [];
+                                let polygon = {
+                                    flat: [],
+                                    holes: []
+                                };
                                 for (let j = 0; j < geom.length; j++) {
                                     if (j > 0) {
-                                        holes.push(flat.length / 2);
+                                        polygon.holes.push(polygon.flat.length / 2);
                                     }
                                     for (let k = 0; k < geom[j].length; k++) {
-                                        flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                                        flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
                                 }
-                                const tris = earcut(flat, holes);
-                                var deviation = earcut.deviation(flat, holes, 2, tris);
-                                if (deviation > 1) {
-                                    console.log('Earcut deviation:', deviation);
-                                }
-                                tris.map(index => {
-                                    geometry.push(flat[2 * index]);
-                                    geometry.push(flat[2 * index + 1]);
-                                });
-                                breakpointList.push(geometry.length);
+                                geometry.push(polygon);
                             }
 
                             catFields.map((name, index) => {
@@ -257,10 +247,10 @@ export default class WindshaftSQL extends Provider {
                         var dataframe = new R.Dataframe(
                             rs.center,
                             rs.scale,
-                            this.geomType == 'point' ? points : new Float32Array(geometry),
+                            this.geomType == 'point' ? points : geometry,
                             dataframeProperties,
                         );
-                        dataframe.breakpointList = breakpointList;
+                        dataframe.type = this.geomType;
                         dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
                         this.renderer.addDataframe(dataframe).setStyle(this.style)

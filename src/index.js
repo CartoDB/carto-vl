@@ -1,6 +1,7 @@
 import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
+import * as earcut from 'earcut';
 
 export { Renderer, Style, Dataframe };
 
@@ -215,6 +216,52 @@ Renderer.prototype.createTileTexture = function (type, features) {
     return texture;
 }
 
+// Decode a tile geometry
+// If the geometry type is 'point' it will pass trough the geom (the vertex array)
+// If the geometry type is 'polygon' it will triangulate the polygon list (geom)
+//      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
+//      Example:
+/*         let geom = [
+                {
+                    flat: [
+                        0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
+                        0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
+                    ]
+                    holes: [5]
+                }
+            ]
+*/
+// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
+function decodeGeom(geomType, geom) {
+    if (geomType == 'point') {
+        return {
+            geometry: geom,
+            breakpointList: []
+        };
+    } else if (geomType == 'polygon') {
+        let vertexArray = []; //Array of triangle vertices
+        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+        geom.map(polygon => {
+            const triangles = earcut(polygon.flat, polygon.holes);
+            const deviation = earcut.deviation(polygon.flat, polygon.holes, 2, triangles);
+            if (deviation > 1) {
+                console.log('Earcut deviation:', deviation);
+            }
+            triangles.map(index => {
+                vertexArray.push(polygon.flat[2 * index]);
+                vertexArray.push(polygon.flat[2 * index + 1]);
+            });
+            breakpointList.push(vertexArray.length);
+        });
+        return {
+            geometry: new Float32Array(vertexArray),
+            breakpointList
+        };
+    } else {
+        throw new Error(`Unimplemented geometry type: '${geomType}'`);
+    }
+}
+
 /**
  * @jsapi
  * @description Adds a new dataframe to the renderer.
@@ -229,10 +276,14 @@ Renderer.prototype.addDataframe = function (dataframe) {
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
-    var points = dataframe.geom;
+    var points;
     const level = 0;
     const width = RTT_WIDTH;
+    const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
+    var points = decodedGeom.geometry;
     dataframe.numVertex = points.length / 2;
+    dataframe.breakpointList = decodedGeom.breakpointList;
+
     dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
     const height = Math.ceil(dataframe.numFeatures / width);
     const border = 0;
