@@ -262,7 +262,6 @@ export default class WindshaftSQL extends Provider {
                                     }
                                 }
                                 featureGeometries.push(geometry);
-                                //TODO bug, renderer cannot distinguish between features in multipolygon cases
                             } else if (this.geomType == 'line') {
                                 geom.map(l => {
                                     let line = [];
@@ -270,7 +269,6 @@ export default class WindshaftSQL extends Provider {
                                         line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
                                     });
                                     geometry.push(line);
-                                    //TODO bug, renderer cannot distinguish between features in multiline cases
                                 });
                                 featureGeometries.push(geometry);
                             } else {
