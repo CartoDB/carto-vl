@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 26);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -2280,7 +2280,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(20);
+var Point = __webpack_require__(21);
 
 module.exports = VectorTileFeature;
 
@@ -2523,7 +2523,7 @@ function signedArea(ring) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_earcut__);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
@@ -6197,2234 +6197,6 @@ if (true) {
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(19);
-module.exports.VectorTileFeature = __webpack_require__(6);
-module.exports.VectorTileLayer = __webpack_require__(5);
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var VectorTileLayer = __webpack_require__(5);
-
-module.exports = VectorTile;
-
-function VectorTile(pbf, end) {
-    this.layers = pbf.readFields(readTile, {}, end);
-}
-
-function readTile(tag, layers, pbf) {
-    if (tag === 3) {
-        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
-        if (layer.length) layers[layer.name] = layer;
-    }
-}
-
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = Point;
-
-/**
- * A standalone point geometry with useful accessor, comparison, and
- * modification methods.
- *
- * @class Point
- * @param {Number} x the x-coordinate. this could be longitude or screen
- * pixels, or any other sort of unit.
- * @param {Number} y the y-coordinate. this could be latitude or screen
- * pixels, or any other sort of unit.
- * @example
- * var point = new Point(-77, 38);
- */
-function Point(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-Point.prototype = {
-
-    /**
-     * Clone this point, returning a new point that can be modified
-     * without affecting the old one.
-     * @return {Point} the clone
-     */
-    clone: function() { return new Point(this.x, this.y); },
-
-    /**
-     * Add this point's x & y coordinates to another point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    add:     function(p) { return this.clone()._add(p); },
-
-    /**
-     * Subtract this point's x & y coordinates to from point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    sub:     function(p) { return this.clone()._sub(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
-
-    /**
-     * Divide this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    mult:    function(k) { return this.clone()._mult(k); },
-
-    /**
-     * Divide this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    div:     function(k) { return this.clone()._div(k); },
-
-    /**
-     * Rotate this point around the 0, 0 origin by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @return {Point} output point
-     */
-    rotate:  function(a) { return this.clone()._rotate(a); },
-
-    /**
-     * Rotate this point around p point by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @param {Point} p Point to rotate around
-     * @return {Point} output point
-     */
-    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
-
-    /**
-     * Multiply this point by a 4x1 transformation matrix
-     * @param {Array<Number>} m transformation matrix
-     * @return {Point} output point
-     */
-    matMult: function(m) { return this.clone()._matMult(m); },
-
-    /**
-     * Calculate this point but as a unit vector from 0, 0, meaning
-     * that the distance from the resulting point to the 0, 0
-     * coordinate will be equal to 1 and the angle from the resulting
-     * point to the 0, 0 coordinate will be the same as before.
-     * @return {Point} unit vector point
-     */
-    unit:    function() { return this.clone()._unit(); },
-
-    /**
-     * Compute a perpendicular point, where the new y coordinate
-     * is the old x coordinate and the new x coordinate is the old y
-     * coordinate multiplied by -1
-     * @return {Point} perpendicular point
-     */
-    perp:    function() { return this.clone()._perp(); },
-
-    /**
-     * Return a version of this point with the x & y coordinates
-     * rounded to integers.
-     * @return {Point} rounded point
-     */
-    round:   function() { return this.clone()._round(); },
-
-    /**
-     * Return the magitude of this point: this is the Euclidean
-     * distance from the 0, 0 coordinate to this point's x and y
-     * coordinates.
-     * @return {Number} magnitude
-     */
-    mag: function() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    },
-
-    /**
-     * Judge whether this point is equal to another point, returning
-     * true or false.
-     * @param {Point} other the other point
-     * @return {boolean} whether the points are equal
-     */
-    equals: function(other) {
-        return this.x === other.x &&
-               this.y === other.y;
-    },
-
-    /**
-     * Calculate the distance from this point to another point
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    dist: function(p) {
-        return Math.sqrt(this.distSqr(p));
-    },
-
-    /**
-     * Calculate the distance from this point to another point,
-     * without the square root step. Useful if you're comparing
-     * relative distances.
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    distSqr: function(p) {
-        var dx = p.x - this.x,
-            dy = p.y - this.y;
-        return dx * dx + dy * dy;
-    },
-
-    /**
-     * Get the angle from the 0, 0 coordinate to this point, in radians
-     * coordinates.
-     * @return {Number} angle
-     */
-    angle: function() {
-        return Math.atan2(this.y, this.x);
-    },
-
-    /**
-     * Get the angle from this point to another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleTo: function(b) {
-        return Math.atan2(this.y - b.y, this.x - b.x);
-    },
-
-    /**
-     * Get the angle between this point and another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleWith: function(b) {
-        return this.angleWithSep(b.x, b.y);
-    },
-
-    /*
-     * Find the angle of the two vectors, solving the formula for
-     * the cross product a x b = |a||b|sin(θ) for θ.
-     * @param {Number} x the x-coordinate
-     * @param {Number} y the y-coordinate
-     * @return {Number} the angle in radians
-     */
-    angleWithSep: function(x, y) {
-        return Math.atan2(
-            this.x * y - this.y * x,
-            this.x * x + this.y * y);
-    },
-
-    _matMult: function(m) {
-        var x = m[0] * this.x + m[1] * this.y,
-            y = m[2] * this.x + m[3] * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _add: function(p) {
-        this.x += p.x;
-        this.y += p.y;
-        return this;
-    },
-
-    _sub: function(p) {
-        this.x -= p.x;
-        this.y -= p.y;
-        return this;
-    },
-
-    _mult: function(k) {
-        this.x *= k;
-        this.y *= k;
-        return this;
-    },
-
-    _div: function(k) {
-        this.x /= k;
-        this.y /= k;
-        return this;
-    },
-
-    _multByPoint: function(p) {
-        this.x *= p.x;
-        this.y *= p.y;
-        return this;
-    },
-
-    _divByPoint: function(p) {
-        this.x /= p.x;
-        this.y /= p.y;
-        return this;
-    },
-
-    _unit: function() {
-        this._div(this.mag());
-        return this;
-    },
-
-    _perp: function() {
-        var y = this.y;
-        this.y = this.x;
-        this.x = -y;
-        return this;
-    },
-
-    _rotate: function(angle) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = cos * this.x - sin * this.y,
-            y = sin * this.x + cos * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _rotateAround: function(angle, p) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
-            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _round: function() {
-        this.x = Math.round(this.x);
-        this.y = Math.round(this.y);
-        return this;
-    }
-};
-
-/**
- * Construct a point from an array if necessary, otherwise if the input
- * is already a Point, or an unknown type, return it unchanged
- * @param {Array<Number>|Point|*} a any kind of input value
- * @return {Point} constructed point, or passed-through value.
- * @example
- * // this
- * var point = Point.convert([0, 1]);
- * // is equivalent to
- * var point = new Point(0, 1);
- */
-Point.convert = function (a) {
-    if (a instanceof Point) {
-        return a;
-    }
-    if (Array.isArray(a)) {
-        return new Point(a[0], a[1]);
-    }
-    return a;
-};
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = Pbf;
-
-var ieee754 = __webpack_require__(22);
-
-function Pbf(buf) {
-    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
-    this.pos = 0;
-    this.type = 0;
-    this.length = this.buf.length;
-}
-
-Pbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum
-Pbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64
-Pbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields
-Pbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32
-
-var SHIFT_LEFT_32 = (1 << 16) * (1 << 16),
-    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
-
-Pbf.prototype = {
-
-    destroy: function() {
-        this.buf = null;
-    },
-
-    // === READING =================================================================
-
-    readFields: function(readField, result, end) {
-        end = end || this.length;
-
-        while (this.pos < end) {
-            var val = this.readVarint(),
-                tag = val >> 3,
-                startPos = this.pos;
-
-            this.type = val & 0x7;
-            readField(tag, result, this);
-
-            if (this.pos === startPos) this.skip(val);
-        }
-        return result;
-    },
-
-    readMessage: function(readField, result) {
-        return this.readFields(readField, result, this.readVarint() + this.pos);
-    },
-
-    readFixed32: function() {
-        var val = readUInt32(this.buf, this.pos);
-        this.pos += 4;
-        return val;
-    },
-
-    readSFixed32: function() {
-        var val = readInt32(this.buf, this.pos);
-        this.pos += 4;
-        return val;
-    },
-
-    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
-
-    readFixed64: function() {
-        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-        this.pos += 8;
-        return val;
-    },
-
-    readSFixed64: function() {
-        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
-        this.pos += 8;
-        return val;
-    },
-
-    readFloat: function() {
-        var val = ieee754.read(this.buf, this.pos, true, 23, 4);
-        this.pos += 4;
-        return val;
-    },
-
-    readDouble: function() {
-        var val = ieee754.read(this.buf, this.pos, true, 52, 8);
-        this.pos += 8;
-        return val;
-    },
-
-    readVarint: function(isSigned) {
-        var buf = this.buf,
-            val, b;
-
-        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;
-        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;
-        b = buf[this.pos];   val |= (b & 0x0f) << 28;
-
-        return readVarintRemainder(val, isSigned, this);
-    },
-
-    readVarint64: function() { // for compatibility with v2.0.1
-        return this.readVarint(true);
-    },
-
-    readSVarint: function() {
-        var num = this.readVarint();
-        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
-    },
-
-    readBoolean: function() {
-        return Boolean(this.readVarint());
-    },
-
-    readString: function() {
-        var end = this.readVarint() + this.pos,
-            str = readUtf8(this.buf, this.pos, end);
-        this.pos = end;
-        return str;
-    },
-
-    readBytes: function() {
-        var end = this.readVarint() + this.pos,
-            buffer = this.buf.subarray(this.pos, end);
-        this.pos = end;
-        return buffer;
-    },
-
-    // verbose for performance reasons; doesn't affect gzipped size
-
-    readPackedVarint: function(arr, isSigned) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readVarint(isSigned));
-        return arr;
-    },
-    readPackedSVarint: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSVarint());
-        return arr;
-    },
-    readPackedBoolean: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readBoolean());
-        return arr;
-    },
-    readPackedFloat: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFloat());
-        return arr;
-    },
-    readPackedDouble: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readDouble());
-        return arr;
-    },
-    readPackedFixed32: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFixed32());
-        return arr;
-    },
-    readPackedSFixed32: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSFixed32());
-        return arr;
-    },
-    readPackedFixed64: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readFixed64());
-        return arr;
-    },
-    readPackedSFixed64: function(arr) {
-        var end = readPackedEnd(this);
-        arr = arr || [];
-        while (this.pos < end) arr.push(this.readSFixed64());
-        return arr;
-    },
-
-    skip: function(val) {
-        var type = val & 0x7;
-        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
-        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
-        else if (type === Pbf.Fixed32) this.pos += 4;
-        else if (type === Pbf.Fixed64) this.pos += 8;
-        else throw new Error('Unimplemented type: ' + type);
-    },
-
-    // === WRITING =================================================================
-
-    writeTag: function(tag, type) {
-        this.writeVarint((tag << 3) | type);
-    },
-
-    realloc: function(min) {
-        var length = this.length || 16;
-
-        while (length < this.pos + min) length *= 2;
-
-        if (length !== this.length) {
-            var buf = new Uint8Array(length);
-            buf.set(this.buf);
-            this.buf = buf;
-            this.length = length;
-        }
-    },
-
-    finish: function() {
-        this.length = this.pos;
-        this.pos = 0;
-        return this.buf.subarray(0, this.length);
-    },
-
-    writeFixed32: function(val) {
-        this.realloc(4);
-        writeInt32(this.buf, val, this.pos);
-        this.pos += 4;
-    },
-
-    writeSFixed32: function(val) {
-        this.realloc(4);
-        writeInt32(this.buf, val, this.pos);
-        this.pos += 4;
-    },
-
-    writeFixed64: function(val) {
-        this.realloc(8);
-        writeInt32(this.buf, val & -1, this.pos);
-        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-        this.pos += 8;
-    },
-
-    writeSFixed64: function(val) {
-        this.realloc(8);
-        writeInt32(this.buf, val & -1, this.pos);
-        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
-        this.pos += 8;
-    },
-
-    writeVarint: function(val) {
-        val = +val || 0;
-
-        if (val > 0xfffffff || val < 0) {
-            writeBigVarint(val, this);
-            return;
-        }
-
-        this.realloc(4);
-
-        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
-        this.buf[this.pos++] =   (val >>> 7) & 0x7f;
-    },
-
-    writeSVarint: function(val) {
-        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
-    },
-
-    writeBoolean: function(val) {
-        this.writeVarint(Boolean(val));
-    },
-
-    writeString: function(str) {
-        str = String(str);
-        this.realloc(str.length * 4);
-
-        this.pos++; // reserve 1 byte for short string length
-
-        var startPos = this.pos;
-        // write the string directly to the buffer and see how much was written
-        this.pos = writeUtf8(this.buf, str, this.pos);
-        var len = this.pos - startPos;
-
-        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
-
-        // finally, write the message length in the reserved place and restore the position
-        this.pos = startPos - 1;
-        this.writeVarint(len);
-        this.pos += len;
-    },
-
-    writeFloat: function(val) {
-        this.realloc(4);
-        ieee754.write(this.buf, val, this.pos, true, 23, 4);
-        this.pos += 4;
-    },
-
-    writeDouble: function(val) {
-        this.realloc(8);
-        ieee754.write(this.buf, val, this.pos, true, 52, 8);
-        this.pos += 8;
-    },
-
-    writeBytes: function(buffer) {
-        var len = buffer.length;
-        this.writeVarint(len);
-        this.realloc(len);
-        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];
-    },
-
-    writeRawMessage: function(fn, obj) {
-        this.pos++; // reserve 1 byte for short message length
-
-        // write the message directly to the buffer and see how much was written
-        var startPos = this.pos;
-        fn(obj, this);
-        var len = this.pos - startPos;
-
-        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
-
-        // finally, write the message length in the reserved place and restore the position
-        this.pos = startPos - 1;
-        this.writeVarint(len);
-        this.pos += len;
-    },
-
-    writeMessage: function(tag, fn, obj) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeRawMessage(fn, obj);
-    },
-
-    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },
-    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },
-    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },
-    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },
-    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },
-    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },
-    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },
-    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },
-    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },
-
-    writeBytesField: function(tag, buffer) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeBytes(buffer);
-    },
-    writeFixed32Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeFixed32(val);
-    },
-    writeSFixed32Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeSFixed32(val);
-    },
-    writeFixed64Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeFixed64(val);
-    },
-    writeSFixed64Field: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeSFixed64(val);
-    },
-    writeVarintField: function(tag, val) {
-        this.writeTag(tag, Pbf.Varint);
-        this.writeVarint(val);
-    },
-    writeSVarintField: function(tag, val) {
-        this.writeTag(tag, Pbf.Varint);
-        this.writeSVarint(val);
-    },
-    writeStringField: function(tag, str) {
-        this.writeTag(tag, Pbf.Bytes);
-        this.writeString(str);
-    },
-    writeFloatField: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed32);
-        this.writeFloat(val);
-    },
-    writeDoubleField: function(tag, val) {
-        this.writeTag(tag, Pbf.Fixed64);
-        this.writeDouble(val);
-    },
-    writeBooleanField: function(tag, val) {
-        this.writeVarintField(tag, Boolean(val));
-    }
-};
-
-function readVarintRemainder(l, s, p) {
-    var buf = p.buf,
-        h, b;
-
-    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);
-    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);
-
-    throw new Error('Expected varint not more than 10 bytes');
-}
-
-function readPackedEnd(pbf) {
-    return pbf.type === Pbf.Bytes ?
-        pbf.readVarint() + pbf.pos : pbf.pos + 1;
-}
-
-function toNum(low, high, isSigned) {
-    if (isSigned) {
-        return high * 0x100000000 + (low >>> 0);
-    }
-
-    return ((high >>> 0) * 0x100000000) + (low >>> 0);
-}
-
-function writeBigVarint(val, pbf) {
-    var low, high;
-
-    if (val >= 0) {
-        low  = (val % 0x100000000) | 0;
-        high = (val / 0x100000000) | 0;
-    } else {
-        low  = ~(-val % 0x100000000);
-        high = ~(-val / 0x100000000);
-
-        if (low ^ 0xffffffff) {
-            low = (low + 1) | 0;
-        } else {
-            low = 0;
-            high = (high + 1) | 0;
-        }
-    }
-
-    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {
-        throw new Error('Given varint doesn\'t fit into 10 bytes');
-    }
-
-    pbf.realloc(10);
-
-    writeBigVarintLow(low, high, pbf);
-    writeBigVarintHigh(high, pbf);
-}
-
-function writeBigVarintLow(low, high, pbf) {
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
-    pbf.buf[pbf.pos]   = low & 0x7f;
-}
-
-function writeBigVarintHigh(high, pbf) {
-    var lsb = (high & 0x07) << 4;
-
-    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
-    pbf.buf[pbf.pos++]  = high & 0x7f;
-}
-
-function makeRoomForExtraLength(startPos, len, pbf) {
-    var extraLen =
-        len <= 0x3fff ? 1 :
-        len <= 0x1fffff ? 2 :
-        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
-
-    // if 1 byte isn't enough for encoding message length, shift the data to the right
-    pbf.realloc(extraLen);
-    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];
-}
-
-function writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }
-function writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }
-function writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }
-function writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }
-function writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }
-function writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }
-function writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }
-function writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }
-function writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }
-
-// Buffer code below from https://github.com/feross/buffer, MIT-licensed
-
-function readUInt32(buf, pos) {
-    return ((buf[pos]) |
-        (buf[pos + 1] << 8) |
-        (buf[pos + 2] << 16)) +
-        (buf[pos + 3] * 0x1000000);
-}
-
-function writeInt32(buf, val, pos) {
-    buf[pos] = val;
-    buf[pos + 1] = (val >>> 8);
-    buf[pos + 2] = (val >>> 16);
-    buf[pos + 3] = (val >>> 24);
-}
-
-function readInt32(buf, pos) {
-    return ((buf[pos]) |
-        (buf[pos + 1] << 8) |
-        (buf[pos + 2] << 16)) +
-        (buf[pos + 3] << 24);
-}
-
-function readUtf8(buf, pos, end) {
-    var str = '';
-    var i = pos;
-
-    while (i < end) {
-        var b0 = buf[i];
-        var c = null; // codepoint
-        var bytesPerSequence =
-            b0 > 0xEF ? 4 :
-            b0 > 0xDF ? 3 :
-            b0 > 0xBF ? 2 : 1;
-
-        if (i + bytesPerSequence > end) break;
-
-        var b1, b2, b3;
-
-        if (bytesPerSequence === 1) {
-            if (b0 < 0x80) {
-                c = b0;
-            }
-        } else if (bytesPerSequence === 2) {
-            b1 = buf[i + 1];
-            if ((b1 & 0xC0) === 0x80) {
-                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);
-                if (c <= 0x7F) {
-                    c = null;
-                }
-            }
-        } else if (bytesPerSequence === 3) {
-            b1 = buf[i + 1];
-            b2 = buf[i + 2];
-            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {
-                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);
-                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {
-                    c = null;
-                }
-            }
-        } else if (bytesPerSequence === 4) {
-            b1 = buf[i + 1];
-            b2 = buf[i + 2];
-            b3 = buf[i + 3];
-            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {
-                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);
-                if (c <= 0xFFFF || c >= 0x110000) {
-                    c = null;
-                }
-            }
-        }
-
-        if (c === null) {
-            c = 0xFFFD;
-            bytesPerSequence = 1;
-
-        } else if (c > 0xFFFF) {
-            c -= 0x10000;
-            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);
-            c = 0xDC00 | c & 0x3FF;
-        }
-
-        str += String.fromCharCode(c);
-        i += bytesPerSequence;
-    }
-
-    return str;
-}
-
-function writeUtf8(buf, str, pos) {
-    for (var i = 0, c, lead; i < str.length; i++) {
-        c = str.charCodeAt(i); // code point
-
-        if (c > 0xD7FF && c < 0xE000) {
-            if (lead) {
-                if (c < 0xDC00) {
-                    buf[pos++] = 0xEF;
-                    buf[pos++] = 0xBF;
-                    buf[pos++] = 0xBD;
-                    lead = c;
-                    continue;
-                } else {
-                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;
-                    lead = null;
-                }
-            } else {
-                if (c > 0xDBFF || (i + 1 === str.length)) {
-                    buf[pos++] = 0xEF;
-                    buf[pos++] = 0xBF;
-                    buf[pos++] = 0xBD;
-                } else {
-                    lead = c;
-                }
-                continue;
-            }
-        } else if (lead) {
-            buf[pos++] = 0xEF;
-            buf[pos++] = 0xBF;
-            buf[pos++] = 0xBD;
-            lead = null;
-        }
-
-        if (c < 0x80) {
-            buf[pos++] = c;
-        } else {
-            if (c < 0x800) {
-                buf[pos++] = c >> 0x6 | 0xC0;
-            } else {
-                if (c < 0x10000) {
-                    buf[pos++] = c >> 0xC | 0xE0;
-                } else {
-                    buf[pos++] = c >> 0x12 | 0xF0;
-                    buf[pos++] = c >> 0xC & 0x3F | 0x80;
-                }
-                buf[pos++] = c >> 0x6 & 0x3F | 0x80;
-            }
-            buf[pos++] = c & 0x3F | 0x80;
-        }
-    }
-    return pos;
-}
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 24 */,
-/* 25 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(7);
-
-
-
-
-const styles = [
-    `width: 3
-color: rgba(0.8,0,0,1)`,
-
-    `width: 3
-color: rgba(0.8,0,0,0.2)`,
-
-    `width: 3
-color: hsv(0, 0, 1)`,
-
-    `width: 3
-color: hsv(0, 0.7, 1.)`,
-
-    `width: 3
-color: hsv(0.2, 0.7, 1.)`,
-
-    `width: 3
-color: hsv(0.7, 0.7, 1.)`,
-
-    `width: 3
-color: hsv($category/10, 0.7, 1.)`,
-
-    `width: 3
-color: ramp($category, Prism)`,
-
-    `width: 3
-color: ramp(top($category, 4), Prism)`,
-
-    `width: 3
-color: setOpacity( ramp($category, Prism), $amount/5000)`,
-
-    `width: 3
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
-
-    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
-color: ramp(MODE($category), Prism)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
-];
-
-const texts = [
-    `We can use RGBA colors`,
-
-    `This means that we can change the opacity (alpha) easily`,
-
-    `There is support for other color spaces like HSV (Hue, Saturation, Value)`,
-
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
-
-    `You can mix expressions. Here we are setting the hue based on the category of each feature`,
-
-    `We can use turbo-carto inspired ramps too`,
-
-    `We can select the top categories, by grouping the rest into the 'others' buckets`,
-
-    `We can normalize the map based on the amount property by changing the opacity`,
-
-    `But, let's go back a little bit...`,
-
-    `We can create a bubble map easily, and we can use the square root to make the circle's area proportional to the feature's property`,
-
-    `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
-
-    `And... let's put a nice stroke`,
-    `Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE`,
-];
-
-const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-
-const barcelonaQueries = [`(SELECT
-        *
-    FROM tx_0125_copy_copy) AS tmp`
-    ,
-    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-(
-    SELECT
-        ST_AsMVTGeom(
-            ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-            CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-        ),
-        SUM(amount) AS amount,
-        _cdb_mode(category) AS category
-    FROM tx_0125_copy_copy AS cdbq
-    WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-    GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-    ORDER BY amount DESC
-)AS geom`];
-
-const ships_WWIQueries = [`(SELECT
-            the_geom_webmercator,
-            temp,
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
-        FROM wwi_ships) AS tmp`
-    ,
-    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-    (
-        SELECT
-            ST_AsMVTGeom(
-                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-            ),
-            AVG(temp)::numeric(3,1) AS temp,
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
-        FROM wwi_ships AS cdbq
-        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
-    )AS geom
-`];
-
-var mapboxgl = window.mapboxgl;
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
-var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
-    center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 13, // starting zoom,
-});
-map.repaint = false;
-var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
-
-let protoSchema = null;
-
-map.on('load', _ => {
-    let index = 0;//styles.length - 1;
-
-    function updateStyle(v) {
-        v = v || document.getElementById("styleEntry").value;
-        document.getElementById("styleEntry").value = v;
-        location.hash = getConfig();
-        try {
-            const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
-            if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
-                protoSchema = p;
-                mgl.provider.setQueries(protoSchema, $('#dataset').val());
-            }
-            mgl.provider.schema.then(schema => {
-                try {
-                    const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v, schema);
-                    mgl.provider.style.set(s, 1000);
-                    document.getElementById("feedback").style.display = 'none';
-                } catch (error) {
-                    const err = `Invalid style: ${error}:${error.stack}`;
-                    console.warn(err);
-                    document.getElementById("feedback").value = err;
-                    document.getElementById("feedback").style.display = 'block';
-                }
-            });
-        } catch (error) {
-            const err = `Invalid style: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
-        }
-    }
-
-    function barcelona() {
-        $('.step').css('display', 'inline');
-        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
-        $('#tutorial').text(texts[index]);
-
-        $('#dataset').val('tx_0125_copy_copy');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
-        $('#user').val('dmanzanares-ded13');
-        $('#cartoURL').val('carto-staging.com');
-
-        document.getElementById("styleEntry").value = styles[index];
-        superRefresh();
-    }
-    function wwi() {
-        $('.step').css('display', 'none');
-        $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-        $('#tutorial').text('');
-
-        $('#dataset').val('wwi');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
-        $('#user').val('dmanzanares-ded13');
-        $('#cartoURL').val('carto-staging.com');
-
-        document.getElementById("styleEntry").value = shipsStyle;
-        superRefresh();
-    }
-
-    $('#prev').click(() => {
-        $("#prev").attr("disabled", false);
-        $("#next").attr("disabled", false);
-        if (index > 0) {
-            index--;
-            $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
-        }
-        if (index == 0) {
-            $("#prev").attr("disabled", true);
-        }
-    });
-    $('#next').click(() => {
-        $("#prev").attr("disabled", false);
-        $("#next").attr("disabled", false);
-        if (index < styles.length - 1) {
-            index++;
-            $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
-        }
-        if (index == styles.length - 1) {
-            $("#next").prop("disabled", true);
-        }
-    });
-
-    $('#barcelona').click(barcelona);
-    $('#wwi').click(wwi);
-    $('#styleEntry').on('input', () => updateStyle());
-    function getConfig() {
-        return '#' + btoa(JSON.stringify({
-            a: $('#dataset').val(),
-            b: $('#apikey').val(),
-            c: $('#user').val(),
-            d: $('#cartoURL').val(),
-            e: $('#styleEntry').val(),
-            f: map.getCenter(),
-            g: map.getZoom(),
-        }));
-    }
-    function setConfig(input) {
-        const c = JSON.parse(atob(input));
-        $('#dataset').val(c.a);
-        $('#apikey').val(c.b);
-        $('#user').val(c.c);
-        $('#cartoURL').val(c.d);
-        $('#styleEntry').val(c.e);
-        map.setCenter(c.f);
-        map.setZoom(c.g);
-
-        superRefresh();
-    }
-
-    const superRefresh = () => {
-        location.hash = getConfig();
-
-        mgl.provider.setCartoURL($('#cartoURL').val());
-        mgl.provider.setUser($('#user').val());
-        mgl.provider.setApiKey($('#apikey').val());
-
-        localStorage.setItem('cartoURL', $('#cartoURL').val());
-        localStorage.setItem('user', $('#user').val());
-        localStorage.setItem('apikey', $('#apikey').val());
-        localStorage.setItem('dataset', $('#dataset').val());
-        protoSchema = null;
-        updateStyle();
-    };
-
-
-    $('#dataset').on('input', superRefresh);
-    $('#apikey').on('input', superRefresh);
-    $('#user').on('input', superRefresh);
-    $('#cartoURL').on('input', superRefresh);
-
-
-    const addButton = (name, code) => {
-        var button = document.createElement("button");
-        button.innerText = name;
-        button.onclick = () => {
-            $('.step').css('display', 'none');
-            $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-            $('#tutorial').text('');
-            setConfig(code);
-        }
-        document.getElementById("buttonlist").appendChild(button);
-    };
-    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IjhhMTc0YzQ1MTIxNWNiOGRjYTkwMjY0ZGUzNDI2MTQwODdjNGVmMGMiLCJjIjoiZG1hbnphbmFyZXMtZGVkMTMiLCJkIjoiY2FydG8tc3RhZ2luZy5jb20iLCJlIjoid2lkdGg6ICAgIGJsZW5kKDEsMixuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpICp6b29tKClcbmNvbG9yOiAgICBzZXRvcGFjaXR5KHJhbXAoQVZHKCR0ZW1wKSwgdGVhbHJvc2UsIDAsIDMwKSwgYmxlbmQoMC4wMDUsMSxuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpKSIsImYiOnsibG5nIjo2MC40MTM2MTE2NzUzMTc3MjUsImxhdCI6MjMuMjIxNzQzODQ0NzQ2Mjg1fSwiZyI6MS41NTE5NTk3NzkwMjk0MTQ2fQ==');
-    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6IHNxcnQoJG51bWJlci8xMClcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MCksMC43KVxuc3Ryb2tlQ29sb3I6IHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi04Ny41MjA2MzAxNzY0MDM5OCwibGF0IjozNy4zNzc2OTk3NjY1MzkzMX0sImciOjIuNzQ2NTk0NjE1NjY2MTg5fQ==');
-    addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRhc2lhbl9wb3ArJGJsYWNrX3BvcCskaGlzcGFuaWNfbykvJHdoaXRlX3BvcFxuY29sb3I6IHNldE9wYWNpdHkoaHN2KDAuNSwxLDEpLDAuNykiLCJmIjp7ImxuZyI6LTkwLjY5OTA1ODUxMjQxMTk3LCJsYXQiOjQwLjYyMTQ3NTIzNDQxNjY2NH0sImciOjIuNDU3MzM2MDY0MjIzNTMxfQ==');
-    addButton('Denver accidents',
-        'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGNvdW50LzJcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoJGNvdW50LCBSZWRPciwwLDEyMCksKCRjb3VudC8yKS8xMClcblxuXG4iLCJmIjp7ImxuZyI6LTEwNC45NjUwNTYyMTU2Njc0NiwibGF0IjozOS43NDk2MTkzNzgyNDYyMn0sImciOjExLjQxODcxODc3MDkwNDQ5NH0=');
-    addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAgICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDApXG5zdHJva2VDb2xvcjogIGhzdigwLjEsICRnaXNfYWNyZXMvMjAwMDAwLCAkZ2lzX2FjcmVzLzQwMDAwMClcbnN0cm9rZVdpZHRoOiAkZ2lzX2FjcmVzLzUwMDAwXG5cblxuXG4iLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2fQ==');
-    addButton('California Wildfires size/opacity by acres burned colored by cause ',
-        'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
-    addButton('Population Density', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRkbi84MClcbmNvbG9yOiBzZXRPcGFjaXR5KGhzdigwLjg4LDEsKCRkbi8yNTQpKSwkZG4vMjU0KVxucmVzb2x1dGlvbjogMVxuXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOjI0Ljc4MjExMzgzOTQ1MDE3NiwibGF0IjoyMy41ODUzMDQ5MjcxOTQ0M30sImciOjEuMDkzMjIyOTcxOTUwOTI4M30=');
-    addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
-    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
-    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsb2coJG51bWZsb29ycyksIEVhcnRoLCAgMSwgNClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
-    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbiIsImYiOnsibG5nIjotMTIyLjQzOTgzNzM3NzEwMDI4LCJsYXQiOjM3Ljc2MjU5NTE0Nzc5MTAyfSwiZyI6MTMuMTY1NzE5NjE3NDcwNjc4fQ==');
-    if (localStorage.getItem("dataset")) {
-        $('#dataset').val(localStorage.getItem("dataset"));
-        $('#apikey').val(localStorage.getItem("apikey"));
-        $('#user').val(localStorage.getItem("user"));
-        $('#cartoURL').val(localStorage.getItem("cartoURL"));
-    }
-    if (location.hash.length > 1) {
-        setConfig(location.hash.substring(1));
-    } else {
-        barcelona();
-    }
-});
-
-
-/***/ }),
-/* 26 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
-
-
-
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-
-class MGLIntegrator {
-    constructor(map, providerClass) {
-        this.map = map;
-        map.on('load', _ => {
-            var cont = map.getCanvasContainer();
-            var canvas = document.createElement('canvas')
-            this.canvas = canvas;
-            canvas.id = 'good';
-            cont.appendChild(canvas)
-            canvas.style.width = map.getCanvas().style.width;
-            canvas.style.height = map.getCanvas().style.height;
-
-            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */](canvas);
-            this.provider = new providerClass(this.renderer, this.style);
-
-            map.on('resize', this.resize.bind(this));
-            map.on('movestart', this.move.bind(this));
-            map.on('move', this.move.bind(this));
-            map.on('moveend', this.move.bind(this));
-            this.move();
-        });
-    }
-    move() {
-        var b = this.map.getBounds();
-        var nw = b.getNorthWest();
-        var c = this.map.getCenter();
-
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
-        this.renderer.setZoom(this.getZoom());
-
-        c = this.renderer.getCenter();
-        var z = this.renderer.getZoom();
-        this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
-        this.renderer.compute('sum',
-            [__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].float(1)]
-        ).then(
-            result => $('#title').text('Demo dataset ~ ' + result + ' features')
-            );
-    }
-
-    resize() {
-        this.canvas.style.width = this.map.getCanvas().style.width;
-        this.canvas.style.height = this.map.getCanvas().style.height;
-        this.move();
-    }
-    getData() {
-        this.provider.getData();
-    }
-    getZoom() {
-        var b = this.map.getBounds();
-        var c = this.map.getCenter();
-        var nw = b.getNorthWest();
-        var sw = b.getSouthWest();
-        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
-        return z;
-    }
-}
-
-
-// Webmercator projection
-function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
-}
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
-
-
-
-var VectorTile = __webpack_require__(18).VectorTile;
-var Protobuf = __webpack_require__(21);
-var LRU = __webpack_require__(30);
-
-
-var style;
-var oldtiles = [];
-
-let user = 'dmanzanares-ded13';
-let cartoURL = 'carto-staging.com';
-let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
-
-const endpoint = (username, enable) => {
-    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}${enable ? '' : '&aggregation=false'}`
-}
-const layerUrl = function url(layergroup, layerIndex) {
-    return (x, y, z) => {
-        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-            const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
-        }
-        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
-    }
-}
-const layerSubdomains = function subdomains(layergroup) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return urlTemplates.subdomains;
-    }
-    return [];
-}
-
-class Provider { }
-
-class WindshaftSQL extends Provider {
-    constructor(renderer) {
-        super();
-        this.renderer = renderer;
-        this.catMap = {};
-        const options = {
-            max: 1000
-            , length: function (dataframe, key) { return 1; }
-            , dispose: (key, promise) => {
-                promise.then(dataframe => {
-                    if (!dataframe.empty) {
-                        dataframe.free();
-                        this.renderer.removeDataframe(dataframe);
-                    }
-                })
-            }
-            , maxAge: 1000 * 60 * 60
-        };
-        this.cache = LRU(options);
-    }
-    setUser(u) {
-        user = u;
-    }
-    setCartoURL(u) {
-        cartoURL = u;
-    }
-    setDataset(d) {
-        dataset = d;
-    }
-    setApiKey(k) {
-        apiKey = k;
-    }
-    setQueries(protoSchema, dataset) {
-
-        let agg = {
-            threshold: 1,
-            resolution: protoSchema.aggRes,
-            columns: {},
-            dimensions: {}
-        };
-        protoSchema.propertyList.map(p => {
-            p.aggFN.forEach(fn => {
-                if (fn != 'raw') {
-                    agg.columns[p.name + '_' + fn] = {
-                        aggregate_function: fn,
-                        aggregated_column: p.name
-                    };
-                }
-            })
-        });
-        protoSchema.propertyList.map(p => {
-            const name = p.name;
-            const aggFN = p.aggFN;
-            if (aggFN.has('raw')) {
-                agg.dimensions[p.name] = p.name;
-            }
-        });
-        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
-        agg.placement = 'centroid';
-        const mapConfigAgg = {
-            buffersize: {
-                'mvt': 0
-            },
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        cartocss: `#layer{}`,
-                        cartocss_version: '3.0.12',
-                        sql: aggSQL,
-                        aggregation: agg
-                    }
-                }
-            ]
-        };
-        const query = `(${aggSQL}) AS tmp`;
-
-        const promise = async () => {
-            this.geomType = await getGeometryType(query);
-            const response = await fetch(endpoint(user, this.geomType == 'point'), {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(mapConfigAgg),
-            });
-            const layergroup = await response.json();
-            return layerUrl(layergroup, 0);
-        };
-
-        this.url = promise();
-
-        //block data acquisition
-        this.style = null;
-        this.schema = getSchema(query, protoSchema).then(schema => {
-            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
-            return schema;
-        });
-        this.cache.reset();
-        oldtiles.forEach(t => t.free());
-        oldtiles.forEach(t => this.renderer.removeDataframe(t));
-        oldtiles = [];
-        this.schema.then(schema => {
-            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
-            this.getData();
-        });
-    }
-    async getSchema() {
-        return await this.schema;
-    }
-    getCatID(catName, catStr, schema, pName) {
-        const index = schema.properties[pName].type.categoryNames.indexOf(catStr);
-        return schema.properties[pName].type.categoryIDs[index];
-    }
-    getDataframe(x, y, z, callback) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            c.then(callback);
-            return;
-        }
-        const promise = this.requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        promise.then(callback);
-    }
-    requestDataframe(x, y, z) {
-        return new Promise((callback, reject) => {
-            const mvt_extent = 4096;
-
-            this.url.then(url => {
-                var oReq = new XMLHttpRequest();
-                oReq.responseType = "arraybuffer";
-                oReq.open("GET", url(x, y, z), true);
-                oReq.onload = (oEvent) => {
-                    this.schema.then(schema => {
-                        if (oReq.response.byteLength == 0 || oReq.response == 'null') {
-                            callback({ empty: true });
-                            return;
-                        }
-                        var tile = new VectorTile(new Protobuf(oReq.response));
-                        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                        var fieldMap = {};
-
-                        const numFields = [];
-                        const catFields = [];
-                        const catFieldsReal = [];
-                        const numFieldsReal = [];
-                        schema.propertyList.map(p =>
-                            p.aggFN.forEach(fn => {
-                                let name = p.name;
-                                if (fn != 'raw') {
-                                    name = p.name + '_' + fn;
-                                }
-                                if (p.type instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
-                                    catFields.push(name);
-                                    catFieldsReal.push(p.name);
-                                } else {
-                                    numFields.push(name);
-                                    numFieldsReal.push(p.name);
-                                }
-                            })
-                        );
-                        catFieldsReal.map((name, i) => fieldMap[name] = i);
-                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
-
-                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                        if (this.geomType == 'point') {
-                            var points = new Float32Array(mvtLayer.length * 2);
-                        }
-                        var geometry = [];
-
-                        const r = Math.random();
-                        for (var i = 0; i < mvtLayer.length; i++) {
-                            const f = mvtLayer.feature(i);
-                            const geom = f.loadGeometry();
-                            if (this.geomType == 'point') {
-                                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            } else if (this.geomType == 'polygon') {
-                                let polygon = {
-                                    flat: [],
-                                    holes: []
-                                };
-                                for (let j = 0; j < geom.length; j++) {
-                                    if (j > 0) {
-                                        polygon.holes.push(polygon.flat.length / 2);
-                                    }
-                                    for (let k = 0; k < geom[j].length; k++) {
-                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
-                                    }
-                                }
-                                geometry.push(polygon);
-                                //TODO bug, renderer cannot distinguish between features in multipolygon cases
-                            } else if (this.geomType == 'line') {
-                                geom.map(l => {
-                                    let line = [];
-                                    l.map(point => {
-                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-                                    });
-                                    geometry.push(line);
-                                    //TODO bug, renderer cannot distinguish between features in multiline cases
-                                });
-                            } else {
-                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
-                            }
-
-                            catFields.map((name, index) => {
-                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
-                            });
-                            numFields.map((name, index) => {
-                                properties[index + catFields.length][i] = Number(f.properties[name]);
-                            });
-                        }
-
-                        var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
-                        let dataframeProperties = {};
-                        Object.keys(fieldMap).map((name, pid) => {
-                            dataframeProperties[name] = properties[pid];
-                        });
-                        var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
-                            rs.center,
-                            rs.scale,
-                            this.geomType == 'point' ? points : geometry,
-                            dataframeProperties,
-                        );
-                        dataframe.type = this.geomType;
-                        dataframe.schema = schema;
-                        dataframe.size = mvtLayer.length;
-                        this.renderer.addDataframe(dataframe).setStyle(this.style)
-                        callback(dataframe);
-                    });
-                }
-                oReq.send(null);
-            });
-        });
-    }
-    getData() {
-        if (!this.style) {
-            return;
-        }
-        const renderer = this.renderer;
-        const bounds = renderer.getBounds();
-        const aspect = renderer.getAspect();
-        const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
-        var completedTiles = [];
-        var needToComplete = tiles.length;
-        tiles.forEach(t => {
-            const x = t.x;
-            const y = t.y;
-            const z = t.z;
-            this.getDataframe(x, y, z, dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete) {
-                    oldtiles.forEach(t => t.setStyle(null));
-                    completedTiles.map(t => t.setStyle(this.style));
-                    this.renderer.compute('sum',
-                        [__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].float(1)]
-                    ).then(
-                        result => $('#title').text('Demo dataset ~ ' + result + ' features')
-                        );
-                    oldtiles = completedTiles;
-                }
-            });
-        });
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = WindshaftSQL;
-
-
-async function getColumnTypes(query) {
-    const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-    const json = await response.json();
-    return json.fields;
-}
-
-async function getGeometryType(query) {
-    const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-    const json = await response.json();
-    const type = json.rows[0].type;
-    switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
-    }
-}
-
-async function getNumericTypes(names, query) {
-    const aggFns = ['min', 'max', 'sum', 'avg'];
-    const numericsSelect = names.map(name =>
-        aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-    ).concat(['COUNT(*)']).join();
-    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
-    const json = await response.json();
-    // TODO avg, sum, count
-    return names.map(name =>
-        new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
-    );
-}
-
-async function getCategoryTypes(names, query) {
-    return Promise.all(names.map(async name => {
-        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
-        const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
-        const json = await response.json();
-        let counts = [];
-        let names = [];
-        let ids = [];
-        json.rows.map((row, id) => {
-            counts.push(row.count);
-            names.push(row.name);
-            ids.push(id);
-        })
-        return new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category(names, counts, ids);
-    }));
-}
-
-
-async function getSchema(query, proto) {
-    //Get column names and types with a limit 0
-    //Get min,max,sum and count of numerics
-    //for each category type
-    //Get category names and counts by grouping by
-    //Assign ids
-    const fields = await getColumnTypes(query);
-    let numerics = [];
-    let categories = [];
-    Object.keys(fields).map(name => {
-        const type = fields[name].type;
-        if (type == 'number') {
-            numerics.push(name);
-            //proto[name].type = 'number';
-        } else if (type == 'string') {
-            categories.push(name);
-            //proto[name].type = 'category';
-        }
-    })
-
-    const numericsTypes = await getNumericTypes(numerics, query);
-    const categoriesTypes = await getCategoryTypes(categories, query);
-
-    numerics.map((name, index) => {
-        const t = numericsTypes[index];
-        proto.properties[name].type = t;
-    });
-    categories.map((name, index) => {
-        const t = categoriesTypes[index];
-        proto.properties[name].type = t;
-    });
-    //const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    return proto;
-}
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rTiles; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRsysFromTile; });
-/**
- * An RSys defines a local coordinate system that maps the coordinates
- * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
- * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
- * It is the combination of a translation and anisotropic scaling.
- * @api
- * @typedef {object} RSys - Renderer relative coordinate system
- * @property {RPoint} center - Position of the local system in external coordinates
- * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
-*/
-
-/*
- * Random notes
- *
- * We can redefine Dataframe to use a Rsys instead of center, scale
- * and we can use an Rsys for the Renderer's canvas.
- *
- * Some interesting World coordinate systems:
- *
- * WM (Webmercator): represents a part of the world (excluding polar regions)
- * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)
- *
- * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*
- * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
- * by WM_R. (positive orientation: E,N)
- *
- * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
- * (positive orientation: E,S)
- *
- * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
- * the range +/-1.
- *
- * When an RSys external coordinate system is WM or NWMC, we can compute:
- * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
- *   Math.ceil(Math.log2(1 / r.scale));
- * * Maximum zoom level for which tiles are no smaller than the rectangle:
- *   Math.floor(Math.log2(1 / r.scale));
- * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
- *
- * We'll use the term World coordinates below for the *external* reference system
- * of an RSys (usually NWMC).
- */
-
-/**
- * R coordinates to World
- * @api
- * @param {RSys} r - ref. of the passed coordinates
- * @param {number} x - x coordinate in r
- * @param {number} y - y coordinate in r
- * @return {RPoint} World coordinates
- */
-function rToW(r, x, y) {
-    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
-}
-
-/**
- * World coordinates to local RSys
- * @api
- * @param {number} x - x W-coordinate
- * @param {number} y - y W-coordinate
- * @param {RSys} r - target ref. system
- * @return {RPoint} R coordinates
- */
-function wToR(x, y, r) {
-    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
-}
-
-/**
- * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
- * @api
- * @param {number} x - TC x coordinate
- * @param {number} y - TC y coordinate
- * @param {number} z - Tile zoom level
- * @return {RSys}
- */
-function tileRsys(x, y, z) {
-    let max = Math.pow(2, z);
-    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
-}
-
-/**
- * Minimum zoom level for which tiles are no larger than the RSys rectangle
- * @api
- * @param {RSys} rsys
- * @return {number}
- */
-function rZoom(zoom) {
-    return Math.ceil(Math.log2(1. / zoom));
-}
-
-/**
- * TC tiles that intersect the local rectangle of an RSys
- * (with the largest tile size no larger than the rectangle)
- * @param {RSys} rsys
- * @return {Array} - array of TC tiles {x, y, z}
- */
-function rTiles(bounds) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
-}
-
-/**
- * TC tiles of a given zoom level that intersect a W rectangle
- * @param {number} z
- * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
- * @return {Array} - array of TC tiles {x, y, z}
- */
-function wRectangleTiles(z, wr) {
-    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
-    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
-
-    const clamp = x => Math.min(Math.max(x, 0), n - 1);
-    // compute tile coordinate ranges
-    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
-    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
-    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
-    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
-    let tiles = [];
-    for (let x = t_minx; x <= t_maxx; ++x) {
-        for (let y = t_miny; y <= t_maxy; ++y) {
-            tiles.push({ x: x, y: y, z: z });
-        }
-    }
-    return tiles;
-}
-
-/**
- * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
- * @param {*} x
- * @param {*} y
- * @param {*} z
- * @returns {RSys}
- */
-function getRsysFromTile(x, y, z) {
-    return {
-        center: {
-            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
-            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
-        },
-        scale: 1 / Math.pow(2, z)
-    }
-}
-
-
-
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -9067,6 +6839,2234 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports.VectorTile = __webpack_require__(20);
+module.exports.VectorTileFeature = __webpack_require__(6);
+module.exports.VectorTileLayer = __webpack_require__(5);
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var VectorTileLayer = __webpack_require__(5);
+
+module.exports = VectorTile;
+
+function VectorTile(pbf, end) {
+    this.layers = pbf.readFields(readTile, {}, end);
+}
+
+function readTile(tag, layers, pbf) {
+    if (tag === 3) {
+        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
+        if (layer.length) layers[layer.name] = layer;
+    }
+}
+
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = Point;
+
+/**
+ * A standalone point geometry with useful accessor, comparison, and
+ * modification methods.
+ *
+ * @class Point
+ * @param {Number} x the x-coordinate. this could be longitude or screen
+ * pixels, or any other sort of unit.
+ * @param {Number} y the y-coordinate. this could be latitude or screen
+ * pixels, or any other sort of unit.
+ * @example
+ * var point = new Point(-77, 38);
+ */
+function Point(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+Point.prototype = {
+
+    /**
+     * Clone this point, returning a new point that can be modified
+     * without affecting the old one.
+     * @return {Point} the clone
+     */
+    clone: function() { return new Point(this.x, this.y); },
+
+    /**
+     * Add this point's x & y coordinates to another point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    add:     function(p) { return this.clone()._add(p); },
+
+    /**
+     * Subtract this point's x & y coordinates to from point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    sub:     function(p) { return this.clone()._sub(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
+
+    /**
+     * Divide this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    mult:    function(k) { return this.clone()._mult(k); },
+
+    /**
+     * Divide this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    div:     function(k) { return this.clone()._div(k); },
+
+    /**
+     * Rotate this point around the 0, 0 origin by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @return {Point} output point
+     */
+    rotate:  function(a) { return this.clone()._rotate(a); },
+
+    /**
+     * Rotate this point around p point by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @param {Point} p Point to rotate around
+     * @return {Point} output point
+     */
+    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
+
+    /**
+     * Multiply this point by a 4x1 transformation matrix
+     * @param {Array<Number>} m transformation matrix
+     * @return {Point} output point
+     */
+    matMult: function(m) { return this.clone()._matMult(m); },
+
+    /**
+     * Calculate this point but as a unit vector from 0, 0, meaning
+     * that the distance from the resulting point to the 0, 0
+     * coordinate will be equal to 1 and the angle from the resulting
+     * point to the 0, 0 coordinate will be the same as before.
+     * @return {Point} unit vector point
+     */
+    unit:    function() { return this.clone()._unit(); },
+
+    /**
+     * Compute a perpendicular point, where the new y coordinate
+     * is the old x coordinate and the new x coordinate is the old y
+     * coordinate multiplied by -1
+     * @return {Point} perpendicular point
+     */
+    perp:    function() { return this.clone()._perp(); },
+
+    /**
+     * Return a version of this point with the x & y coordinates
+     * rounded to integers.
+     * @return {Point} rounded point
+     */
+    round:   function() { return this.clone()._round(); },
+
+    /**
+     * Return the magitude of this point: this is the Euclidean
+     * distance from the 0, 0 coordinate to this point's x and y
+     * coordinates.
+     * @return {Number} magnitude
+     */
+    mag: function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    },
+
+    /**
+     * Judge whether this point is equal to another point, returning
+     * true or false.
+     * @param {Point} other the other point
+     * @return {boolean} whether the points are equal
+     */
+    equals: function(other) {
+        return this.x === other.x &&
+               this.y === other.y;
+    },
+
+    /**
+     * Calculate the distance from this point to another point
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    dist: function(p) {
+        return Math.sqrt(this.distSqr(p));
+    },
+
+    /**
+     * Calculate the distance from this point to another point,
+     * without the square root step. Useful if you're comparing
+     * relative distances.
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    distSqr: function(p) {
+        var dx = p.x - this.x,
+            dy = p.y - this.y;
+        return dx * dx + dy * dy;
+    },
+
+    /**
+     * Get the angle from the 0, 0 coordinate to this point, in radians
+     * coordinates.
+     * @return {Number} angle
+     */
+    angle: function() {
+        return Math.atan2(this.y, this.x);
+    },
+
+    /**
+     * Get the angle from this point to another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleTo: function(b) {
+        return Math.atan2(this.y - b.y, this.x - b.x);
+    },
+
+    /**
+     * Get the angle between this point and another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleWith: function(b) {
+        return this.angleWithSep(b.x, b.y);
+    },
+
+    /*
+     * Find the angle of the two vectors, solving the formula for
+     * the cross product a x b = |a||b|sin(θ) for θ.
+     * @param {Number} x the x-coordinate
+     * @param {Number} y the y-coordinate
+     * @return {Number} the angle in radians
+     */
+    angleWithSep: function(x, y) {
+        return Math.atan2(
+            this.x * y - this.y * x,
+            this.x * x + this.y * y);
+    },
+
+    _matMult: function(m) {
+        var x = m[0] * this.x + m[1] * this.y,
+            y = m[2] * this.x + m[3] * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _add: function(p) {
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    },
+
+    _sub: function(p) {
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    },
+
+    _mult: function(k) {
+        this.x *= k;
+        this.y *= k;
+        return this;
+    },
+
+    _div: function(k) {
+        this.x /= k;
+        this.y /= k;
+        return this;
+    },
+
+    _multByPoint: function(p) {
+        this.x *= p.x;
+        this.y *= p.y;
+        return this;
+    },
+
+    _divByPoint: function(p) {
+        this.x /= p.x;
+        this.y /= p.y;
+        return this;
+    },
+
+    _unit: function() {
+        this._div(this.mag());
+        return this;
+    },
+
+    _perp: function() {
+        var y = this.y;
+        this.y = this.x;
+        this.x = -y;
+        return this;
+    },
+
+    _rotate: function(angle) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = cos * this.x - sin * this.y,
+            y = sin * this.x + cos * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _rotateAround: function(angle, p) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
+            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+};
+
+/**
+ * Construct a point from an array if necessary, otherwise if the input
+ * is already a Point, or an unknown type, return it unchanged
+ * @param {Array<Number>|Point|*} a any kind of input value
+ * @return {Point} constructed point, or passed-through value.
+ * @example
+ * // this
+ * var point = Point.convert([0, 1]);
+ * // is equivalent to
+ * var point = new Point(0, 1);
+ */
+Point.convert = function (a) {
+    if (a instanceof Point) {
+        return a;
+    }
+    if (Array.isArray(a)) {
+        return new Point(a[0], a[1]);
+    }
+    return a;
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = Pbf;
+
+var ieee754 = __webpack_require__(23);
+
+function Pbf(buf) {
+    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
+    this.pos = 0;
+    this.type = 0;
+    this.length = this.buf.length;
+}
+
+Pbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum
+Pbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64
+Pbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields
+Pbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32
+
+var SHIFT_LEFT_32 = (1 << 16) * (1 << 16),
+    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
+
+Pbf.prototype = {
+
+    destroy: function() {
+        this.buf = null;
+    },
+
+    // === READING =================================================================
+
+    readFields: function(readField, result, end) {
+        end = end || this.length;
+
+        while (this.pos < end) {
+            var val = this.readVarint(),
+                tag = val >> 3,
+                startPos = this.pos;
+
+            this.type = val & 0x7;
+            readField(tag, result, this);
+
+            if (this.pos === startPos) this.skip(val);
+        }
+        return result;
+    },
+
+    readMessage: function(readField, result) {
+        return this.readFields(readField, result, this.readVarint() + this.pos);
+    },
+
+    readFixed32: function() {
+        var val = readUInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    readSFixed32: function() {
+        var val = readInt32(this.buf, this.pos);
+        this.pos += 4;
+        return val;
+    },
+
+    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)
+
+    readFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readSFixed64: function() {
+        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;
+        this.pos += 8;
+        return val;
+    },
+
+    readFloat: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 23, 4);
+        this.pos += 4;
+        return val;
+    },
+
+    readDouble: function() {
+        var val = ieee754.read(this.buf, this.pos, true, 52, 8);
+        this.pos += 8;
+        return val;
+    },
+
+    readVarint: function(isSigned) {
+        var buf = this.buf,
+            val, b;
+
+        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;
+        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;
+        b = buf[this.pos];   val |= (b & 0x0f) << 28;
+
+        return readVarintRemainder(val, isSigned, this);
+    },
+
+    readVarint64: function() { // for compatibility with v2.0.1
+        return this.readVarint(true);
+    },
+
+    readSVarint: function() {
+        var num = this.readVarint();
+        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding
+    },
+
+    readBoolean: function() {
+        return Boolean(this.readVarint());
+    },
+
+    readString: function() {
+        var end = this.readVarint() + this.pos,
+            str = readUtf8(this.buf, this.pos, end);
+        this.pos = end;
+        return str;
+    },
+
+    readBytes: function() {
+        var end = this.readVarint() + this.pos,
+            buffer = this.buf.subarray(this.pos, end);
+        this.pos = end;
+        return buffer;
+    },
+
+    // verbose for performance reasons; doesn't affect gzipped size
+
+    readPackedVarint: function(arr, isSigned) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readVarint(isSigned));
+        return arr;
+    },
+    readPackedSVarint: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSVarint());
+        return arr;
+    },
+    readPackedBoolean: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readBoolean());
+        return arr;
+    },
+    readPackedFloat: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFloat());
+        return arr;
+    },
+    readPackedDouble: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readDouble());
+        return arr;
+    },
+    readPackedFixed32: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFixed32());
+        return arr;
+    },
+    readPackedSFixed32: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSFixed32());
+        return arr;
+    },
+    readPackedFixed64: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readFixed64());
+        return arr;
+    },
+    readPackedSFixed64: function(arr) {
+        var end = readPackedEnd(this);
+        arr = arr || [];
+        while (this.pos < end) arr.push(this.readSFixed64());
+        return arr;
+    },
+
+    skip: function(val) {
+        var type = val & 0x7;
+        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}
+        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;
+        else if (type === Pbf.Fixed32) this.pos += 4;
+        else if (type === Pbf.Fixed64) this.pos += 8;
+        else throw new Error('Unimplemented type: ' + type);
+    },
+
+    // === WRITING =================================================================
+
+    writeTag: function(tag, type) {
+        this.writeVarint((tag << 3) | type);
+    },
+
+    realloc: function(min) {
+        var length = this.length || 16;
+
+        while (length < this.pos + min) length *= 2;
+
+        if (length !== this.length) {
+            var buf = new Uint8Array(length);
+            buf.set(this.buf);
+            this.buf = buf;
+            this.length = length;
+        }
+    },
+
+    finish: function() {
+        this.length = this.pos;
+        this.pos = 0;
+        return this.buf.subarray(0, this.length);
+    },
+
+    writeFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeSFixed32: function(val) {
+        this.realloc(4);
+        writeInt32(this.buf, val, this.pos);
+        this.pos += 4;
+    },
+
+    writeFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeSFixed64: function(val) {
+        this.realloc(8);
+        writeInt32(this.buf, val & -1, this.pos);
+        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);
+        this.pos += 8;
+    },
+
+    writeVarint: function(val) {
+        val = +val || 0;
+
+        if (val > 0xfffffff || val < 0) {
+            writeBigVarint(val, this);
+            return;
+        }
+
+        this.realloc(4);
+
+        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;
+        this.buf[this.pos++] =   (val >>> 7) & 0x7f;
+    },
+
+    writeSVarint: function(val) {
+        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);
+    },
+
+    writeBoolean: function(val) {
+        this.writeVarint(Boolean(val));
+    },
+
+    writeString: function(str) {
+        str = String(str);
+        this.realloc(str.length * 4);
+
+        this.pos++; // reserve 1 byte for short string length
+
+        var startPos = this.pos;
+        // write the string directly to the buffer and see how much was written
+        this.pos = writeUtf8(this.buf, str, this.pos);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeFloat: function(val) {
+        this.realloc(4);
+        ieee754.write(this.buf, val, this.pos, true, 23, 4);
+        this.pos += 4;
+    },
+
+    writeDouble: function(val) {
+        this.realloc(8);
+        ieee754.write(this.buf, val, this.pos, true, 52, 8);
+        this.pos += 8;
+    },
+
+    writeBytes: function(buffer) {
+        var len = buffer.length;
+        this.writeVarint(len);
+        this.realloc(len);
+        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];
+    },
+
+    writeRawMessage: function(fn, obj) {
+        this.pos++; // reserve 1 byte for short message length
+
+        // write the message directly to the buffer and see how much was written
+        var startPos = this.pos;
+        fn(obj, this);
+        var len = this.pos - startPos;
+
+        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);
+
+        // finally, write the message length in the reserved place and restore the position
+        this.pos = startPos - 1;
+        this.writeVarint(len);
+        this.pos += len;
+    },
+
+    writeMessage: function(tag, fn, obj) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeRawMessage(fn, obj);
+    },
+
+    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },
+    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },
+    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },
+    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },
+    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },
+    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },
+    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },
+    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },
+    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },
+
+    writeBytesField: function(tag, buffer) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeBytes(buffer);
+    },
+    writeFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFixed32(val);
+    },
+    writeSFixed32Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeSFixed32(val);
+    },
+    writeFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeFixed64(val);
+    },
+    writeSFixed64Field: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeSFixed64(val);
+    },
+    writeVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeVarint(val);
+    },
+    writeSVarintField: function(tag, val) {
+        this.writeTag(tag, Pbf.Varint);
+        this.writeSVarint(val);
+    },
+    writeStringField: function(tag, str) {
+        this.writeTag(tag, Pbf.Bytes);
+        this.writeString(str);
+    },
+    writeFloatField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed32);
+        this.writeFloat(val);
+    },
+    writeDoubleField: function(tag, val) {
+        this.writeTag(tag, Pbf.Fixed64);
+        this.writeDouble(val);
+    },
+    writeBooleanField: function(tag, val) {
+        this.writeVarintField(tag, Boolean(val));
+    }
+};
+
+function readVarintRemainder(l, s, p) {
+    var buf = p.buf,
+        h, b;
+
+    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);
+    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);
+
+    throw new Error('Expected varint not more than 10 bytes');
+}
+
+function readPackedEnd(pbf) {
+    return pbf.type === Pbf.Bytes ?
+        pbf.readVarint() + pbf.pos : pbf.pos + 1;
+}
+
+function toNum(low, high, isSigned) {
+    if (isSigned) {
+        return high * 0x100000000 + (low >>> 0);
+    }
+
+    return ((high >>> 0) * 0x100000000) + (low >>> 0);
+}
+
+function writeBigVarint(val, pbf) {
+    var low, high;
+
+    if (val >= 0) {
+        low  = (val % 0x100000000) | 0;
+        high = (val / 0x100000000) | 0;
+    } else {
+        low  = ~(-val % 0x100000000);
+        high = ~(-val / 0x100000000);
+
+        if (low ^ 0xffffffff) {
+            low = (low + 1) | 0;
+        } else {
+            low = 0;
+            high = (high + 1) | 0;
+        }
+    }
+
+    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {
+        throw new Error('Given varint doesn\'t fit into 10 bytes');
+    }
+
+    pbf.realloc(10);
+
+    writeBigVarintLow(low, high, pbf);
+    writeBigVarintHigh(high, pbf);
+}
+
+function writeBigVarintLow(low, high, pbf) {
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;
+    pbf.buf[pbf.pos]   = low & 0x7f;
+}
+
+function writeBigVarintHigh(high, pbf) {
+    var lsb = (high & 0x07) << 4;
+
+    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;
+    pbf.buf[pbf.pos++]  = high & 0x7f;
+}
+
+function makeRoomForExtraLength(startPos, len, pbf) {
+    var extraLen =
+        len <= 0x3fff ? 1 :
+        len <= 0x1fffff ? 2 :
+        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));
+
+    // if 1 byte isn't enough for encoding message length, shift the data to the right
+    pbf.realloc(extraLen);
+    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];
+}
+
+function writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }
+function writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }
+function writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }
+function writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }
+function writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }
+function writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }
+function writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }
+function writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }
+function writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }
+
+// Buffer code below from https://github.com/feross/buffer, MIT-licensed
+
+function readUInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] * 0x1000000);
+}
+
+function writeInt32(buf, val, pos) {
+    buf[pos] = val;
+    buf[pos + 1] = (val >>> 8);
+    buf[pos + 2] = (val >>> 16);
+    buf[pos + 3] = (val >>> 24);
+}
+
+function readInt32(buf, pos) {
+    return ((buf[pos]) |
+        (buf[pos + 1] << 8) |
+        (buf[pos + 2] << 16)) +
+        (buf[pos + 3] << 24);
+}
+
+function readUtf8(buf, pos, end) {
+    var str = '';
+    var i = pos;
+
+    while (i < end) {
+        var b0 = buf[i];
+        var c = null; // codepoint
+        var bytesPerSequence =
+            b0 > 0xEF ? 4 :
+            b0 > 0xDF ? 3 :
+            b0 > 0xBF ? 2 : 1;
+
+        if (i + bytesPerSequence > end) break;
+
+        var b1, b2, b3;
+
+        if (bytesPerSequence === 1) {
+            if (b0 < 0x80) {
+                c = b0;
+            }
+        } else if (bytesPerSequence === 2) {
+            b1 = buf[i + 1];
+            if ((b1 & 0xC0) === 0x80) {
+                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);
+                if (c <= 0x7F) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 3) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);
+                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {
+                    c = null;
+                }
+            }
+        } else if (bytesPerSequence === 4) {
+            b1 = buf[i + 1];
+            b2 = buf[i + 2];
+            b3 = buf[i + 3];
+            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {
+                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);
+                if (c <= 0xFFFF || c >= 0x110000) {
+                    c = null;
+                }
+            }
+        }
+
+        if (c === null) {
+            c = 0xFFFD;
+            bytesPerSequence = 1;
+
+        } else if (c > 0xFFFF) {
+            c -= 0x10000;
+            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);
+            c = 0xDC00 | c & 0x3FF;
+        }
+
+        str += String.fromCharCode(c);
+        i += bytesPerSequence;
+    }
+
+    return str;
+}
+
+function writeUtf8(buf, str, pos) {
+    for (var i = 0, c, lead; i < str.length; i++) {
+        c = str.charCodeAt(i); // code point
+
+        if (c > 0xD7FF && c < 0xE000) {
+            if (lead) {
+                if (c < 0xDC00) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                    lead = c;
+                    continue;
+                } else {
+                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;
+                    lead = null;
+                }
+            } else {
+                if (c > 0xDBFF || (i + 1 === str.length)) {
+                    buf[pos++] = 0xEF;
+                    buf[pos++] = 0xBF;
+                    buf[pos++] = 0xBD;
+                } else {
+                    lead = c;
+                }
+                continue;
+            }
+        } else if (lead) {
+            buf[pos++] = 0xEF;
+            buf[pos++] = 0xBF;
+            buf[pos++] = 0xBD;
+            lead = null;
+        }
+
+        if (c < 0x80) {
+            buf[pos++] = c;
+        } else {
+            if (c < 0x800) {
+                buf[pos++] = c >> 0x6 | 0xC0;
+            } else {
+                if (c < 0x10000) {
+                    buf[pos++] = c >> 0xC | 0xE0;
+                } else {
+                    buf[pos++] = c >> 0x12 | 0xF0;
+                    buf[pos++] = c >> 0xC & 0x3F | 0x80;
+                }
+                buf[pos++] = c >> 0x6 & 0x3F | 0x80;
+            }
+            buf[pos++] = c & 0x3F | 0x80;
+        }
+    }
+    return pos;
+}
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 25 */,
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(7);
+
+
+
+
+const styles = [
+    `width: 3
+color: rgba(0.8,0,0,1)`,
+
+    `width: 3
+color: rgba(0.8,0,0,0.2)`,
+
+    `width: 3
+color: hsv(0, 0, 1)`,
+
+    `width: 3
+color: hsv(0, 0.7, 1.)`,
+
+    `width: 3
+color: hsv(0.2, 0.7, 1.)`,
+
+    `width: 3
+color: hsv(0.7, 0.7, 1.)`,
+
+    `width: 3
+color: hsv($category/10, 0.7, 1.)`,
+
+    `width: 3
+color: ramp($category, Prism)`,
+
+    `width: 3
+color: ramp(top($category, 4), Prism)`,
+
+    `width: 3
+color: setOpacity( ramp($category, Prism), $amount/5000)`,
+
+    `width: 3
+color: ramp($category, Prism)`,
+
+    `width: sqrt($amount/5000)*20
+color: ramp($category, Prism)`,
+
+    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
+color: ramp($category, Prism)`,
+
+    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
+color: ramp($category, Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`,
+
+    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp(MODE($category), Prism)
+strokeColor:       rgba(0,0,0,0.7)
+strokeWidth:      2*zoom()/50000`,
+];
+
+const texts = [
+    `We can use RGBA colors`,
+
+    `This means that we can change the opacity (alpha) easily`,
+
+    `There is support for other color spaces like HSV (Hue, Saturation, Value)`,
+
+    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
+    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
+    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
+
+    `You can mix expressions. Here we are setting the hue based on the category of each feature`,
+
+    `We can use turbo-carto inspired ramps too`,
+
+    `We can select the top categories, by grouping the rest into the 'others' buckets`,
+
+    `We can normalize the map based on the amount property by changing the opacity`,
+
+    `But, let's go back a little bit...`,
+
+    `We can create a bubble map easily, and we can use the square root to make the circle's area proportional to the feature's property`,
+
+    `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
+
+    `And... let's put a nice stroke`,
+    `Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE`,
+];
+
+const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+
+const barcelonaQueries = [`(SELECT
+        *
+    FROM tx_0125_copy_copy) AS tmp`
+    ,
+    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+(
+    SELECT
+        ST_AsMVTGeom(
+            ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+            CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+        ),
+        SUM(amount) AS amount,
+        _cdb_mode(category) AS category
+    FROM tx_0125_copy_copy AS cdbq
+    WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+    GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
+    ORDER BY amount DESC
+)AS geom`];
+
+const ships_WWIQueries = [`(SELECT
+            the_geom_webmercator,
+            temp,
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
+        FROM wwi_ships) AS tmp`
+    ,
+    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
+    (
+        SELECT
+            ST_AsMVTGeom(
+                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
+                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
+            ),
+            AVG(temp)::numeric(3,1) AS temp,
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
+        FROM wwi_ships AS cdbq
+        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
+        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
+            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
+    )AS geom
+`];
+
+var mapboxgl = window.mapboxgl;
+mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
+var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
+    center: [2.17, 41.38], // starting position [lng, lat]
+    zoom: 13, // starting zoom,
+});
+map.repaint = false;
+var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
+
+let protoSchema = null;
+
+map.on('load', _ => {
+    let index = 0;//styles.length - 1;
+
+    function updateStyle(v) {
+        v = v || document.getElementById("styleEntry").value;
+        document.getElementById("styleEntry").value = v;
+        location.hash = getConfig();
+        try {
+            const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
+            if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
+                protoSchema = p;
+                mgl.provider.setQueries(protoSchema, $('#dataset').val());
+            }
+            mgl.provider.schema.then(schema => {
+                try {
+                    const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v, schema);
+                    mgl.provider.style.set(s, 1000);
+                    document.getElementById("feedback").style.display = 'none';
+                } catch (error) {
+                    const err = `Invalid style: ${error}:${error.stack}`;
+                    console.warn(err);
+                    document.getElementById("feedback").value = err;
+                    document.getElementById("feedback").style.display = 'block';
+                }
+            });
+        } catch (error) {
+            const err = `Invalid style: ${error}:${error.stack}`;
+            console.warn(err);
+            document.getElementById("feedback").value = err;
+            document.getElementById("feedback").style.display = 'block';
+        }
+    }
+
+    function barcelona() {
+        $('.step').css('display', 'inline');
+        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
+        $('#tutorial').text(texts[index]);
+
+        $('#dataset').val('tx_0125_copy_copy');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        document.getElementById("styleEntry").value = styles[index];
+        superRefresh();
+    }
+    function wwi() {
+        $('.step').css('display', 'none');
+        $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
+        $('#tutorial').text('');
+
+        $('#dataset').val('wwi');
+        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
+        $('#user').val('dmanzanares-ded13');
+        $('#cartoURL').val('carto-staging.com');
+
+        document.getElementById("styleEntry").value = shipsStyle;
+        superRefresh();
+    }
+
+    $('#prev').click(() => {
+        $("#prev").attr("disabled", false);
+        $("#next").attr("disabled", false);
+        if (index > 0) {
+            index--;
+            $('#tutorial').text(texts[index]);
+            updateStyle(styles[index]);
+        }
+        if (index == 0) {
+            $("#prev").attr("disabled", true);
+        }
+    });
+    $('#next').click(() => {
+        $("#prev").attr("disabled", false);
+        $("#next").attr("disabled", false);
+        if (index < styles.length - 1) {
+            index++;
+            $('#tutorial').text(texts[index]);
+            updateStyle(styles[index]);
+        }
+        if (index == styles.length - 1) {
+            $("#next").prop("disabled", true);
+        }
+    });
+
+    $('#barcelona').click(barcelona);
+    $('#wwi').click(wwi);
+    $('#styleEntry').on('input', () => updateStyle());
+    function getConfig() {
+        return '#' + btoa(JSON.stringify({
+            a: $('#dataset').val(),
+            b: $('#apikey').val(),
+            c: $('#user').val(),
+            d: $('#cartoURL').val(),
+            e: $('#styleEntry').val(),
+            f: map.getCenter(),
+            g: map.getZoom(),
+        }));
+    }
+    function setConfig(input) {
+        const c = JSON.parse(atob(input));
+        $('#dataset').val(c.a);
+        $('#apikey').val(c.b);
+        $('#user').val(c.c);
+        $('#cartoURL').val(c.d);
+        $('#styleEntry').val(c.e);
+        map.setCenter(c.f);
+        map.setZoom(c.g);
+
+        superRefresh();
+    }
+
+    const superRefresh = () => {
+        location.hash = getConfig();
+
+        mgl.provider.setCartoURL($('#cartoURL').val());
+        mgl.provider.setUser($('#user').val());
+        mgl.provider.setApiKey($('#apikey').val());
+
+        localStorage.setItem('cartoURL', $('#cartoURL').val());
+        localStorage.setItem('user', $('#user').val());
+        localStorage.setItem('apikey', $('#apikey').val());
+        localStorage.setItem('dataset', $('#dataset').val());
+        protoSchema = null;
+        updateStyle();
+    };
+
+
+    $('#dataset').on('input', superRefresh);
+    $('#apikey').on('input', superRefresh);
+    $('#user').on('input', superRefresh);
+    $('#cartoURL').on('input', superRefresh);
+
+
+    const addButton = (name, code) => {
+        var button = document.createElement("button");
+        button.innerText = name;
+        button.onclick = () => {
+            $('.step').css('display', 'none');
+            $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
+            $('#tutorial').text('');
+            setConfig(code);
+        }
+        document.getElementById("buttonlist").appendChild(button);
+    };
+    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IjhhMTc0YzQ1MTIxNWNiOGRjYTkwMjY0ZGUzNDI2MTQwODdjNGVmMGMiLCJjIjoiZG1hbnphbmFyZXMtZGVkMTMiLCJkIjoiY2FydG8tc3RhZ2luZy5jb20iLCJlIjoid2lkdGg6ICAgIGJsZW5kKDEsMixuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpICp6b29tKClcbmNvbG9yOiAgICBzZXRvcGFjaXR5KHJhbXAoQVZHKCR0ZW1wKSwgdGVhbHJvc2UsIDAsIDMwKSwgYmxlbmQoMC4wMDUsMSxuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpKSIsImYiOnsibG5nIjo2MC40MTM2MTE2NzUzMTc3MjUsImxhdCI6MjMuMjIxNzQzODQ0NzQ2Mjg1fSwiZyI6MS41NTE5NTk3NzkwMjk0MTQ2fQ==');
+    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6IHNxcnQoJG51bWJlci8xMClcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MCksMC43KVxuc3Ryb2tlQ29sb3I6IHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi04Ny41MjA2MzAxNzY0MDM5OCwibGF0IjozNy4zNzc2OTk3NjY1MzkzMX0sImciOjIuNzQ2NTk0NjE1NjY2MTg5fQ==');
+    addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRhc2lhbl9wb3ArJGJsYWNrX3BvcCskaGlzcGFuaWNfbykvJHdoaXRlX3BvcFxuY29sb3I6IHNldE9wYWNpdHkoaHN2KDAuNSwxLDEpLDAuNykiLCJmIjp7ImxuZyI6LTkwLjY5OTA1ODUxMjQxMTk3LCJsYXQiOjQwLjYyMTQ3NTIzNDQxNjY2NH0sImciOjIuNDU3MzM2MDY0MjIzNTMxfQ==');
+    addButton('Denver accidents',
+        'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGNvdW50LzJcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoJGNvdW50LCBSZWRPciwwLDEyMCksKCRjb3VudC8yKS8xMClcblxuXG4iLCJmIjp7ImxuZyI6LTEwNC45NjUwNTYyMTU2Njc0NiwibGF0IjozOS43NDk2MTkzNzgyNDYyMn0sImciOjExLjQxODcxODc3MDkwNDQ5NH0=');
+    addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAgICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDApXG5zdHJva2VDb2xvcjogIGhzdigwLjEsICRnaXNfYWNyZXMvMjAwMDAwLCAkZ2lzX2FjcmVzLzQwMDAwMClcbnN0cm9rZVdpZHRoOiAkZ2lzX2FjcmVzLzUwMDAwXG5cblxuXG4iLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2fQ==');
+    addButton('California Wildfires size/opacity by acres burned colored by cause ',
+        'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
+    addButton('Population Density', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRkbi84MClcbmNvbG9yOiBzZXRPcGFjaXR5KGhzdigwLjg4LDEsKCRkbi8yNTQpKSwkZG4vMjU0KVxucmVzb2x1dGlvbjogMVxuXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOjI0Ljc4MjExMzgzOTQ1MDE3NiwibGF0IjoyMy41ODUzMDQ5MjcxOTQ0M30sImciOjEuMDkzMjIyOTcxOTUwOTI4M30=');
+    addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
+    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
+    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsb2coJG51bWZsb29ycyksIEVhcnRoLCAgMSwgNClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
+    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbiIsImYiOnsibG5nIjotMTIyLjQzOTgzNzM3NzEwMDI4LCJsYXQiOjM3Ljc2MjU5NTE0Nzc5MTAyfSwiZyI6MTMuMTY1NzE5NjE3NDcwNjc4fQ==');
+    if (localStorage.getItem("dataset")) {
+        $('#dataset').val(localStorage.getItem("dataset"));
+        $('#apikey').val(localStorage.getItem("apikey"));
+        $('#user').val(localStorage.getItem("user"));
+        $('#cartoURL').val(localStorage.getItem("cartoURL"));
+    }
+    if (location.hash.length > 1) {
+        setConfig(location.hash.substring(1));
+    } else {
+        barcelona();
+    }
+});
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(7);
+
+
+
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
+const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+
+class MGLIntegrator {
+    constructor(map, providerClass) {
+        this.map = map;
+        map.on('load', _ => {
+            var cont = map.getCanvasContainer();
+            var canvas = document.createElement('canvas')
+            this.canvas = canvas;
+            canvas.id = 'good';
+            cont.appendChild(canvas)
+            canvas.style.width = map.getCanvas().style.width;
+            canvas.style.height = map.getCanvas().style.height;
+
+            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */](canvas);
+            this.provider = new providerClass(this.renderer, this.style);
+
+            map.on('resize', this.resize.bind(this));
+            map.on('movestart', this.move.bind(this));
+            map.on('move', this.move.bind(this));
+            map.on('moveend', this.move.bind(this));
+            this.move();
+        });
+    }
+    move() {
+        var b = this.map.getBounds();
+        var nw = b.getNorthWest();
+        var c = this.map.getCenter();
+
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setZoom(this.getZoom());
+
+        c = this.renderer.getCenter();
+        var z = this.renderer.getZoom();
+        this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.renderer.compute('sum',
+            [__WEBPACK_IMPORTED_MODULE_0__src_index__["c" /* Style */].float(1)]
+        ).then(
+            result => $('#title').text('Demo dataset ~ ' + result + ' features')
+            );
+    }
+
+    resize() {
+        this.canvas.style.width = this.map.getCanvas().style.width;
+        this.canvas.style.height = this.map.getCanvas().style.height;
+        this.move();
+    }
+    getData() {
+        this.provider.getData();
+    }
+    getZoom() {
+        var b = this.map.getBounds();
+        var c = this.map.getCenter();
+        var nw = b.getNorthWest();
+        var sw = b.getSouthWest();
+        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        return z;
+    }
+}
+
+
+// Webmercator projection
+function Wmxy(latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x: x, y: y };
+}
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(7);
+
+
+
+var VectorTile = __webpack_require__(19).VectorTile;
+var Protobuf = __webpack_require__(22);
+var LRU = __webpack_require__(30);
+
+
+var style;
+var oldtiles = [];
+
+let user = 'dmanzanares-ded13';
+let cartoURL = 'carto-staging.com';
+let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
+
+const endpoint = (username, enable) => {
+    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}${enable ? '' : '&aggregation=false'}`
+}
+const layerUrl = function url(layergroup, layerIndex) {
+    return (x, y, z) => {
+        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+            const urlTemplates = layergroup.cdn_url.templates.https;
+            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+        }
+        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+    }
+}
+const layerSubdomains = function subdomains(layergroup) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return urlTemplates.subdomains;
+    }
+    return [];
+}
+
+class Provider { }
+
+class WindshaftSQL extends Provider {
+    constructor(renderer) {
+        super();
+        this.renderer = renderer;
+        this.catMap = {};
+        const options = {
+            max: 1000
+            , length: function (dataframe, key) { return 1; }
+            , dispose: (key, promise) => {
+                promise.then(dataframe => {
+                    if (!dataframe.empty) {
+                        dataframe.free();
+                        this.renderer.removeDataframe(dataframe);
+                    }
+                })
+            }
+            , maxAge: 1000 * 60 * 60
+        };
+        this.cache = LRU(options);
+    }
+    setUser(u) {
+        user = u;
+    }
+    setCartoURL(u) {
+        cartoURL = u;
+    }
+    setDataset(d) {
+        dataset = d;
+    }
+    setApiKey(k) {
+        apiKey = k;
+    }
+    setQueries(protoSchema, dataset) {
+
+        let agg = {
+            threshold: 1,
+            resolution: protoSchema.aggRes,
+            columns: {},
+            dimensions: {}
+        };
+        protoSchema.propertyList.map(p => {
+            p.aggFN.forEach(fn => {
+                if (fn != 'raw') {
+                    agg.columns[p.name + '_' + fn] = {
+                        aggregate_function: fn,
+                        aggregated_column: p.name
+                    };
+                }
+            })
+        });
+        protoSchema.propertyList.map(p => {
+            const name = p.name;
+            const aggFN = p.aggFN;
+            if (aggFN.has('raw')) {
+                agg.dimensions[p.name] = p.name;
+            }
+        });
+        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
+        agg.placement = 'centroid';
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        cartocss: `#layer{}`,
+                        cartocss_version: '3.0.12',
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+        const query = `(${aggSQL}) AS tmp`;
+
+        const promise = async () => {
+            this.geomType = await getGeometryType(query);
+            const response = await fetch(endpoint(user, this.geomType == 'point'), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mapConfigAgg),
+            });
+            const layergroup = await response.json();
+            return layerUrl(layergroup, 0);
+        };
+
+        this.url = promise();
+
+        //block data acquisition
+        this.style = null;
+        this.schema = getSchema(query, protoSchema).then(schema => {
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
+            return schema;
+        });
+        this.cache.reset();
+        oldtiles.forEach(t => t.free());
+        oldtiles.forEach(t => this.renderer.removeDataframe(t));
+        oldtiles = [];
+        this.schema.then(schema => {
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
+            this.getData();
+        });
+    }
+    async getSchema() {
+        return await this.schema;
+    }
+    getCatID(catName, catStr, schema, pName) {
+        const index = schema.properties[pName].type.categoryNames.indexOf(catStr);
+        return schema.properties[pName].type.categoryIDs[index];
+    }
+    getDataframe(x, y, z, callback) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            c.then(callback);
+            return;
+        }
+        const promise = this.requestDataframe(x, y, z);
+        this.cache.set(id, promise);
+        promise.then(callback);
+    }
+    requestDataframe(x, y, z) {
+        return new Promise((callback, reject) => {
+            const mvt_extent = 4096;
+
+            this.url.then(url => {
+                var oReq = new XMLHttpRequest();
+                oReq.responseType = "arraybuffer";
+                oReq.open("GET", url(x, y, z), true);
+                oReq.onload = (oEvent) => {
+                    this.schema.then(schema => {
+                        if (oReq.response.byteLength == 0 || oReq.response == 'null') {
+                            callback({ empty: true });
+                            return;
+                        }
+                        var tile = new VectorTile(new Protobuf(oReq.response));
+                        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                        var fieldMap = {};
+
+                        const numFields = [];
+                        const catFields = [];
+                        const catFieldsReal = [];
+                        const numFieldsReal = [];
+                        schema.propertyList.map(p =>
+                            p.aggFN.forEach(fn => {
+                                let name = p.name;
+                                if (fn != 'raw') {
+                                    name = p.name + '_' + fn;
+                                }
+                                if (p.type instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
+                                    catFields.push(name);
+                                    catFieldsReal.push(p.name);
+                                } else {
+                                    numFields.push(name);
+                                    numFieldsReal.push(p.name);
+                                }
+                            })
+                        );
+                        catFieldsReal.map((name, i) => fieldMap[name] = i);
+                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+
+                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+                        if (this.geomType == 'point') {
+                            var points = new Float32Array(mvtLayer.length * 2);
+                        }
+                        var geometry = [];
+
+                        const r = Math.random();
+                        for (var i = 0; i < mvtLayer.length; i++) {
+                            const f = mvtLayer.feature(i);
+                            const geom = f.loadGeometry();
+                            if (this.geomType == 'point') {
+                                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                            } else if (this.geomType == 'polygon') {
+                                let polygon = {
+                                    flat: [],
+                                    holes: []
+                                };
+                                for (let j = 0; j < geom.length; j++) {
+                                    if (j > 0) {
+                                        polygon.holes.push(polygon.flat.length / 2);
+                                    }
+                                    for (let k = 0; k < geom[j].length; k++) {
+                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                                    }
+                                }
+                                geometry.push(polygon);
+                                //TODO bug, renderer cannot distinguish between features in multipolygon cases
+                            } else if (this.geomType == 'line') {
+                                geom.map(l => {
+                                    let line = [];
+                                    l.map(point => {
+                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+                                    });
+                                    geometry.push(line);
+                                    //TODO bug, renderer cannot distinguish between features in multiline cases
+                                });
+                            } else {
+                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
+                            }
+
+                            catFields.map((name, index) => {
+                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
+                            });
+                            numFields.map((name, index) => {
+                                properties[index + catFields.length][i] = Number(f.properties[name]);
+                            });
+                        }
+
+                        var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
+                        let dataframeProperties = {};
+                        Object.keys(fieldMap).map((name, pid) => {
+                            dataframeProperties[name] = properties[pid];
+                        });
+                        var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
+                            rs.center,
+                            rs.scale,
+                            this.geomType == 'point' ? points : geometry,
+                            dataframeProperties,
+                        );
+                        dataframe.type = this.geomType;
+                        dataframe.schema = schema;
+                        dataframe.size = mvtLayer.length;
+                        this.renderer.addDataframe(dataframe).setStyle(this.style)
+                        callback(dataframe);
+                    });
+                }
+                oReq.send(null);
+            });
+        });
+    }
+    getData() {
+        if (!this.style) {
+            return;
+        }
+        const renderer = this.renderer;
+        const bounds = renderer.getBounds();
+        const aspect = renderer.getAspect();
+        const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
+        var completedTiles = [];
+        var needToComplete = tiles.length;
+        tiles.forEach(t => {
+            const x = t.x;
+            const y = t.y;
+            const z = t.z;
+            this.getDataframe(x, y, z, dataframe => {
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length == needToComplete) {
+                    oldtiles.forEach(t => t.setStyle(null));
+                    completedTiles.map(t => t.setStyle(this.style));
+                    this.renderer.compute('sum',
+                        [__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].float(1)]
+                    ).then(
+                        result => $('#title').text('Demo dataset ~ ' + result + ' features')
+                        );
+                    oldtiles = completedTiles;
+                }
+            });
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = WindshaftSQL;
+
+
+async function getColumnTypes(query) {
+    const columnListQuery = `select * from ${query} limit 0;`;
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const json = await response.json();
+    return json.fields;
+}
+
+async function getGeometryType(query) {
+    const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const json = await response.json();
+    const type = json.rows[0].type;
+    switch (type) {
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
+    }
+}
+
+async function getNumericTypes(names, query) {
+    const aggFns = ['min', 'max', 'sum', 'avg'];
+    const numericsSelect = names.map(name =>
+        aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
+    ).concat(['COUNT(*)']).join();
+    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
+    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+    const json = await response.json();
+    // TODO avg, sum, count
+    return names.map(name =>
+        new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
+    );
+}
+
+async function getCategoryTypes(names, query) {
+    return Promise.all(names.map(async name => {
+        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
+        const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+        const json = await response.json();
+        let counts = [];
+        let names = [];
+        let ids = [];
+        json.rows.map((row, id) => {
+            counts.push(row.count);
+            names.push(row.name);
+            ids.push(id);
+        })
+        return new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category(names, counts, ids);
+    }));
+}
+
+
+async function getSchema(query, proto) {
+    //Get column names and types with a limit 0
+    //Get min,max,sum and count of numerics
+    //for each category type
+    //Get category names and counts by grouping by
+    //Assign ids
+    const fields = await getColumnTypes(query);
+    let numerics = [];
+    let categories = [];
+    Object.keys(fields).map(name => {
+        const type = fields[name].type;
+        if (type == 'number') {
+            numerics.push(name);
+            //proto[name].type = 'number';
+        } else if (type == 'string') {
+            categories.push(name);
+            //proto[name].type = 'category';
+        }
+    })
+
+    const numericsTypes = await getNumericTypes(numerics, query);
+    const categoriesTypes = await getCategoryTypes(categories, query);
+
+    numerics.map((name, index) => {
+        const t = numericsTypes[index];
+        proto.properties[name].type = t;
+    });
+    categories.map((name, index) => {
+        const t = categoriesTypes[index];
+        proto.properties[name].type = t;
+    });
+    //const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
+    return proto;
+}
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rTiles; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRsysFromTile; });
+/**
+ * An RSys defines a local coordinate system that maps the coordinates
+ * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
+ * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
+ * It is the combination of a translation and anisotropic scaling.
+ * @api
+ * @typedef {object} RSys - Renderer relative coordinate system
+ * @property {RPoint} center - Position of the local system in external coordinates
+ * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
+*/
+
+/*
+ * Random notes
+ *
+ * We can redefine Dataframe to use a Rsys instead of center, scale
+ * and we can use an Rsys for the Renderer's canvas.
+ *
+ * Some interesting World coordinate systems:
+ *
+ * WM (Webmercator): represents a part of the world (excluding polar regions)
+ * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)
+ *
+ * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*
+ * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
+ * by WM_R. (positive orientation: E,N)
+ *
+ * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
+ * (positive orientation: E,S)
+ *
+ * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
+ * the range +/-1.
+ *
+ * When an RSys external coordinate system is WM or NWMC, we can compute:
+ * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
+ *   Math.ceil(Math.log2(1 / r.scale));
+ * * Maximum zoom level for which tiles are no smaller than the rectangle:
+ *   Math.floor(Math.log2(1 / r.scale));
+ * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
+ *
+ * We'll use the term World coordinates below for the *external* reference system
+ * of an RSys (usually NWMC).
+ */
+
+/**
+ * R coordinates to World
+ * @api
+ * @param {RSys} r - ref. of the passed coordinates
+ * @param {number} x - x coordinate in r
+ * @param {number} y - y coordinate in r
+ * @return {RPoint} World coordinates
+ */
+function rToW(r, x, y) {
+    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
+}
+
+/**
+ * World coordinates to local RSys
+ * @api
+ * @param {number} x - x W-coordinate
+ * @param {number} y - y W-coordinate
+ * @param {RSys} r - target ref. system
+ * @return {RPoint} R coordinates
+ */
+function wToR(x, y, r) {
+    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
+}
+
+/**
+ * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
+ * @api
+ * @param {number} x - TC x coordinate
+ * @param {number} y - TC y coordinate
+ * @param {number} z - Tile zoom level
+ * @return {RSys}
+ */
+function tileRsys(x, y, z) {
+    let max = Math.pow(2, z);
+    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
+}
+
+/**
+ * Minimum zoom level for which tiles are no larger than the RSys rectangle
+ * @api
+ * @param {RSys} rsys
+ * @return {number}
+ */
+function rZoom(zoom) {
+    return Math.ceil(Math.log2(1. / zoom));
+}
+
+/**
+ * TC tiles that intersect the local rectangle of an RSys
+ * (with the largest tile size no larger than the rectangle)
+ * @param {RSys} rsys
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function rTiles(bounds) {
+    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
+}
+
+/**
+ * TC tiles of a given zoom level that intersect a W rectangle
+ * @param {number} z
+ * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function wRectangleTiles(z, wr) {
+    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
+    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
+
+    const clamp = x => Math.min(Math.max(x, 0), n - 1);
+    // compute tile coordinate ranges
+    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
+    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
+    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
+    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
+    let tiles = [];
+    for (let x = t_minx; x <= t_maxx; ++x) {
+        for (let y = t_miny; y <= t_maxy; ++y) {
+            tiles.push({ x: x, y: y, z: z });
+        }
+    }
+    return tiles;
+}
+
+/**
+ * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns {RSys}
+ */
+function getRsysFromTile(x, y, z) {
+    return {
+        center: {
+            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
+            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+        },
+        scale: 1 / Math.pow(2, z)
+    }
+}
+
+
+
+
+
+/***/ }),
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9554,7 +9554,7 @@ if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = __webpack_require__(32)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
 /***/ }),
 /* 32 */
@@ -10266,7 +10266,7 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34), __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34), __webpack_require__(24)))
 
 /***/ }),
 /* 34 */
