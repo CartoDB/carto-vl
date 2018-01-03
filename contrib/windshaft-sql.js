@@ -35,6 +35,16 @@ const layerSubdomains = function subdomains(layergroup) {
 
 class Provider { }
 
+function isClockWise(vertices) {
+    let a = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        let j = (i + 1) % vertices.length;
+        a += vertices[i].x * vertices[j].y;
+        a -= vertices[j].x * vertices[i].y;
+    }
+    return a > 0;
+}
+
 export default class WindshaftSQL extends Provider {
     constructor(renderer) {
         super();
@@ -206,30 +216,52 @@ export default class WindshaftSQL extends Provider {
                         if (this.geomType == 'point') {
                             var points = new Float32Array(mvtLayer.length * 2);
                         }
-                        var geometry = [];
-
+                        let featureGeometries = [];
                         const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
+                            let geometry = [];
                             if (this.geomType == 'point') {
                                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             } else if (this.geomType == 'polygon') {
-                                let polygon = {
-                                    flat: [],
-                                    holes: []
-                                };
+                                let polygon = null;
+                                /*
+                                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+                                    In don't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+                                    See:
+                                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                                        https://en.wikipedia.org/wiki/Shoelace_formula
+                                */
                                 for (let j = 0; j < geom.length; j++) {
-                                    if (j > 0) {
+                                    //if exterior
+                                    //   push current polygon & set new empty
+                                    //else=> add index to holes
+                                    if (isClockWise(geom[j])) {
+                                        if (polygon) {
+                                            geometry.push(polygon);
+                                        }
+                                        polygon = {
+                                            flat: [],
+                                            holes: []
+                                        };
+                                    } else {
+                                        if (j == 0) {
+                                            throw new Error(`Invalid MVT tile: first polygon ring MUST be external`);
+                                        }
                                         polygon.holes.push(polygon.flat.length / 2);
                                     }
                                     for (let k = 0; k < geom[j].length; k++) {
                                         polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
                                         polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
+                                    //if current polygon is not empty=> push it
+                                    if (polygon && polygon.flat.length > 0) {
+                                        geometry.push(polygon);
+                                    }
                                 }
-                                geometry.push(polygon);
+                                featureGeometries.push(geometry);
                                 //TODO bug, renderer cannot distinguish between features in multipolygon cases
                             } else if (this.geomType == 'line') {
                                 geom.map(l => {
@@ -240,6 +272,7 @@ export default class WindshaftSQL extends Provider {
                                     geometry.push(line);
                                     //TODO bug, renderer cannot distinguish between features in multiline cases
                                 });
+                                featureGeometries.push(geometry);
                             } else {
                                 throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
                             }
@@ -260,7 +293,7 @@ export default class WindshaftSQL extends Provider {
                         var dataframe = new R.Dataframe(
                             rs.center,
                             rs.scale,
-                            this.geomType == 'point' ? points : geometry,
+                            this.geomType == 'point' ? points : featureGeometries,
                             dataframeProperties,
                         );
                         dataframe.type = this.geomType;
