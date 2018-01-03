@@ -14,7 +14,7 @@ let cartoURL = 'carto-staging.com';
 let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
 
 const endpoint = (username, enable) => {
-    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}${enable ? '' : '&aggregation=false'}`
+    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
     return (x, y, z) => {
@@ -94,26 +94,27 @@ export default class WindshaftSQL extends Provider {
         });
         const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
         agg.placement = 'centroid';
-        const mapConfigAgg = {
-            buffersize: {
-                'mvt': 0
-            },
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        cartocss: `#layer{}`,
-                        cartocss_version: '3.0.12',
-                        sql: aggSQL,
-                        aggregation: agg
-                    }
-                }
-            ]
-        };
         const query = `(${aggSQL}) AS tmp`;
 
         const promise = async () => {
             this.geomType = await getGeometryType(query);
+            if (this.geomType != 'point') {
+                agg = false;
+            }
+            const mapConfigAgg = {
+                buffersize: {
+                    'mvt': 0
+                },
+                layers: [
+                    {
+                        type: 'mapnik',
+                        options: {
+                            sql: aggSQL,
+                            aggregation: agg
+                        }
+                    }
+                ]
+            };
             const response = await fetch(endpoint(user, this.geomType == 'point'), {
                 method: 'POST',
                 headers: {
