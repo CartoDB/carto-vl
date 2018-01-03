@@ -2797,15 +2797,17 @@ function decodeGeom(geomType, geom) {
     } else if (geomType == 'polygon') {
         let vertexArray = []; //Array of triangle vertices
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(polygon => {
-            const triangles = __WEBPACK_IMPORTED_MODULE_3_earcut__(polygon.flat, polygon.holes);
-            const deviation = __WEBPACK_IMPORTED_MODULE_3_earcut__["deviation"](polygon.flat, polygon.holes, 2, triangles);
-            if (deviation > 1) {
-                console.log('Earcut deviation:', deviation);
-            }
-            triangles.map(index => {
-                vertexArray.push(polygon.flat[2 * index]);
-                vertexArray.push(polygon.flat[2 * index + 1]);
+        geom.map(feature => {
+            feature.map(polygon => {
+                const triangles = __WEBPACK_IMPORTED_MODULE_3_earcut__(polygon.flat, polygon.holes);
+                const deviation = __WEBPACK_IMPORTED_MODULE_3_earcut__["deviation"](polygon.flat, polygon.holes, 2, triangles);
+                if (deviation > 1) {
+                    console.log('Earcut deviation:', deviation);
+                }
+                triangles.map(index => {
+                    vertexArray.push(polygon.flat[2 * index]);
+                    vertexArray.push(polygon.flat[2 * index + 1]);
+                });
             });
             breakpointList.push(vertexArray.length);
         });
@@ -2817,68 +2819,70 @@ function decodeGeom(geomType, geom) {
         let geometry = [];
         let normals = [];
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(line => {
-            // Create triangulation
-            for (let i = 0; i < line.length - 2; i += 2) {
-                const a = [line[i + 0], line[i + 1]];
-                const b = [line[i + 2], line[i + 3]];
-                if (i > 0) {
-                    var prev = [line[i + -2], line[i + -1]];
-                    var nprev = getNormal(a, prev);
+        geom.map(feature => {
+            feature.map(line => {
+                // Create triangulation
+                for (let i = 0; i < line.length - 2; i += 2) {
+                    const a = [line[i + 0], line[i + 1]];
+                    const b = [line[i + 2], line[i + 3]];
+                    if (i > 0) {
+                        var prev = [line[i + -2], line[i + -1]];
+                        var nprev = getNormal(a, prev);
+                    }
+                    if (i < line.length - 4) {
+                        var next = [line[i + 4], line[i + 5]];
+                        var nnext = getNormal(next, b);
+                    }
+                    //Compute normal
+                    let normal = getNormal(b, a);
+                    let na = normal;
+                    let nb = normal;
+                    //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
+                    if (prev) {
+                        na = normalize([
+                            normal[0] * 0.5 + nprev[0] * 0.5,
+                            normal[1] * 0.5 + nprev[1] * 0.5,
+                        ]);
+                    }
+                    if (next) {
+                        nb = normalize([
+                            normal[0] * 0.5 + nnext[0] * 0.5,
+                            normal[1] * 0.5 + nnext[1] * 0.5,
+                        ]);
+                    }
+                    normals.push(-na[0], -na[1]);
+                    normals.push(na[0], na[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    normals.push(na[0], na[1]);
+                    normals.push(nb[0], nb[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    normal = [0, 0];
+
+
+                    //First triangle
+                    geometry.push(a[0] - 0.01 * normal[0]);
+                    geometry.push(a[1] - 0.01 * normal[1]);
+
+                    geometry.push(a[0] + 0.01 * normal[0]);
+                    geometry.push(a[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] - 0.01 * normal[0]);
+                    geometry.push(b[1] - 0.01 * normal[1]);
+
+                    //Second triangle
+                    geometry.push(a[0] + 0.01 * normal[0]);
+                    geometry.push(a[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] + 0.01 * normal[0]);
+                    geometry.push(b[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] - 0.01 * normal[0]);
+                    geometry.push(b[1] - 0.01 * normal[1]);
                 }
-                if (i < line.length - 4) {
-                    var next = [line[i + 4], line[i + 5]];
-                    var nnext = getNormal(next, b);
-                }
-                //Compute normal
-                let normal = getNormal(b, a);
-                let na = normal;
-                let nb = normal;
-                //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
-                if (prev) {
-                    na = normalize([
-                        normal[0] * 0.5 + nprev[0] * 0.5,
-                        normal[1] * 0.5 + nprev[1] * 0.5,
-                    ]);
-                }
-                if (next) {
-                    nb = normalize([
-                        normal[0] * 0.5 + nnext[0] * 0.5,
-                        normal[1] * 0.5 + nnext[1] * 0.5,
-                    ]);
-                }
-                normals.push(-na[0], -na[1]);
-                normals.push(na[0], na[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                normals.push(na[0], na[1]);
-                normals.push(nb[0], nb[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                normal = [0, 0];
-
-
-                //First triangle
-                geometry.push(a[0] - 0.01 * normal[0]);
-                geometry.push(a[1] - 0.01 * normal[1]);
-
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-
-                //Second triangle
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] + 0.01 * normal[0]);
-                geometry.push(b[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-            }
-            //console.log("L", line, geometry)
+                //console.log("L", line, geometry)
+            });
             breakpointList.push(geometry.length);
         });
         return {

@@ -2797,15 +2797,17 @@ function decodeGeom(geomType, geom) {
     } else if (geomType == 'polygon') {
         let vertexArray = []; //Array of triangle vertices
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(polygon => {
-            const triangles = __WEBPACK_IMPORTED_MODULE_3_earcut__(polygon.flat, polygon.holes);
-            const deviation = __WEBPACK_IMPORTED_MODULE_3_earcut__["deviation"](polygon.flat, polygon.holes, 2, triangles);
-            if (deviation > 1) {
-                console.log('Earcut deviation:', deviation);
-            }
-            triangles.map(index => {
-                vertexArray.push(polygon.flat[2 * index]);
-                vertexArray.push(polygon.flat[2 * index + 1]);
+        geom.map(feature => {
+            feature.map(polygon => {
+                const triangles = __WEBPACK_IMPORTED_MODULE_3_earcut__(polygon.flat, polygon.holes);
+                const deviation = __WEBPACK_IMPORTED_MODULE_3_earcut__["deviation"](polygon.flat, polygon.holes, 2, triangles);
+                if (deviation > 1) {
+                    console.log('Earcut deviation:', deviation);
+                }
+                triangles.map(index => {
+                    vertexArray.push(polygon.flat[2 * index]);
+                    vertexArray.push(polygon.flat[2 * index + 1]);
+                });
             });
             breakpointList.push(vertexArray.length);
         });
@@ -2817,68 +2819,70 @@ function decodeGeom(geomType, geom) {
         let geometry = [];
         let normals = [];
         let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(line => {
-            // Create triangulation
-            for (let i = 0; i < line.length - 2; i += 2) {
-                const a = [line[i + 0], line[i + 1]];
-                const b = [line[i + 2], line[i + 3]];
-                if (i > 0) {
-                    var prev = [line[i + -2], line[i + -1]];
-                    var nprev = getNormal(a, prev);
+        geom.map(feature => {
+            feature.map(line => {
+                // Create triangulation
+                for (let i = 0; i < line.length - 2; i += 2) {
+                    const a = [line[i + 0], line[i + 1]];
+                    const b = [line[i + 2], line[i + 3]];
+                    if (i > 0) {
+                        var prev = [line[i + -2], line[i + -1]];
+                        var nprev = getNormal(a, prev);
+                    }
+                    if (i < line.length - 4) {
+                        var next = [line[i + 4], line[i + 5]];
+                        var nnext = getNormal(next, b);
+                    }
+                    //Compute normal
+                    let normal = getNormal(b, a);
+                    let na = normal;
+                    let nb = normal;
+                    //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
+                    if (prev) {
+                        na = normalize([
+                            normal[0] * 0.5 + nprev[0] * 0.5,
+                            normal[1] * 0.5 + nprev[1] * 0.5,
+                        ]);
+                    }
+                    if (next) {
+                        nb = normalize([
+                            normal[0] * 0.5 + nnext[0] * 0.5,
+                            normal[1] * 0.5 + nnext[1] * 0.5,
+                        ]);
+                    }
+                    normals.push(-na[0], -na[1]);
+                    normals.push(na[0], na[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    normals.push(na[0], na[1]);
+                    normals.push(nb[0], nb[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    normal = [0, 0];
+
+
+                    //First triangle
+                    geometry.push(a[0] - 0.01 * normal[0]);
+                    geometry.push(a[1] - 0.01 * normal[1]);
+
+                    geometry.push(a[0] + 0.01 * normal[0]);
+                    geometry.push(a[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] - 0.01 * normal[0]);
+                    geometry.push(b[1] - 0.01 * normal[1]);
+
+                    //Second triangle
+                    geometry.push(a[0] + 0.01 * normal[0]);
+                    geometry.push(a[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] + 0.01 * normal[0]);
+                    geometry.push(b[1] + 0.01 * normal[1]);
+
+                    geometry.push(b[0] - 0.01 * normal[0]);
+                    geometry.push(b[1] - 0.01 * normal[1]);
                 }
-                if (i < line.length - 4) {
-                    var next = [line[i + 4], line[i + 5]];
-                    var nnext = getNormal(next, b);
-                }
-                //Compute normal
-                let normal = getNormal(b, a);
-                let na = normal;
-                let nb = normal;
-                //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
-                if (prev) {
-                    na = normalize([
-                        normal[0] * 0.5 + nprev[0] * 0.5,
-                        normal[1] * 0.5 + nprev[1] * 0.5,
-                    ]);
-                }
-                if (next) {
-                    nb = normalize([
-                        normal[0] * 0.5 + nnext[0] * 0.5,
-                        normal[1] * 0.5 + nnext[1] * 0.5,
-                    ]);
-                }
-                normals.push(-na[0], -na[1]);
-                normals.push(na[0], na[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                normals.push(na[0], na[1]);
-                normals.push(nb[0], nb[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                normal = [0, 0];
-
-
-                //First triangle
-                geometry.push(a[0] - 0.01 * normal[0]);
-                geometry.push(a[1] - 0.01 * normal[1]);
-
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-
-                //Second triangle
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] + 0.01 * normal[0]);
-                geometry.push(b[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-            }
-            //console.log("L", line, geometry)
+                //console.log("L", line, geometry)
+            });
             breakpointList.push(geometry.length);
         });
         return {
@@ -8570,7 +8574,7 @@ map.on('load', _ => {
     addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
     addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
     addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsb2coJG51bWZsb29ycyksIEVhcnRoLCAgMSwgNClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
-    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbiIsImYiOnsibG5nIjotMTIyLjQzOTgzNzM3NzEwMDI4LCJsYXQiOjM3Ljc2MjU5NTE0Nzc5MTAyfSwiZyI6MTMuMTY1NzE5NjE3NDcwNjc4fQ==');
+    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbndpZHRoOiAxLjUiLCJmIjp7ImxuZyI6LTEyMi40NDQwODQ4Njg2MTE5MiwibGF0IjozNy43NzM3MDY3MzYxNDk3MDV9LCJnIjoxMS42NjQzMTA4MDI4NjY4MDV9');
     if (localStorage.getItem("dataset")) {
         $('#dataset').val(localStorage.getItem("dataset"));
         $('#apikey').val(localStorage.getItem("apikey"));
@@ -8713,6 +8717,16 @@ const layerSubdomains = function subdomains(layergroup) {
 }
 
 class Provider { }
+
+function isClockWise(vertices) {
+    let a = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        let j = (i + 1) % vertices.length;
+        a += vertices[i].x * vertices[j].y;
+        a -= vertices[j].x * vertices[i].y;
+    }
+    return a > 0;
+}
 
 class WindshaftSQL extends Provider {
     constructor(renderer) {
@@ -8885,30 +8899,52 @@ class WindshaftSQL extends Provider {
                         if (this.geomType == 'point') {
                             var points = new Float32Array(mvtLayer.length * 2);
                         }
-                        var geometry = [];
-
+                        let featureGeometries = [];
                         const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
+                            let geometry = [];
                             if (this.geomType == 'point') {
                                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                             } else if (this.geomType == 'polygon') {
-                                let polygon = {
-                                    flat: [],
-                                    holes: []
-                                };
+                                let polygon = null;
+                                /*
+                                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+                                    In don't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+                                    See:
+                                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                                        https://en.wikipedia.org/wiki/Shoelace_formula
+                                */
                                 for (let j = 0; j < geom.length; j++) {
-                                    if (j > 0) {
+                                    //if exterior
+                                    //   push current polygon & set new empty
+                                    //else=> add index to holes
+                                    if (isClockWise(geom[j])) {
+                                        if (polygon) {
+                                            geometry.push(polygon);
+                                        }
+                                        polygon = {
+                                            flat: [],
+                                            holes: []
+                                        };
+                                    } else {
+                                        if (j == 0) {
+                                            throw new Error(`Invalid MVT tile: first polygon ring MUST be external`);
+                                        }
                                         polygon.holes.push(polygon.flat.length / 2);
                                     }
                                     for (let k = 0; k < geom[j].length; k++) {
                                         polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
                                         polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
+                                    //if current polygon is not empty=> push it
+                                    if (polygon && polygon.flat.length > 0) {
+                                        geometry.push(polygon);
+                                    }
                                 }
-                                geometry.push(polygon);
+                                featureGeometries.push(geometry);
                                 //TODO bug, renderer cannot distinguish between features in multipolygon cases
                             } else if (this.geomType == 'line') {
                                 geom.map(l => {
@@ -8919,6 +8955,7 @@ class WindshaftSQL extends Provider {
                                     geometry.push(line);
                                     //TODO bug, renderer cannot distinguish between features in multiline cases
                                 });
+                                featureGeometries.push(geometry);
                             } else {
                                 throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
                             }
@@ -8939,7 +8976,7 @@ class WindshaftSQL extends Provider {
                         var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
                             rs.center,
                             rs.scale,
-                            this.geomType == 'point' ? points : geometry,
+                            this.geomType == 'point' ? points : featureGeometries,
                             dataframeProperties,
                         );
                         dataframe.type = this.geomType;
