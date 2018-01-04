@@ -690,7 +690,7 @@ class Blend extends Expression {
             console.warn(a, b);
             throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
         }
-        super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, ${inline.mix})`);
+        super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
         this.schema = a.schema;
         this.type = type;
     }
