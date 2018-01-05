@@ -181,6 +181,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return tan; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return setOpacity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return opacity; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return hsv; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return animate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "max", function() { return max; });
@@ -1114,6 +1115,7 @@ const property = (...args) => new Property(...args);
 const animate = (...args) => new Animate(...args);
 const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
+const opacity = (...args) => new SetOpacity(...args);
 const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
 const max = (...args) => new Max(...args);
@@ -3913,6 +3915,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["setOpacity"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["opacity"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["hsv"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["animate"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "max", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["max"]; });
@@ -8700,12 +8703,16 @@ const endpoint = (username, enable) => {
     return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
+    let subdomainIndex=0;
     return (x, y, z) => {
+        subdomainIndex++;
         if (layergroup.cdn_url && layergroup.cdn_url.templates) {
             const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}',
+                layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
         }
-        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
+        layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
     }
 }
 const layerSubdomains = function subdomains(layergroup) {
