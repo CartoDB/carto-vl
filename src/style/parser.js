@@ -140,7 +140,7 @@ export function getSchema(str) {
     if (ast.type == "Compound") {
         protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
     } else {
-        protoSchema = parseStyleNamedExprForSchema(ast);
+        protoSchema = union(parseStyleNamedExprForSchema(ast));
     }
     jsep.removeBinaryOp("^");
     jsep.removeBinaryOp(":");
