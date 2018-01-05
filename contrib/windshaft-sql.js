@@ -17,12 +17,16 @@ const endpoint = (username, enable) => {
     return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
 }
 const layerUrl = function url(layergroup, layerIndex) {
+    let subdomainIndex=0;
     return (x, y, z) => {
+        subdomainIndex++;
         if (layergroup.cdn_url && layergroup.cdn_url.templates) {
             const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}',
+                layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
         }
-        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}', layergroup.cdn_url.templates.https.subdomains[0]);
+        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
+        layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
     }
 }
 const layerSubdomains = function subdomains(layergroup) {

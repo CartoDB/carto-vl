@@ -916,6 +916,7 @@ const property = (...args) => new Property(...args);
 const animate = (...args) => new Animate(...args);
 const hsv = (...args) => new HSV(...args);
 const setOpacity = (...args) => new SetOpacity(...args);
+const opacity = (...args) => new SetOpacity(...args);
 const ramp = (...args) => new Ramp(...args);
 const float = (...args) => new Float(...args);
 const max = (...args) => new Max(...args);
@@ -931,5 +932,5 @@ const abs = (...args) => new Abs(...args);
 
 export {
     Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs
 };
