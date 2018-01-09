@@ -244,10 +244,9 @@ map.on('load', _ => {
         $('#user').val(c.c);
         $('#cartoURL').val(c.d);
         $('#styleEntry').val(c.e);
-        map.setCenter(c.f);
-        map.setZoom(c.g);
-
         superRefresh();
+        map.setZoom(c.g);
+        map.setCenter(c.f);
     }
 
     const superRefresh = () => {

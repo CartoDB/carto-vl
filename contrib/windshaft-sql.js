@@ -8,27 +8,36 @@ var LRU = require("lru-cache");
 
 var style;
 var oldtiles = [];
-
+/*
 let user = 'dmanzanares-ded13';
 let cartoURL = 'carto-staging.com';
 let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
-
-const endpoint = (username, enable) => {
-    return `https://${user}.${cartoURL}/api/v1/map?api_key=${apiKey}`
+*/
+function conf(user, apiKey, cartoURL) {
+    return {
+        user,
+        apiKey,
+        cartoURL,
+    };
 }
-const layerUrl = function url(layergroup, layerIndex) {
-    let subdomainIndex=0;
+
+const endpoint = (conf) => {
+    return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`
+}
+const layerUrl = function (layergroup, layerIndex, conf) {
+    let subdomainIndex = 0;
     return (x, y, z) => {
         subdomainIndex++;
         if (layergroup.cdn_url && layergroup.cdn_url.templates) {
             const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${apiKey}`.replace('{s}',
-                layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
+            return `${urlTemplates.url}/${conf.user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
+                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
         }
-        return `${endpoint(user)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
-        layergroup.cdn_url.templates.https.subdomains[subdomainIndex%layergroup.cdn_url.templates.https.subdomains.length]);
+        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
+            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
     }
 }
+
 const layerSubdomains = function subdomains(layergroup) {
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
@@ -70,19 +79,24 @@ export default class WindshaftSQL extends Provider {
         this.cache = LRU(options);
     }
     setUser(u) {
-        user = u;
+        this.user = u;
     }
     setCartoURL(u) {
-        cartoURL = u;
+        this.cartoURL = u;
     }
     setDataset(d) {
-        dataset = d;
+        this.dataset = d;
     }
     setApiKey(k) {
-        apiKey = k;
+        this.apiKey = k;
     }
     setQueries(protoSchema, dataset) {
-
+        const conf = {
+            user: this.user,
+            apiKey: this.apiKey,
+            cartoURL: this.cartoURL,
+        };//Need to copy these to avoid race conditions
+        this.conf = conf;
         let agg = {
             threshold: 1,
             resolution: protoSchema.aggRes,
@@ -111,7 +125,7 @@ export default class WindshaftSQL extends Provider {
         const query = `(${aggSQL}) AS tmp`;
 
         const promise = async () => {
-            this.geomType = await getGeometryType(query);
+            this.geomType = await getGeometryType(query, conf);
             if (this.geomType != 'point') {
                 agg = false;
             }
@@ -129,7 +143,7 @@ export default class WindshaftSQL extends Provider {
                     }
                 ]
             };
-            const response = await fetch(endpoint(user, this.geomType == 'point'), {
+            const response = await fetch(endpoint(conf), {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -138,14 +152,14 @@ export default class WindshaftSQL extends Provider {
                 body: JSON.stringify(mapConfigAgg),
             });
             const layergroup = await response.json();
-            return layerUrl(layergroup, 0);
+            return layerUrl(layergroup, 0, conf);
         };
 
         this.url = promise();
 
         //block data acquisition
         this.style = null;
-        this.schema = getSchema(query, protoSchema).then(schema => {
+        this.schema = getSchema(query, protoSchema, conf).then(schema => {
             this.style = new R.Style.Style(this.renderer, schema);
             return schema;
         });
@@ -177,6 +191,7 @@ export default class WindshaftSQL extends Provider {
         promise.then(callback);
     }
     requestDataframe(x, y, z) {
+        const originalConf = this.conf;
         return new Promise((callback, reject) => {
             const mvt_extent = 4096;
 
@@ -186,7 +201,7 @@ export default class WindshaftSQL extends Provider {
                 oReq.open("GET", url(x, y, z), true);
                 oReq.onload = (oEvent) => {
                     this.schema.then(schema => {
-                        if (oReq.response.byteLength == 0 || oReq.response == 'null') {
+                        if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
                             callback({ empty: true });
                             return;
                         }
@@ -317,8 +332,11 @@ export default class WindshaftSQL extends Provider {
         const bounds = renderer.getBounds();
         const aspect = renderer.getAspect();
         const tiles = rsys.rTiles(bounds);
+        this.requestGroupID = this.requestGroupID || 1;
+        this.requestGroupID++;
         var completedTiles = [];
         var needToComplete = tiles.length;
+        const requestGroupID = this.requestGroupID;
         tiles.forEach(t => {
             const x = t.x;
             const y = t.y;
@@ -329,7 +347,7 @@ export default class WindshaftSQL extends Provider {
                 } else {
                     completedTiles.push(dataframe);
                 }
-                if (completedTiles.length == needToComplete) {
+                if (completedTiles.length == needToComplete && requestGroupID == this.requestGroupID) {
                     oldtiles.forEach(t => t.setStyle(null));
                     completedTiles.map(t => t.setStyle(this.style));
                     this.renderer.compute('sum',
@@ -344,16 +362,16 @@ export default class WindshaftSQL extends Provider {
     }
 }
 
-async function getColumnTypes(query) {
+async function getColumnTypes(query, conf) {
     const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     return json.fields;
 }
 
-async function getGeometryType(query) {
+async function getGeometryType(query, conf) {
     const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
@@ -368,13 +386,13 @@ async function getGeometryType(query) {
     }
 }
 
-async function getNumericTypes(names, query) {
+async function getNumericTypes(names, query, conf) {
     const aggFns = ['min', 'max', 'sum', 'avg'];
     const numericsSelect = names.map(name =>
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
-    const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
     // TODO avg, sum, count
     return names.map(name =>
@@ -382,10 +400,10 @@ async function getNumericTypes(names, query) {
     );
 }
 
-async function getCategoryTypes(names, query) {
+async function getCategoryTypes(names, query, conf) {
     return Promise.all(names.map(async name => {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
-        const response = await fetch(`https://${user}.${cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+        const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
         const json = await response.json();
         let counts = [];
         let names = [];
@@ -400,13 +418,13 @@ async function getCategoryTypes(names, query) {
 }
 
 
-async function getSchema(query, proto) {
+async function getSchema(query, proto, conf) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type
     //Get category names and counts by grouping by
     //Assign ids
-    const fields = await getColumnTypes(query);
+    const fields = await getColumnTypes(query, conf);
     let numerics = [];
     let categories = [];
     Object.keys(fields).map(name => {
@@ -420,8 +438,8 @@ async function getSchema(query, proto) {
         }
     })
 
-    const numericsTypes = await getNumericTypes(numerics, query);
-    const categoriesTypes = await getCategoryTypes(categories, query);
+    const numericsTypes = await getNumericTypes(numerics, query, conf);
+    const categoriesTypes = await getCategoryTypes(categories, query, conf);
 
     numerics.map((name, index) => {
         const t = numericsTypes[index];
