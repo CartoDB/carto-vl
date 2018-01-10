@@ -270,6 +270,52 @@ map.on('load', _ => {
     $('#user').on('input', superRefresh);
     $('#cartoURL').on('input', superRefresh);
 
+    $('#map').click((ev) => {
+        let closerID = -1;
+        let closerTile = null;
+        let minD = 100000000;
+        let cx = ev.offsetX / map.getCanvas().style.width.replace(/\D/g, '') * 2. - 1;
+        let cy = -(ev.offsetY / map.getCanvas().style.height.replace(/\D/g, '') * 2. - 1);
+        mgl.renderer.getStyledTiles().map(tile => {
+            for (let i = 0; i < tile.size; i++) {
+                const x = tile.geom[2 * i + 0] * tile.vertexScale[0] - tile.vertexOffset[0];
+                const y = tile.geom[2 * i + 1] * tile.vertexScale[1] - tile.vertexOffset[1];
+                const d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+                if (d < minD) {
+                    minD = d;
+                    closerID = i;
+                    closerTile = tile;
+                }
+            }
+        });
+
+        document.getElementById('popup').style.display = 'inline';
+        const p = [
+            closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
+            closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
+        ];
+        document.getElementById('popup').style.top = (-p[1]*0.5+0.5) * map.getCanvas().style.height.replace(/\D/g, '') + "px";
+        document.getElementById('popup').style.left = (p[0]*0.5+0.5) * map.getCanvas().style.width.replace(/\D/g, '') + "px";
+        let str = '';
+        Object.keys(closerTile.properties).map(name => {
+            str += `${name}: ${closerTile.properties[name][closerID]}\n`;
+        });
+        $('#popup').text(str);
+        console.log(closerID, minD, JSON.stringify(
+            Object.keys(closerTile.properties).map(name => {
+                return {
+                    name: name,
+                    property: closerTile.properties[name][closerID],
+                    position: [
+                        closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
+                        closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
+                    ]
+                };
+            }
+            )
+            , null, 4));
+    });
+
 
     const addButton = (name, code) => {
         var button = document.createElement("button");
