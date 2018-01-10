@@ -1276,7 +1276,7 @@ const styler = {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-//     JavaScript Expression Parser (JSEP) 0.3.3
+//     JavaScript Expression Parser (JSEP) 0.3.2
 //     JSEP may be freely distributed under the MIT License
 //     http://jsep.from.so/
 
@@ -1538,6 +1538,9 @@ const styler = {
 					} else if(ch === SQUOTE_CODE || ch === DQUOTE_CODE) {
 						// Single or double quotes
 						return gobbleStringLiteral();
+					} else if(isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
+						// `foo`, `bar.baz`
+						return gobbleVariable();
 					} else if (ch === OBRACK_CODE) {
 						return gobbleArray();
 					} else {
@@ -1556,13 +1559,8 @@ const styler = {
 							to_check = to_check.substr(0, --tc_len);
 						}
 
-						if (isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
-							// `foo`, `bar.baz`
-							return gobbleVariable();
-						}
+						return false;
 					}
-					
-					return false;
 				},
 				// Parse simple numeric literals: `12`, `3.4`, `.5`. Do this by using a string to
 				// keep track of everything in the numeric literal and then calling `parseFloat` on that string
@@ -1632,7 +1630,7 @@ const styler = {
 								case 'b': str += '\b'; break;
 								case 'f': str += '\f'; break;
 								case 'v': str += '\x0B'; break;
-								default : str += ch;
+								default : str += '\\' + ch;
 							}
 						} else {
 							str += ch;
@@ -1832,7 +1830,7 @@ const styler = {
 		};
 
 	// To be filled in by the template
-	jsep.version = '0.3.3';
+	jsep.version = '0.3.2';
 	jsep.toString = function() { return 'JavaScript Expression Parser (JSEP) v' + jsep.version; };
 
 	/**
@@ -1888,7 +1886,7 @@ const styler = {
 	jsep.removeAllUnaryOps = function() {
 		unary_ops = {};
 		max_unop_len = 0;
-
+		
 		return this;
 	};
 
@@ -1912,7 +1910,7 @@ const styler = {
 	jsep.removeAllBinaryOps = function() {
 		binary_ops = {};
 		max_binop_len = 0;
-
+		
 		return this;
 	};
 
@@ -1932,7 +1930,7 @@ const styler = {
 	 */
 	jsep.removeAllLiterals = function() {
 		literals = {};
-
+		
 		return this;
 	};
 
@@ -3025,6 +3023,9 @@ class ComputeJob {
         }
     }
 }
+Renderer.prototype.getStyledTiles = function () {
+    return this.tiles.filter(tile => tile.style);
+}
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -3125,6 +3126,12 @@ function refresh(timestamp) {
         gl.uniform2f(renderer.vertexOffsetUniformLocation,
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
+
+        tile.vertexScale = [(s / aspect) * tile.scale,
+        s * tile.scale];
+
+        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x),
+        s * (this._center.y - tile.center.y)];
 
         gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -3295,7 +3302,7 @@ Renderer.prototype._compute = function (type, expressions) {
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
-    const tiles = this.tiles.filter(tile => tile.style);
+    let tiles = this.tiles.filter(tile => tile.style);
     tiles.forEach(tile => {
         var obj = {
             freeTexUnit: 4
@@ -6549,24 +6556,36 @@ function isEarHashed(ear, minX, minY, invSize) {
     var minZ = zOrder(minTX, minTY, minX, minY, invSize),
         maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
 
-    // first look for points inside the triangle in increasing z-order
-    var p = ear.nextZ;
+    var p = ear.prevZ,
+        n = ear.nextZ;
 
-    while (p && p.z <= maxZ) {
+    // look for points inside the triangle in both directions
+    while (p && p.z >= minZ && n && n.z <= maxZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
-        p = p.nextZ;
+        p = p.prevZ;
+
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
     }
 
-    // then look for points in decreasing z-order
-    p = ear.prevZ;
-
+    // look for remaining points in decreasing z-order
     while (p && p.z >= minZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
         p = p.prevZ;
+    }
+
+    // look for remaining points in increasing z-order
+    while (n && n.z <= maxZ) {
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
     }
 
     return true;
@@ -8551,6 +8570,52 @@ map.on('load', _ => {
     $('#apikey').on('input', superRefresh);
     $('#user').on('input', superRefresh);
     $('#cartoURL').on('input', superRefresh);
+
+    $('#map').click((ev) => {
+        let closerID = -1;
+        let closerTile = null;
+        let minD = 100000000;
+        let cx = ev.offsetX / map.getCanvas().style.width.replace(/\D/g, '') * 2. - 1;
+        let cy = -(ev.offsetY / map.getCanvas().style.height.replace(/\D/g, '') * 2. - 1);
+        mgl.renderer.getStyledTiles().map(tile => {
+            for (let i = 0; i < tile.size; i++) {
+                const x = tile.geom[2 * i + 0] * tile.vertexScale[0] - tile.vertexOffset[0];
+                const y = tile.geom[2 * i + 1] * tile.vertexScale[1] - tile.vertexOffset[1];
+                const d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+                if (d < minD) {
+                    minD = d;
+                    closerID = i;
+                    closerTile = tile;
+                }
+            }
+        });
+
+        document.getElementById('popup').style.display = 'inline';
+        const p = [
+            closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
+            closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
+        ];
+        document.getElementById('popup').style.top = (-p[1]*0.5+0.5) * map.getCanvas().style.height.replace(/\D/g, '') + "px";
+        document.getElementById('popup').style.left = (p[0]*0.5+0.5) * map.getCanvas().style.width.replace(/\D/g, '') + "px";
+        let str = '';
+        Object.keys(closerTile.properties).map(name => {
+            str += `${name}: ${closerTile.properties[name][closerID]}\n`;
+        });
+        $('#popup').text(str);
+        console.log(closerID, minD, JSON.stringify(
+            Object.keys(closerTile.properties).map(name => {
+                return {
+                    name: name,
+                    property: closerTile.properties[name][closerID],
+                    position: [
+                        closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
+                        closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
+                    ]
+                };
+            }
+            )
+            , null, 4));
+    });
 
 
     const addButton = (name, code) => {
