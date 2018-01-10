@@ -162,6 +162,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return CIELab; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return XYZ; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return Abs; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GreaterThan", function() { return GreaterThan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GreaterThanOrEqualTo", function() { return GreaterThanOrEqualTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThan", function() { return LessThan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return LessThanOrEqualTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return Equals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return NotEquals; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -194,6 +200,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return cielab; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return abs; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return greaterThan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return greaterThanOrEqualTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return lessThan; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return lessThanOrEqualTo; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return equals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return notEquals; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
@@ -776,6 +788,15 @@ const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
 const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
+const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
+const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
+
+const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
+const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
+
+const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
+const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
+
 
 const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
     constructor(a) {
@@ -1128,6 +1149,12 @@ const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
 const abs = (...args) => new Abs(...args);
+const greaterThan = (...args) => new GreaterThan(...args);
+const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
+const lessThan = (...args) => new LessThan(...args);
+const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
+const equals = (...args) => new Equals(...args);
+const notEquals = (...args) => new NotEquals(...args);
 
 
 
@@ -3903,6 +3930,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["CIELab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["XYZ"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Abs"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "GreaterThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["GreaterThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "GreaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["GreaterThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["LessThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["LessThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Equals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["NotEquals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3935,6 +3968,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["abs"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["notEquals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
