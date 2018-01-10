@@ -478,6 +478,9 @@ class ComputeJob {
         }
     }
 }
+Renderer.prototype.getStyledTiles = function () {
+    return this.tiles.filter(tile => tile.style);
+}
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -578,6 +581,12 @@ function refresh(timestamp) {
         gl.uniform2f(renderer.vertexOffsetUniformLocation,
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
+
+        tile.vertexScale = [(s / aspect) * tile.scale,
+        s * tile.scale];
+
+        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x),
+        s * (this._center.y - tile.center.y)];
 
         gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -748,7 +757,7 @@ Renderer.prototype._compute = function (type, expressions) {
     var s = 1. / this._zoom;
     var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
     //For each tile
-    const tiles = this.tiles.filter(tile => tile.style);
+    let tiles = this.tiles.filter(tile => tile.style);
     tiles.forEach(tile => {
         var obj = {
             freeTexUnit: 4
