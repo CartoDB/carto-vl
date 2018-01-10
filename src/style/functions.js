@@ -577,6 +577,15 @@ const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
 const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 
+const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
+const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
+
+const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
+const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
+
+const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
+const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
+
 
 const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
     constructor(a) {
@@ -929,8 +938,14 @@ const zoom = (...args) => new Zoom(...args);
 const cielab = (...args) => new CIELab(...args);
 const xyz = (...args) => new XYZ(...args);
 const abs = (...args) => new Abs(...args);
+const greaterThan = (...args) => new GreaterThan(...args);
+const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
+const lessThan = (...args) => new LessThan(...args);
+const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
+const equals = (...args) => new Equals(...args);
+const notEquals = (...args) => new NotEquals(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs, GreaterThan, GreaterThanOrEqualTo, LessThan, LessThanOrEqualTo, Equals, NotEquals,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals
 };
