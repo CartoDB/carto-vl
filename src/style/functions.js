@@ -527,6 +527,16 @@ const genBinaryOp = (jsFn, glsl) =>
             if (Number.isFinite(b)) {
                 b = float(b);
             }
+            if (typeof b === 'string') {
+                [a, b] = [b, a];
+            }
+            if (typeof a === 'string' && b.schemaType.categoryIDs) {
+                let id = b.schemaType.categoryNames.indexOf(a);
+                if (id >= 0) {
+                    id = b.schemaType.categoryIDs[id];
+                }
+                a = float(id);
+            }
             if (a.type == 'float' && b.type == 'float') {
                 super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
                 this.type = 'float';
