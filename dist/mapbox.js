@@ -8594,13 +8594,17 @@ map.on('load', _ => {
         $('#user').val(c.c);
         $('#cartoURL').val(c.d);
         $('#styleEntry').val(c.e);
-        superRefresh();
+        superRefresh(true);
         map.setZoom(c.g);
         map.setCenter(c.f);
+        location.hash = getConfig();
+        console.log(c, c.g, c.f, map.getZoom());
     }
 
-    const superRefresh = () => {
-        location.hash = getConfig();
+    const superRefresh = (nosave) => {
+        if (nosave) {
+            location.hash = getConfig();
+        }
 
         mgl.provider.setCartoURL($('#cartoURL').val());
         mgl.provider.setUser($('#user').val());
