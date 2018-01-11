@@ -105,9 +105,9 @@ function Style(renderer, schema) {
 
 Style.prototype.set = function (s, duration) {
     s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
-    s.width = s.width || functions.float(4);
+    s.width = s.width != undefined ? s.width : functions.float(4);
     s.strokeColor = s.strokeColor || functions.rgba(0, 0, 0, 0);
-    s.strokeWidth = s.strokeWidth || functions.float(0);
+    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : functions.float(0);
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
