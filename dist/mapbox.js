@@ -1313,7 +1313,7 @@ const styler = {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-//     JavaScript Expression Parser (JSEP) 0.3.2
+//     JavaScript Expression Parser (JSEP) 0.3.3
 //     JSEP may be freely distributed under the MIT License
 //     http://jsep.from.so/
 
@@ -1575,9 +1575,6 @@ const styler = {
 					} else if(ch === SQUOTE_CODE || ch === DQUOTE_CODE) {
 						// Single or double quotes
 						return gobbleStringLiteral();
-					} else if(isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
-						// `foo`, `bar.baz`
-						return gobbleVariable();
 					} else if (ch === OBRACK_CODE) {
 						return gobbleArray();
 					} else {
@@ -1596,8 +1593,13 @@ const styler = {
 							to_check = to_check.substr(0, --tc_len);
 						}
 
-						return false;
+						if (isIdentifierStart(ch) || ch === OPAREN_CODE) { // open parenthesis
+							// `foo`, `bar.baz`
+							return gobbleVariable();
+						}
 					}
+					
+					return false;
 				},
 				// Parse simple numeric literals: `12`, `3.4`, `.5`. Do this by using a string to
 				// keep track of everything in the numeric literal and then calling `parseFloat` on that string
@@ -1667,7 +1669,7 @@ const styler = {
 								case 'b': str += '\b'; break;
 								case 'f': str += '\f'; break;
 								case 'v': str += '\x0B'; break;
-								default : str += '\\' + ch;
+								default : str += ch;
 							}
 						} else {
 							str += ch;
@@ -1867,7 +1869,7 @@ const styler = {
 		};
 
 	// To be filled in by the template
-	jsep.version = '0.3.2';
+	jsep.version = '0.3.3';
 	jsep.toString = function() { return 'JavaScript Expression Parser (JSEP) v' + jsep.version; };
 
 	/**
@@ -1923,7 +1925,7 @@ const styler = {
 	jsep.removeAllUnaryOps = function() {
 		unary_ops = {};
 		max_unop_len = 0;
-		
+
 		return this;
 	};
 
@@ -1947,7 +1949,7 @@ const styler = {
 	jsep.removeAllBinaryOps = function() {
 		binary_ops = {};
 		max_binop_len = 0;
-		
+
 		return this;
 	};
 
@@ -1967,7 +1969,7 @@ const styler = {
 	 */
 	jsep.removeAllLiterals = function() {
 		literals = {};
-		
+
 		return this;
 	};
 
@@ -4092,9 +4094,9 @@ function Style(renderer, schema) {
 
 Style.prototype.set = function (s, duration) {
     s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2, 0.2, 0.8, 0.5);
-    s.width = s.width || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
+    s.width = s.width != undefined ? s.width : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
     s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 0);
-    s.strokeWidth = s.strokeWidth || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
+    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
@@ -6605,36 +6607,24 @@ function isEarHashed(ear, minX, minY, invSize) {
     var minZ = zOrder(minTX, minTY, minX, minY, invSize),
         maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
 
-    var p = ear.prevZ,
-        n = ear.nextZ;
+    // first look for points inside the triangle in increasing z-order
+    var p = ear.nextZ;
 
-    // look for points inside the triangle in both directions
-    while (p && p.z >= minZ && n && n.z <= maxZ) {
+    while (p && p.z <= maxZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
-        p = p.prevZ;
-
-        if (n !== ear.prev && n !== ear.next &&
-            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
-            area(n.prev, n, n.next) >= 0) return false;
-        n = n.nextZ;
+        p = p.nextZ;
     }
 
-    // look for remaining points in decreasing z-order
+    // then look for points in decreasing z-order
+    p = ear.prevZ;
+
     while (p && p.z >= minZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
         p = p.prevZ;
-    }
-
-    // look for remaining points in increasing z-order
-    while (n && n.z <= maxZ) {
-        if (n !== ear.prev && n !== ear.next &&
-            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
-            area(n.prev, n, n.next) >= 0) return false;
-        n = n.nextZ;
     }
 
     return true;
