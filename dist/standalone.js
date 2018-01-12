@@ -168,6 +168,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return LessThanOrEqualTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return Equals; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return NotEquals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return Buckets; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -206,6 +207,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return lessThanOrEqualTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return equals; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return notEquals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return buckets; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
@@ -394,6 +396,48 @@ class Expression {
     }
 }
 
+let bucketUID = 0;
+class Buckets extends Expression {
+    /*
+        If input is numeric => args is a breakpoint list
+        If input is categorical => args is a list of category names to map input
+    */
+    constructor(input, ...args) {
+        //Assert input is of numeric type
+        const protoschema = args.pop();
+        args = args.map(implicitCast);
+        let children = {
+            input
+        };
+        args.map((arg, index) => children[`arg${index}`] = arg);
+        super(children);
+        this.bucketUID = bucketUID++;
+        this.type = 'category';
+        this.numCategories = args.length + 1;
+        this.args = args;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+
+        const funcName = `buckets${this.bucketUID}`;
+        const elif = (_, index) =>
+            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+                return ${index + 1}.;
+            }`;
+        const funcBody = this.args.map(elif).join('');
+        const preface = `float ${funcName}(float x){
+            ${funcBody}
+            return 0.;
+        }`;
+
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+            inline: `${funcName}(${childInlines.input})`
+        }
+    }
+}
 
 class Property extends Expression {
     /**
@@ -414,6 +458,8 @@ class Property extends Expression {
         this.schemaType = schema.properties[name].type;
     }
 }
+
+
 
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
@@ -1044,6 +1090,9 @@ class Ramp extends Expression {
             } else if (input instanceof Top) {
                 minKey = 0;
                 maxKey = 1;
+            } else if (input.type == 'category') {
+                minKey = 0;
+                maxKey = input.numCategories;
             }
         }
 
@@ -1165,6 +1214,7 @@ const lessThan = (...args) => new LessThan(...args);
 const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
 const equals = (...args) => new Equals(...args);
 const notEquals = (...args) => new NotEquals(...args);
+const buckets = (...args) => new Buckets(...args);
 
 
 
@@ -3948,6 +3998,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["LessThanOrEqualTo"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Equals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["NotEquals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Buckets"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3986,6 +4037,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["notEquals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["buckets"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });

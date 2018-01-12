@@ -168,6 +168,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return LessThanOrEqualTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return Equals; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return NotEquals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return Buckets; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
@@ -206,6 +207,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return lessThanOrEqualTo; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return equals; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return notEquals; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return buckets; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(0);
@@ -394,6 +396,48 @@ class Expression {
     }
 }
 
+let bucketUID = 0;
+class Buckets extends Expression {
+    /*
+        If input is numeric => args is a breakpoint list
+        If input is categorical => args is a list of category names to map input
+    */
+    constructor(input, ...args) {
+        //Assert input is of numeric type
+        const protoschema = args.pop();
+        args = args.map(implicitCast);
+        let children = {
+            input
+        };
+        args.map((arg, index) => children[`arg${index}`] = arg);
+        super(children);
+        this.bucketUID = bucketUID++;
+        this.type = 'category';
+        this.numCategories = args.length + 1;
+        this.args = args;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+
+        const funcName = `buckets${this.bucketUID}`;
+        const elif = (_, index) =>
+            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+                return ${index + 1}.;
+            }`;
+        const funcBody = this.args.map(elif).join('');
+        const preface = `float ${funcName}(float x){
+            ${funcBody}
+            return 0.;
+        }`;
+
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+            inline: `${funcName}(${childInlines.input})`
+        }
+    }
+}
 
 class Property extends Expression {
     /**
@@ -414,6 +458,8 @@ class Property extends Expression {
         this.schemaType = schema.properties[name].type;
     }
 }
+
+
 
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
@@ -1044,6 +1090,9 @@ class Ramp extends Expression {
             } else if (input instanceof Top) {
                 minKey = 0;
                 maxKey = 1;
+            } else if (input.type == 'category') {
+                minKey = 0;
+                maxKey = input.numCategories;
             }
         }
 
@@ -1165,6 +1214,7 @@ const lessThan = (...args) => new LessThan(...args);
 const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
 const equals = (...args) => new Equals(...args);
 const notEquals = (...args) => new NotEquals(...args);
+const buckets = (...args) => new Buckets(...args);
 
 
 
@@ -3948,6 +3998,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["LessThanOrEqualTo"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Equals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["NotEquals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["Buckets"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
@@ -3986,6 +4037,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["notEquals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["buckets"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
@@ -8680,7 +8732,7 @@ map.on('load', _ => {
     addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAgICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDApXG5zdHJva2VDb2xvcjogIGhzdigwLjEsICRnaXNfYWNyZXMvMjAwMDAwLCAkZ2lzX2FjcmVzLzQwMDAwMClcbnN0cm9rZVdpZHRoOiAkZ2lzX2FjcmVzLzUwMDAwXG5cblxuXG4iLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2fQ==');
     addButton('California Wildfires size/opacity by acres burned colored by cause ',
         'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
-    addButton('Population Density - Filtering', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogem9vbSgpXG5jb2xvcjogc2V0T3BhY2l0eShoc3YoMC44OCwxLCgkZG4vMjU0KSksICAgIGdyZWF0ZXJUaGFuKCRkbiwgMTQwKSAqIGxlc3NUaGFuKCRkbiwgMTUwKSApXG5cblxuXG5cblxuXG4iLCJmIjp7ImxuZyI6NDYuODY0MTQxNTY2Nzg3NDUsImxhdCI6MzcuMjA2ODczMDQ0ODIzNTh9LCJnIjowLjc5NjUxOTc4MTY1MDUxNX0=');
+    addButton('Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogem9vbSgpXG5jb2xvcjogcmFtcChidWNrZXRzKCRkbiwgODAsIDEwMCwgMTQwKSwgcHJpc20pKmdyZWF0ZXJUaGFuKCRkbiwgNjApXG5cblxuXG4iLCJmIjp7ImxuZyI6LTEwLjg0MDcyMTQwMTQ1MzI2NiwibGF0Ijo0MC4wNjQwNTQxNTY1NzA5Nn0sImciOjEuNDkxNzAxNzE4NTk3NTMyNX0=');
     addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
     addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
     addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsb2coJG51bWZsb29ycyksIEVhcnRoLCAgMSwgNClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
