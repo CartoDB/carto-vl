@@ -199,7 +199,7 @@ class Buckets extends Expression {
         args.map((arg, index) => children[`arg${index}`] = arg);
         super(children);
         this.bucketUID = bucketUID++;
-        this.type = 'category';
+        this.type = 'float';
         this.numCategories = args.length + 1;
         this.args = args;
     }
@@ -877,7 +877,7 @@ class Ramp extends Expression {
             } else if (input instanceof Top) {
                 minKey = 0;
                 maxKey = 1;
-            } else if (input.type == 'category') {
+            } else if (input.numCategories) {
                 minKey = 0;
                 maxKey = input.numCategories;
             }
