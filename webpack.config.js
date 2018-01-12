@@ -4,7 +4,6 @@ module.exports =
   {
     devtool: 'source-map',
     entry: {
-      standalone: "./example/standalone.js",
       mapbox: "./example/mapbox.js",
     },
     output: {
