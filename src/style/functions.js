@@ -183,6 +183,48 @@ class Expression {
     }
 }
 
+let bucketUID = 0;
+class Buckets extends Expression {
+    /*
+        If input is numeric => args is a breakpoint list
+        If input is categorical => args is a list of category names to map input
+    */
+    constructor(input, ...args) {
+        //Assert input is of numeric type
+        const protoschema = args.pop();
+        args = args.map(implicitCast);
+        let children = {
+            input
+        };
+        args.map((arg, index) => children[`arg${index}`] = arg);
+        super(children);
+        this.bucketUID = bucketUID++;
+        this.type = 'category';
+        this.numCategories = args.length + 1;
+        this.args = args;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+
+        const funcName = `buckets${this.bucketUID}`;
+        const elif = (_, index) =>
+            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+                return ${index + 1}.;
+            }`;
+        const funcBody = this.args.map(elif).join('');
+        const preface = `float ${funcName}(float x){
+            ${funcBody}
+            return 0.;
+        }`;
+
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+            inline: `${funcName}(${childInlines.input})`
+        }
+    }
+}
 
 class Property extends Expression {
     /**
@@ -203,6 +245,8 @@ class Property extends Expression {
         this.schemaType = schema.properties[name].type;
     }
 }
+
+
 
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
@@ -833,6 +877,9 @@ class Ramp extends Expression {
             } else if (input instanceof Top) {
                 minKey = 0;
                 maxKey = 1;
+            } else if (input.type == 'category') {
+                minKey = 0;
+                maxKey = input.numCategories;
             }
         }
 
@@ -954,8 +1001,9 @@ const lessThan = (...args) => new LessThan(...args);
 const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
 const equals = (...args) => new Equals(...args);
 const notEquals = (...args) => new NotEquals(...args);
+const buckets = (...args) => new Buckets(...args);
 
 export {
-    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs, GreaterThan, GreaterThanOrEqualTo, LessThan, LessThanOrEqualTo, Equals, NotEquals,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals
+    Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs, GreaterThan, GreaterThanOrEqualTo, LessThan, LessThanOrEqualTo, Equals, NotEquals, Buckets,
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, buckets
 };
