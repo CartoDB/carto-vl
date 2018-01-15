@@ -573,10 +573,7 @@ function refresh(timestamp) {
     });
 
     this.computePool.map(job => job.work(this));
-    this.computePool = this.computePool.filter(j => j.status != 'dispatched');
-    if (this.computePool.length > 0) {
-        window.requestAnimationFrame(refresh.bind(this));
-    }
+    this.computePool = [];
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
