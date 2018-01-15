@@ -56,8 +56,6 @@ function union(b) {
     return newProto;
 }
 
-//TODO SQL functions
-
 function parseNodeForSchema(node) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNodeForSchema(arg));

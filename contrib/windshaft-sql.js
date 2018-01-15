@@ -371,7 +371,6 @@ async function getNumericTypes(names, query, conf) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
     const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    // TODO avg, sum, count
     return names.map(name =>
         new R.schema.Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
     );
