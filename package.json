@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/CartoDB/renderer-prototype#readme",
   "devDependencies": {
+    "eslint": "^4.15.0",
     "webpack": "^3.8.1"
   },
   "dependencies": {
