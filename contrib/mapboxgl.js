@@ -9,12 +9,12 @@ const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 class MGLIntegrator {
     constructor(map, providerClass) {
         this.map = map;
-        map.on('load', _ => {
+        map.on('load', () => {
             var cont = map.getCanvasContainer();
-            var canvas = document.createElement('canvas')
+            var canvas = document.createElement('canvas');
             this.canvas = canvas;
             canvas.id = 'good';
-            cont.appendChild(canvas)
+            cont.appendChild(canvas);
             canvas.style.width = map.getCanvas().style.width;
             canvas.style.height = map.getCanvas().style.height;
 
@@ -29,21 +29,13 @@ class MGLIntegrator {
         });
     }
     move() {
-        var b = this.map.getBounds();
-        var nw = b.getNorthWest();
         var c = this.map.getCenter();
 
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180.,Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
 
         c = this.renderer.getCenter();
-        var z = this.renderer.getZoom();
         this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
-        this.renderer.compute('sum',
-            [R.Style.float(1)]
-        ).then(
-            result => $('#title').text('Demo dataset ~ ' + result + ' features')
-            );
     }
 
     resize() {

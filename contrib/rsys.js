@@ -41,6 +41,8 @@
  * of an RSys (usually NWMC).
  */
 
+/*eslint no-unused-vars: ["off"] */
+
 /**
  * R coordinates to World
  * @api
@@ -137,7 +139,7 @@ function getRsysFromTile(x, y, z) {
             y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
         },
         scale: 1 / Math.pow(2, z)
-    }
+    };
 }
 
 export { rTiles, getRsysFromTile };

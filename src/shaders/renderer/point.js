@@ -1,14 +1,4 @@
-//TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 //TODO performance optimization: direct stroke/color/widths from uniform instead of texture read when possible
-
-/*
-    Z coordinate, Z test and blending
-
-    Correct blending results can only be done by ordering the points in JS.
-
-    However, without correct blending it's possible to set the Z coordinate in this shader,
-    and it's possible to base it on the point size.
-*/
 
 /*
     Antialiasing

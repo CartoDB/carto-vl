@@ -1,6 +1,4 @@
-import jsep from 'jsep';
 import * as functions from './functions';
-import parseStyleExpression from './parser';
 import * as shaders from '../shaders';
 
 export {
@@ -40,22 +38,22 @@ Style.prototype._compileColorShader = function () {
     const r = compileShader(this.renderer.gl, this._color, shaders.styler.createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
-}
+};
 Style.prototype._compileStrokeColorShader = function () {
     const r = compileShader(this.renderer.gl, this._strokeColor, shaders.styler.createColorShader);
     this.propertyStrokeColorTID = r.tid;
     this.strokeColorShader = r.shader;
-}
+};
 Style.prototype._compileStrokeWidthShader = function () {
     const r = compileShader(this.renderer.gl, this._strokeWidth, shaders.styler.createWidthShader);
     this.propertyStrokeWidthTID = r.tid;
     this.strokeWidthShader = r.shader;
-}
+};
 Style.prototype._compileWidthShader = function () {
     const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
-}
+};
 
 /**
  * @jsapi
@@ -112,7 +110,7 @@ Style.prototype.set = function (s, duration) {
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
     this.getStrokeWidth().blendTo(s.strokeWidth, duration);
-}
+};
 
 /**
  * Change the width of the style to a new style expression.
@@ -128,7 +126,7 @@ Style.prototype.setWidth = function (float) {
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     float.notify();
-}
+};
 Style.prototype.setStrokeWidth = function (float) {
     this._strokeWidth = float;
     this.updated = true;
@@ -138,7 +136,7 @@ Style.prototype.setStrokeWidth = function (float) {
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     float.notify();
-}
+};
 Style.prototype._replaceChild = function (toReplace, replacer) {
     if (toReplace == this._color) {
         this._color = replacer;
@@ -157,9 +155,9 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     } else {
-        console.warn('No child found');
+        throw new Error('No child found');
     }
-}
+};
 /**
  * Change the color of the style to a new style expression.
  * @jsapi
@@ -174,7 +172,7 @@ Style.prototype.setColor = function (color) {
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     color.notify();
-}
+};
 
 Style.prototype.setStrokeColor = function (color) {
     this._strokeColor = color;
@@ -185,7 +183,7 @@ Style.prototype.setStrokeColor = function (color) {
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
     color.notify();
-}
+};
 
 
 
@@ -195,19 +193,19 @@ Style.prototype.setStrokeColor = function (color) {
  */
 Style.prototype.getWidth = function () {
     return this._width;
-}
+};
 /**
  * Get the color style expression
  * @jsapi
  */
 Style.prototype.getColor = function () {
     return this._color;
-}
+};
 
 Style.prototype.getStrokeColor = function () {
     return this._strokeColor;
-}
+};
 
 Style.prototype.getStrokeWidth = function () {
     return this._strokeWidth;
-}
+};

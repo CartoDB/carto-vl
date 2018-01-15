@@ -3,10 +3,7 @@ import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 
-export { Renderer, Style, Dataframe };
-
-import * as schema from './schema';
-export { schema };
+export { Renderer, Style, Dataframe, schema };
 
 /**
  * @api
@@ -49,34 +46,30 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    this.fbPool = [];
-    this.computePool = [];
-    if (!this.gl) { //TODO remove hack: remove global context
-        this.gl = canvas.getContext('webgl');
-        const gl = this.gl;
-        if (!gl) {
-            throw new Error("WebGL extension OES_texture_float is unsupported");
-        }
-        var ext = gl.getExtension("OES_texture_float");
-        if (!ext) {
-            throw new Error("WebGL extension OES_texture_float is unsupported");
-        }
-        this.EXT_blend_minmax = gl.getExtension('EXT_blend_minmax');
-        if (!this.EXT_blend_minmax) {
-            throw new Error("WebGL extension EXT_blend_minmax is unsupported");
-        }
-        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-        if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-        }
-        this._initShaders();
-        this._center = { x: 0, y: 0 };
-        this._zoom = 1;
-    }
+    this.computePool = []; //TODO hack, refactor needed
+    this.gl = canvas.getContext('webgl');
     const gl = this.gl;
+    if (!gl) {
+        throw new Error('WebGL 1 is unsupported');
+    }
+    const OES_texture_float = gl.getExtension('OES_texture_float');
+    if (!OES_texture_float) {
+        throw new Error('WebGL extension OES_texture_float is unsupported');
+    }
+    const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (supportedRTT < RTT_WIDTH) {
+        throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+    }
+    this._initShaders();
+    this._center = { x: 0, y: 0 };
+    this._zoom = 1;
+
     this.auxFB = gl.createFramebuffer();
-    this.squareBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+
+    // Create a VBO that covers the entire screen
+    // Use a "big" triangle instead of a square for performance and simplicity
+    this.bigTriangleVBO = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
     var vertices = [
         10.0, -10.0,
         0.0, 10.0,
@@ -84,8 +77,10 @@ function Renderer(canvas) {
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    this.zerotex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
+    // Create a 1x1 RGBA texture set to [0,0,0,0]
+    // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
+    this.zeroTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4));
@@ -97,7 +92,6 @@ function Renderer(canvas) {
 
 /**
  * Get Renderer visualization center
- * @api
  * @return {RPoint}
  */
 Renderer.prototype.getCenter = function () {
@@ -105,7 +99,6 @@ Renderer.prototype.getCenter = function () {
 };
 /**
  * Set Renderer visualization center
- * @api
  * @param {number} x
  * @param {number} y
  */
@@ -115,8 +108,7 @@ Renderer.prototype.setCenter = function (x, y) {
     window.requestAnimationFrame(refresh.bind(this));
 };
 /**
- * Get Renderer visualization center
- * @api
+ * Get Renderer visualization bounds
  * @return {*}
  */
 Renderer.prototype.getBounds = function () {
@@ -124,10 +116,9 @@ Renderer.prototype.getBounds = function () {
     const sx = this.getZoom() * this.getAspect();
     const sy = this.getZoom();
     return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
-}
+};
 /**
  * Get Renderer visualization zoom
- * @api
  * @return {number}
  */
 Renderer.prototype.getZoom = function () {
@@ -135,7 +126,6 @@ Renderer.prototype.getZoom = function () {
 };
 /**
  * Set Renderer visualization zoom
- * @api
  * @param {number} zoom
  */
 Renderer.prototype.setZoom = function (zoom) {
@@ -154,10 +144,6 @@ Renderer.prototype.removeDataframe = function (dataframe) {
 
 
 class Dataframe {
-    /**
-     * @constructor
-     * @jsapi
-     */
     constructor(center, scale, geom, properties) {
         this.center = center;
         this.scale = scale;
@@ -184,14 +170,6 @@ class Dataframe {
     }
 }
 
-class BoundDataframe extends Dataframe {
-    /**
-    * @jsapi
-    * Apply a style
-    * @name setStyle
-    * @param style
-    */
-}
 
 Renderer.prototype.createTileTexture = function (type, features) {
     const gl = this.gl;
@@ -214,7 +192,7 @@ Renderer.prototype.createTileTexture = function (type, features) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     return texture;
-}
+};
 
 function getNormal(a, b) {
     const dx = b[0] - a[0];
@@ -255,10 +233,6 @@ function decodeGeom(geomType, geom) {
         geom.map(feature => {
             feature.map(polygon => {
                 const triangles = earcut(polygon.flat, polygon.holes);
-                const deviation = earcut.deviation(polygon.flat, polygon.holes, 2, triangles);
-                if (deviation > 1) {
-                    console.log('Earcut deviation:', deviation);
-                }
                 triangles.map(index => {
                     vertexArray.push(polygon.flat[2 * index]);
                     vertexArray.push(polygon.flat[2 * index + 1]);
@@ -344,7 +318,7 @@ function decodeGeom(geomType, geom) {
             geometry: new Float32Array(geometry),
             breakpointList,
             normals: new Float32Array(normals)
-        }
+        };
     } else {
         throw new Error(`Unimplemented geometry type: '${geomType}'`);
     }
@@ -364,7 +338,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
-    var points;
     const level = 0;
     const width = RTT_WIDTH;
     const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
@@ -374,17 +347,12 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
     const height = Math.ceil(dataframe.numFeatures / width);
-    const border = 0;
-    const srcFormat = gl.RED;
-    const srcType = gl.FLOAT;
     dataframe.height = height;
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
-            const isCategory = !Number.isFinite(dataframe.properties[k][0]);
-            const property = dataframe.properties[k];
             var propertyID = dataframe.propertyID[k];
             if (propertyID === undefined) {
                 propertyID = dataframe.propertyCount;
@@ -409,7 +377,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
             schema.checkSchemaMatch(style.schema, dataframe.schema);
         }
         window.requestAnimationFrame(refresh.bind(this));
-    }
+    };
     dataframe.style = null;
 
     dataframe.vertexBuffer = gl.createBuffer();
@@ -453,34 +421,19 @@ Renderer.prototype.getAspect = function () {
 
 class ComputeJob {
     constructor(type, expressions, resolve) {
-        this.type = type;
-        this.expressions = expressions;
         this.resolve = resolve;
-        this.status = 'pending';
     }
     work(renderer) {
         let sum = 0;
         renderer.tiles.filter(t => t.style).map(t => {
-            /*for (let i=0; i<t.properties['temp'].length; i++){
-                sum+=t.properties['temp'][i];
-            }*/
             sum += t.numFeatures;
         });
         this.resolve(sum);
-        this.status = 'dispatched';
-        return;
-        if (this.status == 'pending') {
-            this.status = 'sent';
-            this.readback = renderer._compute(this.type, this.expressions);
-        } else if (this.status == 'sent') {
-            this.status = 'dispatched';
-            this.resolve(this.readback());
-        }
     }
 }
 Renderer.prototype.getStyledTiles = function () {
     return this.tiles.filter(tile => tile.style);
-}
+};
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -528,13 +481,13 @@ function refresh(timestamp) {
         gl.useProgram(shader.program);
         for (let i = 0; i < 16; i++) {
             gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
+            gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
             gl.uniform1i(shader.textureLocations[i], 0);
         }
         var obj = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
-        }
+        };
         styleExpr._preDraw(obj, gl);
 
         Object.keys(TID).forEach((name, i) => {
@@ -544,12 +497,12 @@ function refresh(timestamp) {
         });
 
         gl.enableVertexAttribArray(shader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
         gl.vertexAttribPointer(shader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
-    }
+    };
     const tiles = this.tiles.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
@@ -582,11 +535,9 @@ function refresh(timestamp) {
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
 
-        tile.vertexScale = [(s / aspect) * tile.scale,
-        s * tile.scale];
+        tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
-        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x),
-        s * (this._center.y - tile.center.y)];
+        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
 
         gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -649,161 +600,13 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
     this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
     this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
-}
+};
 
 Renderer.prototype.compute = function (type, expressions) {
+    // TODO remove this
     window.requestAnimationFrame(refresh.bind(this));
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve) => {
         this.computePool.push(new ComputeJob(type, expressions, resolve));
     });
     return promise;
-}
-
-function getFBstatus(gl) {
-    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-    switch (status) {
-        case gl.FRAMEBUFFER_COMPLETE:
-            return 'FRAMEBUFFER_COMPLETE';
-        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            return 'FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
-        case gl.FRAMEBUFFER_UNSUPPORTED:
-            return 'FRAMEBUFFER_UNSUPPORTED';
-        case gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            return 'FRAMEBUFFER_INCOMPLETE_MULTISAMPLE';
-        case gl.RENDERBUFFER_SAMPLES:
-            return 'RENDERBUFFER_SAMPLES';
-        default:
-            return 'Unkown Framebuffer status';
-    }
-}
-
-//TODO remove this hack :)
-import * as shaders from './shaders';
-import * as functions from './style/functions';
-
-Renderer.prototype._compute = function (type, expressions) {
-    const gl = this.gl;
-    //Render to 1x1 FB
-
-    let fb = this.fbPool.pop();
-    if (!fb) {
-        this.aux1x1FB = gl.createFramebuffer();
-        fb = this.aux1x1FB;
-        this.aux1x1TEX = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.aux1x1TEX);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            1, 1, 0, gl.RGBA, gl.FLOAT,
-            null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.aux1x1TEX, 0);
-        //Check FB completeness
-        if (getFBstatus(gl) != 'FRAMEBUFFER_COMPLETE') {
-            //This is a very bad time to throw an exception, this code should never be executed,
-            //all checks should be done earlier to avoid problems here
-            //If this is still executed we'll warn and ignore
-            console.warn(getFBstatus());
-            return;
-        }
-    }
-    this.aux1x1FB = fb;
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.aux1x1FB);
-
-    gl.viewport(0, 0, 1, 1);
-
-    if (type == 'sum') {
-        gl.blendEquation(gl.FUNC_ADD);
-        gl.blendFunc(gl.ONE, gl.ONE);
-        gl.clearColor(0, 0, 0, 0);
-    } else if (type == 'min') {
-        gl.blendEquation(this.EXT_blend_minmax.MIN_EXT)
-        gl.clearColor(Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23), Math.pow(2, 23));
-    } else {
-        throw new Error("Invalid compute type");
-    }
-
-
-
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    gl.enable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
-    //TODO disable DEPTH WRITE
-
-    //TODO Render with shader => color = float(EXPRESSION)
-
-    //Compile expression, use expression
-    //const expr = new functions.HSV(1., 0, 0.12);
-    let rgba = [0, 0, 0, 0].map(() => functions.float(0));
-    expressions.map((e, i) => rgba[i] = e);
-    const expr = functions.rgba(...rgba);
-    /*functions.property('amount', {
-        'amount': 'float'
-    });*/
-    const r = Style.compileShader(gl, expr, shaders.computer);
-    const shader = r.shader;
-    //console.log('computer', shader)
-
-    gl.useProgram(shader.program);
-
-    var s = 1. / this._zoom;
-    var aspect = this.canvas.clientWidth / this.canvas.clientHeight;
-    //For each tile
-    let tiles = this.tiles.filter(tile => tile.style);
-    tiles.forEach(tile => {
-        var obj = {
-            freeTexUnit: 4
-        }
-        expr._preDraw(obj, gl);
-
-        //TODO redundant code with refresh => refactor
-        gl.uniform2f(shader.vertexScaleUniformLocation,
-            (s / aspect) * tile.scale,
-            s * tile.scale);
-        gl.uniform2f(shader.vertexOffsetUniformLocation,
-            (s / aspect) * (this._center.x - tile.center.x),
-            s * (this._center.y - tile.center.y));
-
-        gl.enableVertexAttribArray(shader.vertexPositionAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(shader.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-
-
-        gl.enableVertexAttribArray(shader.featureIdAttr);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(shader.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
-
-        Object.keys(r.tid).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(shader.textureLocations[i], i);
-        });
-
-        gl.drawArrays(gl.POINTS, 0, tile.numVertex);
-
-        gl.disableVertexAttribArray(shader.vertexPositionAttribute);
-        gl.disableVertexAttribArray(shader.featureIdAttr);
-
-    });
-
-    gl.blendEquation(gl.FUNC_ADD);
-
-    //Readback!
-    let pixels = new Float32Array(4);
-
-    const readback = () => {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, pixels);
-        this.fbPool.push(fb);
-        return Array.from(pixels);
-    }
-    return readback;
-}
+};

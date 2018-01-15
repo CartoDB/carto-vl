@@ -9,7 +9,7 @@
  */
 function Schema(propertyNames, propertyTypes) {
     if (propertyNames.length != propertyTypes.length) {
-        throw new Error("propertyNames and propertyTypes lengths mismatch");
+        throw new Error('propertyNames and propertyTypes lengths mismatch');
     }
     propertyNames.map((name, index) => this[name] = propertyTypes[index]);
 }
@@ -46,5 +46,11 @@ class Category {
         this.categoryIDs = categoryIDs;
     }
 }
+
+
+/*
+    Metadata of SQL: histograms, count, jenks
+    Schema of Style: used columns
+*/
 
 export { Schema, checkSchemaMatch, Float, Category};

@@ -1,9 +1,8 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
-import { Schema } from '../schema';
 
+// TODO this was the string-representation overview, this should be adjusted to the JS API
 /** @module style/functions/
- * @api
  * @description
  * # Styling language overview
  *
@@ -11,7 +10,7 @@ import { Schema } from '../schema';
  * These properties are: color, width, stroke-color and stroke-width.
  *
  * Properties are styled by using styling expressions.
- * A styling expression is a numeric literal, an identifier, a function call, or a built-in mathematic operation.
+ * A styling expression is a numeric literal, a string literal, an identifier, a function call, or a built-in mathematic operation.
  *
  *
  *
@@ -19,7 +18,7 @@ import { Schema } from '../schema';
  * ```
  * 5            //This IS a valid expression, a numeric literal
  * 0.3          //This IS a valid expression too
- * 'myString'   //This IS NOT a valid expression, strings are unsupported
+ * 'myString'   //This IS a valid expression, strings are supported
  * ```
  * ## Identifiers.
  * Identifiers can be used to refer to a feature property by prefixing the property name by '$'.
@@ -53,29 +52,22 @@ import { Schema } from '../schema';
  * ```
  */
 
-
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return float(value);
-    }
-    return value;
-}
-
-const schemas = {};
+// Bring CartoColor palettes
+const palettes = {};
 Object.keys(cartocolor).map(name => {
     const s = cartocolor[name];
     var defaultFound = false;
     for (let i = 20; i >= 0; i--) {
         if (s[i]) {
             if (!defaultFound) {
-                schemas[name.toLowerCase()] = () => s[i];
+                palettes[name.toLowerCase()] = () => s[i];
                 defaultFound = true;
             }
-            schemas[`${name.toLowerCase()}_${i}`] = () => s[i];
+            palettes[`${name.toLowerCase()}_${i}`] = () => s[i];
         }
     }
 });
-export { schemas };
+export { palettes };
 
 /*
     Each styling function should:
@@ -89,27 +81,67 @@ export { schemas };
         - Have a type property declaring the GLSL output type: 'float', 'color'
 */
 
-/*
-    TODO
-        - Integrated color palettes
-        - Type checking for color palettes
-        - Allow multiplication, division and pow() to color expressions and color literals
-        - Add SetOpacity(colorExpr, opacityFloatOverride)
-        - HSV
-        - Think about uniform-only types / parameters
-        - Think about "Date" and "string" types.
-        - Heatmaps (renderer should be improved too to accommodate this)
-*/
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return float(value);
+    }
+    // TODO we need to encapsulate strings as categories
+    return value;
+}
+
+/**
+ * The styling "functions" are a set of styling classes with function helpers to construct them.
+ *
+ * These classes can be combined together since all of them inherit from Expression.
+ * Of course, not all combinations are valid, all expressions have a type,
+ * which is the type that conceptually they returned, for example, the RGBA class conceptually returns a color,
+ * therefore, its type is 'color'.
+ *
+ * The following types exist: 'color', 'float', 'cat'. Colors are encoded in RGBA, floats and categories are encoded
+ * into floating point values, but their semantics differ (categories are integers within the range [0, v.numCategories)
+ *
+ * This combination of styling expression generates trees, in a similar way to what a compiler does.
+ * For example, the addition of two numbers is transformed into a root node (the addition operator) and two children (the numbers).
+ *
+ * However, normally, the style expressions are evaluated on a WebGL shader. To achieve this each expression
+ * has a set of WebGL methods that are invoked to generate GLSL code, to set up the shader after compilation,
+ * and to set shader uniforms properly each frame.
+ *
+ * GLSL code generation is by recursively invoking the _applyToShaderSource() method. Usually, parents first invoke it
+ * to get the children GLSL code, and then they interpolate those strings with their specific code.
+ * This code is divided in two parts: preface and inline. The inline part is the execution entry point, parents invoke this part
+ * to get the evaluated value of sub-expressions. The preface part is used optionally to allow expressions to define GLSL functions that
+ * can be used within the inline part.
+ *
+ * After successful shader compilation the _postShaderCompile() method of the root expression is called.
+ * Parents should call the method of their children too in a recursive way (the entire tree is traversed).
+ * Expressions can use this method to get shader uniform locations.
+ *
+ * After that the _preDraw() method is called each time the style is going to be evaluated (i.e. the styling shader invoked).
+ * This allows expressions to set shader uniforms properly. These values are not integrated into the shader GLSL code as literals to allow
+ * to set time-variable values without the overhead of shader recompilation.
+ *
+ *
+ * To enable a core renderer efficient implementation styling expressions have a isAnimated() method which should return true
+ * if the expression (or their children) dynamically change their output (for example, the now() function).
+ *
+ *
+ * To enable the .blendTo() we use an internal _replaceChild() method that, when called, replaces a child of a expression by other expression.
+ * Therefore if we have a color RED and we want to blend it with BLUE, we call RED.parent._replaceChild(RED, blend(RED, BLUE)).
+ * Replacing blend by the blending operator.
+ */
 
 class Expression {
     /**
-     * @jsapi
+     * @api
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker
      * @param {*} preface
      */
-    constructor(children, inlineMaker, preface) {
+    constructor(type, children, inlineMaker, preface) {
+        this.type = type;
         this.inlineMaker = inlineMaker;
         this.preface = (preface ? preface : '');
         this.childrenNames = Object.keys(children);
@@ -128,7 +160,7 @@ class Expression {
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
             inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
-        }
+        };
     }
     /**
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
@@ -169,7 +201,8 @@ class Expression {
      * @param {Expression} duration
      * @param {Expression} blendFunc
      */
-    blendTo(final, duration = 500, blendFunc = 'linear') {
+    //TODO blendFunc = 'linear'
+    blendTo(final, duration = 500) {
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
         parent._replaceChild(this, blender);
@@ -191,15 +224,14 @@ class Buckets extends Expression {
     */
     constructor(input, ...args) {
         //Assert input is of numeric type
-        const protoschema = args.pop();
+        args.pop();//Remove protoschema from breakpoint list
         args = args.map(implicitCast);
         let children = {
             input
         };
         args.map((arg, index) => children[`arg${index}`] = arg);
-        super(children);
+        super('cat', children);
         this.bucketUID = bucketUID++;
-        this.type = 'category';
         this.numCategories = args.length + 1;
         this.args = args;
     }
@@ -222,7 +254,7 @@ class Buckets extends Expression {
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
             inline: `${funcName}(${childInlines.input})`
-        }
+        };
     }
 }
 
@@ -236,24 +268,25 @@ class Property extends Expression {
             throw new Error(`Invalid property name '${name}'`);
         }
         if (!schema.properties[name]) {
-            throw new Error(`Property name not found`);
+            throw new Error('Property name not found');
         }
-        super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        super(schema.properties[name].type.categoryNames ? 'cat' : 'float', {}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        if (schema.properties[name].type.categoryNames) {
+            this.numCategories = schema.properties[name].type.categoryNames.length;
+        }
         this.name = name;
-        this.type = 'float';
         this.schema = schema;
         this.schemaType = schema.properties[name].type;
     }
 }
 
 
-
+// TODO fix
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
-        constructor(property, schema) {
-            super({ expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
+        constructor(property) {
+            super('float', { expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
             this.name = name;
-            this.type = 'float';
         }
     };
 const Max = metadataAccessGenerator('globalMax');
@@ -264,8 +297,7 @@ const Min = metadataAccessGenerator('globalMin');
 class Top extends Expression {
     constructor(property, buckets) {
         // TODO validation
-        super({ property: property });
-        this.type = 'float';
+        super('float', { property: property });
         this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -319,8 +351,7 @@ class Now extends Expression {
      * @description get the current timestamp
      */
     constructor() {
-        super({ now: float(0) }, inline => inline.now);
-        this.type = 'float';
+        super('float', { now: float(0) }, inline => inline.now);
     }
     _preDraw(...args) {
         this.now.expr = (Date.now() - nowInit) / 1000.;
@@ -337,8 +368,7 @@ class Zoom extends Expression {
      * @description get the current zoom level
      */
     constructor() {
-        super({ zoom: float(0) }, inline => inline.zoom);
-        this.type = 'float';
+        super('float', { zoom: float(0) }, inline => inline.zoom);
     }
     _preDraw(o, gl) {
         this.zoom.expr = o.zoom;
@@ -357,14 +387,13 @@ class Animate extends Expression {
      */
     constructor(duration) {
         if (!Number.isFinite(duration)) {
-            throw new Error("Animate only supports number literals");
+            throw new Error('Animate only supports number literals');
         }
-        super({});
-        this.type = 'float';
+        super('float', {});
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker) {
         this._uniformID = uniformIDMaker();
         return {
             preface: `uniform float anim${this._uniformID};\n`,
@@ -394,9 +423,9 @@ class XYZ extends Expression {
         y = implicitCast(y);
         z = implicitCast(z);
         if (x.type != 'float' || y.type != 'float' || z.type != 'float') {
-            throw new Error(`XYZ`);
+            throw new Error('XYZ');
         }
-        super({ x: x, y: y, z: z }, inline =>
+        super('color', { x: x, y: y, z: z }, inline =>
             `vec4(xyztosrgb((
                 vec3(
                     clamp(${inline.x}, -100000., 10000.),
@@ -404,8 +433,7 @@ class XYZ extends Expression {
                     clamp(${inline.z}, -12800., 12800.)
                 )
             )), 1)`
-            ,
-            `
+            , `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -450,7 +478,6 @@ class XYZ extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
 }
 
@@ -460,9 +487,9 @@ class CIELab extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
         if (l.type != 'float' || a.type != 'float' || b.type != 'float') {
-            throw new Error(`CIELab`);
+            throw new Error('CIELab');
         }
-        super({ l: l, a: a, b: b }, inline =>
+        super('color', { l: l, a: a, b: b }, inline =>
             `vec4(xyztosrgb(cielabtoxyz(
                 vec3(
                     clamp(${inline.l}, 0., 100.),
@@ -470,8 +497,7 @@ class CIELab extends Expression {
                     clamp(${inline.b}, -128., 128.)
                 )
             )), 1)`
-            ,
-            `
+            , `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -511,7 +537,6 @@ class CIELab extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
 }
 
@@ -524,17 +549,24 @@ class HSV extends Expression {
      * @param {*} value value (brightness) of the color in the [0,1] range
      */
     constructor(h, s, v) {
+        function typeCheck(v) {
+            return !(v.type == 'float' || v.type == 'cat');
+        }
+        function normalize(v, hue = false) {
+            if (v.type == 'cat') {
+                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+            }
+            return '';
+        }
         h = implicitCast(h);
         s = implicitCast(s);
         v = implicitCast(v);
-        if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
-            console.warn(h, s, v);
-            throw new Error(`SetOpacity cannot be performed between `);
+        if (typeCheck(h) && typeCheck(s) && typeCheck(v)) {
+            throw new Error('HSV invalid parameters');
         }
-        super({ h: h, s: s, v: v }, inline =>
-            `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
-            ,
-            `
+        super('color', { h: h, s: s, v: v }, inline =>
+            `vec4(hsv2rgb(vec3(${inline.h}${normalize(h, true)}, clamp(${inline.s}${normalize(s)}, 0.,1.), clamp(${inline.v}${normalize(v)}, 0.,1.))), 1)`
+            , `
         #ifndef HSV2RGB
         #define HSV2RGB
         vec3 hsv2rgb(vec3 c) {
@@ -544,9 +576,8 @@ class HSV extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
-};
+}
 
 
 
@@ -582,16 +613,12 @@ const genBinaryOp = (jsFn, glsl) =>
                 a = float(id);
             }
             if (a.type == 'float' && b.type == 'float') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'float';
+                super('float', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else if (a.type == 'color' && b.type == 'color') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'color';
+                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else if (a.type == 'color' && b.type == 'float') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'color';
+                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else {
-                console.warn(a, b);
                 throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
             }
         }
@@ -610,15 +637,12 @@ class SetOpacity extends Expression {
         if (Number.isFinite(b)) {
             b = float(b);
         }
-        if (a.type == 'color' && b.type == 'float') {
-        } else {
-            console.warn(a, b);
+        if (!(a.type == 'color' && b.type == 'float')) {
             throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
         }
-        super({ a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
-        this.type = 'color';
+        super('color', { a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
     }
-};
+}
 
 /**
 * @jsapi
@@ -647,13 +671,11 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
             return float(jsFn(a));
         }
         if (a.type != 'float') {
-            console.warn(a);
             throw new Error(`Binary operation cannot be performed to '${a}'`);
         }
-        super({ a: a }, inlines => glsl(inlines.a));
-        this.type = 'float';
+        super('float', { a: a }, inlines => glsl(inlines.a));
     }
-}
+};
 
 const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
 const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
@@ -680,16 +702,15 @@ class Near extends Expression {
         threshold = implicitCast(threshold);
         falloff = implicitCast(falloff);
         if ([input, center, threshold, falloff].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Near()`);
+            throw new Error('Invalid arguments to Near()');
         }
         if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
             throw new Error('Near(): invalid parameter type');
         }
-        super({ input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
+        super('float', { input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
             `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
             0., 1.))`
         );
-        this.type = 'float';
     }
 }
 
@@ -697,13 +718,13 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
     constructor(m) {
         m = implicitCast(m);
         if (m.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${mix.type}'`);
+            throw new Error(`Blending cannot be performed by '${m.type}'`);
         }
-        super({ m: m }, inline => inlineMaker(inline.m), preface);
+        super('float', { m: m }, inline => inlineMaker(inline.m), preface);
         this.schema = m.schema;
         this.isInterpolator = true;
     }
-}
+};
 class Linear extends genInterpolator(inner => inner) { }
 class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
@@ -733,7 +754,7 @@ class Blend extends Expression {
         b = implicitCast(b);
         mix = implicitCast(mix);
         if ([a, b, mix].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Blend(): ${args}`);
+            throw new Error('Invalid arguments to Blend()');
         }
         if (mix.type != 'float') {
             throw new Error(`Blending cannot be performed by '${mix.type}'`);
@@ -750,12 +771,10 @@ class Blend extends Expression {
         } else if (a.type == 'color' && b.type == 'color') {
             type = 'color';
         } else {
-            console.warn(a, b);
             throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
         }
-        super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
+        super(type, { a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
         this.schema = a.schema;
-        this.type = type;
     }
     _preDraw(l, gl) {
         super._preDraw(l, gl);
@@ -778,19 +797,18 @@ class RGBA extends Expression {
     constructor(r, g, b, a) {
         var color = [r, g, b, a];
         if (!Array.isArray(color)) {
-            throw new Error(`Invalid arguments to Color(): ${args}`);
+            throw new Error(`Invalid arguments to Color(): ${color}`);
         }
-        color = color.filter(x => true);
+        color = color.filter(() => true);
         color = color.map(x => Number.isFinite(x) ? float(x) : x);
         if (color.length != 4) {
-            throw new Error(`Invalid arguments to Color(): ${args}`);
+            throw new Error(`Invalid arguments to Color(): ${color}`);
         }
         r = color[0];
         g = color[1];
         b = color[2];
         a = color[3];
-        super({ r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
-        this.type = 'color';
+        super('color', { r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
     }
 }
 
@@ -804,8 +822,7 @@ class Float extends Expression {
         if (!Number.isFinite(x)) {
             throw new Error(`Invalid arguments to Float(): ${x}`);
         }
-        super({});
-        this.type = 'float';
+        super('float', {});
         this.expr = x;
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -877,7 +894,7 @@ class Ramp extends Expression {
             } else if (input instanceof Top) {
                 minKey = 0;
                 maxKey = 1;
-            } else if (input.type == 'category') {
+            } else if (input.numCategories) {
                 minKey = 0;
                 maxKey = input.numCategories;
             }
@@ -888,10 +905,9 @@ class Ramp extends Expression {
         maxKey = implicitCast(maxKey);
         var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Ramp()`);
+            throw new Error('Invalid arguments to Ramp()');
         }
-        super({ input: input });
-        this.type = 'color';
+        super('color', { input: input });
         this.input = input;
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
