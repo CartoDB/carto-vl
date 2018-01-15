@@ -377,7 +377,7 @@ class Zoom extends Expression {
 }
 
 
-//TODO convert to use uniformfloat class
+//TODO refactor to use uniformfloat class
 class Animate extends Expression {
     /**
      * @jsapi
@@ -784,7 +784,7 @@ class Blend extends Expression {
     }
 }
 
-//TODO rename to uniformcolor, write color (plain, literal)
+//TODO refactor to uniformcolor, write color (plain, literal)
 class RGBA extends Expression {
     /**
      * @api
