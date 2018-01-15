@@ -49,9 +49,8 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    this.fbPool = [];
     this.computePool = [];
-    if (!this.gl) { //TODO remove hack: remove global context
+    if (!this.gl) {
         this.gl = canvas.getContext('webgl');
         const gl = this.gl;
         if (!gl) {
@@ -657,26 +656,4 @@ Renderer.prototype.compute = function (type, expressions) {
         this.computePool.push(new ComputeJob(type, expressions, resolve));
     });
     return promise;
-}
-
-function getFBstatus(gl) {
-    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-    switch (status) {
-        case gl.FRAMEBUFFER_COMPLETE:
-            return 'FRAMEBUFFER_COMPLETE';
-        case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-            return 'FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT';
-        case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-            return 'FRAMEBUFFER_INCOMPLETE_DIMENSIONS';
-        case gl.FRAMEBUFFER_UNSUPPORTED:
-            return 'FRAMEBUFFER_UNSUPPORTED';
-        case gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
-            return 'FRAMEBUFFER_INCOMPLETE_MULTISAMPLE';
-        case gl.RENDERBUFFER_SAMPLES:
-            return 'RENDERBUFFER_SAMPLES';
-        default:
-            return 'Unkown Framebuffer status';
-    }
 }
