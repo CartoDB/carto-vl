@@ -49,29 +49,30 @@ const RTT_WIDTH = 1024;
 function Renderer(canvas) {
     this.canvas = canvas;
     this.tiles = [];
-    this.computePool = [];
-    if (!this.gl) {
-        this.gl = canvas.getContext('webgl');
-        const gl = this.gl;
-        if (!gl) {
-            throw new Error("WebGL extension OES_texture_float is unsupported");
-        }
-        var ext = gl.getExtension("OES_texture_float");
-        if (!ext) {
-            throw new Error("WebGL extension OES_texture_float is unsupported");
-        }
-        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-        if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-        }
-        this._initShaders();
-        this._center = { x: 0, y: 0 };
-        this._zoom = 1;
-    }
+    this.computePool = []; //TODO hack, refactor needed
+    this.gl = canvas.getContext('webgl');
     const gl = this.gl;
+    if (!gl) {
+        throw new Error("WebGL 1 is unsupported");
+    }
+    const OES_texture_float = gl.getExtension("OES_texture_float");
+    if (!OES_texture_float) {
+        throw new Error("WebGL extension OES_texture_float is unsupported");
+    }
+    const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (supportedRTT < RTT_WIDTH) {
+        throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+    }
+    this._initShaders();
+    this._center = { x: 0, y: 0 };
+    this._zoom = 1;
+
     this.auxFB = gl.createFramebuffer();
-    this.squareBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+
+    // Create a VBO that covers the entire screen
+    // Use a "big" triangle instead of a square for performance and simplicity
+    this.bigTriangleVBO = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
     var vertices = [
         10.0, -10.0,
         0.0, 10.0,
@@ -79,8 +80,10 @@ function Renderer(canvas) {
     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-    this.zerotex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
+    // Create a 1x1 RGBA texture set to [0,0,0,0]
+    // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
+    this.zeroTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
         new Uint8Array(4));
@@ -92,7 +95,6 @@ function Renderer(canvas) {
 
 /**
  * Get Renderer visualization center
- * @api
  * @return {RPoint}
  */
 Renderer.prototype.getCenter = function () {
@@ -100,7 +102,6 @@ Renderer.prototype.getCenter = function () {
 };
 /**
  * Set Renderer visualization center
- * @api
  * @param {number} x
  * @param {number} y
  */
@@ -110,8 +111,7 @@ Renderer.prototype.setCenter = function (x, y) {
     window.requestAnimationFrame(refresh.bind(this));
 };
 /**
- * Get Renderer visualization center
- * @api
+ * Get Renderer visualization bounds
  * @return {*}
  */
 Renderer.prototype.getBounds = function () {
@@ -122,7 +122,6 @@ Renderer.prototype.getBounds = function () {
 }
 /**
  * Get Renderer visualization zoom
- * @api
  * @return {number}
  */
 Renderer.prototype.getZoom = function () {
@@ -130,7 +129,6 @@ Renderer.prototype.getZoom = function () {
 };
 /**
  * Set Renderer visualization zoom
- * @api
  * @param {number} zoom
  */
 Renderer.prototype.setZoom = function (zoom) {
@@ -523,7 +521,7 @@ function refresh(timestamp) {
         gl.useProgram(shader.program);
         for (let i = 0; i < 16; i++) {
             gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, this.zerotex);
+            gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
             gl.uniform1i(shader.textureLocations[i], 0);
         }
         var obj = {
@@ -539,7 +537,7 @@ function refresh(timestamp) {
         });
 
         gl.enableVertexAttribArray(shader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.squareBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
         gl.vertexAttribPointer(shader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
