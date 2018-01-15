@@ -88,7 +88,7 @@ function parseNodeForSchema(node) {
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
             return new ProtoSchema(node.name.substring(1), 'raw');
-        } else if (functions.schemas[node.name.toLowerCase()]) {
+        } else if (functions.palettes[node.name.toLowerCase()]) {
             return null;
         } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
             return null;
@@ -233,8 +233,8 @@ function parseNode(node, schema) {
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
             return functions.property(node.name.substring(1), schema);
-        } else if (functions.schemas[node.name.toLowerCase()]) {
-            return functions.schemas[node.name.toLowerCase()]();
+        } else if (functions.palettes[node.name.toLowerCase()]) {
+            return functions.palettes[node.name.toLowerCase()]();
         } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
             return lowerCaseFunctions[node.name.toLowerCase()];
         }

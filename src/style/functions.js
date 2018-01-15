@@ -1,8 +1,8 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
 
+// TODO this was the string-representation overview, this should be adjusted to the JS API
 /** @module style/functions/
- * @api
  * @description
  * # Styling language overview
  *
@@ -10,7 +10,7 @@ import * as schema from '../schema';
  * These properties are: color, width, stroke-color and stroke-width.
  *
  * Properties are styled by using styling expressions.
- * A styling expression is a numeric literal, an identifier, a function call, or a built-in mathematic operation.
+ * A styling expression is a numeric literal, a string literal, an identifier, a function call, or a built-in mathematic operation.
  *
  *
  *
@@ -18,7 +18,7 @@ import * as schema from '../schema';
  * ```
  * 5            //This IS a valid expression, a numeric literal
  * 0.3          //This IS a valid expression too
- * 'myString'   //This IS NOT a valid expression, strings are unsupported
+ * 'myString'   //This IS a valid expression, strings are supported
  * ```
  * ## Identifiers.
  * Identifiers can be used to refer to a feature property by prefixing the property name by '$'.
@@ -52,29 +52,22 @@ import * as schema from '../schema';
  * ```
  */
 
-
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return float(value);
-    }
-    return value;
-}
-
-const schemas = {};
+// Bring CartoColor palettes
+const palettes = {};
 Object.keys(cartocolor).map(name => {
     const s = cartocolor[name];
     var defaultFound = false;
     for (let i = 20; i >= 0; i--) {
         if (s[i]) {
             if (!defaultFound) {
-                schemas[name.toLowerCase()] = () => s[i];
+                palettes[name.toLowerCase()] = () => s[i];
                 defaultFound = true;
             }
-            schemas[`${name.toLowerCase()}_${i}`] = () => s[i];
+            palettes[`${name.toLowerCase()}_${i}`] = () => s[i];
         }
     }
 });
-export { schemas };
+export { palettes };
 
 /*
     Each styling function should:
@@ -88,21 +81,56 @@ export { schemas };
         - Have a type property declaring the GLSL output type: 'float', 'color'
 */
 
-/*
-    TODO
-        - Integrated color palettes
-        - Type checking for color palettes
-        - Allow multiplication, division and pow() to color expressions and color literals
-        - Add SetOpacity(colorExpr, opacityFloatOverride)
-        - HSV
-        - Think about uniform-only types / parameters
-        - Think about "Date" and "string" types.
-        - Heatmaps (renderer should be improved too to accommodate this)
-*/
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return float(value);
+    }
+    // TODO we need to encapsulate strings as categories
+    return value;
+}
 
+/**
+ * The styling "functions" are a set of styling classes with function helpers to construct them.
+ *
+ * These classes can be combined together since all of them inherit from Expression.
+ * Of course, not all combinations are valid, all expressions have a type,
+ * which is the type that conceptually they returned, for example, the RGBA class conceptually returns a color,
+ * therefore, its type is 'color'.
+ *
+ * This combination of styling expression generates trees, in a similar way to what a compiler does.
+ * For example, the addition of two numbers is transformed into a root node (the addition operator) and two children (the numbers).
+ *
+ * However, normally, the style expressions are evaluated on a WebGL shader. To achieve this each expression
+ * has a set of WebGL methods that are invoked to generate GLSL code, to set up the shader after compilation,
+ * and to set shader uniforms properly each frame.
+ *
+ * GLSL code generation is by recursively invoking the _applyToShaderSource() method. Usually, parents first invoke it
+ * to get the children GLSL code, and then they interpolate those strings with their specific code.
+ * This code is divided in two parts: preface and inline. The inline part is the execution entry point, parents invoke this part
+ * to get the evaluated value of sub-expressions. The preface part is used optionally to allow expressions to define GLSL functions that
+ * can be used within the inline part.
+ *
+ * After successful shader compilation the _postShaderCompile() method of the root expression is called.
+ * Parents should call the method of their children too in a recursive way (the entire tree is traversed).
+ * Expressions can use this method to get shader uniform locations.
+ *
+ * After that the _preDraw() method is called each time the style is going to be evaluated (i.e. the styling shader invoked).
+ * This allows expressions to set shader uniforms properly. These values are not integrated into the shader GLSL code as literals to allow
+ * to set time-variable values without the overhead of shader recompilation.
+ *
+ *
+ * To enable a core renderer efficient implementation styling expressions have a isAnimated() method which should return true
+ * if the expression (or their children) dynamically change their output (for example, the now() function).
+ *
+ *
+ * To enable the .blendTo() we use an internal _replaceChild() method that, when called, replaces a child of a expression by other expression.
+ * Therefore if we have a color RED and we want to blend it with BLUE, we call RED.parent._replaceChild(RED, blend(RED, BLUE)).
+ * Replacing blend by the blending operator.
+ */
 class Expression {
     /**
-     * @jsapi
+     * @api
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker

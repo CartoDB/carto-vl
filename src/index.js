@@ -144,10 +144,6 @@ Renderer.prototype.removeDataframe = function (dataframe) {
 
 
 class Dataframe {
-    /**
-     * @constructor
-     * @jsapi
-     */
     constructor(center, scale, geom, properties) {
         this.center = center;
         this.scale = scale;

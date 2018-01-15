@@ -47,4 +47,10 @@ class Category {
     }
 }
 
+
+/*
+    Metadata of SQL: histograms, count, jenks
+    Schema of Style: used columns
+*/
+
 export { Schema, checkSchemaMatch, Float, Category};
