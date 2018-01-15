@@ -54,32 +54,32 @@ strokeWidth:      2*zoom()/50000`,
 ];
 
 const texts = [
-    `We can use RGBA colors`,
+    'We can use RGBA colors',
 
-    `This means that we can change the opacity (alpha) easily`,
+    'This means that we can change the opacity (alpha) easily',
 
-    `There is support for other color spaces like HSV (Hue, Saturation, Value)`,
+    'There is support for other color spaces like HSV (Hue, Saturation, Value)',
 
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
-    `Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)`,
+    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
+    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
+    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
 
-    `You can mix expressions. Here we are setting the hue based on the category of each feature`,
+    'You can mix expressions. Here we are setting the hue based on the category of each feature',
 
-    `We can use turbo-carto inspired ramps too`,
+    'We can use turbo-carto inspired ramps too',
 
-    `We can select the top categories, by grouping the rest into the 'others' buckets`,
+    'We can select the top categories, by grouping the rest into the \'others\' buckets',
 
-    `We can normalize the map based on the amount property by changing the opacity`,
+    'We can normalize the map based on the amount property by changing the opacity',
 
-    `But, let's go back a little bit...`,
+    'But, let\'s go back a little bit...',
 
-    `We can create a bubble map easily, and we can use the square root to make the circle's area proportional to the feature's property`,
+    'We can create a bubble map easily, and we can use the square root to make the circle\'s area proportional to the feature\'s property',
 
-    `We can make them proportional to the scale too, to avoid not very attractive overlaps`,
+    'We can make them proportional to the scale too, to avoid not very attractive overlaps',
 
-    `And... let's put a nice stroke`,
-    `Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE`,
+    'And... let\'s put a nice stroke',
+    'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE',
 ];
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
@@ -142,8 +142,8 @@ map.on('load', _ => {
     let index = 0;//styles.length - 1;
 
     function updateStyle(v) {
-        v = v || document.getElementById("styleEntry").value;
-        document.getElementById("styleEntry").value = v;
+        v = v || document.getElementById('styleEntry').value;
+        document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
             const p = R.Style.getSchema(v);
@@ -155,19 +155,19 @@ map.on('load', _ => {
                 try {
                     const s = R.Style.parseStyle(v, schema);
                     mgl.provider.style.set(s, 1000);
-                    document.getElementById("feedback").style.display = 'none';
+                    document.getElementById('feedback').style.display = 'none';
                 } catch (error) {
                     const err = `Invalid style: ${error}:${error.stack}`;
                     console.warn(err);
-                    document.getElementById("feedback").value = err;
-                    document.getElementById("feedback").style.display = 'block';
+                    document.getElementById('feedback').value = err;
+                    document.getElementById('feedback').style.display = 'block';
                 }
             });
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
-            document.getElementById("feedback").value = err;
-            document.getElementById("feedback").style.display = 'block';
+            document.getElementById('feedback').value = err;
+            document.getElementById('feedback').style.display = 'block';
         }
     }
 
@@ -181,7 +181,7 @@ map.on('load', _ => {
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
-        document.getElementById("styleEntry").value = styles[index];
+        document.getElementById('styleEntry').value = styles[index];
         superRefresh();
     }
     function wwi() {
@@ -194,32 +194,32 @@ map.on('load', _ => {
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
-        document.getElementById("styleEntry").value = shipsStyle;
+        document.getElementById('styleEntry').value = shipsStyle;
         superRefresh();
     }
 
     $('#prev').click(() => {
-        $("#prev").attr("disabled", false);
-        $("#next").attr("disabled", false);
+        $('#prev').attr('disabled', false);
+        $('#next').attr('disabled', false);
         if (index > 0) {
             index--;
             $('#tutorial').text(texts[index]);
             updateStyle(styles[index]);
         }
         if (index == 0) {
-            $("#prev").attr("disabled", true);
+            $('#prev').attr('disabled', true);
         }
     });
     $('#next').click(() => {
-        $("#prev").attr("disabled", false);
-        $("#next").attr("disabled", false);
+        $('#prev').attr('disabled', false);
+        $('#next').attr('disabled', false);
         if (index < styles.length - 1) {
             index++;
             $('#tutorial').text(texts[index]);
             updateStyle(styles[index]);
         }
         if (index == styles.length - 1) {
-            $("#next").prop("disabled", true);
+            $('#next').prop('disabled', true);
         }
     });
 
@@ -298,8 +298,8 @@ map.on('load', _ => {
             closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
             closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
         ];
-        document.getElementById('popup').style.top = (-p[1] * 0.5 + 0.5) * map.getCanvas().style.height.replace(/\D/g, '') + "px";
-        document.getElementById('popup').style.left = (p[0] * 0.5 + 0.5) * map.getCanvas().style.width.replace(/\D/g, '') + "px";
+        document.getElementById('popup').style.top = (-p[1] * 0.5 + 0.5) * map.getCanvas().style.height.replace(/\D/g, '') + 'px';
+        document.getElementById('popup').style.left = (p[0] * 0.5 + 0.5) * map.getCanvas().style.width.replace(/\D/g, '') + 'px';
         let str = '';
         Object.keys(closerTile.properties).map(name => {
             str += `${name}: ${closerTile.properties[name][closerID]}\n`;
@@ -322,15 +322,15 @@ map.on('load', _ => {
 
 
     const addButton = (name, code) => {
-        var button = document.createElement("button");
+        var button = document.createElement('button');
         button.innerText = name;
         button.onclick = () => {
             $('.step').css('display', 'none');
             $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
             $('#tutorial').text('');
             setConfig(code);
-        }
-        document.getElementById("buttonlist").appendChild(button);
+        };
+        document.getElementById('buttonlist').appendChild(button);
     };
     addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IjhhMTc0YzQ1MTIxNWNiOGRjYTkwMjY0ZGUzNDI2MTQwODdjNGVmMGMiLCJjIjoiZG1hbnphbmFyZXMtZGVkMTMiLCJkIjoiY2FydG8tc3RhZ2luZy5jb20iLCJlIjoid2lkdGg6ICAgIGJsZW5kKDEsMixuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpICp6b29tKClcbmNvbG9yOiAgICBzZXRvcGFjaXR5KHJhbXAoQVZHKCR0ZW1wKSwgdGVhbHJvc2UsIDAsIDMwKSwgYmxlbmQoMC4wMDUsMSxuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpKSIsImYiOnsibG5nIjo2MC40MTM2MTE2NzUzMTc3MjUsImxhdCI6MjMuMjIxNzQzODQ0NzQ2Mjg1fSwiZyI6MS41NTE5NTk3NzkwMjk0MTQ2fQ==');
     addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6IHNxcnQoJG51bWJlci8xMClcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MCksMC43KVxuc3Ryb2tlQ29sb3I6IHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi04Ny41MjA2MzAxNzY0MDM5OCwibGF0IjozNy4zNzc2OTk3NjY1MzkzMX0sImciOjIuNzQ2NTk0NjE1NjY2MTg5fQ==');
@@ -348,11 +348,11 @@ map.on('load', _ => {
     addButton('Gecat', 'eyJhIjoiKHNlbGVjdCAqLCAxIGFzIGNvIGZyb20gZ2VjYXRfZ2VvZGF0YV9jb3B5KSBBUyB0bXAiLCJiIjoiNzNmYWNmMmFiNmMyZTdlOTI5ZGFhODFhMjE5YTFmZDQ2NzRmMzBmNiIsImMiOiJjZGJzb2wtYWRtaW4iLCJkIjoiY2FydG8uY29tIiwiZSI6ImNvbG9yOiBzZXRvcGFjaXR5KHJhbXAobG9nKGF2Zygkc3BlZWQpKSwgR2V5c2VyLCAwLCA0KSwgIHN1bSgkY28pKnpvb20oKS8xMDAwMDAqMS44KjQpXG53aWR0aDogMlxucmVzb2x1dGlvbjogMC4yNSAiLCJmIjp7ImxuZyI6MS4yNjE2NzkyNjY5NTQ4NDMxLCJsYXQiOjQxLjcwNDEwNDk3NDkyMDQ1NX0sImciOjcuMzQ2NTM5NDk3NjAzMDR9');
     addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiOGExNzRjNDUxMjE1Y2I4ZGNhOTAyNjRkZTM0MjYxNDA4N2M0ZWYwYyIsImMiOiJkbWFuemFuYXJlcy1kZWQxMyIsImQiOiJjYXJ0by1zdGFnaW5nLmNvbSIsImUiOiJ3aWR0aDogc3FydChTVU0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjUqXG4oZXF1YWxzKE1PREUoJGNhdGVnb3J5KSwgXCJUcmFuc3BvcnRlc1wiKSArIGVxdWFscyhNT0RFKCRjYXRlZ29yeSksIFwiU2FsdWRcIikgKVxuY29sb3I6IHJhbXAoTU9ERSgkY2F0ZWdvcnkpLCBQcmlzbSkiLCJmIjp7ImxuZyI6Mi4xNjU4NTg4OTcwMDI3NDk1LCJsYXQiOjQxLjM3MDU1MjA4MDk0Mzg3fSwiZyI6MTEuNjg4MjUzMTg3MjM4MTk4fQ==');
 
-    if (localStorage.getItem("dataset")) {
-        $('#dataset').val(localStorage.getItem("dataset"));
-        $('#apikey').val(localStorage.getItem("apikey"));
-        $('#user').val(localStorage.getItem("user"));
-        $('#cartoURL').val(localStorage.getItem("cartoURL"));
+    if (localStorage.getItem('dataset')) {
+        $('#dataset').val(localStorage.getItem('dataset'));
+        $('#apikey').val(localStorage.getItem('apikey'));
+        $('#user').val(localStorage.getItem('user'));
+        $('#cartoURL').val(localStorage.getItem('cartoURL'));
     }
     if (location.hash.length > 1) {
         setConfig(location.hash.substring(1));

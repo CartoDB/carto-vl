@@ -77,12 +77,12 @@ function parseNodeForSchema(node, proto) {
         return union([left, right]);
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
-            case '-':
-                return parseNodeForSchema(node.argument);
-            case '+':
-                return parseNodeForSchema(node.argument);
-            default:
-                throw new Error(`Invalid unary operator '${node.operator}'`);
+        case '-':
+            return parseNodeForSchema(node.argument);
+        case '+':
+            return parseNodeForSchema(node.argument);
+        default:
+            throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
@@ -114,7 +114,7 @@ function parseStyleNamedExprForSchema(node) {
 }
 
 function flattenArray(x) {
-    return x.reduce((a, b) => a.concat(b), [])
+    return x.reduce((a, b) => a.concat(b), []);
 }
 
 const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
@@ -133,17 +133,17 @@ export function protoSchemaIsEquals(a, b) {
 }
 
 export function getSchema(str) {
-    jsep.addBinaryOp(":", 1);
-    jsep.addBinaryOp("^", 10);
+    jsep.addBinaryOp(':', 1);
+    jsep.addBinaryOp('^', 10);
     const ast = jsep(str);
     let protoSchema = null;
-    if (ast.type == "Compound") {
+    if (ast.type == 'Compound') {
         protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
     } else {
         protoSchema = union(parseStyleNamedExprForSchema(ast));
     }
-    jsep.removeBinaryOp("^");
-    jsep.removeBinaryOp(":");
+    jsep.removeBinaryOp('^');
+    jsep.removeBinaryOp(':');
 
     return protoSchema;
 }
@@ -155,9 +155,9 @@ export function getSchema(str) {
  */
 export function parseStyleExpression(str, schema) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp("^", 10);
+    jsep.addBinaryOp('^', 10);
     const r = parseNode(jsep(str), schema);
-    jsep.removeBinaryOp("^");
+    jsep.removeBinaryOp('^');
     return r;
 }
 
@@ -174,17 +174,17 @@ function parseStyleNamedExpr(style, node, schema) {
 }
 export function parseStyle(str, schema) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp(":", 1);
-    jsep.addBinaryOp("^", 10);
+    jsep.addBinaryOp(':', 1);
+    jsep.addBinaryOp('^', 10);
     const ast = jsep(str);
     let style = {};
-    if (ast.type == "Compound") {
+    if (ast.type == 'Compound') {
         ast.body.map(node => parseStyleNamedExpr(style, node, schema));
     } else {
         parseStyleNamedExpr(style, ast, schema);
     }
-    jsep.removeBinaryOp("^");
-    jsep.removeBinaryOp(":");
+    jsep.removeBinaryOp('^');
+    jsep.removeBinaryOp(':');
     return style;
 }
 
@@ -209,29 +209,29 @@ function parseNode(node, schema) {
         const left = parseNode(node.left, schema);
         const right = parseNode(node.right, schema);
         switch (node.operator) {
-            case "*":
-                return functions.floatMul(left, right, schema);
-            case "/":
-                return functions.floatDiv(left, right, schema);
-            case "+":
-                return functions.floatAdd(left, right, schema);
-            case "-":
-                return functions.floatSub(left, right, schema);
-            case "%":
-                return functions.floatMod(left, right, schema);
-            case "^":
-                return functions.floatPow(left, right, schema);
-            default:
-                throw new Error(`Invalid binary operator '${node.operator}'`);
+        case '*':
+            return functions.floatMul(left, right, schema);
+        case '/':
+            return functions.floatDiv(left, right, schema);
+        case '+':
+            return functions.floatAdd(left, right, schema);
+        case '-':
+            return functions.floatSub(left, right, schema);
+        case '%':
+            return functions.floatMod(left, right, schema);
+        case '^':
+            return functions.floatPow(left, right, schema);
+        default:
+            throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
-            case '-':
-                return functions.floatMul(-1, parseNode(node.argument, schema));
-            case '+':
-                return parseNode(node.argument, schema);
-            default:
-                throw new Error(`Invalid unary operator '${node.operator}'`);
+        case '-':
+            return functions.floatMul(-1, parseNode(node.argument, schema));
+        case '+':
+            return parseNode(node.argument, schema);
+        default:
+            throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {

@@ -11,10 +11,10 @@ class MGLIntegrator {
         this.map = map;
         map.on('load', _ => {
             var cont = map.getCanvasContainer();
-            var canvas = document.createElement('canvas')
+            var canvas = document.createElement('canvas');
             this.canvas = canvas;
             canvas.id = 'good';
-            cont.appendChild(canvas)
+            cont.appendChild(canvas);
             canvas.style.width = map.getCanvas().style.width;
             canvas.style.height = map.getCanvas().style.height;
 
@@ -43,7 +43,7 @@ class MGLIntegrator {
             [R.Style.float(1)]
         ).then(
             result => $('#title').text('Demo dataset ~ ' + result + ' features')
-            );
+        );
     }
 
     resize() {

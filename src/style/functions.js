@@ -128,7 +128,7 @@ class Expression {
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
             inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
-        }
+        };
     }
     /**
      * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
@@ -222,7 +222,7 @@ class Buckets extends Expression {
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
             inline: `${funcName}(${childInlines.input})`
-        }
+        };
     }
 }
 
@@ -236,7 +236,7 @@ class Property extends Expression {
             throw new Error(`Invalid property name '${name}'`);
         }
         if (!schema.properties[name]) {
-            throw new Error(`Property name not found`);
+            throw new Error('Property name not found');
         }
         super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
         this.name = name;
@@ -357,7 +357,7 @@ class Animate extends Expression {
      */
     constructor(duration) {
         if (!Number.isFinite(duration)) {
-            throw new Error("Animate only supports number literals");
+            throw new Error('Animate only supports number literals');
         }
         super({});
         this.type = 'float';
@@ -394,7 +394,7 @@ class XYZ extends Expression {
         y = implicitCast(y);
         z = implicitCast(z);
         if (x.type != 'float' || y.type != 'float' || z.type != 'float') {
-            throw new Error(`XYZ`);
+            throw new Error('XYZ');
         }
         super({ x: x, y: y, z: z }, inline =>
             `vec4(xyztosrgb((
@@ -405,7 +405,7 @@ class XYZ extends Expression {
                 )
             )), 1)`
             ,
-            `
+        `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -460,7 +460,7 @@ class CIELab extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
         if (l.type != 'float' || a.type != 'float' || b.type != 'float') {
-            throw new Error(`CIELab`);
+            throw new Error('CIELab');
         }
         super({ l: l, a: a, b: b }, inline =>
             `vec4(xyztosrgb(cielabtoxyz(
@@ -471,7 +471,7 @@ class CIELab extends Expression {
                 )
             )), 1)`
             ,
-            `
+        `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -529,12 +529,12 @@ class HSV extends Expression {
         v = implicitCast(v);
         if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
             console.warn(h, s, v);
-            throw new Error(`SetOpacity cannot be performed between `);
+            throw new Error('SetOpacity cannot be performed between ');
         }
         super({ h: h, s: s, v: v }, inline =>
             `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
             ,
-            `
+        `
         #ifndef HSV2RGB
         #define HSV2RGB
         vec3 hsv2rgb(vec3 c) {
@@ -546,7 +546,7 @@ class HSV extends Expression {
         `);
         this.type = 'color';
     }
-};
+}
 
 
 
@@ -618,7 +618,7 @@ class SetOpacity extends Expression {
         super({ a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
         this.type = 'color';
     }
-};
+}
 
 /**
 * @jsapi
@@ -653,7 +653,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
         super({ a: a }, inlines => glsl(inlines.a));
         this.type = 'float';
     }
-}
+};
 
 const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
 const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
@@ -680,7 +680,7 @@ class Near extends Expression {
         threshold = implicitCast(threshold);
         falloff = implicitCast(falloff);
         if ([input, center, threshold, falloff].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Near()`);
+            throw new Error('Invalid arguments to Near()');
         }
         if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
             throw new Error('Near(): invalid parameter type');
@@ -703,7 +703,7 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
         this.schema = m.schema;
         this.isInterpolator = true;
     }
-}
+};
 class Linear extends genInterpolator(inner => inner) { }
 class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
@@ -888,7 +888,7 @@ class Ramp extends Expression {
         maxKey = implicitCast(maxKey);
         var values = implicitCast(palette);
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Ramp()`);
+            throw new Error('Invalid arguments to Ramp()');
         }
         super({ input: input });
         this.type = 'color';
