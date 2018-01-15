@@ -98,6 +98,9 @@ function implicitCast(value) {
  * which is the type that conceptually they returned, for example, the RGBA class conceptually returns a color,
  * therefore, its type is 'color'.
  *
+ * The following types exist: 'color', 'float', 'cat'. Colors are encoded in RGBA, floats and categories are encoded
+ * into floating point values, but their semantics differ (categories are integers within the range [0, v.numCategories)
+ *
  * This combination of styling expression generates trees, in a similar way to what a compiler does.
  * For example, the addition of two numbers is transformed into a root node (the addition operator) and two children (the numbers).
  *

@@ -1,3 +1,4 @@
+//TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 
 export const VS = `
 
