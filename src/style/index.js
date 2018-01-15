@@ -1,6 +1,4 @@
-import jsep from 'jsep';
 import * as functions from './functions';
-import parseStyleExpression from './parser';
 import * as shaders from '../shaders';
 
 export {
@@ -157,7 +155,7 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
         replacer.parent = this;
         replacer.notify = toReplace.notify;
     } else {
-        console.warn('No child found');
+        throw new Error('No child found');
     }
 };
 /**

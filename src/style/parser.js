@@ -1,7 +1,8 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import * as schema from '../schema';
+
+// TODO use Schema classes
 
 const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
 
@@ -57,7 +58,7 @@ function union(b) {
 
 //TODO SQL functions
 
-function parseNodeForSchema(node, proto) {
+function parseNodeForSchema(node) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNodeForSchema(arg));
         const name = node.callee.name.toLowerCase();
@@ -111,10 +112,6 @@ function parseStyleNamedExprForSchema(node) {
     } else {
         return parseNodeForSchema(node.right);
     }
-}
-
-function flattenArray(x) {
-    return x.reduce((a, b) => a.concat(b), []);
 }
 
 const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
