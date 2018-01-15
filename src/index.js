@@ -60,10 +60,6 @@ function Renderer(canvas) {
         if (!ext) {
             throw new Error("WebGL extension OES_texture_float is unsupported");
         }
-        this.EXT_blend_minmax = gl.getExtension('EXT_blend_minmax');
-        if (!this.EXT_blend_minmax) {
-            throw new Error("WebGL extension EXT_blend_minmax is unsupported");
-        }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
