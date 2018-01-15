@@ -250,22 +250,17 @@ class Dataframe {
 }
 
 
-Renderer.prototype.createTileTexture = function (type, features) {
+Renderer.prototype.createStyleTileTexture = function (numFeatures) {
+    // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
+    // since RGB components are discarded
     const gl = this.gl;
     const width = RTT_WIDTH;
-    const height = Math.ceil(features / width);
-
+    const height = Math.ceil(numFeatures / width);
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    if (type == 'size') {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-            width, height, 0, gl.ALPHA, gl.UNSIGNED_BYTE,
-            null);
-    } else {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            null);
-    }
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+        null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
@@ -273,7 +268,8 @@ Renderer.prototype.createTileTexture = function (type, features) {
     return texture;
 };
 
-function getNormal(a, b) {
+
+function getLineNormal(a, b) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
     return normalize([-dy, dx]);
@@ -335,14 +331,13 @@ function decodeGeom(geomType, geom) {
                     const b = [line[i + 2], line[i + 3]];
                     if (i > 0) {
                         var prev = [line[i + -2], line[i + -1]];
-                        var nprev = getNormal(a, prev);
+                        var nprev = getLineNormal(a, prev);
                     }
                     if (i < line.length - 4) {
                         var next = [line[i + 4], line[i + 5]];
-                        var nnext = getNormal(next, b);
+                        var nnext = getLineNormal(next, b);
                     }
-                    //Compute normal
-                    let normal = getNormal(b, a);
+                    let normal = getLineNormal(b, a);
                     let na = normal;
                     let nb = normal;
                     //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
@@ -389,7 +384,6 @@ function decodeGeom(geomType, geom) {
                     geometry.push(b[0] - 0.01 * normal[0]);
                     geometry.push(b[1] - 0.01 * normal[1]);
                 }
-                //console.log("L", line, geometry)
             });
             breakpointList.push(geometry.length);
         });
@@ -404,7 +398,6 @@ function decodeGeom(geomType, geom) {
 }
 
 /**
- * @jsapi
  * @description Adds a new dataframe to the renderer.
  *
  * Performance-intensive. The required allocation and copy of resources will happen synchronously.
@@ -462,10 +455,10 @@ Renderer.prototype.addDataframe = function (dataframe) {
     dataframe.vertexBuffer = gl.createBuffer();
     dataframe.featureIDBuffer = gl.createBuffer();
 
-    dataframe.texColor = this.createTileTexture('color', dataframe.numFeatures);
-    dataframe.texWidth = this.createTileTexture('color', dataframe.numFeatures);
-    dataframe.texStrokeColor = this.createTileTexture('color', dataframe.numFeatures);
-    dataframe.texStrokeWidth = this.createTileTexture('color', dataframe.numFeatures);
+    dataframe.texColor = this.createStyleTileTexture(dataframe.numFeatures);
+    dataframe.texWidth = this.createStyleTileTexture(dataframe.numFeatures);
+    dataframe.texStrokeColor = this.createStyleTileTexture(dataframe.numFeatures);
+    dataframe.texStrokeWidth = this.createStyleTileTexture(dataframe.numFeatures);
 
     var ids = new Float32Array(points.length);
     let index = 0;
@@ -1157,7 +1150,7 @@ class Zoom extends Expression {
 }
 
 
-//TODO convert to use uniformfloat class
+//TODO refactor to use uniformfloat class
 class Animate extends Expression {
     /**
      * @jsapi
@@ -1564,7 +1557,7 @@ class Blend extends Expression {
     }
 }
 
-//TODO rename to uniformcolor, write color (plain, literal)
+//TODO refactor to uniformcolor, write color (plain, literal)
 class RGBA extends Expression {
     /**
      * @api
@@ -5827,8 +5820,6 @@ function union(b) {
     return newProto;
 }
 
-//TODO SQL functions
-
 function parseNodeForSchema(node) {
     if (node.type == 'CallExpression') {
         const args = node.arguments.map(arg => parseNodeForSchema(arg));
@@ -7736,7 +7727,6 @@ async function getNumericTypes(names, query, conf) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
     const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    // TODO avg, sum, count
     return names.map(name =>
         new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
     );
