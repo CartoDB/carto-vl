@@ -31,6 +31,35 @@
         <h2><span class="attribs"><span class="type-signature"></span></span>
             <span class="ancestors"><a href="module-style_functions_.html">style/functions/</a>~</span>Expression</h2>
         
+            <div class="class-description"><p>The styling &quot;functions&quot; are a set of styling classes with function helpers to construct them.</p>
+<p>These classes can be combined together since all of them inherit from Expression.
+Of course, not all combinations are valid, all expressions have a type,
+which is the type that conceptually they returned, for example, the RGBA class conceptually returns a color,
+therefore, its type is 'color'.</p>
+<p>The following types exist: 'color', 'float', 'cat'. Colors are encoded in RGBA, floats and categories are encoded
+into floating point values, but their semantics differ (categories are integers within the range [0, v.numCategories)</p>
+<p>This combination of styling expression generates trees, in a similar way to what a compiler does.
+For example, the addition of two numbers is transformed into a root node (the addition operator) and two children (the numbers).</p>
+<p>However, normally, the style expressions are evaluated on a WebGL shader. To achieve this each expression
+has a set of WebGL methods that are invoked to generate GLSL code, to set up the shader after compilation,
+and to set shader uniforms properly each frame.</p>
+<p>GLSL code generation is by recursively invoking the _applyToShaderSource() method. Usually, parents first invoke it
+to get the children GLSL code, and then they interpolate those strings with their specific code.
+This code is divided in two parts: preface and inline. The inline part is the execution entry point, parents invoke this part
+to get the evaluated value of sub-expressions. The preface part is used optionally to allow expressions to define GLSL functions that
+can be used within the inline part.</p>
+<p>After successful shader compilation the _postShaderCompile() method of the root expression is called.
+Parents should call the method of their children too in a recursive way (the entire tree is traversed).
+Expressions can use this method to get shader uniform locations.</p>
+<p>After that the _preDraw() method is called each time the style is going to be evaluated (i.e. the styling shader invoked).
+This allows expressions to set shader uniforms properly. These values are not integrated into the shader GLSL code as literals to allow
+to set time-variable values without the overhead of shader recompilation.</p>
+<p>To enable a core renderer efficient implementation styling expressions have a isAnimated() method which should return true
+if the expression (or their children) dynamically change their output (for example, the now() function).</p>
+<p>To enable the .blendTo() we use an internal _replaceChild() method that, when called, replaces a child of a expression by other expression.
+Therefore if we have a color RED and we want to blend it with BLUE, we call RED.parent._replaceChild(RED, blend(RED, BLUE)).
+Replacing blend by the blending operator.</p></div>
+        
     
 </header>
 
@@ -903,8 +932,6 @@
             
                 <td class="default">
                 
-                    linear
-                
                 </td>
             
 
@@ -1075,13 +1102,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-style_functions_.html">style/functions/</a></li></ul><h3>Classes</h3><ul><li><a href="global.html#Dataframe">Dataframe</a></li><li><a href="module-style_functions_-Animate.html">style/functions/~Animate</a></li><li><a href="module-style_functions_-BinaryOperation.html">style/functions/~BinaryOperation</a></li><li><a href="module-style_functions_-Blend.html">style/functions/~Blend</a></li><li><a href="module-style_functions_-Expression.html">style/functions/~Expression</a></li><li><a href="module-style_functions_-Float.html">style/functions/~Float</a></li><li><a href="module-style_functions_-FloatMul.html">style/functions/~FloatMul</a></li><li><a href="module-style_functions_-HSV.html">style/functions/~HSV</a></li><li><a href="module-style_functions_-Near.html">style/functions/~Near</a></li><li><a href="module-style_functions_-Now.html">style/functions/~Now</a></li><li><a href="module-style_functions_-Property.html">style/functions/~Property</a></li><li><a href="module-style_functions_-Ramp.html">style/functions/~Ramp</a></li><li><a href="module-style_functions_-RGBA.html">style/functions/~RGBA</a></li><li><a href="module-style_functions_-SetOpacity.html">style/functions/~SetOpacity</a></li><li><a href="module-style_functions_-Zoom.html">style/functions/~Zoom</a></li><li><a href="renderer.Renderer.html">renderer.Renderer</a></li><li><a href="Schema.html">Schema</a></li><li><a href="Style.html">Style</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkSchemaMatch">checkSchemaMatch</a></li><li><a href="global.html#parseStyleExpression">parseStyleExpression</a></li><li><a href="global.html#RTT_WIDTH">RTT_WIDTH</a></li><li><a href="global.html#setStyle">setStyle</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-style_functions_.html">style/functions/</a></li></ul><h3>Classes</h3><ul><li><a href="module-style_functions_-Animate.html">style/functions/~Animate</a></li><li><a href="module-style_functions_-BinaryOperation.html">style/functions/~BinaryOperation</a></li><li><a href="module-style_functions_-Blend.html">style/functions/~Blend</a></li><li><a href="module-style_functions_-Expression.html">style/functions/~Expression</a></li><li><a href="module-style_functions_-Float.html">style/functions/~Float</a></li><li><a href="module-style_functions_-FloatMul.html">style/functions/~FloatMul</a></li><li><a href="module-style_functions_-HSV.html">style/functions/~HSV</a></li><li><a href="module-style_functions_-Near.html">style/functions/~Near</a></li><li><a href="module-style_functions_-Now.html">style/functions/~Now</a></li><li><a href="module-style_functions_-Property.html">style/functions/~Property</a></li><li><a href="module-style_functions_-Ramp.html">style/functions/~Ramp</a></li><li><a href="module-style_functions_-RGBA.html">style/functions/~RGBA</a></li><li><a href="module-style_functions_-SetOpacity.html">style/functions/~SetOpacity</a></li><li><a href="module-style_functions_-Zoom.html">style/functions/~Zoom</a></li><li><a href="renderer.Renderer.html">renderer.Renderer</a></li><li><a href="Schema.html">Schema</a></li><li><a href="Style.html">Style</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkSchemaMatch">checkSchemaMatch</a></li><li><a href="global.html#parseStyleExpression">parseStyleExpression</a></li><li><a href="global.html#RTT_WIDTH">RTT_WIDTH</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jan 12 2018 11:46:02 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 15 2018 16:25:51 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
