@@ -1,3 +1,6 @@
+/*eslint-env jquery*/
+/*eslint no-console: ["off"] */
+
 import * as MGL from '../contrib/mapboxgl';
 import WindshaftSQL from '../contrib/windshaft-sql';
 import * as R from '../src/index';
@@ -84,47 +87,6 @@ const texts = [
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
-const barcelonaQueries = [`(SELECT
-        *
-    FROM tx_0125_copy_copy) AS tmp`
-    ,
-    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-(
-    SELECT
-        ST_AsMVTGeom(
-            ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-            CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-        ),
-        SUM(amount) AS amount,
-        _cdb_mode(category) AS category
-    FROM tx_0125_copy_copy AS cdbq
-    WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-    GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25)
-    ORDER BY amount DESC
-)AS geom`];
-
-const ships_WWIQueries = [`(SELECT
-            the_geom_webmercator,
-            temp,
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::numeric AS day
-        FROM wwi_ships) AS tmp`
-    ,
-    (x, y, z) => `select st_asmvt(geom, 'lid') FROM
-    (
-        SELECT
-            ST_AsMVTGeom(
-                ST_SetSRID(ST_MakePoint(avg(ST_X(the_geom_webmercator)), avg(ST_Y(the_geom_webmercator))),3857),
-                CDB_XYZ_Extent(${x},${y},${z}), 1024, 0, false
-            ),
-            AVG(temp)::numeric(3,1) AS temp,
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )::smallint AS day
-        FROM wwi_ships AS cdbq
-        WHERE the_geom_webmercator && CDB_XYZ_Extent(${x},${y},${z})
-        GROUP BY ST_SnapToGrid(the_geom_webmercator, CDB_XYZ_Resolution(${z})*0.25),
-            DATE_PART('day', date::timestamp-'1912-12-31 01:00:00'::timestamp )
-    )AS geom
-`];
-
 var mapboxgl = window.mapboxgl;
 mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
@@ -138,7 +100,7 @@ var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
 let protoSchema = null;
 
-map.on('load', _ => {
+map.on('load', () => {
     let index = 0;//styles.length - 1;
 
     function updateStyle(v) {
@@ -248,7 +210,6 @@ map.on('load', _ => {
         map.setZoom(c.g);
         map.setCenter(c.f);
         location.hash = getConfig();
-        console.log(c, c.g, c.f, map.getZoom());
     }
 
     const superRefresh = (nosave) => {

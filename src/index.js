@@ -3,10 +3,7 @@ import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 
-export { Renderer, Style, Dataframe };
-
-import * as schema from './schema';
-export { schema };
+export { Renderer, Style, Dataframe, schema };
 
 /**
  * @api
@@ -53,11 +50,11 @@ function Renderer(canvas) {
     this.gl = canvas.getContext('webgl');
     const gl = this.gl;
     if (!gl) {
-        throw new Error("WebGL 1 is unsupported");
+        throw new Error('WebGL 1 is unsupported');
     }
-    const OES_texture_float = gl.getExtension("OES_texture_float");
+    const OES_texture_float = gl.getExtension('OES_texture_float');
     if (!OES_texture_float) {
-        throw new Error("WebGL extension OES_texture_float is unsupported");
+        throw new Error('WebGL extension OES_texture_float is unsupported');
     }
     const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
     if (supportedRTT < RTT_WIDTH) {
@@ -119,7 +116,7 @@ Renderer.prototype.getBounds = function () {
     const sx = this.getZoom() * this.getAspect();
     const sy = this.getZoom();
     return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
-}
+};
 /**
  * Get Renderer visualization zoom
  * @return {number}
@@ -177,14 +174,6 @@ class Dataframe {
     }
 }
 
-class BoundDataframe extends Dataframe {
-    /**
-    * @jsapi
-    * Apply a style
-    * @name setStyle
-    * @param style
-    */
-}
 
 Renderer.prototype.createTileTexture = function (type, features) {
     const gl = this.gl;
@@ -207,7 +196,7 @@ Renderer.prototype.createTileTexture = function (type, features) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     return texture;
-}
+};
 
 function getNormal(a, b) {
     const dx = b[0] - a[0];
@@ -248,10 +237,6 @@ function decodeGeom(geomType, geom) {
         geom.map(feature => {
             feature.map(polygon => {
                 const triangles = earcut(polygon.flat, polygon.holes);
-                const deviation = earcut.deviation(polygon.flat, polygon.holes, 2, triangles);
-                if (deviation > 1) {
-                    console.log('Earcut deviation:', deviation);
-                }
                 triangles.map(index => {
                     vertexArray.push(polygon.flat[2 * index]);
                     vertexArray.push(polygon.flat[2 * index + 1]);
@@ -337,7 +322,7 @@ function decodeGeom(geomType, geom) {
             geometry: new Float32Array(geometry),
             breakpointList,
             normals: new Float32Array(normals)
-        }
+        };
     } else {
         throw new Error(`Unimplemented geometry type: '${geomType}'`);
     }
@@ -357,7 +342,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
-    var points;
     const level = 0;
     const width = RTT_WIDTH;
     const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
@@ -367,17 +351,12 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
     const height = Math.ceil(dataframe.numFeatures / width);
-    const border = 0;
-    const srcFormat = gl.RED;
-    const srcType = gl.FLOAT;
     dataframe.height = height;
     dataframe.propertyID = {}; //Name => PID
     dataframe.propertyCount = 0;
     dataframe.renderer = this;
     for (var k in dataframe.properties) {
         if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
-            const isCategory = !Number.isFinite(dataframe.properties[k][0]);
-            const property = dataframe.properties[k];
             var propertyID = dataframe.propertyID[k];
             if (propertyID === undefined) {
                 propertyID = dataframe.propertyCount;
@@ -402,7 +381,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
             schema.checkSchemaMatch(style.schema, dataframe.schema);
         }
         window.requestAnimationFrame(refresh.bind(this));
-    }
+    };
     dataframe.style = null;
 
     dataframe.vertexBuffer = gl.createBuffer();
@@ -446,34 +425,19 @@ Renderer.prototype.getAspect = function () {
 
 class ComputeJob {
     constructor(type, expressions, resolve) {
-        this.type = type;
-        this.expressions = expressions;
         this.resolve = resolve;
-        this.status = 'pending';
     }
     work(renderer) {
         let sum = 0;
         renderer.tiles.filter(t => t.style).map(t => {
-            /*for (let i=0; i<t.properties['temp'].length; i++){
-                sum+=t.properties['temp'][i];
-            }*/
             sum += t.numFeatures;
         });
         this.resolve(sum);
-        this.status = 'dispatched';
-        return;
-        if (this.status == 'pending') {
-            this.status = 'sent';
-            this.readback = renderer._compute(this.type, this.expressions);
-        } else if (this.status == 'sent') {
-            this.status = 'dispatched';
-            this.resolve(this.readback());
-        }
     }
 }
 Renderer.prototype.getStyledTiles = function () {
     return this.tiles.filter(tile => tile.style);
-}
+};
 
 /**
  * Refresh the canvas by redrawing everything needed.
@@ -527,7 +491,7 @@ function refresh(timestamp) {
         var obj = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
-        }
+        };
         styleExpr._preDraw(obj, gl);
 
         Object.keys(TID).forEach((name, i) => {
@@ -542,7 +506,7 @@ function refresh(timestamp) {
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
-    }
+    };
     const tiles = this.tiles.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
@@ -575,11 +539,9 @@ function refresh(timestamp) {
             (s / aspect) * (this._center.x - tile.center.x),
             s * (this._center.y - tile.center.y));
 
-        tile.vertexScale = [(s / aspect) * tile.scale,
-        s * tile.scale];
+        tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
-        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x),
-        s * (this._center.y - tile.center.y)];
+        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
 
         gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -642,12 +604,13 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
     this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
     this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
-}
+};
 
 Renderer.prototype.compute = function (type, expressions) {
+    // TODO remove this
     window.requestAnimationFrame(refresh.bind(this));
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve) => {
         this.computePool.push(new ComputeJob(type, expressions, resolve));
     });
     return promise;
-}
+};

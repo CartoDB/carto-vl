@@ -1,29 +1,15 @@
 import * as rsys from './rsys';
 import * as R from '../src/index';
 
-var VectorTile = require('@mapbox/vector-tile').VectorTile;
-var Protobuf = require('pbf');
-var LRU = require("lru-cache");
+import { VectorTile } from '@mapbox/vector-tile';
+import * as Protobuf from 'pbf';
+import * as LRU from 'lru-cache';
 
-
-var style;
 var oldtiles = [];
-/*
-let user = 'dmanzanares-ded13';
-let cartoURL = 'carto-staging.com';
-let apiKey = '8a174c451215cb8dca90264de342614087c4ef0c';
-*/
-function conf(user, apiKey, cartoURL) {
-    return {
-        user,
-        apiKey,
-        cartoURL,
-    };
-}
 
 const endpoint = (conf) => {
-    return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`
-}
+    return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`;
+};
 const layerUrl = function (layergroup, layerIndex, conf) {
     let subdomainIndex = 0;
     return (x, y, z) => {
@@ -35,16 +21,8 @@ const layerUrl = function (layergroup, layerIndex, conf) {
         }
         return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
             layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-    }
-}
-
-const layerSubdomains = function subdomains(layergroup) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return urlTemplates.subdomains;
-    }
-    return [];
-}
+    };
+};
 
 class Provider { }
 
@@ -65,14 +43,15 @@ export default class WindshaftSQL extends Provider {
         this.catMap = {};
         const options = {
             max: 1000
-            , length: function (dataframe, key) { return 1; }
+            // TODO improve cache length heuristic
+            , length: function () { return 1; }
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
                         dataframe.free();
                         this.renderer.removeDataframe(dataframe);
                     }
-                })
+                });
             }
             , maxAge: 1000 * 60 * 60
         };
@@ -111,10 +90,9 @@ export default class WindshaftSQL extends Provider {
                         aggregated_column: p.name
                     };
                 }
-            })
+            });
         });
         protoSchema.propertyList.map(p => {
-            const name = p.name;
             const aggFN = p.aggFN;
             if (aggFN.has('raw')) {
                 agg.dimensions[p.name] = p.name;
@@ -192,14 +170,14 @@ export default class WindshaftSQL extends Provider {
     }
     requestDataframe(x, y, z) {
         const originalConf = this.conf;
-        return new Promise((callback, reject) => {
+        return new Promise((callback) => {
             const mvt_extent = 4096;
 
             this.url.then(url => {
                 var oReq = new XMLHttpRequest();
-                oReq.responseType = "arraybuffer";
-                oReq.open("GET", url(x, y, z), true);
-                oReq.onload = (oEvent) => {
+                oReq.responseType = 'arraybuffer';
+                oReq.open('GET', url(x, y, z), true);
+                oReq.onload = () => {
                     this.schema.then(schema => {
                         if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
                             callback({ empty: true });
@@ -236,7 +214,6 @@ export default class WindshaftSQL extends Provider {
                             var points = new Float32Array(mvtLayer.length * 2);
                         }
                         let featureGeometries = [];
-                        const r = Math.random();
                         for (var i = 0; i < mvtLayer.length; i++) {
                             const f = mvtLayer.feature(i);
                             const geom = f.loadGeometry();
@@ -267,7 +244,7 @@ export default class WindshaftSQL extends Provider {
                                         };
                                     } else {
                                         if (j == 0) {
-                                            throw new Error(`Invalid MVT tile: first polygon ring MUST be external`);
+                                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                                         }
                                         polygon.holes.push(polygon.flat.length / 2);
                                     }
@@ -291,7 +268,7 @@ export default class WindshaftSQL extends Provider {
                                 });
                                 featureGeometries.push(geometry);
                             } else {
-                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`)
+                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
                             }
 
                             catFields.map((name, index) => {
@@ -316,10 +293,10 @@ export default class WindshaftSQL extends Provider {
                         dataframe.type = this.geomType;
                         dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
-                        this.renderer.addDataframe(dataframe).setStyle(this.style)
+                        this.renderer.addDataframe(dataframe).setStyle(this.style);
                         callback(dataframe);
                     });
-                }
+                };
                 oReq.send(null);
             });
         });
@@ -330,7 +307,6 @@ export default class WindshaftSQL extends Provider {
         }
         const renderer = this.renderer;
         const bounds = renderer.getBounds();
-        const aspect = renderer.getAspect();
         const tiles = rsys.rTiles(bounds);
         this.requestGroupID = this.requestGroupID || 1;
         this.requestGroupID++;
@@ -353,8 +329,9 @@ export default class WindshaftSQL extends Provider {
                     this.renderer.compute('sum',
                         [R.Style.float(1)]
                     ).then(
-                        result => $('#title').text('Demo dataset ~ ' + result + ' features')
-                        );
+                        result => {
+                            document.getElementById('title').innerText = `Demo dataset ~ ${result} features`;
+                        });
                     oldtiles = completedTiles;
                 }
             });
@@ -375,14 +352,14 @@ async function getGeometryType(query, conf) {
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+    case 'ST_MultiPolygon':
+        return 'polygon';
+    case 'ST_Point':
+        return 'point';
+    case 'ST_MultiLineString':
+        return 'line';
+    default:
+        throw new Error(`Unimplemented geometry type ''${type}'`);
     }
 }
 
@@ -391,7 +368,7 @@ async function getNumericTypes(names, query, conf) {
     const numericsSelect = names.map(name =>
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
-    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`
+    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
     const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
     // TODO avg, sum, count
@@ -402,7 +379,7 @@ async function getNumericTypes(names, query, conf) {
 
 async function getCategoryTypes(names, query, conf) {
     return Promise.all(names.map(async name => {
-        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`
+        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
         const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
         const json = await response.json();
         let counts = [];
@@ -412,7 +389,7 @@ async function getCategoryTypes(names, query, conf) {
             counts.push(row.count);
             names.push(row.name);
             ids.push(id);
-        })
+        });
         return new R.schema.Category(names, counts, ids);
     }));
 }
@@ -436,7 +413,7 @@ async function getSchema(query, proto, conf) {
             categories.push(name);
             //proto[name].type = 'category';
         }
-    })
+    });
 
     const numericsTypes = await getNumericTypes(numerics, query, conf);
     const categoriesTypes = await getCategoryTypes(categories, query, conf);

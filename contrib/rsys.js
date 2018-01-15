@@ -41,6 +41,8 @@
  * of an RSys (usually NWMC).
  */
 
+/*eslint no-unused-vars: ["off"] */
+
 /**
  * R coordinates to World
  * @api
