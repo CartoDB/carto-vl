@@ -1,6 +1,5 @@
 import * as cartocolor from 'cartocolor';
 import * as schema from '../schema';
-import { Schema } from '../schema';
 
 /** @module style/functions/
  * @api
@@ -169,7 +168,8 @@ class Expression {
      * @param {Expression} duration
      * @param {Expression} blendFunc
      */
-    blendTo(final, duration = 500, blendFunc = 'linear') {
+    //TODO blendFunc = 'linear'
+    blendTo(final, duration = 500) {
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
         parent._replaceChild(this, blender);
@@ -191,7 +191,7 @@ class Buckets extends Expression {
     */
     constructor(input, ...args) {
         //Assert input is of numeric type
-        const protoschema = args.pop();
+        args.pop();//Remove protoschema from breakpoint list
         args = args.map(implicitCast);
         let children = {
             input
@@ -247,10 +247,10 @@ class Property extends Expression {
 }
 
 
-
+// TODO fix
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
-        constructor(property, schema) {
+        constructor(property) {
             super({ expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
             this.name = name;
             this.type = 'float';
@@ -364,7 +364,7 @@ class Animate extends Expression {
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker) {
         this._uniformID = uniformIDMaker();
         return {
             preface: `uniform float anim${this._uniformID};\n`,
@@ -404,8 +404,7 @@ class XYZ extends Expression {
                     clamp(${inline.z}, -12800., 12800.)
                 )
             )), 1)`
-            ,
-        `
+            , `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -470,8 +469,7 @@ class CIELab extends Expression {
                     clamp(${inline.b}, -128., 128.)
                 )
             )), 1)`
-            ,
-        `
+            , `
         #ifndef cielabtoxyz_fn
         #define cielabtoxyz_fn
 
@@ -528,13 +526,11 @@ class HSV extends Expression {
         s = implicitCast(s);
         v = implicitCast(v);
         if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
-            console.warn(h, s, v);
             throw new Error('SetOpacity cannot be performed between ');
         }
         super({ h: h, s: s, v: v }, inline =>
             `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
-            ,
-        `
+            , `
         #ifndef HSV2RGB
         #define HSV2RGB
         vec3 hsv2rgb(vec3 c) {
@@ -591,7 +587,6 @@ const genBinaryOp = (jsFn, glsl) =>
                 super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
                 this.type = 'color';
             } else {
-                console.warn(a, b);
                 throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
             }
         }
@@ -610,9 +605,7 @@ class SetOpacity extends Expression {
         if (Number.isFinite(b)) {
             b = float(b);
         }
-        if (a.type == 'color' && b.type == 'float') {
-        } else {
-            console.warn(a, b);
+        if (!(a.type == 'color' && b.type == 'float')) {
             throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
         }
         super({ a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
@@ -647,7 +640,6 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
             return float(jsFn(a));
         }
         if (a.type != 'float') {
-            console.warn(a);
             throw new Error(`Binary operation cannot be performed to '${a}'`);
         }
         super({ a: a }, inlines => glsl(inlines.a));
@@ -697,7 +689,7 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
     constructor(m) {
         m = implicitCast(m);
         if (m.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${mix.type}'`);
+            throw new Error(`Blending cannot be performed by '${m.type}'`);
         }
         super({ m: m }, inline => inlineMaker(inline.m), preface);
         this.schema = m.schema;
@@ -733,7 +725,7 @@ class Blend extends Expression {
         b = implicitCast(b);
         mix = implicitCast(mix);
         if ([a, b, mix].some(x => x === undefined || x === null)) {
-            throw new Error(`Invalid arguments to Blend(): ${args}`);
+            throw new Error('Invalid arguments to Blend()');
         }
         if (mix.type != 'float') {
             throw new Error(`Blending cannot be performed by '${mix.type}'`);
@@ -750,7 +742,6 @@ class Blend extends Expression {
         } else if (a.type == 'color' && b.type == 'color') {
             type = 'color';
         } else {
-            console.warn(a, b);
             throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
         }
         super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
@@ -778,12 +769,12 @@ class RGBA extends Expression {
     constructor(r, g, b, a) {
         var color = [r, g, b, a];
         if (!Array.isArray(color)) {
-            throw new Error(`Invalid arguments to Color(): ${args}`);
+            throw new Error(`Invalid arguments to Color(): ${color}`);
         }
-        color = color.filter(x => true);
+        color = color.filter(() => true);
         color = color.map(x => Number.isFinite(x) ? float(x) : x);
         if (color.length != 4) {
-            throw new Error(`Invalid arguments to Color(): ${args}`);
+            throw new Error(`Invalid arguments to Color(): ${color}`);
         }
         r = color[0];
         g = color[1];
