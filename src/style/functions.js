@@ -128,6 +128,7 @@ function implicitCast(value) {
  * Therefore if we have a color RED and we want to blend it with BLUE, we call RED.parent._replaceChild(RED, blend(RED, BLUE)).
  * Replacing blend by the blending operator.
  */
+
 class Expression {
     /**
      * @api
@@ -136,7 +137,8 @@ class Expression {
      * @param {*} inlineMaker
      * @param {*} preface
      */
-    constructor(children, inlineMaker, preface) {
+    constructor(type, children, inlineMaker, preface) {
+        this.type = type;
         this.inlineMaker = inlineMaker;
         this.preface = (preface ? preface : '');
         this.childrenNames = Object.keys(children);
@@ -225,9 +227,8 @@ class Buckets extends Expression {
             input
         };
         args.map((arg, index) => children[`arg${index}`] = arg);
-        super(children);
+        super('cat', children);
         this.bucketUID = bucketUID++;
-        this.type = 'float';
         this.numCategories = args.length + 1;
         this.args = args;
     }
@@ -266,9 +267,11 @@ class Property extends Expression {
         if (!schema.properties[name]) {
             throw new Error('Property name not found');
         }
-        super({}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        super(schema.properties[name].type.categoryNames ? 'cat' : 'float', {}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        if (schema.properties[name].type.categoryNames) {
+            this.numCategories = schema.properties[name].type.categoryNames.length;
+        }
         this.name = name;
-        this.type = 'float';
         this.schema = schema;
         this.schemaType = schema.properties[name].type;
     }
@@ -279,9 +282,8 @@ class Property extends Expression {
 const metadataAccessGenerator = (metadataProperty) =>
     class metadataAcessor extends Expression {
         constructor(property) {
-            super({ expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
+            super('float', { expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
             this.name = name;
-            this.type = 'float';
         }
     };
 const Max = metadataAccessGenerator('globalMax');
@@ -292,8 +294,7 @@ const Min = metadataAccessGenerator('globalMin');
 class Top extends Expression {
     constructor(property, buckets) {
         // TODO validation
-        super({ property: property });
-        this.type = 'float';
+        super('float', { property: property });
         this.buckets = buckets;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -347,8 +348,7 @@ class Now extends Expression {
      * @description get the current timestamp
      */
     constructor() {
-        super({ now: float(0) }, inline => inline.now);
-        this.type = 'float';
+        super('float', { now: float(0) }, inline => inline.now);
     }
     _preDraw(...args) {
         this.now.expr = (Date.now() - nowInit) / 1000.;
@@ -365,8 +365,7 @@ class Zoom extends Expression {
      * @description get the current zoom level
      */
     constructor() {
-        super({ zoom: float(0) }, inline => inline.zoom);
-        this.type = 'float';
+        super('float', { zoom: float(0) }, inline => inline.zoom);
     }
     _preDraw(o, gl) {
         this.zoom.expr = o.zoom;
@@ -387,8 +386,7 @@ class Animate extends Expression {
         if (!Number.isFinite(duration)) {
             throw new Error('Animate only supports number literals');
         }
-        super({});
-        this.type = 'float';
+        super('float', {});
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
     }
@@ -424,7 +422,7 @@ class XYZ extends Expression {
         if (x.type != 'float' || y.type != 'float' || z.type != 'float') {
             throw new Error('XYZ');
         }
-        super({ x: x, y: y, z: z }, inline =>
+        super('color', { x: x, y: y, z: z }, inline =>
             `vec4(xyztosrgb((
                 vec3(
                     clamp(${inline.x}, -100000., 10000.),
@@ -477,7 +475,6 @@ class XYZ extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
 }
 
@@ -489,7 +486,7 @@ class CIELab extends Expression {
         if (l.type != 'float' || a.type != 'float' || b.type != 'float') {
             throw new Error('CIELab');
         }
-        super({ l: l, a: a, b: b }, inline =>
+        super('color', { l: l, a: a, b: b }, inline =>
             `vec4(xyztosrgb(cielabtoxyz(
                 vec3(
                     clamp(${inline.l}, 0., 100.),
@@ -537,7 +534,6 @@ class CIELab extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
 }
 
@@ -550,14 +546,23 @@ class HSV extends Expression {
      * @param {*} value value (brightness) of the color in the [0,1] range
      */
     constructor(h, s, v) {
+        function typeCheck(v) {
+            return !(v.type == 'float' || v.type == 'cat');
+        }
+        function normalize(v, hue = false) {
+            if (v.type == 'cat') {
+                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+            }
+            return '';
+        }
         h = implicitCast(h);
         s = implicitCast(s);
         v = implicitCast(v);
-        if (h.type != 'float' || s.type != 'float' || v.type != 'float') {
-            throw new Error('SetOpacity cannot be performed between ');
+        if (typeCheck(h) && typeCheck(s) && typeCheck(v)) {
+            throw new Error('HSV invalid parameters');
         }
-        super({ h: h, s: s, v: v }, inline =>
-            `vec4(hsv2rgb(vec3(${inline.h}, clamp(${inline.s}, 0.,1.), clamp(${inline.v}, 0.,1.))), 1)`
+        super('color', { h: h, s: s, v: v }, inline =>
+            `vec4(hsv2rgb(vec3(${inline.h}${normalize(h, true)}, clamp(${inline.s}${normalize(s)}, 0.,1.), clamp(${inline.v}${normalize(v)}, 0.,1.))), 1)`
             , `
         #ifndef HSV2RGB
         #define HSV2RGB
@@ -568,7 +573,6 @@ class HSV extends Expression {
         }
         #endif
         `);
-        this.type = 'color';
     }
 }
 
@@ -606,14 +610,11 @@ const genBinaryOp = (jsFn, glsl) =>
                 a = float(id);
             }
             if (a.type == 'float' && b.type == 'float') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'float';
+                super('float', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else if (a.type == 'color' && b.type == 'color') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'color';
+                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else if (a.type == 'color' && b.type == 'float') {
-                super({ a: a, b: b }, inline => glsl(inline.a, inline.b));
-                this.type = 'color';
+                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
             } else {
                 throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
             }
@@ -636,8 +637,7 @@ class SetOpacity extends Expression {
         if (!(a.type == 'color' && b.type == 'float')) {
             throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
         }
-        super({ a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
-        this.type = 'color';
+        super('color', { a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
     }
 }
 
@@ -670,8 +670,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
         if (a.type != 'float') {
             throw new Error(`Binary operation cannot be performed to '${a}'`);
         }
-        super({ a: a }, inlines => glsl(inlines.a));
-        this.type = 'float';
+        super('float', { a: a }, inlines => glsl(inlines.a));
     }
 };
 
@@ -705,11 +704,10 @@ class Near extends Expression {
         if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
             throw new Error('Near(): invalid parameter type');
         }
-        super({ input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
+        super('float', { input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
             `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
             0., 1.))`
         );
-        this.type = 'float';
     }
 }
 
@@ -719,7 +717,7 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
         if (m.type != 'float') {
             throw new Error(`Blending cannot be performed by '${m.type}'`);
         }
-        super({ m: m }, inline => inlineMaker(inline.m), preface);
+        super('float', { m: m }, inline => inlineMaker(inline.m), preface);
         this.schema = m.schema;
         this.isInterpolator = true;
     }
@@ -772,9 +770,8 @@ class Blend extends Expression {
         } else {
             throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
         }
-        super({ a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
+        super(type, { a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
         this.schema = a.schema;
-        this.type = type;
     }
     _preDraw(l, gl) {
         super._preDraw(l, gl);
@@ -808,8 +805,7 @@ class RGBA extends Expression {
         g = color[1];
         b = color[2];
         a = color[3];
-        super({ r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
-        this.type = 'color';
+        super('color', { r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
     }
 }
 
@@ -823,8 +819,7 @@ class Float extends Expression {
         if (!Number.isFinite(x)) {
             throw new Error(`Invalid arguments to Float(): ${x}`);
         }
-        super({});
-        this.type = 'float';
+        super('float', {});
         this.expr = x;
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -909,8 +904,7 @@ class Ramp extends Expression {
         if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
             throw new Error('Invalid arguments to Ramp()');
         }
-        super({ input: input });
-        this.type = 'color';
+        super('color', { input: input });
         this.input = input;
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
