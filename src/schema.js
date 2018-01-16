@@ -47,10 +47,106 @@ class Category {
     }
 }
 
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+export const IDENTITY = {
+    columns: []
+};
 
 /*
-    Metadata of SQL: histograms, count, jenks
-    Schema of Style: used columns
-*/
+const metadata = {
+    featureCount: 0,
+    columns: [
+        {
+            name: 'temp',
+            type: 'float',
+            min: -10,
+            max: 45,
+            avg: 25,
+            histogram: [3, 6, 10, 22, 21, 14, 2, 1],
+            jenks3: [10, 20],
+            jenks4: [8, 15, 22],
+            jenks5: [7, 14, 18, 23],
+            jenks6: [],
+            jenks7: [],
+        },
+        {
+            name: 'cat',
+            type: 'category',
+            categoryNames: ['red', 'blue', 'green'],
+            categoryCount: [10, 30, 15],
+        }
+    ]
+};
 
-export { Schema, checkSchemaMatch, Float, Category};
+const schema = {
+    columns: [
+        {
+            name: 'temp',
+            aggs: ['avg', 'min', 'max']
+        },
+        {
+            name: 'cat',
+            aggs: null,
+        }
+    ]
+};*/
+
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+function contains(supersetSchema, subsetSchema) {
+    subsetSchema.columns.map(columnA => {
+        const columnB = supersetSchema.find(column => column.name == columnA.name);
+        if (!columnB) {
+            return false;
+        }
+        if (!columnA.aggs) {
+            return !columnB.aggs;
+        }
+        return columnA.aggs.map(agg => columnB.aggs.find(agg)).reduce((x, y) => x && y, true);
+    }).reduce((x, y) => x && y, true);
+}
+
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+function union(a, b) {
+    const r = { columns: [] };
+    a.columns.map(c => {
+        r.columns.push(
+            {
+                name: c.name,
+                aggs: c.aggs.map(x => x),
+            }
+        );
+    });
+    b.columns.map(c => {
+        const rc = r.columns.find(rc => rc.name == c.name);
+        if (rc) {
+            if (!rc.aggs && !c.aggs) {
+                return;
+            }
+            if (!!rc.aggs == !!c.aggs) {
+                throw new Error(`Schema union is undefined: aggregation mismatch between ${rc.aggs} and ${c.aggs} for column ${c.name}`);
+            }
+            c.aggs.map(agg => {
+                if (rc.aggs.indexOf(agg) < 0) {
+                    rc.aggs.push(agg);
+                }
+            });
+        }
+        r.columns.push(
+            {
+                name: c.name,
+                aggs: c.aggs.map(x => x),
+            }
+        );
+    });
+}
+
+export { Schema, checkSchemaMatch, Float, Category };

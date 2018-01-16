@@ -214,6 +214,20 @@ class Expression {
     _getChildren() {
         return this.childrenNames.map(name => this[name]);
     }
+    _getRoot() {
+        if (this.parent){
+            return this.parent._getRoot();
+        }
+        return this;
+    }
+    _getMinimumNeededSchemaForNode() {
+        // Depth First Search => reduce using union
+        // if union throws, let it throw
+        this._getChildren().map(child => child._getMinimumNeededSchemaForNode()).reduce((a,b)=> schema.union(a,b), schema.IDENTITY);
+    }
+    _getMinimumNeededSchema() {
+        return this._getRoot()._getMinimumNeededSchemaForNode();
+    }
 }
 
 let bucketUID = 0;
