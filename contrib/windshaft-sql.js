@@ -4,6 +4,7 @@ import * as R from '../src/index';
 import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
+import { schema } from '../src/index';
 
 var oldtiles = [];
 
@@ -167,6 +168,31 @@ export default class WindshaftSQL extends Provider {
         const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
         promise.then(callback);
+    }
+    async setStyle(style, duration) {
+        const s = await this.schema;
+        const meta = {
+            featureCount: 1000,
+            columns: [],
+        };
+        Object.keys(s.properties).map(property => {
+            const p = s.properties[property];
+            let type = null;
+            let metaColumn = {
+                name: p.name,
+            };
+            if (p.type instanceof schema.Category) {
+                metaColumn.type = 'category';
+                metaColumn.categoryNames = p.type.categoryNames.slice();
+                metaColumn.categoryCounts = p.type.categoryCounts.slice();
+            } else {
+                metaColumn.type = 'float';
+            }
+            meta.columns.push(metaColumn);
+        });
+        console.log(meta);
+        this.meta = meta;
+        this.style.set(style, duration, this.meta);
     }
     requestDataframe(x, y, z) {
         const originalConf = this.conf;

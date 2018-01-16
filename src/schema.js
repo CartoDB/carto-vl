@@ -97,7 +97,7 @@ const schema = {
 // A schema A is contained by the schema B when all columns of A are present in B and
 // all aggregations in A are present in B, if a column is not aggregated in A, it must
 // be not aggregated in B
-function contains(supersetSchema, subsetSchema) {
+export function contains(supersetSchema, subsetSchema) {
     subsetSchema.columns.map(columnA => {
         const columnB = supersetSchema.find(column => column.name == columnA.name);
         if (!columnB) {
@@ -115,13 +115,13 @@ function contains(supersetSchema, subsetSchema) {
 // aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
 // The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
 // to null. In this case the function will throw an exception.
-function union(a, b) {
+export function union(a, b) {
     const r = { columns: [] };
     a.columns.map(c => {
         r.columns.push(
             {
                 name: c.name,
-                aggs: c.aggs.map(x => x),
+                aggs: c.aggs ? c.aggs.map(x => x) : undefined,
             }
         );
     });
@@ -143,10 +143,11 @@ function union(a, b) {
         r.columns.push(
             {
                 name: c.name,
-                aggs: c.aggs.map(x => x),
+                aggs: c.aggs ? c.aggs.map(x => x) : undefined,
             }
         );
     });
+    return r;
 }
 
 export { Schema, checkSchemaMatch, Float, Category };

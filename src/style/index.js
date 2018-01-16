@@ -1,5 +1,6 @@
 import * as functions from './functions';
 import * as shaders from '../shaders';
+import * as metadata from '../metadata';
 
 export {
     Style,
@@ -94,18 +95,19 @@ function Style(renderer, schema) {
         this._compileStrokeWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-
-    this._compileWidthShader();
-    this._compileColorShader();
-    this._compileStrokeColorShader();
-    this._compileStrokeWidthShader();
 }
 
-Style.prototype.set = function (s, duration) {
+Style.prototype.set = function (s, duration, meta) {
     s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
     s.width = s.width != undefined ? s.width : functions.float(4);
     s.strokeColor = s.strokeColor || functions.rgba(0, 0, 0, 0);
     s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : functions.float(0);
+
+    this._width._bind(meta);
+    this._color._bind(meta);
+    this._strokeColor._bind(meta);
+    this._strokeWidth._bind(meta);
+
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
