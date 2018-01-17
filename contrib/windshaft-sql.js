@@ -4,7 +4,6 @@ import * as R from '../src/index';
 import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
-import { schema } from '../src/index';
 
 var oldtiles = [];
 
@@ -40,7 +39,7 @@ function isClockWise(vertices) {
 function getBase(name) {
     return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
 }
-function getAggFN(name){
+function getAggFN(name) {
     let s = name.substr('_cdb_agg_'.length);
     return s.substr(0, s.indexOf('_'));
 }
@@ -50,6 +49,7 @@ export default class WindshaftSQL extends Provider {
         this.renderer = renderer;
         this.style = new R.Style.Style(this.renderer);
         this.catMap = {};
+        this.MNS = R.schema.IDENTITY;
         const options = {
             max: 1000
             // TODO improve cache length heuristic
@@ -79,10 +79,13 @@ export default class WindshaftSQL extends Provider {
         this.apiKey = k;
     }
     setQueries(dataset, style) {
-        style = style || this.style;
+        this.proposedDataset = dataset;
+        if (!style) {
+            return;//TODO Remove this hack, we need to support atomic configuration setting
+        }
         this.dataset = dataset;
-        const schema = style.getMinimumNeededSchema();
-        this.realSchema = schema;
+        const MNS = style.getMinimumNeededSchema();
+        this.MNS = MNS;
         const conf = {
             user: this.user,
             apiKey: this.apiKey,
@@ -95,7 +98,7 @@ export default class WindshaftSQL extends Provider {
             columns: {},
             dimensions: {}
         };
-        schema.columns.map(name => {
+        MNS.columns.map(name => {
             if (name.startsWith('_cdb_agg_')) {
                 const base = getBase(name);
                 const fn = getAggFN(name);
@@ -107,7 +110,7 @@ export default class WindshaftSQL extends Provider {
                 agg.dimensions[name] = name;
             }
         });
-        const select = schema.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+        const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
         const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${dataset}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
@@ -147,23 +150,18 @@ export default class WindshaftSQL extends Provider {
 
         //block data acquisition
         this.style = new R.Style.Style(this.renderer);
-        this.schema = getSchema(query, schema, conf).then(schema => {
-            return schema;
-        });
+        this.metadata = getMetadata(query, MNS, conf);
         this.cache.reset();
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-        this.schema.then(schema => {
-            this.style = new R.Style.Style(this.renderer, schema);
+        this.metadata.then(metadata => {
+            this.style = new R.Style.Style(this.renderer, metadata);
             this.getData();
         });
     }
-    async getSchema() {
-        return await this.schema;
-    }
-    getCatID(catName, catStr, schema, pName) {
-        const id = schema.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
+    getCatID(catName, catStr, metadata, pName) {
+        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
         return id;
     }
     getDataframe(x, y, z, callback) {
@@ -178,9 +176,12 @@ export default class WindshaftSQL extends Provider {
         promise.then(callback);
     }
     async setStyle(style, duration) {
-        this.setQueries(this.dataset, style);
-        const s = await this.schema;
-        this.meta = s;
+        console.log(style.getMinimumNeededSchema(), this.MNS, R.schema.equals(style.getMinimumNeededSchema(), this.MNS));
+        if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
+            this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
+            const s = await this.metadata;
+            this.meta = s;
+        }
         this.style.set(style, duration, this.meta);
     }
     requestDataframe(x, y, z) {
@@ -193,7 +194,7 @@ export default class WindshaftSQL extends Provider {
                 oReq.responseType = 'arraybuffer';
                 oReq.open('GET', url(x, y, z), true);
                 oReq.onload = () => {
-                    this.schema.then(schema => {
+                    this.metadata.then(metadata => {
                         if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
                             callback({ empty: true });
                             return;
@@ -206,9 +207,9 @@ export default class WindshaftSQL extends Provider {
                         const catFields = [];
                         const catFieldsReal = [];
                         const numFieldsReal = [];
-                        this.realSchema.columns.map(name => {
+                        this.MNS.columns.map(name => {
                             const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                            if (schema.columns.find(c => c.name == basename).type == 'category') {
+                            if (metadata.columns.find(c => c.name == basename).type == 'category') {
                                 catFields.push(name);
                                 catFieldsReal.push(name);
                             } else {
@@ -284,7 +285,7 @@ export default class WindshaftSQL extends Provider {
                             }
 
                             catFields.map((name, index) => {
-                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
+                                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
                             });
                             numFields.map((name, index) => {
                                 properties[index + catFields.length][i] = Number(f.properties[name]);
@@ -303,7 +304,6 @@ export default class WindshaftSQL extends Provider {
                             dataframeProperties,
                         );
                         dataframe.type = this.geomType;
-                        dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
                         this.renderer.addDataframe(dataframe).setStyle(this.style);
                         callback(dataframe);
@@ -417,7 +417,7 @@ async function getCategoryTypes(names, query, conf) {
 }
 
 
-async function getSchema(query, proto, conf) {
+async function getMetadata(query, proto, conf) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type

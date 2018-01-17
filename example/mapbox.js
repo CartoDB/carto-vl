@@ -107,8 +107,8 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const s1 = R.Style.parseStyle(v);
-            mgl.provider.setStyle(s1, 1000);
+            const s = R.Style.parseStyle(v);
+            mgl.provider.setStyle(s, 1000);
             document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
