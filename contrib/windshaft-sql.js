@@ -176,7 +176,6 @@ export default class WindshaftSQL extends Provider {
         promise.then(callback);
     }
     async setStyle(style, duration) {
-        console.log(style.getMinimumNeededSchema(), this.MNS, R.schema.equals(style.getMinimumNeededSchema(), this.MNS));
         if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
             this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
             const s = await this.metadata;

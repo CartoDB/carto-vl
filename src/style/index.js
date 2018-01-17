@@ -1,6 +1,5 @@
 import * as functions from './functions';
 import * as shaders from '../shaders';
-import * as metadata from '../metadata';
 import * as schema from '../schema';
 
 export {

@@ -287,10 +287,10 @@ const genAggregationOp = (aggName) => class AggregationOperation extends Express
     constructor(property) {
         super({ property: property });
     }
-    get name(){
+    get name() {
         return this.property.name;
     }
-    get numCategories(){
+    get numCategories() {
         return this.property.numCategories;
     }
     //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
@@ -304,8 +304,7 @@ const genAggregationOp = (aggName) => class AggregationOperation extends Express
             inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
         };
     }
-    _postShaderCompile(program, gl) {
-    }
+    _postShaderCompile() { }
     _getMinimumNeededSchema() {
         return {
             columns: [
@@ -336,7 +335,6 @@ class Property extends Expression {
     _bindMetadata(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {
-            debugger;
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
@@ -756,7 +754,7 @@ class SetOpacity extends Expression {
     _bindMetadata(meta) {
         super._bindMetadata(meta);
         if (!(this.a.type == 'color' && this.b.type == 'float')) {
-            throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
+            throw new Error(`SetOpacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
         }
         this.type = 'color';
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
@@ -792,7 +790,7 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
     _bindMetadata(meta) {
         super._bindMetadata(meta);
         if (this.a.type != 'float') {
-            throw new Error(`Binary operation cannot be performed to '${a}'`);
+            throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
         }
         this.type = 'float';
         this.inlineMaker = inlines => glsl(inlines.a);
@@ -848,7 +846,7 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
     _bindMetadata(meta) {
         super._bindMetadata(meta);
         if (this.m.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${m.type}'`);
+            throw new Error(`Blending cannot be performed by '${this.m.type}'`);
         }
         this.type = 'float';
         this._setGenericGLSL(inline => inlineMaker(inline.m), preface);

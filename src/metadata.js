@@ -5,7 +5,7 @@ export const IDENTITY = {
     columns: []
 };
 
-
+/*
 const metadataExample = {
     featureCount: 0,
     columns: [
@@ -30,4 +30,4 @@ const metadataExample = {
         }
     ]
 };
-
+*/
