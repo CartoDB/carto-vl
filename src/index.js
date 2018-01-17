@@ -366,9 +366,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        if (style) {
-            schema.checkSchemaMatch(style.schema, dataframe.schema);
-        }
+        // TODO check schema match
         window.requestAnimationFrame(refresh.bind(this));
     };
     dataframe.style = null;

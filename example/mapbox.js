@@ -98,7 +98,6 @@ var map = new mapboxgl.Map({
 map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
-let currentSchema = null;
 
 map.on('load', () => {
     let index = 0;//styles.length - 1;
@@ -109,24 +108,8 @@ map.on('load', () => {
         location.hash = getConfig();
         try {
             const s1 = R.Style.parseStyle(v);
-            console.log('DONE', s1.getMinimumNeededSchema());
-            const p = R.Style.getSchema(v);
-            if (!R.Style.protoSchemaIsEquals(p, currentSchema)) {
-                currentSchema = p;
-                mgl.provider.setQueries(currentSchema, $('#dataset').val());
-            }
-            mgl.provider.schema.then(schema => {
-                try {
-                    const s = R.Style.parseStyle(v, schema);
-                    mgl.provider.setStyle(s, 1000);
-                    document.getElementById('feedback').style.display = 'none';
-                } catch (error) {
-                    const err = `Invalid style: ${error}:${error.stack}`;
-                    console.warn(err);
-                    document.getElementById('feedback').value = err;
-                    document.getElementById('feedback').style.display = 'block';
-                }
-            });
+            mgl.provider.setStyle(s1, 1000);
+            document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
@@ -227,7 +210,7 @@ map.on('load', () => {
         localStorage.setItem('user', $('#user').val());
         localStorage.setItem('apikey', $('#apikey').val());
         localStorage.setItem('dataset', $('#dataset').val());
-        currentSchema = null;
+        mgl.provider.setQueries($('#dataset').val());
         updateStyle();
     };
 

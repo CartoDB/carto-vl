@@ -230,7 +230,7 @@ class Expression {
     }
     _getMinimumNeededSchema() {
         // Depth First Search => reduce using union
-        return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce((a, b) => schema.union(a, b), schema.IDENTITY);
+        return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 }
 
@@ -285,23 +285,32 @@ class Buckets extends Expression {
 
 const genAggregationOp = (aggName) => class AggregationOperation extends Expression {
     constructor(property) {
-        this.property = property;
-        super({});
+        super({ property: property });
+    }
+    get name(){
+        return this.property.name;
+    }
+    get numCategories(){
+        return this.property.numCategories;
     }
     //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+    _bindMetadata(metadata) {
+        super._bindMetadata(metadata);
+        this.type = this.property.type;
+    }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         return {
             preface: '',
-            inline: `p${propertyTIDMaker(this.property.name + aggName)}`
+            inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
         };
     }
     _postShaderCompile(program, gl) {
     }
     _getMinimumNeededSchema() {
         return {
-            columns: [{
-                name: this.name
-            }]
+            columns: [
+                `_cdb_agg_${aggName}_${this.property.name}`
+            ]
         };
     }
 };
@@ -338,9 +347,9 @@ class Property extends Expression {
     }
     _getMinimumNeededSchema() {
         return {
-            columns: [{
-                name: this.name
-            }]
+            columns: [
+                this.name
+            ]
         };
     }
 }
@@ -712,7 +721,7 @@ const genBinaryOp = (jsFn, glsl) =>
             super._bindMetadata(meta);
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
-            if (typeof b === 'string' && a.type == 'category' && a instanceof Property) {
+            if (typeof b === 'string' && a.type == 'category' && a.name) {
                 let id = meta.columns.find(c => c.name == a.name).categoryNames.indexOf(b);
                 this.auxFloat.expr = id;
                 this.type = 'float';
@@ -1137,5 +1146,5 @@ const buckets = (...args) => new Buckets(...args);
 
 export {
     Property, Blend, Now, Near, RGBA, Float, Ramp, FloatMul, FloatDiv, FloatAdd, FloatSub, FloatPow, Log, Sqrt, Sin, Cos, Tan, Sign, SetOpacity, HSV, Animate, Max, Min, Top, Linear, Cubic, Zoom, FloatMod, CIELab, XYZ, Abs, GreaterThan, GreaterThanOrEqualTo, LessThan, LessThanOrEqualTo, Equals, NotEquals, Buckets,
-    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, buckets
+    property, blend, now, near, rgba, float, ramp, floatMul, floatDiv, floatAdd, floatSub, floatPow, log, sqrt, sin, cos, tan, sign, setOpacity, opacity, hsv, animate, max, min, top, linear, cubic, zoom, floatMod, cielab, xyz, abs, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, buckets, avg, sum, mode
 };

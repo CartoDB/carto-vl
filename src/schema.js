@@ -116,38 +116,10 @@ export function contains(supersetSchema, subsetSchema) {
 // The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
 // to null. In this case the function will throw an exception.
 export function union(a, b) {
-    const r = { columns: [] };
-    a.columns.map(c => {
-        r.columns.push(
-            {
-                name: c.name,
-                aggs: c.aggs ? c.aggs.map(x => x) : undefined,
-            }
-        );
-    });
-    b.columns.map(c => {
-        const rc = r.columns.find(rc => rc.name == c.name);
-        if (rc) {
-            if (!rc.aggs && !c.aggs) {
-                return;
-            }
-            if (!!rc.aggs == !!c.aggs) {
-                throw new Error(`Schema union is undefined: aggregation mismatch between ${rc.aggs} and ${c.aggs} for column ${c.name}`);
-            }
-            c.aggs.map(agg => {
-                if (rc.aggs.indexOf(agg) < 0) {
-                    rc.aggs.push(agg);
-                }
-            });
-        }
-        r.columns.push(
-            {
-                name: c.name,
-                aggs: c.aggs ? c.aggs.map(x => x) : undefined,
-            }
-        );
-    });
-    return r;
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+    };
 }
 
 export { Schema, checkSchemaMatch, Float, Category };
