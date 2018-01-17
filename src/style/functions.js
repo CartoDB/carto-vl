@@ -216,7 +216,6 @@ class Expression {
     blendTo(final, duration = 500) {
         final = implicitCast(final);
         const parent = this.parent;
-        this._metaBindings.map(m => final._bind(m));
         const blender = blend(this, final, animate(duration));
         this._metaBindings.map(m => blender._bind(m));
         parent._replaceChild(this, blender);
