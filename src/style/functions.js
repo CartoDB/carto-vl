@@ -149,11 +149,11 @@ class Expression {
     }
     _bind(metadata) {
         this._metaBindings.push(metadata);
-        this._bindMetadata(metadata);
+        this._compile(metadata);
         return this;
     }
-    _bindMetadata(metadata) {
-        this._getChildren().map(child => child._bindMetadata(metadata));
+    _compile(metadata) {
+        this._getChildren().map(child => child._compile(metadata));
     }
     _setGenericGLSL(inlineMaker, preface) {
         this.inlineMaker = inlineMaker;
@@ -250,8 +250,8 @@ class Buckets extends Expression {
         this.numCategories = args.length + 1;
         this.args = args;
     }
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         this.type = 'category';
         this.args.map(breakpoint => {
             if (breakpoint.type != 'float') {
@@ -293,8 +293,8 @@ const genAggregationOp = (aggName) => class AggregationOperation extends Express
         return this.property.numCategories;
     }
     //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         this.type = this.property.type;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -331,7 +331,7 @@ class Property extends Expression {
         super({});
         this.name = name;
     }
-    _bindMetadata(meta) {
+    _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
@@ -371,8 +371,8 @@ class Top extends Expression {
         super({ property: property });
         this.buckets = buckets; //TODO force fixed literal
     }
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         if (this.property.type != 'category') {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
@@ -430,8 +430,8 @@ class Now extends Expression {
     constructor() {
         super({ now: float(0) });
     }
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         this.type = 'float';
         super.inlineMaker = inline => inline.now;
     }
@@ -452,8 +452,8 @@ class Zoom extends Expression {
     constructor() {
         super({ zoom: float(0) });
     }
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         this.type = 'float';
         super.inlineMaker = inline => inline.zoom;
     }
@@ -480,7 +480,7 @@ class Animate extends Expression {
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
     }
-    _bindMetadata() {
+    _compile() {
         this.type = 'float';
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -514,8 +514,8 @@ class XYZ extends Expression {
         z = implicitCast(z);
         super({ x: x, y: y, z: z });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.x.type != 'float' || this.y.type != 'float' || this.z.type != 'float') {
             throw new Error('XYZ() invalid parameters');
         }
@@ -583,8 +583,8 @@ class CIELab extends Expression {
         b = implicitCast(b);
         super({ l: l, a: a, b: b });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.l.type != 'float' || this.a.type != 'float' || this.b.type != 'float') {
             throw new Error('CIELab() invalid parameters');
         }
@@ -654,8 +654,8 @@ class HSV extends Expression {
         v = implicitCast(v);
         super({ h: h, s: s, v: v });
     }
-    _bindMetadata(metadata) {
-        super._bindMetadata(metadata);
+    _compile(metadata) {
+        super._compile(metadata);
         function typeCheck(v) {
             return !(v.type == 'float' || v.type == 'category');
         }
@@ -714,8 +714,8 @@ const genBinaryOp = (jsFn, glsl) =>
             }
 
         }
-        _bindMetadata(meta) {
-            super._bindMetadata(meta);
+        _compile(meta) {
+            super._compile(meta);
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
             if (typeof b === 'string' && a.type == 'category' && a.name) {
@@ -750,8 +750,8 @@ class SetOpacity extends Expression {
         }
         super({ a: a, b: b });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (!(this.a.type == 'color' && this.b.type == 'float')) {
             throw new Error(`SetOpacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
         }
@@ -786,8 +786,8 @@ const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
         a = implicitCast(a);
         super({ a: a });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.a.type != 'float') {
             throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
         }
@@ -824,8 +824,8 @@ class Near extends Expression {
         falloff = implicitCast(falloff);
         super({ input: input, center: center, threshold: threshold, falloff: falloff });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.input.type != 'float' || this.center.type != 'float' || this.threshold.type != 'float' || this.falloff.type != 'float') {
             throw new Error('Near(): invalid parameter type');
         }
@@ -842,8 +842,8 @@ const genInterpolator = (inlineMaker, preface) => class Interpolator extends Exp
         super({ m: m });
         this.isInterpolator = true; //TODO remove this hack
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.m.type != 'float') {
             throw new Error(`Blending cannot be performed by '${this.m.type}'`);
         }
@@ -884,8 +884,8 @@ class Blend extends Expression {
         }
         super({ a: a, b: b, mix: mix });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.mix.type != 'float') {
             throw new Error(`Blending cannot be performed by '${this.mix.type}'`);
         }
@@ -925,8 +925,8 @@ class RGBA extends Expression {
         a = color[3];
         super({ r, g, b, a });
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         if (this.r.type != 'float' || this.g.type != 'float' || this.b.type != 'float' || this.a.type != 'float') {
             throw new Error('Invalid parameters for RGBA()');
         }
@@ -948,7 +948,7 @@ class Float extends Expression {
         super({});
         this.expr = x;
     }
-    _bindMetadata() {
+    _compile() {
         this.type = 'float';
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -1025,8 +1025,8 @@ class Ramp extends Expression {
         this.maxKey = maxKey.expr;
         this.values = values;
     }
-    _bindMetadata(meta) {
-        super._bindMetadata(meta);
+    _compile(meta) {
+        super._compile(meta);
         this.type = 'color';
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
