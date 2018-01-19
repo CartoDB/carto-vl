@@ -44,14 +44,21 @@ const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 function Renderer(canvas) {
-    this.canvas = canvas;
+    if (canvas) {
+        this.gl = canvas.getContext('webgl');
+        if (!this.gl) {
+            throw new Error('WebGL 1 is unsupported');
+        }
+        this._initGL(this.gl);
+    }
+    this._center = { x: 0, y: 0 };
+    this._zoom = 1;
     this.tiles = [];
     this.computePool = []; //TODO hack, refactor needed
-    this.gl = canvas.getContext('webgl');
-    const gl = this.gl;
-    if (!gl) {
-        throw new Error('WebGL 1 is unsupported');
-    }
+}
+
+Renderer.prototype._initGL = function (gl) {
+    this.gl = gl;
     const OES_texture_float = gl.getExtension('OES_texture_float');
     if (!OES_texture_float) {
         throw new Error('WebGL extension OES_texture_float is unsupported');
@@ -61,8 +68,6 @@ function Renderer(canvas) {
         throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
     }
     this._initShaders();
-    this._center = { x: 0, y: 0 };
-    this._zoom = 1;
 
     this.auxFB = gl.createFramebuffer();
 
@@ -88,7 +93,7 @@ function Renderer(canvas) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-}
+};
 
 /**
  * Get Renderer visualization center
@@ -105,7 +110,7 @@ Renderer.prototype.getCenter = function () {
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
 };
 /**
  * Get Renderer visualization bounds
@@ -130,7 +135,7 @@ Renderer.prototype.getZoom = function () {
  */
 Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
 };
 
 /**
@@ -328,6 +333,7 @@ function decodeGeom(geomType, geom) {
  */
 Renderer.prototype.addDataframe = function (dataframe) {
     const gl = this.gl;
+    //this.ext.bindVertexArrayOES(this.vao);
     this.tiles.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -366,8 +372,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        // TODO check schema match
-        window.requestAnimationFrame(refresh.bind(this));
+        this._RAF();
     };
     dataframe.style = null;
 
@@ -400,14 +405,20 @@ Renderer.prototype.addDataframe = function (dataframe) {
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
     return dataframe;
 };
 
+Renderer.prototype._RAF = function () {
+    window.requestAnimationFrame(this.refresh.bind(this));
+};
+
 Renderer.prototype.getAspect = function () {
-    return this.canvas.clientWidth / this.canvas.clientHeight;
+    if (this.gl) {
+        return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+    }
+    return 1;
 };
 
 class ComputeJob {
@@ -426,21 +437,13 @@ Renderer.prototype.getStyledTiles = function () {
     return this.tiles.filter(tile => tile.style);
 };
 
-/**
- * Refresh the canvas by redrawing everything needed.
- * Should only be called by requestAnimationFrame
- * @param timestamp - timestamp of the animation provided by requestAnimationFrame
- */
-Renderer.prototype.refresh = refresh;
-function refresh(timestamp) {
+Renderer.prototype.refresh = function (timestamp) {
     const gl = this.gl;
     // Don't re-render more than once per animation frame
-    if (this.lastFrame == timestamp) {
+    if (this.lastFrame === timestamp) {
         return;
     }
 
-    this.lastFrame = timestamp;
-    var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
     if (gl.canvas.width != width ||
@@ -448,21 +451,18 @@ function refresh(timestamp) {
         gl.canvas.width = width;
         gl.canvas.height = height;
     }
-    var aspect = canvas.clientWidth / canvas.clientHeight;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.clearColor(0., 0., 0., 0.);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
     gl.enable(gl.CULL_FACE);
 
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.STENCIL_TEST);
     gl.depthMask(false);
 
     // Render To Texture
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-
 
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -575,11 +575,11 @@ function refresh(timestamp) {
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-            window.requestAnimationFrame(refresh.bind(this));
+            this._RAF();
         }
     });
-
-}
+    gl.disable(gl.CULL_FACE);
+};
 
 /**
  * Initialize static shaders
@@ -592,7 +592,6 @@ Renderer.prototype._initShaders = function () {
 
 Renderer.prototype.compute = function (type, expressions) {
     // TODO remove this
-    window.requestAnimationFrame(refresh.bind(this));
     const promise = new Promise((resolve) => {
         this.computePool.push(new ComputeJob(type, expressions, resolve));
     });
