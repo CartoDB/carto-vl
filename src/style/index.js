@@ -1,5 +1,6 @@
 import * as functions from './functions';
 import * as shaders from '../shaders';
+import * as schema from '../schema';
 
 export {
     Style,
@@ -94,18 +95,21 @@ function Style(renderer, schema) {
         this._compileStrokeWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-
-    this._compileWidthShader();
-    this._compileColorShader();
-    this._compileStrokeColorShader();
-    this._compileStrokeWidthShader();
 }
 
-Style.prototype.set = function (s, duration) {
+Style.prototype.set = function (s, duration, meta) {
     s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
     s.width = s.width != undefined ? s.width : functions.float(4);
     s.strokeColor = s.strokeColor || functions.rgba(0, 0, 0, 0);
     s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : functions.float(0);
+    s.resolution = s.resolution == undefined ? 1 : s.resolution;
+
+    this._width._bind(meta);
+    this._color._bind(meta);
+    this._strokeColor._bind(meta);
+    this._strokeWidth._bind(meta);
+    this.resolution = s.resolution;
+
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
@@ -157,6 +161,10 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
     } else {
         throw new Error('No child found');
     }
+};
+Style.prototype.getMinimumNeededSchema = function () {
+    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
+    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
 };
 /**
  * Change the color of the style to a new style expression.
