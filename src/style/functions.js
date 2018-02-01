@@ -17,6 +17,15 @@ import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 
+// Unary ops
+import { Log } from './unary';
+import { Sqrt } from './unary';
+import { Sin } from './unary';
+import { Cos } from './unary';
+import { Tan } from './unary';
+import { Sign } from './unary';
+import { Abs } from './unary';
+
 const genAggregationOp = (aggName) => class AggregationOperation extends Expression {
     constructor(property) {
         super({ property: property });
@@ -72,14 +81,6 @@ const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}
 const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
 const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
 
-// Unary ops
-const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
-const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
-const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
-const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
-const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
-const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
-const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
 
 
 // Interpolators

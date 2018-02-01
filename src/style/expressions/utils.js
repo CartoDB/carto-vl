@@ -69,21 +69,3 @@ export function genBinaryOp(jsFn, glsl) {
         }
     };
 }
-
-
-export function genUnaryOp(jsFn, glsl) {
-    return class UnaryOperation extends Expression {
-        constructor(a) {
-            a = implicitCast(a);
-            super({ a: a });
-        }
-        _compile(meta) {
-            super._compile(meta);
-            if (this.a.type != 'float') {
-                throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
-            }
-            this.type = 'float';
-            this.inlineMaker = inlines => glsl(inlines.a);
-        }
-    };
-}
