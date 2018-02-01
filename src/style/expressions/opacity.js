@@ -1,7 +1,7 @@
 import Expression from './expression';
 import { float } from '../functions';
 
-export default class SetOpacity extends Expression {
+export default class Opacity extends Expression {
     /**
      * @api
      * @description Override the input color opacity
@@ -17,7 +17,7 @@ export default class SetOpacity extends Expression {
     _compile(meta) {
         super._compile(meta);
         if (!(this.a.type == 'color' && this.b.type == 'float')) {
-            throw new Error(`SetOpacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
+            throw new Error(`Opacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
         }
         this.type = 'color';
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
