@@ -2,12 +2,7 @@ import * as functions from './functions';
 import * as shaders from '../shaders';
 import * as schema from '../schema';
 
-export {
-    Style,
-    compileShader,
-};
-export * from './functions';
-export * from './parser';
+
 
 let cache = {};
 
@@ -217,3 +212,11 @@ Style.prototype.getStrokeColor = function () {
 Style.prototype.getStrokeWidth = function () {
     return this._strokeWidth;
 };
+
+
+export {
+    Style,
+    compileShader,
+};
+export * from './functions';
+export * from './parser';
