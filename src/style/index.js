@@ -1,3 +1,4 @@
+import { compileShader } from './shader-compiler';
 import * as functions from './functions';
 import * as shaders from '../shaders';
 import * as schema from '../schema';
@@ -190,33 +191,6 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
         throw new Error('No child found');
     }
 };
-
-let cache = {};
-
-function compileShader(gl, styleRootExpr, shaderCreator) {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    let shader = null;
-    if (cache[JSON.stringify(colorModifier)]) {
-        shader = cache[JSON.stringify(colorModifier)];
-    } else {
-        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        //console.log("COMPILE", cache)
-        cache[JSON.stringify(colorModifier)] = shader;
-    }
-    styleRootExpr._postShaderCompile(shader.program, gl);
-    return {
-        tid: tid,
-        shader: shader
-    };
-}
 
 export {
     Style,
