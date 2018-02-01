@@ -2,55 +2,6 @@ import * as functions from './functions';
 import * as shaders from '../shaders';
 import * as schema from '../schema';
 
-
-
-let cache = {};
-
-function compileShader(gl, styleRootExpr, shaderCreator) {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    let shader = null;
-    if (cache[JSON.stringify(colorModifier)]) {
-        shader = cache[JSON.stringify(colorModifier)];
-    } else {
-        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        //console.log("COMPILE", cache)
-        cache[JSON.stringify(colorModifier)] = shader;
-    }
-    styleRootExpr._postShaderCompile(shader.program, gl);
-    return {
-        tid: tid,
-        shader: shader
-    };
-}
-Style.prototype._compileColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._color, shaders.styler.createColorShader);
-    this.propertyColorTID = r.tid;
-    this.colorShader = r.shader;
-};
-Style.prototype._compileStrokeColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeColor, shaders.styler.createColorShader);
-    this.propertyStrokeColorTID = r.tid;
-    this.strokeColorShader = r.shader;
-};
-Style.prototype._compileStrokeWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeWidth, shaders.styler.createWidthShader);
-    this.propertyStrokeWidthTID = r.tid;
-    this.strokeWidthShader = r.shader;
-};
-Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
-    this.propertyWidthTID = r.tid;
-    this.widthShader = r.shader;
-};
-
 /**
  * @jsapi
  * @constructor
@@ -92,6 +43,11 @@ function Style(renderer, schema) {
     };
 }
 
+Style.prototype.getMinimumNeededSchema = function () {
+    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
+    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+};
+
 Style.prototype.set = function (s, duration, meta) {
     s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
     s.width = s.width != undefined ? s.width : functions.float(4);
@@ -126,6 +82,7 @@ Style.prototype.setWidth = function (float) {
     };
     float.notify();
 };
+
 Style.prototype.setStrokeWidth = function (float) {
     this._strokeWidth = float;
     this.updated = true;
@@ -136,31 +93,7 @@ Style.prototype.setStrokeWidth = function (float) {
     };
     float.notify();
 };
-Style.prototype._replaceChild = function (toReplace, replacer) {
-    if (toReplace == this._color) {
-        this._color = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._width) {
-        this._width = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeColor) {
-        this._strokeColor = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeWidth) {
-        this._strokeWidth = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else {
-        throw new Error('No child found');
-    }
-};
-Style.prototype.getMinimumNeededSchema = function () {
-    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
-    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
-};
+
 /**
  * Change the color of the style to a new style expression.
  * @jsapi
@@ -188,8 +121,6 @@ Style.prototype.setStrokeColor = function (color) {
     color.notify();
 };
 
-
-
 /**
  * Get the width style expression
  * @jsapi
@@ -197,6 +128,7 @@ Style.prototype.setStrokeColor = function (color) {
 Style.prototype.getWidth = function () {
     return this._width;
 };
+
 /**
  * Get the color style expression
  * @jsapi
@@ -213,6 +145,78 @@ Style.prototype.getStrokeWidth = function () {
     return this._strokeWidth;
 };
 
+Style.prototype._compileColorShader = function () {
+    const r = compileShader(this.renderer.gl, this._color, shaders.styler.createColorShader);
+    this.propertyColorTID = r.tid;
+    this.colorShader = r.shader;
+};
+
+Style.prototype._compileStrokeColorShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeColor, shaders.styler.createColorShader);
+    this.propertyStrokeColorTID = r.tid;
+    this.strokeColorShader = r.shader;
+};
+
+Style.prototype._compileStrokeWidthShader = function () {
+    const r = compileShader(this.renderer.gl, this._strokeWidth, shaders.styler.createWidthShader);
+    this.propertyStrokeWidthTID = r.tid;
+    this.strokeWidthShader = r.shader;
+};
+
+Style.prototype._compileWidthShader = function () {
+    const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
+    this.propertyWidthTID = r.tid;
+    this.widthShader = r.shader;
+};
+
+Style.prototype._replaceChild = function (toReplace, replacer) {
+    if (toReplace == this._color) {
+        this._color = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._width) {
+        this._width = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeColor) {
+        this._strokeColor = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeWidth) {
+        this._strokeWidth = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else {
+        throw new Error('No child found');
+    }
+};
+
+let cache = {};
+
+function compileShader(gl, styleRootExpr, shaderCreator) {
+    var uniformIDcounter = 0;
+    var tid = {};
+    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    let shader = null;
+    if (cache[JSON.stringify(colorModifier)]) {
+        shader = cache[JSON.stringify(colorModifier)];
+    } else {
+        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+        //console.log("COMPILE", cache)
+        cache[JSON.stringify(colorModifier)] = shader;
+    }
+    styleRootExpr._postShaderCompile(shader.program, gl);
+    return {
+        tid: tid,
+        shader: shader
+    };
+}
 
 export {
     Style,
