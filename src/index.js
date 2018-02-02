@@ -2,6 +2,7 @@ import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
+import Dataframe from './dataframe';
 
 export { Renderer, Style, Dataframe, schema };
 
@@ -10,15 +11,6 @@ export { Renderer, Style, Dataframe, schema };
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
- */
-
-/**
- * @api
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
  */
 
 /**
@@ -141,35 +133,6 @@ Renderer.prototype.setZoom = function (zoom) {
 Renderer.prototype.removeDataframe = function (dataframe) {
     this.tiles = this.tiles.filter(t => t !== dataframe);
 };
-
-
-class Dataframe {
-    constructor(center, scale, geom, properties) {
-        this.center = center;
-        this.scale = scale;
-        this.geom = geom;
-        this.properties = properties;
-    }
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
-        }
-    }
-}
-
 
 Renderer.prototype.createStyleTileTexture = function (numFeatures) {
     // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
