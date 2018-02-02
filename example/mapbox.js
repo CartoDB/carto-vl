@@ -25,7 +25,7 @@ color: hsv(0.2, 0.7, 1.)`,
 color: hsv(0.7, 0.7, 1.)`,
 
     `width: 3
-color: hsv($category/10, 0.7, 1.)`,
+color: hsv($category, 0.7, 1.)`,
 
     `width: 3
 color: ramp($category, Prism)`,
@@ -98,7 +98,6 @@ var map = new mapboxgl.Map({
 map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
-let protoSchema = null;
 
 map.on('load', () => {
     let index = 0;//styles.length - 1;
@@ -108,23 +107,9 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const p = R.Style.getSchema(v);
-            if (!R.Style.protoSchemaIsEquals(p, protoSchema)) {
-                protoSchema = p;
-                mgl.provider.setQueries(protoSchema, $('#dataset').val());
-            }
-            mgl.provider.schema.then(schema => {
-                try {
-                    const s = R.Style.parseStyle(v, schema);
-                    mgl.provider.style.set(s, 1000);
-                    document.getElementById('feedback').style.display = 'none';
-                } catch (error) {
-                    const err = `Invalid style: ${error}:${error.stack}`;
-                    console.warn(err);
-                    document.getElementById('feedback').value = err;
-                    document.getElementById('feedback').style.display = 'block';
-                }
-            });
+            const s = R.Style.parseStyle(v);
+            mgl.provider.setStyle(s, 1000);
+            document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
@@ -225,7 +210,7 @@ map.on('load', () => {
         localStorage.setItem('user', $('#user').val());
         localStorage.setItem('apikey', $('#apikey').val());
         localStorage.setItem('dataset', $('#dataset').val());
-        protoSchema = null;
+        mgl.provider.setQueries($('#dataset').val());
         updateStyle();
     };
 

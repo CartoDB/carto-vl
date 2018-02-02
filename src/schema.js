@@ -1,56 +1,35 @@
-/**
- * @jsapi
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error('propertyNames and propertyTypes lengths mismatch');
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
-
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b, true);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
-        }
-    }
-}
-
-
-
-class Float {
-    constructor(globalMin, globalMax) {
-        this.globalMin = globalMin;
-        this.globalMax = globalMax;
-    }
-}
-class Category {
-    constructor(categoryNames, categoryCounts, categoryIDs) {
-        this.categoryNames = categoryNames;
-        this.categoryCounts = categoryCounts;
-        this.categoryIDs = categoryIDs;
-    }
-}
-
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+export const IDENTITY = {
+    columns: []
+};
 
 /*
-    Metadata of SQL: histograms, count, jenks
-    Schema of Style: used columns
-*/
+const schema = {
+    columns: ['temp', 'cat']
+};*/
 
-export { Schema, checkSchemaMatch, Float, Category};
+//TODO
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+//export function contains(supersetSchema, subsetSchema) {
+//}
+
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+export function union(a, b) {
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+    };
+}
+
+export function equals(a,b){
+    return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
+}
