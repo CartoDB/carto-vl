@@ -13,7 +13,7 @@ export default class Expression {
      */
     constructor(children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = children[name]);
+        Object.keys(children).map(name => this[name] = implicitCast(children[name]));
         this._getChildren().map(child => child.parent = this);
         this._metaBindings = [];
         this.preface = '';
