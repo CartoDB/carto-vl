@@ -2,7 +2,7 @@ import { implicitCast } from './utils';
 import Expression from './expression';
 
 
-export class Linear extends genInterpolator(inner => inner) { }
+export class ILinear extends genInterpolator(inner => inner) { }
 export class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
@@ -37,4 +37,4 @@ function genInterpolator(inlineMaker, preface) {
         }
     };
 
-} 
+}

@@ -5,6 +5,7 @@ import Buckets from './expressions/buckets';
 import CIELab from './expressions/CIELab';
 import Float from './expressions/float';
 import HSV from './expressions/hsv';
+import Linear from './expressions/linear';
 import Near from './expressions/near';
 import Now from './expressions/now';
 import Property from './expressions/property';
@@ -46,7 +47,7 @@ import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
 
 // Interpolators
-import { Linear } from './expressions/interpolators';
+import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
 
