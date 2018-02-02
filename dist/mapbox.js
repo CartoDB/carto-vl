@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,14 +68,591 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
+
+
+
+
+
+class Expression {
+    /**
+     * @api
+     * @hideconstructor
+     * @param {*} children
+     * @param {*} inlineMaker
+     * @param {*} preface
+     */
+    constructor(children) {
+        this.childrenNames = Object.keys(children);
+        Object.keys(children).map(name => this[name] = children[name]);
+        this._getChildren().map(child => child.parent = this);
+        this._metaBindings = [];
+        this.preface = '';
+    }
+
+    _bind(metadata) {
+        this._metaBindings.push(metadata);
+        this._compile(metadata);
+        return this;
+    }
+
+    _compile(metadata) {
+        this._getChildren().map(child => child._compile(metadata));
+    }
+
+    _setGenericGLSL(inlineMaker, preface) {
+        this.inlineMaker = inlineMaker;
+        this.preface = (preface ? preface : '');
+    }
+
+    /**
+     * Generate GLSL code
+     * @param {*} uniformIDMaker    fn to get unique IDs
+     * @param {*} propertyTIDMaker  fn to get property IDs and inform of used properties
+     */
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
+            inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
+        };
+    }
+
+    /**
+     * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
+     * @param {*} program
+     */
+    _postShaderCompile(program, gl) {
+        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
+    }
+
+    /**
+     * Pre-rendering routine. Should establish related WebGL state as needed.
+     * @param {*} l
+     */
+    _preDraw(l, gl) {
+        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
+    }
+
+    /**
+     * @jsapi
+     * @returns true if the evaluation of the function at styling time won't be the same every time.
+     */
+    isAnimated() {
+        return this._getChildren().some(child => child.isAnimated());
+    }
+
+    /**
+     * Replace child *toReplace* by *replacer*
+     * @param {*} toReplace
+     * @param {*} replacer
+     */
+    _replaceChild(toReplace, replacer) {
+        const name = this.childrenNames.find(name => this[name] == toReplace);
+        this[name] = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    }
+
+    /**
+     * Linear interpolation between this and finalValue with the specified duration
+     * @jsapi
+     * @param {Expression} final
+     * @param {Expression} duration
+     * @param {Expression} blendFunc
+     */
+    //TODO blendFunc = 'linear'
+    blendTo(final, duration = 500) {
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(final);
+        const parent = this.parent;
+        const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
+        this._metaBindings.map(m => blender._bind(m));
+        parent._replaceChild(this, blender);
+        blender.notify();
+    }
+
+    /**
+     * @returns a list with the expression children
+     */
+    _getChildren() {
+        return this.childrenNames.map(name => this[name]);
+    }
+
+    _getMinimumNeededSchema() {
+        // Depth First Search => reduce using union
+        return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__schema__["union"], __WEBPACK_IMPORTED_MODULE_2__schema__["IDENTITY"]);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Expression;
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
+
+
+
+
+// Binary ops
+const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["e"] = FloatMul;
+
+const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["c"] = FloatDiv;
+
+const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["b"] = FloatAdd;
+
+const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["g"] = FloatSub;
+
+const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["d"] = FloatMod;
+
+const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+/* harmony export (immutable) */ __webpack_exports__["f"] = FloatPow;
+
+
+const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["h"] = GreaterThan;
+
+const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["i"] = GreaterThanOrEqualTo;
+
+
+const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["j"] = LessThan;
+
+const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["k"] = LessThanOrEqualTo;
+
+
+const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["a"] = Equals;
+
+const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
+/* harmony export (immutable) */ __webpack_exports__["l"] = NotEquals;
+
+
+function genBinaryOp(jsFn, glsl) {
+    return class BinaryOperation extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
+        /**
+         * @jsapi
+         * @name BinaryOperation
+         * @hideconstructor
+         * @augments Expression
+         * @constructor
+         * @param {*} a
+         * @param {*} b
+         */
+        constructor(a, b) {
+            if (Number.isFinite(a) && Number.isFinite(b)) {
+                return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(jsFn(a, b));
+            }
+            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(a);
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(b);
+            if (typeof a === 'string') {
+                [a, b] = [b, a];
+            }
+            if (typeof b === 'string') {
+                super({ a: a, auxFloat: Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(0) });
+                this.b = b;
+            } else {
+                super({ a: a, b: b });
+            }
+
+        }
+        _compile(meta) {
+            super._compile(meta);
+            const [a, b] = [this.a, this.b];
+            this.inlineMaker = inline => glsl(inline.a, inline.b);
+            if (typeof b === 'string' && a.type == 'category' && a.name) {
+                let id = meta.columns.find(c => c.name == a.name).categoryNames.indexOf(b);
+                this.auxFloat.expr = id;
+                this.type = 'float';
+                this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
+            } else if (a.type == 'float' && b.type == 'float') {
+                this.type = 'float';
+            } else if (a.type == 'color' && b.type == 'color') {
+                this.type = 'color';
+            } else if (a.type == 'color' && b.type == 'float') {
+                this.type = 'color';
+            } else {
+                throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
+            }
+        }
+    };
+}
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_near__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_now__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_property__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_ramp__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_rgba__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_opacity__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_top__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_xyz__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_zoom__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_unary__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_binary__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_interpolators__ = __webpack_require__(10);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Unary ops
+
+
+
+
+
+
+
+
+// Binary ops
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Aggregation ops
+
+
+
+
+
+
+// Interpolators
+
+
+
+
+
+// Expose clases as constructor functions
+const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["e" /* FloatMul */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatMul"] = floatMul;
+
+const floatDiv = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["c" /* FloatDiv */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatDiv"] = floatDiv;
+
+const floatAdd = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["b" /* FloatAdd */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatAdd"] = floatAdd;
+
+const floatSub = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["g" /* FloatSub */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatSub"] = floatSub;
+
+const floatPow = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["f" /* FloatPow */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatPow"] = floatPow;
+
+const floatMod = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["d" /* FloatMod */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatMod"] = floatMod;
+
+const log = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["c" /* Log */](...args);
+/* harmony export (immutable) */ __webpack_exports__["log"] = log;
+
+const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["f" /* Sqrt */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sqrt"] = sqrt;
+
+const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["e" /* Sin */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sin"] = sin;
+
+const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["b" /* Cos */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cos"] = cos;
+
+const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["g" /* Tan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["tan"] = tan;
+
+const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["d" /* Sign */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sign"] = sign;
+
+const near = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_near__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["near"] = near;
+
+const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_blend__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["blend"] = blend;
+
+const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_rgba__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["rgba"] = rgba;
+
+const property = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_property__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["property"] = property;
+
+const animate = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_animate__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["animate"] = animate;
+
+const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
+
+const setOpacity = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_opacity__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["setOpacity"] = setOpacity;
+
+const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_opacity__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
+
+const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_ramp__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["ramp"] = ramp;
+
+const float = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_float__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["float"] = float;
+
+const max = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__["b" /* Max */](...args);
+/* harmony export (immutable) */ __webpack_exports__["max"] = max;
+
+const min = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__["c" /* Min */](...args);
+/* harmony export (immutable) */ __webpack_exports__["min"] = min;
+
+const sum = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__["e" /* Sum */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sum"] = sum;
+
+const avg = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__["a" /* Avg */](...args);
+/* harmony export (immutable) */ __webpack_exports__["avg"] = avg;
+
+const mode = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_aggregation__["d" /* Mode */](...args);
+/* harmony export (immutable) */ __webpack_exports__["mode"] = mode;
+
+const top = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_top__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["top"] = top;
+
+const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_interpolators__["b" /* Linear */](...args);
+/* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
+
+const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_interpolators__["a" /* Cubic */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
+
+const now = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_now__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["now"] = now;
+
+const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_zoom__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
+
+const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
+
+const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_xyz__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
+
+const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_unary__["a" /* Abs */](...args);
+/* harmony export (immutable) */ __webpack_exports__["abs"] = abs;
+
+const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["h" /* GreaterThan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["greaterThan"] = greaterThan;
+
+const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["i" /* GreaterThanOrEqualTo */](...args);
+/* harmony export (immutable) */ __webpack_exports__["greaterThanOrEqualTo"] = greaterThanOrEqualTo;
+
+const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["j" /* LessThan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["lessThan"] = lessThan;
+
+const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["k" /* LessThanOrEqualTo */](...args);
+/* harmony export (immutable) */ __webpack_exports__["lessThanOrEqualTo"] = lessThanOrEqualTo;
+
+const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["a" /* Equals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+
+const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_binary__["l" /* NotEquals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["notEquals"] = notEquals;
+
+const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["buckets"] = buckets;
+
+
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["a"] = hexToRgb;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
+
+
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
+    }
+    // TODO we need to encapsulate strings as categories
+    return value;
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+
+const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["c"] = Log;
+
+const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["f"] = Sqrt;
+
+const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["e"] = Sin;
+
+const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["b"] = Cos;
+
+const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["g"] = Tan;
+
+const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["d"] = Sign;
+
+const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
+/* harmony export (immutable) */ __webpack_exports__["a"] = Abs;
+
+
+function genUnaryOp(jsFn, glsl) {
+    return class UnaryOperation extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+        constructor(a) {
+            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(a);
+            super({ a: a });
+        }
+        _compile(meta) {
+            super._compile(meta);
+            if (this.a.type != 'float') {
+                throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
+            }
+            this.type = 'float';
+            this.inlineMaker = inlines => glsl(inlines.a);
+        }
+    };
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+// Aggregation ops
+const Max = genAggregationOp('max');
+/* harmony export (immutable) */ __webpack_exports__["b"] = Max;
+
+const Min = genAggregationOp('min');
+/* harmony export (immutable) */ __webpack_exports__["c"] = Min;
+
+const Avg = genAggregationOp('avg');
+/* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
+
+const Sum = genAggregationOp('sum');
+/* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
+
+const Mode = genAggregationOp('mode');
+/* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
+
+
+function genAggregationOp(aggName) {
+    return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(property) {
+            super({ property: property });
+        }
+        get name() {
+            return this.property.name;
+        }
+        get numCategories() {
+            return this.property.numCategories;
+        }
+        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+        _compile(metadata) {
+            super._compile(metadata);
+            this.type = this.property.type;
+        }
+        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+            return {
+                preface: '',
+                inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
+            };
+        }
+        _postShaderCompile() { }
+        _getMinimumNeededSchema() {
+            return {
+                columns: [
+                    `_cdb_agg_${aggName}_${this.property.name}`
+                ]
+            };
+        }
+    };
+} 
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Dataframe; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_earcut__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dataframe__ = __webpack_require__(45);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_4__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
 
 
@@ -89,15 +666,6 @@
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
- */
-
-/**
- * @api
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
  */
 
 /**
@@ -123,8 +691,9 @@ const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 function Renderer(canvas) {
+    console.log('R', this);
     this.canvas = canvas;
-    this.tiles = [];
+    this.dataframes = [];
     this.computePool = []; //TODO hack, refactor needed
     this.gl = canvas.getContext('webgl');
     const gl = this.gl;
@@ -218,37 +787,8 @@ Renderer.prototype.setZoom = function (zoom) {
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
-    this.tiles = this.tiles.filter(t => t !== dataframe);
+    this.dataframes = this.dataframes.filter(t => t !== dataframe);
 };
-
-
-class Dataframe {
-    constructor(center, scale, geom, properties) {
-        this.center = center;
-        this.scale = scale;
-        this.geom = geom;
-        this.properties = properties;
-    }
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
-        }
-    }
-}
-
 
 Renderer.prototype.createStyleTileTexture = function (numFeatures) {
     // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
@@ -407,7 +947,7 @@ function decodeGeom(geomType, geom) {
  */
 Renderer.prototype.addDataframe = function (dataframe) {
     const gl = this.gl;
-    this.tiles.push(dataframe);
+    this.dataframes.push(dataframe);
     dataframe.propertyTex = [];
 
     const level = 0;
@@ -445,9 +985,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        if (style) {
-            __WEBPACK_IMPORTED_MODULE_2__schema__["checkSchemaMatch"](style.schema, dataframe.schema);
-        }
+        // TODO check schema match
         window.requestAnimationFrame(refresh.bind(this));
     };
     dataframe.style = null;
@@ -497,14 +1035,14 @@ class ComputeJob {
     }
     work(renderer) {
         let sum = 0;
-        renderer.tiles.filter(t => t.style).map(t => {
+        renderer.dataframes.filter(t => t.style).map(t => {
             sum += t.numFeatures;
         });
         this.resolve(sum);
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.tiles.filter(tile => tile.style);
+    return this.dataframes.filter(tile => tile.style);
 };
 
 /**
@@ -575,7 +1113,7 @@ function refresh(timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    const tiles = this.tiles.filter(tile => tile.style);
+    const tiles = this.dataframes.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
@@ -652,10 +1190,7 @@ function refresh(timestamp) {
     });
 
     this.computePool.map(job => job.work(this));
-    this.computePool = this.computePool.filter(j => j.status != 'dispatched');
-    if (this.computePool.length > 0) {
-        window.requestAnimationFrame(refresh.bind(this));
-    }
+    this.computePool = [];
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
@@ -684,1125 +1219,63 @@ Renderer.prototype.compute = function (type, expressions) {
 };
 
 
+
+
 /***/ }),
-/* 1 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return palettes; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return Property; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return Blend; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return Now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return Near; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RGBA", function() { return RGBA; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Ramp", function() { return Ramp; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return FloatMul; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return FloatDiv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return FloatAdd; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return FloatSub; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return FloatPow; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return Log; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return Sqrt; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sin", function() { return Sin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return Cos; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return Tan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return Sign; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return SetOpacity; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HSV", function() { return HSV; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Animate", function() { return Animate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Max", function() { return Max; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Min", function() { return Min; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return Top; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return Linear; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return Cubic; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return Zoom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return FloatMod; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return CIELab; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return XYZ; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return Abs; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GreaterThan", function() { return GreaterThan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GreaterThanOrEqualTo", function() { return GreaterThanOrEqualTo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThan", function() { return LessThan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return LessThanOrEqualTo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return Equals; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return NotEquals; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return Buckets; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "property", function() { return property; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return blend; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "near", function() { return near; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return rgba; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "float", function() { return float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return ramp; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return floatMul; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return floatDiv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return floatAdd; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return floatSub; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return floatPow; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log", function() { return log; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return sqrt; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return sin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return cos; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return tan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return setOpacity; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return opacity; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return hsv; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return animate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "max", function() { return max; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "min", function() { return min; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "top", function() { return top; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return floatMod; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return cielab; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return abs; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return greaterThan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return greaterThanOrEqualTo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return lessThan; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return lessThanOrEqualTo; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return equals; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return notEquals; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return buckets; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(3);
-
-
-
-// TODO this was the string-representation overview, this should be adjusted to the JS API
-/** @module style/functions/
- * @description
- * # Styling language overview
- *
- * A style has a fixed number of properties with default values.
- * These properties are: color, width, stroke-color and stroke-width.
- *
- * Properties are styled by using styling expressions.
- * A styling expression is a numeric literal, a string literal, an identifier, a function call, or a built-in mathematic operation.
- *
- *
- *
- * ## Numeric literals:
- * ```
- * 5            //This IS a valid expression, a numeric literal
- * 0.3          //This IS a valid expression too
- * 'myString'   //This IS a valid expression, strings are supported
- * ```
- * ## Identifiers.
- * Identifiers can be used to refer to a feature property by prefixing the property name by '$'.
- * Cartocolors schemes are identifiers too.
- * ```
- * $myAwesomeProperty   //This IS a valid expression
- * Prism                //This IS a valid expression, Prism is a cartocolor palette
- * wadusWadus           //This IS NOT a valid expression since wadusWadus is not a known palette nor it is prefixed by '$'
- * ```
- *
- * ## Built-in mathematic operations
- * Some basic mathematical operations are supported:
- * ```
- * 3+4       //This IS a valid expression
- * 2^5       //This IS a valid expression, '^' is the power function, this resolves to 32
- * 2<<3      //This IS NOT a valid expression (no, binary operators are unsupported)
- * ```
- *
- *
- * ## Function calling.
- * Functions can be used to mix different expressions creating richer expressions.
- * ```
- * rgba(0.5,0.5,0.5, 1) //This IS a valid expression
- * now()                //This IS a valid expression
- *
- * wadusWadus()         //This IS NOT a valid expression, wadusWadus is not a known function
- * rgba(1)              //This IS NOT a valid expression since rgba() takes 4 parameters and only one was passed
- *
- * rgba(0,0,0, now())           //This IS a valid expression, now is a numeric expression and match the alpha parameter type of rgba()
- * rgba(0,0,0, rgba(0,0,0,0))   //This IS NOT a valid expression, the alpha parameter of the first function call is of type color since rgba returns a color
- * ```
- */
-
-// Bring CartoColor palettes
-const palettes = {};
-Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
-    const s = __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name];
-    var defaultFound = false;
-    for (let i = 20; i >= 0; i--) {
-        if (s[i]) {
-            if (!defaultFound) {
-                palettes[name.toLowerCase()] = () => s[i];
-                defaultFound = true;
-            }
-            palettes[`${name.toLowerCase()}_${i}`] = () => s[i];
-        }
-    }
-});
+/* harmony export (immutable) */ __webpack_exports__["union"] = union;
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+const IDENTITY = {
+    columns: []
+};
+/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
 
 
 /*
-    Each styling function should:
-        - Create their own objects, i.e.: be used without "new"
-        - Check input validity on user input (constructor and exposed functions).
-        - Have certain functions that never fail:
-            - _applyToShaderSource should use uniformIDMaker and propertyTIDMaker to get unique uniform IDs and property IDs as needed
-            - _postShaderCompile should get uniform location after program compilation as needed
-            - _preDraw should set any program's uniforms as needed
-            - isAnimated should return true if the function output could change depending on the timestamp
-        - Have a type property declaring the GLSL output type: 'float', 'color'
-*/
+const schema = {
+    columns: ['temp', 'cat']
+};*/
 
-// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return float(value);
-    }
-    // TODO we need to encapsulate strings as categories
-    return value;
-}
+//TODO
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+//export function contains(supersetSchema, subsetSchema) {
+//}
 
-/**
- * The styling "functions" are a set of styling classes with function helpers to construct them.
- *
- * These classes can be combined together since all of them inherit from Expression.
- * Of course, not all combinations are valid, all expressions have a type,
- * which is the type that conceptually they returned, for example, the RGBA class conceptually returns a color,
- * therefore, its type is 'color'.
- *
- * The following types exist: 'color', 'float', 'cat'. Colors are encoded in RGBA, floats and categories are encoded
- * into floating point values, but their semantics differ (categories are integers within the range [0, v.numCategories)
- *
- * This combination of styling expression generates trees, in a similar way to what a compiler does.
- * For example, the addition of two numbers is transformed into a root node (the addition operator) and two children (the numbers).
- *
- * However, normally, the style expressions are evaluated on a WebGL shader. To achieve this each expression
- * has a set of WebGL methods that are invoked to generate GLSL code, to set up the shader after compilation,
- * and to set shader uniforms properly each frame.
- *
- * GLSL code generation is by recursively invoking the _applyToShaderSource() method. Usually, parents first invoke it
- * to get the children GLSL code, and then they interpolate those strings with their specific code.
- * This code is divided in two parts: preface and inline. The inline part is the execution entry point, parents invoke this part
- * to get the evaluated value of sub-expressions. The preface part is used optionally to allow expressions to define GLSL functions that
- * can be used within the inline part.
- *
- * After successful shader compilation the _postShaderCompile() method of the root expression is called.
- * Parents should call the method of their children too in a recursive way (the entire tree is traversed).
- * Expressions can use this method to get shader uniform locations.
- *
- * After that the _preDraw() method is called each time the style is going to be evaluated (i.e. the styling shader invoked).
- * This allows expressions to set shader uniforms properly. These values are not integrated into the shader GLSL code as literals to allow
- * to set time-variable values without the overhead of shader recompilation.
- *
- *
- * To enable a core renderer efficient implementation styling expressions have a isAnimated() method which should return true
- * if the expression (or their children) dynamically change their output (for example, the now() function).
- *
- *
- * To enable the .blendTo() we use an internal _replaceChild() method that, when called, replaces a child of a expression by other expression.
- * Therefore if we have a color RED and we want to blend it with BLUE, we call RED.parent._replaceChild(RED, blend(RED, BLUE)).
- * Replacing blend by the blending operator.
- */
-
-class Expression {
-    /**
-     * @api
-     * @hideconstructor
-     * @param {*} children
-     * @param {*} inlineMaker
-     * @param {*} preface
-     */
-    constructor(type, children, inlineMaker, preface) {
-        this.type = type;
-        this.inlineMaker = inlineMaker;
-        this.preface = (preface ? preface : '');
-        this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = children[name]);
-        this._getChildren().map(child => child.parent = this);
-    }
-    /**
-     * Generate GLSL code
-     * @param {*} uniformIDMaker    fn to get unique IDs
-     * @param {*} propertyTIDMaker  fn to get property IDs and inform of used properties
-     */
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
-        let childInlines = {};
-        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-        return {
-            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
-            inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
-        };
-    }
-    /**
-     * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
-     * @param {*} program
-     */
-    _postShaderCompile(program, gl) {
-        this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
-    }
-    /**
-     * Pre-rendering routine. Should establish related WebGL state as needed.
-     * @param {*} l
-     */
-    _preDraw(l, gl) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
-    }
-    /**
-     * @jsapi
-     * @returns true if the evaluation of the function at styling time won't be the same every time.
-     */
-    isAnimated() {
-        return this._getChildren().some(child => child.isAnimated());
-    }
-    /**
-     * Replace child *toReplace* by *replacer*
-     * @param {*} toReplace
-     * @param {*} replacer
-     */
-    _replaceChild(toReplace, replacer) {
-        const name = this.childrenNames.find(name => this[name] == toReplace);
-        this[name] = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    }
-    /**
-     * Linear interpolation between this and finalValue with the specified duration
-     * @jsapi
-     * @param {Expression} final
-     * @param {Expression} duration
-     * @param {Expression} blendFunc
-     */
-    //TODO blendFunc = 'linear'
-    blendTo(final, duration = 500) {
-        const parent = this.parent;
-        const blender = blend(this, final, animate(duration));
-        parent._replaceChild(this, blender);
-        blender.notify();
-    }
-    /**
-     * @returns a list with the expression children
-     */
-    _getChildren() {
-        return this.childrenNames.map(name => this[name]);
-    }
-}
-
-let bucketUID = 0;
-class Buckets extends Expression {
-    /*
-        If input is numeric => args is a breakpoint list
-        If input is categorical => args is a list of category names to map input
-    */
-    constructor(input, ...args) {
-        //Assert input is of numeric type
-        args.pop();//Remove protoschema from breakpoint list
-        args = args.map(implicitCast);
-        let children = {
-            input
-        };
-        args.map((arg, index) => children[`arg${index}`] = arg);
-        super('cat', children);
-        this.bucketUID = bucketUID++;
-        this.numCategories = args.length + 1;
-        this.args = args;
-    }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
-        let childInlines = {};
-        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-
-        const funcName = `buckets${this.bucketUID}`;
-        const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-                return ${index + 1}.;
-            }`;
-        const funcBody = this.args.map(elif).join('');
-        const preface = `float ${funcName}(float x){
-            ${funcBody}
-            return 0.;
-        }`;
-
-        return {
-            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
-            inline: `${funcName}(${childInlines.input})`
-        };
-    }
-}
-
-class Property extends Expression {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
-    constructor(name, schema) {
-        if (typeof name !== 'string' || name == '') {
-            throw new Error(`Invalid property name '${name}'`);
-        }
-        if (!schema.properties[name]) {
-            throw new Error('Property name not found');
-        }
-        super(schema.properties[name].type.categoryNames ? 'cat' : 'float', {}, (childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
-        if (schema.properties[name].type.categoryNames) {
-            this.numCategories = schema.properties[name].type.categoryNames.length;
-        }
-        this.name = name;
-        this.schema = schema;
-        this.schemaType = schema.properties[name].type;
-    }
-}
-
-
-// TODO fix
-const metadataAccessGenerator = (metadataProperty) =>
-    class metadataAcessor extends Expression {
-        constructor(property) {
-            super('float', { expr: float(property.schemaType[metadataProperty]) }, inlines => inlines.expr);
-            this.name = name;
-        }
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+function union(a, b) {
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
     };
-const Max = metadataAccessGenerator('globalMax');
-const Min = metadataAccessGenerator('globalMin');
-
-
-
-class Top extends Expression {
-    constructor(property, buckets) {
-        // TODO validation
-        super('float', { property: property });
-        this.buckets = buckets;
-    }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        this._UID = uniformIDMaker();
-        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        return {
-            preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
-            inline: `texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        if (!this.init) {
-            const schema = this.property.schemaType;
-            if (this.buckets > schema.categoryIDs.length) {
-                this.buckets = schema.categoryIDs.length;
-            }
-            this.init = true;
-            this.texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const width = 1024;
-            let pixels = new Uint8Array(4 * width);
-
-            for (let i = 0; i < this.buckets - 1; i++) {
-                pixels[4 * schema.categoryIDs[i] + 3] = 255. * (i + 1) / (this.buckets);
-            }
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                pixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-        this.property._postShaderCompile(program);
-        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
-    }
-    _preDraw(l, gl) {
-        this.property._preDraw(l);
-        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._texLoc, l.freeTexUnit);
-        l.freeTexUnit++;
-    }
-    //TODO _free
 }
 
-const nowInit = Date.now();
-class Now extends Expression {
-    /**
-     * @api
-     * @description get the current timestamp
-     */
-    constructor() {
-        super('float', { now: float(0) }, inline => inline.now);
-    }
-    _preDraw(...args) {
-        this.now.expr = (Date.now() - nowInit) / 1000.;
-        this.now._preDraw(...args);
-    }
-    isAnimated() {
-        return true;
-    }
+function equals(a,b){
+    return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
 }
-
-class Zoom extends Expression {
-    /**
-     * @api
-     * @description get the current zoom level
-     */
-    constructor() {
-        super('float', { zoom: float(0) }, inline => inline.zoom);
-    }
-    _preDraw(o, gl) {
-        this.zoom.expr = o.zoom;
-        this.zoom._preDraw(o, gl);
-    }
-}
-
-
-//TODO refactor to use uniformfloat class
-class Animate extends Expression {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
-    constructor(duration) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Animate only supports number literals');
-        }
-        super('float', {});
-        this.aTime = Date.now();
-        this.bTime = this.aTime + Number(duration);
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
-    }
-    _preDraw(l, gl) {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
-        } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
-        }
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
-    }
-}
-
-class XYZ extends Expression {
-    constructor(x, y, z) {
-        x = implicitCast(x);
-        y = implicitCast(y);
-        z = implicitCast(z);
-        if (x.type != 'float' || y.type != 'float' || z.type != 'float') {
-            throw new Error('XYZ');
-        }
-        super('color', { x: x, y: y, z: z }, inline =>
-            `vec4(xyztosrgb((
-                vec3(
-                    clamp(${inline.x}, -100000., 10000.),
-                    clamp(${inline.y}, -12800., 12800.),
-                    clamp(${inline.z}, -12800., 12800.)
-                )
-            )), 1)`
-            , `
-        #ifndef cielabtoxyz_fn
-        #define cielabtoxyz_fn
-
-        const mat3 XYZ_2_RGB = (mat3(
-            3.2404542,-1.5371385,-0.4985314,
-           -0.9692660, 1.8760108, 0.0415560,
-            0.0556434,-0.2040259, 1.0572252
-       ));
-       const mat3 XYZ_2_RGB_T = (mat3(
-        3.2404542,-0.9692660,0.0556434,
-        -1.5371385, 1.8760108, -0.2040259,
-        -0.4985314,0.0415560, 1.0572252
-   ));
-       const float SRGB_GAMMA = 1.0 / 2.2;
-
-       vec3 rgb_to_srgb_approx(vec3 rgb) {
-        return pow(rgb, vec3(SRGB_GAMMA));
-    }
-        float f1(float t){
-            const float sigma = 6./29.;
-            if (t>sigma){
-                return t*t*t;
-            }else{
-                return 3.*sigma*sigma*(t-4./29.);
-            }
-        }
-        vec3 cielabtoxyz(vec3 c) {
-            const float xn = 95.047;
-            const float yn = 100.;
-            const float zn = 108.883;
-            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
-                        yn*f1((c.x+16.)/116.),
-                        zn*f1((c.x+16.)/116.  - c.z/200. )
-                    );
-        }
-        vec3 xyztorgb(vec3 c){
-            return c * XYZ_2_RGB;
-        }
-
-        vec3 xyztosrgb(vec3 c) {
-            return rgb_to_srgb_approx(xyztorgb(c));
-        }
-        #endif
-        `);
-    }
-}
-
-class CIELab extends Expression {
-    constructor(l, a, b) {
-        l = implicitCast(l);
-        a = implicitCast(a);
-        b = implicitCast(b);
-        if (l.type != 'float' || a.type != 'float' || b.type != 'float') {
-            throw new Error('CIELab');
-        }
-        super('color', { l: l, a: a, b: b }, inline =>
-            `vec4(xyztosrgb(cielabtoxyz(
-                vec3(
-                    clamp(${inline.l}, 0., 100.),
-                    clamp(${inline.a}, -128., 128.),
-                    clamp(${inline.b}, -128., 128.)
-                )
-            )), 1)`
-            , `
-        #ifndef cielabtoxyz_fn
-        #define cielabtoxyz_fn
-
-        const mat3 XYZ_2_RGB = (mat3(
-            3.2404542,-1.5371385,-0.4985314,
-           -0.9692660, 1.8760108, 0.0415560,
-            0.0556434,-0.2040259, 1.0572252
-       ));
-       const float SRGB_GAMMA = 1.0 / 2.2;
-
-       vec3 rgb_to_srgb_approx(vec3 rgb) {
-        return pow(rgb, vec3(SRGB_GAMMA));
-    }
-        float f1(float t){
-            const float sigma = 6./29.;
-            if (t>sigma){
-                return t*t*t;
-            }else{
-                return 3.*sigma*sigma*(t-4./29.);
-            }
-        }
-        vec3 cielabtoxyz(vec3 c) {
-            const float xn = 95.047/100.;
-            const float yn = 100./100.;
-            const float zn = 108.883/100.;
-            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
-                        yn*f1((c.x+16.)/116.),
-                        zn*f1((c.x+16.)/116.  - c.z/200. )
-                    );
-        }
-        vec3 xyztorgb(vec3 c){
-            return c *XYZ_2_RGB;
-        }
-
-        vec3 xyztosrgb(vec3 c) {
-            return rgb_to_srgb_approx(xyztorgb(c));
-        }
-        #endif
-        `);
-    }
-}
-
-class HSV extends Expression {
-    /**
-     * @api
-     * @description Color constructor for Hue Saturation Value (HSV) color space
-     * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
-     * @param {*} saturation saturation of the color in the [0,1] range
-     * @param {*} value value (brightness) of the color in the [0,1] range
-     */
-    constructor(h, s, v) {
-        function typeCheck(v) {
-            return !(v.type == 'float' || v.type == 'cat');
-        }
-        function normalize(v, hue = false) {
-            if (v.type == 'cat') {
-                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
-            }
-            return '';
-        }
-        h = implicitCast(h);
-        s = implicitCast(s);
-        v = implicitCast(v);
-        if (typeCheck(h) && typeCheck(s) && typeCheck(v)) {
-            throw new Error('HSV invalid parameters');
-        }
-        super('color', { h: h, s: s, v: v }, inline =>
-            `vec4(hsv2rgb(vec3(${inline.h}${normalize(h, true)}, clamp(${inline.s}${normalize(s)}, 0.,1.), clamp(${inline.v}${normalize(v)}, 0.,1.))), 1)`
-            , `
-        #ifndef HSV2RGB
-        #define HSV2RGB
-        vec3 hsv2rgb(vec3 c) {
-        vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-        }
-        #endif
-        `);
-    }
-}
-
-
-
-const genBinaryOp = (jsFn, glsl) =>
-    class BinaryOperation extends Expression {
-        /**
-         * @jsapi
-         * @name BinaryOperation
-         * @hideconstructor
-         * @augments Expression
-         * @constructor
-         * @param {*} a
-         * @param {*} b
-         */
-        constructor(a, b) {
-            if (Number.isFinite(a) && Number.isFinite(b)) {
-                return float(jsFn(a, b));
-            }
-            if (Number.isFinite(a)) {
-                a = float(a);
-            }
-            if (Number.isFinite(b)) {
-                b = float(b);
-            }
-            if (typeof b === 'string') {
-                [a, b] = [b, a];
-            }
-            if (typeof a === 'string' && b.schemaType.categoryIDs) {
-                let id = b.schemaType.categoryNames.indexOf(a);
-                if (id >= 0) {
-                    id = b.schemaType.categoryIDs[id];
-                }
-                a = float(id);
-            }
-            if (a.type == 'float' && b.type == 'float') {
-                super('float', { a: a, b: b }, inline => glsl(inline.a, inline.b));
-            } else if (a.type == 'color' && b.type == 'color') {
-                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
-            } else if (a.type == 'color' && b.type == 'float') {
-                super('color', { a: a, b: b }, inline => glsl(inline.a, inline.b));
-            } else {
-                throw new Error(`Binary operation cannot be performed between '${a}' and '${b}'`);
-            }
-        }
-    };
-
-
-
-class SetOpacity extends Expression {
-    /**
-     * @api
-     * @description Override the input color opacity
-     * @param {*} color input color
-     * @param {*} opacity new opacity
-     */
-    constructor(a, b) {
-        if (Number.isFinite(b)) {
-            b = float(b);
-        }
-        if (!(a.type == 'color' && b.type == 'float')) {
-            throw new Error(`SetOpacity cannot be performed between '${a}' and '${b}'`);
-        }
-        super('color', { a: a, b: b }, inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`);
-    }
-}
-
-/**
-* @jsapi
-* @augments {BinaryOperation}
-*/
-class FloatMul extends genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`) { }
-const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
-const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
-const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
-const FloatMod = genBinaryOp((x, y) => x - y, (x, y) => `mod(${x}, ${y})`);
-const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
-
-const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
-const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
-
-const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
-const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
-
-const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
-const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
-
-
-const genUnaryOp = (jsFn, glsl) => class UnaryOperation extends Expression {
-    constructor(a) {
-        if (Number.isFinite(a)) {
-            return float(jsFn(a));
-        }
-        if (a.type != 'float') {
-            throw new Error(`Binary operation cannot be performed to '${a}'`);
-        }
-        super('float', { a: a }, inlines => glsl(inlines.a));
-    }
-};
-
-const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
-const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
-const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
-const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
-const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
-const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
-const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
-
-
-class Near extends Expression {
-    /**
-     * @api
-     * @description Near returns zero for inputs that are far away from center.
-     * This can be useful for filtering out features by setting their size to zero.
-     * @param {*} input
-     * @param {*} center
-     * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
-     * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
-     */
-    constructor(input, center, threshold, falloff) {
-        input = implicitCast(input);
-        center = implicitCast(center);
-        threshold = implicitCast(threshold);
-        falloff = implicitCast(falloff);
-        if ([input, center, threshold, falloff].some(x => x === undefined || x === null)) {
-            throw new Error('Invalid arguments to Near()');
-        }
-        if (input.type != 'float' || center.type != 'float' || threshold.type != 'float' || falloff.type != 'float') {
-            throw new Error('Near(): invalid parameter type');
-        }
-        super('float', { input: input, center: center, threshold: threshold, falloff: falloff }, (inline) =>
-            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-            0., 1.))`
-        );
-    }
-}
-
-const genInterpolator = (inlineMaker, preface) => class Interpolator extends Expression {
-    constructor(m) {
-        m = implicitCast(m);
-        if (m.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${m.type}'`);
-        }
-        super('float', { m: m }, inline => inlineMaker(inline.m), preface);
-        this.schema = m.schema;
-        this.isInterpolator = true;
-    }
-};
-class Linear extends genInterpolator(inner => inner) { }
-class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
-    `
-    #ifndef CUBIC
-    #define CUBIC
-    float cubicEaseInOut(float p){
-        if (p < 0.5) {
-            return 4. * p * p * p;
-        }else {
-            float f = ((2. * p) - 2.);
-            return 0.5 * f * f * f + 1.;
-        }
-    }
-    #endif
-`) { }
-
-class Blend extends Expression {
-    /**
-     * @api
-     * @description Interpolate from *a* to *b* based on *mix*
-     * @param {*} a can be a color or a number
-     * @param {*} b type must match a's type
-     * @param {*} mix interpolation parameter in the [0,1] range
-     */
-    constructor(a, b, mix, interpolator) {
-        a = implicitCast(a);
-        b = implicitCast(b);
-        mix = implicitCast(mix);
-        if ([a, b, mix].some(x => x === undefined || x === null)) {
-            throw new Error('Invalid arguments to Blend()');
-        }
-        if (mix.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${mix.type}'`);
-        }
-        if (__WEBPACK_IMPORTED_MODULE_1__schema__["checkSchemaMatch"](a.schema, b.schema)) {
-            throw new Error('Blend parameters schemas mismatch');
-        }
-        if (interpolator && interpolator.isInterpolator) {
-            mix = interpolator(mix);
-        }
-        let type = '';
-        if (a.type == 'float' && b.type == 'float') {
-            type = 'float';
-        } else if (a.type == 'color' && b.type == 'color') {
-            type = 'color';
-        } else {
-            throw new Error(`Blending cannot be performed between types '${a.type}' and '${b.type}'`);
-        }
-        super(type, { a: a, b: b, mix: mix }, inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`);
-        this.schema = a.schema;
-    }
-    _preDraw(l, gl) {
-        super._preDraw(l, gl);
-        if (this.mix instanceof Animate && !this.mix.isAnimated()) {
-            this.parent._replaceChild(this, this.b);
-        }
-    }
-}
-
-//TODO refactor to uniformcolor, write color (plain, literal)
-class RGBA extends Expression {
-    /**
-     * @api
-     * @description RGBA color constructor
-     * @param {*} r red component in the [0,1] range
-     * @param {*} g green component in the [0,1] range
-     * @param {*} b blue component in the [0,1] range
-     * @param {*} a alpha/opacity component in the [0,1] range
-     */
-    constructor(r, g, b, a) {
-        var color = [r, g, b, a];
-        if (!Array.isArray(color)) {
-            throw new Error(`Invalid arguments to Color(): ${color}`);
-        }
-        color = color.filter(() => true);
-        color = color.map(x => Number.isFinite(x) ? float(x) : x);
-        if (color.length != 4) {
-            throw new Error(`Invalid arguments to Color(): ${color}`);
-        }
-        r = color[0];
-        g = color[1];
-        b = color[2];
-        a = color[3];
-        super('color', { r, g, b, a }, inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`);
-    }
-}
-
-
-class Float extends Expression {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        if (!Number.isFinite(x)) {
-            throw new Error(`Invalid arguments to Float(): ${x}`);
-        }
-        super('float', {});
-        this.expr = x;
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float float${this._uniformID};\n`,
-            inline: `float${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
-    }
-    _preDraw(l, gl) {
-        gl.uniform1f(this._uniformLocation, this.expr);
-    }
-    isAnimated() {
-        return false;
-    }
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-
-//Palette => used by Ramp, Ramp gets texture2D from palette by asking for number of buckets (0/interpolated palette, 2,3,4,5,6...)
-
-/*
-hsv(top($cat, 5), 0.5, 1.);
-ramp(top($cat, 7), Prism);
-
-hsv(localtop($cat, 5), 0.5, 1.);
-ramp(localtop($cat, 7), Prism);
-
-
-top/localtop returns  a normalized category number:
-For example:
-0.,0.2,0.4,0.6,0.8,1. (where 1 means 'others')
-Values are clamped to 1 (others)
-
-top computes them by ordering the metadata by their influence (histogram)
-localtop computes them by computing the histogram in-place filtering in the viewport region
-
-*/
-
-
-class Ramp extends Expression {
-    /**
-     * @api
-     * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
-     * @param {*} input
-     * @param {*} palette
-     * @param {*} minKey Optional
-     * @param {*} maxKey Optional
-     */
-    constructor(input, palette, minKey, maxKey) {
-        if (maxKey == undefined) {
-            if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Float"]) {
-                minKey = input.schemaType.globalMin;
-                maxKey = input.schemaType.globalMax;
-            } else if (input.schemaType instanceof __WEBPACK_IMPORTED_MODULE_1__schema__["Category"]) {
-                minKey = -1;
-                maxKey = input.schemaType.categoryNames.length;
-            } else if (input instanceof Top) {
-                minKey = 0;
-                maxKey = 1;
-            } else if (input.numCategories) {
-                minKey = 0;
-                maxKey = input.numCategories;
-            }
-        }
-
-        input = implicitCast(input);
-        minKey = implicitCast(minKey);
-        maxKey = implicitCast(maxKey);
-        var values = implicitCast(palette);
-        if ([input, minKey, maxKey, values].some(x => x === undefined || x === null)) {
-            throw new Error('Invalid arguments to Ramp()');
-        }
-        super('color', { input: input });
-        this.input = input;
-        this.minKey = minKey.expr;
-        this.maxKey = maxKey.expr;
-        this.values = values;
-    }
-    _free(gl) {
-        gl.deleteTexture(this.texture);
-    }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        this._UID = uniformIDMaker();
-        const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
-        return {
-            preface: input.preface + `
-        uniform sampler2D texRamp${this._UID};
-        uniform float keyMin${this._UID};
-        uniform float keyWidth${this._UID};
-        `,
-            inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        if (!this.init) {
-            this.init = true;
-            this.texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const level = 0;
-            const internalFormat = gl.RGBA;
-            const width = 256;
-            const height = 1;
-            const border = 0;
-            const srcFormat = gl.RGBA;
-            const srcType = gl.UNSIGNED_BYTE;
-            const pixel = new Uint8Array(4 * width);
-            const values = this.values;
-            for (var i = 0; i < width; i++) {
-                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
-                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
-                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-                pixel[4 * i + 0] = v[0];
-                pixel[4 * i + 1] = v[1];
-                pixel[4 * i + 2] = v[2];
-                pixel[4 * i + 3] = v[3];
-            }
-            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        }
-        this.input._postShaderCompile(program, gl);
-        this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
-        this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
-        this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
-    }
-    _preDraw(l, gl) {
-        this.input._preDraw(l, gl);
-        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._texLoc, l.freeTexUnit);
-        gl.uniform1f(this._keyMinLoc, (this.minKey));
-        gl.uniform1f(this._keyWidthLoc, (this.maxKey) - (this.minKey));
-        l.freeTexUnit++;
-    }
-}
-
-
-const floatMul = (...args) => new FloatMul(...args);
-const floatDiv = (...args) => new FloatDiv(...args);
-const floatAdd = (...args) => new FloatAdd(...args);
-const floatSub = (...args) => new FloatSub(...args);
-const floatPow = (...args) => new FloatPow(...args);
-const floatMod = (...args) => new FloatMod(...args);
-const log = (...args) => new Log(...args);
-const sqrt = (...args) => new Sqrt(...args);
-const sin = (...args) => new Sin(...args);
-const cos = (...args) => new Cos(...args);
-const tan = (...args) => new Tan(...args);
-const sign = (...args) => new Sign(...args);
-const near = (...args) => new Near(...args);
-const blend = (...args) => new Blend(...args);
-const rgba = (...args) => new RGBA(...args);
-const property = (...args) => new Property(...args);
-const animate = (...args) => new Animate(...args);
-const hsv = (...args) => new HSV(...args);
-const setOpacity = (...args) => new SetOpacity(...args);
-const opacity = (...args) => new SetOpacity(...args);
-const ramp = (...args) => new Ramp(...args);
-const float = (...args) => new Float(...args);
-const max = (...args) => new Max(...args);
-const min = (...args) => new Min(...args);
-const top = (...args) => new Top(...args);
-const linear = (...args) => new Linear(...args);
-const cubic = (...args) => new Cubic(...args);
-const now = (...args) => new Now(...args);
-const zoom = (...args) => new Zoom(...args);
-const cielab = (...args) => new CIELab(...args);
-const xyz = (...args) => new XYZ(...args);
-const abs = (...args) => new Abs(...args);
-const greaterThan = (...args) => new GreaterThan(...args);
-const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
-const lessThan = (...args) => new LessThan(...args);
-const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
-const equals = (...args) => new Equals(...args);
-const notEquals = (...args) => new NotEquals(...args);
-const buckets = (...args) => new Buckets(...args);
-
-
 
 /***/ }),
-/* 2 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(20);
 
 
 
@@ -1913,80 +1386,119 @@ const styler = {
 
 
 /***/ }),
-/* 3 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Schema", function() { return Schema; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkSchemaMatch", function() { return checkSchemaMatch; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return Float; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Category", function() { return Category; });
-/**
- * @jsapi
- * @constructor
- * @description A schema is a list of properties with associated types.
- *
- * Schemas are used as dataframe headers and as a way to define what kind of dataframes are valid for a particular style.
- * @param {String[]} propertyNames
- * @param {String[]} propertyTypes
- */
-function Schema(propertyNames, propertyTypes) {
-    if (propertyNames.length != propertyTypes.length) {
-        throw new Error('propertyNames and propertyTypes lengths mismatch');
-    }
-    propertyNames.map((name, index) => this[name] = propertyTypes[index]);
-}
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
-/**
- * Assert that two schemas match.
- *
- * Two schemas match if at least one of them is undefined or if they contain the same properties with the same types.
- * @param {Schema} schemaA
- * @param {Schema} schemaB
- * @throws If the schemas don't match
- */
-function checkSchemaMatch(schemaA, schemaB) {
-    if (schemaA != undefined && schemaB != undefined) {
-        const equals = Object.keys(schemaA).map(name => schemaA[name] == schemaB[name]).reduce((a, b) => a && b, true);
-        if (!equals) {
-            throw new Error(`schema mismatch: ${JSON.stringify(schemaA)}, ${JSON.stringify(schemaB)}`);
+
+
+//TODO refactor to use uniformfloat class
+class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
+     */
+    constructor(duration) {
+        if (!Number.isFinite(duration)) {
+            throw new Error('Animate only supports number literals');
+        }
+        super({});
+        this.aTime = Date.now();
+        this.bTime = this.aTime + Number(duration);
+    }
+    _compile() {
+        this.type = 'float';
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float anim${this._uniformID};\n`,
+            inline: `anim${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+    }
+    _preDraw(l, gl) {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (this.mix > 1.) {
+            gl.uniform1f(this._uniformLocation, 1);
+        } else {
+            gl.uniform1f(this._uniformLocation, this.mix);
         }
     }
-}
-
-
-
-class Float {
-    constructor(globalMin, globalMax) {
-        this.globalMin = globalMin;
-        this.globalMax = globalMax;
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
     }
 }
-class Category {
-    constructor(categoryNames, categoryCounts, categoryIDs) {
-        this.categoryNames = categoryNames;
-        this.categoryCounts = categoryCounts;
-        this.categoryIDs = categoryIDs;
-    }
-}
-
-
-/*
-    Metadata of SQL: histograms, count, jenks
-    Schema of Style: used columns
-*/
-
+/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
 
 
 /***/ }),
-/* 4 */
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+
+class Linear extends genInterpolator(inner => inner) { }
+/* harmony export (immutable) */ __webpack_exports__["b"] = Linear;
+
+class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`) { }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
+
+
+
+// Interpolators
+function genInterpolator(inlineMaker, preface) {
+    return class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+        constructor(m) {
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
+            super({ m: m });
+            this.isInterpolator = true; //TODO remove this hack
+        }
+        _compile(meta) {
+            super._compile(meta);
+            if (this.m.type != 'float') {
+                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+            }
+            this.type = 'float';
+            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+        }
+    };
+
+} 
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(5);
+var VectorTileFeature = __webpack_require__(12);
 
 module.exports = VectorTileLayer;
 
@@ -2048,13 +1560,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 5 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(26);
+var Point = __webpack_require__(50);
 
 module.exports = VectorTileFeature;
 
@@ -2288,7 +1800,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 6 */
+/* 13 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2478,14 +1990,14 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 7 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(6);
 /*eslint-env jquery*/
 /*eslint no-console: ["off"] */
 
@@ -2513,7 +2025,7 @@ color: hsv(0.2, 0.7, 1.)`,
 color: hsv(0.7, 0.7, 1.)`,
 
     `width: 3
-color: hsv($category/10, 0.7, 1.)`,
+color: hsv($category, 0.7, 1.)`,
 
     `width: 3
 color: ramp($category, Prism)`,
@@ -2586,7 +2098,6 @@ var map = new mapboxgl.Map({
 map.repaint = false;
 var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
 
-let protoSchema = null;
 
 map.on('load', () => {
     let index = 0;//styles.length - 1;
@@ -2596,23 +2107,9 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const p = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].getSchema(v);
-            if (!__WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].protoSchemaIsEquals(p, protoSchema)) {
-                protoSchema = p;
-                mgl.provider.setQueries(protoSchema, $('#dataset').val());
-            }
-            mgl.provider.schema.then(schema => {
-                try {
-                    const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v, schema);
-                    mgl.provider.style.set(s, 1000);
-                    document.getElementById('feedback').style.display = 'none';
-                } catch (error) {
-                    const err = `Invalid style: ${error}:${error.stack}`;
-                    console.warn(err);
-                    document.getElementById('feedback').value = err;
-                    document.getElementById('feedback').style.display = 'block';
-                }
-            });
+            const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v);
+            mgl.provider.setStyle(s, 1000);
+            document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
             console.warn(err);
@@ -2713,7 +2210,7 @@ map.on('load', () => {
         localStorage.setItem('user', $('#user').val());
         localStorage.setItem('apikey', $('#apikey').val());
         localStorage.setItem('dataset', $('#dataset').val());
-        protoSchema = null;
+        mgl.provider.setQueries($('#dataset').val());
         updateStyle();
     };
 
@@ -2812,12 +2309,12 @@ map.on('load', () => {
 
 
 /***/ }),
-/* 8 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(6);
 
 
 
@@ -2889,13 +2386,13 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 9 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(19);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -2905,7 +2402,7 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 10 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3039,7 +2536,7 @@ void main(void) {
 
 
 /***/ }),
-/* 11 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3128,7 +2625,7 @@ void main(void) {
 
 
 /***/ }),
-/* 12 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3176,7 +2673,7 @@ void main(void) {
 
 
 /***/ }),
-/* 13 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3224,151 +2721,67 @@ void main(void) {
 
 
 /***/ }),
-/* 14 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return compileShader; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shaders__ = __webpack_require__(2);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["palettes"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Property", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Property"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Blend", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Blend"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Now", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Now"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Near", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Near"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "RGBA", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["RGBA"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Float", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Float"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Ramp", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Ramp"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMul", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatMul"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatDiv", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatDiv"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatAdd", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatAdd"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatSub", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatSub"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatPow", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatPow"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Log", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Log"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sqrt", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Sqrt"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sin", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Sin"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cos", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Cos"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Tan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Tan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Sign", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Sign"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "SetOpacity", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["SetOpacity"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "HSV", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["HSV"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Animate", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Animate"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Max", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Max"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Min", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Min"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Top", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Top"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Linear", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Linear"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Cubic"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Zoom", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Zoom"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "FloatMod", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["FloatMod"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "CIELab", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["CIELab"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "XYZ", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["XYZ"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Abs", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Abs"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "GreaterThan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["GreaterThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "GreaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["GreaterThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["LessThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "LessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["LessThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Equals", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Equals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "NotEquals", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["NotEquals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "Buckets", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["Buckets"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["property"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["blend"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["now"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "near", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["near"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["rgba"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "float", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["float"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["ramp"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatMul"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatDiv"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatAdd"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatSub"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatPow"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["log"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["sqrt"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["sin"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["cos"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["tan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["sign"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["setOpacity"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["opacity"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["hsv"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["animate"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "max", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["max"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "min", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["min"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["top"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["linear"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["cubic"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["zoom"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["floatMod"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["cielab"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["xyz"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["abs"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["greaterThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["greaterThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["lessThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["lessThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["equals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["notEquals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return __WEBPACK_IMPORTED_MODULE_0__functions__["buckets"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser__ = __webpack_require__(19);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "protoSchemaIsEquals", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "getSchema", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__parser__["b"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shader_compiler__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shaders__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__schema__ = __webpack_require__(7);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return __WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["log"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sqrt"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sin"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cos"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["near"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["animate"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["hsv"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["setOpacity"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["opacity"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["ramp"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["float"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "max", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["max"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "min", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["min"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sum", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sum"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "avg", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["avg"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "mode", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["mode"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["top"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["abs"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["notEquals"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["buckets"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parser__ = __webpack_require__(42);
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_4__parser__["b"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_4__parser__["a"]; });
 
 
 
 
-
-
-
-let cache = {};
-
-function compileShader(gl, styleRootExpr, shaderCreator) {
-    var uniformIDcounter = 0;
-    var tid = {};
-    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
-        }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
-    });
-    let shader = null;
-    if (cache[JSON.stringify(colorModifier)]) {
-        shader = cache[JSON.stringify(colorModifier)];
-    } else {
-        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
-        //console.log("COMPILE", cache)
-        cache[JSON.stringify(colorModifier)] = shader;
-    }
-    styleRootExpr._postShaderCompile(shader.program, gl);
-    return {
-        tid: tid,
-        shader: shader
-    };
-}
-Style.prototype._compileColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_1__shaders__["b" /* styler */].createColorShader);
-    this.propertyColorTID = r.tid;
-    this.colorShader = r.shader;
-};
-Style.prototype._compileStrokeColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeColor, __WEBPACK_IMPORTED_MODULE_1__shaders__["b" /* styler */].createColorShader);
-    this.propertyStrokeColorTID = r.tid;
-    this.strokeColorShader = r.shader;
-};
-Style.prototype._compileStrokeWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeWidth, __WEBPACK_IMPORTED_MODULE_1__shaders__["b" /* styler */].createWidthShader);
-    this.propertyStrokeWidthTID = r.tid;
-    this.strokeWidthShader = r.shader;
-};
-Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_1__shaders__["b" /* styler */].createWidthShader);
-    this.propertyWidthTID = r.tid;
-    this.widthShader = r.shader;
-};
 
 /**
  * @jsapi
@@ -3385,42 +2798,50 @@ function Style(renderer, schema) {
     this.updated = true;
     this.schema = schema;
 
-    this._width = __WEBPACK_IMPORTED_MODULE_0__functions__["float"](5);
+    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
     this._width.parent = this;
     this._width.notify = () => {
         this._compileWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._color = __WEBPACK_IMPORTED_MODULE_0__functions__["rgba"](0, 0, 0, 1);
+    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 1);
     this._color.parent = this;
     this._color.notify = () => {
         this._compileColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._strokeColor = __WEBPACK_IMPORTED_MODULE_0__functions__["rgba"](0, 1, 0, 0.5);
+    this._strokeColor = __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 1, 0, 0.5);
     this._strokeColor.parent = this;
     this._strokeColor.notify = () => {
         this._compileStrokeColorShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-    this._strokeWidth = __WEBPACK_IMPORTED_MODULE_0__functions__["float"](0);
+    this._strokeWidth = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
     this._strokeWidth.parent = this;
     this._strokeWidth.notify = () => {
         this._compileStrokeWidthShader();
         window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
     };
-
-    this._compileWidthShader();
-    this._compileColorShader();
-    this._compileStrokeColorShader();
-    this._compileStrokeWidthShader();
 }
 
-Style.prototype.set = function (s, duration) {
-    s.color = s.color || __WEBPACK_IMPORTED_MODULE_0__functions__["rgba"](0.2, 0.2, 0.8, 0.5);
-    s.width = s.width != undefined ? s.width : __WEBPACK_IMPORTED_MODULE_0__functions__["float"](4);
-    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_0__functions__["rgba"](0, 0, 0, 0);
-    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : __WEBPACK_IMPORTED_MODULE_0__functions__["float"](0);
+Style.prototype.getMinimumNeededSchema = function () {
+    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
+    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_3__schema__["union"], __WEBPACK_IMPORTED_MODULE_3__schema__["IDENTITY"]);
+};
+
+Style.prototype.set = function (s, duration, meta) {
+    s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2, 0.2, 0.8, 0.5);
+    s.width = s.width != undefined ? s.width : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
+    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 0);
+    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
+    s.resolution = s.resolution == undefined ? 1 : s.resolution;
+
+    this._width._bind(meta);
+    this._color._bind(meta);
+    this._strokeColor._bind(meta);
+    this._strokeWidth._bind(meta);
+    this.resolution = s.resolution;
+
     this.getWidth().blendTo(s.width, duration);
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
@@ -3442,6 +2863,7 @@ Style.prototype.setWidth = function (float) {
     };
     float.notify();
 };
+
 Style.prototype.setStrokeWidth = function (float) {
     this._strokeWidth = float;
     this.updated = true;
@@ -3452,27 +2874,7 @@ Style.prototype.setStrokeWidth = function (float) {
     };
     float.notify();
 };
-Style.prototype._replaceChild = function (toReplace, replacer) {
-    if (toReplace == this._color) {
-        this._color = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._width) {
-        this._width = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeColor) {
-        this._strokeColor = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeWidth) {
-        this._strokeWidth = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else {
-        throw new Error('No child found');
-    }
-};
+
 /**
  * Change the color of the style to a new style expression.
  * @jsapi
@@ -3500,8 +2902,6 @@ Style.prototype.setStrokeColor = function (color) {
     color.notify();
 };
 
-
-
 /**
  * Get the width style expression
  * @jsapi
@@ -3509,6 +2909,7 @@ Style.prototype.setStrokeColor = function (color) {
 Style.prototype.getWidth = function () {
     return this._width;
 };
+
 /**
  * Get the color style expression
  * @jsapi
@@ -3525,15 +2926,126 @@ Style.prototype.getStrokeWidth = function () {
     return this._strokeWidth;
 };
 
+Style.prototype._compileColorShader = function () {
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
+    this.propertyColorTID = r.tid;
+    this.colorShader = r.shader;
+};
+
+Style.prototype._compileStrokeColorShader = function () {
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._strokeColor, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
+    this.propertyStrokeColorTID = r.tid;
+    this.strokeColorShader = r.shader;
+};
+
+Style.prototype._compileStrokeWidthShader = function () {
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._strokeWidth, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
+    this.propertyStrokeWidthTID = r.tid;
+    this.strokeWidthShader = r.shader;
+};
+
+Style.prototype._compileWidthShader = function () {
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
+    this.propertyWidthTID = r.tid;
+    this.widthShader = r.shader;
+};
+
+Style.prototype._replaceChild = function (toReplace, replacer) {
+    if (toReplace == this._color) {
+        this._color = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._width) {
+        this._width = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeColor) {
+        this._strokeColor = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeWidth) {
+        this._strokeWidth = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else {
+        throw new Error('No child found');
+    }
+};
+
+
+
+
+
 /***/ }),
-/* 15 */
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = compileShader;
+
+const cache = {};
+
+function compileShader(gl, styleRootExpr, shaderCreator) {
+    let uniformIDcounter = 0;
+    let tid = {};
+    let shader = null;
+    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+        if (tid[name] !== undefined) {
+            return tid[name];
+        }
+        tid[name] = Object.keys(tid).length;
+        return tid[name];
+    });
+    if (cache[JSON.stringify(colorModifier)]) {
+        shader = cache[JSON.stringify(colorModifier)];
+    } else {
+        shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+        //console.log("COMPILE", cache)
+        cache[JSON.stringify(colorModifier)] = shader;
+    }
+    styleRootExpr._postShaderCompile(shader.program, gl);
+    return {
+        tid: tid,
+        shader: shader
+    };
+}
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return palettes; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
+
+
+const palettes = {};
+Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
+    const s = __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name];
+    var defaultFound = false;
+    for (let i = 20; i >= 0; i--) {
+        if (s[i]) {
+            if (!defaultFound) {
+                palettes[name.toLowerCase()] = () => s[i];
+                defaultFound = true;
+            }
+            palettes[`${name.toLowerCase()}_${i}`] = () => s[i];
+        }
+    }
+});
+
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(16);
+module.exports = __webpack_require__(25);
 
 
 /***/ }),
-/* 16 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -5386,7 +4898,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(17);
+var colorbrewer = __webpack_require__(26);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -5419,14 +4931,14 @@ if (true) {
 
 
 /***/ }),
-/* 17 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(18);
+module.exports = __webpack_require__(27);
 
 
 /***/ }),
-/* 18 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -5751,24 +5263,804 @@ if (true) {
 
 
 /***/ }),
-/* 19 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["d"] = protoSchemaIsEquals;
-/* harmony export (immutable) */ __webpack_exports__["a"] = getSchema;
-/* harmony export (immutable) */ __webpack_exports__["c"] = parseStyleExpression;
-/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyle;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
+
+
+
+
+class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description Interpolate from *a* to *b* based on *mix*
+     * @param {*} a can be a color or a number
+     * @param {*} b type must match a's type
+     * @param {*} mix interpolation parameter in the [0,1] range
+     */
+    constructor(a, b, mix, interpolator) {
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(mix);
+        if (interpolator && interpolator.isInterpolator) {
+            mix = interpolator(mix);
+        }
+        super({ a: a, b: b, mix: mix });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.mix.type != 'float') {
+            throw new Error(`Blending cannot be performed by '${this.mix.type}'`);
+        }
+        if (this.a.type == 'float' && this.b.type == 'float') {
+            this.type = 'float';
+        } else if (this.a.type == 'color' && this.b.type == 'color') {
+            this.type = 'color';
+        } else {
+            throw new Error(`Blending cannot be performed between types '${this.a.type}' and '${this.b.type}'`);
+        }
+        this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
+    }
+    _preDraw(l, gl) {
+        super._preDraw(l, gl);
+        if (this.mix instanceof __WEBPACK_IMPORTED_MODULE_1__animate__["a" /* default */] && !this.mix.isAnimated()) {
+            this.parent._replaceChild(this, this.b);
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+
+
+
+let bucketUID = 0;
+
+class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /*
+        If input is numeric => args is a breakpoint list
+        If input is categorical => args is a list of category names to map input
+    */
+    constructor(input, ...args) {
+        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */]);
+        let children = {
+            input
+        };
+        args.map((arg, index) => children[`arg${index}`] = arg);
+        super(children);
+        this.bucketUID = bucketUID++;
+        this.numCategories = args.length + 1;
+        this.args = args;
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        this.type = 'category';
+        this.args.map(breakpoint => {
+            if (breakpoint.type != 'float') {
+                throw new Error('Buckets() invalid parameter');
+            }
+        });
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+
+        const funcName = `buckets${this.bucketUID}`;
+        const elif = (_, index) =>
+            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+                return ${index + 1}.;
+            }`;
+        const funcBody = this.args.map(elif).join('');
+        const preface = `float ${funcName}(float x){
+            ${funcBody}
+            return 0.;
+        }`;
+
+        return {
+            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+            inline: `${funcName}(${childInlines.input})`
+        };
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Buckets;
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+
+
+
+class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(l, a, b) {
+        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(l);
+        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(b);
+        super({ l: l, a: a, b: b });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.l.type != 'float' || this.a.type != 'float' || this.b.type != 'float') {
+            throw new Error('CIELab() invalid parameters');
+        }
+        this.type = 'color';
+        this._setGenericGLSL(inline =>
+            `vec4(xyztosrgb(cielabtoxyz(
+                vec3(
+                    clamp(${inline.l}, 0., 100.),
+                    clamp(${inline.a}, -128., 128.),
+                    clamp(${inline.b}, -128., 128.)
+                )
+            )), 1)`
+            , `
+        #ifndef cielabtoxyz_fn
+        #define cielabtoxyz_fn
+
+        const mat3 XYZ_2_RGB = (mat3(
+            3.2404542,-1.5371385,-0.4985314,
+           -0.9692660, 1.8760108, 0.0415560,
+            0.0556434,-0.2040259, 1.0572252
+       ));
+       const float SRGB_GAMMA = 1.0 / 2.2;
+
+       vec3 rgb_to_srgb_approx(vec3 rgb) {
+        return pow(rgb, vec3(SRGB_GAMMA));
+    }
+        float f1(float t){
+            const float sigma = 6./29.;
+            if (t>sigma){
+                return t*t*t;
+            }else{
+                return 3.*sigma*sigma*(t-4./29.);
+            }
+        }
+        vec3 cielabtoxyz(vec3 c) {
+            const float xn = 95.047/100.;
+            const float yn = 100./100.;
+            const float zn = 108.883/100.;
+            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
+                        yn*f1((c.x+16.)/116.),
+                        zn*f1((c.x+16.)/116.  - c.z/200. )
+                    );
+        }
+        vec3 xyztorgb(vec3 c){
+            return c *XYZ_2_RGB;
+        }
+
+        vec3 xyztosrgb(vec3 c) {
+            return rgb_to_srgb_approx(xyztorgb(c));
+        }
+        #endif
+        `);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = CIELab;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+
+class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} x
+     */
+    constructor(x) {
+        if (!Number.isFinite(x)) {
+            throw new Error(`Invalid arguments to Float(): ${x}`);
+        }
+        super({});
+        this.expr = x;
+    }
+    _compile() {
+        this.type = 'float';
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float float${this._uniformID};\n`,
+            inline: `float${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
+    }
+    _preDraw(l, gl) {
+        gl.uniform1f(this._uniformLocation, this.expr);
+    }
+    isAnimated() {
+        return false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Float;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+
+
+
+class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description Color constructor for Hue Saturation Value (HSV) color space
+     * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
+     * @param {*} saturation saturation of the color in the [0,1] range
+     * @param {*} value value (brightness) of the color in the [0,1] range
+     */
+    constructor(h, s, v) {
+        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(h);
+        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(s);
+        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(v);
+        super({ h: h, s: s, v: v });
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        function typeCheck(v) {
+            return !(v.type == 'float' || v.type == 'category');
+        }
+        if (typeCheck(this.h) || typeCheck(this.s) || typeCheck(this.v)) {
+            throw new Error('CIELab() invalid parameters');
+        }
+        this.type = 'color';
+        const normalize = (v, hue = false) => {
+            if (v.type == 'category') {
+                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+            }
+            return '';
+        };
+        super._setGenericGLSL(inline =>
+            `vec4(hsv2rgb(vec3(${inline.h}${normalize(this.h, true)}, clamp(${inline.s}${normalize(this.s)}, 0.,1.), clamp(${inline.v}${normalize(this.v)}, 0.,1.))), 1)`
+            , `
+    #ifndef HSV2RGB
+    #define HSV2RGB
+    vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+    #endif
+    `);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = HSV;
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+
+
+
+//
+class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description Near returns zero for inputs that are far away from center.
+     * This can be useful for filtering out features by setting their size to zero.
+     * 
+     *       _____
+     * _____/     \_____
+     * 
+     * @param {*} input
+     * @param {*} center
+     * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
+     * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
+     */
+    constructor(input, center, threshold, falloff) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(input);
+        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(center);
+        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(threshold);
+        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(falloff);
+        super({ input: input, center: center, threshold: threshold, falloff: falloff });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.input.type != 'float' || this.center.type != 'float' || this.threshold.type != 'float' || this.falloff.type != 'float') {
+            throw new Error('Near(): invalid parameter type');
+        }
+        this.type = 'float';
+        this.inlineMaker = (inline) =>
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
+        0., 1.))`;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Near;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+
+
+
+const nowInit = Date.now();
+
+class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description get the current timestamp
+     */
+    constructor() {
+        super({ now: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(0) });
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        this.type = 'float';
+        super.inlineMaker = inline => inline.now;
+    }
+    _preDraw(...args) {
+        this.now.expr = (Date.now() - nowInit) / 1000.;
+        this.now._preDraw(...args);
+    }
+    isAnimated() {
+        return true;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Now;
+
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} name Property/column name
+     */
+    constructor(name) {
+        if (typeof name !== 'string' || name == '') {
+            throw new Error(`Invalid property name '${name}'`);
+        }
+        super({});
+        this.name = name;
+    }
+    _compile(meta) {
+        const metaColumn = meta.columns.find(c => c.name == this.name);
+        if (!metaColumn) {
+            throw new Error(`Property '${this.name}' does not exist`);
+        }
+        this.type = metaColumn.type;
+        if (this.type == 'category') {
+            this.numCategories = metaColumn.categoryNames.length;
+        }
+        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+    }
+    _getMinimumNeededSchema() {
+        return {
+            columns: [
+                this.name
+            ]
+        };
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Property;
+
+
+/***/ }),
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
+
+
+
+
+class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
+     * @param {*} input
+     * @param {*} palette
+     * @param {*} minKey Optional
+     * @param {*} maxKey Optional
+     */
+    constructor(input, palette, minKey, maxKey) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(input);
+        minKey = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(minKey);
+        maxKey = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(maxKey);
+        var values = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(palette);
+        super({ input: input });
+        if (minKey === undefined) {
+            minKey = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["float"])(0);
+            maxKey = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["float"])(1);
+        }
+        this.minKey = minKey.expr;
+        this.maxKey = maxKey.expr;
+        this.values = values;
+    }
+    _compile(meta) {
+        super._compile(meta);
+        this.type = 'color';
+        if (this.input.type == 'category') {
+            this.maxKey = this.input.numCategories - 1;
+        }
+    }
+    _free(gl) {
+        gl.deleteTexture(this.texture);
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        this._UID = uniformIDMaker();
+        const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: input.preface + `
+        uniform sampler2D texRamp${this._UID};
+        uniform float keyMin${this._UID};
+        uniform float keyWidth${this._UID};
+        `,
+            inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 256;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            const pixel = new Uint8Array(4 * width);
+            const values = this.values;
+            for (var i = 0; i < width; i++) {
+                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
+                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).b, 255];
+                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).b, 255];
+                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                pixel[4 * i + 0] = v[0];
+                pixel[4 * i + 1] = v[1];
+                pixel[4 * i + 2] = v[2];
+                pixel[4 * i + 3] = v[3];
+            }
+            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        }
+        this.input._postShaderCompile(program, gl);
+        this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
+        this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
+        this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
+    }
+    _preDraw(l, gl) {
+        this.input._preDraw(l, gl);
+        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.uniform1i(this._texLoc, l.freeTexUnit);
+        gl.uniform1f(this._keyMinLoc, (this.minKey));
+        gl.uniform1f(this._keyWidthLoc, (this.maxKey) - (this.minKey));
+        l.freeTexUnit++;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Ramp;
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+
+
+
+//TODO refactor to uniformcolor, write color (plain, literal)
+class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description RGBA color constructor
+     * @param {*} r red component in the [0,1] range
+     * @param {*} g green component in the [0,1] range
+     * @param {*} b blue component in the [0,1] range
+     * @param {*} a alpha/opacity component in the [0,1] range
+     */
+    constructor(r, g, b, a) {
+        var color = [r, g, b, a];
+        color = color.map(x => Number.isFinite(x) ? Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(x) : x);
+        r = color[0];
+        g = color[1];
+        b = color[2];
+        a = color[3];
+        super({ r, g, b, a });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.r.type != 'float' || this.g.type != 'float' || this.b.type != 'float' || this.a.type != 'float') {
+            throw new Error('Invalid parameters for RGBA()');
+        }
+        this.type = 'color'; // TODO this kind of thing can be refactored into Color class and use: extends ColorExpression
+        this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RGBA;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+
+
+
+class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description Override the input color opacity
+     * @param {*} color input color
+     * @param {*} opacity new opacity
+     */
+    constructor(a, b) {
+        if (Number.isFinite(b)) {
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(b);
+        }
+        super({ a: a, b: b });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (!(this.a.type == 'color' && this.b.type == 'float')) {
+            throw new Error(`Opacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
+        }
+        this.type = 'color';
+        this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Opacity;
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(property, buckets) {
+        // TODO 'cat'
+        super({ property: property });
+        this.buckets = buckets; //TODO force fixed literal
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        if (this.property.type != 'category') {
+            throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
+        }
+        this.type = 'category';
+        this.numCategories = this.buckets;
+    }
+    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        this._UID = uniformIDMaker();
+        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        return {
+            preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
+            inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        if (!this.init) {
+            if (this.buckets > this.property.numCategories) {
+                this.buckets = this.property.numCategories;
+            }
+            this.init = true;
+            this.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            const width = 1024;
+            let pixels = new Uint8Array(4 * width);
+            for (let i = 0; i < this.buckets - 1; i++) {
+                pixels[4 * i + 3] = (i + 1);
+            }
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                pixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
+        this.property._postShaderCompile(program);
+        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
+    }
+    _preDraw(l, gl) {
+        this.property._preDraw(l);
+        gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.uniform1i(this._texLoc, l.freeTexUnit);
+        l.freeTexUnit++;
+    }
+    //TODO _free
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Top;
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+
+
+
+
+class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(x, y, z) {
+        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(x);
+        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(y);
+        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(z);
+        super({ x: x, y: y, z: z });
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.x.type != 'float' || this.y.type != 'float' || this.z.type != 'float') {
+            throw new Error('XYZ() invalid parameters');
+        }
+        this.type = 'color';
+        this._setGenericGLSL(inline =>
+            `vec4(xyztosrgb((
+                vec3(
+                    clamp(${inline.x}, -100000., 10000.),
+                    clamp(${inline.y}, -12800., 12800.),
+                    clamp(${inline.z}, -12800., 12800.)
+                )
+            )), 1)`
+            , `
+        #ifndef cielabtoxyz_fn
+        #define cielabtoxyz_fn
+
+        const mat3 XYZ_2_RGB = (mat3(
+            3.2404542,-1.5371385,-0.4985314,
+           -0.9692660, 1.8760108, 0.0415560,
+            0.0556434,-0.2040259, 1.0572252
+       ));
+       const mat3 XYZ_2_RGB_T = (mat3(
+        3.2404542,-0.9692660,0.0556434,
+        -1.5371385, 1.8760108, -0.2040259,
+        -0.4985314,0.0415560, 1.0572252
+   ));
+       const float SRGB_GAMMA = 1.0 / 2.2;
+
+       vec3 rgb_to_srgb_approx(vec3 rgb) {
+        return pow(rgb, vec3(SRGB_GAMMA));
+    }
+        float f1(float t){
+            const float sigma = 6./29.;
+            if (t>sigma){
+                return t*t*t;
+            }else{
+                return 3.*sigma*sigma*(t-4./29.);
+            }
+        }
+        vec3 cielabtoxyz(vec3 c) {
+            const float xn = 95.047;
+            const float yn = 100.;
+            const float zn = 108.883;
+            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
+                        yn*f1((c.x+16.)/116.),
+                        zn*f1((c.x+16.)/116.  - c.z/200. )
+                    );
+        }
+        vec3 xyztorgb(vec3 c){
+            return c * XYZ_2_RGB;
+        }
+
+        vec3 xyztosrgb(vec3 c) {
+            return rgb_to_srgb_approx(xyztorgb(c));
+        }
+        #endif
+        `);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = XYZ;
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+
+
+
+class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @api
+     * @description get the current zoom level
+     */
+    constructor() {
+        super({ zoom: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(0) });
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        this.type = 'float';
+        super.inlineMaker = inline => inline.zoom;
+    }
+    _preDraw(o, gl) {
+        this.zoom.expr = o.zoom;
+        this.zoom._preDraw(o, gl);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Zoom;
+
+
+/***/ }),
+/* 42 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__index__ = __webpack_require__(6);
+
 
 
 
 
 // TODO use Schema classes
 
-const aggFns = ['sum', 'avg', 'mode', 'min', 'max'];
+const aggFns = [];
 
 var lowerCaseFunctions = {};
 Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
@@ -5776,136 +6068,6 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__).filter(
 ).map(name => {
     lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name];
 });
-
-class ProtoSchema {
-    constructor(name, aggFN) {
-        this.properties = {};
-        this.propertyList = [];
-        if (name) {
-            this.addPropertyAccess(name, aggFN);
-        }
-    }
-    addPropertyAccess(name, aggFN) {
-        if (!this.properties[name]) {
-            this.properties[name] = {
-                name: name,
-                aggFN: new Set()
-            };
-            this.propertyList.push(this.properties[name]);
-        }
-        this.properties[name].aggFN.add(aggFN);
-    }
-    setAggFN(fn) {
-        this.propertyList.map(p => p.aggFN.delete('raw'));
-        this.propertyList.map(p => p.aggFN.add(fn));
-        return this;
-    }
-}
-function union(b) {
-    let newProto = new ProtoSchema();
-    if (!Array.isArray(b)) {
-        b = [b];
-    }
-    b = b.filter(x => x != null);
-    b.map(
-        x => x.propertyList.map(
-            p => {
-                p.aggFN.forEach(
-                    fn => newProto.addPropertyAccess(p.name, fn)
-                );
-            }
-        )
-    );
-    newProto.aggRes = b.map(x => x.aggRes).reduce((x, y) => x || y, undefined);
-    return newProto;
-}
-
-function parseNodeForSchema(node) {
-    if (node.type == 'CallExpression') {
-        const args = node.arguments.map(arg => parseNodeForSchema(arg));
-        const name = node.callee.name.toLowerCase();
-        if (aggFns.includes(name)) {
-            return args[0].setAggFN(name);
-        } else if (lowerCaseFunctions[name]) {
-            return union(args);
-        }
-        throw new Error(`Invalid function name '${node.callee.name}'`);
-    } else if (node.type == 'Literal') {
-        return null;
-    } else if (node.type == 'ArrayExpression') {
-        return null;
-    } else if (node.type == 'BinaryExpression') {
-        const left = parseNodeForSchema(node.left);
-        const right = parseNodeForSchema(node.right);
-        return union([left, right]);
-    } else if (node.type == 'UnaryExpression') {
-        switch (node.operator) {
-        case '-':
-            return parseNodeForSchema(node.argument);
-        case '+':
-            return parseNodeForSchema(node.argument);
-        default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
-        }
-    } else if (node.type == 'Identifier') {
-        if (node.name[0] == '$') {
-            return new ProtoSchema(node.name.substring(1), 'raw');
-        } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
-            return null;
-        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-            return null;
-        }
-    }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
-}
-
-function parseStyleNamedExprForSchema(node) {
-    if (node.operator != ':') {
-        throw new Error('Invalid syntax');
-    }
-    const name = node.left.name;
-    if (!name) {
-        throw new Error('Invalid syntax');
-    }
-    if (name == 'resolution') {
-        let p = new ProtoSchema();
-        p.aggRes = node.right.value;
-        return p;
-    } else {
-        return parseNodeForSchema(node.right);
-    }
-}
-
-const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-
-function protoSchemaIsEquals(a, b) {
-    if (!a || !b) {
-        return false;
-    }
-    if (a.propertyList.length != b.propertyList.length) {
-        return false;
-    }
-    const l = a.propertyList.map((_, index) =>
-        a.propertyList[index].name == b.propertyList[index].name && isSetsEqual(a.propertyList[index].aggFN, b.propertyList[index].aggFN)
-    );
-    return l.every(x => x) && a.aggRes == b.aggRes;
-}
-
-function getSchema(str) {
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(':', 1);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('^', 10);
-    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
-    let protoSchema = null;
-    if (ast.type == 'Compound') {
-        protoSchema = union(ast.body.map(node => parseStyleNamedExprForSchema(node)));
-    } else {
-        protoSchema = union(parseStyleNamedExprForSchema(ast));
-    }
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('^');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(':');
-
-    return protoSchema;
-}
 
 /**
  * @jsapi
@@ -5920,7 +6082,7 @@ function parseStyleExpression(str, schema) {
     return r;
 }
 
-function parseStyleNamedExpr(style, node, schema) {
+function parseStyleNamedExpr(style, node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
@@ -5928,73 +6090,83 @@ function parseStyleNamedExpr(style, node, schema) {
     if (!name) {
         throw new Error('Invalid syntax');
     }
-    const value = parseNode(node.right, schema);
+    const value = parseNode(node.right);
     style[name] = value;
 }
-function parseStyle(str, schema) {
+
+class Style {
+    constructor() {
+    }
+    getMinimumNeededSchema() {
+        const exprs = [this.width, this.color, this.strokeColor, this.strokeWidth].filter(x => x && x._getMinimumNeededSchema);
+        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__index__["d" /* schema */].union, __WEBPACK_IMPORTED_MODULE_2__index__["d" /* schema */].IDENTITY);
+    }
+}
+
+function parseStyle(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(':', 1);
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('^', 10);
     const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
-    let style = {};
+    let style = new Style();
     if (ast.type == 'Compound') {
-        ast.body.map(node => parseStyleNamedExpr(style, node, schema));
+        ast.body.map(node => parseStyleNamedExpr(style, node));
     } else {
-        parseStyleNamedExpr(style, ast, schema);
+        parseStyleNamedExpr(style, ast);
     }
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('^');
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(':');
     return style;
 }
 
-function parseNode(node, schema) {
+function parseNode(node) {
     if (node.type == 'CallExpression') {
         const name = node.callee.name.toLowerCase();
         if (aggFns.includes(name)) {
             //node.arguments[0].name += '_' + name;
-            const args = node.arguments.map(arg => parseNode(arg, schema));
+            const args = node.arguments.map(arg => parseNode(arg));
             return args[0];
         }
-        const args = node.arguments.map(arg => parseNode(arg, schema));
+        const args = node.arguments.map(arg => parseNode(arg));
         if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args, schema);
+            return lowerCaseFunctions[name](...args);
         }
         throw new Error(`Invalid function name '${node.callee.name}'`);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e, schema));
+        return node.elements.map(e => parseNode(e));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left, schema);
-        const right = parseNode(node.right, schema);
+        const left = parseNode(node.left);
+        const right = parseNode(node.right);
         switch (node.operator) {
         case '*':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
         case '/':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
         case '+':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
         case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
         case '%':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
         case '^':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right, schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
         default:
             throw new Error(`Invalid binary operator '${node.operator}'`);
         }
     } else if (node.type == 'UnaryExpression') {
         switch (node.operator) {
         case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument, schema));
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
         case '+':
-            return parseNode(node.argument, schema);
+            return parseNode(node.argument);
         default:
             throw new Error(`Invalid unary operator '${node.operator}'`);
         }
     } else if (node.type == 'Identifier') {
         if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1), schema);
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
         } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
             return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]();
         } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
@@ -6005,10 +6177,8 @@ function parseNode(node, schema) {
 }
 
 
-
-
 /***/ }),
-/* 20 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -6695,7 +6865,7 @@ function parseNode(node, schema) {
 
 
 /***/ }),
-/* 21 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7340,17 +7510,60 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 22 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(24);
+/**
+ * @api
+ * @typedef {object} Dataframe - Point in renderer coordinates space
+ * @property {RPoint} center
+ * @property {number} scale
+ * @property {geom} geometry
+ * @property {Properties} properties
+ */
+
+class Dataframe {
+    constructor(center, scale, geom, properties) {
+        this.center = center;
+        this.scale = scale;
+        this.geom = geom;
+        this.properties = properties;
+    }
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+            this.texColor = 'freed';
+            this.texStrokeColor = 'freed';
+            this.texStrokeWidth = 'freed';
+            this.vertexBuffer = 'freed';
+            this.featureIDBuffer = 'freed';
+            this.propertyTex = null;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Dataframe;
+
+
+/***/ }),
+/* 46 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(48);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
 
 
@@ -7390,11 +7603,20 @@ function isClockWise(vertices) {
     return a > 0;
 }
 
+function getBase(name) {
+    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
+}
+function getAggFN(name) {
+    let s = name.substr('_cdb_agg_'.length);
+    return s.substr(0, s.indexOf('_'));
+}
 class WindshaftSQL extends Provider {
     constructor(renderer) {
         super();
         this.renderer = renderer;
+        this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer);
         this.catMap = {};
+        this.MNS = __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].IDENTITY;
         const options = {
             max: 1000
             // TODO improve cache length heuristic
@@ -7423,7 +7645,14 @@ class WindshaftSQL extends Provider {
     setApiKey(k) {
         this.apiKey = k;
     }
-    setQueries(protoSchema, dataset) {
+    setQueries(dataset, style) {
+        this.proposedDataset = dataset;
+        if (!style) {
+            return;//TODO Remove this hack, we need to support atomic configuration setting
+        }
+        this.dataset = dataset;
+        const MNS = style.getMinimumNeededSchema();
+        this.MNS = MNS;
         const conf = {
             user: this.user,
             apiKey: this.apiKey,
@@ -7432,27 +7661,24 @@ class WindshaftSQL extends Provider {
         this.conf = conf;
         let agg = {
             threshold: 1,
-            resolution: protoSchema.aggRes,
+            resolution: style.resolution,
             columns: {},
             dimensions: {}
         };
-        protoSchema.propertyList.map(p => {
-            p.aggFN.forEach(fn => {
-                if (fn != 'raw') {
-                    agg.columns[p.name + '_' + fn] = {
-                        aggregate_function: fn,
-                        aggregated_column: p.name
-                    };
-                }
-            });
-        });
-        protoSchema.propertyList.map(p => {
-            const aggFN = p.aggFN;
-            if (aggFN.has('raw')) {
-                agg.dimensions[p.name] = p.name;
+        MNS.columns.map(name => {
+            if (name.startsWith('_cdb_agg_')) {
+                const base = getBase(name);
+                const fn = getAggFN(name);
+                agg.columns[name] = {
+                    aggregate_function: fn,
+                    aggregated_column: base,
+                };
+            } else {
+                agg.dimensions[name] = name;
             }
         });
-        const aggSQL = `SELECT ${protoSchema.propertyList.map(p => p.name).concat(['the_geom', 'the_geom_webmercator']).join()} FROM ${dataset}`;
+        const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${dataset}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
@@ -7490,26 +7716,20 @@ class WindshaftSQL extends Provider {
         this.url = promise();
 
         //block data acquisition
-        this.style = null;
-        this.schema = getSchema(query, protoSchema, conf).then(schema => {
-            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
-            return schema;
-        });
+        this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer);
+        this.metadata = getMetadata(query, MNS, conf);
         this.cache.reset();
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-        this.schema.then(schema => {
-            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, schema);
+        this.metadata.then(metadata => {
+            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, metadata);
             this.getData();
         });
     }
-    async getSchema() {
-        return await this.schema;
-    }
-    getCatID(catName, catStr, schema, pName) {
-        const index = schema.properties[pName].type.categoryNames.indexOf(catStr);
-        return schema.properties[pName].type.categoryIDs[index];
+    getCatID(catName, catStr, metadata, pName) {
+        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
+        return id;
     }
     getDataframe(x, y, z, callback) {
         const id = `${x},${y},${z}`;
@@ -7522,6 +7742,14 @@ class WindshaftSQL extends Provider {
         this.cache.set(id, promise);
         promise.then(callback);
     }
+    async setStyle(style, duration) {
+        if (this.proposedDataset != this.dataset || !__WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].equals(style.getMinimumNeededSchema(), this.MNS)) {
+            this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
+            const s = await this.metadata;
+            this.meta = s;
+        }
+        this.style.set(style, duration, this.meta);
+    }
     requestDataframe(x, y, z) {
         const originalConf = this.conf;
         return new Promise((callback) => {
@@ -7532,7 +7760,7 @@ class WindshaftSQL extends Provider {
                 oReq.responseType = 'arraybuffer';
                 oReq.open('GET', url(x, y, z), true);
                 oReq.onload = () => {
-                    this.schema.then(schema => {
+                    this.metadata.then(metadata => {
                         if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
                             callback({ empty: true });
                             return;
@@ -7545,20 +7773,17 @@ class WindshaftSQL extends Provider {
                         const catFields = [];
                         const catFieldsReal = [];
                         const numFieldsReal = [];
-                        schema.propertyList.map(p =>
-                            p.aggFN.forEach(fn => {
-                                let name = p.name;
-                                if (fn != 'raw') {
-                                    name = p.name + '_' + fn;
-                                }
-                                if (p.type instanceof __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category) {
-                                    catFields.push(name);
-                                    catFieldsReal.push(p.name);
-                                } else {
-                                    numFields.push(name);
-                                    numFieldsReal.push(p.name);
-                                }
-                            })
+                        this.MNS.columns.map(name => {
+                            const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                            if (metadata.columns.find(c => c.name == basename).type == 'category') {
+                                catFields.push(name);
+                                catFieldsReal.push(name);
+                            } else {
+                                numFields.push(name);
+                                numFieldsReal.push(name);
+                            }
+
+                        }
                         );
                         catFieldsReal.map((name, i) => fieldMap[name] = i);
                         numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
@@ -7606,10 +7831,10 @@ class WindshaftSQL extends Provider {
                                         polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
                                         polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
-                                    //if current polygon is not empty=> push it
-                                    if (polygon && polygon.flat.length > 0) {
-                                        geometry.push(polygon);
-                                    }
+                                }
+                                //if current polygon is not empty=> push it
+                                if (polygon && polygon.flat.length > 0) {
+                                    geometry.push(polygon);
                                 }
                                 featureGeometries.push(geometry);
                             } else if (this.geomType == 'line') {
@@ -7626,7 +7851,7 @@ class WindshaftSQL extends Provider {
                             }
 
                             catFields.map((name, index) => {
-                                properties[index][i] = this.getCatID(name, f.properties[name], schema, catFieldsReal[index]);
+                                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
                             });
                             numFields.map((name, index) => {
                                 properties[index + catFields.length][i] = Number(f.properties[name]);
@@ -7645,9 +7870,8 @@ class WindshaftSQL extends Provider {
                             dataframeProperties,
                         );
                         dataframe.type = this.geomType;
-                        dataframe.schema = schema;
                         dataframe.size = mvtLayer.length;
-                        this.renderer.addDataframe(dataframe).setStyle(this.style);
+                        this.renderer.addDataframe(dataframe);
                         callback(dataframe);
                     });
                 };
@@ -7656,7 +7880,7 @@ class WindshaftSQL extends Provider {
         });
     }
     getData() {
-        if (!this.style) {
+        if (!this.dataset) {
             return;
         }
         const renderer = this.renderer;
@@ -7727,8 +7951,16 @@ async function getNumericTypes(names, query, conf) {
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
     const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
-    return names.map(name =>
-        new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Float(json.rows[0][`${name}_min`], json.rows[0][`${name}_max`])
+    return names.map(name => {
+        return {
+            name,
+            type: 'float',
+            min: json.rows[0][`${name}_min`],
+            max: json.rows[0][`${name}_max`],
+            avg: json.rows[0][`${name}_avg`],
+            sum: json.rows[0][`${name}_sum`],
+        };
+    }
     );
 }
 
@@ -7739,23 +7971,30 @@ async function getCategoryTypes(names, query, conf) {
         const json = await response.json();
         let counts = [];
         let names = [];
-        let ids = [];
-        json.rows.map((row, id) => {
+        json.rows.map(row => {
             counts.push(row.count);
             names.push(row.name);
-            ids.push(id);
         });
-        return new __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].Category(names, counts, ids);
+        return {
+            name,
+            type: 'category',
+            categoryNames: names,
+            categoryCounts: counts
+        };
     }));
 }
 
 
-async function getSchema(query, proto, conf) {
+async function getMetadata(query, proto, conf) {
     //Get column names and types with a limit 0
     //Get min,max,sum and count of numerics
     //for each category type
     //Get category names and counts by grouping by
     //Assign ids
+    const metadata = {
+        featureCount: 1000,
+        columns: [],
+    };
     const fields = await getColumnTypes(query, conf);
     let numerics = [];
     let categories = [];
@@ -7775,19 +8014,18 @@ async function getSchema(query, proto, conf) {
 
     numerics.map((name, index) => {
         const t = numericsTypes[index];
-        proto.properties[name].type = t;
+        metadata.columns.push(t);
     });
     categories.map((name, index) => {
         const t = categoriesTypes[index];
-        proto.properties[name].type = t;
+        metadata.columns.push(t);
     });
-    //const schema = new R.schema.Schema(numerics.concat(categories), numericsTypes.concat(categoriesTypes));
-    return proto;
+    return metadata;
 }
 
 
 /***/ }),
-/* 23 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7942,22 +8180,22 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 24 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(25);
-module.exports.VectorTileFeature = __webpack_require__(5);
-module.exports.VectorTileLayer = __webpack_require__(4);
+module.exports.VectorTile = __webpack_require__(49);
+module.exports.VectorTileFeature = __webpack_require__(12);
+module.exports.VectorTileLayer = __webpack_require__(11);
 
 
 /***/ }),
-/* 25 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(4);
+var VectorTileLayer = __webpack_require__(11);
 
 module.exports = VectorTile;
 
@@ -7975,7 +8213,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 26 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8294,7 +8532,7 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 27 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8302,7 +8540,7 @@ Point.convert = function (a) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(28);
+var ieee754 = __webpack_require__(52);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -8919,7 +9157,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 28 */
+/* 52 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -9009,7 +9247,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 29 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9019,11 +9257,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(30)
-var util = __webpack_require__(32)
+var Map = __webpack_require__(54)
+var util = __webpack_require__(56)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(36)
+var Yallist = __webpack_require__(60)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -9483,7 +9721,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 30 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -9493,13 +9731,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(31)
+  module.exports = __webpack_require__(55)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ }),
-/* 31 */
+/* 55 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -9618,7 +9856,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 32 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10146,7 +10384,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(34);
+exports.isBuffer = __webpack_require__(58);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -10190,7 +10428,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(35);
+exports.inherits = __webpack_require__(59);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -10208,10 +10446,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(33), __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(57), __webpack_require__(13)))
 
 /***/ }),
-/* 33 */
+/* 57 */
 /***/ (function(module, exports) {
 
 var g;
@@ -10238,7 +10476,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 34 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -10249,7 +10487,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 35 */
+/* 59 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -10278,7 +10516,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 36 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
