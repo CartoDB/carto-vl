@@ -4,7 +4,6 @@ import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
 
-export { Renderer, Style, Dataframe, schema };
 
 /**
  * @api
@@ -561,3 +560,6 @@ Renderer.prototype.compute = function (type, expressions) {
     });
     return promise;
 };
+
+
+export { Renderer, Style, Dataframe, schema };
