@@ -36,7 +36,7 @@ const RTT_WIDTH = 1024;
  */
 function Renderer(canvas) {
     this.canvas = canvas;
-    this.tiles = [];
+    this.dataframes = [];
     this.computePool = []; //TODO hack, refactor needed
     this.gl = canvas.getContext('webgl');
     const gl = this.gl;
@@ -130,7 +130,7 @@ Renderer.prototype.setZoom = function (zoom) {
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
-    this.tiles = this.tiles.filter(t => t !== dataframe);
+    this.dataframes = this.dataframes.filter(t => t !== dataframe);
 };
 
 Renderer.prototype.createStyleTileTexture = function (numFeatures) {
@@ -290,7 +290,7 @@ function decodeGeom(geomType, geom) {
  */
 Renderer.prototype.addDataframe = function (dataframe) {
     const gl = this.gl;
-    this.tiles.push(dataframe);
+    this.dataframes.push(dataframe);
     dataframe.propertyTex = [];
 
     const level = 0;
@@ -378,14 +378,14 @@ class ComputeJob {
     }
     work(renderer) {
         let sum = 0;
-        renderer.tiles.filter(t => t.style).map(t => {
+        renderer.dataframes.filter(t => t.style).map(t => {
             sum += t.numFeatures;
         });
         this.resolve(sum);
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.tiles.filter(tile => tile.style);
+    return this.dataframes.filter(tile => tile.style);
 };
 
 /**
@@ -456,7 +456,7 @@ function refresh(timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    const tiles = this.tiles.filter(tile => tile.style);
+    const tiles = this.dataframes.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
