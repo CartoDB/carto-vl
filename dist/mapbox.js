@@ -693,15 +693,23 @@ const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 function Renderer(canvas) {
+    if (canvas) {
+        this.gl = canvas.getContext('webgl');
+        if (!this.gl) {
+            throw new Error('WebGL 1 is unsupported');
+        }
+        this._initGL(this.gl);
+    }
+    this._center = { x: 0, y: 0 };
+    this._zoom = 1;
     console.log('R', this);
     this.canvas = canvas;
     this.dataframes = [];
     this.computePool = []; //TODO hack, refactor needed
-    this.gl = canvas.getContext('webgl');
-    const gl = this.gl;
-    if (!gl) {
-        throw new Error('WebGL 1 is unsupported');
-    }
+}
+
+Renderer.prototype._initGL = function (gl) {
+    this.gl = gl;
     const OES_texture_float = gl.getExtension('OES_texture_float');
     if (!OES_texture_float) {
         throw new Error('WebGL extension OES_texture_float is unsupported');
@@ -711,8 +719,6 @@ function Renderer(canvas) {
         throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
     }
     this._initShaders();
-    this._center = { x: 0, y: 0 };
-    this._zoom = 1;
 
     this.auxFB = gl.createFramebuffer();
 
@@ -738,7 +744,7 @@ function Renderer(canvas) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-}
+};
 
 /**
  * Get Renderer visualization center
@@ -755,7 +761,7 @@ Renderer.prototype.getCenter = function () {
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
 };
 /**
  * Get Renderer visualization bounds
@@ -780,7 +786,7 @@ Renderer.prototype.getZoom = function () {
  */
 Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
 };
 
 /**
@@ -949,6 +955,7 @@ function decodeGeom(geomType, geom) {
  */
 Renderer.prototype.addDataframe = function (dataframe) {
     const gl = this.gl;
+    //this.ext.bindVertexArrayOES(this.vao);
     this.dataframes.push(dataframe);
     dataframe.propertyTex = [];
 
@@ -987,8 +994,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        // TODO check schema match
-        window.requestAnimationFrame(refresh.bind(this));
+        this._RAF();
     };
     dataframe.style = null;
 
@@ -1021,14 +1027,20 @@ Renderer.prototype.addDataframe = function (dataframe) {
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    window.requestAnimationFrame(refresh.bind(this));
+    this._RAF();
     return dataframe;
 };
 
+Renderer.prototype._RAF = function () {
+    window.requestAnimationFrame(this.refresh.bind(this));
+};
+
 Renderer.prototype.getAspect = function () {
-    return this.canvas.clientWidth / this.canvas.clientHeight;
+    if (this.gl) {
+        return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+    }
+    return 1;
 };
 
 class ComputeJob {
@@ -1047,21 +1059,13 @@ Renderer.prototype.getStyledTiles = function () {
     return this.dataframes.filter(tile => tile.style);
 };
 
-/**
- * Refresh the canvas by redrawing everything needed.
- * Should only be called by requestAnimationFrame
- * @param timestamp - timestamp of the animation provided by requestAnimationFrame
- */
-Renderer.prototype.refresh = refresh;
-function refresh(timestamp) {
+Renderer.prototype.refresh = function (timestamp) {
     const gl = this.gl;
     // Don't re-render more than once per animation frame
-    if (this.lastFrame == timestamp) {
+    if (this.lastFrame === timestamp) {
         return;
     }
 
-    this.lastFrame = timestamp;
-    var canvas = this.canvas;
     var width = gl.canvas.clientWidth;
     var height = gl.canvas.clientHeight;
     if (gl.canvas.width != width ||
@@ -1069,21 +1073,18 @@ function refresh(timestamp) {
         gl.canvas.width = width;
         gl.canvas.height = height;
     }
-    var aspect = canvas.clientWidth / canvas.clientHeight;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.clearColor(0., 0., 0., 0.);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
     gl.enable(gl.CULL_FACE);
 
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.STENCIL_TEST);
     gl.depthMask(false);
 
     // Render To Texture
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-
 
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -1196,11 +1197,11 @@ function refresh(timestamp) {
 
     tiles.forEach(t => {
         if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-            window.requestAnimationFrame(refresh.bind(this));
+            this._RAF();
         }
     });
-
-}
+    gl.disable(gl.CULL_FACE);
+};
 
 /**
  * Initialize static shaders
@@ -1213,7 +1214,6 @@ Renderer.prototype._initShaders = function () {
 
 Renderer.prototype.compute = function (type, expressions) {
     // TODO remove this
-    window.requestAnimationFrame(refresh.bind(this));
     const promise = new Promise((resolve) => {
         this.computePool.push(new ComputeJob(type, expressions, resolve));
     });
@@ -2097,7 +2097,6 @@ var map = new mapboxgl.Map({
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
 });
-map.repaint = false;
 var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
 
 
@@ -2329,15 +2328,34 @@ class MGLIntegrator {
     constructor(map, providerClass) {
         this.map = map;
         map.on('load', () => {
-            var cont = map.getCanvasContainer();
-            var canvas = document.createElement('canvas');
-            this.canvas = canvas;
-            canvas.id = 'good';
-            cont.appendChild(canvas);
-            canvas.style.width = map.getCanvas().style.width;
-            canvas.style.height = map.getCanvas().style.height;
-
-            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */](canvas);
+            map.addLayer({
+                'id': 'carto.gl',
+                'type': 'webgl',
+                'layout': {
+                    'callback': 'cartoGL',
+                }
+            }, 'watername_ocean');
+            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */]();
+            let cleanFN = null;
+            this.renderer._RAF = () => {
+                map.repaint = true;
+            };
+            const original = this.renderer.addDataframe.bind(this.renderer);
+            this.renderer.addDataframe = (dataframe) => {
+                const r = original(dataframe);
+                cleanFN();
+                return r;
+            };
+            window.cartoGL = (gl, clean) => {
+                cleanFN = clean;
+                if (!this.renderer.gl) {
+                    this.renderer._initGL(gl);
+                }
+                if (map.repaint) {
+                    map.repaint = false;
+                }
+                this.renderer.refresh(Number.NaN);
+            };
             this.provider = new providerClass(this.renderer, this.style);
 
             map.on('resize', this.resize.bind(this));
@@ -2350,11 +2368,11 @@ class MGLIntegrator {
     move() {
         var c = this.map.getCenter();
 
-        this.renderer.setCenter(c.lng / 180.,Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
 
         c = this.renderer.getCenter();
-        this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.getData(this.renderer.getAspect());
     }
 
     resize() {
