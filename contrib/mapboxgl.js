@@ -10,15 +10,34 @@ class MGLIntegrator {
     constructor(map, providerClass) {
         this.map = map;
         map.on('load', () => {
-            var cont = map.getCanvasContainer();
-            var canvas = document.createElement('canvas');
-            this.canvas = canvas;
-            canvas.id = 'good';
-            cont.appendChild(canvas);
-            canvas.style.width = map.getCanvas().style.width;
-            canvas.style.height = map.getCanvas().style.height;
-
-            this.renderer = new R.Renderer(canvas);
+            map.addLayer({
+                'id': 'carto.gl',
+                'type': 'webgl',
+                'layout': {
+                    'callback': 'cartoGL',
+                }
+            }, 'watername_ocean');
+            this.renderer = new R.Renderer();
+            let cleanFN = null;
+            this.renderer._RAF = () => {
+                map.repaint = true;
+            };
+            const original = this.renderer.addDataframe.bind(this.renderer);
+            this.renderer.addDataframe = (dataframe) => {
+                const r = original(dataframe);
+                cleanFN();
+                return r;
+            };
+            window.cartoGL = (gl, clean) => {
+                cleanFN = clean;
+                if (!this.renderer.gl) {
+                    this.renderer._initGL(gl);
+                }
+                if (map.repaint) {
+                    map.repaint = false;
+                }
+                this.renderer.refresh(Number.NaN);
+            };
             this.provider = new providerClass(this.renderer, this.style);
 
             map.on('resize', this.resize.bind(this));
@@ -31,11 +50,11 @@ class MGLIntegrator {
     move() {
         var c = this.map.getCenter();
 
-        this.renderer.setCenter(c.lng / 180.,Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
 
         c = this.renderer.getCenter();
-        this.getData(this.canvas.clientWidth / this.canvas.clientHeight);
+        this.getData(this.renderer.getAspect());
     }
 
     resize() {

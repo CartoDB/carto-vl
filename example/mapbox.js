@@ -95,7 +95,6 @@ var map = new mapboxgl.Map({
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
 });
-map.repaint = false;
 var mgl = new MGL.MGLIntegrator(map, WindshaftSQL);
 
 
