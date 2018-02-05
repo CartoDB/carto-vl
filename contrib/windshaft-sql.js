@@ -264,10 +264,10 @@ export default class WindshaftSQL extends Provider {
                                         polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
                                         polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
                                     }
-                                    //if current polygon is not empty=> push it
-                                    if (polygon && polygon.flat.length > 0) {
-                                        geometry.push(polygon);
-                                    }
+                                }
+                                //if current polygon is not empty=> push it
+                                if (polygon && polygon.flat.length > 0) {
+                                    geometry.push(polygon);
                                 }
                                 featureGeometries.push(geometry);
                             } else if (this.geomType == 'line') {
@@ -304,7 +304,7 @@ export default class WindshaftSQL extends Provider {
                         );
                         dataframe.type = this.geomType;
                         dataframe.size = mvtLayer.length;
-                        this.renderer.addDataframe(dataframe).setStyle(this.style);
+                        this.renderer.addDataframe(dataframe);
                         callback(dataframe);
                     });
                 };

@@ -16,7 +16,7 @@
   },
   "keywords": [],
   "author": "David Manzanares",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/CartoDB/renderer-prototype/issues"
   },

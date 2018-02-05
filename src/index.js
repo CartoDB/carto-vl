@@ -2,23 +2,14 @@ import * as shaders from './shaders';
 import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
+import Dataframe from './dataframe';
 
-export { Renderer, Style, Dataframe, schema };
 
 /**
  * @api
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
- */
-
-/**
- * @api
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
  */
 
 /**
@@ -44,6 +35,7 @@ const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 function Renderer(canvas) {
+<<<<<<< HEAD
     if (canvas) {
         this.gl = canvas.getContext('webgl');
         if (!this.gl) {
@@ -54,6 +46,11 @@ function Renderer(canvas) {
     this._center = { x: 0, y: 0 };
     this._zoom = 1;
     this.tiles = [];
+=======
+    console.log('R', this);
+    this.canvas = canvas;
+    this.dataframes = [];
+>>>>>>> master
     this.computePool = []; //TODO hack, refactor needed
 }
 
@@ -144,37 +141,8 @@ Renderer.prototype.setZoom = function (zoom) {
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
-    this.tiles = this.tiles.filter(t => t !== dataframe);
+    this.dataframes = this.dataframes.filter(t => t !== dataframe);
 };
-
-
-class Dataframe {
-    constructor(center, scale, geom, properties) {
-        this.center = center;
-        this.scale = scale;
-        this.geom = geom;
-        this.properties = properties;
-    }
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
-        }
-    }
-}
-
 
 Renderer.prototype.createStyleTileTexture = function (numFeatures) {
     // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
@@ -334,7 +302,7 @@ function decodeGeom(geomType, geom) {
 Renderer.prototype.addDataframe = function (dataframe) {
     const gl = this.gl;
     //this.ext.bindVertexArrayOES(this.vao);
-    this.tiles.push(dataframe);
+    this.dataframes.push(dataframe);
     dataframe.propertyTex = [];
 
     const level = 0;
@@ -427,14 +395,14 @@ class ComputeJob {
     }
     work(renderer) {
         let sum = 0;
-        renderer.tiles.filter(t => t.style).map(t => {
+        renderer.dataframes.filter(t => t.style).map(t => {
             sum += t.numFeatures;
         });
         this.resolve(sum);
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.tiles.filter(tile => tile.style);
+    return this.dataframes.filter(tile => tile.style);
 };
 
 Renderer.prototype.refresh = function (timestamp) {
@@ -494,7 +462,7 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    const tiles = this.tiles.filter(tile => tile.style);
+    const tiles = this.dataframes.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
@@ -597,3 +565,6 @@ Renderer.prototype.compute = function (type, expressions) {
     });
     return promise;
 };
+
+
+export { Renderer, Style, Dataframe, schema };
