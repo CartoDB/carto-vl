@@ -183,22 +183,21 @@ export default class WindshaftSQL extends Provider {
         }
         this.style.set(style, duration, this.meta);
     }
+    
     requestDataframe(x, y, z) {
         const originalConf = this.conf;
-        return new Promise((callback) => {
-            const mvt_extent = 4096;
+        const mvt_extent = 4096;
 
-            this.urlPromise.then(url => {
-                var oReq = new XMLHttpRequest();
-                oReq.responseType = 'arraybuffer';
-                oReq.open('GET', url(x, y, z), true);
-                oReq.onload = () => {
-                    this.metadataPromise.then(metadata => {
-                        if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
-                            callback({ empty: true });
-                            return;
+        return this.urlPromise.then(url => {
+            return fetch(url(x, y, z))
+                .then(rawData => rawData.arrayBuffer())
+                .then(response => {
+                    return this.metadataPromise.then(metadata => {
+
+                        if (response.byteLength == 0 || response == 'null' || originalConf != this.conf) {
+                            return { empty: true };
                         }
-                        var tile = new VectorTile(new Protobuf(oReq.response));
+                        var tile = new VectorTile(new Protobuf(response));
                         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
                         var fieldMap = {};
 
@@ -231,11 +230,9 @@ export default class WindshaftSQL extends Provider {
                         let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
                         const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
                         this.renderer.addDataframe(dataframe);
-                        callback(dataframe);
+                        return dataframe;
                     });
-                };
-                oReq.send(null);
-            });
+                });
         });
     }
 
