@@ -119,12 +119,12 @@ export default class WindshaftSQL extends Provider {
 
         //block data acquisition
         this.style = new R.Style.Style(this.renderer);
-        this.metadata = getMetadata(query, MNS, conf);
+        this.metadataPromise = getMetadata(query, MNS, conf);
         this.cache.reset();
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-        this.metadata.then(metadata => {
+        this.metadataPromise.then(metadata => {
             this.style = new R.Style.Style(this.renderer, metadata);
             this.getData();
         });
@@ -178,7 +178,7 @@ export default class WindshaftSQL extends Provider {
     async setStyle(style, duration) {
         if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
             this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
-            const s = await this.metadata;
+            const s = await this.metadataPromise;
             this.meta = s;
         }
         this.style.set(style, duration, this.meta);
@@ -193,7 +193,7 @@ export default class WindshaftSQL extends Provider {
                 oReq.responseType = 'arraybuffer';
                 oReq.open('GET', url(x, y, z), true);
                 oReq.onload = () => {
-                    this.metadata.then(metadata => {
+                    this.metadataPromise.then(metadata => {
                         if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
                             callback({ empty: true });
                             return;
