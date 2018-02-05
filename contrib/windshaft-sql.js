@@ -183,7 +183,7 @@ export default class WindshaftSQL extends Provider {
         }
         this.style.set(style, duration, this.meta);
     }
-    
+
     requestDataframe(x, y, z) {
         const originalConf = this.conf;
         const mvt_extent = 4096;
@@ -311,6 +311,7 @@ export default class WindshaftSQL extends Provider {
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
+        // TODO: Should the dataframe constructor have type and size parameters?
         const dataframe = new R.Dataframe(
             rs.center,
             rs.scale,
