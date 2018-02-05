@@ -164,16 +164,15 @@ export default class WindshaftSQL extends Provider {
         const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
         return id;
     }
-    getDataframe(x, y, z, callback) {
+    getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
-            c.then(callback);
-            return;
+            return c;
         }
         const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
-        promise.then(callback);
+        return promise;
     }
     async setStyle(style, duration) {
         if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
@@ -328,7 +327,7 @@ export default class WindshaftSQL extends Provider {
             const x = t.x;
             const y = t.y;
             const z = t.z;
-            this.getDataframe(x, y, z, dataframe => {
+            this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
                 } else {
@@ -337,12 +336,7 @@ export default class WindshaftSQL extends Provider {
                 if (completedTiles.length == needToComplete && requestGroupID == this.requestGroupID) {
                     oldtiles.forEach(t => t.setStyle(null));
                     completedTiles.map(t => t.setStyle(this.style));
-                    this.renderer.compute('sum',
-                        [R.Style.float(1)]
-                    ).then(
-                        result => {
-                            document.getElementById('title').innerText = `Demo dataset ~ ${result} features`;
-                        });
+                    this.renderer.compute('sum', [R.Style.float(1)]).then(result => document.getElementById('title').innerText = `Demo dataset ~ ${result} features`);
                     oldtiles = completedTiles;
                 }
             });
@@ -363,14 +357,14 @@ async function getGeometryType(query, conf) {
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
-    case 'ST_MultiPolygon':
-        return 'polygon';
-    case 'ST_Point':
-        return 'point';
-    case 'ST_MultiLineString':
-        return 'line';
-    default:
-        throw new Error(`Unimplemented geometry type ''${type}'`);
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
     }
 }
 
