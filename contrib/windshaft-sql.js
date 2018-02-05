@@ -115,38 +115,7 @@ export default class WindshaftSQL extends Provider {
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
-        const promise = async () => {
-            this.geomType = await getGeometryType(query, conf);
-            if (this.geomType != 'point') {
-                agg = false;
-            }
-            const mapConfigAgg = {
-                buffersize: {
-                    'mvt': 0
-                },
-                layers: [
-                    {
-                        type: 'mapnik',
-                        options: {
-                            sql: aggSQL,
-                            aggregation: agg
-                        }
-                    }
-                ]
-            };
-            const response = await fetch(endpoint(conf), {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(mapConfigAgg),
-            });
-            const layergroup = await response.json();
-            return layerUrl(layergroup, 0, conf);
-        };
-
-        this.url = promise();
+        this.urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
 
         //block data acquisition
         this.style = new R.Style.Style(this.renderer);
@@ -160,6 +129,38 @@ export default class WindshaftSQL extends Provider {
             this.getData();
         });
     }
+
+    async _getUrlPromise(query, conf, agg, aggSQL) {
+        this.geomType = await getGeometryType(query, conf);
+        if (this.geomType != 'point') {
+            agg = false;
+        }
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+        const response = await fetch(endpoint(conf), {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mapConfigAgg),
+        });
+        const layergroup = await response.json();
+        return layerUrl(layergroup, 0, conf);
+    }
+
     getCatID(catName, catStr, metadata, pName) {
         const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
         return id;
@@ -187,7 +188,7 @@ export default class WindshaftSQL extends Provider {
         return new Promise((callback) => {
             const mvt_extent = 4096;
 
-            this.url.then(url => {
+            this.urlPromise.then(url => {
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = 'arraybuffer';
                 oReq.open('GET', url(x, y, z), true);
