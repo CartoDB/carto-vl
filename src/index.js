@@ -35,7 +35,6 @@ const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 function Renderer(canvas) {
-<<<<<<< HEAD
     if (canvas) {
         this.gl = canvas.getContext('webgl');
         if (!this.gl) {
@@ -45,12 +44,9 @@ function Renderer(canvas) {
     }
     this._center = { x: 0, y: 0 };
     this._zoom = 1;
-    this.tiles = [];
-=======
     console.log('R', this);
     this.canvas = canvas;
     this.dataframes = [];
->>>>>>> master
     this.computePool = []; //TODO hack, refactor needed
 }
 
