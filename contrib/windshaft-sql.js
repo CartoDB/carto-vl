@@ -115,90 +115,89 @@ export default class WindshaftSQL extends Provider {
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
-        const promise = async () => {
-            this.geomType = await getGeometryType(query, conf);
-            if (this.geomType != 'point') {
-                agg = false;
-            }
-            const mapConfigAgg = {
-                buffersize: {
-                    'mvt': 0
-                },
-                layers: [
-                    {
-                        type: 'mapnik',
-                        options: {
-                            sql: aggSQL,
-                            aggregation: agg
-                        }
-                    }
-                ]
-            };
-            const response = await fetch(endpoint(conf), {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(mapConfigAgg),
-            });
-            const layergroup = await response.json();
-            return layerUrl(layergroup, 0, conf);
-        };
-
-        this.url = promise();
+        this.urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
 
         //block data acquisition
         this.style = new R.Style.Style(this.renderer);
-        this.metadata = getMetadata(query, MNS, conf);
+        this.metadataPromise = getMetadata(query, MNS, conf);
         this.cache.reset();
         oldtiles.forEach(t => t.free());
         oldtiles.forEach(t => this.renderer.removeDataframe(t));
         oldtiles = [];
-        this.metadata.then(metadata => {
+        this.metadataPromise.then(metadata => {
             this.style = new R.Style.Style(this.renderer, metadata);
             this.getData();
         });
     }
+
+    async _getUrlPromise(query, conf, agg, aggSQL) {
+        this.geomType = await getGeometryType(query, conf);
+        if (this.geomType != 'point') {
+            agg = false;
+        }
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+        const response = await fetch(endpoint(conf), {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mapConfigAgg),
+        });
+        const layergroup = await response.json();
+        return layerUrl(layergroup, 0, conf);
+    }
+
     getCatID(catName, catStr, metadata, pName) {
         const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
         return id;
     }
-    getDataframe(x, y, z, callback) {
+    getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
-            c.then(callback);
-            return;
+            return c;
         }
         const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
-        promise.then(callback);
+        return promise;
     }
     async setStyle(style, duration) {
         if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
             this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
-            const s = await this.metadata;
+            const s = await this.metadataPromise;
             this.meta = s;
         }
         this.style.set(style, duration, this.meta);
     }
+
     requestDataframe(x, y, z) {
         const originalConf = this.conf;
-        return new Promise((callback) => {
-            const mvt_extent = 4096;
+        const mvt_extent = 4096;
 
-            this.url.then(url => {
-                var oReq = new XMLHttpRequest();
-                oReq.responseType = 'arraybuffer';
-                oReq.open('GET', url(x, y, z), true);
-                oReq.onload = () => {
-                    this.metadata.then(metadata => {
-                        if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
-                            callback({ empty: true });
-                            return;
+        return this.urlPromise.then(url => {
+            return fetch(url(x, y, z))
+                .then(rawData => rawData.arrayBuffer())
+                .then(response => {
+                    return this.metadataPromise.then(metadata => {
+
+                        if (response.byteLength == 0 || response == 'null' || originalConf != this.conf) {
+                            return { empty: true };
                         }
-                        var tile = new VectorTile(new Protobuf(oReq.response));
+                        var tile = new VectorTile(new Protobuf(response));
                         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
                         var fieldMap = {};
 
@@ -221,96 +220,108 @@ export default class WindshaftSQL extends Provider {
                         catFieldsReal.map((name, i) => fieldMap[name] = i);
                         numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
-                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                        if (this.geomType == 'point') {
-                            var points = new Float32Array(mvtLayer.length * 2);
-                        }
-                        let featureGeometries = [];
-                        for (var i = 0; i < mvtLayer.length; i++) {
-                            const f = mvtLayer.feature(i);
-                            const geom = f.loadGeometry();
-                            let geometry = [];
-                            if (this.geomType == 'point') {
-                                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            } else if (this.geomType == 'polygon') {
-                                let polygon = null;
-                                /*
-                                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-                                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-                                    See:
-                                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                                        https://en.wikipedia.org/wiki/Shoelace_formula
-                                */
-                                for (let j = 0; j < geom.length; j++) {
-                                    //if exterior
-                                    //   push current polygon & set new empty
-                                    //else=> add index to holes
-                                    if (isClockWise(geom[j])) {
-                                        if (polygon) {
-                                            geometry.push(polygon);
-                                        }
-                                        polygon = {
-                                            flat: [],
-                                            holes: []
-                                        };
-                                    } else {
-                                        if (j == 0) {
-                                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                                        }
-                                        polygon.holes.push(polygon.flat.length / 2);
-                                    }
-                                    for (let k = 0; k < geom[j].length; k++) {
-                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
-                                    }
-                                }
-                                //if current polygon is not empty=> push it
-                                if (polygon && polygon.flat.length > 0) {
-                                    geometry.push(polygon);
-                                }
-                                featureGeometries.push(geometry);
-                            } else if (this.geomType == 'line') {
-                                geom.map(l => {
-                                    let line = [];
-                                    l.map(point => {
-                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-                                    });
-                                    geometry.push(line);
-                                });
-                                featureGeometries.push(geometry);
-                            } else {
-                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
-                            }
-
-                            catFields.map((name, index) => {
-                                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
-                            });
-                            numFields.map((name, index) => {
-                                properties[index + catFields.length][i] = Number(f.properties[name]);
-                            });
-                        }
+                        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
 
                         var rs = rsys.getRsysFromTile(x, y, z);
                         let dataframeProperties = {};
                         Object.keys(fieldMap).map((name, pid) => {
                             dataframeProperties[name] = properties[pid];
                         });
-                        var dataframe = new R.Dataframe(
-                            rs.center,
-                            rs.scale,
-                            this.geomType == 'point' ? points : featureGeometries,
-                            dataframeProperties,
-                        );
-                        dataframe.type = this.geomType;
-                        dataframe.size = mvtLayer.length;
+                        let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                        const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
                         this.renderer.addDataframe(dataframe);
-                        callback(dataframe);
+                        return dataframe;
                     });
-                };
-                oReq.send(null);
-            });
+                });
         });
+    }
+
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
+        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+        if (this.geomType == 'point') {
+            var points = new Float32Array(mvtLayer.length * 2);
+        }
+        let featureGeometries = [];
+        for (var i = 0; i < mvtLayer.length; i++) {
+            const f = mvtLayer.feature(i);
+            const geom = f.loadGeometry();
+            let geometry = [];
+            if (this.geomType == 'point') {
+                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+            } else if (this.geomType == 'polygon') {
+                let polygon = null;
+                /*
+                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+                    See:
+                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                        https://en.wikipedia.org/wiki/Shoelace_formula
+                */
+                for (let j = 0; j < geom.length; j++) {
+                    //if exterior
+                    //   push current polygon & set new empty
+                    //else=> add index to holes
+                    if (isClockWise(geom[j])) {
+                        if (polygon) {
+                            geometry.push(polygon);
+                        }
+                        polygon = {
+                            flat: [],
+                            holes: []
+                        };
+                    } else {
+                        if (j == 0) {
+                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+                        }
+                        polygon.holes.push(polygon.flat.length / 2);
+                    }
+                    for (let k = 0; k < geom[j].length; k++) {
+                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                    }
+                }
+                //if current polygon is not empty=> push it
+                if (polygon && polygon.flat.length > 0) {
+                    geometry.push(polygon);
+                }
+                featureGeometries.push(geometry);
+            } else if (this.geomType == 'line') {
+                geom.map(l => {
+                    let line = [];
+                    l.map(point => {
+                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+                    });
+                    geometry.push(line);
+                });
+                featureGeometries.push(geometry);
+            } else {
+                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
+            }
+
+            catFields.map((name, index) => {
+                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
+            });
+            numFields.map((name, index) => {
+                properties[index + catFields.length][i] = Number(f.properties[name]);
+            });
+        }
+
+        return { properties, points, featureGeometries };
+    }
+
+    _generateDataFrame(rs, geometry, properties, size, type) {
+        // TODO: Should the dataframe constructor have type and size parameters?
+        const dataframe = new R.Dataframe(
+            rs.center,
+            rs.scale,
+            geometry,
+            properties,
+        );
+        dataframe.type = type;
+        dataframe.size = size;
+
+        return dataframe;
     }
     getData() {
         if (!this.dataset) {
@@ -328,7 +339,7 @@ export default class WindshaftSQL extends Provider {
             const x = t.x;
             const y = t.y;
             const z = t.z;
-            this.getDataframe(x, y, z, dataframe => {
+            this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
                 } else {
@@ -337,12 +348,7 @@ export default class WindshaftSQL extends Provider {
                 if (completedTiles.length == needToComplete && requestGroupID == this.requestGroupID) {
                     oldtiles.forEach(t => t.setStyle(null));
                     completedTiles.map(t => t.setStyle(this.style));
-                    this.renderer.compute('sum',
-                        [R.Style.float(1)]
-                    ).then(
-                        result => {
-                            document.getElementById('title').innerText = `Demo dataset ~ ${result} features`;
-                        });
+                    this.renderer.compute('sum', [R.Style.float(1)]).then(result => document.getElementById('title').innerText = `Demo dataset ~ ${result} features`);
                     oldtiles = completedTiles;
                 }
             });
