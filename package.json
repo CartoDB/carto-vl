@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
+    "sst": "mocha test/sstest/index.test.js --timeout 15000",
     "test": "./node_modules/.bin/eslint example/ contrib/ src/",
     "loc": "node_modules/sloc/bin/sloc src/ contrib/ example/",
     "build": "webpack",
@@ -22,7 +23,9 @@
   },
   "homepage": "https://github.com/CartoDB/renderer-prototype#readme",
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.15.0",
+    "serve": "^6.4.9",
     "sloc": "^0.2.0",
     "webpack": "^3.8.1"
   },
@@ -30,6 +33,7 @@
     "@mapbox/vector-tile": "^1.3.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
+    "exquisite-sst": "IagoLast/Exquisite#master",
     "jsdoc": "^3.5.5",
     "jsep": "^0.3.2",
     "lru-cache": "^4.1.1",
