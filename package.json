@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "sst": "mocha test/sstest/index.test.js --timeout 15000",
-    "test": "./node_modules/.bin/eslint example/ contrib/ src/",
+    "test": "./node_modules/.bin/eslint example/ contrib/ src/ *.js",
     "loc": "node_modules/sloc/bin/sloc src/ contrib/ example/",
     "build": "webpack",
     "build:watch": "webpack -w",
