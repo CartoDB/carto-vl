@@ -43,7 +43,7 @@
     "build": "webpack",
     "build:watch": "webpack -w",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
-    "docs:internal": "rm -rf docs/internal; jsdoc --configure config/jsdoc/internal-conf.json",
+    "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }

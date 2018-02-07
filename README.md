@@ -27,3 +27,9 @@ npm run build:watch
 ```
 npm run docs
 ```
+
+To generate all the docs
+
+```
+npm run docs:all
+```
