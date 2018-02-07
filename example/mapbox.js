@@ -1,11 +1,6 @@
+/* global carto */
 /*eslint-env jquery*/
 /*eslint no-console: ["off"] */
-
-import * as R from '../src/index';
-
-import cartoLayer from '../contrib/layer';
-import cartoDataset from '../contrib/dataset';
-import { Style } from '../src/style/index';
 
 const styles = [
     `width: 3
@@ -102,7 +97,9 @@ const auth = {
     user: 'dmanzanares',
     apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
 };
-const layer = (new cartoLayer('myCartoLayer', new cartoDataset('ne_10m_populated_places_simple', auth), new Style()));
+const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
+const style = new carto.Style();
+const layer = new carto.Layer('myCartoLayer', source, style);
 layer.addTo(map, 'watername_ocean');
 
 map.on('load', () => {
@@ -113,7 +110,7 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const s = R.Style.parseStyle(v);
+            const s = carto.parseStyle(v);
             layer.setStyle(s);
             document.getElementById('feedback').style.display = 'none';
         } catch (error) {
@@ -207,8 +204,7 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
-
-        layer.setSource(new cartoDataset(
+        layer.setSource(new carto.source.Dataset(
             $('#dataset').val(),
             {
                 user: $('#user').val(),

@@ -7,11 +7,13 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
-    <script src='../dist/mapbox-gl-dev.js'></script>
+    <script src='../vendor/mapboxgl-patched.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
     <link href='css/normalize.css' rel='stylesheet' />
     <link href='css/skeleton.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <script src="../dist/cartogl.js"></script>
+    <script src="mapbox.js" defer></script> 
     <style>
         html,
         body,
@@ -98,9 +100,10 @@
             <h5 id='tutorial'></h5>
             <div class='row'>
                 <button id='prev' class='two columns step'>Previous</button>
-                <textarea class="twelve columns" id="styleEntry">width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()
-color:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))
-                                </textarea>
+                <textarea class="twelve columns" id="styleEntry">
+                    width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()
+                    color:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))
+                </textarea>
                 <button id='next' class='two columns step'>Next</button>
             </div>
             <div class='row'>
@@ -109,6 +112,5 @@ color:    setopacity(ramp($temp, tealrose, 0, 30), blend(0.005,1,near($day, (25*
                 <textarea class="three columns" id="dataset">tx_0125_copy_copy</textarea>
                 <textarea class="three columns" id="cartoURL">carto-staging.com</textarea>
             </div>
-            <script src="../dist/mapbox.js"></script>
 
 </html>
