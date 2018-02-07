@@ -25,32 +25,28 @@
         container: 'map', // container id
         style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
         center: [2.17, 41.38], // starting position [lng, lat]
-        zoom: 13, // starting zoom,
+        zoom: 0, // starting zoom,
       });
 
-      map.on('load', () => {
-        // Auth
-        carto.setDefaultAuth({
-          key: 'YOUR_API_KEY',
-          username: 'cartojs-test'
-        })
+      // Create auth object
+      const auth = {
+          user: 'cartojs-test',
+          apiKey: 'YOUR_API_KEY'
+      };
 
-        // Source
-        const source = new carto.source.Dataset(`
-          ne_10m_populated_places_simple
-        `);
+      // Source
+      const source = new carto.source.Dataset(`
+        ne_10m_populated_places_simple
+      `, auth);
 
-        // Style
-        const style = new carto.style.VectorStyle(`
-          ...
-        `);
+      // Style
+      const style = new carto.Style();
 
-        // layer
-        const layer = new carto.layer.VectorLayer('layer1', source, style);
+      // Layer
+      const layer = new carto.Layer('layer1', source, style);
 
-        // Add layer
-        layer.addTo(map);
-      });
+      // Add layer
+      layer.addTo(map, 'watername_ocean');
     </script>
   </body>
 </html>

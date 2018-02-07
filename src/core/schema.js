@@ -31,5 +31,8 @@ export function union(a, b) {
 }
 
 export function equals(a,b){
+    if (!a || !b){
+        return false;
+    }
     return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
 }

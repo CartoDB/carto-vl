@@ -9,15 +9,21 @@
  */
 
 // Temporary for debug
-const R = require('./core');
-const MGL = require('./api/mapboxgl');
-const WindshaftSQL = require('./api/windshaft-sql');
 
-const carto = {
-    version: require('../package.json').version,
-    R: R,
-    MGL: MGL,
-    WindshaftSQL: WindshaftSQL
+import * as R from './core';
+import Dataset from './api/dataset';
+import Layer from './api/layer';
+import { Style } from './core/style';
+import { version } from '../package.json';
+
+const source = {
+    Dataset: Dataset
 };
 
-module.exports = carto;
+export {
+    version,
+    R,
+    source,
+    Style,
+    Layer
+};
