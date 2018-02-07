@@ -1,13 +1,12 @@
 const path = require('path');
 
-module.exports =
-  {
+module.exports = {
     devtool: 'source-map',
     entry: {
-      mapbox: "./example/mapbox.js",
+        mapbox: './examples/complete/mapbox.js',
     },
     output: {
-      path: path.join(__dirname, "dist"),
-      filename: "[name].js"
+        path: path.join(__dirname, 'dist'),
+        filename: '[name].js'
     }
-  };
+};
