@@ -31,6 +31,8 @@ class MGLIntegrator {
         map.on('moveend', this.move.bind(this));
 
         this.moveObservers = {};
+
+        this._layers = [];
     }
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
@@ -48,6 +50,7 @@ class MGLIntegrator {
                 callback: callbackID,
             }
         }, beforeLayerID);
+        this._layers.push(layerId);
         map.repaint = true;
 
         window[callbackID] = (gl, invalidate) => {
