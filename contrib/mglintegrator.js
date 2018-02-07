@@ -20,9 +20,9 @@ export default function getMGLIntegrator(map) {
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
  */
 class MGLIntegrator {
-    constructor(map) {
+       constructor(map) {
         this.renderer = new R.Renderer();
-        this.map = map;
+           this.map = map;
         this.invalidateMGLWebGLState = null;
 
         map.on('resize', this.resize.bind(this));
@@ -43,6 +43,7 @@ class MGLIntegrator {
     addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
         const callbackID = `_cartoGL_${uid++}`;
         this._registerMoveObserver(callbackID, moveCallback);
+        this.map.repaint = true;
         this.map.addLayer({
             id: layerId,
             type: 'webgl',
@@ -51,7 +52,6 @@ class MGLIntegrator {
             }
         }, beforeLayerID);
         this._layers.push(layerId);
-        map.repaint = true;
 
         window[callbackID] = (gl, invalidate) => {
             if (!this.invalidateMGLWebGLState) {
@@ -68,7 +68,7 @@ class MGLIntegrator {
 
     }
     needRefresh() {
-        map.repaint = true;
+        this.map.repaint = true;
     }
     move() {
         var c = this.map.getCenter();

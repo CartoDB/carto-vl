@@ -46,7 +46,7 @@ export default class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                        dataframe.free();
+                           dataframe.free();
                         // TODO this.renderer.removeDataframe(dataframe);
                     }
                 });
