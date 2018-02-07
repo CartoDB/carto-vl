@@ -36,11 +36,14 @@
   "main": "src/index.js",
   "scripts": {
     "sst": "mocha test/sstest/index.test.js --timeout 15000",
-    "test": "./node_modules/.bin/eslint example/ contrib/ src/",
-    "loc": "node_modules/sloc/bin/sloc src/ contrib/ example/",
+    "loc": "node_modules/sloc/bin/sloc src/ examples/",
+    "test": "npm run lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "build": "webpack",
     "build:watch": "webpack -w",
-    "build-doc": "rm -rf docs/; node_modules/.bin/jsdoc --configure config/jsdoc/internal.json; node_modules/.bin/jsdoc --configure config/jsdoc/public.json",
+    "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
+    "docs:internal": "rm -rf docs/internal; jsdoc --configure config/jsdoc/internal-conf.json",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }

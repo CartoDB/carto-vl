@@ -1,7 +1,9 @@
 {
     "env": {
+        "es6": true,
+        "node": true,
         "browser": true,
-        "es6": true
+        "mocha": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
@@ -24,6 +26,7 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "no-console": "off"
     }
 }

@@ -1,5 +1,5 @@
 import * as rsys from './rsys';
-import * as R from '../src/index';
+import * as R from '../core/index';
 
 import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';

@@ -1,5 +1,5 @@
 
-import * as R from '../src/index';
+import * as R from '../core/index';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;

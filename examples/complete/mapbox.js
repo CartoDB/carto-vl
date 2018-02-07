@@ -1,9 +1,9 @@
 /*eslint-env jquery*/
 /*eslint no-console: ["off"] */
 
-import * as MGL from '../lib/api/mapboxgl';
-import WindshaftSQL from '../lib/api/windshaft-sql';
-import * as R from '../src/index';
+import * as MGL from '../../src/api/mapboxgl';
+import WindshaftSQL from '../../src/api/windshaft-sql';
+import * as R from '../../src/core/index';
 
 const styles = [
     `width: 3

@@ -83,6 +83,7 @@ export const mode = (...args) => new Mode(...args);
 export const top = (...args) => new Top(...args);
 export const linear = (...args) => new Linear(...args);
 export const cubic = (...args) => new Cubic(...args);
+export const ilinear = (...args) => new ILinear(...args);
 export const now = (...args) => new Now(...args);
 export const zoom = (...args) => new Zoom(...args);
 export const cielab = (...args) => new CIELab(...args);
