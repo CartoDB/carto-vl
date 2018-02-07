@@ -1,11 +1,10 @@
 import * as rsys from './rsys';
+import * as Protobuf from 'pbf';
+import { VectorTile } from '@mapbox/vector-tile';
+import * as LRU from 'lru-cache';
 import * as R from '../src/index';
 
-import { VectorTile } from '@mapbox/vector-tile';
-import * as Protobuf from 'pbf';
-import * as LRU from 'lru-cache';
-
-var oldtiles = [];
+//TODO auth, config, source engine, use async/await
 
 const endpoint = (conf) => {
     return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`;
@@ -24,33 +23,23 @@ const layerUrl = function (layergroup, layerIndex, conf) {
     };
 };
 
-class Provider { }
 
-function isClockWise(vertices) {
-    let a = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        let j = (i + 1) % vertices.length;
-        a += vertices[i].x * vertices[j].y;
-        a -= vertices[j].x * vertices[i].y;
-    }
-    return a > 0;
-}
-
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
-}
-export default class WindshaftSQL extends Provider {
-    constructor(renderer) {
-        super();
-        this.renderer = renderer;
-        this.style = new R.Style.Style(this.renderer);
-        this.catMap = {};
-        this.MNS = R.schema.IDENTITY;
-        const options = {
+/**
+ * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
+ */
+export default class Dataset {
+    constructor(dataset, auth, options) {
+        this._dataset = dataset;
+        this._user = auth.user;
+        this._apiKey = auth.apiKey;
+        this._cartoURL = 'carto.com';
+        // TODO options, TODO error control
+        this._options = options;
+        this._requestGroupID = 0;
+        this._oldDataframes = [];
+        this._MNS = null;
+        this._promiseMNS = null;
+        const lruOptions = {
             max: 1000
             // TODO improve cache length heuristic
             , length: function () { return 1; }
@@ -64,37 +53,18 @@ export default class WindshaftSQL extends Provider {
             }
             , maxAge: 1000 * 60 * 60
         };
-        this.cache = LRU(options);
+        this.cache = LRU(lruOptions);
     }
-    setUser(u) {
-        this.user = u;
-    }
-    setCartoURL(u) {
-        this.cartoURL = u;
-    }
-    setDataset(d) {
-        this.dataset = d;
-    }
-    setApiKey(k) {
-        this.apiKey = k;
-    }
-    setQueries(dataset, style) {
-        this.proposedDataset = dataset;
-        if (!style) {
-            return;//TODO Remove this hack, we need to support atomic configuration setting
-        }
-        this.dataset = dataset;
-        const MNS = style.getMinimumNeededSchema();
-        this.MNS = MNS;
-        const conf = {
-            user: this.user,
-            apiKey: this.apiKey,
-            cartoURL: this.cartoURL,
-        };//Need to copy these to avoid race conditions
-        this.conf = conf;
+    _instantiate() {
+        this._oldDataframes.forEach(t => this.renderer.removeDataframe(t));
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.url = null;
+
+        const MNS = this._MNS;
         let agg = {
             threshold: 1,
-            resolution: style.resolution,
+            resolution: 1,//TODO style.resolution
             columns: {},
             dimensions: {}
         };
@@ -111,25 +81,84 @@ export default class WindshaftSQL extends Provider {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${dataset}`;
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._dataset}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
-        this.urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
+        const conf = {
+            user: this._user,
+            apiKey: this._apiKey,
+            cartoURL: this._cartoURL,
+        };
 
-        //block data acquisition
-        this.style = new R.Style.Style(this.renderer);
+        const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
         this.metadataPromise = getMetadata(query, MNS, conf);
-        this.cache.reset();
-        oldtiles.forEach(t => t.free());
-        oldtiles.forEach(t => this.renderer.removeDataframe(t));
-        oldtiles = [];
-        this.metadataPromise.then(metadata => {
-            this.style = new R.Style.Style(this.renderer, metadata);
-            this.getData();
+
+        return (async () => {
+            const metadata = await this.metadataPromise;
+            this.url = await urlPromise;
+            return metadata;
+        })();
+    }
+    /**
+     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * @param {*R} viewport 
+     * @param {*} MNS 
+     * @param {*} addDataframe 
+     * @param {*} styleDataframe 
+     */
+    _getData(viewport, MNS, addDataframe, styleDataframe) {
+        if (!R.schema.equals(this._MNS, MNS)) {
+            this._MNS = MNS;
+            return this._instantiate();
+        }
+        if (!this.url) {
+            // Instantiation is in progress, nothing to do yet
+            return;
+        }
+
+        const tiles = rsys.rTiles(viewport);
+        this._requestGroupID++;
+        var completedTiles = [];
+        var needToComplete = tiles.length;
+        const requestGroupID = this._requestGroupID;
+        const promises = [];
+        tiles.forEach(t => {
+            // TODO object deconstruction
+            const x = t.x;
+            const y = t.y;
+            const z = t.z;
+            this.getDataframe(x, y, z, addDataframe).then(dataframe => {
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
+                    this._oldDataframes.forEach(t => t.setStyle(null));
+                    completedTiles.map(t => styleDataframe(t));
+                    this._oldDataframes = completedTiles;
+                }
+            });
         });
     }
+    _free() {
+        this._oldDataframes.forEach(t => t.setStyle(null));
+        this.cache.reset();
+    }
+    _generateDataFrame(rs, geometry, properties, size, type) {
+        // TODO: Should the dataframe constructor have type and size parameters?
+        const dataframe = new R.Dataframe(
+            rs.center,
+            rs.scale,
+            geometry,
+            properties,
+        );
+        dataframe.type = type;
+        dataframe.size = size;
 
+        return dataframe;
+    }
     async _getUrlPromise(query, conf, agg, aggSQL) {
         this.geomType = await getGeometryType(query, conf);
         if (this.geomType != 'point') {
@@ -165,75 +194,64 @@ export default class WindshaftSQL extends Provider {
         const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
         return id;
     }
-    getDataframe(x, y, z) {
+    getDataframe(x, y, z, addDataframe) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
             return c;
         }
-        const promise = this.requestDataframe(x, y, z);
+        const promise = this.requestDataframe(x, y, z, addDataframe);
         this.cache.set(id, promise);
         return promise;
     }
-    async setStyle(style, duration) {
-        if (this.proposedDataset != this.dataset || !R.schema.equals(style.getMinimumNeededSchema(), this.MNS)) {
-            this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
-            const s = await this.metadataPromise;
-            this.meta = s;
-        }
-        this.style.set(style, duration, this.meta);
-    }
 
-    requestDataframe(x, y, z) {
-        const originalConf = this.conf;
+    requestDataframe(x, y, z, addDataframe) {
         const mvt_extent = 4096;
 
-        return this.urlPromise.then(url => {
-            return fetch(url(x, y, z))
-                .then(rawData => rawData.arrayBuffer())
-                .then(response => {
-                    return this.metadataPromise.then(metadata => {
+        return fetch(this.url(x, y, z))
+            .then(rawData => rawData.arrayBuffer())
+            .then(response => {
+                return this.metadataPromise.then(metadata => {
 
-                        if (response.byteLength == 0 || response == 'null' || originalConf != this.conf) {
-                            return { empty: true };
+                    if (response.byteLength == 0 || response == 'null') {
+                        return { empty: true };
+                    }
+                    var tile = new VectorTile(new Protobuf(response));
+                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                    var fieldMap = {};
+
+                    const numFields = [];
+                    const catFields = [];
+                    const catFieldsReal = [];
+                    const numFieldsReal = [];
+                    this._MNS.columns.map(name => {
+                        const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                        if (metadata.columns.find(c => c.name == basename).type == 'category') {
+                            catFields.push(name);
+                            catFieldsReal.push(name);
+                        } else {
+                            numFields.push(name);
+                            numFieldsReal.push(name);
                         }
-                        var tile = new VectorTile(new Protobuf(response));
-                        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                        var fieldMap = {};
 
-                        const numFields = [];
-                        const catFields = [];
-                        const catFieldsReal = [];
-                        const numFieldsReal = [];
-                        this.MNS.columns.map(name => {
-                            const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                            if (metadata.columns.find(c => c.name == basename).type == 'category') {
-                                catFields.push(name);
-                                catFieldsReal.push(name);
-                            } else {
-                                numFields.push(name);
-                                numFieldsReal.push(name);
-                            }
+                    }
+                    );
+                    catFieldsReal.map((name, i) => fieldMap[name] = i);
+                    numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
-                        }
-                        );
-                        catFieldsReal.map((name, i) => fieldMap[name] = i);
-                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+                    const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
 
-                        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
-
-                        var rs = rsys.getRsysFromTile(x, y, z);
-                        let dataframeProperties = {};
-                        Object.keys(fieldMap).map((name, pid) => {
-                            dataframeProperties[name] = properties[pid];
-                        });
-                        let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                        const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                        this.renderer.addDataframe(dataframe);
-                        return dataframe;
+                    var rs = rsys.getRsysFromTile(x, y, z);
+                    let dataframeProperties = {};
+                    Object.keys(fieldMap).map((name, pid) => {
+                        dataframeProperties[name] = properties[pid];
                     });
+                    let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                    const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                    addDataframe(dataframe);
+                    return dataframe;
                 });
-        });
+            });
     }
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
@@ -309,52 +327,8 @@ export default class WindshaftSQL extends Provider {
 
         return { properties, points, featureGeometries };
     }
-
-    _generateDataFrame(rs, geometry, properties, size, type) {
-        // TODO: Should the dataframe constructor have type and size parameters?
-        const dataframe = new R.Dataframe(
-            rs.center,
-            rs.scale,
-            geometry,
-            properties,
-        );
-        dataframe.type = type;
-        dataframe.size = size;
-
-        return dataframe;
-    }
-    getData() {
-        if (!this.dataset) {
-            return;
-        }
-        const renderer = this.renderer;
-        const bounds = renderer.getBounds();
-        const tiles = rsys.rTiles(bounds);
-        this.requestGroupID = this.requestGroupID || 1;
-        this.requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
-        const requestGroupID = this.requestGroupID;
-        tiles.forEach(t => {
-            const x = t.x;
-            const y = t.y;
-            const z = t.z;
-            this.getDataframe(x, y, z).then(dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete && requestGroupID == this.requestGroupID) {
-                    oldtiles.forEach(t => t.setStyle(null));
-                    completedTiles.map(t => t.setStyle(this.style));
-                    this.renderer.compute('sum', [R.Style.float(1)]).then(result => document.getElementById('title').innerText = `Demo dataset ~ ${result} features`);
-                    oldtiles = completedTiles;
-                }
-            });
-        });
-    }
 }
+
 
 async function getColumnTypes(query, conf) {
     const columnListQuery = `select * from ${query} limit 0;`;
@@ -369,14 +343,14 @@ async function getGeometryType(query, conf) {
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
-    case 'ST_MultiPolygon':
-        return 'polygon';
-    case 'ST_Point':
-        return 'point';
-    case 'ST_MultiLineString':
-        return 'line';
-    default:
-        throw new Error(`Unimplemented geometry type ''${type}'`);
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
     }
 }
 
@@ -458,4 +432,22 @@ async function getMetadata(query, proto, conf) {
         metadata.columns.push(t);
     });
     return metadata;
+}
+
+function isClockWise(vertices) {
+    let a = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        let j = (i + 1) % vertices.length;
+        a += vertices[i].x * vertices[j].y;
+        a -= vertices[j].x * vertices[i].y;
+    }
+    return a > 0;
+}
+
+function getBase(name) {
+    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
+}
+function getAggFN(name) {
+    let s = name.substr('_cdb_agg_'.length);
+    return s.substr(0, s.indexOf('_'));
 }

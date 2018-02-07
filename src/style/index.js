@@ -10,38 +10,40 @@ import * as schema from '../schema';
  *
  * Styles are only compatible with dataframes that comply with the same schema.
  * The schema is the interface that a dataframe must comply with.
- * @param {Renderer.Renderer} renderer
- * @param {Schema} schema
  */
-function Style(renderer, schema) {
-    this.renderer = renderer;
+function Style() {
     this.updated = true;
-    this.schema = schema;
 
     this._width = functions.float(5);
     this._width.parent = this;
     this._width.notify = () => {
-        this._compileWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+        this._changed();
     };
-    this._color = functions.rgba(0, 0, 0, 1);
+    this._color = functions.rgba(0, 1, 0, 0.5);
     this._color.parent = this;
     this._color.notify = () => {
-        this._compileColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+        this._changed();
     };
     this._strokeColor = functions.rgba(0, 1, 0, 0.5);
     this._strokeColor.parent = this;
     this._strokeColor.notify = () => {
-        this._compileStrokeColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+        this._changed();
     };
     this._strokeWidth = functions.float(0);
     this._strokeWidth.parent = this;
     this._strokeWidth.notify = () => {
-        this._compileStrokeWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
+        this._changed();
     };
+    this._observer = null;
+}
+
+Style.prototype._changed = function () {
+    if (this._observer) {
+        this._observer();
+    }
+}
+Style.prototype.onChange = function (callback) {
+    this._observer = callback;
 }
 
 Style.prototype.getMinimumNeededSchema = function () {
@@ -69,60 +71,6 @@ Style.prototype.set = function (s, duration, meta) {
 };
 
 /**
- * Change the width of the style to a new style expression.
- * @jsapi
- * @param {*} float
- */
-Style.prototype.setWidth = function (float) {
-    this._width = float;
-    this.updated = true;
-    float.parent = this;
-    float.notify = () => {
-        this._compileWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    float.notify();
-};
-
-Style.prototype.setStrokeWidth = function (float) {
-    this._strokeWidth = float;
-    this.updated = true;
-    float.parent = this;
-    float.notify = () => {
-        this._compileStrokeWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    float.notify();
-};
-
-/**
- * Change the color of the style to a new style expression.
- * @jsapi
- * @param {*} color
- */
-Style.prototype.setColor = function (color) {
-    this._color = color;
-    this.updated = true;
-    color.parent = this;
-    color.notify = () => {
-        this._compileColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    color.notify();
-};
-
-Style.prototype.setStrokeColor = function (color) {
-    this._strokeColor = color;
-    this.updated = true;
-    color.parent = this;
-    color.notify = () => {
-        this._compileStrokeColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    color.notify();
-};
-
-/**
  * Get the width style expression
  * @jsapi
  */
@@ -146,26 +94,30 @@ Style.prototype.getStrokeWidth = function () {
     return this._strokeWidth;
 };
 
-Style.prototype._compileColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._color, shaders.styler.createColorShader);
+Style.prototype._compileColorShader = function (gl, metadata) {
+    this._color._bind(metadata);
+    const r = compileShader(gl, this._color, shaders.styler.createColorShader);
     this.propertyColorTID = r.tid;
     this.colorShader = r.shader;
 };
 
-Style.prototype._compileStrokeColorShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeColor, shaders.styler.createColorShader);
+Style.prototype._compileStrokeColorShader = function (gl, metadata) {
+    this._strokeColor._bind(metadata);
+    const r = compileShader(gl, this._strokeColor, shaders.styler.createColorShader);
     this.propertyStrokeColorTID = r.tid;
     this.strokeColorShader = r.shader;
 };
 
-Style.prototype._compileStrokeWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._strokeWidth, shaders.styler.createWidthShader);
+Style.prototype._compileStrokeWidthShader = function (gl, metadata) {
+    this._strokeWidth._bind(metadata);
+    const r = compileShader(gl, this._strokeWidth, shaders.styler.createWidthShader);
     this.propertyStrokeWidthTID = r.tid;
     this.strokeWidthShader = r.shader;
 };
 
-Style.prototype._compileWidthShader = function () {
-    const r = compileShader(this.renderer.gl, this._width, shaders.styler.createWidthShader);
+Style.prototype._compileWidthShader = function (gl, metadata) {
+    this._width._bind(metadata);
+    const r = compileShader(gl, this._width, shaders.styler.createWidthShader);
     this.propertyWidthTID = r.tid;
     this.widthShader = r.shader;
 };

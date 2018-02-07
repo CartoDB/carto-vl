@@ -375,7 +375,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 };
 
 Renderer.prototype._RAF = function () {
-    window.requestAnimationFrame(this.refresh.bind(this));
+    //window.requestAnimationFrame(this.refresh.bind(this));
 };
 
 Renderer.prototype.getAspect = function () {
