@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Single layer | CARTO</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <!-- Include CARTO GL JS -->
+    <script src="../../dist/carto-gl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src='../../dist/mapbox-gl-dev.js'></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; height: 100%; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
+
+      // Create map
+      const map = new mapboxgl.Map({
+        container: 'map', // container id
+        style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
+        center: [2.17, 41.38], // starting position [lng, lat]
+        zoom: 13, // starting zoom,
+      });
+
+      map.on('load', () => {
+        // Auth
+        carto.setDefaultAuth({
+          key: 'YOUR_API_KEY',
+          username: 'cartojs-test'
+        })
+
+        // Source
+        const source = new carto.source.Dataset(`
+          ne_10m_populated_places_simple
+        `);
+
+        // Style
+        const style = new carto.style.VectorStyle(`
+          ...
+        `);
+
+        // layer
+        const layer = new carto.layer.VectorLayer('layer1', source, style);
+
+        // Add layer
+        layer.addTo(map);
+      });
+    </script>
+  </body>
+</html>
