@@ -46,7 +46,7 @@ export default class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                           dataframe.free();
+                        dataframe.free();
                         // TODO this.renderer.removeDataframe(dataframe);
                     }
                 });
@@ -94,9 +94,13 @@ export default class Dataset {
         this.metadataPromise = getMetadata(query, MNS, conf);
 
         return (async () => {
-            const metadata = await this.metadataPromise;
-            this.url = await urlPromise;
-            return metadata;
+            try {
+                const metadata = await this.metadataPromise;
+                this.url = await urlPromise;
+                return metadata;
+            } catch (err) {
+                throw new Error('Invalid source');
+            }
         })();
     }
     /**
@@ -121,7 +125,6 @@ export default class Dataset {
         var completedTiles = [];
         var needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
-        const promises = [];
         tiles.forEach(t => {
             // TODO object deconstruction
             const x = t.x;
@@ -342,14 +345,14 @@ async function getGeometryType(query, conf) {
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+    case 'ST_MultiPolygon':
+        return 'polygon';
+    case 'ST_Point':
+        return 'point';
+    case 'ST_MultiLineString':
+        return 'line';
+    default:
+        throw new Error(`Unimplemented geometry type ''${type}'`);
     }
 }
 

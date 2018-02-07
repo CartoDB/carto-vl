@@ -42,10 +42,10 @@ Style.prototype._changed = function () {
     if (this._observer) {
         this._observer();
     }
-}
+};
 Style.prototype.onChange = function (callback) {
     this._observer = callback;
-}
+};
 
 Style.prototype.getMinimumNeededSchema = function () {
     const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);

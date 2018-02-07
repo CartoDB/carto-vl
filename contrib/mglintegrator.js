@@ -20,9 +20,9 @@ export default function getMGLIntegrator(map) {
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
  */
 class MGLIntegrator {
-       constructor(map) {
+    constructor(map) {
         this.renderer = new R.Renderer();
-           this.map = map;
+        this.map = map;
         this.invalidateMGLWebGLState = null;
 
         map.on('resize', this.resize.bind(this));

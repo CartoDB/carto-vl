@@ -7,7 +7,7 @@ import getMGLIntegrator from './mglintegrator';
 export default class Layer {
     constructor(name, source, style) {
         this._name = name;
-          this._source = source;
+        this._source = source;
         this._style = style;
         this._lastViewport = null;
         this._lastMNS = null;
@@ -15,12 +15,11 @@ export default class Layer {
         this._dataframes = [];
 
         style.onChange(this._styleChanged.bind(this));
-        console.log("L", this);
+        console.log('L', this);
     }
     setSource(source) {
         this._source._free();
         this._source = source;
-        this._getData();
     }
     setStyle(style) {
         this._style.onChange(null);
@@ -50,7 +49,7 @@ export default class Layer {
         if (this._mglIntegrator) {
             return this._mglIntegrator.renderer.getBounds();
         }
-        throw new Error('?')
+        throw new Error('?');
     }
     _getData() {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
