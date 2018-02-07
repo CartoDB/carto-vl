@@ -31,6 +31,7 @@
     "eslint": "^4.15.0",
     "serve": "^6.4.9",
     "sloc": "^0.2.0",
+    "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.8.1"
   },
   "main": "src/index.js",
@@ -40,8 +41,8 @@
     "test": "npm run lint",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "webpack",
-    "build:watch": "webpack -w",
+    "build": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
+    "build:watch": "webpack -w --config webpack/webpack.config.js",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
