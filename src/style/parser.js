@@ -1,7 +1,7 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import { schema } from '../index';
+import { schema } from '../renderer';
 
 // TODO use Schema classes
 

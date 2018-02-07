@@ -2,7 +2,7 @@ import * as rsys from './rsys';
 import * as Protobuf from 'pbf';
 import { VectorTile } from '@mapbox/vector-tile';
 import * as LRU from 'lru-cache';
-import * as R from '../src/index';
+import * as R from '../src/renderer';
 
 //TODO auth, config, source engine, use async/await
 
