@@ -1,4 +1,4 @@
-import * as R from '../core';
+import * as R from '../core/renderer';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -20,9 +20,9 @@ export default function getMGLIntegrator(map) {
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
  */
 class MGLIntegrator {
-       constructor(map) {
+    constructor(map) {
         this.renderer = new R.Renderer();
-           this.map = map;
+        this.map = map;
         this.invalidateMGLWebGLState = null;
 
         map.on('resize', this.resize.bind(this));
@@ -58,9 +58,6 @@ class MGLIntegrator {
                 this.invalidateMGLWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-            }
-            if (map.repaint) {
-                //map.repaint = false;
             }
             paintCallback();
             invalidate();

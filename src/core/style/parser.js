@@ -1,7 +1,7 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import { schema } from '../index';
+import { schema } from '../renderer';
 import {implicitCast} from './expressions/utils';
 // TODO use Schema classes
 

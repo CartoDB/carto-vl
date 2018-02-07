@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Double layer | CARTO</title>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
+    <script src="../../vendor/mapboxgl-patched.js"></script>
+    <script src="../../dist/carto-gl.js"></script>
+
+    <style>
+        html,
+        body,
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map' class='map'></div>
+
+</body>
+
+<script>
+    /*eslint-env jquery*/
+    /*eslint no-console: ["off"] */
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
+    let map = new mapboxgl.Map({
+        container: 'map',
+        style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+        center: [2.17, 41.38],
+        zoom: 0,
+    });
+
+    const auth = {
+        user: 'dmanzanares',
+        apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
+    };
+
+    const source0 = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
+    const style0 = new carto.Style();
+    const layer0 = new carto.Layer('layer0', source0, style0);
+
+    layer0.addTo(map, 'watername_ocean');
+
+    const source1 = new carto.source.Dataset('world_borders', auth);
+    const style1 = new carto.Style();
+    const layer1 = new carto.Layer('layer1', source1, style1);
+
+    layer1.addTo(map, 'watername_ocean');
+
+
+</script>
+
+</html>

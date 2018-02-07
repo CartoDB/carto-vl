@@ -7,7 +7,6 @@ export default class Linear extends Expression {
      */
     constructor(input, min, max) {
         super({ input, min, max });
-        console.log(this);
     }
     _compile(metadata) {
         super._compile(metadata);
