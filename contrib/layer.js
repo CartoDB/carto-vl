@@ -1,8 +1,5 @@
 import getMGLIntegrator from './mglintegrator';
 
-let uid = 0;
-
-
 /**
  * Responsabilities:  rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
  * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
@@ -37,7 +34,7 @@ export default class Layer {
         this._styleChanged();
     }
     _styleChanged() {
-        if (!this._cleanFN) {
+        if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
         this._getData();
@@ -56,20 +53,17 @@ export default class Layer {
         throw new Error('?')
     }
     _getData() {
-        if (!this._cleanFN) {
+        if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
         const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema(),
             dataframe => {
-                this._dataframes.push(dataframe);
                 this._mglIntegrator.renderer.addDataframe(dataframe);
                 dataframe.setStyle(null);
-                this._cleanFN();
+                this._mglIntegrator.invalidateMGLWebGLState();
             },
             dataframe => {
-                if (!this._style) {
-                    console.log(this._style)
-                }
+                this._dataframes.push(dataframe);
                 dataframe.setStyle(this._style);
             });
         if (r) {
@@ -84,40 +78,10 @@ export default class Layer {
     _addToMGLMap(map, beforeLayerID) {
         map.on('load', () => {
             this._mglIntegrator = getMGLIntegrator(map);
-            const callbackID = `_cartoGL_${uid++}`;
-            this._mglIntegrator.registerMoveObserver(callbackID, this._getData.bind(this));
-            map.addLayer({
-                id: this._name,
-                type: 'webgl',
-                layout: {
-                    callback: callbackID,
-                }
-            }, beforeLayerID);
-            map.repaint = true;
-
-            window[callbackID] = (gl, clean) => {
-                this._dataframes.map(dataframe => {
-                    if (dataframe.style) {
-                        dataframe.style = this._style;
-                    }
-                });
-
-                // TODO remove this hack
-                if (!this._cleanFN) {
-                    this._cleanFN = clean;
-                    this._styleChanged();
-                }
-
-                if (!this._mglIntegrator.renderer.gl) {
-                    this._mglIntegrator.renderer._initGL(gl);
-                }
-                if (map.repaint) {
-                    //map.repaint = false;
-                }
+            this._mglIntegrator.addLayer(this._name, beforeLayerID, this._getData.bind(this), () => {
+                // TODO deactivate all non owned dataframes
                 this._mglIntegrator.renderer.refresh(Number.NaN);
-                clean();
-            };
-
+            });
         });
     }
     //TODO free layer resources

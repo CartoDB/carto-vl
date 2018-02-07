@@ -46,7 +46,7 @@ export default class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                        //dataframe.free();
+                        dataframe.free();
                         // TODO this.renderer.removeDataframe(dataframe);
                     }
                 });
@@ -142,8 +142,8 @@ export default class Dataset {
         });
     }
     _free() {
-        //TODO this._oldDataframes.forEach(t => t.setStyle(null));
-        //this.cache.reset();
+        this._oldDataframes.forEach(t => t.setStyle(null));
+        this.cache.reset();
     }
     _generateDataFrame(rs, geometry, properties, size, type) {
         // TODO: Should the dataframe constructor have type and size parameters?

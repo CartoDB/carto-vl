@@ -5,6 +5,7 @@ const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
+let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
 let integrator = null;
@@ -22,6 +23,7 @@ class MGLIntegrator {
     constructor(map) {
         this.renderer = new R.Renderer();
         this.map = map;
+        this.invalidateMGLWebGLState = null;
 
         map.on('resize', this.resize.bind(this));
         map.on('movestart', this.move.bind(this));
@@ -30,11 +32,37 @@ class MGLIntegrator {
 
         this.moveObservers = {};
     }
-    registerMoveObserver(observerName, observerCallback) {
+    _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
-    unregisterMoveObserver(observerName) {
+    _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
+    }
+    addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
+        const callbackID = `_cartoGL_${uid++}`;
+        this._registerMoveObserver(callbackID, moveCallback);
+        this.map.addLayer({
+            id: layerId,
+            type: 'webgl',
+            layout: {
+                callback: callbackID,
+            }
+        }, beforeLayerID);
+        map.repaint = true;
+
+        window[callbackID] = (gl, invalidate) => {
+            if (!this.invalidateMGLWebGLState) {
+                this.invalidateMGLWebGLState = invalidate;
+                this.notifyObservers();
+                this.renderer._initGL(gl);
+            }
+            if (map.repaint) {
+                //map.repaint = false;
+            }
+            paintCallback();
+            invalidate();
+        };
+
     }
     needRefresh() {
         map.repaint = true;
@@ -44,14 +72,14 @@ class MGLIntegrator {
         // TODO create getCenter method
         this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
-        this.getData();
+        this.notifyObservers();
     }
     resize() {
         this.canvas.style.width = this.map.getCanvas().style.width;
         this.canvas.style.height = this.map.getCanvas().style.height;
         this.move();
     }
-    getData() {
+    notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
     getZoom() {
