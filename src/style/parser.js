@@ -2,7 +2,7 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 import { schema } from '../renderer';
-
+import {implicitCast} from './expressions/utils';
 // TODO use Schema classes
 
 const aggFns = [];
@@ -36,7 +36,7 @@ function parseStyleNamedExpr(style, node) {
         throw new Error('Invalid syntax');
     }
     const value = parseNode(node.right);
-    style[name] = value;
+    style[name] = implicitCast(value);
 }
 
 class Style {

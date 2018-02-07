@@ -7,7 +7,7 @@ import getMGLIntegrator from './mglintegrator';
 export default class Layer {
     constructor(name, source, style) {
         this._name = name;
-        this._source = source;
+          this._source = source;
         this._style = style;
         this._lastViewport = null;
         this._lastMNS = null;
