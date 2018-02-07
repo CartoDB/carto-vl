@@ -11,25 +11,26 @@ import * as schema from '../schema';
  * Styles are only compatible with dataframes that comply with the same schema.
  * The schema is the interface that a dataframe must comply with.
  */
-function Style() {
+function Style(o) {
+    o = o || {};
     this.updated = true;
 
-    this._width = functions.float(5);
+    this._width = o.width || functions.float(5);
     this._width.parent = this;
     this._width.notify = () => {
         this._changed();
     };
-    this._color = functions.rgba(0, 1, 0, 0.5);
+    this._color = o.color || functions.rgba(0, 1, 0, 0.5);
     this._color.parent = this;
     this._color.notify = () => {
         this._changed();
     };
-    this._strokeColor = functions.rgba(0, 1, 0, 0.5);
+    this._strokeColor = o.strokeColor || functions.rgba(0, 1, 0, 0.5);
     this._strokeColor.parent = this;
     this._strokeColor.notify = () => {
         this._changed();
     };
-    this._strokeWidth = functions.float(0);
+    this._strokeWidth = o.strokeWidth || functions.float(0);
     this._strokeWidth.parent = this;
     this._strokeWidth.notify = () => {
         this._changed();
@@ -51,6 +52,7 @@ Style.prototype.getMinimumNeededSchema = function () {
     return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
 };
 
+/*
 Style.prototype.set = function (s, duration, meta) {
     s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
     s.width = s.width != undefined ? s.width : functions.float(4);
@@ -68,31 +70,7 @@ Style.prototype.set = function (s, duration, meta) {
     this.getColor().blendTo(s.color, duration);
     this.getStrokeColor().blendTo(s.strokeColor, duration);
     this.getStrokeWidth().blendTo(s.strokeWidth, duration);
-};
-
-/**
- * Get the width style expression
- * @jsapi
- */
-Style.prototype.getWidth = function () {
-    return this._width;
-};
-
-/**
- * Get the color style expression
- * @jsapi
- */
-Style.prototype.getColor = function () {
-    return this._color;
-};
-
-Style.prototype.getStrokeColor = function () {
-    return this._strokeColor;
-};
-
-Style.prototype.getStrokeWidth = function () {
-    return this._strokeWidth;
-};
+};*/
 
 Style.prototype._compileColorShader = function (gl, metadata) {
     this._color._bind(metadata);
@@ -144,9 +122,15 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
     }
 };
 
+import * as parser from './parser';
+function parseStyle(str) {
+    const o = parser.parseStyle(str);
+    return new Style(o);
+}
+
 export {
     Style,
     compileShader,
+    parseStyle
 };
 export * from './functions';
-export * from './parser';

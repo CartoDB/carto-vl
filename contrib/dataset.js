@@ -32,7 +32,7 @@ export default class Dataset {
         this._dataset = dataset;
         this._user = auth.user;
         this._apiKey = auth.apiKey;
-        this._cartoURL = 'carto.com';
+        this._cartoURL = (options && options.cartoURL) ? options.cartoURL : 'carto.com';
         // TODO options, TODO error control
         this._options = options;
         this._requestGroupID = 0;
@@ -46,8 +46,8 @@ export default class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                        dataframe.free();
-                        this.renderer.removeDataframe(dataframe);
+                        //dataframe.free();
+                        // TODO this.renderer.removeDataframe(dataframe);
                     }
                 });
             }
@@ -56,7 +56,6 @@ export default class Dataset {
         this.cache = LRU(lruOptions);
     }
     _instantiate() {
-        this._oldDataframes.forEach(t => this.renderer.removeDataframe(t));
         this._oldDataframes = [];
         this.cache.reset();
         this.url = null;
@@ -135,7 +134,7 @@ export default class Dataset {
                     completedTiles.push(dataframe);
                 }
                 if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.forEach(t => t.setStyle(null));
+                    this._oldDataframes.forEach(t => t.setStyle(false));
                     completedTiles.map(t => styleDataframe(t));
                     this._oldDataframes = completedTiles;
                 }
@@ -143,8 +142,8 @@ export default class Dataset {
         });
     }
     _free() {
-        this._oldDataframes.forEach(t => t.setStyle(null));
-        this.cache.reset();
+        //TODO this._oldDataframes.forEach(t => t.setStyle(null));
+        //this.cache.reset();
     }
     _generateDataFrame(rs, geometry, properties, size, type) {
         // TODO: Should the dataframe constructor have type and size parameters?

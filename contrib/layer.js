@@ -15,11 +15,31 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._mglIntegrator = null;
-        this._oldDataframes = [];
+        this._dataframes = [];
 
         style.onChange(this._styleChanged.bind(this));
+        console.log("L", this);
+    }
+    setSource(source) {
+        this._source._free();
+        this._source = source;
+        this._getData();
+    }
+    setStyle(style) {
+        this._style.onChange(null);
+        style.onChange(this._styleChanged.bind(this));
+        this._style = style;
+        this._dataframes.map(dataframe => {
+            if (dataframe.style) {
+                dataframe.style = this._style;
+            }
+        });
+        this._styleChanged();
     }
     _styleChanged() {
+        if (!this._cleanFN) {
+            return;
+        }
         this._getData();
         // This should probably be part of the renderer but...
         this.metadataPromise.then(metadata => {
@@ -27,7 +47,6 @@ export default class Layer {
             this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
             this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
             this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            console.log("style")
         });
     }
     _getViewport() {
@@ -37,15 +56,22 @@ export default class Layer {
         throw new Error('?')
     }
     _getData() {
+        if (!this._cleanFN) {
+            return;
+        }
         const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema(),
             dataframe => {
+                this._dataframes.push(dataframe);
                 this._mglIntegrator.renderer.addDataframe(dataframe);
+                dataframe.setStyle(null);
                 this._cleanFN();
-                console.log(dataframe);
-                this._mglIntegrator.needRefresh();
-                console.log("NR")
             },
-            dataframe => dataframe.setStyle(this._style));
+            dataframe => {
+                if (!this._style) {
+                    console.log(this._style)
+                }
+                dataframe.setStyle(this._style);
+            });
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
@@ -70,9 +96,17 @@ export default class Layer {
             map.repaint = true;
 
             window[callbackID] = (gl, clean) => {
+                this._dataframes.map(dataframe => {
+                    if (dataframe.style) {
+                        dataframe.style = this._style;
+                    }
+                });
 
                 // TODO remove this hack
-                this._cleanFN = clean;
+                if (!this._cleanFN) {
+                    this._cleanFN = clean;
+                    this._styleChanged();
+                }
 
                 if (!this._mglIntegrator.renderer.gl) {
                     this._mglIntegrator.renderer._initGL(gl);
@@ -84,7 +118,6 @@ export default class Layer {
                 clean();
             };
 
-            this._getData();
         });
     }
     //TODO free layer resources
