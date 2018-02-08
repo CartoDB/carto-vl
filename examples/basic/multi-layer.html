@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Single layer | CARTO</title>
+        <title>Multi layer | CARTO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <!-- Include CARTO GL JS -->
@@ -33,10 +33,16 @@
             apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
         };
 
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-        const style = new carto.Style();
-        const layer = new carto.Layer('myCartoLayer', source, style);
+        const source0 = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
+        const style0 = new carto.Style();
+        const layer0 = new carto.Layer('layer0', source0, style0);
 
-        layer.addTo(map, 'watername_ocean');
+        layer0.addTo(map, 'watername_ocean');
+
+        const source1 = new carto.source.Dataset('world_borders', auth);
+        const style1 = new carto.Style();
+        const layer1 = new carto.Layer('layer1', source1, style1);
+
+        layer1.addTo(map, 'watername_ocean');
     </script>
 </html>
