@@ -44,16 +44,7 @@ class MGLIntegrator {
         const callbackID = `_cartoGL_${uid++}`;
         this._registerMoveObserver(callbackID, moveCallback);
         this.map.repaint = true;
-        this.map.addLayer({
-            id: layerId,
-            type: 'webgl',
-            layout: {
-                callback: callbackID,
-            }
-        }, beforeLayerID);
-        this._layers.push(layerId);
-
-        window[callbackID] = (gl, invalidate) => {
+        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateMGLWebGLState) {
                 this.invalidateMGLWebGLState = invalidate;
                 this.notifyObservers();
@@ -61,8 +52,12 @@ class MGLIntegrator {
             }
             paintCallback();
             invalidate();
-        };
-
+        });
+        this.map.addLayer({
+            id: layerId,
+            type: 'custom-webgl'
+        }, beforeLayerID);
+        this._layers.push(layerId);
     }
     needRefresh() {
         this.map.repaint = true;
