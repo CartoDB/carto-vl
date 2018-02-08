@@ -1,8 +1,17 @@
-import Layer from '../contrib/layer';
-import Dataset from '../contrib/dataset';
-import { Style, parseStyle } from './style/index';
+/**
+ *  @api
+ *  @namespace carto
+ *
+ *  @description
+ *  # CARTO GL
+ *  All the library features are exposed through the `carto` namespace.
+ *
+ */
+import Layer from './api/layer';
+import Dataset from './api/dataset';
+import { Style, parseStyle } from './core/style';
 
-// Source namespace has dataset and Sql
+// Source namespace has dataset and SQL
 const source = { Dataset };
 
 export { Layer };

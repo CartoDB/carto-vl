@@ -45,7 +45,6 @@ function Renderer(canvas) {
     this._center = { x: 0, y: 0 };
     this._zoom = 1;
     console.log('R', this);
-    this.canvas = canvas;
     this.dataframes = [];
     this.computePool = []; //TODO hack, refactor needed
 }

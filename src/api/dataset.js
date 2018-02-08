@@ -2,7 +2,7 @@ import * as rsys from './rsys';
 import * as Protobuf from 'pbf';
 import { VectorTile } from '@mapbox/vector-tile';
 import * as LRU from 'lru-cache';
-import * as R from '../src/renderer';
+import * as R from '../core/renderer';
 
 //TODO auth, config, source engine, use async/await
 
@@ -105,10 +105,10 @@ export default class Dataset {
     }
     /**
      * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
-     * @param {*R} viewport 
-     * @param {*} MNS 
-     * @param {*} addDataframe 
-     * @param {*} styleDataframe 
+     * @param {*R} viewport
+     * @param {*} MNS
+     * @param {*} addDataframe
+     * @param {*} styleDataframe
      */
     _getData(viewport, MNS, addDataframe, styleDataframe) {
         if (!R.schema.equals(this._MNS, MNS)) {

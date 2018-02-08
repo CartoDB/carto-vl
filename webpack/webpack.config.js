@@ -1,14 +1,12 @@
-/*eslint-env node*/
 const path = require('path');
 const webpack = require('webpack');
-const VERSION = require('./package.json').version;
-const banner = `CARTOGL-${VERSION}`;
+const banner = require('./banner');
 
 module.exports = {
     entry: './src/index.js',
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'cartogl.js',
+        path: path.resolve(__dirname, '..', 'dist'),
+        filename: 'carto-gl.js',
         library: 'carto',
         libraryTarget: 'umd'
     },

@@ -1,4 +1,4 @@
-import * as R from '../src/renderer';
+import * as R from '../core/renderer';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -58,9 +58,6 @@ class MGLIntegrator {
                 this.invalidateMGLWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-            }
-            if (map.repaint) {
-                //map.repaint = false;
             }
             paintCallback();
             invalidate();

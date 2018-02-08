@@ -15,6 +15,6 @@
   ],
   "opts": {
     "recurse": true,
-    "destination": "./docs/internal"
+    "destination": "./docs/all"
   }
 }
