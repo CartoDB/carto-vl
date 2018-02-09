@@ -2,4 +2,3 @@ node_modules/
 .vscode/
 *.log
 docs/
-dist/

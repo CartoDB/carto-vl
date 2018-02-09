@@ -1,4 +1,19 @@
-/******/ (function(modules) { // webpackBootstrap
+/*!
+ * CARTO GL js https://carto.com/
+ * Version: 0.0.0-alpha.0
+ * 
+ */
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["carto"] = factory();
+	else
+		root["carto"] = factory();
+})(typeof self !== 'undefined' ? self : this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -60,7 +75,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -68,8 +83,8 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
 
 
@@ -195,8 +210,36 @@ class Expression {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony export (immutable) */ __webpack_exports__["b"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["a"] = hexToRgb;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(3);
+
+
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
+    }
+    // TODO we need to encapsulate strings as categories
+    return value;
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
@@ -294,32 +337,32 @@ function genBinaryOp(jsFn, glsl) {
 }
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_linear__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_near__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_now__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_property__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_ramp__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_rgba__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_linear__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_near__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_now__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_property__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_ramp__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_rgba__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_unary__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_binary__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_binary__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__ = __webpack_require__(11);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
 
 
@@ -466,6 +509,9 @@ const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_linear_
 const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__["a" /* Cubic */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
 
+const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__["b" /* ILinear */](...args);
+/* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
+
 const now = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_now__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["now"] = now;
 
@@ -506,39 +552,11 @@ const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_bucket
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = implicitCast;
-/* harmony export (immutable) */ __webpack_exports__["a"] = hexToRgb;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
-
-
-// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
-    }
-    // TODO we need to encapsulate strings as categories
-    return value;
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -648,14 +666,14 @@ function genAggregationOp(aggName) {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(46);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_earcut__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dataframe__ = __webpack_require__(46);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__style__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dataframe__ = __webpack_require__(47);
+/* unused harmony reexport Style */
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_4__dataframe__["a"]; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
 
 
 
@@ -703,7 +721,6 @@ function Renderer(canvas) {
     this._center = { x: 0, y: 0 };
     this._zoom = 1;
     console.log('R', this);
-    this.canvas = canvas;
     this.dataframes = [];
     this.computePool = []; //TODO hack, refactor needed
 }
@@ -1033,7 +1050,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 };
 
 Renderer.prototype._RAF = function () {
-    window.requestAnimationFrame(this.refresh.bind(this));
+    //window.requestAnimationFrame(this.refresh.bind(this));
 };
 
 Renderer.prototype.getAspect = function () {
@@ -1223,6 +1240,7 @@ Renderer.prototype.compute = function (type, expressions) {
 
 
 
+
 /***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -1266,6 +1284,9 @@ function union(a, b) {
 }
 
 function equals(a,b){
+    if (!a || !b){
+        return false;
+    }
     return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
 }
 
@@ -1276,8 +1297,8 @@ function equals(a,b){
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(22);
 
 
 
@@ -1392,6 +1413,154 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Style; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseStyle; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shader_compiler__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shaders__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parser__ = __webpack_require__(44);
+/* unused harmony reexport compileShader */
+/* unused harmony namespace reexport */
+
+
+
+
+
+/**
+ * @jsapi
+ * @constructor
+ * @description A Style defines how associated dataframes of a particular renderer should be renderer.
+ *
+ * Styles are only compatible with dataframes that comply with the same schema.
+ * The schema is the interface that a dataframe must comply with.
+ */
+function Style(o) {
+    o = o || {};
+    this.updated = true;
+
+    this._width = o.width || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
+    this._width.parent = this;
+    this._width.notify = () => {
+        this._changed();
+    };
+    this._color = o.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 1, 0, 0.5);
+    this._color.parent = this;
+    this._color.notify = () => {
+        this._changed();
+    };
+    this._strokeColor = o.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 1, 0, 0.5);
+    this._strokeColor.parent = this;
+    this._strokeColor.notify = () => {
+        this._changed();
+    };
+    this._strokeWidth = o.strokeWidth || __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
+    this._strokeWidth.parent = this;
+    this._strokeWidth.notify = () => {
+        this._changed();
+    };
+    this._observer = null;
+}
+
+Style.prototype._changed = function () {
+    if (this._observer) {
+        this._observer();
+    }
+};
+Style.prototype.onChange = function (callback) {
+    this._observer = callback;
+};
+
+Style.prototype.getMinimumNeededSchema = function () {
+    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
+    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_3__schema__["union"], __WEBPACK_IMPORTED_MODULE_3__schema__["IDENTITY"]);
+};
+
+/*
+Style.prototype.set = function (s, duration, meta) {
+    s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
+    s.width = s.width != undefined ? s.width : functions.float(4);
+    s.strokeColor = s.strokeColor || functions.rgba(0, 0, 0, 0);
+    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : functions.float(0);
+    s.resolution = s.resolution == undefined ? 1 : s.resolution;
+
+    this._width._bind(meta);
+    this._color._bind(meta);
+    this._strokeColor._bind(meta);
+    this._strokeWidth._bind(meta);
+    this.resolution = s.resolution;
+
+    this.getWidth().blendTo(s.width, duration);
+    this.getColor().blendTo(s.color, duration);
+    this.getStrokeColor().blendTo(s.strokeColor, duration);
+    this.getStrokeWidth().blendTo(s.strokeWidth, duration);
+};*/
+
+Style.prototype._compileColorShader = function (gl, metadata) {
+    this._color._bind(metadata);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(gl, this._color, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
+    this.propertyColorTID = r.tid;
+    this.colorShader = r.shader;
+};
+
+Style.prototype._compileStrokeColorShader = function (gl, metadata) {
+    this._strokeColor._bind(metadata);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(gl, this._strokeColor, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
+    this.propertyStrokeColorTID = r.tid;
+    this.strokeColorShader = r.shader;
+};
+
+Style.prototype._compileStrokeWidthShader = function (gl, metadata) {
+    this._strokeWidth._bind(metadata);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(gl, this._strokeWidth, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
+    this.propertyStrokeWidthTID = r.tid;
+    this.strokeWidthShader = r.shader;
+};
+
+Style.prototype._compileWidthShader = function (gl, metadata) {
+    this._width._bind(metadata);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(gl, this._width, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
+    this.propertyWidthTID = r.tid;
+    this.widthShader = r.shader;
+};
+
+Style.prototype._replaceChild = function (toReplace, replacer) {
+    if (toReplace == this._color) {
+        this._color = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._width) {
+        this._width = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeColor) {
+        this._strokeColor = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else if (toReplace == this._strokeWidth) {
+        this._strokeWidth = replacer;
+        replacer.parent = this;
+        replacer.notify = toReplace.notify;
+    } else {
+        throw new Error('No child found');
+    }
+};
+
+
+function parseStyle(str) {
+    const o = __WEBPACK_IMPORTED_MODULE_4__parser__["a" /* parseStyle */](str);
+    return new Style(o);
+}
+
+
+
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
 
@@ -1442,18 +1611,18 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
 
 
 class ILinear extends genInterpolator(inner => inner) { }
-/* unused harmony export ILinear */
+/* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
 
 class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
@@ -1494,13 +1663,13 @@ function genInterpolator(inlineMaker, preface) {
 }
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(12);
+var VectorTileFeature = __webpack_require__(13);
 
 module.exports = VectorTileLayer;
 
@@ -1562,13 +1731,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(51);
+var Point = __webpack_require__(54);
 
 module.exports = VectorTileFeature;
 
@@ -1802,7 +1971,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -1992,331 +2161,143 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__src_index__ = __webpack_require__(6);
-/*eslint-env jquery*/
-/*eslint no-console: ["off"] */
-
-
-
-
-
-const styles = [
-    `width: 3
-color: rgba(0.8,0,0,1)`,
-
-    `width: 3
-color: rgba(0.8,0,0,0.2)`,
-
-    `width: 3
-color: hsv(0, 0, 1)`,
-
-    `width: 3
-color: hsv(0, 0.7, 1.)`,
-
-    `width: 3
-color: hsv(0.2, 0.7, 1.)`,
-
-    `width: 3
-color: hsv(0.7, 0.7, 1.)`,
-
-    `width: 3
-color: hsv($category, 0.7, 1.)`,
-
-    `width: 3
-color: ramp($category, Prism)`,
-
-    `width: 3
-color: ramp(top($category, 4), Prism)`,
-
-    `width: 3
-color: setOpacity( ramp($category, Prism), $amount/5000)`,
-
-    `width: 3
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)`,
-
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
-
-    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
-color: ramp(MODE($category), Prism)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
-];
-
-const texts = [
-    'We can use RGBA colors',
-
-    'This means that we can change the opacity (alpha) easily',
-
-    'There is support for other color spaces like HSV (Hue, Saturation, Value)',
-
-    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
-    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
-    'Hue, Saturation and Value are defined in the [0,1] range, the hue is wrapped (cylindrical space)',
-
-    'You can mix expressions. Here we are setting the hue based on the category of each feature',
-
-    'We can use turbo-carto inspired ramps too',
-
-    'We can select the top categories, by grouping the rest into the \'others\' buckets',
-
-    'We can normalize the map based on the amount property by changing the opacity',
-
-    'But, let\'s go back a little bit...',
-
-    'We can create a bubble map easily, and we can use the square root to make the circle\'s area proportional to the feature\'s property',
-
-    'We can make them proportional to the scale too, to avoid not very attractive overlaps',
-
-    'And... let\'s put a nice stroke',
-    'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE',
-];
-
-const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-
-var mapboxgl = window.mapboxgl;
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
-var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
-    center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 13, // starting zoom,
-});
-var mgl = new __WEBPACK_IMPORTED_MODULE_0__contrib_mapboxgl__["a" /* MGLIntegrator */](map, __WEBPACK_IMPORTED_MODULE_1__contrib_windshaft_sql__["a" /* default */]);
-
-
-map.on('load', () => {
-    let index = 0;//styles.length - 1;
-
-    function updateStyle(v) {
-        v = v || document.getElementById('styleEntry').value;
-        document.getElementById('styleEntry').value = v;
-        location.hash = getConfig();
-        try {
-            const s = __WEBPACK_IMPORTED_MODULE_2__src_index__["c" /* Style */].parseStyle(v);
-            mgl.provider.setStyle(s, 1000);
-            document.getElementById('feedback').style.display = 'none';
-        } catch (error) {
-            const err = `Invalid style: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById('feedback').value = err;
-            document.getElementById('feedback').style.display = 'block';
-        }
-    }
-
-    function barcelona() {
-        $('.step').css('display', 'inline');
-        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
-        $('#tutorial').text(texts[index]);
-
-        $('#dataset').val('tx_0125_copy_copy');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
-        $('#user').val('dmanzanares-ded13');
-        $('#cartoURL').val('carto-staging.com');
-
-        document.getElementById('styleEntry').value = styles[index];
-        superRefresh();
-    }
-    function wwi() {
-        $('.step').css('display', 'none');
-        $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-        $('#tutorial').text('');
-
-        $('#dataset').val('wwi');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
-        $('#user').val('dmanzanares-ded13');
-        $('#cartoURL').val('carto-staging.com');
-
-        document.getElementById('styleEntry').value = shipsStyle;
-        superRefresh();
-    }
-
-    $('#prev').click(() => {
-        $('#prev').attr('disabled', false);
-        $('#next').attr('disabled', false);
-        if (index > 0) {
-            index--;
-            $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
-        }
-        if (index == 0) {
-            $('#prev').attr('disabled', true);
-        }
-    });
-    $('#next').click(() => {
-        $('#prev').attr('disabled', false);
-        $('#next').attr('disabled', false);
-        if (index < styles.length - 1) {
-            index++;
-            $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
-        }
-        if (index == styles.length - 1) {
-            $('#next').prop('disabled', true);
-        }
-    });
-
-    $('#barcelona').click(barcelona);
-    $('#wwi').click(wwi);
-    $('#styleEntry').on('input', () => updateStyle());
-    function getConfig() {
-        return '#' + btoa(JSON.stringify({
-            a: $('#dataset').val(),
-            b: $('#apikey').val(),
-            c: $('#user').val(),
-            d: $('#cartoURL').val(),
-            e: $('#styleEntry').val(),
-            f: map.getCenter(),
-            g: map.getZoom(),
-        }));
-    }
-    function setConfig(input) {
-        const c = JSON.parse(atob(input));
-        $('#dataset').val(c.a);
-        $('#apikey').val(c.b);
-        $('#user').val(c.c);
-        $('#cartoURL').val(c.d);
-        $('#styleEntry').val(c.e);
-        superRefresh(true);
-        map.setZoom(c.g);
-        map.setCenter(c.f);
-        location.hash = getConfig();
-    }
-
-    const superRefresh = (nosave) => {
-        if (nosave) {
-            location.hash = getConfig();
-        }
-
-        mgl.provider.setCartoURL($('#cartoURL').val());
-        mgl.provider.setUser($('#user').val());
-        mgl.provider.setApiKey($('#apikey').val());
-
-        localStorage.setItem('cartoURL', $('#cartoURL').val());
-        localStorage.setItem('user', $('#user').val());
-        localStorage.setItem('apikey', $('#apikey').val());
-        localStorage.setItem('dataset', $('#dataset').val());
-        mgl.provider.setQueries($('#dataset').val());
-        updateStyle();
-    };
-
-
-    $('#dataset').on('input', superRefresh);
-    $('#apikey').on('input', superRefresh);
-    $('#user').on('input', superRefresh);
-    $('#cartoURL').on('input', superRefresh);
-
-    $('#map').click((ev) => {
-        let closerID = -1;
-        let closerTile = null;
-        let minD = 100000000;
-        let cx = ev.offsetX / map.getCanvas().style.width.replace(/\D/g, '') * 2. - 1;
-        let cy = -(ev.offsetY / map.getCanvas().style.height.replace(/\D/g, '') * 2. - 1);
-        mgl.renderer.getStyledTiles().map(tile => {
-            for (let i = 0; i < tile.size; i++) {
-                const x = tile.geom[2 * i + 0] * tile.vertexScale[0] - tile.vertexOffset[0];
-                const y = tile.geom[2 * i + 1] * tile.vertexScale[1] - tile.vertexOffset[1];
-                const d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
-                if (d < minD) {
-                    minD = d;
-                    closerID = i;
-                    closerTile = tile;
-                }
-            }
-        });
-
-        document.getElementById('popup').style.display = 'inline';
-        const p = [
-            closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
-            closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
-        ];
-        document.getElementById('popup').style.top = (-p[1] * 0.5 + 0.5) * map.getCanvas().style.height.replace(/\D/g, '') + 'px';
-        document.getElementById('popup').style.left = (p[0] * 0.5 + 0.5) * map.getCanvas().style.width.replace(/\D/g, '') + 'px';
-        let str = '';
-        Object.keys(closerTile.properties).map(name => {
-            str += `${name}: ${closerTile.properties[name][closerID]}\n`;
-        });
-        $('#popup').text(str);
-        console.log(closerID, minD, JSON.stringify(
-            Object.keys(closerTile.properties).map(name => {
-                return {
-                    name: name,
-                    property: closerTile.properties[name][closerID],
-                    position: [
-                        closerTile.geom[2 * closerID + 0] * closerTile.vertexScale[0] - closerTile.vertexOffset[0],
-                        closerTile.geom[2 * closerID + 1] * closerTile.vertexScale[1] - closerTile.vertexOffset[1]
-                    ]
-                };
-            }
-            )
-            , null, 4));
-    });
-
-
-    const addButton = (name, code) => {
-        var button = document.createElement('button');
-        button.innerText = name;
-        button.onclick = () => {
-            $('.step').css('display', 'none');
-            $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-            $('#tutorial').text('');
-            setConfig(code);
-        };
-        document.getElementById('buttonlist').appendChild(button);
-    };
-    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IjhhMTc0YzQ1MTIxNWNiOGRjYTkwMjY0ZGUzNDI2MTQwODdjNGVmMGMiLCJjIjoiZG1hbnphbmFyZXMtZGVkMTMiLCJkIjoiY2FydG8tc3RhZ2luZy5jb20iLCJlIjoid2lkdGg6ICAgIGJsZW5kKDEsMixuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpICp6b29tKClcbmNvbG9yOiAgICBzZXRvcGFjaXR5KHJhbXAobGluZWFyKEFWRygkdGVtcCksIDAsMzApLCB0ZWFscm9zZSksIGJsZW5kKDAuMDA1LDEsbmVhcigkZGF5LCAoMjUqbm93KCkpICUxMDAwLCAwLCAxMCksIGN1YmljKSkiLCJmIjp7ImxuZyI6NjAuNDEzNjExNjc1MzE3NzI1LCJsYXQiOjIzLjIyMTc0Mzg0NDc0NjI4NX0sImciOjEuNTUxOTU5Nzc5MDI5NDE0Nn0=');
-    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6IHNxcnQoJG51bWJlci8xMClcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MCksMC43KVxuc3Ryb2tlQ29sb3I6IHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi04Ny41MjA2MzAxNzY0MDM5OCwibGF0IjozNy4zNzc2OTk3NjY1MzkzMX0sImciOjIuNzQ2NTk0NjE1NjY2MTg5fQ==');
-    addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRhc2lhbl9wb3ArJGJsYWNrX3BvcCskaGlzcGFuaWNfbykvJHdoaXRlX3BvcFxuY29sb3I6IHNldE9wYWNpdHkoaHN2KDAuNSwxLDEpLDAuNykiLCJmIjp7ImxuZyI6LTkwLjY5OTA1ODUxMjQxMTk3LCJsYXQiOjQwLjYyMTQ3NTIzNDQxNjY2NH0sImciOjIuNDU3MzM2MDY0MjIzNTMxfQ==');
-    addButton('Denver accidents',
-        'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGNvdW50LzJcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoJGNvdW50LCBSZWRPciwwLDEyMCksKCRjb3VudC8yKS8xMClcblxuXG4iLCJmIjp7ImxuZyI6LTEwNC45NjUwNTYyMTU2Njc0NiwibGF0IjozOS43NDk2MTkzNzgyNDYyMn0sImciOjExLjQxODcxODc3MDkwNDQ5NH0=');
-    addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAgICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDApXG5zdHJva2VDb2xvcjogIGhzdigwLjEsICRnaXNfYWNyZXMvMjAwMDAwLCAkZ2lzX2FjcmVzLzQwMDAwMClcbnN0cm9rZVdpZHRoOiAkZ2lzX2FjcmVzLzUwMDAwXG5cblxuXG4iLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2fQ==');
-    addButton('California Wildfires size/opacity by acres burned colored by cause ',
-        'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
-    addButton('Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogem9vbSgpXG5jb2xvcjogcmFtcChidWNrZXRzKCRkbiwgODAsIDEwMCwgMTQwKSwgcHJpc20pKmdyZWF0ZXJUaGFuKCRkbiwgNjApXG5cblxuXG4iLCJmIjp7ImxuZyI6LTEwLjg0MDcyMTQwMTQ1MzI2NiwibGF0Ijo0MC4wNjQwNTQxNTY1NzA5Nn0sImciOjEuNDkxNzAxNzE4NTk3NTMyNX0=');
-    addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
-    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
-    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsaW5lYXIobG9nKCRudW1mbG9vcnMpLCAxLCA0KSwgRWFydGgpXG4iLCJmIjp7ImxuZyI6LTczLjkwNDM5MDkwNTU1NTQzLCJsYXQiOjQwLjc0OTExODc3NjQyMTR9LCJnIjoxMS43NDgzMTYzMjg5MTA2MjJ9');
-    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbndpZHRoOiAxLjUiLCJmIjp7ImxuZyI6LTEyMi40NDQwODQ4Njg2MTE5MiwibGF0IjozNy43NzM3MDY3MzYxNDk3MDV9LCJnIjoxMS42NjQzMTA4MDI4NjY4MDV9');
-    addButton('Gecat', 'eyJhIjoiKHNlbGVjdCAqLCAxIGFzIGNvIGZyb20gZ2VjYXRfZ2VvZGF0YV9jb3B5KSBBUyB0bXAiLCJiIjoiNzNmYWNmMmFiNmMyZTdlOTI5ZGFhODFhMjE5YTFmZDQ2NzRmMzBmNiIsImMiOiJjZGJzb2wtYWRtaW4iLCJkIjoiY2FydG8uY29tIiwiZSI6ImNvbG9yOiBzZXRvcGFjaXR5KHJhbXAobG9nKGF2Zygkc3BlZWQpKSwgR2V5c2VyLCAwLCA0KSwgIHN1bSgkY28pKnpvb20oKS8xMDAwMDAqMS44KjQpXG53aWR0aDogMlxucmVzb2x1dGlvbjogMC4yNSAiLCJmIjp7ImxuZyI6MS4yNjE2NzkyNjY5NTQ4NDMxLCJsYXQiOjQxLjcwNDEwNDk3NDkyMDQ1NX0sImciOjcuMzQ2NTM5NDk3NjAzMDR9');
-    addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiOGExNzRjNDUxMjE1Y2I4ZGNhOTAyNjRkZTM0MjYxNDA4N2M0ZWYwYyIsImMiOiJkbWFuemFuYXJlcy1kZWQxMyIsImQiOiJjYXJ0by1zdGFnaW5nLmNvbSIsImUiOiJ3aWR0aDogc3FydChTVU0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjUqXG4oZXF1YWxzKE1PREUoJGNhdGVnb3J5KSwgXCJUcmFuc3BvcnRlc1wiKSArIGVxdWFscyhNT0RFKCRjYXRlZ29yeSksIFwiU2FsdWRcIikgKVxuY29sb3I6IHJhbXAoTU9ERSgkY2F0ZWdvcnkpLCBQcmlzbSkiLCJmIjp7ImxuZyI6Mi4xNjU4NTg4OTcwMDI3NDk1LCJsYXQiOjQxLjM3MDU1MjA4MDk0Mzg3fSwiZyI6MTEuNjg4MjUzMTg3MjM4MTk4fQ==');
-
-    if (localStorage.getItem('dataset')) {
-        $('#dataset').val(localStorage.getItem('dataset'));
-        $('#apikey').val(localStorage.getItem('apikey'));
-        $('#user').val(localStorage.getItem('user'));
-        $('#cartoURL').val(localStorage.getItem('cartoURL'));
-    }
-    if (location.hash.length > 1) {
-        setConfig(location.hash.substring(1));
-    } else {
-        barcelona();
-    }
-});
-
-
-/***/ }),
 /* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MGLIntegrator; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__src_index__ = __webpack_require__(6);
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_layer__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_dataset__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style__ = __webpack_require__(9);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_0__api_layer__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_2__core_style__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__core_style__["b"]; });
+/**
+ *  @api
+ *  @namespace carto
+ *
+ *  @description
+ *  # CARTO GL
+ *  All the library features are exposed through the `carto` namespace.
+ *
+ */
 
+
+
+
+// Source namespace has dataset and SQL
+const source = { Dataset: __WEBPACK_IMPORTED_MODULE_1__api_dataset__["a" /* default */] };
+
+
+
+
+ // TODO(@iago): temporal export, we must find a better place
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mglintegrator__ = __webpack_require__(17);
+
+
+/**
+ * Responsabilities:  rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
+ * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
+ */
+class Layer {
+    constructor(name, source, style) {
+        this._name = name;
+        this._source = source;
+        this._style = style;
+        this._lastViewport = null;
+        this._lastMNS = null;
+        this._mglIntegrator = null;
+        this._dataframes = [];
+
+        style.onChange(this._styleChanged.bind(this));
+        console.log('L', this);
+    }
+    setSource(source) {
+        this._source._free();
+        this._source = source;
+    }
+    setStyle(style) {
+        this._style.onChange(null);
+        style.onChange(this._styleChanged.bind(this));
+        this._style = style;
+        this._dataframes.map(dataframe => {
+            if (dataframe.style) {
+                dataframe.style = this._style;
+            }
+        });
+        this._styleChanged();
+    }
+    _styleChanged() {
+        if (!this._mglIntegrator.invalidateMGLWebGLState) {
+            return;
+        }
+        this._getData();
+        // This should probably be part of the renderer but...
+        this.metadataPromise.then(metadata => {
+            this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+            this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+            this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+        });
+    }
+    _getViewport() {
+        if (this._mglIntegrator) {
+            return this._mglIntegrator.renderer.getBounds();
+        }
+        throw new Error('?');
+    }
+    _getData() {
+        if (!this._mglIntegrator.invalidateMGLWebGLState) {
+            return;
+        }
+        const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema(),
+            dataframe => {
+                this._mglIntegrator.renderer.addDataframe(dataframe);
+                dataframe.setStyle(null);
+                this._mglIntegrator.invalidateMGLWebGLState();
+            },
+            dataframe => {
+                this._dataframes.push(dataframe);
+                dataframe.setStyle(this._style);
+            });
+        if (r) {
+            this.metadataPromise = r;
+            r.then(() => this._styleChanged());
+        }
+    }
+    addTo(map, beforeLayerID) {
+        // TODO check map type
+        this._addToMGLMap(map, beforeLayerID);
+    }
+    _addToMGLMap(map, beforeLayerID) {
+        map.on('load', () => {
+            this._mglIntegrator = Object(__WEBPACK_IMPORTED_MODULE_0__mglintegrator__["a" /* default */])(map);
+            this._mglIntegrator.addLayer(this._name, beforeLayerID, this._getData.bind(this), () => {
+                // TODO deactivate all non owned dataframes
+                this._mglIntegrator.renderer.refresh(Number.NaN);
+            });
+        });
+    }
+    //TODO free layer resources
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Layer;
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(6);
 
 
 const DEG2RAD = Math.PI / 180;
@@ -2324,64 +2305,72 @@ const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
-class MGLIntegrator {
-    constructor(map, providerClass) {
-        this.map = map;
-        map.on('load', () => {
-            map.addLayer({
-                'id': 'carto.gl',
-                'type': 'webgl',
-                'layout': {
-                    'callback': 'cartoGL',
-                }
-            }, 'watername_ocean');
-            this.renderer = new __WEBPACK_IMPORTED_MODULE_0__src_index__["b" /* Renderer */]();
-            let cleanFN = null;
-            this.renderer._RAF = () => {
-                map.repaint = true;
-            };
-            const original = this.renderer.addDataframe.bind(this.renderer);
-            this.renderer.addDataframe = (dataframe) => {
-                const r = original(dataframe);
-                cleanFN();
-                return r;
-            };
-            window.cartoGL = (gl, clean) => {
-                cleanFN = clean;
-                if (!this.renderer.gl) {
-                    this.renderer._initGL(gl);
-                }
-                if (map.repaint) {
-                    map.repaint = false;
-                }
-                this.renderer.refresh(Number.NaN);
-            };
-            this.provider = new providerClass(this.renderer, this.style);
+let uid = 0;
 
-            map.on('resize', this.resize.bind(this));
-            map.on('movestart', this.move.bind(this));
-            map.on('move', this.move.bind(this));
-            map.on('moveend', this.move.bind(this));
-            this.move();
+// TODO This needs to be separated by each mgl map to support multi map pages
+let integrator = null;
+function getMGLIntegrator(map) {
+    if (integrator) {
+        return integrator;
+    }
+    return integrator ? integrator : new MGLIntegrator(map);
+}
+
+/**
+ * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
+ */
+class MGLIntegrator {
+    constructor(map) {
+        this.renderer = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["b" /* Renderer */]();
+        this.map = map;
+        this.invalidateMGLWebGLState = null;
+
+        map.on('movestart', this.move.bind(this));
+        map.on('move', this.move.bind(this));
+        map.on('moveend', this.move.bind(this));
+        map.on('resize', this.move.bind(this));
+
+        this.moveObservers = {};
+
+        this._layers = [];
+    }
+    _registerMoveObserver(observerName, observerCallback) {
+        this.moveObservers[observerName] = observerCallback;
+    }
+    _unregisterMoveObserver(observerName) {
+        delete this.moveObservers[observerName];
+    }
+    addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
+        const callbackID = `_cartoGL_${uid++}`;
+        this._registerMoveObserver(callbackID, moveCallback);
+        this.map.repaint = true;
+        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
+            if (!this.invalidateMGLWebGLState) {
+                this.invalidateMGLWebGLState = invalidate;
+                this.notifyObservers();
+                this.renderer._initGL(gl);
+            }
+            paintCallback();
+            invalidate();
         });
+        this.map.addLayer({
+            id: layerId,
+            type: 'custom-webgl'
+        }, beforeLayerID);
+        this._layers.push(layerId);
+    }
+    needRefresh() {
+        this.map.repaint = true;
     }
     move() {
         var c = this.map.getCenter();
-
+        // TODO create getCenter method
         this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
-
-        c = this.renderer.getCenter();
-        this.getData(this.renderer.getAspect());
+        this.notifyObservers();
     }
-
-    resize() {
-        this.canvas.style.width = this.map.getCanvas().style.width;
-        this.canvas.style.height = this.map.getCanvas().style.height;
-        this.move();
-    }
-    getData() {
-        this.provider.getData();
+    notifyObservers() {
+        Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
     getZoom() {
         var b = this.map.getBounds();
@@ -2394,7 +2383,6 @@ class MGLIntegrator {
     }
 }
 
-
 // Webmercator projection
 function Wmxy(latLng) {
     let lat = latLng.lat * DEG2RAD;
@@ -2406,13 +2394,13 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(21);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -2422,7 +2410,7 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2556,7 +2544,7 @@ void main(void) {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2645,7 +2633,7 @@ void main(void) {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2693,7 +2681,7 @@ void main(void) {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2741,263 +2729,7 @@ void main(void) {
 
 
 /***/ }),
-/* 21 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return Style; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shader_compiler__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shaders__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__schema__ = __webpack_require__(7);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compileShader", function() { return __WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMul", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatDiv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatAdd", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatSub", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatPow", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "floatMod", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "log", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["log"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sqrt"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sin"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cos", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cos"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "tan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["tan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sign"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "near", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["near"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["blend"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "rgba", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "property", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["property"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "animate", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["animate"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "hsv", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["hsv"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "setOpacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["setOpacity"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "opacity", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["opacity"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["ramp"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "float", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["float"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "max", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["max"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "min", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["min"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "sum", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["sum"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "avg", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["avg"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "mode", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["mode"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "top", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["top"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["linear"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cubic"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "now", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["now"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["zoom"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "cielab", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["cielab"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["xyz"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "abs", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["abs"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "greaterThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThan", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "lessThanOrEqualTo", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "equals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "notEquals", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["notEquals"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "buckets", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["buckets"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parser__ = __webpack_require__(43);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyleExpression", function() { return __WEBPACK_IMPORTED_MODULE_4__parser__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_4__parser__["a"]; });
-
-
-
-
-
-/**
- * @jsapi
- * @constructor
- * @description A Style defines how associated dataframes of a particular renderer should be renderer.
- *
- * Styles are only compatible with dataframes that comply with the same schema.
- * The schema is the interface that a dataframe must comply with.
- * @param {Renderer.Renderer} renderer
- * @param {Schema} schema
- */
-function Style(renderer, schema) {
-    this.renderer = renderer;
-    this.updated = true;
-    this.schema = schema;
-
-    this._width = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](5);
-    this._width.parent = this;
-    this._width.notify = () => {
-        this._compileWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    this._color = __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 1);
-    this._color.parent = this;
-    this._color.notify = () => {
-        this._compileColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    this._strokeColor = __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 1, 0, 0.5);
-    this._strokeColor.parent = this;
-    this._strokeColor.notify = () => {
-        this._compileStrokeColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    this._strokeWidth = __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
-    this._strokeWidth.parent = this;
-    this._strokeWidth.notify = () => {
-        this._compileStrokeWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-}
-
-Style.prototype.getMinimumNeededSchema = function () {
-    const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
-    return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_3__schema__["union"], __WEBPACK_IMPORTED_MODULE_3__schema__["IDENTITY"]);
-};
-
-Style.prototype.set = function (s, duration, meta) {
-    s.color = s.color || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0.2, 0.2, 0.8, 0.5);
-    s.width = s.width != undefined ? s.width : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](4);
-    s.strokeColor = s.strokeColor || __WEBPACK_IMPORTED_MODULE_1__functions__["rgba"](0, 0, 0, 0);
-    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : __WEBPACK_IMPORTED_MODULE_1__functions__["float"](0);
-    s.resolution = s.resolution == undefined ? 1 : s.resolution;
-
-    this._width._bind(meta);
-    this._color._bind(meta);
-    this._strokeColor._bind(meta);
-    this._strokeWidth._bind(meta);
-    this.resolution = s.resolution;
-
-    this.getWidth().blendTo(s.width, duration);
-    this.getColor().blendTo(s.color, duration);
-    this.getStrokeColor().blendTo(s.strokeColor, duration);
-    this.getStrokeWidth().blendTo(s.strokeWidth, duration);
-};
-
-/**
- * Change the width of the style to a new style expression.
- * @jsapi
- * @param {*} float
- */
-Style.prototype.setWidth = function (float) {
-    this._width = float;
-    this.updated = true;
-    float.parent = this;
-    float.notify = () => {
-        this._compileWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    float.notify();
-};
-
-Style.prototype.setStrokeWidth = function (float) {
-    this._strokeWidth = float;
-    this.updated = true;
-    float.parent = this;
-    float.notify = () => {
-        this._compileStrokeWidthShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    float.notify();
-};
-
-/**
- * Change the color of the style to a new style expression.
- * @jsapi
- * @param {*} color
- */
-Style.prototype.setColor = function (color) {
-    this._color = color;
-    this.updated = true;
-    color.parent = this;
-    color.notify = () => {
-        this._compileColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    color.notify();
-};
-
-Style.prototype.setStrokeColor = function (color) {
-    this._strokeColor = color;
-    this.updated = true;
-    color.parent = this;
-    color.notify = () => {
-        this._compileStrokeColorShader();
-        window.requestAnimationFrame(this.renderer.refresh.bind(this.renderer));
-    };
-    color.notify();
-};
-
-/**
- * Get the width style expression
- * @jsapi
- */
-Style.prototype.getWidth = function () {
-    return this._width;
-};
-
-/**
- * Get the color style expression
- * @jsapi
- */
-Style.prototype.getColor = function () {
-    return this._color;
-};
-
-Style.prototype.getStrokeColor = function () {
-    return this._strokeColor;
-};
-
-Style.prototype.getStrokeWidth = function () {
-    return this._strokeWidth;
-};
-
-Style.prototype._compileColorShader = function () {
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._color, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
-    this.propertyColorTID = r.tid;
-    this.colorShader = r.shader;
-};
-
-Style.prototype._compileStrokeColorShader = function () {
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._strokeColor, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createColorShader);
-    this.propertyStrokeColorTID = r.tid;
-    this.strokeColorShader = r.shader;
-};
-
-Style.prototype._compileStrokeWidthShader = function () {
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._strokeWidth, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
-    this.propertyStrokeWidthTID = r.tid;
-    this.strokeWidthShader = r.shader;
-};
-
-Style.prototype._compileWidthShader = function () {
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__shader_compiler__["a" /* compileShader */])(this.renderer.gl, this._width, __WEBPACK_IMPORTED_MODULE_2__shaders__["b" /* styler */].createWidthShader);
-    this.propertyWidthTID = r.tid;
-    this.widthShader = r.shader;
-};
-
-Style.prototype._replaceChild = function (toReplace, replacer) {
-    if (toReplace == this._color) {
-        this._color = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._width) {
-        this._width = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeColor) {
-        this._strokeColor = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else if (toReplace == this._strokeWidth) {
-        this._strokeWidth = replacer;
-        replacer.parent = this;
-        replacer.notify = toReplace.notify;
-    } else {
-        throw new Error('No child found');
-    }
-};
-
-
-
-
-
-/***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3031,12 +2763,12 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return palettes; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 
 
@@ -3058,14 +2790,14 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(25);
+module.exports = __webpack_require__(26);
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -4918,7 +4650,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(26);
+var colorbrewer = __webpack_require__(27);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -4951,14 +4683,14 @@ if (true) {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(27);
+module.exports = __webpack_require__(28);
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -5283,12 +5015,12 @@ if (true) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
@@ -5336,12 +5068,12 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -5398,12 +5130,12 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -5474,7 +5206,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5518,12 +5250,12 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -5574,7 +5306,7 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5588,7 +5320,6 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
      */
     constructor(input, min, max) {
         super({ input, min, max });
-        console.log(this);
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -5600,12 +5331,12 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -5646,12 +5377,12 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
 
 
 
@@ -5683,7 +5414,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5725,13 +5456,13 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(3);
 
 
 
@@ -5834,12 +5565,12 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
 
 
 
@@ -5875,12 +5606,12 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
 
 
 
@@ -5910,7 +5641,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5976,12 +5707,12 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -6058,12 +5789,12 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
 
 
 
@@ -6089,16 +5820,17 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
+/* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(45);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__index__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderer__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_utils__ = __webpack_require__(1);
 
 
 
@@ -6137,7 +5869,7 @@ function parseStyleNamedExpr(style, node) {
         throw new Error('Invalid syntax');
     }
     const value = parseNode(node.right);
-    style[name] = value;
+    style[name] = Object(__WEBPACK_IMPORTED_MODULE_3__expressions_utils__["b" /* implicitCast */])(value);
 }
 
 class Style {
@@ -6145,7 +5877,7 @@ class Style {
     }
     getMinimumNeededSchema() {
         const exprs = [this.width, this.color, this.strokeColor, this.strokeWidth].filter(x => x && x._getMinimumNeededSchema);
-        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__index__["d" /* schema */].union, __WEBPACK_IMPORTED_MODULE_2__index__["d" /* schema */].IDENTITY);
+        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__renderer__["c" /* schema */].union, __WEBPACK_IMPORTED_MODULE_2__renderer__["c" /* schema */].IDENTITY);
     }
 }
 
@@ -6224,7 +5956,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -6911,7 +6643,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7091,24 +6823,36 @@ function isEarHashed(ear, minX, minY, invSize) {
     var minZ = zOrder(minTX, minTY, minX, minY, invSize),
         maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
 
-    // first look for points inside the triangle in increasing z-order
-    var p = ear.nextZ;
+    var p = ear.prevZ,
+        n = ear.nextZ;
 
-    while (p && p.z <= maxZ) {
+    // look for points inside the triangle in both directions
+    while (p && p.z >= minZ && n && n.z <= maxZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
-        p = p.nextZ;
+        p = p.prevZ;
+
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
     }
 
-    // then look for points in decreasing z-order
-    p = ear.prevZ;
-
+    // look for remaining points in decreasing z-order
     while (p && p.z >= minZ) {
         if (p !== ear.prev && p !== ear.next &&
             pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
             area(p.prev, p, p.next) >= 0) return false;
         p = p.prevZ;
+    }
+
+    // look for remaining points in increasing z-order
+    while (n && n.z <= maxZ) {
+        if (n !== ear.prev && n !== ear.next &&
+            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
+            area(n.prev, n, n.next) >= 0) return false;
+        n = n.nextZ;
     }
 
     return true;
@@ -7556,7 +7300,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7599,26 +7343,25 @@ class Dataframe {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__src_index__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_pbf__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_pbf__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_renderer__ = __webpack_require__(6);
 
 
 
 
 
 
-
-var oldtiles = [];
+//TODO auth, config, source engine, use async/await
 
 const endpoint = (conf) => {
     return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`;
@@ -7637,33 +7380,23 @@ const layerUrl = function (layergroup, layerIndex, conf) {
     };
 };
 
-class Provider { }
 
-function isClockWise(vertices) {
-    let a = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        let j = (i + 1) % vertices.length;
-        a += vertices[i].x * vertices[j].y;
-        a -= vertices[j].x * vertices[i].y;
-    }
-    return a > 0;
-}
-
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
-}
-class WindshaftSQL extends Provider {
-    constructor(renderer) {
-        super();
-        this.renderer = renderer;
-        this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer);
-        this.catMap = {};
-        this.MNS = __WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].IDENTITY;
-        const options = {
+/**
+ * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
+ */
+class Dataset {
+    constructor(dataset, auth, options) {
+        this._dataset = dataset;
+        this._user = auth.user;
+        this._apiKey = auth.apiKey;
+        this._cartoURL = (options && options.cartoURL) ? options.cartoURL : 'carto.com';
+        // TODO options, TODO error control
+        this._options = options;
+        this._requestGroupID = 0;
+        this._oldDataframes = [];
+        this._MNS = null;
+        this._promiseMNS = null;
+        const lruOptions = {
             max: 1000
             // TODO improve cache length heuristic
             , length: function () { return 1; }
@@ -7671,43 +7404,23 @@ class WindshaftSQL extends Provider {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
                         dataframe.free();
-                        this.renderer.removeDataframe(dataframe);
+                        // TODO this.renderer.removeDataframe(dataframe);
                     }
                 });
             }
             , maxAge: 1000 * 60 * 60
         };
-        this.cache = __WEBPACK_IMPORTED_MODULE_4_lru_cache__(options);
+        this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
     }
-    setUser(u) {
-        this.user = u;
-    }
-    setCartoURL(u) {
-        this.cartoURL = u;
-    }
-    setDataset(d) {
-        this.dataset = d;
-    }
-    setApiKey(k) {
-        this.apiKey = k;
-    }
-    setQueries(dataset, style) {
-        this.proposedDataset = dataset;
-        if (!style) {
-            return;//TODO Remove this hack, we need to support atomic configuration setting
-        }
-        this.dataset = dataset;
-        const MNS = style.getMinimumNeededSchema();
-        this.MNS = MNS;
-        const conf = {
-            user: this.user,
-            apiKey: this.apiKey,
-            cartoURL: this.cartoURL,
-        };//Need to copy these to avoid race conditions
-        this.conf = conf;
+    _instantiate() {
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.url = null;
+
+        const MNS = this._MNS;
         let agg = {
             threshold: 1,
-            resolution: style.resolution,
+            resolution: 1,//TODO style.resolution
             columns: {},
             dimensions: {}
         };
@@ -7724,245 +7437,258 @@ class WindshaftSQL extends Provider {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${dataset}`;
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._dataset}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
-        const promise = async () => {
-            this.geomType = await getGeometryType(query, conf);
-            if (this.geomType != 'point') {
-                agg = false;
-            }
-            const mapConfigAgg = {
-                buffersize: {
-                    'mvt': 0
-                },
-                layers: [
-                    {
-                        type: 'mapnik',
-                        options: {
-                            sql: aggSQL,
-                            aggregation: agg
-                        }
-                    }
-                ]
-            };
-            const response = await fetch(endpoint(conf), {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(mapConfigAgg),
-            });
-            const layergroup = await response.json();
-            return layerUrl(layergroup, 0, conf);
+        const conf = {
+            user: this._user,
+            apiKey: this._apiKey,
+            cartoURL: this._cartoURL,
         };
 
-        this.url = promise();
+        const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
+        this.metadataPromise = getMetadata(query, MNS, conf);
 
-        //block data acquisition
-        this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer);
-        this.metadata = getMetadata(query, MNS, conf);
-        this.cache.reset();
-        oldtiles.forEach(t => t.free());
-        oldtiles.forEach(t => this.renderer.removeDataframe(t));
-        oldtiles = [];
-        this.metadata.then(metadata => {
-            this.style = new __WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].Style(this.renderer, metadata);
-            this.getData();
-        });
+        return (async () => {
+            try {
+                const metadata = await this.metadataPromise;
+                this.url = await urlPromise;
+                return metadata;
+            } catch (err) {
+                throw new Error('Invalid source');
+            }
+        })();
     }
-    getCatID(catName, catStr, metadata, pName) {
-        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
-        return id;
-    }
-    getDataframe(x, y, z, callback) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            c.then(callback);
+    /**
+     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * @param {*} viewport
+     * @param {*} MNS
+     * @param {*} addDataframe
+     * @param {*} styleDataframe
+     */
+    _getData(viewport, MNS, addDataframe, styleDataframe) {
+        if (!__WEBPACK_IMPORTED_MODULE_4__core_renderer__["c" /* schema */].equals(this._MNS, MNS)) {
+            this._MNS = MNS;
+            return this._instantiate();
+        }
+        if (!this.url) {
+            // Instantiation is in progress, nothing to do yet
             return;
         }
-        const promise = this.requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        promise.then(callback);
-    }
-    async setStyle(style, duration) {
-        if (this.proposedDataset != this.dataset || !__WEBPACK_IMPORTED_MODULE_1__src_index__["d" /* schema */].equals(style.getMinimumNeededSchema(), this.MNS)) {
-            this.setQueries(this.proposedDataset, style); // TODO lack of atomic config setting HACK
-            const s = await this.metadata;
-            this.meta = s;
-        }
-        this.style.set(style, duration, this.meta);
-    }
-    requestDataframe(x, y, z) {
-        const originalConf = this.conf;
-        return new Promise((callback) => {
-            const mvt_extent = 4096;
 
-            this.url.then(url => {
-                var oReq = new XMLHttpRequest();
-                oReq.responseType = 'arraybuffer';
-                oReq.open('GET', url(x, y, z), true);
-                oReq.onload = () => {
-                    this.metadata.then(metadata => {
-                        if (oReq.response.byteLength == 0 || oReq.response == 'null' || originalConf != this.conf) {
-                            callback({ empty: true });
-                            return;
-                        }
-                        var tile = new __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_3_pbf__(oReq.response));
-                        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                        var fieldMap = {};
-
-                        const numFields = [];
-                        const catFields = [];
-                        const catFieldsReal = [];
-                        const numFieldsReal = [];
-                        this.MNS.columns.map(name => {
-                            const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                            if (metadata.columns.find(c => c.name == basename).type == 'category') {
-                                catFields.push(name);
-                                catFieldsReal.push(name);
-                            } else {
-                                numFields.push(name);
-                                numFieldsReal.push(name);
-                            }
-
-                        }
-                        );
-                        catFieldsReal.map((name, i) => fieldMap[name] = i);
-                        numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
-
-                        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-                        if (this.geomType == 'point') {
-                            var points = new Float32Array(mvtLayer.length * 2);
-                        }
-                        let featureGeometries = [];
-                        for (var i = 0; i < mvtLayer.length; i++) {
-                            const f = mvtLayer.feature(i);
-                            const geom = f.loadGeometry();
-                            let geometry = [];
-                            if (this.geomType == 'point') {
-                                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                            } else if (this.geomType == 'polygon') {
-                                let polygon = null;
-                                /*
-                                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-                                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-                                    See:
-                                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                                        https://en.wikipedia.org/wiki/Shoelace_formula
-                                */
-                                for (let j = 0; j < geom.length; j++) {
-                                    //if exterior
-                                    //   push current polygon & set new empty
-                                    //else=> add index to holes
-                                    if (isClockWise(geom[j])) {
-                                        if (polygon) {
-                                            geometry.push(polygon);
-                                        }
-                                        polygon = {
-                                            flat: [],
-                                            holes: []
-                                        };
-                                    } else {
-                                        if (j == 0) {
-                                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                                        }
-                                        polygon.holes.push(polygon.flat.length / 2);
-                                    }
-                                    for (let k = 0; k < geom[j].length; k++) {
-                                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
-                                    }
-                                }
-                                //if current polygon is not empty=> push it
-                                if (polygon && polygon.flat.length > 0) {
-                                    geometry.push(polygon);
-                                }
-                                featureGeometries.push(geometry);
-                            } else if (this.geomType == 'line') {
-                                geom.map(l => {
-                                    let line = [];
-                                    l.map(point => {
-                                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-                                    });
-                                    geometry.push(line);
-                                });
-                                featureGeometries.push(geometry);
-                            } else {
-                                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
-                            }
-
-                            catFields.map((name, index) => {
-                                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
-                            });
-                            numFields.map((name, index) => {
-                                properties[index + catFields.length][i] = Number(f.properties[name]);
-                            });
-                        }
-
-                        var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
-                        let dataframeProperties = {};
-                        Object.keys(fieldMap).map((name, pid) => {
-                            dataframeProperties[name] = properties[pid];
-                        });
-                        var dataframe = new __WEBPACK_IMPORTED_MODULE_1__src_index__["a" /* Dataframe */](
-                            rs.center,
-                            rs.scale,
-                            this.geomType == 'point' ? points : featureGeometries,
-                            dataframeProperties,
-                        );
-                        dataframe.type = this.geomType;
-                        dataframe.size = mvtLayer.length;
-                        this.renderer.addDataframe(dataframe);
-                        callback(dataframe);
-                    });
-                };
-                oReq.send(null);
-            });
-        });
-    }
-    getData() {
-        if (!this.dataset) {
-            return;
-        }
-        const renderer = this.renderer;
-        const bounds = renderer.getBounds();
-        const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](bounds);
-        this.requestGroupID = this.requestGroupID || 1;
-        this.requestGroupID++;
+        const tiles = __WEBPACK_IMPORTED_MODULE_0__rsys__["b" /* rTiles */](viewport);
+        this._requestGroupID++;
         var completedTiles = [];
         var needToComplete = tiles.length;
-        const requestGroupID = this.requestGroupID;
+        const requestGroupID = this._requestGroupID;
         tiles.forEach(t => {
+            // TODO object deconstruction
             const x = t.x;
             const y = t.y;
             const z = t.z;
-            this.getDataframe(x, y, z, dataframe => {
+            this.getDataframe(x, y, z, addDataframe).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
                 } else {
                     completedTiles.push(dataframe);
                 }
-                if (completedTiles.length == needToComplete && requestGroupID == this.requestGroupID) {
-                    oldtiles.forEach(t => t.setStyle(null));
-                    completedTiles.map(t => t.setStyle(this.style));
-                    this.renderer.compute('sum',
-                        [__WEBPACK_IMPORTED_MODULE_1__src_index__["c" /* Style */].float(1)]
-                    ).then(
-                        result => {
-                            document.getElementById('title').innerText = `Demo dataset ~ ${result} features`;
-                        });
-                    oldtiles = completedTiles;
+                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
+                    this._oldDataframes.forEach(t => t.setStyle(false));
+                    completedTiles.map(t => styleDataframe(t));
+                    this._oldDataframes = completedTiles;
                 }
             });
         });
     }
+    _free() {
+        this._oldDataframes.forEach(t => t.setStyle(null));
+        this.cache.reset();
+    }
+    _generateDataFrame(rs, geometry, properties, size, type) {
+        // TODO: Should the dataframe constructor have type and size parameters?
+        const dataframe = new __WEBPACK_IMPORTED_MODULE_4__core_renderer__["a" /* Dataframe */](
+            rs.center,
+            rs.scale,
+            geometry,
+            properties,
+        );
+        dataframe.type = type;
+        dataframe.size = size;
+
+        return dataframe;
+    }
+    async _getUrlPromise(query, conf, agg, aggSQL) {
+        this.geomType = await getGeometryType(query, conf);
+        if (this.geomType != 'point') {
+            agg = false;
+        }
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+        const response = await fetch(endpoint(conf), {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mapConfigAgg),
+        });
+        const layergroup = await response.json();
+        return layerUrl(layergroup, 0, conf);
+    }
+
+    getCatID(catName, catStr, metadata, pName) {
+        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
+        return id;
+    }
+    getDataframe(x, y, z, addDataframe) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            return c;
+        }
+        const promise = this.requestDataframe(x, y, z, addDataframe);
+        this.cache.set(id, promise);
+        return promise;
+    }
+
+    requestDataframe(x, y, z, addDataframe) {
+        const mvt_extent = 4096;
+
+        return fetch(this.url(x, y, z))
+            .then(rawData => rawData.arrayBuffer())
+            .then(response => {
+                return this.metadataPromise.then(metadata => {
+
+                    if (response.byteLength == 0 || response == 'null') {
+                        return { empty: true };
+                    }
+                    var tile = new __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_1_pbf__(response));
+                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                    var fieldMap = {};
+
+                    const numFields = [];
+                    const catFields = [];
+                    const catFieldsReal = [];
+                    const numFieldsReal = [];
+                    this._MNS.columns.map(name => {
+                        const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                        if (metadata.columns.find(c => c.name == basename).type == 'category') {
+                            catFields.push(name);
+                            catFieldsReal.push(name);
+                        } else {
+                            numFields.push(name);
+                            numFieldsReal.push(name);
+                        }
+
+                    }
+                    );
+                    catFieldsReal.map((name, i) => fieldMap[name] = i);
+                    numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+
+                    const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
+
+                    var rs = __WEBPACK_IMPORTED_MODULE_0__rsys__["a" /* getRsysFromTile */](x, y, z);
+                    let dataframeProperties = {};
+                    Object.keys(fieldMap).map((name, pid) => {
+                        dataframeProperties[name] = properties[pid];
+                    });
+                    let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                    const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                    addDataframe(dataframe);
+                    return dataframe;
+                });
+            });
+    }
+
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
+        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+        if (this.geomType == 'point') {
+            var points = new Float32Array(mvtLayer.length * 2);
+        }
+        let featureGeometries = [];
+        for (var i = 0; i < mvtLayer.length; i++) {
+            const f = mvtLayer.feature(i);
+            const geom = f.loadGeometry();
+            let geometry = [];
+            if (this.geomType == 'point') {
+                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+            } else if (this.geomType == 'polygon') {
+                let polygon = null;
+                /*
+                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+                    See:
+                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                        https://en.wikipedia.org/wiki/Shoelace_formula
+                */
+                for (let j = 0; j < geom.length; j++) {
+                    //if exterior
+                    //   push current polygon & set new empty
+                    //else=> add index to holes
+                    if (isClockWise(geom[j])) {
+                        if (polygon) {
+                            geometry.push(polygon);
+                        }
+                        polygon = {
+                            flat: [],
+                            holes: []
+                        };
+                    } else {
+                        if (j == 0) {
+                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+                        }
+                        polygon.holes.push(polygon.flat.length / 2);
+                    }
+                    for (let k = 0; k < geom[j].length; k++) {
+                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                    }
+                }
+                //if current polygon is not empty=> push it
+                if (polygon && polygon.flat.length > 0) {
+                    geometry.push(polygon);
+                }
+                featureGeometries.push(geometry);
+            } else if (this.geomType == 'line') {
+                geom.map(l => {
+                    let line = [];
+                    l.map(point => {
+                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+                    });
+                    geometry.push(line);
+                });
+                featureGeometries.push(geometry);
+            } else {
+                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
+            }
+
+            catFields.map((name, index) => {
+                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
+            });
+            numFields.map((name, index) => {
+                properties[index + catFields.length][i] = Number(f.properties[name]);
+            });
+        }
+
+        return { properties, points, featureGeometries };
+    }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = WindshaftSQL;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Dataset;
+
 
 
 async function getColumnTypes(query, conf) {
@@ -8069,9 +7795,27 @@ async function getMetadata(query, proto, conf) {
     return metadata;
 }
 
+function isClockWise(vertices) {
+    let a = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        let j = (i + 1) % vertices.length;
+        a += vertices[i].x * vertices[j].y;
+        a -= vertices[j].x * vertices[i].y;
+    }
+    return a > 0;
+}
+
+function getBase(name) {
+    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
+}
+function getAggFN(name) {
+    let s = name.substr('_cdb_agg_'.length);
+    return s.substr(0, s.indexOf('_'));
+}
+
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8226,359 +7970,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 49 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports.VectorTile = __webpack_require__(50);
-module.exports.VectorTileFeature = __webpack_require__(12);
-module.exports.VectorTileLayer = __webpack_require__(11);
-
-
-/***/ }),
 /* 50 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var VectorTileLayer = __webpack_require__(11);
-
-module.exports = VectorTile;
-
-function VectorTile(pbf, end) {
-    this.layers = pbf.readFields(readTile, {}, end);
-}
-
-function readTile(tag, layers, pbf) {
-    if (tag === 3) {
-        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
-        if (layer.length) layers[layer.name] = layer;
-    }
-}
-
-
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = Point;
-
-/**
- * A standalone point geometry with useful accessor, comparison, and
- * modification methods.
- *
- * @class Point
- * @param {Number} x the x-coordinate. this could be longitude or screen
- * pixels, or any other sort of unit.
- * @param {Number} y the y-coordinate. this could be latitude or screen
- * pixels, or any other sort of unit.
- * @example
- * var point = new Point(-77, 38);
- */
-function Point(x, y) {
-    this.x = x;
-    this.y = y;
-}
-
-Point.prototype = {
-
-    /**
-     * Clone this point, returning a new point that can be modified
-     * without affecting the old one.
-     * @return {Point} the clone
-     */
-    clone: function() { return new Point(this.x, this.y); },
-
-    /**
-     * Add this point's x & y coordinates to another point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    add:     function(p) { return this.clone()._add(p); },
-
-    /**
-     * Subtract this point's x & y coordinates to from point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    sub:     function(p) { return this.clone()._sub(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
-
-    /**
-     * Divide this point's x & y coordinates by point,
-     * yielding a new point.
-     * @param {Point} p the other point
-     * @return {Point} output point
-     */
-    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
-
-    /**
-     * Multiply this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    mult:    function(k) { return this.clone()._mult(k); },
-
-    /**
-     * Divide this point's x & y coordinates by a factor,
-     * yielding a new point.
-     * @param {Point} k factor
-     * @return {Point} output point
-     */
-    div:     function(k) { return this.clone()._div(k); },
-
-    /**
-     * Rotate this point around the 0, 0 origin by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @return {Point} output point
-     */
-    rotate:  function(a) { return this.clone()._rotate(a); },
-
-    /**
-     * Rotate this point around p point by an angle a,
-     * given in radians
-     * @param {Number} a angle to rotate around, in radians
-     * @param {Point} p Point to rotate around
-     * @return {Point} output point
-     */
-    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
-
-    /**
-     * Multiply this point by a 4x1 transformation matrix
-     * @param {Array<Number>} m transformation matrix
-     * @return {Point} output point
-     */
-    matMult: function(m) { return this.clone()._matMult(m); },
-
-    /**
-     * Calculate this point but as a unit vector from 0, 0, meaning
-     * that the distance from the resulting point to the 0, 0
-     * coordinate will be equal to 1 and the angle from the resulting
-     * point to the 0, 0 coordinate will be the same as before.
-     * @return {Point} unit vector point
-     */
-    unit:    function() { return this.clone()._unit(); },
-
-    /**
-     * Compute a perpendicular point, where the new y coordinate
-     * is the old x coordinate and the new x coordinate is the old y
-     * coordinate multiplied by -1
-     * @return {Point} perpendicular point
-     */
-    perp:    function() { return this.clone()._perp(); },
-
-    /**
-     * Return a version of this point with the x & y coordinates
-     * rounded to integers.
-     * @return {Point} rounded point
-     */
-    round:   function() { return this.clone()._round(); },
-
-    /**
-     * Return the magitude of this point: this is the Euclidean
-     * distance from the 0, 0 coordinate to this point's x and y
-     * coordinates.
-     * @return {Number} magnitude
-     */
-    mag: function() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    },
-
-    /**
-     * Judge whether this point is equal to another point, returning
-     * true or false.
-     * @param {Point} other the other point
-     * @return {boolean} whether the points are equal
-     */
-    equals: function(other) {
-        return this.x === other.x &&
-               this.y === other.y;
-    },
-
-    /**
-     * Calculate the distance from this point to another point
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    dist: function(p) {
-        return Math.sqrt(this.distSqr(p));
-    },
-
-    /**
-     * Calculate the distance from this point to another point,
-     * without the square root step. Useful if you're comparing
-     * relative distances.
-     * @param {Point} p the other point
-     * @return {Number} distance
-     */
-    distSqr: function(p) {
-        var dx = p.x - this.x,
-            dy = p.y - this.y;
-        return dx * dx + dy * dy;
-    },
-
-    /**
-     * Get the angle from the 0, 0 coordinate to this point, in radians
-     * coordinates.
-     * @return {Number} angle
-     */
-    angle: function() {
-        return Math.atan2(this.y, this.x);
-    },
-
-    /**
-     * Get the angle from this point to another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleTo: function(b) {
-        return Math.atan2(this.y - b.y, this.x - b.x);
-    },
-
-    /**
-     * Get the angle between this point and another point, in radians
-     * @param {Point} b the other point
-     * @return {Number} angle
-     */
-    angleWith: function(b) {
-        return this.angleWithSep(b.x, b.y);
-    },
-
-    /*
-     * Find the angle of the two vectors, solving the formula for
-     * the cross product a x b = |a||b|sin(θ) for θ.
-     * @param {Number} x the x-coordinate
-     * @param {Number} y the y-coordinate
-     * @return {Number} the angle in radians
-     */
-    angleWithSep: function(x, y) {
-        return Math.atan2(
-            this.x * y - this.y * x,
-            this.x * x + this.y * y);
-    },
-
-    _matMult: function(m) {
-        var x = m[0] * this.x + m[1] * this.y,
-            y = m[2] * this.x + m[3] * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _add: function(p) {
-        this.x += p.x;
-        this.y += p.y;
-        return this;
-    },
-
-    _sub: function(p) {
-        this.x -= p.x;
-        this.y -= p.y;
-        return this;
-    },
-
-    _mult: function(k) {
-        this.x *= k;
-        this.y *= k;
-        return this;
-    },
-
-    _div: function(k) {
-        this.x /= k;
-        this.y /= k;
-        return this;
-    },
-
-    _multByPoint: function(p) {
-        this.x *= p.x;
-        this.y *= p.y;
-        return this;
-    },
-
-    _divByPoint: function(p) {
-        this.x /= p.x;
-        this.y /= p.y;
-        return this;
-    },
-
-    _unit: function() {
-        this._div(this.mag());
-        return this;
-    },
-
-    _perp: function() {
-        var y = this.y;
-        this.y = this.x;
-        this.x = -y;
-        return this;
-    },
-
-    _rotate: function(angle) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = cos * this.x - sin * this.y,
-            y = sin * this.x + cos * this.y;
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _rotateAround: function(angle, p) {
-        var cos = Math.cos(angle),
-            sin = Math.sin(angle),
-            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
-            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
-        this.x = x;
-        this.y = y;
-        return this;
-    },
-
-    _round: function() {
-        this.x = Math.round(this.x);
-        this.y = Math.round(this.y);
-        return this;
-    }
-};
-
-/**
- * Construct a point from an array if necessary, otherwise if the input
- * is already a Point, or an unknown type, return it unchanged
- * @param {Array<Number>|Point|*} a any kind of input value
- * @return {Point} constructed point, or passed-through value.
- * @example
- * // this
- * var point = Point.convert([0, 1]);
- * // is equivalent to
- * var point = new Point(0, 1);
- */
-Point.convert = function (a) {
-    if (a instanceof Point) {
-        return a;
-    }
-    if (Array.isArray(a)) {
-        return new Point(a[0], a[1]);
-    }
-    return a;
-};
-
-
-/***/ }),
-/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8586,7 +7978,7 @@ Point.convert = function (a) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(53);
+var ieee754 = __webpack_require__(51);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -9203,7 +8595,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 53 */
+/* 51 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -9293,7 +8685,359 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports.VectorTile = __webpack_require__(53);
+module.exports.VectorTileFeature = __webpack_require__(13);
+module.exports.VectorTileLayer = __webpack_require__(12);
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var VectorTileLayer = __webpack_require__(12);
+
+module.exports = VectorTile;
+
+function VectorTile(pbf, end) {
+    this.layers = pbf.readFields(readTile, {}, end);
+}
+
+function readTile(tag, layers, pbf) {
+    if (tag === 3) {
+        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);
+        if (layer.length) layers[layer.name] = layer;
+    }
+}
+
+
+
+/***/ }),
 /* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = Point;
+
+/**
+ * A standalone point geometry with useful accessor, comparison, and
+ * modification methods.
+ *
+ * @class Point
+ * @param {Number} x the x-coordinate. this could be longitude or screen
+ * pixels, or any other sort of unit.
+ * @param {Number} y the y-coordinate. this could be latitude or screen
+ * pixels, or any other sort of unit.
+ * @example
+ * var point = new Point(-77, 38);
+ */
+function Point(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+Point.prototype = {
+
+    /**
+     * Clone this point, returning a new point that can be modified
+     * without affecting the old one.
+     * @return {Point} the clone
+     */
+    clone: function() { return new Point(this.x, this.y); },
+
+    /**
+     * Add this point's x & y coordinates to another point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    add:     function(p) { return this.clone()._add(p); },
+
+    /**
+     * Subtract this point's x & y coordinates to from point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    sub:     function(p) { return this.clone()._sub(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    multByPoint:    function(p) { return this.clone()._multByPoint(p); },
+
+    /**
+     * Divide this point's x & y coordinates by point,
+     * yielding a new point.
+     * @param {Point} p the other point
+     * @return {Point} output point
+     */
+    divByPoint:     function(p) { return this.clone()._divByPoint(p); },
+
+    /**
+     * Multiply this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    mult:    function(k) { return this.clone()._mult(k); },
+
+    /**
+     * Divide this point's x & y coordinates by a factor,
+     * yielding a new point.
+     * @param {Point} k factor
+     * @return {Point} output point
+     */
+    div:     function(k) { return this.clone()._div(k); },
+
+    /**
+     * Rotate this point around the 0, 0 origin by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @return {Point} output point
+     */
+    rotate:  function(a) { return this.clone()._rotate(a); },
+
+    /**
+     * Rotate this point around p point by an angle a,
+     * given in radians
+     * @param {Number} a angle to rotate around, in radians
+     * @param {Point} p Point to rotate around
+     * @return {Point} output point
+     */
+    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },
+
+    /**
+     * Multiply this point by a 4x1 transformation matrix
+     * @param {Array<Number>} m transformation matrix
+     * @return {Point} output point
+     */
+    matMult: function(m) { return this.clone()._matMult(m); },
+
+    /**
+     * Calculate this point but as a unit vector from 0, 0, meaning
+     * that the distance from the resulting point to the 0, 0
+     * coordinate will be equal to 1 and the angle from the resulting
+     * point to the 0, 0 coordinate will be the same as before.
+     * @return {Point} unit vector point
+     */
+    unit:    function() { return this.clone()._unit(); },
+
+    /**
+     * Compute a perpendicular point, where the new y coordinate
+     * is the old x coordinate and the new x coordinate is the old y
+     * coordinate multiplied by -1
+     * @return {Point} perpendicular point
+     */
+    perp:    function() { return this.clone()._perp(); },
+
+    /**
+     * Return a version of this point with the x & y coordinates
+     * rounded to integers.
+     * @return {Point} rounded point
+     */
+    round:   function() { return this.clone()._round(); },
+
+    /**
+     * Return the magitude of this point: this is the Euclidean
+     * distance from the 0, 0 coordinate to this point's x and y
+     * coordinates.
+     * @return {Number} magnitude
+     */
+    mag: function() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    },
+
+    /**
+     * Judge whether this point is equal to another point, returning
+     * true or false.
+     * @param {Point} other the other point
+     * @return {boolean} whether the points are equal
+     */
+    equals: function(other) {
+        return this.x === other.x &&
+               this.y === other.y;
+    },
+
+    /**
+     * Calculate the distance from this point to another point
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    dist: function(p) {
+        return Math.sqrt(this.distSqr(p));
+    },
+
+    /**
+     * Calculate the distance from this point to another point,
+     * without the square root step. Useful if you're comparing
+     * relative distances.
+     * @param {Point} p the other point
+     * @return {Number} distance
+     */
+    distSqr: function(p) {
+        var dx = p.x - this.x,
+            dy = p.y - this.y;
+        return dx * dx + dy * dy;
+    },
+
+    /**
+     * Get the angle from the 0, 0 coordinate to this point, in radians
+     * coordinates.
+     * @return {Number} angle
+     */
+    angle: function() {
+        return Math.atan2(this.y, this.x);
+    },
+
+    /**
+     * Get the angle from this point to another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleTo: function(b) {
+        return Math.atan2(this.y - b.y, this.x - b.x);
+    },
+
+    /**
+     * Get the angle between this point and another point, in radians
+     * @param {Point} b the other point
+     * @return {Number} angle
+     */
+    angleWith: function(b) {
+        return this.angleWithSep(b.x, b.y);
+    },
+
+    /*
+     * Find the angle of the two vectors, solving the formula for
+     * the cross product a x b = |a||b|sin(θ) for θ.
+     * @param {Number} x the x-coordinate
+     * @param {Number} y the y-coordinate
+     * @return {Number} the angle in radians
+     */
+    angleWithSep: function(x, y) {
+        return Math.atan2(
+            this.x * y - this.y * x,
+            this.x * x + this.y * y);
+    },
+
+    _matMult: function(m) {
+        var x = m[0] * this.x + m[1] * this.y,
+            y = m[2] * this.x + m[3] * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _add: function(p) {
+        this.x += p.x;
+        this.y += p.y;
+        return this;
+    },
+
+    _sub: function(p) {
+        this.x -= p.x;
+        this.y -= p.y;
+        return this;
+    },
+
+    _mult: function(k) {
+        this.x *= k;
+        this.y *= k;
+        return this;
+    },
+
+    _div: function(k) {
+        this.x /= k;
+        this.y /= k;
+        return this;
+    },
+
+    _multByPoint: function(p) {
+        this.x *= p.x;
+        this.y *= p.y;
+        return this;
+    },
+
+    _divByPoint: function(p) {
+        this.x /= p.x;
+        this.y /= p.y;
+        return this;
+    },
+
+    _unit: function() {
+        this._div(this.mag());
+        return this;
+    },
+
+    _perp: function() {
+        var y = this.y;
+        this.y = this.x;
+        this.x = -y;
+        return this;
+    },
+
+    _rotate: function(angle) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = cos * this.x - sin * this.y,
+            y = sin * this.x + cos * this.y;
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _rotateAround: function(angle, p) {
+        var cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),
+            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);
+        this.x = x;
+        this.y = y;
+        return this;
+    },
+
+    _round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    }
+};
+
+/**
+ * Construct a point from an array if necessary, otherwise if the input
+ * is already a Point, or an unknown type, return it unchanged
+ * @param {Array<Number>|Point|*} a any kind of input value
+ * @return {Point} constructed point, or passed-through value.
+ * @example
+ * // this
+ * var point = Point.convert([0, 1]);
+ * // is equivalent to
+ * var point = new Point(0, 1);
+ */
+Point.convert = function (a) {
+    if (a instanceof Point) {
+        return a;
+    }
+    if (Array.isArray(a)) {
+        return new Point(a[0], a[1]);
+    }
+    return a;
+};
+
+
+/***/ }),
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9303,11 +9047,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(55)
-var util = __webpack_require__(57)
+var Map = __webpack_require__(56)
+var util = __webpack_require__(58)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(61)
+var Yallist = __webpack_require__(62)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -9767,7 +9511,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -9777,13 +9521,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(56)
+  module.exports = __webpack_require__(57)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -9902,7 +9646,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10430,7 +10174,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(59);
+exports.isBuffer = __webpack_require__(60);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -10474,7 +10218,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(60);
+exports.inherits = __webpack_require__(61);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -10492,10 +10236,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(58), __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(59), __webpack_require__(14)))
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 var g;
@@ -10522,7 +10266,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -10533,7 +10277,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -10562,7 +10306,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -10939,4 +10683,5 @@ function Node (value, prev, next, list) {
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=mapbox.js.map
+});
+//# sourceMappingURL=carto-gl.js.map
