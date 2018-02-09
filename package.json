@@ -45,8 +45,8 @@
     "build-dev": "webpack --config webpack/webpack.config.js",
     "build-all": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
     "build:watch": "webpack -w --config webpack/webpack.config.js",
-    "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
-    "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "build-docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
+    "build-docs-all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn build-docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }
