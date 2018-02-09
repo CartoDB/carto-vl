@@ -1,38 +1,52 @@
 {
-  "name": "renderer-prototype",
-  "version": "0.0.0",
-  "description": "",
-  "scripts": {
-    "test": "./node_modules/.bin/eslint example/ contrib/ src/",
-    "loc": "node_modules/sloc/bin/sloc src/ contrib/ example/",
-    "build": "webpack",
-    "build:watch": "webpack -w",
-    "build-doc": "rm -rf docs/; node_modules/.bin/jsdoc --configure config/jsdoc/internal.json; node_modules/.bin/jsdoc --configure config/jsdoc/public.json",
-    "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
-  },
+  "name": "carto-gl",
+  "version": "0.0.0-alpha.0",
+  "description": "CARTO Vector library",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CartoDB/renderer-prototype.git"
+    "url": "git://github.com/CartoDB/renderer-prototype.git"
   },
-  "keywords": [],
-  "author": "David Manzanares",
+  "author": {
+    "name": "CARTO",
+    "url": "https://carto.com/"
+  },
+  "contributors": [
+    "David Manzanares <dmanzanares@carto.com>",
+    "Iago Lastra <iago@carto.com>",
+    "Jesús Arroyo Torrens <jarroyo@carto.com>"
+  ],
   "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/CartoDB/renderer-prototype/issues"
-  },
-  "homepage": "https://github.com/CartoDB/renderer-prototype#readme",
-  "devDependencies": {
-    "eslint": "^4.15.0",
-    "sloc": "^0.2.0",
-    "webpack": "^3.8.1"
-  },
   "dependencies": {
     "@mapbox/vector-tile": "^1.3.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
-    "jsdoc": "^3.5.5",
     "jsep": "^0.3.2",
     "lru-cache": "^4.1.1",
     "pbf": "^3.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.15.0",
+    "exquisite-sst": "IagoLast/Exquisite#master",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.0.0",
+    "serve": "^6.4.9",
+    "sloc": "^0.2.0",
+    "uglifyjs-webpack-plugin": "^1.1.8",
+    "webpack": "^3.8.1"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "sst": "mocha test/acceptance/index.test.js --timeout 15000",
+    "loc": "sloc src/ examples/",
+    "test": "npm run lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build-dev": "webpack --config webpack/webpack.config.js",
+    "build-all": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
+    "build:watch": "webpack -w --config webpack/webpack.config.js",
+    "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
+    "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }
