@@ -52,7 +52,7 @@ function genBinaryOp(jsFn, glsl) {
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
             if (typeof b === 'string' && a.type == 'category' && a.name) {
-                let id = meta.columns.find(c => c.name == a.name).categoryNames.indexOf(b);
+                const id = meta.categoryIDs[b];
                 this.auxFloat.expr = id;
                 this.type = 'float';
                 this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
