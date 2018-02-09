@@ -105,7 +105,7 @@ export default class Dataset {
     }
     /**
      * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
-     * @param {*R} viewport
+     * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
