@@ -25,10 +25,10 @@ class MGLIntegrator {
         this.map = map;
         this.invalidateMGLWebGLState = null;
 
-        map.on('resize', this.resize.bind(this));
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
         map.on('moveend', this.move.bind(this));
+        map.on('resize', this.move.bind(this));
 
         this.moveObservers = {};
 
@@ -68,11 +68,6 @@ class MGLIntegrator {
         this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
-    }
-    resize() {
-        this.canvas.style.width = this.map.getCanvas().style.width;
-        this.canvas.style.height = this.map.getCanvas().style.height;
-        this.move();
     }
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
