@@ -48,14 +48,19 @@ export default class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
+                        console.log('FREE', dataframe);
                         dataframe.free();
-                        // TODO this.renderer.removeDataframe(dataframe);
+                        this._removeDataframe(dataframe);
                     }
                 });
             }
             , maxAge: 1000 * 60 * 60
         };
         this.cache = LRU(lruOptions);
+    }
+    _bindLayer(addDataframe, removeDataframe) {
+        this._addDataframe = addDataframe;
+        this._removeDataframe = removeDataframe;
     }
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category]) {
@@ -121,7 +126,7 @@ export default class Dataset {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    _getData(viewport, MNS, addDataframe, styleDataframe) {
+    _getData(viewport, MNS) {
         if (!R.schema.equals(this._MNS, MNS)) {
             this._MNS = MNS;
             return this._instantiate();
@@ -141,7 +146,7 @@ export default class Dataset {
             const x = t.x;
             const y = t.y;
             const z = t.z;
-            this.getDataframe(x, y, z, addDataframe).then(dataframe => {
+            this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
                 } else {
@@ -149,14 +154,12 @@ export default class Dataset {
                 }
                 if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
                     this._oldDataframes.forEach(t => t.setStyle(false));
-                    completedTiles.map(t => styleDataframe(t));
                     this._oldDataframes = completedTiles;
                 }
             });
         });
     }
     _free() {
-        this._oldDataframes.forEach(t => t.setStyle(null));
         this.cache.reset();
     }
     _generateDataFrame(rs, geometry, properties, size, type) {
@@ -202,18 +205,18 @@ export default class Dataset {
         const layergroup = await response.json();
         return layerUrl(layergroup, 0, conf);
     }
-    getDataframe(x, y, z, addDataframe) {
+    getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
             return c;
         }
-        const promise = this.requestDataframe(x, y, z, addDataframe);
+        const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
         return promise;
     }
 
-    requestDataframe(x, y, z, addDataframe) {
+    requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
         return fetch(this.url(x, y, z))
@@ -256,7 +259,7 @@ export default class Dataset {
                     });
                     let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
                     const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                    addDataframe(dataframe);
+                    this._addDataframe(dataframe);
                     return dataframe;
                 });
             });
