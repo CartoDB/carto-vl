@@ -7,7 +7,7 @@ module.exports = function (config) {
         port: 9876,  // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
-        browsers: ['ChromeHeadless'],
+        browsers: ['ChromeHeadlessNoSandbox'],
         autoWatch: false,
         singleRun: true, // Karma captures browsers, runs the tests and exits
         concurrency: Infinity,
@@ -16,6 +16,13 @@ module.exports = function (config) {
         },
         webpack: {
             devtool: 'inline-source-map'
-        }
+        },
+        customLaunchers: {
+            // https://github.com/karma-runner/karma-chrome-launcher/issues/158
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox']
+            }
+        },
     });
 };
