@@ -33,8 +33,8 @@ export default class Blend extends Expression {
         }
         this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
-    _preDraw(l, gl) {
-        super._preDraw(l, gl);
+    _preDraw(...args) {
+        super._preDraw(...args);
         if (this.mix instanceof Animate && !this.mix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }

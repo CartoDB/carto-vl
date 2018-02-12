@@ -86,7 +86,7 @@ export default class Ramp extends Expression {
         this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
         this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(l, gl) {
+    _preDraw(l, gl,) {
         this.input._preDraw(l, gl);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);

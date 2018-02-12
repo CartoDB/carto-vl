@@ -61,8 +61,8 @@ export default class Expression {
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l, gl) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
+    _preDraw(...args) {
+        this.childrenNames.forEach(name => this[name]._preDraw(...args));
     }
 
     /**

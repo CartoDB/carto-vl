@@ -50,8 +50,8 @@ export default class Top extends Expression {
         this.property._postShaderCompile(program);
         this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(l, gl) {
-        this.property._preDraw(l);
+    _preDraw(l, gl, dataframes) {
+        this.property._preDraw(l, dataframes);
         gl.activeTexture(gl.TEXTURE0 + l.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._texLoc, l.freeTexUnit);

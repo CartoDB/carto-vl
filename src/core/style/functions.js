@@ -51,6 +51,7 @@ import { Mode } from './expressions/aggregation';
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
+import ViewportMax from './expressions/viewportAggregation';
 
 
 // Expose clases as constructor functions
@@ -98,4 +99,5 @@ export const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
 export const equals = (...args) => new Equals(...args);
 export const notEquals = (...args) => new NotEquals(...args);
 export const buckets = (...args) => new Buckets(...args);
+export const viewportMax = (...args) => new ViewportMax(...args);
 export { palettes };

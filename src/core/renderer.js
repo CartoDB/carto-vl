@@ -442,7 +442,7 @@ Renderer.prototype.refresh = function (timestamp) {
             freeTexUnit: 4,
             zoom: 1. / this._zoom
         };
-        styleExpr._preDraw(obj, gl);
+        styleExpr._preDraw(obj, gl, tiles);
 
         Object.keys(TID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
