@@ -83,8 +83,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
 
 
@@ -210,9 +210,229 @@ class Expression {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_hsv__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_rgba__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_opacity__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_top__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_xyz__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_zoom__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_unary__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_binary__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_interpolators__ = __webpack_require__(11);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Unary ops
+
+
+
+
+
+
+
+
+// Binary ops
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Aggregation ops
+
+
+
+
+
+
+// Interpolators
+
+
+
+
+
+// Expose clases as constructor functions
+const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["e" /* FloatMul */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatMul"] = floatMul;
+
+const floatDiv = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["c" /* FloatDiv */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatDiv"] = floatDiv;
+
+const floatAdd = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["b" /* FloatAdd */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatAdd"] = floatAdd;
+
+const floatSub = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["g" /* FloatSub */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatSub"] = floatSub;
+
+const floatPow = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["f" /* FloatPow */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatPow"] = floatPow;
+
+const floatMod = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["d" /* FloatMod */](...args);
+/* harmony export (immutable) */ __webpack_exports__["floatMod"] = floatMod;
+
+const log = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["c" /* Log */](...args);
+/* harmony export (immutable) */ __webpack_exports__["log"] = log;
+
+const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["f" /* Sqrt */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sqrt"] = sqrt;
+
+const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["e" /* Sin */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sin"] = sin;
+
+const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["b" /* Cos */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cos"] = cos;
+
+const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["g" /* Tan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["tan"] = tan;
+
+const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["d" /* Sign */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sign"] = sign;
+
+const near = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_near__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["near"] = near;
+
+const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_blend__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["blend"] = blend;
+
+const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_rgba__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["rgba"] = rgba;
+
+const property = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_property__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["property"] = property;
+
+const animate = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_animate__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["animate"] = animate;
+
+const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_hsv__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
+
+const setOpacity = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_opacity__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["setOpacity"] = setOpacity;
+
+const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_opacity__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
+
+const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["ramp"] = ramp;
+
+const float = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_float__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["float"] = float;
+
+const category = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_category__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["category"] = category;
+
+const max = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__["b" /* Max */](...args);
+/* harmony export (immutable) */ __webpack_exports__["max"] = max;
+
+const min = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__["c" /* Min */](...args);
+/* harmony export (immutable) */ __webpack_exports__["min"] = min;
+
+const sum = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__["e" /* Sum */](...args);
+/* harmony export (immutable) */ __webpack_exports__["sum"] = sum;
+
+const avg = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__["a" /* Avg */](...args);
+/* harmony export (immutable) */ __webpack_exports__["avg"] = avg;
+
+const mode = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_aggregation__["d" /* Mode */](...args);
+/* harmony export (immutable) */ __webpack_exports__["mode"] = mode;
+
+const top = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_top__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["top"] = top;
+
+const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_linear__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
+
+const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_interpolators__["a" /* Cubic */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
+
+const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_interpolators__["b" /* ILinear */](...args);
+/* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
+
+const now = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_now__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["now"] = now;
+
+const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_zoom__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
+
+const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
+
+const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_xyz__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
+
+const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_unary__["a" /* Abs */](...args);
+/* harmony export (immutable) */ __webpack_exports__["abs"] = abs;
+
+const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["h" /* GreaterThan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["greaterThan"] = greaterThan;
+
+const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["i" /* GreaterThanOrEqualTo */](...args);
+/* harmony export (immutable) */ __webpack_exports__["greaterThanOrEqualTo"] = greaterThanOrEqualTo;
+
+const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["j" /* LessThan */](...args);
+/* harmony export (immutable) */ __webpack_exports__["lessThan"] = lessThan;
+
+const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["k" /* LessThanOrEqualTo */](...args);
+/* harmony export (immutable) */ __webpack_exports__["lessThanOrEqualTo"] = lessThanOrEqualTo;
+
+const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["a" /* Equals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+
+const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_binary__["l" /* NotEquals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["notEquals"] = notEquals;
+
+const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["buckets"] = buckets;
+
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = implicitCast;
 /* harmony export (immutable) */ __webpack_exports__["a"] = hexToRgb;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
 
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
@@ -220,7 +440,9 @@ function implicitCast(value) {
     if (Number.isFinite(value)) {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
     }
-    // TODO we need to encapsulate strings as categories
+    if (typeof value == 'string'){
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
+    }
     return value;
 }
 
@@ -234,12 +456,12 @@ function hexToRgb(hex) {
 }
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
@@ -318,8 +540,9 @@ function genBinaryOp(jsFn, glsl) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
+            // TODO this logic is operation dependant
             if (typeof b === 'string' && a.type == 'category' && a.name) {
-                let id = meta.columns.find(c => c.name == a.name).categoryNames.indexOf(b);
+                const id = meta.categoryIDs[b];
                 this.auxFloat.expr = id;
                 this.type = 'float';
                 this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
@@ -329,6 +552,8 @@ function genBinaryOp(jsFn, glsl) {
                 this.type = 'color';
             } else if (a.type == 'color' && b.type == 'float') {
                 this.type = 'color';
+            } else if (a.type == 'category' && b.type == 'category') {
+                this.type = 'float';
             } else {
                 throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
             }
@@ -337,226 +562,11 @@ function genBinaryOp(jsFn, glsl) {
 }
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_linear__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_near__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_now__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_property__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_ramp__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_rgba__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_unary__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_binary__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__ = __webpack_require__(11);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Unary ops
-
-
-
-
-
-
-
-
-// Binary ops
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Aggregation ops
-
-
-
-
-
-
-// Interpolators
-
-
-
-
-
-// Expose clases as constructor functions
-const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["e" /* FloatMul */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatMul"] = floatMul;
-
-const floatDiv = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["c" /* FloatDiv */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatDiv"] = floatDiv;
-
-const floatAdd = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["b" /* FloatAdd */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatAdd"] = floatAdd;
-
-const floatSub = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["g" /* FloatSub */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatSub"] = floatSub;
-
-const floatPow = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["f" /* FloatPow */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatPow"] = floatPow;
-
-const floatMod = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["d" /* FloatMod */](...args);
-/* harmony export (immutable) */ __webpack_exports__["floatMod"] = floatMod;
-
-const log = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["c" /* Log */](...args);
-/* harmony export (immutable) */ __webpack_exports__["log"] = log;
-
-const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["f" /* Sqrt */](...args);
-/* harmony export (immutable) */ __webpack_exports__["sqrt"] = sqrt;
-
-const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["e" /* Sin */](...args);
-/* harmony export (immutable) */ __webpack_exports__["sin"] = sin;
-
-const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["b" /* Cos */](...args);
-/* harmony export (immutable) */ __webpack_exports__["cos"] = cos;
-
-const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["g" /* Tan */](...args);
-/* harmony export (immutable) */ __webpack_exports__["tan"] = tan;
-
-const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["d" /* Sign */](...args);
-/* harmony export (immutable) */ __webpack_exports__["sign"] = sign;
-
-const near = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_near__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["near"] = near;
-
-const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_blend__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["blend"] = blend;
-
-const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_rgba__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["rgba"] = rgba;
-
-const property = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_property__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["property"] = property;
-
-const animate = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_animate__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["animate"] = animate;
-
-const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_hsv__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
-
-const setOpacity = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["setOpacity"] = setOpacity;
-
-const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
-
-const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_ramp__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["ramp"] = ramp;
-
-const float = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_float__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["float"] = float;
-
-const max = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__["b" /* Max */](...args);
-/* harmony export (immutable) */ __webpack_exports__["max"] = max;
-
-const min = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__["c" /* Min */](...args);
-/* harmony export (immutable) */ __webpack_exports__["min"] = min;
-
-const sum = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__["e" /* Sum */](...args);
-/* harmony export (immutable) */ __webpack_exports__["sum"] = sum;
-
-const avg = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__["a" /* Avg */](...args);
-/* harmony export (immutable) */ __webpack_exports__["avg"] = avg;
-
-const mode = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_aggregation__["d" /* Mode */](...args);
-/* harmony export (immutable) */ __webpack_exports__["mode"] = mode;
-
-const top = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_top__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["top"] = top;
-
-const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_linear__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
-
-const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__["a" /* Cubic */](...args);
-/* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
-
-const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_interpolators__["b" /* ILinear */](...args);
-/* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
-
-const now = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_now__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["now"] = now;
-
-const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
-
-const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
-
-const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
-
-const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_unary__["a" /* Abs */](...args);
-/* harmony export (immutable) */ __webpack_exports__["abs"] = abs;
-
-const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["h" /* GreaterThan */](...args);
-/* harmony export (immutable) */ __webpack_exports__["greaterThan"] = greaterThan;
-
-const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["i" /* GreaterThanOrEqualTo */](...args);
-/* harmony export (immutable) */ __webpack_exports__["greaterThanOrEqualTo"] = greaterThanOrEqualTo;
-
-const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["j" /* LessThan */](...args);
-/* harmony export (immutable) */ __webpack_exports__["lessThan"] = lessThan;
-
-const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["k" /* LessThanOrEqualTo */](...args);
-/* harmony export (immutable) */ __webpack_exports__["lessThanOrEqualTo"] = lessThanOrEqualTo;
-
-const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["a" /* Equals */](...args);
-/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
-
-const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_binary__["l" /* NotEquals */](...args);
-/* harmony export (immutable) */ __webpack_exports__["notEquals"] = notEquals;
-
-const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["buckets"] = buckets;
-
-
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -668,9 +678,9 @@ function genAggregationOp(aggName) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_earcut__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dataframe__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__dataframe__ = __webpack_require__(48);
 /* unused harmony reexport Style */
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_4__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__schema__; });
@@ -1416,10 +1426,10 @@ const styler = {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Style; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return parseStyle; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shader_compiler__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__shaders__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parser__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__parser__ = __webpack_require__(45);
 /* unused harmony reexport compileShader */
 /* unused harmony namespace reexport */
 
@@ -1615,7 +1625,7 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -1737,7 +1747,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(54);
+var Point = __webpack_require__(55);
 
 module.exports = VectorTileFeature;
 
@@ -2168,11 +2178,13 @@ process.umask = function() { return 0; };
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_layer__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_dataset__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_dataset__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style__ = __webpack_require__(9);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_0__api_layer__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_2__core_style__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_2__core_style__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_3__core_style__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "parseStyle", function() { return __WEBPACK_IMPORTED_MODULE_3__core_style__["b"]; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "expressions", function() { return __WEBPACK_IMPORTED_MODULE_2__core_style_functions__; });
 /**
  *  @api
  *  @namespace carto
@@ -2186,13 +2198,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 // Source namespace has dataset and SQL
 const source = { Dataset: __WEBPACK_IMPORTED_MODULE_1__api_dataset__["a" /* default */] };
 
 
 
 
+
  // TODO(@iago): temporal export, we must find a better place
+
 
 
 /***/ }),
@@ -2218,21 +2233,31 @@ class Layer {
         this._dataframes = [];
 
         style.onChange(this._styleChanged.bind(this));
+        this.setSource(source);
         console.log('L', this);
     }
     setSource(source) {
-        this._source._free();
+        source._bindLayer(
+            dataframe => {
+                this._dataframes.push(dataframe);
+                this._mglIntegrator.renderer.addDataframe(dataframe);
+                this._mglIntegrator.invalidateMGLWebGLState();
+            },
+            dataframe => {
+                this._dataframes = this._dataframes.filter(d => d !== dataframe);
+                this._mglIntegrator.renderer.removeDataframe(dataframe);
+                this._mglIntegrator.invalidateMGLWebGLState();
+            }
+        );
+        if (this._source && this._source !== source) {
+            this._source._free();
+        }
         this._source = source;
     }
     setStyle(style) {
         this._style.onChange(null);
         style.onChange(this._styleChanged.bind(this));
         this._style = style;
-        this._dataframes.map(dataframe => {
-            if (dataframe.style) {
-                dataframe.style = this._style;
-            }
-        });
         this._styleChanged();
     }
     _styleChanged() {
@@ -2240,12 +2265,16 @@ class Layer {
             return;
         }
         this._getData();
-        // This should probably be part of the renderer but...
+        const originalPromise = this.metadataPromise;
         this.metadataPromise.then(metadata => {
-            this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            // We should only compile the shaders if the metadata came from the original promise
+            // if not, we would be compiling with a stale metadata
+            if (originalPromise == this.metadataPromise) {
+                this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            }
         });
     }
     _getViewport() {
@@ -2258,16 +2287,7 @@ class Layer {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema(),
-            dataframe => {
-                this._mglIntegrator.renderer.addDataframe(dataframe);
-                dataframe.setStyle(null);
-                this._mglIntegrator.invalidateMGLWebGLState();
-            },
-            dataframe => {
-                this._dataframes.push(dataframe);
-                dataframe.setStyle(this._style);
-            });
+        const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema());
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
@@ -2281,8 +2301,16 @@ class Layer {
         map.on('load', () => {
             this._mglIntegrator = Object(__WEBPACK_IMPORTED_MODULE_0__mglintegrator__["a" /* default */])(map);
             this._mglIntegrator.addLayer(this._name, beforeLayerID, this._getData.bind(this), () => {
-                // TODO deactivate all non owned dataframes
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.setStyle(this._style);
+                        dataframe.visible = true;
+                    });
                 this._mglIntegrator.renderer.refresh(Number.NaN);
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.visible = false;
+                    });
             });
         });
     }
@@ -2358,6 +2386,7 @@ class MGLIntegrator {
             type: 'custom-webgl'
         }, beforeLayerID);
         this._layers.push(layerId);
+        this.move();
     }
     needRefresh() {
         this.map.repaint = true;
@@ -5019,7 +5048,7 @@ if (true) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
@@ -5073,7 +5102,7 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5099,8 +5128,8 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         super._compile(metadata);
         this.type = 'category';
         this.args.map(breakpoint => {
-            if (breakpoint.type != 'float') {
-                throw new Error('Buckets() invalid parameter');
+            if (breakpoint.type != this.input.type) {
+                throw new Error('Buckets() argument types mismatch');
             }
         });
     }
@@ -5110,8 +5139,9 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
 
         const funcName = `buckets${this.bucketUID}`;
+        const cmp = this.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+            `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index + 1}.;
             }`;
         const funcBody = this.args.map(elif).join('');
@@ -5135,7 +5165,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5255,7 +5285,52 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} x
+     */
+    constructor(x) {
+        if (typeof x !== 'string') {
+            throw new Error(`Invalid arguments to Category(): ${x}`);
+        }
+        super({});
+        this.expr = x;
+    }
+    _compile(metadata) {
+        this.type = 'category';
+        this._metadata = metadata;
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float cat${this._uniformID};\n`,
+            inline: `cat${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
+    }
+    _preDraw(l, gl) {
+        const id = this._metadata.categoryIDs[this.expr];
+        gl.uniform1f(this._uniformLocation, id);
+    }
+    isAnimated() {
+        return false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Category;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5306,7 +5381,7 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5331,12 +5406,12 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5377,12 +5452,12 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
 
@@ -5414,7 +5489,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5456,13 +5531,13 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(1);
 
 
 
@@ -5565,12 +5640,12 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
 
@@ -5606,12 +5681,12 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
 
@@ -5641,7 +5716,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5660,7 +5735,8 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
         this.type = 'category';
-        this.numCategories = this.buckets;
+        this.numCategories = this.buckets + 1;
+        this._meta = metadata;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -5680,9 +5756,12 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
-            for (let i = 0; i < this.buckets - 1; i++) {
-                pixels[4 * i + 3] = (i + 1);
-            }
+            const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+            metaColumn.categoryNames.map((name, i) => {
+                if (i < this.buckets) {
+                    pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
+                }
+            });
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);
@@ -5707,12 +5786,12 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5789,12 +5868,12 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
 
@@ -5820,17 +5899,17 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyle;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(46);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__renderer__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_utils__ = __webpack_require__(2);
 
 
 
@@ -5956,7 +6035,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -6643,7 +6722,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7300,7 +7379,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7343,16 +7422,16 @@ class Dataframe {
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_pbf__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rsys__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_pbf__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_renderer__ = __webpack_require__(6);
 
@@ -7396,6 +7475,8 @@ class Dataset {
         this._oldDataframes = [];
         this._MNS = null;
         this._promiseMNS = null;
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
         const lruOptions = {
             max: 1000
             // TODO improve cache length heuristic
@@ -7403,8 +7484,9 @@ class Dataset {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
+                        console.log('FREE', dataframe);
                         dataframe.free();
-                        // TODO this.renderer.removeDataframe(dataframe);
+                        this._removeDataframe(dataframe);
                     }
                 });
             }
@@ -7412,6 +7494,19 @@ class Dataset {
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
     }
+    _bindLayer(addDataframe, removeDataframe) {
+        this._addDataframe = addDataframe;
+        this._removeDataframe = removeDataframe;
+    }
+    _getCategoryIDFromString(category) {
+        if (this._categoryStringToIDMap[category]) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._numCategories++;
+        this._categoryStringToIDMap[category] = this._numCategories;
+        return this._numCategories;
+    }
+
     _instantiate() {
         this._oldDataframes = [];
         this.cache.reset();
@@ -7448,7 +7543,7 @@ class Dataset {
         };
 
         const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
-        this.metadataPromise = getMetadata(query, MNS, conf);
+        this.metadataPromise = this.getMetadata(query, MNS, conf);
 
         return (async () => {
             try {
@@ -7467,7 +7562,7 @@ class Dataset {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    _getData(viewport, MNS, addDataframe, styleDataframe) {
+    _getData(viewport, MNS) {
         if (!__WEBPACK_IMPORTED_MODULE_4__core_renderer__["c" /* schema */].equals(this._MNS, MNS)) {
             this._MNS = MNS;
             return this._instantiate();
@@ -7487,7 +7582,7 @@ class Dataset {
             const x = t.x;
             const y = t.y;
             const z = t.z;
-            this.getDataframe(x, y, z, addDataframe).then(dataframe => {
+            this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
                 } else {
@@ -7495,14 +7590,12 @@ class Dataset {
                 }
                 if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
                     this._oldDataframes.forEach(t => t.setStyle(false));
-                    completedTiles.map(t => styleDataframe(t));
                     this._oldDataframes = completedTiles;
                 }
             });
         });
     }
     _free() {
-        this._oldDataframes.forEach(t => t.setStyle(null));
         this.cache.reset();
     }
     _generateDataFrame(rs, geometry, properties, size, type) {
@@ -7548,23 +7641,18 @@ class Dataset {
         const layergroup = await response.json();
         return layerUrl(layergroup, 0, conf);
     }
-
-    getCatID(catName, catStr, metadata, pName) {
-        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
-        return id;
-    }
-    getDataframe(x, y, z, addDataframe) {
+    getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
             return c;
         }
-        const promise = this.requestDataframe(x, y, z, addDataframe);
+        const promise = this.requestDataframe(x, y, z);
         this.cache.set(id, promise);
         return promise;
     }
 
-    requestDataframe(x, y, z, addDataframe) {
+    requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
         return fetch(this.url(x, y, z))
@@ -7607,7 +7695,7 @@ class Dataset {
                     });
                     let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
                     const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                    addDataframe(dataframe);
+                    this._addDataframe(dataframe);
                     return dataframe;
                 });
             });
@@ -7677,7 +7765,7 @@ class Dataset {
             }
 
             catFields.map((name, index) => {
-                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
+                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
             });
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
@@ -7685,6 +7773,45 @@ class Dataset {
         }
 
         return { properties, points, featureGeometries };
+    }
+    async getMetadata(query, proto, conf) {
+        //Get column names and types with a limit 0
+        //Get min,max,sum and count of numerics
+        //for each category type
+        //Get category names and counts by grouping by
+        //Assign ids
+        const metadata = {
+            featureCount: 1000,
+            columns: [],
+        };
+        const fields = await getColumnTypes(query, conf);
+        let numerics = [];
+        let categories = [];
+        Object.keys(fields).map(name => {
+            const type = fields[name].type;
+            if (type == 'number') {
+                numerics.push(name);
+                //proto[name].type = 'number';
+            } else if (type == 'string') {
+                categories.push(name);
+                //proto[name].type = 'category';
+            }
+        });
+
+        const numericsTypes = await getNumericTypes(numerics, query, conf);
+        const categoriesTypes = await getCategoryTypes(categories, query, conf);
+
+        numerics.map((name, index) => {
+            const t = numericsTypes[index];
+            metadata.columns.push(t);
+        });
+        metadata.categoryIDs = {};
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            metadata.columns.push(t);
+        });
+        return metadata;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Dataset;
@@ -7757,43 +7884,6 @@ async function getCategoryTypes(names, query, conf) {
 }
 
 
-async function getMetadata(query, proto, conf) {
-    //Get column names and types with a limit 0
-    //Get min,max,sum and count of numerics
-    //for each category type
-    //Get category names and counts by grouping by
-    //Assign ids
-    const metadata = {
-        featureCount: 1000,
-        columns: [],
-    };
-    const fields = await getColumnTypes(query, conf);
-    let numerics = [];
-    let categories = [];
-    Object.keys(fields).map(name => {
-        const type = fields[name].type;
-        if (type == 'number') {
-            numerics.push(name);
-            //proto[name].type = 'number';
-        } else if (type == 'string') {
-            categories.push(name);
-            //proto[name].type = 'category';
-        }
-    });
-
-    const numericsTypes = await getNumericTypes(numerics, query, conf);
-    const categoriesTypes = await getCategoryTypes(categories, query, conf);
-
-    numerics.map((name, index) => {
-        const t = numericsTypes[index];
-        metadata.columns.push(t);
-    });
-    categories.map((name, index) => {
-        const t = categoriesTypes[index];
-        metadata.columns.push(t);
-    });
-    return metadata;
-}
 
 function isClockWise(vertices) {
     let a = 0;
@@ -7815,7 +7905,7 @@ function getAggFN(name) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7970,7 +8060,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7978,7 +8068,7 @@ function getRsysFromTile(x, y, z) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(51);
+var ieee754 = __webpack_require__(52);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -8595,7 +8685,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -8685,16 +8775,16 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(53);
+module.exports.VectorTile = __webpack_require__(54);
 module.exports.VectorTileFeature = __webpack_require__(13);
 module.exports.VectorTileLayer = __webpack_require__(12);
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8718,7 +8808,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9037,7 +9127,7 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9047,11 +9137,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(56)
-var util = __webpack_require__(58)
+var Map = __webpack_require__(57)
+var util = __webpack_require__(59)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(62)
+var Yallist = __webpack_require__(63)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -9511,7 +9601,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -9521,13 +9611,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(57)
+  module.exports = __webpack_require__(58)
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -9646,7 +9736,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10174,7 +10264,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(60);
+exports.isBuffer = __webpack_require__(61);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -10218,7 +10308,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(61);
+exports.inherits = __webpack_require__(62);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -10236,10 +10326,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(59), __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(60), __webpack_require__(14)))
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 var g;
@@ -10266,7 +10356,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -10277,7 +10367,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -10306,7 +10396,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
