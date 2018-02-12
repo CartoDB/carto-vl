@@ -12,7 +12,8 @@ export default class Top extends Expression {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
         this.type = 'category';
-        this.numCategories = this.buckets;
+        this.numCategories = this.buckets + 1;
+        this._meta = metadata;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
         this._UID = uniformIDMaker();
@@ -32,9 +33,12 @@ export default class Top extends Expression {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
-            for (let i = 0; i < this.buckets - 1; i++) {
-                pixels[4 * i + 3] = (i + 1);
-            }
+            const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+            metaColumn.categoryNames.map((name, i) => {
+                if (i < this.buckets) {
+                    pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
+                }
+            });
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);

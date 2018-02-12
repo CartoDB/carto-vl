@@ -51,8 +51,9 @@ function genBinaryOp(jsFn, glsl) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
+            // TODO this logic is operation dependant
             if (typeof b === 'string' && a.type == 'category' && a.name) {
-                let id = meta.columns.find(c => c.name == a.name).categoryNames.indexOf(b);
+                const id = meta.categoryIDs[b];
                 this.auxFloat.expr = id;
                 this.type = 'float';
                 this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
@@ -62,6 +63,8 @@ function genBinaryOp(jsFn, glsl) {
                 this.type = 'color';
             } else if (a.type == 'color' && b.type == 'float') {
                 this.type = 'color';
+            } else if (a.type == 'category' && b.type == 'category') {
+                this.type = 'float';
             } else {
                 throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
             }
