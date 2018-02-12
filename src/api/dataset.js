@@ -205,7 +205,7 @@ export default class Dataset {
         const layergroup = await response.json();
         return layerUrl(layergroup, 0, conf);
     }
-    getDataframe(x, y, z, addDataframe) {
+    getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
