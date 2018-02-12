@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^4.15.0",
     "jasmine-core": "^2.99.1",
     "jsdoc": "^3.5.5",
@@ -52,7 +53,7 @@
     "lint": "eslint .",
     "loc": "sloc src/ examples/",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
-    "sst": "mocha test/integration/index.test.js --timeout 15000",
+    "test:acceptance": "mocha test/acceptance/index.test.js --timeout 15000",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
     "test": "yarn lint && yarn test:unit"
   }
