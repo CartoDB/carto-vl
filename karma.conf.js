@@ -2,7 +2,7 @@ module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
         files: ['test/**/*.test.js'],
-        exclude: ['test/acceptance/**'],
+        exclude: ['test/integration/**'],
         reporters: ['progress'],
         port: 9876,  // karma web server port
         colors: true,
