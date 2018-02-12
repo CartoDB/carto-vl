@@ -1,6 +1,5 @@
 import Expression from './expression';
 
-let i=0;
 export default class Category extends Expression {
     /**
      * @jsapi
