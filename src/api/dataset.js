@@ -39,6 +39,8 @@ export default class Dataset {
         this._oldDataframes = [];
         this._MNS = null;
         this._promiseMNS = null;
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
         const lruOptions = {
             max: 1000
             // TODO improve cache length heuristic
@@ -60,6 +62,15 @@ export default class Dataset {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
     }
+    _getCategoryIDFromString(category) {
+        if (this._categoryStringToIDMap[category]) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._numCategories++;
+        this._categoryStringToIDMap[category] = this._numCategories;
+        return this._numCategories;
+    }
+
     _instantiate() {
         this._oldDataframes = [];
         this.cache.reset();
@@ -96,7 +107,7 @@ export default class Dataset {
         };
 
         const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
-        this.metadataPromise = getMetadata(query, MNS, conf);
+        this.metadataPromise = this.getMetadata(query, MNS, conf);
 
         return (async () => {
             try {
@@ -194,12 +205,7 @@ export default class Dataset {
         const layergroup = await response.json();
         return layerUrl(layergroup, 0, conf);
     }
-
-    getCatID(catName, catStr, metadata, pName) {
-        const id = metadata.columns.find(c => c.name == getBase(pName)).categoryNames.indexOf(catStr);
-        return id;
-    }
-    getDataframe(x, y, z) {
+    getDataframe(x, y, z, addDataframe) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
@@ -323,7 +329,7 @@ export default class Dataset {
             }
 
             catFields.map((name, index) => {
-                properties[index][i] = this.getCatID(name, f.properties[name], metadata, catFieldsReal[index]);
+                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
             });
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
@@ -331,6 +337,45 @@ export default class Dataset {
         }
 
         return { properties, points, featureGeometries };
+    }
+    async getMetadata(query, proto, conf) {
+        //Get column names and types with a limit 0
+        //Get min,max,sum and count of numerics
+        //for each category type
+        //Get category names and counts by grouping by
+        //Assign ids
+        const metadata = {
+            featureCount: 1000,
+            columns: [],
+        };
+        const fields = await getColumnTypes(query, conf);
+        let numerics = [];
+        let categories = [];
+        Object.keys(fields).map(name => {
+            const type = fields[name].type;
+            if (type == 'number') {
+                numerics.push(name);
+                //proto[name].type = 'number';
+            } else if (type == 'string') {
+                categories.push(name);
+                //proto[name].type = 'category';
+            }
+        });
+
+        const numericsTypes = await getNumericTypes(numerics, query, conf);
+        const categoriesTypes = await getCategoryTypes(categories, query, conf);
+
+        numerics.map((name, index) => {
+            const t = numericsTypes[index];
+            metadata.columns.push(t);
+        });
+        metadata.categoryIDs = {};
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            metadata.columns.push(t);
+        });
+        return metadata;
     }
 }
 
@@ -401,43 +446,6 @@ async function getCategoryTypes(names, query, conf) {
 }
 
 
-async function getMetadata(query, proto, conf) {
-    //Get column names and types with a limit 0
-    //Get min,max,sum and count of numerics
-    //for each category type
-    //Get category names and counts by grouping by
-    //Assign ids
-    const metadata = {
-        featureCount: 1000,
-        columns: [],
-    };
-    const fields = await getColumnTypes(query, conf);
-    let numerics = [];
-    let categories = [];
-    Object.keys(fields).map(name => {
-        const type = fields[name].type;
-        if (type == 'number') {
-            numerics.push(name);
-            //proto[name].type = 'number';
-        } else if (type == 'string') {
-            categories.push(name);
-            //proto[name].type = 'category';
-        }
-    });
-
-    const numericsTypes = await getNumericTypes(numerics, query, conf);
-    const categoriesTypes = await getCategoryTypes(categories, query, conf);
-
-    numerics.map((name, index) => {
-        const t = numericsTypes[index];
-        metadata.columns.push(t);
-    });
-    categories.map((name, index) => {
-        const t = categoriesTypes[index];
-        metadata.columns.push(t);
-    });
-    return metadata;
-}
 
 function isClockWise(vertices) {
     let a = 0;

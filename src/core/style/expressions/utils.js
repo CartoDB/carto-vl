@@ -1,11 +1,13 @@
-import { float } from '../functions';
+import { float, category } from '../functions';
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
         return float(value);
     }
-    // TODO we need to encapsulate strings as categories
+    if (typeof value == 'string'){
+        return category(value);
+    }
     return value;
 }
 
