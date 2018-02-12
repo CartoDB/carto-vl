@@ -1,5 +1,5 @@
 import Expression from './expression';
-import {implicitCast} from './utils' ;
+import { implicitCast } from './utils';
 
 let bucketUID = 0;
 
@@ -23,8 +23,8 @@ export default class Buckets extends Expression {
         super._compile(metadata);
         this.type = 'category';
         this.args.map(breakpoint => {
-            if (breakpoint.type != 'float') {
-                throw new Error('Buckets() invalid parameter');
+            if (breakpoint.type != this.input.type) {
+                throw new Error('Buckets() argument types mismatch');
             }
         });
     }
@@ -34,8 +34,9 @@ export default class Buckets extends Expression {
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
 
         const funcName = `buckets${this.bucketUID}`;
+        const cmp = this.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+            `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index + 1}.;
             }`;
         const funcBody = this.args.map(elif).join('');
