@@ -58,6 +58,7 @@ class MGLIntegrator {
             type: 'custom-webgl'
         }, beforeLayerID);
         this._layers.push(layerId);
+        this.move();
     }
     needRefresh() {
         this.map.repaint = true;

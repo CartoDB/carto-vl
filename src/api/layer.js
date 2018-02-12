@@ -15,21 +15,31 @@ export default class Layer {
         this._dataframes = [];
 
         style.onChange(this._styleChanged.bind(this));
+        this.setSource(source);
         console.log('L', this);
     }
     setSource(source) {
-        this._source._free();
+        source._bindLayer(
+            dataframe => {
+                this._dataframes.push(dataframe);
+                this._mglIntegrator.renderer.addDataframe(dataframe);
+                this._mglIntegrator.invalidateMGLWebGLState();
+            },
+            dataframe => {
+                this._dataframes = this._dataframes.filter(d => d !== dataframe);
+                this._mglIntegrator.renderer.removeDataframe(dataframe);
+                this._mglIntegrator.invalidateMGLWebGLState();
+            }
+        );
+        if (this._source && this._source !== source) {
+            this._source._free();
+        }
         this._source = source;
     }
     setStyle(style) {
         this._style.onChange(null);
         style.onChange(this._styleChanged.bind(this));
         this._style = style;
-        this._dataframes.map(dataframe => {
-            if (dataframe.style) {
-                dataframe.style = this._style;
-            }
-        });
         this._styleChanged();
     }
     _styleChanged() {
@@ -37,12 +47,16 @@ export default class Layer {
             return;
         }
         this._getData();
-        // This should probably be part of the renderer but...
+        const originalPromise = this.metadataPromise;
         this.metadataPromise.then(metadata => {
-            this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-            this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            // We should only compile the shaders if the metadata came from the original promise
+            // if not, we would be compiling with a stale metadata
+            if (originalPromise == this.metadataPromise) {
+                this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            }
         });
     }
     _getViewport() {
@@ -55,16 +69,7 @@ export default class Layer {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema(),
-            dataframe => {
-                this._mglIntegrator.renderer.addDataframe(dataframe);
-                dataframe.setStyle(null);
-                this._mglIntegrator.invalidateMGLWebGLState();
-            },
-            dataframe => {
-                this._dataframes.push(dataframe);
-                dataframe.setStyle(this._style);
-            });
+        const r = this._source._getData(this._getViewport(), this._style.getMinimumNeededSchema());
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
@@ -78,8 +83,16 @@ export default class Layer {
         map.on('load', () => {
             this._mglIntegrator = getMGLIntegrator(map);
             this._mglIntegrator.addLayer(this._name, beforeLayerID, this._getData.bind(this), () => {
-                // TODO deactivate all non owned dataframes
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.setStyle(this._style);
+                        dataframe.visible = true;
+                    });
                 this._mglIntegrator.renderer.refresh(Number.NaN);
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.visible = false;
+                    });
             });
         });
     }
