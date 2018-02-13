@@ -444,8 +444,14 @@ Renderer.prototype.refresh = function (timestamp) {
             }
         ]
     };
-    let requiredColumns = ['amount'];
-    //console.log(tiles);
+    let requiredColumns = tiles.map(d => {
+        const widthRequirements = d.style._width._getDrawMetadataRequirements();
+        const colorRequirements = d.style._color._getDrawMetadataRequirements();
+        const strokeWidthRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        const strokeColorRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
+            reduce(schema.union, schema.IDENTITY);
+    }).reduce(schema.union, schema.IDENTITY).columns;
     const s = 1. / this._zoom;
     tiles.map(d => {
         requiredColumns.map(column => {
@@ -473,7 +479,7 @@ Renderer.prototype.refresh = function (timestamp) {
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
                     const v = values[i];
-                    if (!Number.isFinite(v)){
+                    if (!Number.isFinite(v)) {
                         console.warn('asd');
                     }
                     sum += v;

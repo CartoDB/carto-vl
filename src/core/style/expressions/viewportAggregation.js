@@ -26,14 +26,14 @@ function generateViewportExpression(metadataPropertyName) {
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
         }
-        _getDrawMetadataRequirements(){
-            return [this.property.name];
+        _getDrawMetadataRequirements() {
+            return { columns: [this.property.name] };
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
             this.value.expr = column[metadataPropertyName];
-            if (Math.random() > 0.998) {
-                console.log(column[metadataPropertyName]);
+            if (Math.random() > 0.999) {
+                console.log(metadataPropertyName, this.property.name, column[metadataPropertyName]);
             }
             this.value._preDraw(drawMetadata, gl);
         }
