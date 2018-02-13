@@ -36,17 +36,17 @@ export default class SQL extends Base {
 
     _checkQuery (query) {
         if (_.isUndefined(query)) {
-            throw new Error('source', 'noQuery');
+            throw new Error('source', 'queryRequired');
         }
         if (!_.isString(query)) {
-            throw new Error('source', 'requiredString');
+            throw new Error('source', 'queryString');
         }
         if (_.isEmpty(query)) {
-            throw new Error('source', 'requiredNoEmpty');
+            throw new Error('source', 'nonValidQuery');
         }
         var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
         if (!query.match(sqlRegex)) {
-            throw new Error('source', 'requiredSQLQuery');
+            throw new Error('source', 'nonValidSQLQuery');
         }
     }
 }

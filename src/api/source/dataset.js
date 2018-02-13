@@ -36,13 +36,13 @@ export default class Dataset extends Base {
 
     _checkTableName (tableName) {
         if (_.isUndefined(tableName)) {
-            throw new Error('source', 'noTableName');
+            throw new Error('source', 'tableNameRequired');
         }
         if (!_.isString(tableName)) {
-            throw new Error('source', 'requiredString');
+            throw new Error('source', 'tableNameString');
         }
         if (_.isEmpty(tableName)) {
-            throw new Error('source', 'requiredNoEmpty');
+            throw new Error('source', 'nonValidTableName');
         }
     }
 }

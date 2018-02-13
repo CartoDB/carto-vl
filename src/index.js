@@ -9,11 +9,9 @@
  * - **source** : Source description
  */
 
-import Layer from './api/layer';
 import * as expressions from './core/style/functions';
 import { Style, parseStyle } from './core/style';
 
-export { Layer };
 export { Style };
 export { parseStyle }; // TODO(@iago): temporal export, we must find a better place
 export { expressions };
@@ -22,7 +20,8 @@ export { expressions };
 
 import Dataset from './api/source/dataset';
 import SQL from './api/source/sql';
+import Layer from './api/layer';
 
 const source = { Dataset, SQL };
 
-export { source };
+export { source, Layer };
