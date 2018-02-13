@@ -13,8 +13,10 @@ export default class Ramp extends Expression {
      */
     constructor(input, palette, minKey, maxKey) {
         input = implicitCast(input);
-        minKey = implicitCast(minKey);
-        maxKey = implicitCast(maxKey);
+        if (minKey !== undefined) {
+            minKey = implicitCast(minKey);
+            maxKey = implicitCast(maxKey);
+        }
         var values = implicitCast(palette);
         super({ input: input });
         if (minKey === undefined) {

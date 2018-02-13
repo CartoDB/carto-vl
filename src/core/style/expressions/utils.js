@@ -9,7 +9,7 @@ export function implicitCast(value) {
     if (typeof value == 'string'){
         return category(value);
     }
-    if (!( value instanceof Expression)){
+    if (!( value instanceof Expression) && !value.length){
         throw new Error('value cannot be casted');
     }
     return value;
