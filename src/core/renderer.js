@@ -467,31 +467,17 @@ Renderer.prototype.refresh = function (timestamp) {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
             for (let i = 0; i < d.numFeatures; i++) {
-                let avoid = false;
-                {
-                    const x = d.geom[2 * i + 0] * d.vertexScale[0] - d.vertexOffset[0];
-                    const y = d.geom[2 * i + 1] * d.vertexScale[1] - d.vertexOffset[1];
-                    if (x > 1 || x < -1 || y > 1 || y < -1) {
-                        avoid = true;
-                    }
-                }
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
                     const v = values[i];
                     if (!Number.isFinite(v)) {
-                        console.warn('asd');
+                        continue;
                     }
                     sum += v;
                     min = Math.min(min, v);
                     max = Math.max(max, v);
                     count++;
-                    if (avoid) {
-                        console.warn('err');
-                    }
-                } else if (!avoid) {
-                    console.warn('err2');
-                    debugger;
                 }
             }
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
