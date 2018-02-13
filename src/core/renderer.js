@@ -436,35 +436,68 @@ Renderer.prototype.refresh = function (timestamp) {
         columns: [
             {
                 name: 'amount',
-                min: 1,
-                max: 3,
-                avg: 2,
-                count: 100,
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+                avg: undefined,
+                count: 0,
+                sum: 0,
             }
         ]
     };
     let requiredColumns = ['amount'];
+    //console.log(tiles);
+    const s = 1. / this._zoom;
     tiles.map(d => {
         requiredColumns.map(column => {
             const values = d.properties[column];
             let min = Number.POSITIVE_INFINITY;
             let max = Number.NEGATIVE_INFINITY;
             let sum = 0;
-            for (let i = 0; i < values.length; i++) {
-                const v = values[i];
-                sum += v;
-                min = Math.min(min, v);
-                max = Math.max(max, v);
+            let count = 0;
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+            for (let i = 0; i < d.numFeatures; i++) {
+                let avoid = false;
+                {
+                    const x = d.geom[2 * i + 0] * d.vertexScale[0] - d.vertexOffset[0];
+                    const y = d.geom[2 * i + 1] * d.vertexScale[1] - d.vertexOffset[1];
+                    if (x > 1 || x < -1 || y > 1 || y < -1) {
+                        avoid = true;
+                    }
+                }
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    const v = values[i];
+                    if (!Number.isFinite(v)){
+                        console.warn('asd');
+                    }
+                    sum += v;
+                    min = Math.min(min, v);
+                    max = Math.max(max, v);
+                    count++;
+                    if (avoid) {
+                        console.warn('err');
+                    }
+                } else if (!avoid) {
+                    console.warn('err2');
+                    debugger;
+                }
             }
-            const count = values.length;
-            const avg = sum / count;
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            metaColumn.min = min;
-            metaColumn.max = max;
-            metaColumn.avg = avg;
-            metaColumn.count = count;
-            metaColumn.sum = sum;
+            metaColumn.min = Math.min(min, metaColumn.min);
+            metaColumn.max = Math.max(max, metaColumn.max);
+            metaColumn.count += count;
+            metaColumn.sum += sum;
         });
+    });
+    requiredColumns.map(column => {
+        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+        metaColumn.avg = metaColumn.sum / metaColumn.count;
     });
 
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
@@ -506,7 +539,6 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    var s = 1. / this._zoom;
 
 
     tiles.forEach(tile => {
