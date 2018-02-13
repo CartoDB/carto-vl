@@ -427,6 +427,46 @@ Renderer.prototype.refresh = function (timestamp) {
     // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
+    const tiles = this.dataframes.filter(tile => tile.style);
+    //console.log(tiles);
+
+    let drawMetadata = {
+        freeTexUnit: 4,
+        zoom: 1. / this._zoom,
+        columns: [
+            {
+                name: 'amount',
+                min: 1,
+                max: 3,
+                avg: 2,
+                count: 100,
+            }
+        ]
+    };
+    let requiredColumns = ['amount'];
+    tiles.map(d => {
+        requiredColumns.map(column => {
+            const values = d.properties[column];
+            let min = Number.POSITIVE_INFINITY;
+            let max = Number.NEGATIVE_INFINITY;
+            let sum = 0;
+            for (let i = 0; i < values.length; i++) {
+                const v = values[i];
+                sum += v;
+                min = Math.min(min, v);
+                max = Math.max(max, v);
+            }
+            const count = values.length;
+            const avg = sum / count;
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            metaColumn.min = min;
+            metaColumn.max = max;
+            metaColumn.avg = avg;
+            metaColumn.count = count;
+            metaColumn.sum = sum;
+        });
+    });
+
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -438,11 +478,9 @@ Renderer.prototype.refresh = function (timestamp) {
             gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
             gl.uniform1i(shader.textureLocations[i], 0);
         }
-        var obj = {
-            freeTexUnit: 4,
-            zoom: 1. / this._zoom
-        };
-        styleExpr._preDraw(obj, gl, tiles);
+
+        drawMetadata.freeTexUnit = 4;
+        styleExpr._preDraw(drawMetadata, gl);
 
         Object.keys(TID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
@@ -457,7 +495,6 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    const tiles = this.dataframes.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));

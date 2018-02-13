@@ -30,7 +30,7 @@ export default class Animate extends Expression {
     _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(l, gl) {
+    _preDraw(drawMetadata, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {

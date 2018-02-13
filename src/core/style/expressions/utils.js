@@ -1,4 +1,5 @@
 import { float, category } from '../functions';
+import Expression from './expression';
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
@@ -7,6 +8,9 @@ export function implicitCast(value) {
     }
     if (typeof value == 'string'){
         return category(value);
+    }
+    if (!( value instanceof Expression)){
+        throw new Error('value cannot be casted');
     }
     return value;
 }
