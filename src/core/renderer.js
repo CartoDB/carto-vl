@@ -406,17 +406,7 @@ Renderer.prototype._computeDrawMetadata = function () {
     let drawMetadata = {
         freeTexUnit: 4,
         zoom: 1. / this._zoom,
-        columns: [
-            {
-                name: 'amount',
-                min: Number.POSITIVE_INFINITY,
-                max: Number.NEGATIVE_INFINITY,
-                avg: undefined,
-                count: 0,
-                sum: 0,
-                histogram: Array.from({ length: 1000 }, () => 0),
-            }
-        ]
+        columns: []
     };
     let requiredColumns = tiles.map(d => {
         const widthRequirements = d.style._width._getDrawMetadataRequirements();
@@ -426,6 +416,22 @@ Renderer.prototype._computeDrawMetadata = function () {
         return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
             reduce(schema.union, schema.IDENTITY);
     }).reduce(schema.union, schema.IDENTITY).columns;
+
+    requiredColumns.map(column => {
+        drawMetadata.columns.push(
+            {
+                name: column,
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+                avg: undefined,
+                count: 0,
+                sum: 0,
+                histogram: Array.from({ length: 1000 }, () => 0),
+                accumHistogram: Array.from({ length: 1000 }, () => 0),
+            }
+        );
+    });
+
     const s = 1. / this._zoom;
     tiles.map(d => {
         requiredColumns.map(column => {
@@ -488,6 +494,14 @@ Renderer.prototype._computeDrawMetadata = function () {
                     }
                     metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
                 }
+            }
+        });
+    });
+    tiles.map(d => {
+        requiredColumns.map(column => {
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            for (let i = 1; i < 1000; i++) {
+                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
             }
         });
     });
