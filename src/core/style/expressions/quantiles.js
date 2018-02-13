@@ -1,5 +1,4 @@
 import Expression from './expression';
-import { implicitCast } from './utils';
 import { float } from '../functions';
 
 let quantilesUID = 0;

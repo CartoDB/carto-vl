@@ -497,13 +497,11 @@ Renderer.prototype._computeDrawMetadata = function () {
             }
         });
     });
-    tiles.map(d => {
-        requiredColumns.map(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            for (let i = 1; i < 1000; i++) {
-                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
-            }
-        });
+    requiredColumns.map(column => {
+        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+        for (let i = 1; i < 1000; i++) {
+            metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
+        }
     });
     return drawMetadata;
 };
