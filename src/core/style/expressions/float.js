@@ -26,7 +26,7 @@ export default class Float extends Expression {
     _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
-    _preDraw(l, gl) {
+    _preDraw(drawMetadata, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
     isAnimated() {

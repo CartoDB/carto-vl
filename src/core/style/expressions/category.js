@@ -26,7 +26,7 @@ export default class Category extends Expression {
     _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
     }
-    _preDraw(l, gl) {
+    _preDraw(drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
     }

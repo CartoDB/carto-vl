@@ -14,8 +14,8 @@ export default class Zoom extends Expression {
         this.type = 'float';
         super.inlineMaker = inline => inline.zoom;
     }
-    _preDraw(o, gl) {
-        this.zoom.expr = o.zoom;
-        this.zoom._preDraw(o, gl);
+    _preDraw(drawMetadata, gl) {
+        this.zoom.expr = drawMetadata.zoom;
+        this.zoom._preDraw(drawMetadata, gl);
     }
 }
