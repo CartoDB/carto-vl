@@ -5,7 +5,6 @@ import * as schema from '../../schema';
 
 export default class Expression {
     /**
-     * @api
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker

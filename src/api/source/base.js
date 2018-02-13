@@ -1,40 +1,31 @@
-import * as rsys from './rsys';
 import * as Protobuf from 'pbf';
-import { VectorTile } from '@mapbox/vector-tile';
 import * as LRU from 'lru-cache';
-import * as R from '../core/renderer';
 
-//TODO auth, config, source engine, use async/await
+import { VectorTile } from '@mapbox/vector-tile';
 
-const endpoint = (conf) => {
-    return `https://${conf.user}.${conf.cartoURL}/api/v1/map?api_key=${conf.apiKey}`;
-};
-const layerUrl = function (layergroup, layerIndex, conf) {
-    let subdomainIndex = 0;
-    return (x, y, z) => {
-        subdomainIndex++;
-        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-            const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${conf.user}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
-                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-        }
-        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
-            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-    };
-};
+import * as rsys from '../../core/rsys';
+import * as R from '../../core/renderer';
 
 
-/**
- * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
- */
-export default class Dataset {
-    constructor(dataset, auth, options) {
-        this._dataset = dataset;
-        this._user = auth.user;
-        this._apiKey = auth.apiKey;
-        this._cartoURL = (options && options.cartoURL) ? options.cartoURL : 'carto.com';
-        // TODO options, TODO error control
-        this._options = options;
+export default class Base {
+
+    /**
+     * Base data source object.
+     *
+     * The methods listed in the {@link carto.source.Base|source.Base} object are availiable in all source objects.
+     *
+     * Use a source to reference the data used in a {@link carto.layer.Base|layer}.
+     *
+     * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset} or {@link carto.source.SQL} instead.
+     *
+     * @fires error
+     *
+     * @constructor Base
+     * @abstract
+     * @memberof carto.source
+     * @api
+     */
+    constructor() {
         this._requestGroupID = 0;
         this._oldDataframes = [];
         this._MNS = null;
@@ -58,10 +49,12 @@ export default class Dataset {
         };
         this.cache = LRU(lruOptions);
     }
+
     _bindLayer(addDataframe, removeDataframe) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
     }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category]) {
             return this._categoryStringToIDMap[category];
@@ -70,7 +63,6 @@ export default class Dataset {
         this._categoryStringToIDMap[category] = this._numCategories;
         return this._numCategories;
     }
-
     _instantiate() {
         this._oldDataframes = [];
         this.cache.reset();
@@ -96,14 +88,14 @@ export default class Dataset {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._dataset}`;
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._tableName}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
         const conf = {
-            user: this._user,
             apiKey: this._apiKey,
-            cartoURL: this._cartoURL,
+            username: this._username,
+            serverURL: this._serverURL
         };
 
         const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
@@ -119,9 +111,10 @@ export default class Dataset {
             }
         })();
     }
+
     /**
      * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
-     * @param {*R} viewport
+     * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
@@ -382,14 +375,14 @@ export default class Dataset {
 
 async function getColumnTypes(query, conf) {
     const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     return json.fields;
 }
 
 async function getGeometryType(query, conf) {
     const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
     const type = json.rows[0].type;
     switch (type) {
@@ -410,7 +403,7 @@ async function getNumericTypes(names, query, conf) {
         aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
     ).concat(['COUNT(*)']).join();
     const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-    const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
     const json = await response.json();
     return names.map(name => {
         return {
@@ -428,7 +421,7 @@ async function getNumericTypes(names, query, conf) {
 async function getCategoryTypes(names, query, conf) {
     return Promise.all(names.map(async name => {
         const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-        const response = await fetch(`https://${conf.user}.${conf.cartoURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
         const json = await response.json();
         let counts = [];
         let names = [];
@@ -444,7 +437,6 @@ async function getCategoryTypes(names, query, conf) {
         };
     }));
 }
-
 
 
 function isClockWise(vertices) {
@@ -464,3 +456,24 @@ function getAggFN(name) {
     let s = name.substr('_cdb_agg_'.length);
     return s.substr(0, s.indexOf('_'));
 }
+
+const endpoint = (conf) => {
+    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
+};
+const layerUrl = function (layergroup, layerIndex, conf) {
+    let subdomainIndex = 0;
+    return (x, y, z) => {
+        subdomainIndex++;
+        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+            const urlTemplates = layergroup.cdn_url.templates.https;
+            return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
+                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
+        }
+        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
+            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
+    };
+};
+
+/**
+ * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
+ */

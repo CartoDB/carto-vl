@@ -5,7 +5,6 @@ const nowInit = Date.now();
 
 export default class Now extends Expression {
     /**
-     * @api
      * @description get the current timestamp
      */
     constructor() {

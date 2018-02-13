@@ -2,7 +2,6 @@ import Expression from './expression';
 
 export default class Linear extends Expression {
     /**
-     * @api
      * @description get the current timestamp
      */
     constructor(input, min, max) {

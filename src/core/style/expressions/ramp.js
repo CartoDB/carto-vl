@@ -4,7 +4,6 @@ import { float } from '../functions';
 
 export default class Ramp extends Expression {
     /**
-     * @api
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
      * @param {*} palette

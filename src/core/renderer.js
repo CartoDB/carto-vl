@@ -6,7 +6,6 @@ import Dataframe from './dataframe';
 
 
 /**
- * @api
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
@@ -132,7 +131,6 @@ Renderer.prototype.setZoom = function (zoom) {
 
 /**
  * Removes a dataframe for the renderer. Freeing its resources.
- * @api
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {

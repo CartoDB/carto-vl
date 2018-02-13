@@ -3,7 +3,6 @@ import { float } from '../functions';
 
 export default class Zoom extends Expression {
     /**
-     * @api
      * @description get the current zoom level
      */
     constructor() {
