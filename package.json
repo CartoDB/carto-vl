@@ -27,7 +27,6 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "eslint": "^4.15.0",
-    "exquisite-sst": "IagoLast/Exquisite#master",
     "jasmine-core": "^2.99.1",
     "jsdoc": "^3.5.5",
     "karma": "^2.0.0",
@@ -45,8 +44,6 @@
   "scripts": {
     "build-all": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
     "build-dev": "webpack --config webpack/webpack.config.js",
-    "build-docs-all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
-    "build-docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
     "build:watch": "webpack -w --config webpack/webpack.config.js",
     "build": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
@@ -55,8 +52,7 @@
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "loc": "sloc src/ examples/",
-    "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
-    "test": "yarn test:unit"
+    "test": "yarn test:unit && yarn lint"
   }
 }
