@@ -414,6 +414,7 @@ Renderer.prototype._computeDrawMetadata = function () {
                 avg: undefined,
                 count: 0,
                 sum: 0,
+                histogram: Array.from({ length: 1000 }, () => 0),
             }
         ]
     };
@@ -464,7 +465,32 @@ Renderer.prototype._computeDrawMetadata = function () {
         const metaColumn = drawMetadata.columns.find(c => c.name == column);
         metaColumn.avg = metaColumn.sum / metaColumn.count;
     });
-
+    tiles.map(d => {
+        requiredColumns.map(column => {
+            const values = d.properties[column];
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const vmin = metaColumn.min;
+            const vmax = metaColumn.max;
+            const vdiff = vmax - vmin;
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    const v = values[i];
+                    if (!Number.isFinite(v)) {
+                        continue;
+                    }
+                    metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
+                }
+            }
+        });
+    });
     return drawMetadata;
 };
 

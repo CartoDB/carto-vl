@@ -16,6 +16,7 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
+import Quantiles from './expressions/quantiles';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -100,6 +101,7 @@ export const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
 export const equals = (...args) => new Equals(...args);
 export const notEquals = (...args) => new NotEquals(...args);
 export const buckets = (...args) => new Buckets(...args);
+export const quantiles = (...args) => new Quantiles(...args);
 export const viewportMax = (...args) => new ViewportMax(...args);
 export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportAvg = (...args) => new ViewportAvg(...args);

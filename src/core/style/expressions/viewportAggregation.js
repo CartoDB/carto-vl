@@ -33,7 +33,7 @@ function generateViewportExpression(metadataPropertyName) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
             this.value.expr = column[metadataPropertyName];
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, column[metadataPropertyName]);
+                console.log(metadataPropertyName, this.property.name, column[metadataPropertyName], drawMetadata);
             }
             this.value._preDraw(drawMetadata, gl);
         }
