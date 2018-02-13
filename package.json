@@ -52,6 +52,6 @@
     "loc": "sloc src/ examples/",
     "test": "yarn lint && yarn test:unit",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn build-docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }
