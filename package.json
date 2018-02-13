@@ -42,17 +42,16 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "build-all": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
     "build-dev": "webpack --config webpack/webpack.config.js",
-    "build:watch": "webpack -w --config webpack/webpack.config.js",
     "build": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
-    "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
+    "build:watch": "webpack -w --config webpack/webpack.config.js",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn build-docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
-    "lint:fix": "eslint . --fix",
+    "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "loc": "sloc src/ examples/",
+    "test": "yarn lint && yarn test:unit",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
-    "test": "yarn test:unit && yarn lint"
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn build-docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }
