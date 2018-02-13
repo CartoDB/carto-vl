@@ -1116,12 +1116,12 @@ class ComputeJob {
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.dataframes.filter(tile => tile.style);
+    return this.dataframes.filter(tile => tile.style && tile.visible);
 };
 
 Renderer.prototype._computeDrawMetadata = function () {
     const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-    const tiles = this.dataframes.filter(tile => tile.style);
+    const tiles = this.getStyledTiles();
     let drawMetadata = {
         freeTexUnit: 4,
         zoom: 1. / this._zoom,
@@ -1249,7 +1249,7 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.depthMask(false);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-    const tiles = this.dataframes.filter(tile => tile.style);
+    const tiles = this.getStyledTiles();
 
     const drawMetadata = this._computeDrawMetadata();
 
@@ -2440,7 +2440,7 @@ class Layer {
                 this._dataframes.map(
                     dataframe => {
                         dataframe.setStyle(this._style);
-                        dataframe.visible = true;
+                        dataframe.visible = dataframe.active;
                     });
                 this._mglIntegrator.renderer.refresh(Number.NaN);
                 this._dataframes.map(
@@ -7868,7 +7868,8 @@ class Dataset {
                     completedTiles.push(dataframe);
                 }
                 if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.forEach(t => t.setStyle(false));
+                    this._oldDataframes.map(d => d.active = false);
+                    completedTiles.map(d => d.active = true);
                     this._oldDataframes = completedTiles;
                 }
             });
