@@ -400,36 +400,9 @@ Renderer.prototype.getStyledTiles = function () {
     return this.dataframes.filter(tile => tile.style);
 };
 
-Renderer.prototype.refresh = function (timestamp) {
-    const gl = this.gl;
-    // Don't re-render more than once per animation frame
-    if (this.lastFrame === timestamp) {
-        return;
-    }
-
-    var width = gl.canvas.clientWidth;
-    var height = gl.canvas.clientHeight;
-    if (gl.canvas.width != width ||
-        gl.canvas.height != height) {
-        gl.canvas.width = width;
-        gl.canvas.height = height;
-    }
-    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-
-    gl.enable(gl.CULL_FACE);
-
-    gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.STENCIL_TEST);
-    gl.depthMask(false);
-
-    // Render To Texture
-    // COLOR
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-
+Renderer.prototype._computeDrawMetadata = function () {
+    const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
     const tiles = this.dataframes.filter(tile => tile.style);
-    //console.log(tiles);
-
     let drawMetadata = {
         freeTexUnit: 4,
         zoom: 1. / this._zoom,
@@ -492,6 +465,37 @@ Renderer.prototype.refresh = function (timestamp) {
         metaColumn.avg = metaColumn.sum / metaColumn.count;
     });
 
+    return drawMetadata;
+};
+
+Renderer.prototype.refresh = function (timestamp) {
+    const gl = this.gl;
+    // Don't re-render more than once per animation frame
+    if (this.lastFrame === timestamp) {
+        return;
+    }
+
+    var width = gl.canvas.clientWidth;
+    var height = gl.canvas.clientHeight;
+    if (gl.canvas.width != width ||
+        gl.canvas.height != height) {
+        gl.canvas.width = width;
+        gl.canvas.height = height;
+    }
+    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+
+    gl.enable(gl.CULL_FACE);
+
+    gl.disable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.STENCIL_TEST);
+    gl.depthMask(false);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+
+    const tiles = this.dataframes.filter(tile => tile.style);
+
+    const drawMetadata = this._computeDrawMetadata();
+
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
         gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -532,7 +536,7 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
 
-
+    const s = 1. / this._zoom;
     tiles.forEach(tile => {
         let renderer = null;
         if (tile.type == 'point') {
