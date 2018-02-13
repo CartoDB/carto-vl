@@ -54,6 +54,8 @@
     "loc": "sloc src/ examples/",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
     "test:acceptance": "mocha test/acceptance/index.test.js --timeout 15000",
+    "test:acceptance:prepare": "node test/acceptance/get-references.js ",
+    "test:acceptance:clean": "rm -rf test/acceptance/reference/**/*_out.png",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
     "test": "yarn lint && yarn test:unit"
   }
