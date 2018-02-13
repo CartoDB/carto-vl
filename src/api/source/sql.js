@@ -3,12 +3,12 @@ import * as _ from 'lodash';
 import Base from './base';
 
 
-export default class Dataset extends Base {
+export default class SQL extends Base {
 
     /**
      * Create a carto.source.Dataset.
      *
-     * @param {string} tableName - The name of an existing table
+     * @param {string} query - A SQL query containing a SELECT statement
      * @param {object} auth
      * @param {string} auth.apiKey - API key used to authenticate against CARTO
      * @param {string} auth.user - Name of the user
@@ -16,33 +16,37 @@ export default class Dataset extends Base {
      * @param {string} [options.serverURL='https://{user}.carto.com'] - URL of the Maps API server
      *
      * @example
-     * new carto.source.Dataset('european_cities', {
+     * new carto.source.SQL('SELECT * FROM european_cities', {
      *   apiKey: 'YOUR_API_KEY_HERE',
      *   user: 'YOUR_USERNAME_HERE'
      * });
      *
      * @fires Error
      *
-     * @constructor Dataset
+     * @constructor SQL
      * @extends carto.source.Base
      * @memberof carto.source
      * @api
      */
-    constructor(tableName, auth, options) {
+    constructor(query, auth, options) {
         super(auth, options);
-        this._checkTableName(tableName);
-        this._tableName = tableName;
+        this._checkQuery(query);
+        this._query = query;
     }
 
-    _checkTableName (tableName) {
-        if (_.isUndefined(tableName)) {
-            throw new Error('source', 'noTableName');
+    _checkQuery (query) {
+        if (_.isUndefined(query)) {
+            throw new Error('source', 'noQuery');
         }
-        if (!_.isString(tableName)) {
+        if (!_.isString(query)) {
             throw new Error('source', 'requiredString');
         }
-        if (_.isEmpty(tableName)) {
+        if (_.isEmpty(query)) {
             throw new Error('source', 'requiredNoEmpty');
+        }
+        var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
+        if (!query.match(sqlRegex)) {
+            throw new Error('source', 'requiredSQLQuery');
         }
     }
 }

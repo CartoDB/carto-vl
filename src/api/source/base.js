@@ -1,5 +1,6 @@
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
+import * as _ from 'lodash';
 
 import { VectorTile } from '@mapbox/vector-tile';
 
@@ -25,7 +26,15 @@ export default class Base {
      * @memberof carto.source
      * @api
      */
-    constructor() {
+    constructor(auth, options) {
+        auth.username = auth.user; // API adapter
+        this._checkAuth(auth);
+        this._checkOptions(options);
+        this._apiKey = auth.apiKey;
+        this._username = auth.username;
+        this._serverURL = (options && options.serverURL) || 'https://{user}.carto.com';
+        this._serverURL = this._serverURL.replace(/{user}/, auth.username);
+
         this._requestGroupID = 0;
         this._oldDataframes = [];
         this._MNS = null;
@@ -48,6 +57,42 @@ export default class Base {
             , maxAge: 1000 * 60 * 60
         };
         this.cache = LRU(lruOptions);
+    }
+
+    _checkAuth (auth) {
+        this._checkApiKey(auth.apiKey);
+        this._checkUsername(auth.username);
+    }
+
+    _checkApiKey (apiKey) {
+        if (!apiKey) {
+            throw new Error('source', 'apiKeyRequired');
+        }
+        if (!_.isString(apiKey)) {
+            throw new Error('source', 'apiKeyString');
+        }
+    }
+
+    _checkUsername (username) {
+        if (!username) {
+            throw new Error('source', 'usernameRequired');
+        }
+        if (!_.isString(username)) {
+            throw new Error('source', 'usernameString');
+        }
+    }
+
+    _checkOptions (options) {
+        if (options && options.serverURL) {
+            this._checkServerURL(options.serverURL);
+        }
+    }
+
+    _checkServerUrl (serverURL) {
+        var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+        if (!serverURL.match(urlregex)) {
+            throw new Error('source', 'nonValidServerURL');
+        }
     }
 
     _bindLayer(addDataframe, removeDataframe) {
@@ -88,7 +133,7 @@ export default class Base {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._tableName}`;
+        const aggSQL = this._query ? this._query : `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._tableName}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 

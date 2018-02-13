@@ -21,7 +21,8 @@ export { expressions };
 
 
 import Dataset from './api/source/dataset';
+import SQL from './api/source/sql';
 
-const source = { Dataset };
+const source = { Dataset, SQL };
 
 export { source };

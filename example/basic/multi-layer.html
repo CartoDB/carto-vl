@@ -38,7 +38,7 @@
 
         layer0.addTo(map, 'watername_ocean');
 
-        const source1 = new carto.source.Dataset('world_borders', auth);
+        const source1 = new carto.source.SQL('SELECT * FROM world_borders', auth);
         const style1 = new carto.Style();
         const layer1 = new carto.Layer('layer1', source1, style1);
 
