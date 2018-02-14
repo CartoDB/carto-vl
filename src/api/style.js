@@ -1,3 +1,4 @@
+/*
 import { parseStyle } from '../core/style/parser';
 import { Style as InternalStyle } from '../core/style/index';
 import * as _ from 'lodash';
@@ -16,3 +17,4 @@ export default function Style(params) {
 function _buildStyle(styleObject) {
 
 }
+*/
