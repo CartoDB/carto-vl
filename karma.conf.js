@@ -9,7 +9,7 @@ module.exports = function (config) {
         logLevel: config.LOG_INFO,
         browsers: ['ChromeHeadlessNoSandbox'],
         autoWatch: false,
-        singleRun: true, // Karma captures browsers, runs the tests and exits
+        singleRun: false, // Karma captures browsers, runs the tests and exits
         concurrency: Infinity,
         preprocessors: {
             'test/**/*.test.js': ['webpack', 'sourcemap'],

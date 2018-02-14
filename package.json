@@ -54,6 +54,7 @@
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "loc": "sloc src/ examples/",
+    "test:tdd": "karma start --browsers ChromeHeadlessNoSandbox karma.conf.js",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox karma.conf.js",
     "test": "yarn test:unit && yarn lint"
   }
