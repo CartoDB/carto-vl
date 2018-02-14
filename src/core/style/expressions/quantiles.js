@@ -51,18 +51,20 @@ export default class Quantiles extends Expression {
     _preDraw(drawMetadata, gl) {
         const column = drawMetadata.columns.find(c => c.name == this.input.name);
         let i = 0;
-        const total = column.accumHistogram[999];
+        const total = column.accumHistogram[column.histogramBuckets - 1];
         const r = Math.random();
         let brs = [];
+
+        // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
-            for (i; i < 1000; i++) {
+            for (i; i < column.histogramBuckets; i++) {
                 if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
                     break;
                 }
             }
-            const br = i / 1000 * (column.max - column.min) + column.min;
-            brs.push(br);
-            breakpoint.expr = br;
+            const percentileValue = i / column.histogramBuckets * (column.max - column.min) + column.min;
+            brs.push(percentileValue);
+            breakpoint.expr = percentileValue;
         });
         if (r > 0.99) {
             console.log(brs, column.min);
