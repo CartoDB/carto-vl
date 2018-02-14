@@ -32,6 +32,8 @@
             apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
         };
 
+        carto.setDefaultAuth(auth);
+
         const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
         const style = new carto.Style();
         const layer = new carto.Layer('myCartoLayer', source, style);

@@ -29,7 +29,7 @@ const validation = {
             friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
         }
     },
-    source: {
+    setup: {
         'auth-required': {
             messageRegex: /authRequired/,
             friendlyMessage: '`auth` property is required.'
@@ -62,14 +62,16 @@ const validation = {
             messageRegex: /nonValidUsername/,
             friendlyMessage: '`username` property must be not empty.'
         },
-        'options-object-required': {
-            messageRegex: /optionsObjectRequired/,
-            friendlyMessage: '`options` property must be an object.'
+        'config-object-required': {
+            messageRegex: /configObjectRequired/,
+            friendlyMessage: '`config` property must be an object.'
         },
         'server-url-string-required': {
             messageRegex: /serverURLStringRequired/,
             friendlyMessage: '`serverURL` property must be a string.'
-        },
+        }
+    },
+    source: {
         'non-valid-server-url': {
             messageRegex: /nonValidServerURL/,
             friendlyMessage: '`serverURL` property is not a valid URL.'

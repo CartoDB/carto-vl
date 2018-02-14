@@ -11,10 +11,19 @@ import * as expressions from './core/style/functions';
 import Dataset from './api/source/dataset';
 import Layer from './api/layer';
 import SQL from './api/source/sql';
-import Style from './api/style';
+import { Style } from './core/style';
+import { setDefaultAuth } from './api/setup/auth-service';
+import { setDefaultConfig } from './api/setup/config-service';
 
 // Namespaces
 const style = { expressions };
 const source = { Dataset, SQL };
 
-export { source, style, Style, Layer };
+export {
+    source,
+    Layer,
+    setDefaultAuth,
+    setDefaultConfig,
+    style,
+    Style
+};

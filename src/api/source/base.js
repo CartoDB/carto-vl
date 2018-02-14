@@ -1,8 +1,10 @@
-import * as _ from 'lodash';
-
 import Windshaft from '../../client/windshaft';
 import CartoValidationError from '../error-handling/carto-validation-error';
+import { getDefaultAuth, checkAuth } from '../setup/auth-service';
+import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
+
+const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
 
 export default class Base {
 
@@ -26,14 +28,14 @@ export default class Base {
         this._client = new Windshaft(this);
     }
 
-    initialize(auth, options) {
-        this._checkAuth(auth);
-        this._checkOptions(options);
+    initialize(auth, config) {
+        auth = auth || getDefaultAuth();
+        config = config || getDefaultConfig();
+        checkAuth(auth);
+        checkConfig(config);
         this._apiKey = auth.apiKey;
         this._username = auth.username;
-        this._serverURL = (options && options.serverURL) || 'https://{user}.carto.com';
-        this._serverURL = this._serverURL.replace(/{user}/, auth.username);
-        this._validateServerURL(this._serverURL);
+        this._serverURL = this._generateURL(auth, config);
     }
 
     bindLayer(...args) {
@@ -44,55 +46,11 @@ export default class Base {
         return this._client._getData(viewport, mns);
     }
 
-    _checkAuth(auth) {
-        if (_.isUndefined(auth)) {
-            throw new CartoValidationError('source', 'authRequired');
-        }
-        if (!_.isObject(auth)) {
-            throw new CartoValidationError('source', 'authObjectRequired');
-        }
-        auth.username = auth.user; // API adapter
-        this._checkApiKey(auth.apiKey);
-        this._checkUsername(auth.username);
-    }
-
-    _checkApiKey(apiKey) {
-        if (_.isUndefined(apiKey)) {
-            throw new CartoValidationError('source', 'apiKeyRequired');
-        }
-        if (!_.isString(apiKey)) {
-            throw new CartoValidationError('source', 'apiKeyStringRequired');
-        }
-        if (_.isEmpty(apiKey)) {
-            throw new CartoValidationError('source', 'nonValidApiKey');
-        }
-    }
-
-    _checkUsername(username) {
-        if (_.isUndefined(username)) {
-            throw new CartoValidationError('source', 'usernameRequired');
-        }
-        if (!_.isString(username)) {
-            throw new CartoValidationError('source', 'usernameStringRequired');
-        }
-        if (_.isEmpty(username)) {
-            throw new CartoValidationError('source', 'nonValidUsername');
-        }
-    }
-
-    _checkOptions(options) {
-        if (options) {
-            if (!_.isObject(options)) {
-                throw new CartoValidationError('source', 'optionsObjectRequired');
-            }
-            this._checkServerURL(options.serverURL);
-        }
-    }
-
-    _checkServerURL(serverURL) {
-        if (!_.isString(serverURL)) {
-            throw new CartoValidationError('source', 'serverURLStringRequired');
-        }
+    _generateURL(auth, config) {
+        let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
+        url = url.replace(/{user}/, auth.username);
+        this._validateServerURL(url);
+        return url;
     }
 
     _validateServerURL(serverURL) {
