@@ -1,4 +1,4 @@
-import { setDefaultAuth, getDefaultAuth, checkAuth } from '../../../../src/api/setup/auth-service';
+import { setDefaultAuth, getDefaultAuth, checkAuth, cleanDefaultAuth } from '../../../../src/api/setup/auth-service';
 
 describe('api/setup/auth-service', () => {
     const auth = {
@@ -54,6 +54,6 @@ describe('api/setup/auth-service', () => {
 
     // Reset global state to prevent errors in different tests
     afterAll(() => {
-        setDefaultAuth(undefined);
+        cleanDefaultAuth(undefined);
     });
 });

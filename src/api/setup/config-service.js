@@ -27,6 +27,13 @@ function getDefaultConfig() {
     return defaultConfig;
 }
 
+/** 
+ * Clean default config object
+ */
+function cleanDefaultConfig() {
+    defaultConfig = undefined;
+}
+
 /**
  * Check a valid config parameter.
  *
@@ -47,4 +54,4 @@ function checkServerURL(serverURL) {
     }
 }
 
-export { setDefaultConfig, getDefaultConfig, checkConfig };
+export { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig };

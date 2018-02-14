@@ -29,6 +29,13 @@ function getDefaultAuth() {
 }
 
 /**
+ * Reset the auth object
+ */
+function cleanDefaultAuth() {
+    defaultAuth = undefined;
+}
+
+/**
  * Check a valid auth parameter.
  *
  * @param  {object} auth
@@ -69,4 +76,4 @@ function checkUsername(username) {
     }
 }
 
-export { setDefaultAuth, getDefaultAuth, checkAuth };
+export { setDefaultAuth, getDefaultAuth, checkAuth, cleanDefaultAuth };

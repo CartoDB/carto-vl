@@ -1,4 +1,4 @@
-import { setDefaultConfig, getDefaultConfig, checkConfig } from '../../../../src/api/setup/config-service';
+import { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig } from '../../../../src/api/setup/config-service';
 
 describe('api/setup/config-service', () => {
     const config = {
@@ -32,6 +32,6 @@ describe('api/setup/config-service', () => {
 
     // Reset global state to prevent errors in different tests
     afterAll(() => {
-        setDefaultConfig(undefined);
+        cleanDefaultConfig(undefined);
     });
 });
