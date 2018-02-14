@@ -30,6 +30,14 @@ const validation = {
         }
     },
     source: {
+        'auth-required': {
+            messageRegex: /authRequired/,
+            friendlyMessage: '`auth` property is required.'
+        },
+        'auth-object-required': {
+            messageRegex: /authObjectRequired/,
+            friendlyMessage: '`auth` property must be an object.'
+        },
         'api-key-required': {
             messageRegex: /apiKeyRequired/,
             friendlyMessage: '`apiKey` property is required.'
@@ -54,9 +62,17 @@ const validation = {
             messageRegex: /nonValidUsername/,
             friendlyMessage: '`username` property must be not empty.'
         },
+        'options-object-required': {
+            messageRegex: /optionsObjectRequired/,
+            friendlyMessage: '`options` property must be an object.'
+        },
+        'server-url-string-required': {
+            messageRegex: /serverURLStringRequired/,
+            friendlyMessage: '`serverURL` property must be a string.'
+        },
         'non-valid-server-url': {
             messageRegex: /nonValidServerURL/,
-            friendlyMessage: '`serverURL` is not a valid URL.'
+            friendlyMessage: '`serverURL` property is not a valid URL.'
         },
         'table-name-required': {
             messageRegex: /tableNameRequired/,

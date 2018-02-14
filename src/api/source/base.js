@@ -23,13 +23,13 @@ export default class Base {
      * @api
      */
     constructor(auth, options) {
-        auth.username = auth.user; // API adapter
         this._checkAuth(auth);
         this._checkOptions(options);
         this._apiKey = auth.apiKey;
         this._username = auth.username;
         this._serverURL = (options && options.serverURL) || 'https://{user}.carto.com';
         this._serverURL = this._serverURL.replace(/{user}/, auth.username);
+        this._validateServerURL(this._serverURL);
 
         this._client = new Windshaft(this);
     }
@@ -43,6 +43,13 @@ export default class Base {
     }
 
     _checkAuth (auth) {
+        if (_.isUndefined(auth)) {
+            throw new CartoValidationError('source', 'authRequired');
+        }
+        if (!_.isObject(auth)) {
+            throw new CartoValidationError('source', 'authObjectRequired');
+        }
+        auth.username = auth.user; // API adapter
         this._checkApiKey(auth.apiKey);
         this._checkUsername(auth.username);
     }
@@ -72,12 +79,21 @@ export default class Base {
     }
 
     _checkOptions (options) {
-        if (options && options.serverURL) {
+        if (options) {
+            if (!_.isObject(options)) {
+                throw new CartoValidationError('source', 'optionsObjectRequired');
+            }
             this._checkServerURL(options.serverURL);
         }
     }
 
-    _checkServerUrl (serverURL) {
+    _checkServerURL (serverURL) {
+        if (!_.isString(serverURL)) {
+            throw new CartoValidationError('source', 'serverURLStringRequired');
+        }
+    }
+
+    _validateServerURL (serverURL) {
         var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
         if (!serverURL.match(urlregex)) {
             throw new CartoValidationError('source', 'nonValidServerURL');
