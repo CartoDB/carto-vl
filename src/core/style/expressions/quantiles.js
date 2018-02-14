@@ -67,8 +67,11 @@ export default class Quantiles extends Expression {
             breakpoint.expr = br;
         });
         if (r > 0.99) {
-            console.log(brs, column.min);
+            //console.log(brs, column.min);
         }
         super._preDraw(drawMetadata, gl);
+    }
+    getBreakpointList() {
+        return this.breakpoints.map(br => br.expr);
     }
 }
