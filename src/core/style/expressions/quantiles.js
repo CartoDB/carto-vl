@@ -51,7 +51,7 @@ export default class Quantiles extends Expression {
     _preDraw(drawMetadata, gl) {
         const column = drawMetadata.columns.find(c => c.name == this.input.name);
         let i = 0;
-        const total = column.accumHistogram[999];
+        const total = column.accumHistogram[column.histogramBuckets - 1];
         const r = Math.random();
         let brs = [];
 
