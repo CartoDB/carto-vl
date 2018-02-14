@@ -73,12 +73,12 @@ export class ViewportPercentile extends Expression {
         const column = drawMetadata.columns.find(c => c.name == this.property.name);
         const total = column.accumHistogram[999];
         // TODO OPT: this could be faster with binary search
-        for (var i = 0; i < 1000; i++) {
+        for (var i = 0; i < column.histogramBuckets; i++) {
             if (column.accumHistogram[i] >= this.percentile / 100 * total) {
                 break;
             }
         }
-        const br = i / 1000 * (column.max - column.min) + column.min;
+        const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
         this.value.expr = br;
 
         if (Math.random() > 0.99) {
