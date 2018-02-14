@@ -4,6 +4,7 @@ import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
 
+const HISTOGRAM_BUCKETS = 1000;
 
 /**
  * @api
@@ -426,8 +427,9 @@ Renderer.prototype._computeDrawMetadata = function () {
                 avg: undefined,
                 count: 0,
                 sum: 0,
-                histogram: Array.from({ length: 1000 }, () => 0),
-                accumHistogram: Array.from({ length: 1000 }, () => 0),
+                histogramBuckets: HISTOGRAM_BUCKETS,
+                histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
+                accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
             }
         );
     });
@@ -499,7 +501,7 @@ Renderer.prototype._computeDrawMetadata = function () {
     });
     requiredColumns.map(column => {
         const metaColumn = drawMetadata.columns.find(c => c.name == column);
-        for (let i = 1; i < 1000; i++) {
+        for (let i = 1; i < metaColumn.histogramBuckets; i++) {
             metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
         }
     });

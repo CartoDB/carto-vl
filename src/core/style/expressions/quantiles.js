@@ -57,14 +57,14 @@ export default class Quantiles extends Expression {
 
         // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
-            for (i; i < 1000; i++) {
+            for (i; i < column.histogramBuckets; i++) {
                 if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
                     break;
                 }
             }
-            const br = i / 1000 * (column.max - column.min) + column.min;
-            brs.push(br);
-            breakpoint.expr = br;
+            const percentileValue = i / column.histogramBuckets * (column.max - column.min) + column.min;
+            brs.push(percentileValue);
+            breakpoint.expr = percentileValue;
         });
         if (r > 0.99) {
             console.log(brs, column.min);
