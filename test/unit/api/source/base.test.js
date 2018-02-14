@@ -17,6 +17,7 @@ describe('api/source/base', () => {
             expect(source._serverURL).toEqual('https://test.test.com');
             expect(source._client).toBeDefined();
         });
+
         it('should build a new Source with (auth) and default options', () => {
             const source = new SourceBase(auth);
             expect(source._username).toEqual('test');
@@ -24,6 +25,7 @@ describe('api/source/base', () => {
             expect(source._serverURL).toEqual('https://test.carto.com');
             expect(source._client).toBeDefined();
         });
+
         it('should throw an error if auth is not valid', function () {
             expect(function () {
                 new SourceBase(undefined);
@@ -32,6 +34,7 @@ describe('api/source/base', () => {
                 new SourceBase(1234);
             }).toThrowError('`auth` property must be an object.');
         });
+
         it('should throw an error if auth.apiKey is not valid', function () {
             expect(function () {
                 new SourceBase({});
@@ -43,6 +46,7 @@ describe('api/source/base', () => {
                 new SourceBase({ apiKey: '' });
             }).toThrowError('`apiKey` property must be not empty.');
         });
+
         it('should throw an error if auth.username is not valid', function () {
             expect(function () {
                 new SourceBase({ apiKey: '123456789' });
@@ -54,11 +58,13 @@ describe('api/source/base', () => {
                 new SourceBase({ user: '', apiKey: '123456789' });
             }).toThrowError('`username` property must be not empty.');
         });
+
         it('should throw an error if options are not valid', function () {
             expect(function () {
                 new SourceBase(auth, 1234);
             }).toThrowError('`options` property must be an object.');
         });
+
         it('should throw an error if options.serverURL is not valid', function () {
             expect(function () {
                 new SourceBase(auth, { serverURL: 1234 });
