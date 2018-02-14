@@ -39,6 +39,8 @@ function Point(gl) {
     this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
     this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
     this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+    this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
+    this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
 }
 function Tri(gl) {
     compileProgram.call(this, gl, rendererGLSL.tris.VS, rendererGLSL.tris.FS);

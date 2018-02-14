@@ -575,7 +575,10 @@ Renderer.prototype.refresh = function (timestamp) {
 
 
     const s = 1. / this._zoom;
+    //foreach order bucket
     tiles.forEach(tile => {
+        //Set filtering condition on "... AND feature is in current order bucket"
+
         let renderer = null;
         if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
@@ -585,6 +588,10 @@ Renderer.prototype.refresh = function (timestamp) {
             renderer = this.triRendererProgram;
         }
         gl.useProgram(renderer.program);
+
+        gl.uniform1f(renderer.orderMinWidth, 0);
+        gl.uniform1f(renderer.orderMaxWidth, 10000);
+
         gl.uniform2f(renderer.vertexScaleUniformLocation,
             (s / aspect) * tile.scale,
             s * tile.scale);
