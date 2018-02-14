@@ -575,72 +575,83 @@ Renderer.prototype.refresh = function (timestamp) {
 
 
     const s = 1. / this._zoom;
+
+    const orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
+    const orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
+
+    //const orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
+    //const orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
     //foreach order bucket
-    tiles.forEach(tile => {
-        //Set filtering condition on "... AND feature is in current order bucket"
-
-        let renderer = null;
-        if (tile.type == 'point') {
-            renderer = this.finalRendererProgram;
-        } else if (tile.type == 'line') {
-            renderer = this.lineRendererProgram;
-        } else {
-            renderer = this.triRendererProgram;
+    orderingMins.map((_, orderingIndex) => {
+        if (orderingIndex == 0) {
+            return;
         }
-        gl.useProgram(renderer.program);
+        tiles.forEach(tile => {
+            //Set filtering condition on "... AND feature is in current order bucket"
 
-        gl.uniform1f(renderer.orderMinWidth, 0);
-        gl.uniform1f(renderer.orderMaxWidth, 10000);
+            let renderer = null;
+            if (tile.type == 'point') {
+                renderer = this.finalRendererProgram;
+            } else if (tile.type == 'line') {
+                renderer = this.lineRendererProgram;
+            } else {
+                renderer = this.triRendererProgram;
+            }
+            gl.useProgram(renderer.program);
 
-        gl.uniform2f(renderer.vertexScaleUniformLocation,
-            (s / aspect) * tile.scale,
-            s * tile.scale);
-        gl.uniform2f(renderer.vertexOffsetUniformLocation,
-            (s / aspect) * (this._center.x - tile.center.x),
-            s * (this._center.y - tile.center.y));
+            gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
+            gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
-        tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
+            gl.uniform2f(renderer.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(renderer.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
 
-        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+            tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
-        gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+            tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+
+            gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
 
-        gl.enableVertexAttribArray(renderer.featureIdAttr);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(renderer.featureIdAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-        if (tile.type == 'line') {
-            gl.enableVertexAttribArray(renderer.normalAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
-            gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
-        }
+            if (tile.type == 'line') {
+                gl.enableVertexAttribArray(renderer.normalAttr);
+                gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
+                gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
+            }
 
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(renderer.colorTexture, 0);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.uniform1i(renderer.colorTexture, 0);
 
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(renderer.widthTexture, 1);
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.uniform1i(renderer.widthTexture, 1);
 
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-        gl.uniform1i(renderer.colorStrokeTexture, 2);
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+            gl.uniform1i(renderer.colorStrokeTexture, 2);
 
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-        gl.uniform1i(renderer.strokeWidthTexture, 3);
+            gl.activeTexture(gl.TEXTURE3);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+            gl.uniform1i(renderer.strokeWidthTexture, 3);
 
-        gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
-        gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
-        gl.disableVertexAttribArray(renderer.featureIdAttr);
-        if (tile.type == 'line') {
-            gl.disableVertexAttribArray(renderer.normalAttr);
-        }
+            gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
+            gl.disableVertexAttribArray(renderer.featureIdAttr);
+            if (tile.type == 'line') {
+                gl.disableVertexAttribArray(renderer.normalAttr);
+            }
+        });
     });
 
     this.computePool.map(job => job.work(this));

@@ -52,6 +52,8 @@ attribute vec2 featureID;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
+uniform float orderMinWidth;
+uniform float orderMaxWidth;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -65,8 +67,6 @@ varying highp float dp;
 varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
-varying highp float orderMinWidth;
-varying highp float orderMaxWidth;
 
 void main(void) {
     color = texture2D(colorTex, featureID);
@@ -86,7 +86,7 @@ void main(void) {
     sizeNormalizer = (size+1.)/(size);
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    if (size==0. || (stroke.a==0. && color.a==0.) || size<0. || size>1000.){
+    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;
