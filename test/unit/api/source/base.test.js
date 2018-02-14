@@ -1,4 +1,4 @@
-import SourceBase from '../../../src/api/source/base';
+import SourceBase from '../../../../src/api/source/base';
 
 describe('api/source/base', () => {
     const auth = {

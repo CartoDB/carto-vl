@@ -28,33 +28,6 @@ export default class Layer {
         console.log('L', this);
     }
 
-    _checkId(id) {
-        if (_.isUndefined(id)) {
-            throw new CartoValidationError('layer', 'idRequired');
-        }
-        if (!_.isString(id)) {
-            throw new CartoValidationError('layer', 'idStringRequired');
-        }
-        if (_.isEmpty(id)) {
-            throw new CartoValidationError('layer', 'nonValidId');
-        }
-    }
-
-    _checkSource(source) {
-        if (_.isUndefined(source)) {
-            throw new CartoValidationError('layer', 'sourceRequired');
-        }
-        if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError('layer', 'nonValidSource');
-        }
-    }
-
-    _checkStyle(style) {
-        if (_.isUndefined(style)) {
-            throw new CartoValidationError('layer', 'styleRequired');
-        }
-    }
-
     /**
      * [setSource description]
      * @param {[type]} source [description]
@@ -115,6 +88,24 @@ export default class Layer {
         return true;
     }
 
+    _addToMGLMap(map, beforeLayerID) {
+        map.on('load', () => {
+            this._mglIntegrator = getMGLIntegrator(map);
+            this._mglIntegrator.addLayer(this._id, beforeLayerID, this._getData.bind(this), () => {
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.setStyle(this._style);
+                        dataframe.visible = true;
+                    });
+                this._mglIntegrator.renderer.refresh(Number.NaN);
+                this._dataframes.map(
+                    dataframe => {
+                        dataframe.visible = false;
+                    });
+            });
+        });
+    }
+
     _styleChanged() {
         if (!(this._mglIntegrator && this._mglIntegrator.invalidateMGLWebGLState)) {
             return;
@@ -131,6 +122,33 @@ export default class Layer {
                 this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
             }
         });
+    }
+
+    _checkId(id) {
+        if (_.isUndefined(id)) {
+            throw new CartoValidationError('layer', 'idRequired');
+        }
+        if (!_.isString(id)) {
+            throw new CartoValidationError('layer', 'idStringRequired');
+        }
+        if (_.isEmpty(id)) {
+            throw new CartoValidationError('layer', 'nonValidId');
+        }
+    }
+
+    _checkSource(source) {
+        if (_.isUndefined(source)) {
+            throw new CartoValidationError('layer', 'sourceRequired');
+        }
+        if (!(source instanceof SourceBase)) {
+            throw new CartoValidationError('layer', 'nonValidSource');
+        }
+    }
+
+    _checkStyle(style) {
+        if (_.isUndefined(style)) {
+            throw new CartoValidationError('layer', 'styleRequired');
+        }
     }
 
     _getViewport() {
@@ -151,22 +169,5 @@ export default class Layer {
         }
     }
 
-    _addToMGLMap(map, beforeLayerID) {
-        map.on('load', () => {
-            this._mglIntegrator = getMGLIntegrator(map);
-            this._mglIntegrator.addLayer(this._id, beforeLayerID, this._getData.bind(this), () => {
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.setStyle(this._style);
-                        dataframe.visible = true;
-                    });
-                this._mglIntegrator.renderer.refresh(Number.NaN);
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.visible = false;
-                    });
-            });
-        });
-    }
     //TODO free layer resources
 }

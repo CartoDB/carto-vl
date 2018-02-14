@@ -42,7 +42,7 @@ export default class Base {
         return this._client._getData(viewport, mns);
     }
 
-    _checkAuth (auth) {
+    _checkAuth(auth) {
         if (_.isUndefined(auth)) {
             throw new CartoValidationError('source', 'authRequired');
         }
@@ -54,7 +54,7 @@ export default class Base {
         this._checkUsername(auth.username);
     }
 
-    _checkApiKey (apiKey) {
+    _checkApiKey(apiKey) {
         if (_.isUndefined(apiKey)) {
             throw new CartoValidationError('source', 'apiKeyRequired');
         }
@@ -66,7 +66,7 @@ export default class Base {
         }
     }
 
-    _checkUsername (username) {
+    _checkUsername(username) {
         if (_.isUndefined(username)) {
             throw new CartoValidationError('source', 'usernameRequired');
         }
@@ -78,7 +78,7 @@ export default class Base {
         }
     }
 
-    _checkOptions (options) {
+    _checkOptions(options) {
         if (options) {
             if (!_.isObject(options)) {
                 throw new CartoValidationError('source', 'optionsObjectRequired');
@@ -87,13 +87,13 @@ export default class Base {
         }
     }
 
-    _checkServerURL (serverURL) {
+    _checkServerURL(serverURL) {
         if (!_.isString(serverURL)) {
             throw new CartoValidationError('source', 'serverURLStringRequired');
         }
     }
 
-    _validateServerURL (serverURL) {
+    _validateServerURL(serverURL) {
         var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
         if (!serverURL.match(urlregex)) {
             throw new CartoValidationError('source', 'nonValidServerURL');

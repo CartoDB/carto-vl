@@ -35,7 +35,7 @@ export default class Dataset extends Base {
         this._tableName = tableName;
     }
 
-    _checkTableName (tableName) {
+    _checkTableName(tableName) {
         if (_.isUndefined(tableName)) {
             throw new CartoValidationError('source', 'tableNameRequired');
         }

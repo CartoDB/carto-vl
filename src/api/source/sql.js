@@ -35,7 +35,7 @@ export default class SQL extends Base {
         this._query = query;
     }
 
-    _checkQuery (query) {
+    _checkQuery(query) {
         if (_.isUndefined(query)) {
             throw new CartoValidationError('source', 'queryRequired');
         }

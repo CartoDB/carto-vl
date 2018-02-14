@@ -1,11 +1,16 @@
 import * as R from '../core/renderer';
-import * as rsys from '../core/rsys';
+import * as rsys from './rsys';
 
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 
 import { VectorTile } from '@mapbox/vector-tile';
 
+// Get dataframes <- MVT <- Windshaft
+// Get metadata
+// Instantiate map Windshaft
+// Requrest SQL API (temp)
+// Cache dataframe
 
 export default class Windshaft {
 

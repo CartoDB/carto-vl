@@ -1,7 +1,7 @@
-import Dataset from '../../src/api/source/dataset';
-import { Style } from '../../src/core/style';
+import Dataset from '../../../src/api/source/dataset';
+import { Style } from '../../../src/core/style';
 
-import Layer from '../../src/api/layer';
+import Layer from '../../../src/api/layer';
 
 describe('api/layer', () => {
     let source;
