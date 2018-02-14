@@ -3,6 +3,7 @@ import getMGLIntegrator from './mglintegrator';
 import * as _ from 'lodash';
 
 import SourceBase from './source/base';
+import CartoValidationError from './error-handling/carto-validation-error';
 
 /**
  * Responsabilities:  rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
@@ -29,28 +30,28 @@ export default class Layer {
 
     _checkId(id) {
         if (_.isUndefined(id)) {
-            throw new Error('layer', 'idRequired');
+            throw new CartoValidationError('layer', 'idRequired');
         }
         if (!_.isString(id)) {
-            throw new Error('layer', 'idString');
+            throw new CartoValidationError('layer', 'idStringRequired');
         }
         if (_.isEmpty(id)) {
-            throw new Error('layer', 'nonValidId');
+            throw new CartoValidationError('layer', 'nonValidId');
         }
     }
 
     _checkSource(source) {
         if (_.isUndefined(source)) {
-            throw new Error('layer', 'sourceRequired');
+            throw new CartoValidationError('layer', 'sourceRequired');
         }
         if (!(source instanceof SourceBase)) {
-            throw new Error('layer', 'nonValidSource');
+            throw new CartoValidationError('layer', 'nonValidSource');
         }
     }
 
     _checkStyle(style) {
         if (_.isUndefined(style)) {
-            throw new Error('layer', 'styleRequired');
+            throw new CartoValidationError('layer', 'styleRequired');
         }
     }
 

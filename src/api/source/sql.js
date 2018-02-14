@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 import Base from './base';
+import CartoValidationError from '../error-handling/carto-validation-error';
 
 
 export default class SQL extends Base {
@@ -36,17 +37,17 @@ export default class SQL extends Base {
 
     _checkQuery (query) {
         if (_.isUndefined(query)) {
-            throw new Error('source', 'queryRequired');
+            throw new CartoValidationError('source', 'queryRequired');
         }
         if (!_.isString(query)) {
-            throw new Error('source', 'queryString');
+            throw new CartoValidationError('source', 'queryStringRequired');
         }
         if (_.isEmpty(query)) {
-            throw new Error('source', 'nonValidQuery');
+            throw new CartoValidationError('source', 'nonValidQuery');
         }
         var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
         if (!query.match(sqlRegex)) {
-            throw new Error('source', 'nonValidSQLQuery');
+            throw new CartoValidationError('source', 'nonValidSQLQuery');
         }
     }
 }

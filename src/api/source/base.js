@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 import Windshaft from '../../client/windshaft';
+import CartoValidationError from '../error-handling/carto-validation-error';
 
 
 export default class Base {
@@ -48,19 +49,25 @@ export default class Base {
 
     _checkApiKey (apiKey) {
         if (_.isUndefined(apiKey)) {
-            throw new Error('source', 'apiKeyRequired');
+            throw new CartoValidationError('source', 'apiKeyRequired');
         }
         if (!_.isString(apiKey)) {
-            throw new Error('source', 'apiKeyString');
+            throw new CartoValidationError('source', 'apiKeyStringRequired');
+        }
+        if (_.isEmpty(apiKey)) {
+            throw new CartoValidationError('source', 'nonValidApiKey');
         }
     }
 
     _checkUsername (username) {
         if (_.isUndefined(username)) {
-            throw new Error('source', 'usernameRequired');
+            throw new CartoValidationError('source', 'usernameRequired');
         }
         if (!_.isString(username)) {
-            throw new Error('source', 'usernameString');
+            throw new CartoValidationError('source', 'usernameStringRequired');
+        }
+        if (_.isEmpty(username)) {
+            throw new CartoValidationError('source', 'nonValidUsername');
         }
     }
 
@@ -73,7 +80,7 @@ export default class Base {
     _checkServerUrl (serverURL) {
         var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
         if (!serverURL.match(urlregex)) {
-            throw new Error('source', 'nonValidServerURL');
+            throw new CartoValidationError('source', 'nonValidServerURL');
         }
     }
 }
