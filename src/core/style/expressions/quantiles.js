@@ -54,6 +54,8 @@ export default class Quantiles extends Expression {
         const total = column.accumHistogram[999];
         const r = Math.random();
         let brs = [];
+
+        // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
             for (i; i < 1000; i++) {
                 if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
