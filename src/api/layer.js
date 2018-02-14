@@ -30,8 +30,11 @@ export default class Layer {
     }
 
     /**
-     * [setSource description]
-     * @param {[type]} source [description]
+     * Set a new source for this layer.
+     *
+     * @param {carto.source.Base} source - New source
+     *
+     * @memberof carto.layer
      * @api
      */
     setSource(source) {
@@ -55,8 +58,11 @@ export default class Layer {
     }
 
     /**
-     * [setStyle description]
-     * @param {[type]} style [description]
+     * Set a new style for this layer.
+     *
+     * @param {carto.Style} style - New style
+     *
+     * @memberof carto.layer
      * @api
      */
     setStyle(style) {
@@ -71,9 +77,9 @@ export default class Layer {
     }
 
     /**
-     * [addTo description]
-     * @param {[type]} map           [description]
-     * @param {[type]} beforeLayerID [description]
+     * Add this layer to a amp
+     * @param {mapboxgl.Map} map
+     * @param {string} beforeLayerID
      */
     addTo(map, beforeLayerID) {
         if (this._isMGLMap(map)) {

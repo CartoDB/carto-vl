@@ -29,7 +29,7 @@ function getDefaultAuth() {
 }
 
 /**
- * Reset the auth object
+ * Reset the default auth object
  */
 function cleanDefaultAuth() {
     defaultAuth = undefined;
