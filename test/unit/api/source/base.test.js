@@ -8,7 +8,7 @@ describe('api/source/base', () => {
     const config = {
         serverURL: 'https://{user}.test.com'
     };
-    const source = new SourceBase();
+
 
     describe('constructor', () => {
         it('should build a new Source', () => {
@@ -18,9 +18,11 @@ describe('api/source/base', () => {
     });
 
     describe('.initialize', () => {
+        const source = new SourceBase();
         it('should initialize the source with (auth, config)', () => {
             const source = new SourceBase();
             source.initialize(auth, config);
+
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
             expect(source._serverURL).toEqual('https://test.test.com');
@@ -30,6 +32,7 @@ describe('api/source/base', () => {
         it('should build a new Source with (auth) and default config', () => {
             const source = new SourceBase();
             source.initialize(auth);
+            
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
             expect(source._serverURL).toEqual('https://test.carto.com');

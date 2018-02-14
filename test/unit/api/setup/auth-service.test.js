@@ -51,4 +51,9 @@ describe('api/setup/auth-service', () => {
             }).toThrowError('`username` property must be not empty.');
         });
     });
+
+    // Reset global state to prevent errors in different tests
+    afterAll(() => {
+        setDefaultAuth(undefined);
+    });
 });

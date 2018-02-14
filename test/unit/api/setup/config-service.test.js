@@ -29,4 +29,9 @@ describe('api/setup/config-service', () => {
             }).toThrowError('`serverURL` property must be a string.');
         });
     });
+
+    // Reset global state to prevent errors in different tests
+    afterAll(() => {
+        setDefaultConfig(undefined);
+    });
 });
