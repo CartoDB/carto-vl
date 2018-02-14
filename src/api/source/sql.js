@@ -30,9 +30,10 @@ export default class SQL extends Base {
      * @api
      */
     constructor(query, auth, options) {
-        super(auth, options);
+        super();
         this._checkQuery(query);
         this._query = query;
+        this.initialize(auth, options);
     }
 
     _checkQuery(query) {

@@ -31,16 +31,16 @@ describe('api/source/sql', () => {
 
         it('should throw an error if query is not valid', function () {
             expect(function () {
-                new SQL(undefined, auth);
+                new SQL();
             }).toThrowError('`query` property is required.');
             expect(function () {
-                new SQL(1234, auth);
+                new SQL(1234);
             }).toThrowError('`query` property must be a string.');
             expect(function () {
-                new SQL('', auth);
+                new SQL('');
             }).toThrowError('`query` property must be not empty.');
             expect(function () {
-                new SQL('ABC', auth);
+                new SQL('ABC');
             }).toThrowError('`query` property must be a SQL query.');
         });
     });

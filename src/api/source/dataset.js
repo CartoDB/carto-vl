@@ -30,9 +30,10 @@ export default class Dataset extends Base {
      * @api
      */
     constructor(tableName, auth, options) {
-        super(auth, options);
+        super();
         this._checkTableName(tableName);
         this._tableName = tableName;
+        this.initialize(auth, options);
     }
 
     _checkTableName(tableName) {

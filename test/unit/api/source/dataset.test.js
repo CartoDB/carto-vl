@@ -28,16 +28,16 @@ describe('api/source/dataset', () => {
             expect(source._serverURL).toEqual('https://test.carto.com');
             expect(source._client).toBeDefined();
         });
-        
+
         it('should throw an error if tableName is not valid', function () {
             expect(function () {
-                new Dataset(undefined, auth);
+                new Dataset();
             }).toThrowError('`tableName` property is required.');
             expect(function () {
-                new Dataset(1234, auth);
+                new Dataset(1234);
             }).toThrowError('`tableName` property must be a string.');
             expect(function () {
-                new Dataset('', auth);
+                new Dataset('');
             }).toThrowError('`tableName` property must be not empty.');
         });
     });

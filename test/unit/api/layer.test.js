@@ -25,28 +25,28 @@ describe('api/layer', () => {
 
         it('should throw an error if id is not valid', function () {
             expect(function () {
-                new Layer(undefined, source, style);
+                new Layer();
             }).toThrowError('`id` property required.');
             expect(function () {
-                new Layer({}, source, style);
+                new Layer({});
             }).toThrowError('`id` property must be a string.');
             expect(function () {
-                new Layer('', source, style);
+                new Layer('');
             }).toThrowError('`id` property must be not empty.');
         });
 
         it('should throw an error if source is not valid', function () {
             expect(function () {
-                new Layer('layer0', undefined, style);
+                new Layer('layer0');
             }).toThrowError('`source` property required.');
             expect(function () {
-                new Layer('layer0', {}, style);
+                new Layer('layer0', {});
             }).toThrowError('The given object is not a valid source. See "carto.source.Base".');
         });
 
         xit('should throw an error if style is not valid', function () {
             expect(function () {
-                new Layer('layer0', source, undefined);
+                new Layer('layer0', source);
             }).toThrowError('`style` property required.');
             expect(function () {
                 new Layer('layer0', source, {});

@@ -22,7 +22,11 @@ export default class Base {
      * @memberof carto.source
      * @api
      */
-    constructor(auth, options) {
+    constructor() {
+        this._client = new Windshaft(this);
+    }
+
+    initialize(auth, options) {
         this._checkAuth(auth);
         this._checkOptions(options);
         this._apiKey = auth.apiKey;
@@ -30,8 +34,6 @@ export default class Base {
         this._serverURL = (options && options.serverURL) || 'https://{user}.carto.com';
         this._serverURL = this._serverURL.replace(/{user}/, auth.username);
         this._validateServerURL(this._serverURL);
-
-        this._client = new Windshaft(this);
     }
 
     bindLayer(...args) {
