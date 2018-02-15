@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Single layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO GL JS -->
+    <script src="../../dist/carto-gl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="../../vendor/mapbox-gl-dev.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+</body>
+<script>
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+        center: [2.1734, 41.3851],
+        zoom: 14,
+    });
+
+    const auth = {
+        user: 'dmanzanares-ded13',
+        apiKey: ''
+    };
+
+    const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { cartoURL: 'carto-staging.com' });
+    const s = carto.expressions;
+    const style = new carto.Style({
+        width: s.floatMul(s.floatMul(s.sqrt(s.floatDiv(s.property('amount'), 5000)), 20), s.floatMul(s.floatAdd(s.floatDiv(s.zoom(), 4000), 0.01), 1.5)),
+        color: s.ramp(s.property('category'), s.palettes.prism()),
+        strokeColor: s.rgba(0, 0, 0, 0.7),
+        strokeWidth: s.floatDiv(s.zoom(), 10000),
+        order: s.desc(s.width())
+    });
+    const layer = new carto.Layer('myCartoLayer', source, style);
+
+    layer.addTo(map, 'watername_ocean');
+</script>
+
+</html>
