@@ -37,6 +37,9 @@ function generateViewportExpression(metadataPropertyName) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
+        getValue() {
+            return this.value.expr;
+        }
     };
 }
 
@@ -82,5 +85,8 @@ export class ViewportPercentile extends Expression {
             console.log(`percentile${this.percentile}`, this.property.name, br, drawMetadata);
         }
         this.value._preDraw(drawMetadata, gl);
+    }
+    getValue() {
+        return this.value.expr;
     }
 }
