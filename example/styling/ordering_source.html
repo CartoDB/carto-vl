@@ -44,10 +44,18 @@
     const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { cartoURL: 'carto-staging.com' });
     const s = carto.expressions;
     const style = new carto.Style({
-        width: s.floatMul(s.floatMul(s.sqrt(s.floatDiv(s.property('amount'), 5000)), 20), s.floatMul(s.floatAdd(s.floatDiv(s.zoom(), 4000), 0.01), 1.5)),
-        color: s.ramp(s.property('category'), s.palettes.prism()),
+        width: s.floatMul(
+            s.floatMul(s.sqrt(s.floatDiv(s.property('amount'), 5000)), 20),
+            s.floatMul(s.floatAdd(s.floatDiv(s.zoom(), 4000), 0.01), 1.5)
+        ),
+        color: s.ramp(
+            s.property('category'),
+            s.palettes.prism()
+        ),
         strokeColor: s.rgba(0, 0, 0, 0.7),
-        strokeWidth: s.floatDiv(s.zoom(), 10000),
+        strokeWidth: s.floatDiv(
+            s.zoom(),
+            10000),
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
 
