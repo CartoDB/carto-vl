@@ -6,10 +6,10 @@ export function implicitCast(value) {
     if (Number.isFinite(value)) {
         return float(value);
     }
-    if (typeof value == 'string'){
+    if (typeof value == 'string') {
         return category(value);
     }
-    if (!( value instanceof Expression) && !value.length){
+    if (!(value instanceof Expression) && value.type != 'paletteGenerator') {
         throw new Error('value cannot be casted');
     }
     return value;

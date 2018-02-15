@@ -17,7 +17,7 @@ export default class Ramp extends Expression {
             minKey = implicitCast(minKey);
             maxKey = implicitCast(maxKey);
         }
-        var values = implicitCast(palette);
+        palette = implicitCast(palette);
         super({ input: input });
         if (minKey === undefined) {
             minKey = float(0);
@@ -25,7 +25,7 @@ export default class Ramp extends Expression {
         }
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
-        this.values = values;
+        this.palette = palette;
     }
     _compile(meta) {
         super._compile(meta);
@@ -62,13 +62,33 @@ export default class Ramp extends Expression {
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
-            const values = this.values;
+            let palette = this.palette;
+            if (this.palette.type == 'paletteGenerator') {
+                if (this.input.numCategories){
+                    palette = palette.subPalettes[this.input.numCategories];
+                    //TODO if others && palette.tags.contains('qualitative)
+                    palette.pop();
+                }else{
+                    //TODO getLargerSubPalette()
+                    palette = palette.subPalettes['7'];
+                }
+            }
+            /*
+    if palette is cartocolor then
+          if input contains "others" bucket  then
+                 apply cartocolor subscheme
+          else if input doesn't contain ''others" bucket then
+                  if cartocolor has "qualitative" tag then
+                         apply cartocolor subscheme with one extra bucket to ignore the last bucket
+                  else if cartocolor doesn't have "qualitative" tag then
+                        apply cartocolor subscheme
+            */
             for (var i = 0; i < width; i++) {
-                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlowRaw = palette[Math.floor(i / width * (palette.length - 1))];
+                const vhighRaw = palette[Math.ceil(i / width * (palette.length - 1))];
                 const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
                 const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const m = i / width * (palette.length - 1) - Math.floor(i / width * (palette.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
                 pixel[4 * i + 1] = v[1];

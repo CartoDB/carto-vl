@@ -36,13 +36,14 @@ export default class Buckets extends Expression {
         const cmp = this.input.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
-                return ${index + 1}.;
+                return ${index}.;
             }`;
         const funcBody = this.args.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return 0.;
+            return ${this.numCategories - 1}.;
         }`;
+        console.log(preface);
 
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,

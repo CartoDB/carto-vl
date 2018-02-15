@@ -113,7 +113,7 @@ function parseNode(node) {
         if (node.name[0] == '$') {
             return functions.property(node.name.substring(1));
         } else if (functions.palettes[node.name.toLowerCase()]) {
-            return functions.palettes[node.name.toLowerCase()]();
+            return functions.palettes[node.name.toLowerCase()];
         } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
             return lowerCaseFunctions[node.name.toLowerCase()];
         }
