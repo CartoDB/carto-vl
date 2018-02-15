@@ -35,6 +35,12 @@ function Style(o) {
     this._strokeWidth.notify = () => {
         this._changed();
     };
+    this._order = o.order || functions.noOrder();
+    this._order.parent = this;
+    this._order.notify = () => {
+        this._changed();
+    };
+    this._resolution = 1;
     this._observer = null;
 }
 
@@ -51,26 +57,6 @@ Style.prototype.getMinimumNeededSchema = function () {
     const exprs = [this._width, this._color, this._strokeColor, this._strokeWidth].filter(x => x && x._getMinimumNeededSchema);
     return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
 };
-
-/*
-Style.prototype.set = function (s, duration, meta) {
-    s.color = s.color || functions.rgba(0.2, 0.2, 0.8, 0.5);
-    s.width = s.width != undefined ? s.width : functions.float(4);
-    s.strokeColor = s.strokeColor || functions.rgba(0, 0, 0, 0);
-    s.strokeWidth = s.strokeWidth != undefined ? s.strokeWidth : functions.float(0);
-    s.resolution = s.resolution == undefined ? 1 : s.resolution;
-
-    this._width._bind(meta);
-    this._color._bind(meta);
-    this._strokeColor._bind(meta);
-    this._strokeWidth._bind(meta);
-    this.resolution = s.resolution;
-
-    this.getWidth().blendTo(s.width, duration);
-    this.getColor().blendTo(s.color, duration);
-    this.getStrokeColor().blendTo(s.strokeColor, duration);
-    this.getStrokeWidth().blendTo(s.strokeWidth, duration);
-};*/
 
 Style.prototype._compileColorShader = function (gl, metadata) {
     this._color._bind(metadata);

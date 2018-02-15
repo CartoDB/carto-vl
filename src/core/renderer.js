@@ -3,6 +3,7 @@ import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
+import * as ordering from './style/expressions/ordering';
 
 const HISTOGRAM_BUCKETS = 1000;
 
@@ -577,7 +578,27 @@ Renderer.prototype.refresh = function (timestamp) {
 
 
     const s = 1. / this._zoom;
-    tiles.forEach(tile => {
+
+    // TODO remove hack
+    let orderer = null;
+    if (tiles.length > 0) {
+        orderer =tiles[0].style._order;
+    }
+    let orderingMins = null;
+    let orderingMaxs = null;
+    if (orderer instanceof ordering.Asc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
+    } else if (orderer instanceof ordering.Desc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
+    }else{
+        orderingMins = [0];
+        orderingMaxs = [1000];
+    }
+
+    const renderDrawPass = orderingIndex => tiles.forEach(tile => {
+
         let renderer = null;
         if (tile.type == 'point') {
             renderer = this.finalRendererProgram;
@@ -587,6 +608,11 @@ Renderer.prototype.refresh = function (timestamp) {
             renderer = this.triRendererProgram;
         }
         gl.useProgram(renderer.program);
+
+        //Set filtering condition on "... AND feature is in current order bucket"
+        gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
+        gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
+
         gl.uniform2f(renderer.vertexScaleUniformLocation,
             (s / aspect) * tile.scale,
             s * tile.scale);
@@ -636,6 +662,9 @@ Renderer.prototype.refresh = function (timestamp) {
         if (tile.type == 'line') {
             gl.disableVertexAttribArray(renderer.normalAttr);
         }
+    });
+    orderingMins.map((_, orderingIndex) => {
+        renderDrawPass(orderingIndex);
     });
 
     this.computePool.map(job => job.work(this));
