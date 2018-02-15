@@ -17,7 +17,6 @@ export default class Base {
      *
      * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset} or {@link carto.source.SQL} instead.
      *
-     * @fires error
      *
      * @constructor Base
      * @abstract

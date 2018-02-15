@@ -5,7 +5,7 @@ import getMGLIntegrator from './integration/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 /**
- * Responsabilities:  rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
+ * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
  * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
  */
 

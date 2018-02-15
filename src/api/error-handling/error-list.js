@@ -113,6 +113,10 @@ const validation = {
         'non-valid-expression': {
             messageRegex: /nonValidExpression$/,
             friendlyMessage: 'Some parameter is not a valid style Expresion.'
+        },
+        'resolution-number-required': {
+            messageRegex: /resolutionNumberRequired$/,
+            friendlyMessage: '`resolution` must be a number.'
         }
     }
 };

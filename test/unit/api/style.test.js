@@ -2,6 +2,7 @@ import Style from '../../../src/api/style';
 import * as s from '../../../src/core/style/functions';
 
 describe('api/style', () => {
+
     describe('constructor', () => {
         describe('when parameter is a styleSpec object', () => {
             it('should set default style values when no parameters are given', () => {
@@ -10,6 +11,7 @@ describe('api/style', () => {
                 // Check returned object inherits from Style
                 expect(actual).toEqual(jasmine.any(Style));
                 // Check returned object properties
+                expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor()).toEqual(s.rgba(0, 1, 0, 0.5));
                 expect(actual.getWidth()).toEqual(s.float(5));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
@@ -20,6 +22,7 @@ describe('api/style', () => {
                 const actual = new Style({});
 
                 expect(actual).toEqual(jasmine.any(Style));
+                expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor()).toEqual(s.rgba(0, 1, 0, 0.5));
                 expect(actual.getWidth()).toEqual(s.float(5));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
@@ -28,15 +31,16 @@ describe('api/style', () => {
 
             it('should set the style properties when defined in the styleSpec object', () => {
                 const styleSpec = {
+                    resolution: 2,
                     color: s.rgba(1, 0, 0, 1),
                     width: s.float(10),
                     strokeColor: s.rgba(0, 0, 1, 1),
                     strokeWidth: s.float(15)
                 };
-
                 const actual = new Style(styleSpec);
 
                 expect(actual).toEqual(jasmine.any(Style));
+                expect(actual.getResolution()).toEqual(styleSpec.resolution);
                 expect(actual.getColor()).toEqual(styleSpec.color);
                 expect(actual.getWidth()).toEqual(styleSpec.width);
                 expect(actual.getStrokeColor()).toEqual(styleSpec.strokeColor);
@@ -49,6 +53,15 @@ describe('api/style', () => {
                 expect(function () {
                     new Style(1234);
                 }).toThrowError('style definition should be a styleSpec object or a valid style string.');
+            });
+
+            it('should throw an error when resolution is not a number', () => {
+                const styleSpec = {
+                    resolution: false // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`resolution` must be a number.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -95,6 +108,3 @@ describe('api/style', () => {
 
     });
 });
-
-
-

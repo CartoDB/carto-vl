@@ -1,17 +1,16 @@
 import * as _ from 'lodash';
 
-import { parseStyle } from '../core/style/parser';
-// import Expression from './core/style/expressions/expression';
-import CartoValidationError from './error-handling/carto-validation-error';
 import * as s from '../core/style/functions';
+import { parseStyle } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
+import CartoValidationError from './error-handling/carto-validation-error';
 
 
+const DEFAULT_RESOLUTION = 1;
 const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_WIDTH_EXPRESSION = s.float(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
-
 
 export default class Style {
 
@@ -29,7 +28,7 @@ export default class Style {
      *   color: carto.style.expression.rgb(0,0,0)
      * });
      *
-     * @fires Error
+     * @fires CartoError
      *
      * @constructor Style
      * @memberof carto
@@ -41,26 +40,55 @@ export default class Style {
         this._styleSpec = styleSpec;
     }
 
+    /**
+     * Return the resolution.
+     *
+     * @return {number}
+     * @api
+     */
+    getResolution() {
+        return this._styleSpec.resolution;
+    }
+
+    /**
+     * Return the color expression.
+     *
+     * @return {carto.style.expression}
+     * @api
+     */
     getColor() {
         return this._styleSpec.color;
     }
 
+    /**
+     * Return the width expression.
+     *
+     * @return {carto.style.expression}
+     * @api
+     */
     getWidth() {
         return this._styleSpec.width;
     }
 
+    /**
+     * Return the strokeColor expression.
+     *
+     * @return {carto.style.expression}
+     * @api
+     */
     getStrokeColor() {
         return this._styleSpec.strokeColor;
     }
 
+    /**
+     * Return the strokeWidth expression.
+     *
+     * @return {carto.style.expression}
+     * @api
+     */
     getStrokeWidth() {
         return this._styleSpec.strokeWidth;
     }
-
-    // TODO: Do we need this?
-    // updated?
-    // observer?
-
 
     /**
      * This function checks the input parameter `definition` returning always an object.
@@ -79,19 +107,19 @@ export default class Style {
             return this._setDefaults(definition);
         }
         if (_.isString(definition)) {
-            let parsedStyle = parseStyle(definition);
-            return this._setDefaults({
-                color: parsedStyle.color,
-                width: parsedStyle.width,
-                strokeColor: parsedStyle.strokeColor,
-                strokeWidth: parsedStyle.strokeWidth
-            });
+            return this._setDefaults(parseStyle(definition));
         }
         throw new CartoValidationError('style', 'nonValidDefinition');
     }
 
-    // Add default values to a styleSpec object
+    /**
+     * Add default values to a styleSpec object.
+     *
+     * @param {StyleSpec} styleSpec
+     * @return {StyleSpec}
+     */
     _setDefaults(styleSpec) {
+        styleSpec.resolution = _.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
         styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION;
         styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
@@ -110,8 +138,12 @@ export default class Style {
          * @api
          */
 
-        // TODO: Check expression types ie: color is not a number!
+        // TODO: Check expression types ie: color is not a number expression!
+        // TODO: add property name to the exception
 
+        if (!_.isNumber(styleSpec.resolution)) {
+            throw new CartoValidationError('style', 'resolutionNumberRequired');
+        }
         if (!(styleSpec.color instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression');
         }
@@ -125,4 +157,8 @@ export default class Style {
             throw new CartoValidationError('style', 'nonValidExpression');
         }
     }
+
+    // TODO:
+    // updated?
+    // observer?
 }

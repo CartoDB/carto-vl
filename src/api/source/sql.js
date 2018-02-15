@@ -22,7 +22,7 @@ export default class SQL extends Base {
      *   user: 'YOUR_USERNAME_HERE'
      * });
      *
-     * @fires Error
+     * @fires CartoError
      *
      * @constructor SQL
      * @extends carto.source.Base

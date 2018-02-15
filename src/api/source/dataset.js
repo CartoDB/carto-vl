@@ -22,7 +22,7 @@ export default class Dataset extends Base {
      *   user: 'YOUR_USERNAME_HERE'
      * });
      *
-     * @fires Error
+     * @fires CartoError
      *
      * @constructor Dataset
      * @extends carto.source.Base
