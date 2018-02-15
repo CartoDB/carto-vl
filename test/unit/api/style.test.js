@@ -5,7 +5,7 @@ describe('api/style', () => {
 
     describe('constructor', () => {
         describe('when parameter is a styleSpec object', () => {
-            it('should set default style values when no parameters are given', () => {
+            xit('should set default style values when no parameters are given', () => {
                 const actual = new Style();
 
                 // Check returned object inherits from Style
@@ -18,7 +18,7 @@ describe('api/style', () => {
                 expect(actual.getStrokeWidth()).toEqual(s.float(0));
             });
 
-            it('should set default style values when an empty object is given', () => {
+            xit('should set default style values when an empty object is given', () => {
                 const actual = new Style({});
 
                 expect(actual).toEqual(jasmine.any(Style));
@@ -29,7 +29,7 @@ describe('api/style', () => {
                 expect(actual.getStrokeWidth()).toEqual(s.float(0));
             });
 
-            it('should set the style properties when defined in the styleSpec object', () => {
+            it('should set the style properties defined in the styleSpec object', () => {
                 const styleSpec = {
                     resolution: 2,
                     color: s.rgba(1, 0, 0, 1),
@@ -103,7 +103,22 @@ describe('api/style', () => {
         });
 
         describe('when parameter is a string', () => {
-            pending('Implement and test');
+            xit('should set the style properties defined in the string', () => {
+                const styleSpec = `
+                    color: rgba(1, 0, 0, 1),
+                    width: float(10),
+                    strokeColor: rgba(0, 0, 1, 1),
+                    strokeWidth: float(15)
+                `;
+                const actual = new Style(styleSpec);
+
+                expect(actual).toEqual(jasmine.any(Style));
+                expect(actual.getResolution()).toEqual(1);
+                expect(actual.getColor()).toEqual(s.rgba(1, 0, 0, 1));
+                expect(actual.getWidth()).toEqual(s.float(10));
+                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
+                expect(actual.getStrokeWidth()).toEqual(s.float(15));
+            });
         });
     });
 });

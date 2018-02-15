@@ -122,15 +122,8 @@ Style.prototype._replaceChild = function (toReplace, replacer) {
     }
 };
 
-import * as parser from './parser';
-function parseStyle(str) {
-    const o = parser.parseStyle(str);
-    return new Style(o);
-}
-
 export {
     Style,
-    compileShader,
-    parseStyle
+    compileShader
 };
 export * from './functions';

@@ -456,10 +456,10 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
     const tiles = this.dataframes.filter(tile => tile.style);
-    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
-    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
+    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
 
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
@@ -535,7 +535,7 @@ Renderer.prototype.refresh = function (timestamp) {
     this.computePool = [];
 
     tiles.forEach(t => {
-        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+        if (t.style.getColor().isAnimated() || t.style.getWidth().isAnimated()) {
             this._RAF();
         }
     });

@@ -1,7 +1,10 @@
 import * as _ from 'lodash';
 
 import * as s from '../core/style/functions';
-import { parseStyle } from '../core/style/parser';
+import * as schema from '../core/schema';
+import * as shaders from '../core/shaders';
+import { compileShader } from '../core/style/shader-compiler';
+import { parseStyleDefinition } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
 import CartoValidationError from './error-handling/carto-validation-error';
 
@@ -12,10 +15,18 @@ const DEFAULT_WIDTH_EXPRESSION = s.float(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
 
+/**
+ * @description A Style defines how associated dataframes of a particular renderer should be renderer.
+ *
+ * Styles are only compatible with dataframes that comply with the same schema.
+ * The schema is the interface that a dataframe must comply with.
+ */
+
 export default class Style {
 
     /**
      * Create a carto.Style.
+     *
      *
      * @param {string|object} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
      *
@@ -38,6 +49,18 @@ export default class Style {
         const styleSpec = this._parseStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
         this._styleSpec = styleSpec;
+
+        // REVIEW THIS vv
+        this._changeCallback = null;
+        this._styleSpec.color.parent = this;
+        this._styleSpec.width.parent = this;
+        this._styleSpec.strokeColor.parent = this;
+        this._styleSpec.strokeWidth.parent = this;
+        this._styleSpec.color.notify = () => { this._changed(); };
+        this._styleSpec.width.notify = () => { this._changed(); };
+        this._styleSpec.strokeColor.notify = () => { this._changed(); };
+        this._styleSpec.strokeWidth.notify = () => { this._changed(); };
+        // ^^
     }
 
     /**
@@ -90,13 +113,79 @@ export default class Style {
         return this._styleSpec.strokeWidth;
     }
 
-    onChange() {
-        // TODO
+    // REVIEW THIS vv
+
+    onChange(callback) {
+        this._changeCallback = callback;
+    }
+
+    _changed() {
+        if (this._changeCallback) {
+            this._changeCallback();
+        }
     }
 
     getMinimumNeededSchema() {
-        // TODO
+        const exprs = [
+            this._styleSpec.color,
+            this._styleSpec.width,
+            this._styleSpec.strokeColor,
+            this._styleSpec.strokeWidth
+        ].filter(x => x && x._getMinimumNeededSchema);
+        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
+
+    _compileColorShader(gl, metadata) {
+        this._styleSpec.color._bind(metadata);
+        const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
+        this.propertyColorTID = r.tid;
+        this.colorShader = r.shader;
+    }
+
+    _compileWidthShader(gl, metadata) {
+        this._styleSpec.width._bind(metadata);
+        const r = compileShader(gl, this._styleSpec.width, shaders.styler.createWidthShader);
+        this.propertyWidthTID = r.tid;
+        this.widthShader = r.shader;
+    }
+
+    _compileStrokeColorShader(gl, metadata) {
+        this._styleSpec.strokeColor._bind(metadata);
+        const r = compileShader(gl, this._styleSpec.strokeColor, shaders.styler.createColorShader);
+        this.propertyStrokeColorTID = r.tid;
+        this.strokeColorShader = r.shader;
+    }
+
+    _compileStrokeWidthShader(gl, metadata) {
+        this._styleSpec.strokeWidth._bind(metadata);
+        const r = compileShader(gl, this._styleSpec.strokeWidth, shaders.styler.createWidthShader);
+        this.propertyStrokeWidthTID = r.tid;
+        this.strokeWidthShader = r.shader;
+    }
+
+    _replaceChild(toReplace, replacer) {
+        if (toReplace == this._styleSpec.color) {
+            this._styleSpec.color = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this._styleSpec.width) {
+            this._styleSpec.width = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this._styleSpec.strokeColor) {
+            this._styleSpec.strokeColor = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this._styleSpec.strokeWidth) {
+            this._styleSpec.strokeWidth = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else {
+            throw new Error('No child found');
+        }
+    }
+
+    // ^^
 
     /**
      * This function checks the input parameter `definition` returning always an object.
@@ -115,7 +204,7 @@ export default class Style {
             return this._setDefaults(definition);
         }
         if (_.isString(definition)) {
-            return this._setDefaults(parseStyle(definition));
+            return this._setDefaults(parseStyleDefinition(definition));
         }
         throw new CartoValidationError('style', 'nonValidDefinition');
     }
