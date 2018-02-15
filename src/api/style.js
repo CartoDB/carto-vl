@@ -94,6 +94,10 @@ export default class Style {
         // TODO
     }
 
+    getMinimumNeededSchema() {
+        // TODO
+    }
+
     /**
      * This function checks the input parameter `definition` returning always an object.
      * If the `definition` is an object it returns the same object.
@@ -149,16 +153,16 @@ export default class Style {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
         }
         if (!(styleSpec.color instanceof Expression)) {
-            throw new CartoValidationError('style', 'nonValidExpression');
+            throw new CartoValidationError('style', 'nonValidExpression[color]');
         }
         if (!(styleSpec.width instanceof Expression)) {
-            throw new CartoValidationError('style', 'nonValidExpression');
+            throw new CartoValidationError('style', 'nonValidExpression[width]');
         }
         if (!(styleSpec.strokeColor instanceof Expression)) {
-            throw new CartoValidationError('style', 'nonValidExpression');
+            throw new CartoValidationError('style', 'nonValidExpression[strokeColor]');
         }
         if (!(styleSpec.strokeWidth instanceof Expression)) {
-            throw new CartoValidationError('style', 'nonValidExpression');
+            throw new CartoValidationError('style', 'nonValidExpression[strokeWidth]');
         }
     }
 

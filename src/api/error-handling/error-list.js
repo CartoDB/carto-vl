@@ -111,8 +111,8 @@ const validation = {
             friendlyMessage: 'style definition should be a styleSpec object or a valid style string.'
         },
         'non-valid-expression': {
-            messageRegex: /nonValidExpression$/,
-            friendlyMessage: 'Some parameter is not a valid style Expresion.'
+            messageRegex: /nonValidExpression\[(.+)\]$/,
+            friendlyMessage: '`$0` parameter is not a valid style Expresion.'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,

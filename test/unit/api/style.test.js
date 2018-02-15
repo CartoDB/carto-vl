@@ -70,7 +70,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError('Some parameter is not a valid style Expresion.');
+                }).toThrowError('`color` parameter is not a valid style Expresion.');
             });
 
             it('should throw an error when width is not a valid expression', () => {
@@ -79,7 +79,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError('Some parameter is not a valid style Expresion.');
+                }).toThrowError('`width` parameter is not a valid style Expresion.');
             });
 
             it('should throw an error when strokeColor is not a valid expression', () => {
@@ -88,7 +88,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError('Some parameter is not a valid style Expresion.');
+                }).toThrowError('`strokeColor` parameter is not a valid style Expresion.');
             });
 
             it('should throw an error when strokeWidth is not a valid expression', () => {
@@ -97,7 +97,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError('Some parameter is not a valid style Expresion.');
+                }).toThrowError('`strokeWidth` parameter is not a valid style Expresion.');
             });
 
         });

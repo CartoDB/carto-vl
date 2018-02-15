@@ -45,7 +45,7 @@ class CartoError extends Error {
             }
             if (error.messageRegex.test(this.message)) {
                 return {
-                    friendlyMessage: error.friendlyMessage
+                    friendlyMessage: this._replaceRegex(error)
                 };
             }
         }
@@ -58,6 +58,20 @@ class CartoError extends Error {
 
     _getErrorList() {
         return ERROR_LIST[this.origin] && ERROR_LIST[this.origin][this.type];
+    }
+
+    /**
+     * Replace $0 with the proper paramter in the listedError regex to build a friendly message.
+     */
+    _replaceRegex (error) {
+        if (!error.friendlyMessage) {
+            return this.message;
+        }
+        var match = this.message && this.message.match(error.messageRegex);
+        if (match && match.length > 1) {
+            return error.friendlyMessage.replace('$0', match[1]);
+        }
+        return error.friendlyMessage;
     }
 }
 
