@@ -37,11 +37,11 @@
     });
 
     const auth = {
-        user: 'dmanzanares-ded13',
+        user: 'cartogl',
         apiKey: ''
     };
 
-    const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { cartoURL: 'carto-staging.com' });
+    const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { cartoURL: 'carto.com' });
     const s = carto.expressions;
     const style = new carto.Style({
         width: s.floatMul(
