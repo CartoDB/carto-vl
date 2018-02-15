@@ -408,10 +408,10 @@ Renderer.prototype._computeDrawMetadata = function () {
         columns: []
     };
     let requiredColumns = tiles.map(d => {
-        const widthRequirements = d.style._width._getDrawMetadataRequirements();
-        const colorRequirements = d.style._color._getDrawMetadataRequirements();
-        const strokeWidthRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
-        const strokeColorRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
         return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
             reduce(schema.union, schema.IDENTITY);
     }).reduce(schema.union, schema.IDENTITY).columns;

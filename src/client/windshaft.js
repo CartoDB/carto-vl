@@ -80,7 +80,8 @@ export default class Windshaft {
                     completedTiles.push(dataframe);
                 }
                 if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.forEach(t => t.setStyle(false));
+                    this._oldDataframes.map(d => d.active = false);
+                    completedTiles.map(d => d.active = true);
                     this._oldDataframes = completedTiles;
                 }
             });

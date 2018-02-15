@@ -94,7 +94,7 @@ var map = new mapboxgl.Map({
 
 const auth = {
     user: 'dmanzanares',
-    apiKey: ''
+    apiKey: 'YOUR_API_KEY'
 };
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
@@ -204,7 +204,7 @@ map.on('load', () => {
             $('#dataset').val(),
             {
                 user: $('#user').val(),
-                apiKey: ''
+                apiKey: 'YOUR_API_KEY'
             },
             {
                 cartoURL: $('#cartoURL').val()
