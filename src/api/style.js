@@ -90,6 +90,10 @@ export default class Style {
         return this._styleSpec.strokeWidth;
     }
 
+    onChange() {
+        // TODO
+    }
+
     /**
      * This function checks the input parameter `definition` returning always an object.
      * If the `definition` is an object it returns the same object.

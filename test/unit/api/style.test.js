@@ -105,6 +105,5 @@ describe('api/style', () => {
         describe('when parameter is a string', () => {
             pending('Implement and test');
         });
-
     });
 });

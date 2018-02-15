@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 
 import SourceBase from './source/base';
+import Style from './style';
 import getMGLIntegrator from './integration/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 
@@ -34,7 +35,6 @@ export default class Layer {
      *
      * @param {carto.source.Base} source - New source
      *
-     * @memberof carto.layer
      * @api
      */
     setSource(source) {
@@ -62,7 +62,6 @@ export default class Layer {
      *
      * @param {carto.Style} style - New style
      *
-     * @memberof carto.layer
      * @api
      */
     setStyle(style) {
@@ -77,9 +76,12 @@ export default class Layer {
     }
 
     /**
-     * Add this layer to a amp
+     * Add this layer to a map.
+     *
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
+     *
+     * @api
      */
     addTo(map, beforeLayerID) {
         if (this._isMGLMap(map)) {
@@ -155,6 +157,9 @@ export default class Layer {
     _checkStyle(style) {
         if (_.isUndefined(style)) {
             throw new CartoValidationError('layer', 'styleRequired');
+        }
+        if (!(style instanceof Style)) {
+            throw new CartoValidationError('layer', 'nonValidStyle');
         }
     }
 

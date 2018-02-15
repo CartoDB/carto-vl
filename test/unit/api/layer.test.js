@@ -1,5 +1,5 @@
 import Dataset from '../../../src/api/source/dataset';
-import { Style } from '../../../src/core/style';
+import Style from '../../../src/api/style';
 
 import Layer from '../../../src/api/layer';
 
@@ -44,7 +44,7 @@ describe('api/layer', () => {
             }).toThrowError('The given object is not a valid source. See "carto.source.Base".');
         });
 
-        xit('should throw an error if style is not valid', function () {
+        it('should throw an error if style is not valid', function () {
             expect(function () {
                 new Layer('layer0', source);
             }).toThrowError('`style` property required.');
