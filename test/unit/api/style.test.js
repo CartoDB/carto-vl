@@ -3,7 +3,7 @@ import * as s from '../../../src/core/style/functions';
 
 describe('api/style', () => {
     describe('constructor', () => {
-        describe('when parameter is a styleSpect object', () => {
+        describe('when parameter is a styleSpec object', () => {
             it('should set default style values when no parameters are given', () => {
                 const actual = new Style();
 
@@ -42,12 +42,51 @@ describe('api/style', () => {
                 expect(actual.getStrokeColor()).toEqual(styleSpec.strokeColor);
                 expect(actual.getStrokeWidth()).toEqual(styleSpec.strokeWidth);
             });
+        });
 
-            it('should throw an error when styleSpec object is not valid', function () {
+        describe('when parameter is invalid', () => {
+            it('should throw an error when parameter is not an object neither a string', function () {
                 expect(function () {
                     new Style(1234);
                 }).toThrowError('style definition should be a styleSpec object or a valid style string.');
             });
+
+            it('should throw an error when color is not a valid expression', () => {
+                const styleSpec = {
+                    color: 'red' // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('Some parameter is not a valid style Expresion.');
+            });
+
+            it('should throw an error when width is not a valid expression', () => {
+                const styleSpec = {
+                    width: 10 // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('Some parameter is not a valid style Expresion.');
+            });
+
+            it('should throw an error when strokeColor is not a valid expression', () => {
+                const styleSpec = {
+                    strokeColor: 'red' // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('Some parameter is not a valid style Expresion.');
+            });
+
+            it('should throw an error when strokeWidth is not a valid expression', () => {
+                const styleSpec = {
+                    strokeWidth: 5 // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('Some parameter is not a valid style Expresion.');
+            });
+
         });
 
         describe('when parameter is a string', () => {

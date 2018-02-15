@@ -4,6 +4,7 @@ import { parseStyle } from '../core/style/parser';
 // import Expression from './core/style/expressions/expression';
 import CartoValidationError from './error-handling/carto-validation-error';
 import * as s from '../core/style/functions';
+import Expression from '../core/style/expressions/expression';
 
 
 const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
@@ -68,7 +69,7 @@ export default class Style {
      * Otherwise it throws an error.
      *
      * @param  {string|object} definition
-     * @return {object}
+     * @return {StyleSpec}
      */
     _parseStyleDefinition(definition) {
         if (_.isUndefined(definition)) {
@@ -98,16 +99,30 @@ export default class Style {
         return styleSpec;
     }
 
-    _checkStyleSpec(/*styleSpec*/) {
+    _checkStyleSpec(styleSpec) {
         /**
-        * @typedef {object} StyleSpec
-        * @property {carto.style.expression.Base} color
-        * @property {carto.style.expression.Base} width
-        * @property {carto.style.expression.Base} strokeColor
-        * @property {carto.style.expression.Base} strokeWidth
-        * @property {number} resolution
-        * @api
-        */
-        // TODO
+         * @typedef {object} StyleSpec
+         * @property {carto.style.expression.Base} color
+         * @property {carto.style.expression.Base} width
+         * @property {carto.style.expression.Base} strokeColor
+         * @property {carto.style.expression.Base} strokeWidth
+         * @property {number} resolution
+         * @api
+         */
+
+        // TODO: Check expression types ie: color is not a number!
+
+        if (!(styleSpec.color instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression');
+        }
+        if (!(styleSpec.width instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression');
+        }
+        if (!(styleSpec.strokeColor instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression');
+        }
+        if (!(styleSpec.strokeWidth instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression');
+        }
     }
 }

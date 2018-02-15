@@ -109,6 +109,10 @@ const validation = {
         'non-valid-definition': {
             messageRegex: /nonValidDefinition$/,
             friendlyMessage: 'style definition should be a styleSpec object or a valid style string.'
+        },
+        'non-valid-expression': {
+            messageRegex: /nonValidExpression$/,
+            friendlyMessage: 'Some parameter is not a valid style Expresion.'
         }
     }
 };
