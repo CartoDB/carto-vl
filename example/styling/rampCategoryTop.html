@@ -42,8 +42,8 @@
         apiKey: '8a174c451215cb8dca90264de342614087c4ef0c'
     };
 
-    const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { cartoURL: 'carto-staging.com' });
-    const s = carto.expressions;
+    const source = new carto.source.Dataset('tx_0125_copy_copy', auth, { serverURL: 'https://{user}.carto-staging.com' });
+    const s = carto.style.expressions;
     const style = new carto.Style({
         color: s.ramp(s.top(s.property('category'), 3), s.palettes.prism())
     });

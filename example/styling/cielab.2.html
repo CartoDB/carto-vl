@@ -33,7 +33,7 @@
         };
 
         const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-        const s = carto.expressions;
+        const s = carto.style.expressions;
         const style = new carto.Style({
             color: s.cielab(80,10,60)
         });
