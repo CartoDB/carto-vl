@@ -85,7 +85,6 @@ const texts = [
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 var mapboxgl = window.mapboxgl;
-mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
 var map = new mapboxgl.Map({
     container: 'map', // container id
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
@@ -95,7 +94,7 @@ var map = new mapboxgl.Map({
 
 const auth = {
     user: 'dmanzanares',
-    apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
+    apiKey: ''
 };
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
@@ -127,7 +126,6 @@ map.on('load', () => {
         $('#tutorial').text(texts[index]);
 
         $('#dataset').val('tx_0125_copy_copy');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
@@ -140,7 +138,6 @@ map.on('load', () => {
         $('#tutorial').text('');
 
         $('#dataset').val('wwi');
-        $('#apikey').val('8a174c451215cb8dca90264de342614087c4ef0c');
         $('#user').val('dmanzanares-ded13');
         $('#cartoURL').val('carto-staging.com');
 
@@ -179,7 +176,7 @@ map.on('load', () => {
     function getConfig() {
         return '#' + btoa(JSON.stringify({
             a: $('#dataset').val(),
-            b: $('#apikey').val(),
+            b: '',
             c: $('#user').val(),
             d: $('#cartoURL').val(),
             e: $('#styleEntry').val(),
@@ -190,7 +187,6 @@ map.on('load', () => {
     function setConfig(input) {
         const c = JSON.parse(atob(input));
         $('#dataset').val(c.a);
-        $('#apikey').val(c.b);
         $('#user').val(c.c);
         $('#cartoURL').val(c.d);
         $('#styleEntry').val(c.e);
@@ -208,7 +204,7 @@ map.on('load', () => {
             $('#dataset').val(),
             {
                 user: $('#user').val(),
-                apiKey: $('#apikey').val()
+                apiKey: ''
             },
             {
                 cartoURL: $('#cartoURL').val()
@@ -217,14 +213,12 @@ map.on('load', () => {
 
         localStorage.setItem('cartoURL', $('#cartoURL').val());
         localStorage.setItem('user', $('#user').val());
-        localStorage.setItem('apikey', $('#apikey').val());
         localStorage.setItem('dataset', $('#dataset').val());
         updateStyle();
     };
 
 
     $('#dataset').on('input', superRefresh);
-    $('#apikey').on('input', superRefresh);
     $('#user').on('input', superRefresh);
     $('#cartoURL').on('input', superRefresh);
 
@@ -239,25 +233,24 @@ map.on('load', () => {
         };
         document.getElementById('buttonlist').appendChild(button);
     };
-    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IjhhMTc0YzQ1MTIxNWNiOGRjYTkwMjY0ZGUzNDI2MTQwODdjNGVmMGMiLCJjIjoiZG1hbnphbmFyZXMtZGVkMTMiLCJkIjoiY2FydG8tc3RhZ2luZy5jb20iLCJlIjoid2lkdGg6ICAgIGJsZW5kKDEsMixuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpICp6b29tKClcbmNvbG9yOiAgICBzZXRvcGFjaXR5KHJhbXAobGluZWFyKEFWRygkdGVtcCksIDAsMzApLCB0ZWFscm9zZSksIGJsZW5kKDAuMDA1LDEsbmVhcigkZGF5LCAoMjUqbm93KCkpICUxMDAwLCAwLCAxMCksIGN1YmljKSkiLCJmIjp7ImxuZyI6NjAuNDEzNjExNjc1MzE3NzI1LCJsYXQiOjIzLjIyMTc0Mzg0NDc0NjI4NX0sImciOjEuNTUxOTU5Nzc5MDI5NDE0Nn0=');
-    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6IHNxcnQoJG51bWJlci8xMClcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MCksMC43KVxuc3Ryb2tlQ29sb3I6IHJhbXAoTUFYKCRudW1iZXIpXjAuNSwgU3Vuc2V0LCAwLCA1MClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi04Ny41MjA2MzAxNzY0MDM5OCwibGF0IjozNy4zNzc2OTk3NjY1MzkzMX0sImciOjIuNzQ2NTk0NjE1NjY2MTg5fQ==');
-    addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCRhc2lhbl9wb3ArJGJsYWNrX3BvcCskaGlzcGFuaWNfbykvJHdoaXRlX3BvcFxuY29sb3I6IHNldE9wYWNpdHkoaHN2KDAuNSwxLDEpLDAuNykiLCJmIjp7ImxuZyI6LTkwLjY5OTA1ODUxMjQxMTk3LCJsYXQiOjQwLjYyMTQ3NTIzNDQxNjY2NH0sImciOjIuNDU3MzM2MDY0MjIzNTMxfQ==');
+    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJkbWFuemFuYXJlcy1kZWQxMyIsImQiOiJjYXJ0by1zdGFnaW5nLmNvbSIsImUiOiJ3aWR0aDogICAgYmxlbmQoMSwyLG5lYXIoJGRheSwgKDI1Km5vdygpKSAlMTAwMCwgMCwgMTApLCBjdWJpYykgKnpvb20oKVxuY29sb3I6ICAgIHNldG9wYWNpdHkocmFtcChsaW5lYXIoQVZHKCR0ZW1wKSwgMCwzMCksIHRlYWxyb3NlKSwgYmxlbmQoMC4wMDUsMSxuZWFyKCRkYXksICgyNSpub3coKSkgJTEwMDAsIDAsIDEwKSwgY3ViaWMpKSIsImYiOnsibG5nIjo2MC40MTM2MTE2NzUzMTc3MjUsImxhdCI6MjMuMjIxNzQzODQ0NzQ2Mjg1fSwiZyI6MS41NTE5NTk3NzkwMjk0MTQ2fQ==');
+    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydCgkbnVtYmVyLzEwKVxuY29sb3I6IHNldE9wYWNpdHkocmFtcChNQVgoJG51bWJlcileMC41LCBTdW5zZXQsIDAsIDUwKSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChNQVgoJG51bWJlcileMC41LCBTdW5zZXQsIDAsIDUwKVxuc3Ryb2tlV2lkdGg6IDFcblxuXG5cblxuXG4iLCJmIjp7ImxuZyI6LTg3LjUyMDYzMDE3NjQwMzk4LCJsYXQiOjM3LjM3NzY5OTc2NjUzOTMxfSwiZyI6Mi43NDY1OTQ2MTU2NjYxODl9');
+    addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAoJGFzaWFuX3BvcCskYmxhY2tfcG9wKyRoaXNwYW5pY19vKS8kd2hpdGVfcG9wXG5jb2xvcjogc2V0T3BhY2l0eShoc3YoMC41LDEsMSksMC43KSIsImYiOnsibG5nIjotOTAuNjk5MDU4NTEyNDExOTcsImxhdCI6NDAuNjIxNDc1MjM0NDE2NjY0fSwiZyI6Mi40NTczMzYwNjQyMjM1MzF9');
     addButton('Denver accidents',
-        'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGNvdW50LzJcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoJGNvdW50LCBSZWRPciwwLDEyMCksKCRjb3VudC8yKS8xMClcblxuXG4iLCJmIjp7ImxuZyI6LTEwNC45NjUwNTYyMTU2Njc0NiwibGF0IjozOS43NDk2MTkzNzgyNDYyMn0sImciOjExLjQxODcxODc3MDkwNDQ5NH0=');
-    addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAgICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiByZ2JhKDI1NSwyNTUsMjU1LDApXG5zdHJva2VDb2xvcjogIGhzdigwLjEsICRnaXNfYWNyZXMvMjAwMDAwLCAkZ2lzX2FjcmVzLzQwMDAwMClcbnN0cm9rZVdpZHRoOiAkZ2lzX2FjcmVzLzUwMDAwXG5cblxuXG4iLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2fQ==');
+        'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAkY291bnQvMlxuY29sb3I6IHNldE9wYWNpdHkocmFtcCgkY291bnQsIFJlZE9yLDAsMTIwKSwoJGNvdW50LzIpLzEwKVxuXG5cbiIsImYiOnsibG5nIjotMTA0Ljk2NTA1NjIxNTY2NzQ2LCJsYXQiOjM5Ljc0OTYxOTM3ODI0NjIyfSwiZyI6MTEuNDE4NzE4NzcwOTA0NDk0fQ==');
+    addButton('California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGdpc19hY3Jlcy8xMDAwMFxuY29sb3I6IHJnYmEoMjU1LDI1NSwyNTUsMClcbnN0cm9rZUNvbG9yOiAgaHN2KDAuMSwgJGdpc19hY3Jlcy8yMDAwMDAsICRnaXNfYWNyZXMvNDAwMDAwKVxuc3Ryb2tlV2lkdGg6ICRnaXNfYWNyZXMvNTAwMDBcblxuXG5cbiIsImYiOnsibG5nIjotMTE2LjIxMzg3ODM2NjMyNjM2LCJsYXQiOjM4LjA3Mjc4MzE4ODM2MTk0fSwiZyI6NS4xODExODk4NjE2NTIxODZ9');
     addButton('California Wildfires size/opacity by acres burned colored by cause ',
-        'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiNGQyMTIzNzUzODZiYWYxYTA5YmI4MjYwOGM2NDgyMTg4ZGEzYTViMCIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiAkZ2lzX2FjcmVzLzEwMDAwXG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCRjYXVzZSxQcmlzbSwxLDE0KSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
-    addButton('Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogem9vbSgpXG5jb2xvcjogcmFtcChidWNrZXRzKCRkbiwgODAsIDEwMCwgMTQwKSwgcHJpc20pKmdyZWF0ZXJUaGFuKCRkbiwgNjApXG5cblxuXG4iLCJmIjp7ImxuZyI6LTEwLjg0MDcyMTQwMTQ1MzI2NiwibGF0Ijo0MC4wNjQwNTQxNTY1NzA5Nn0sImciOjEuNDkxNzAxNzE4NTk3NTMyNX0=');
-    addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiI0ZDIxMjM3NTM4NmJhZjFhMDliYjgyNjA4YzY0ODIxODhkYTNhNWIwIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICgkd29ya2Vyc19pbl9mbG93LzI5MDM0NjEqMTAwKSo0XG5jb2xvcjogc2V0T3BhY2l0eShyYW1wKCR3b3JrZXJzX2luX2Zsb3csYWdfR3JuWWwsMCwxMDAwMDApLCgkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KSlcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTUuOTk2NTM1NTQ2MTU3OTksImxhdCI6MzQuNDQzOTIzMjQ3ODc1MDM0fSwiZyI6Mi42Mzg1MjMzODQ5MTY0NzU4fQ==');
-    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IjRkMjEyMzc1Mzg2YmFmMWEwOWJiODI2MDhjNjQ4MjE4OGRhM2E1YjAiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKS80MDAqem9vbSgpXG5jb2xvcjogc2V0b3BhY2l0eShoc3YoMC4sMSwxKSpzdW0oJGJsYWNrX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjErXG4gICAgICAgICAgICBoc3YoMC42NiwxLDEpKnN1bSgkYXNpYW5fcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMytcbiAgICAgICAgICAgIGhzdigwLjMzLDEsMSkqc3VtKCRoaXNwYW5pY19vKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjE1LDAsMSkqc3VtKCR3aGl0ZV9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSowLjgsIDAuOClcbnN0cm9rZUNvbG9yOiByZ2JhKDAsMCwwLDEuKVxuc3Ryb2tlV2lkdGg6IDFcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTk3LjU2MzI1NTI1NTczNjY5LCJsYXQiOjQxLjAxNzcxOTYxMzEwMjI5fSwiZyI6NC4wNDY4MDg4MDEzODk5ODg2fQ==');
-    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiJkOWQ2ODZkZjY1ODQyYThmZGRiZDE4NjcxMTI1NWNlNWQxOWFhOWI4IiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcChsaW5lYXIobG9nKCRudW1mbG9vcnMpLCAxLCA0KSwgRWFydGgpXG4iLCJmIjp7ImxuZyI6LTczLjkwNDM5MDkwNTU1NTQzLCJsYXQiOjQwLjc0OTExODc3NjQyMTR9LCJnIjoxMS43NDgzMTYzMjg5MTA2MjJ9');
-    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiZDlkNjg2ZGY2NTg0MmE4ZmRkYmQxODY3MTEyNTVjZTVkMTlhYTliOCIsImMiOiJkbWFuemFuYXJlcyIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHJhbXAoJHN0X3R5cGUsIHByaXNtKSBcbndpZHRoOiAxLjUiLCJmIjp7ImxuZyI6LTEyMi40NDQwODQ4Njg2MTE5MiwibGF0IjozNy43NzM3MDY3MzYxNDk3MDV9LCJnIjoxMS42NjQzMTA4MDI4NjY4MDV9');
-    addButton('Gecat', 'eyJhIjoiKHNlbGVjdCAqLCAxIGFzIGNvIGZyb20gZ2VjYXRfZ2VvZGF0YV9jb3B5KSBBUyB0bXAiLCJiIjoiNzNmYWNmMmFiNmMyZTdlOTI5ZGFhODFhMjE5YTFmZDQ2NzRmMzBmNiIsImMiOiJjZGJzb2wtYWRtaW4iLCJkIjoiY2FydG8uY29tIiwiZSI6ImNvbG9yOiBzZXRvcGFjaXR5KHJhbXAobG9nKGF2Zygkc3BlZWQpKSwgR2V5c2VyLCAwLCA0KSwgIHN1bSgkY28pKnpvb20oKS8xMDAwMDAqMS44KjQpXG53aWR0aDogMlxucmVzb2x1dGlvbjogMC4yNSAiLCJmIjp7ImxuZyI6MS4yNjE2NzkyNjY5NTQ4NDMxLCJsYXQiOjQxLjcwNDEwNDk3NDkyMDQ1NX0sImciOjcuMzQ2NTM5NDk3NjAzMDR9');
-    addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiOGExNzRjNDUxMjE1Y2I4ZGNhOTAyNjRkZTM0MjYxNDA4N2M0ZWYwYyIsImMiOiJkbWFuemFuYXJlcy1kZWQxMyIsImQiOiJjYXJ0by1zdGFnaW5nLmNvbSIsImUiOiJ3aWR0aDogc3FydChTVU0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjUqXG4oZXF1YWxzKE1PREUoJGNhdGVnb3J5KSwgXCJUcmFuc3BvcnRlc1wiKSArIGVxdWFscyhNT0RFKCRjYXRlZ29yeSksIFwiU2FsdWRcIikgKVxuY29sb3I6IHJhbXAoTU9ERSgkY2F0ZWdvcnkpLCBQcmlzbSkiLCJmIjp7ImxuZyI6Mi4xNjU4NTg4OTcwMDI3NDk1LCJsYXQiOjQxLjM3MDU1MjA4MDk0Mzg3fSwiZyI6MTEuNjg4MjUzMTg3MjM4MTk4fQ==');
+        'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJjYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGdpc19hY3Jlcy8xMDAwMFxuY29sb3I6IHJnYmEoMjU1LDI1NSwyNTUsMClcbnN0cm9rZUNvbG9yOiAgaHN2KDAuMSwgJGdpc19hY3Jlcy8yMDAwMDAsICRnaXNfYWNyZXMvNDAwMDAwKVxuc3Ryb2tlV2lkdGg6ICRnaXNfYWNyZXMvNTAwMDBcblxuXG5cbiIsImYiOnsibG5nIjotMTE2LjIxMzg3ODM2NjMyNjM2LCJsYXQiOjM4LjA3Mjc4MzE4ODM2MTk0fSwiZyI6NS4xODExODk4NjE2NTIxODZ9');
+    addButton('Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiB6b29tKClcbmNvbG9yOiByYW1wKGJ1Y2tldHMoJGRuLCA4MCwgMTAwLCAxNDApLCBwcmlzbSkqZ3JlYXRlclRoYW4oJGRuLCA2MClcblxuXG5cbiIsImYiOnsibG5nIjotMTAuODQwNzIxNDAxNDUzMjY2LCJsYXQiOjQwLjA2NDA1NDE1NjU3MDk2fSwiZyI6MS40OTE3MDE3MTg1OTc1MzI1fQ==');
+    addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJ3aWR0aDogKCR3b3JrZXJzX2luX2Zsb3cvMjkwMzQ2MSoxMDApKjRcbmNvbG9yOiBzZXRPcGFjaXR5KHJhbXAoJHdvcmtlcnNfaW5fZmxvdyxhZ19Hcm5ZbCwwLDEwMDAwMCksKCRyZXNpZGVuY2VfZmlwc19jb25jYXQtJHdvcmtfZmlwc19jb25jYXQpKVxuXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi05NS45OTY1MzU1NDYxNTc5OSwibGF0IjozNC40NDM5MjMyNDc4NzUwMzR9LCJnIjoyLjYzODUyMzM4NDkxNjQ3NTh9');
+    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpLzQwMCp6b29tKClcbmNvbG9yOiBzZXRvcGFjaXR5KGhzdigwLiwxLDEpKnN1bSgkYmxhY2tfcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjY2LDEsMSkqc3VtKCRhc2lhbl9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSozK1xuICAgICAgICAgICAgaHN2KDAuMzMsMSwxKSpzdW0oJGhpc3BhbmljX28pLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSoxK1xuICAgICAgICAgICAgaHN2KDAuMTUsMCwxKSpzdW0oJHdoaXRlX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjAuOCwgMC44KVxuc3Ryb2tlQ29sb3I6IHJnYmEoMCwwLDAsMS4pXG5zdHJva2VXaWR0aDogMVxucmVzb2x1dGlvbjogNCIsImYiOnsibG5nIjotOTcuNTYzMjU1MjU1NzM2NjksImxhdCI6NDEuMDE3NzE5NjEzMTAyMjl9LCJnIjo0LjA0NjgwODgwMTM4OTk4ODZ9');
+    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDEsIDQpLCBFYXJ0aClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
+    addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiIiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcCgkc3RfdHlwZSwgcHJpc20pIFxud2lkdGg6IDEuNSIsImYiOnsibG5nIjotMTIyLjQ0NDA4NDg2ODYxMTkyLCJsYXQiOjM3Ljc3MzcwNjczNjE0OTcwNX0sImciOjExLjY2NDMxMDgwMjg2NjgwNX0=');
+    addButton('Gecat', 'eyJhIjoiKHNlbGVjdCAqLCAxIGFzIGNvIGZyb20gZ2VjYXRfZ2VvZGF0YV9jb3B5KSBBUyB0bXAiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJjYXJ0by5jb20iLCJlIjoiY29sb3I6IHNldG9wYWNpdHkocmFtcChsb2coYXZnKCRzcGVlZCkpLCBHZXlzZXIsIDAsIDQpLCAgc3VtKCRjbykqem9vbSgpLzEwMDAwMCoxLjgqNClcbndpZHRoOiAyXG5yZXNvbHV0aW9uOiAwLjI1ICIsImYiOnsibG5nIjoxLjI2MTY3OTI2Njk1NDg0MzEsImxhdCI6NDEuNzA0MTA0OTc0OTIwNDU1fSwiZyI6Ny4zNDY1Mzk0OTc2MDMwNH0=');
+    addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImRtYW56YW5hcmVzLWRlZDEzIiwiZCI6ImNhcnRvLXN0YWdpbmcuY29tIiwiZSI6IndpZHRoOiBzcXJ0KFNVTSgkYW1vdW50KS81MDAwMCkqMjAqKHpvb20oKS80MDAwKzAuMDEpKjEuNSpcbihlcXVhbHMoTU9ERSgkY2F0ZWdvcnkpLCBcIlRyYW5zcG9ydGVzXCIpICsgZXF1YWxzKE1PREUoJGNhdGVnb3J5KSwgXCJTYWx1ZFwiKSApXG5jb2xvcjogcmFtcChNT0RFKCRjYXRlZ29yeSksIFByaXNtKSIsImYiOnsibG5nIjoyLjE2NTg1ODg5NzAwMjc0OTUsImxhdCI6NDEuMzcwNTUyMDgwOTQzODd9LCJnIjoxMS42ODgyNTMxODcyMzgxOTh9');
 
     if (localStorage.getItem('dataset')) {
         $('#dataset').val(localStorage.getItem('dataset'));
-        $('#apikey').val(localStorage.getItem('apikey'));
         $('#user').val(localStorage.getItem('user'));
         $('#cartoURL').val(localStorage.getItem('cartoURL'));
     }

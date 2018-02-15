@@ -4,6 +4,7 @@ import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
 
+const HISTOGRAM_BUCKETS = 1000;
 
 /**
  * @api
@@ -397,7 +398,114 @@ class ComputeJob {
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.dataframes.filter(tile => tile.style);
+    return this.dataframes.filter(tile => tile.style && tile.visible);
+};
+
+Renderer.prototype._computeDrawMetadata = function () {
+    const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+    const tiles = this.getStyledTiles();
+    let drawMetadata = {
+        freeTexUnit: 4,
+        zoom: 1. / this._zoom,
+        columns: []
+    };
+    let requiredColumns = tiles.map(d => {
+        const widthRequirements = d.style._width._getDrawMetadataRequirements();
+        const colorRequirements = d.style._color._getDrawMetadataRequirements();
+        const strokeWidthRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        const strokeColorRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
+            reduce(schema.union, schema.IDENTITY);
+    }).reduce(schema.union, schema.IDENTITY).columns;
+
+    requiredColumns.map(column => {
+        drawMetadata.columns.push(
+            {
+                name: column,
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+                avg: undefined,
+                count: 0,
+                sum: 0,
+                histogramBuckets: HISTOGRAM_BUCKETS,
+                histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
+                accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
+            }
+        );
+    });
+
+    const s = 1. / this._zoom;
+    tiles.map(d => {
+        requiredColumns.map(column => {
+            const values = d.properties[column];
+            let min = Number.POSITIVE_INFINITY;
+            let max = Number.NEGATIVE_INFINITY;
+            let sum = 0;
+            let count = 0;
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    const v = values[i];
+                    if (!Number.isFinite(v)) {
+                        continue;
+                    }
+                    sum += v;
+                    min = Math.min(min, v);
+                    max = Math.max(max, v);
+                    count++;
+                }
+            }
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            metaColumn.min = Math.min(min, metaColumn.min);
+            metaColumn.max = Math.max(max, metaColumn.max);
+            metaColumn.count += count;
+            metaColumn.sum += sum;
+        });
+    });
+    requiredColumns.map(column => {
+        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+        metaColumn.avg = metaColumn.sum / metaColumn.count;
+    });
+    tiles.map(d => {
+        requiredColumns.map(column => {
+            const values = d.properties[column];
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const vmin = metaColumn.min;
+            const vmax = metaColumn.max;
+            const vdiff = vmax - vmin;
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    const v = values[i];
+                    if (!Number.isFinite(v)) {
+                        continue;
+                    }
+                    metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
+                }
+            }
+        });
+    });
+    requiredColumns.map(column => {
+        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+        for (let i = 1; i < metaColumn.histogramBuckets; i++) {
+            metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
+        }
+    });
+    return drawMetadata;
 };
 
 Renderer.prototype.refresh = function (timestamp) {
@@ -422,10 +530,11 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.STENCIL_TEST);
     gl.depthMask(false);
-
-    // Render To Texture
-    // COLOR
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+
+    const tiles = this.getStyledTiles();
+
+    const drawMetadata = this._computeDrawMetadata();
 
     const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -438,11 +547,9 @@ Renderer.prototype.refresh = function (timestamp) {
             gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
             gl.uniform1i(shader.textureLocations[i], 0);
         }
-        var obj = {
-            freeTexUnit: 4,
-            zoom: 1. / this._zoom
-        };
-        styleExpr._preDraw(obj, gl);
+
+        drawMetadata.freeTexUnit = 4;
+        styleExpr._preDraw(drawMetadata, gl);
 
         Object.keys(TID).forEach((name, i) => {
             gl.activeTexture(gl.TEXTURE0 + i);
@@ -457,7 +564,6 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    const tiles = this.dataframes.filter(tile => tile.style);
     tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
     tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
     tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
@@ -469,9 +575,8 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    var s = 1. / this._zoom;
 
-
+    const s = 1. / this._zoom;
     tiles.forEach(tile => {
         let renderer = null;
         if (tile.type == 'point') {
