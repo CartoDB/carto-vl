@@ -1,6 +1,5 @@
 import Dataset from '../../../src/api/source/dataset';
 import Style from '../../../src/api/style';
-
 import Layer from '../../../src/api/layer';
 
 describe('api/layer', () => {

@@ -38,7 +38,7 @@ describe('api/style', () => {
                     width: s.float(10),
                     strokeColor: s.rgba(0, 0, 1, 1),
                     strokeWidth: s.float(15),
-                    order: s.asc()
+                    order: s.asc(s.width())
                 };
                 const actual = new Style(styleSpec);
 
@@ -121,7 +121,7 @@ describe('api/style', () => {
                     width: float(10),
                     strokeColor: rgba(0, 0, 1, 1),
                     strokeWidth: float(15),
-                    order: asc()
+                    order: asc(width())
                 `;
                 const actual = new Style(styleSpec);
 
@@ -131,7 +131,7 @@ describe('api/style', () => {
                 expect(actual.getWidth()).toEqual(s.float(10));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
                 expect(actual.getStrokeWidth()).toEqual(s.float(15));
-                expect(actual.getOrder()).toEqual(s.asc());
+                expect(actual.getOrder()).toEqual(s.asc(s.width()));
             });
         });
     });

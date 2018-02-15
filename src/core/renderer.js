@@ -2,7 +2,7 @@ import * as shaders from './shaders';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
-import * as ordering from './style/expressions/ordering';
+import { Asc, Desc } from './style/functions';
 
 const HISTOGRAM_BUCKETS = 1000;
 
@@ -579,14 +579,14 @@ Renderer.prototype.refresh = function (timestamp) {
     // TODO remove hack
     let orderer = null;
     if (tiles.length > 0) {
-        orderer =tiles[0].style._order;
+        orderer = tiles[0].style.getOrder();
     }
     let orderingMins = null;
     let orderingMaxs = null;
-    if (orderer instanceof ordering.Asc) {
+    if (orderer instanceof Asc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
-    } else if (orderer instanceof ordering.Desc) {
+    } else if (orderer instanceof Desc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
     }else{

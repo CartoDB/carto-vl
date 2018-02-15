@@ -55,8 +55,7 @@ import { Cubic } from './expressions/interpolators';
 import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
     from './expressions/viewportAggregation';
 
-import { Asc, Desc, NoOrder, Width}
-    from './expressions/ordering';
+import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
 
 
 // Expose classes as constructor functions
@@ -116,4 +115,4 @@ export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 
-export { palettes };
+export { palettes, Asc, Desc };
