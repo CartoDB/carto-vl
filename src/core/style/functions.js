@@ -55,8 +55,15 @@ import { Cubic } from './expressions/interpolators';
 import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
     from './expressions/viewportAggregation';
 
+import { Asc, Desc, NoOrder, Width}
+    from './expressions/ordering';
+
 
 // Expose classes as constructor functions
+export const asc = (...args) => new Asc(...args);
+export const desc = (...args) => new Desc(...args);
+export const noOrder = (...args) => new NoOrder(...args);
+export const width = (...args) => new Width(...args);
 export const floatMul = (...args) => new FloatMul(...args);
 export const floatDiv = (...args) => new FloatDiv(...args);
 export const floatAdd = (...args) => new FloatAdd(...args);
