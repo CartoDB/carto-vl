@@ -16,6 +16,7 @@ describe('api/style', () => {
                 expect(actual.getWidth()).toEqual(s.float(5));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
                 expect(actual.getStrokeWidth()).toEqual(s.float(0));
+                expect(actual.getOrder()).toEqual(s.noOrder());
             });
 
             xit('should set default style values when an empty object is given', () => {
@@ -27,6 +28,7 @@ describe('api/style', () => {
                 expect(actual.getWidth()).toEqual(s.float(5));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
                 expect(actual.getStrokeWidth()).toEqual(s.float(0));
+                expect(actual.getOrder()).toEqual(s.noOrder());
             });
 
             it('should set the style properties defined in the styleSpec object', () => {
@@ -35,7 +37,8 @@ describe('api/style', () => {
                     color: s.rgba(1, 0, 0, 1),
                     width: s.float(10),
                     strokeColor: s.rgba(0, 0, 1, 1),
-                    strokeWidth: s.float(15)
+                    strokeWidth: s.float(15),
+                    order: s.asc()
                 };
                 const actual = new Style(styleSpec);
 
@@ -45,6 +48,7 @@ describe('api/style', () => {
                 expect(actual.getWidth()).toEqual(styleSpec.width);
                 expect(actual.getStrokeColor()).toEqual(styleSpec.strokeColor);
                 expect(actual.getStrokeWidth()).toEqual(styleSpec.strokeWidth);
+                expect(actual.getOrder()).toEqual(styleSpec.order);
             });
         });
 
@@ -100,6 +104,14 @@ describe('api/style', () => {
                 }).toThrowError('`strokeWidth` parameter is not a valid style Expresion.');
             });
 
+            it('should throw an error when order is not a valid expression', () => {
+                const styleSpec = {
+                    order: 10 // wrong type!
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`order` parameter is not a valid style Expresion.');
+            });
         });
 
         describe('when parameter is a string', () => {
@@ -108,7 +120,8 @@ describe('api/style', () => {
                     color: rgba(1, 0, 0, 1),
                     width: float(10),
                     strokeColor: rgba(0, 0, 1, 1),
-                    strokeWidth: float(15)
+                    strokeWidth: float(15),
+                    order: asc()
                 `;
                 const actual = new Style(styleSpec);
 
@@ -118,6 +131,7 @@ describe('api/style', () => {
                 expect(actual.getWidth()).toEqual(s.float(10));
                 expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
                 expect(actual.getStrokeWidth()).toEqual(s.float(15));
+                expect(actual.getOrder()).toEqual(s.asc());
             });
         });
     });

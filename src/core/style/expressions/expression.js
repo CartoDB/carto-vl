@@ -56,12 +56,17 @@ export default class Expression {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
 
+    _getDrawMetadataRequirements() {
+        // Depth First Search => reduce using union
+        return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(schema.union, schema.IDENTITY);
+    }
+
     /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
-    _preDraw(l, gl) {
-        this.childrenNames.forEach(name => this[name]._preDraw(l, gl));
+    _preDraw(...args) {
+        this.childrenNames.forEach(name => this[name]._preDraw(...args));
     }
 
     /**

@@ -145,7 +145,6 @@ export default class Windshaft {
         })();
     }
 
-
     _free() {
         this.cache.reset();
     }

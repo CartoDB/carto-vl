@@ -52,11 +52,14 @@ attribute vec2 featureID;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
+uniform float orderMinWidth;
+uniform float orderMaxWidth;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D colorStrokeTex;
 uniform sampler2D strokeWidthTex;
+//TODO order bucket texture
 
 varying lowp vec4 color;
 varying lowp vec4 stroke;
@@ -83,7 +86,7 @@ void main(void) {
     sizeNormalizer = (size+1.)/(size);
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    if (size==0. || (stroke.a==0. && color.a==0.)){
+    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;

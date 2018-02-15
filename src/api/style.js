@@ -14,6 +14,7 @@ const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_WIDTH_EXPRESSION = s.float(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
+const DEFAULT_ORDER_EXPRESSION = s.noOrder();
 
 /**
  * @description A Style defines how associated dataframes of a particular renderer should be renderer.
@@ -51,15 +52,18 @@ export default class Style {
         this._styleSpec = styleSpec;
 
         // REVIEW THIS vv
+        this.updated = true;
         this._changeCallback = null;
         this._styleSpec.color.parent = this;
         this._styleSpec.width.parent = this;
         this._styleSpec.strokeColor.parent = this;
         this._styleSpec.strokeWidth.parent = this;
+        this._styleSpec.order.parent = this;
         this._styleSpec.color.notify = () => { this._changed(); };
         this._styleSpec.width.notify = () => { this._changed(); };
         this._styleSpec.strokeColor.notify = () => { this._changed(); };
         this._styleSpec.strokeWidth.notify = () => { this._changed(); };
+        this._styleSpec.order.notify = () => { this._changed(); };
         // ^^
     }
 
@@ -111,6 +115,16 @@ export default class Style {
      */
     getStrokeWidth() {
         return this._styleSpec.strokeWidth;
+    }
+
+    /**
+     * Return the order expression.
+     *
+     * @return {carto.style.expression}
+     * @api
+     */
+    getOrder() {
+        return this._styleSpec.order;
     }
 
     // REVIEW THIS vv
@@ -221,6 +235,7 @@ export default class Style {
         styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
         styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION;
+        styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION;
         return styleSpec;
     }
 
@@ -231,6 +246,7 @@ export default class Style {
          * @property {carto.style.expression.Base} width
          * @property {carto.style.expression.Base} strokeColor
          * @property {carto.style.expression.Base} strokeWidth
+         * @property {carto.style.expression.Base} order
          * @property {number} resolution
          * @api
          */
@@ -253,9 +269,8 @@ export default class Style {
         if (!(styleSpec.strokeWidth instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[strokeWidth]');
         }
+        if (!(styleSpec.order instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression[order]');
+        }
     }
-
-    // TODO:
-    // updated?
-    // observer?
 }

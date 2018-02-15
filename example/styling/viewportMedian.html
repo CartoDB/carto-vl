@@ -28,16 +28,22 @@
         });
 
         const auth = {
-            user: 'dmanzanares',
-            apiKey: 'd9d686df65842a8fddbd186711255ce5d19aa9b8'
+            user: 'mamataakella',
+            apiKey: ''
         };
 
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-        const s = carto.style.expressions;
+        const source = new carto.source.Dataset('pop_density_points', auth);
+        const s = carto.expressions;
+        const median = s.viewportPercentile(s.property('dn'), 50);
         const style = new carto.Style({
-            color: s.cielab(80,10,60)
+            color: s.ramp(s.property('dn'), s.palettes.earth()),
+            width: s.floatMul(median, 0.1)
         });
         const layer = new carto.Layer('myCartoLayer', source, style);
+
+        map.on('move', ()=>{
+            console.log(median.getValue());
+        });
 
         layer.addTo(map, 'watername_ocean');
     </script>

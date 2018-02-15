@@ -104,7 +104,7 @@ export default class Layer {
                 this._dataframes.map(
                     dataframe => {
                         dataframe.setStyle(this._style);
-                        dataframe.visible = true;
+                        dataframe.visible = dataframe.active;
                     });
                 this._mglIntegrator.renderer.refresh(Number.NaN);
                 this._dataframes.map(

@@ -30,6 +30,12 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 npm test
 ```
 
+Note: you need to configure the CHROME_BIN variable before running the tests, for example:
+
+```
+export CHROME_BIN=/usr/bin/chromium-browser
+```
+
 ### Build the library
 
 ```

@@ -32,9 +32,8 @@ export default class Buckets extends Expression {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-
         const funcName = `buckets${this.bucketUID}`;
-        const cmp = this.type == 'category' ? '==' : '<';
+        const cmp = this.input.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index + 1}.;
