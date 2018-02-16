@@ -112,6 +112,15 @@ describe('api/style', () => {
                     new Style(styleSpec);
                 }).toThrowError('`order` parameter is not a valid style Expresion.');
             });
+
+            it('should add a console.warn when non supported properties are included', () => {
+                const styleSpec = {
+                    notSupported: s.float(5)
+                };
+                spyOn(console, 'warn');
+                new Style(styleSpec);
+                expect(console.warn).toHaveBeenCalledWith('Property \'notSupported\' is not supported');
+            });
         });
 
         describe('when parameter is a string', () => {

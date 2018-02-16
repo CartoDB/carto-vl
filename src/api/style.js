@@ -15,6 +15,14 @@ const DEFAULT_WIDTH_EXPRESSION = s.float(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();
+const SUPPORTED_PROPERTIES = [
+    'resolution',
+    'color',
+    'width',
+    'strokeColor',
+    'strokeWidth',
+    'order'
+];
 
 /**
  * @description A Style defines how associated dataframes of a particular renderer should be renderer.
@@ -253,17 +261,16 @@ export default class Style {
     _checkStyleSpec(styleSpec) {
         /**
          * @typedef {object} StyleSpec
+         * @property {number} resolution
          * @property {carto.style.expression.Base} color
          * @property {carto.style.expression.Base} width
          * @property {carto.style.expression.Base} strokeColor
          * @property {carto.style.expression.Base} strokeWidth
          * @property {carto.style.expression.Base} order
-         * @property {number} resolution
          * @api
          */
 
         // TODO: Check expression types ie: color is not a number expression!
-        // TODO: add property name to the exception
 
         if (!_.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
@@ -283,5 +290,10 @@ export default class Style {
         if (!(styleSpec.order instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[order]');
         }
+        _.forOwn(styleSpec, function(value, key) {
+            if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
+                console.warn(`Property '${key}' is not supported`);
+            }
+        });
     }
 }
