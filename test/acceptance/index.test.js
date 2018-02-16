@@ -1,4 +1,3 @@
-const serve = require('serve');
 const fs = require('fs');
 const exquisite = require('exquisite-sst');
 const path = require('path');
@@ -7,21 +6,12 @@ chai.use(require('chai-as-promised'));
 
 const expect = chai.expect;
 const DELAY = 3000;
-const PORT = 5555;
-var server;
 
 const references = _flatten(_getReferences('reference'));
 
 
 describe('Screenshot tests:', () => {
-    before(done => {
-        server = serve(path.join(__dirname, '../../'), { port: PORT, });
-        done();
-    });
     references.forEach(test);
-    after(() => {
-        server.stop();
-    });
 });
 
 // Wrapper to perform a single test.
@@ -30,8 +20,9 @@ function test({ folder, file }) {
     it(file, () => {
         const input = path.resolve(__dirname, `reference/${folder}/${file}.png`);
         const output = path.resolve(__dirname, `reference/${folder}/${file}_out.png`);
-        const URL = `http://localhost:${PORT}/example/${folder}/${file}.html`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY })).to.eventually.be.true;
+        const filepath = path.resolve(__dirname, `../../example/${folder}/${file}.html`);
+        const URL = `file://${filepath}`;
+        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.5 })).to.eventually.be.true;
     });
 }
 
