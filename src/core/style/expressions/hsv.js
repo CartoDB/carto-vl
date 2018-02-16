@@ -3,7 +3,6 @@ import { implicitCast } from './utils';
 
 export default class HSV extends Expression {
     /**
-     * @api
      * @description Color constructor for Hue Saturation Value (HSV) color space
      * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
      * @param {*} saturation saturation of the color in the [0,1] range

@@ -4,6 +4,7 @@
         <title>Single layer | CARTO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
+        <script src="../hide-attribution.js"></script>
         <!-- Include CARTO GL JS -->
         <script src="../../dist/carto-gl.js"></script>
         <!-- Include Mapbox GL JS -->
@@ -28,11 +29,11 @@
 
         const auth = {
             user: 'cartogl',
-            apiKey: ''
+            apiKey: 'YOUR_API_KEY'
         };
 
         const source = new carto.source.Dataset('wwi', auth);
-        const s = carto.expressions;
+        const s = carto.style.expressions;
         const style = new carto.Style({
             width:  s.floatMul(s.blend(1,2, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
             color:  s.opacity(s.ramp(s.linear(s.avg(s.property('temp')), 0,30), s.palettes.tealrose()), s.blend(0.005,1, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic))

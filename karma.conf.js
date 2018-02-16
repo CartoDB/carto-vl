@@ -1,18 +1,18 @@
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
-        files: ['test/**/*.test.js'],
+        files: ['test/unit/index.test.js'],
         exclude: ['test/integration/**'],
-        reporters: ['progress'],
+        reporters: ['mocha'],
         port: 9876,  // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
         browsers: ['ChromeHeadlessNoSandbox'],
         autoWatch: false,
-        singleRun: true, // Karma captures browsers, runs the tests and exits
+        singleRun: false,
         concurrency: Infinity,
         preprocessors: {
-            'test/**/*.test.js': ['webpack', 'sourcemap'],
+            'test/unit/index.test.js': ['webpack', 'sourcemap'],
         },
         webpack: {
             devtool: 'inline-source-map'
