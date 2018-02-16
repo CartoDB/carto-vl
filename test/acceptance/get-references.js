@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const FOLDERS = ['basic', 'styling'];
 const DELAY = 8000;
+// Headless chrome with GPU only works with linux
+const HEADLESS_FLAG = (process.platfom === 'linux') ? '--headless' : '';
 
 FOLDERS.forEach(getReferences);
 
@@ -14,12 +16,12 @@ FOLDERS.forEach(getReferences);
  */
 function getReferences(folder) {
     const files = fs.readdirSync(path.join(__dirname, `../../example/${folder}`));
-    
+
     files.forEach(file => {
         const filepath = path.resolve(__dirname, `../../example/${folder}/${file}`);
         if (file.endsWith('.html')) {
             console.log(`Taking reference from ${file}`);
-            execSync(`$(npm bin)/exquisite-sst --headless --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
+            execSync(`$(npm bin)/exquisite-sst ${HEADLESS_FLAG} --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
         }
     });
 }
