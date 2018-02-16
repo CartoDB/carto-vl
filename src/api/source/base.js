@@ -45,6 +45,10 @@ export default class Base {
         return this._client._getData(viewport, mns);
     }
 
+    free() {
+        this._client.free();
+    }
+
     _generateURL(auth, config) {
         let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
         url = url.replace(/{user}/, auth.username);

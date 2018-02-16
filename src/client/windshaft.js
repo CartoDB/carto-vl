@@ -146,7 +146,7 @@ export default class Windshaft {
         })();
     }
 
-    _free() {
+    free() {
         this.cache.reset();
     }
     _generateDataFrame(rs, geometry, properties, size, type) {

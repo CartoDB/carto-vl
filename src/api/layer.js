@@ -70,7 +70,7 @@ export default class Layer {
             }
         );
         if (this._source && this._source !== source) {
-            this._source._free();
+            this._source.free();
         }
         this._source = source;
     }
