@@ -5,13 +5,14 @@ const chai = require('chai');
 chai.use(require('chai-as-promised'));
 
 const expect = chai.expect;
-const DELAY = 3000;
+const DELAY = 4000;
 
 const references = _flatten(_getReferences('reference'));
 
 
 describe('Screenshot tests:', () => {
     references.forEach(test);
+    // test({ folder: 'styling', file: 'rampCategoryAuto' });
 });
 
 // Wrapper to perform a single test.
@@ -22,7 +23,7 @@ function test({ folder, file }) {
         const output = path.resolve(__dirname, `reference/${folder}/${file}_out.png`);
         const filepath = path.resolve(__dirname, `../../example/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.5 })).to.eventually.be.true;
+        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.1 })).to.eventually.be.true;
     });
 }
 

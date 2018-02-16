@@ -2,15 +2,10 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const serve = require('serve');
-const PORT = 5556;
-
-const server = serve(path.join(__dirname, '../../'), { port: PORT, });
 const FOLDERS = ['basic', 'styling'];
+const DELAY = 4000;
 
 FOLDERS.forEach(getReferences);
-
-server.stop();
 
 
 /**
@@ -19,9 +14,11 @@ server.stop();
  */
 function getReferences(folder) {
     const files = fs.readdirSync(path.join(__dirname, `../../example/${folder}`));
+    
     files.forEach(file => {
+        const filepath = path.resolve(__dirname, `../../example/${folder}/${file}`);
         if (file.endsWith('.html')) {
-            execSync(`$(npm bin)/exquisite-sst --reference --url http://localhost:${PORT}/example/${folder}/${file} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay 8000`);
+            execSync(`$(npm bin)/exquisite-sst --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
         }
     });
 }
