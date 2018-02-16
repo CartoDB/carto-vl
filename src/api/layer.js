@@ -202,5 +202,9 @@ export default class Layer {
         }
     }
 
+    getNumFeatures() {
+        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+    }
+
     //TODO free layer resources
 }
