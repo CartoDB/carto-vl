@@ -194,7 +194,8 @@ export default class Layer {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema());
+        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
+            this._style.getResolution());
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
