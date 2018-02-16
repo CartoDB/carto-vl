@@ -55,6 +55,6 @@
     "test:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome karma.conf.js",
     "loc": "sloc src/ examples/",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
   }
 }
