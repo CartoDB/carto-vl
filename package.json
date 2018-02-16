@@ -50,7 +50,7 @@
     "build": "webpack --config webpack/webpack.config.js && webpack --config webpack/webpack.min.config.js",
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build-dev && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
+    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "loc": "sloc src/ examples/",

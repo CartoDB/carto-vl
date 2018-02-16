@@ -194,11 +194,16 @@ export default class Layer {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema());
+        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
+            this._style.getResolution());
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
         }
+    }
+
+    getNumFeatures() {
+        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
     //TODO free layer resources

@@ -53,10 +53,11 @@ export default class Windshaft {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    _getData(viewport, MNS) {
-        if (!R.schema.equals(this._MNS, MNS)) {
+    _getData(viewport, MNS, resolution) {
+        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution) {
             this._MNS = MNS;
-            return this._instantiate();
+            this.resolution = resolution;
+            return this._instantiate(MNS, resolution);
         }
         if (!this.url) {
             // Instantiation is in progress, nothing to do yet
@@ -97,15 +98,14 @@ export default class Windshaft {
         return this._numCategories;
     }
 
-    _instantiate() {
+    _instantiate(MNS, resolution) {
         this._oldDataframes = [];
         this.cache.reset();
         this.url = null;
 
-        const MNS = this._MNS;
         let agg = {
             threshold: 1,
-            resolution: 1,//TODO style.resolution
+            resolution: resolution,
             columns: {},
             dimensions: {}
         };
