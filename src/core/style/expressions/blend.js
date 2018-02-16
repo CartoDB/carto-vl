@@ -13,8 +13,8 @@ export default class Blend extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
-        if (interpolator) {
-            mix = new interpolator(mix);
+        if (interpolator && interpolator.isInterpolator) {
+            mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });
     }

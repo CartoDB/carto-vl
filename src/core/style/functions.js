@@ -52,9 +52,6 @@ import { Mode } from './expressions/aggregation';
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
-export {Cubic};
-
-
 import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
     from './expressions/viewportAggregation';
 
@@ -117,6 +114,5 @@ export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
-
 
 export { palettes, Asc, Desc };
