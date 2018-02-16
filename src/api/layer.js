@@ -95,6 +95,29 @@ export default class Layer {
     }
 
     /**
+     * Blend the current style with another style
+     *
+     * @param {carto.Style} style - style to blend to
+     *
+     * @memberof carto.Layer
+     * @api
+     */
+    blendToStyle(style, ms = 3000, interpolator = undefined) {
+        this._checkStyle(style);
+        if (this._style) {
+            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
+            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
+            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
+            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+            this._style.onChange(null);
+        }
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+        // Force style changed event
+        this._styleChanged();
+    }
+
+    /**
      * Add this layer to a map.
      *
      * @param {mapboxgl.Map} map
