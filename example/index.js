@@ -102,7 +102,7 @@ const layer = new carto.Layer('myCartoLayer', source, style);
 layer.addTo(map, 'watername_ocean');
 
 setInterval(()=>{
-    document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()}`;
+    document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
 }, 500)
 
 map.on('load', () => {
