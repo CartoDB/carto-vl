@@ -5,19 +5,25 @@
  *  @description
  *  # CARTO GL
  *  All the library features are exposed through the `carto` namespace.
- *
  */
-import Layer from './api/layer';
-import Dataset from './api/dataset';
+
 import * as expressions from './core/style/functions';
-import { Style, parseStyle } from './core/style';
+import Dataset from './api/source/dataset';
+import Layer from './api/layer';
+import SQL from './api/source/sql';
+import Style from './api/style';
+import { setDefaultAuth } from './api/setup/auth-service';
+import { setDefaultConfig } from './api/setup/config-service';
 
-// Source namespace has dataset and SQL
-const source = { Dataset };
+// Namespaces
+const style = { expressions };
+const source = { Dataset, SQL };
 
-
-export { Layer };
-export { source };
-export { Style };
-export { parseStyle }; // TODO(@iago): temporal export, we must find a better place
-export { expressions };
+export {
+    source,
+    Layer,
+    setDefaultAuth,
+    setDefaultConfig,
+    style,
+    Style
+};

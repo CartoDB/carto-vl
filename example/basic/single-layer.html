@@ -28,8 +28,10 @@
 
         const auth = {
             user: 'dmanzanares',
-            apiKey: ''
+            apiKey: 'YOUR_API_KEY'
         };
+
+        carto.setDefaultAuth(auth);
 
         const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
         const style = new carto.Style();

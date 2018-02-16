@@ -94,7 +94,7 @@ var map = new mapboxgl.Map({
 
 const auth = {
     user: 'dmanzanares',
-    apiKey: ''
+    apiKey: 'YOUR_API_KEY'
 };
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
@@ -109,8 +109,7 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const s = carto.parseStyle(v);
-            layer.setStyle(s);
+            layer.setStyle(new carto.Style(v));
             document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
@@ -127,7 +126,7 @@ map.on('load', () => {
 
         $('#dataset').val('tx_0125_copy_copy');
         $('#user').val('cartogl');
-        $('#cartoURL').val('carto.com');
+        $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = styles[index];
         superRefresh();
@@ -139,7 +138,7 @@ map.on('load', () => {
 
         $('#dataset').val('wwi');
         $('#user').val('cartogl');
-        $('#cartoURL').val('carto.com');
+        $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = shipsStyle;
         superRefresh();
@@ -178,7 +177,7 @@ map.on('load', () => {
             a: $('#dataset').val(),
             b: '',
             c: $('#user').val(),
-            d: $('#cartoURL').val(),
+            d: $('#serverURL').val(),
             e: $('#styleEntry').val(),
             f: map.getCenter(),
             g: map.getZoom(),
@@ -188,11 +187,14 @@ map.on('load', () => {
         let c = JSON.parse(atob(input));
         if (c.c == 'dmanzanares-ded13') {
             c.c = 'cartogl';
-            c.d = 'carto.com';
+            c.d = 'https://{user}.carto.com';
+        }
+        if (c.d == 'carto.com') {
+            c.d = 'https://{user}.carto.com';
         }
         $('#dataset').val(c.a);
         $('#user').val(c.c);
-        $('#cartoURL').val(c.d);
+        $('#serverURL').val(c.d);
         $('#styleEntry').val(c.e);
         superRefresh(true);
         map.setZoom(c.g);
@@ -208,14 +210,14 @@ map.on('load', () => {
             $('#dataset').val(),
             {
                 user: $('#user').val(),
-                apiKey: ''
+                apiKey: 'YOUR_API_KEY'
             },
             {
-                cartoURL: $('#cartoURL').val()
+                serverURL: $('#serverURL').val()
             }
         ));
 
-        localStorage.setItem('cartoURL', $('#cartoURL').val());
+        localStorage.setItem('serverURL', $('#serverURL').val());
         localStorage.setItem('user', $('#user').val());
         localStorage.setItem('dataset', $('#dataset').val());
         updateStyle();
@@ -224,7 +226,7 @@ map.on('load', () => {
 
     $('#dataset').on('input', superRefresh);
     $('#user').on('input', superRefresh);
-    $('#cartoURL').on('input', superRefresh);
+    $('#serverURL').on('input', superRefresh);
 
     const addButton = (name, code) => {
         var button = document.createElement('button');
@@ -256,7 +258,7 @@ map.on('load', () => {
     if (localStorage.getItem('dataset')) {
         $('#dataset').val(localStorage.getItem('dataset'));
         $('#user').val(localStorage.getItem('user'));
-        $('#cartoURL').val(localStorage.getItem('cartoURL'));
+        $('#serverURL').val(localStorage.getItem('serverURL'));
     }
     if (location.hash.length > 1) {
         setConfig(location.hash.substring(1));

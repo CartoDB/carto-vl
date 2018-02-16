@@ -1,5 +1,4 @@
 /**
- * @api
  * @typedef {object} Dataframe - Point in renderer coordinates space
  * @property {RPoint} center
  * @property {number} scale

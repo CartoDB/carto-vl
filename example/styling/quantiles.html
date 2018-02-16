@@ -29,11 +29,11 @@
 
         const auth = {
             user: 'mamataakella',
-            apiKey: ''
+            apiKey: 'YOUR_API_KEY'
         };
 
         const source = new carto.source.Dataset('pop_density_points', auth);
-        const s = carto.expressions;
+        const s = carto.style.expressions;
         const classifier = s.quantiles(s.property('dn'),6);
         const style = new carto.Style({
             color: s.ramp(classifier, s.palettes.earth()),
