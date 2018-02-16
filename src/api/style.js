@@ -66,11 +66,11 @@ export default class Style {
         this._styleSpec.strokeColor.parent = this;
         this._styleSpec.strokeWidth.parent = this;
         this._styleSpec.order.parent = this;
-        this._styleSpec.color.notify = () => { this._changed(); };
-        this._styleSpec.width.notify = () => { this._changed(); };
-        this._styleSpec.strokeColor.notify = () => { this._changed(); };
-        this._styleSpec.strokeWidth.notify = () => { this._changed(); };
-        this._styleSpec.order.notify = () => { this._changed(); };
+        this._styleSpec.color.notify = this._changed;
+        this._styleSpec.width.notify = this._changed;
+        this._styleSpec.strokeColor.notify = this._changed;
+        this._styleSpec.strokeWidth.notify = this._changed;
+        this._styleSpec.order.notify = this._changed;
         // ^^
     }
 

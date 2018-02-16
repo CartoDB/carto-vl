@@ -27,7 +27,7 @@ function getDefaultConfig() {
     return defaultConfig;
 }
 
-/** 
+/**
  * Clean default config object
  */
 function cleanDefaultConfig() {
@@ -44,11 +44,11 @@ function checkConfig(config) {
         if (!_.isObject(config)) {
             throw new CartoValidationError('setup', 'configObjectRequired');
         }
-        checkServerURL(config.serverURL);
+        _checkServerURL(config.serverURL);
     }
 }
 
-function checkServerURL(serverURL) {
+function _checkServerURL(serverURL) {
     if (!_.isString(serverURL)) {
         throw new CartoValidationError('setup', 'serverURLStringRequired');
     }
