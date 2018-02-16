@@ -101,6 +101,10 @@ const style = new carto.Style();
 const layer = new carto.Layer('myCartoLayer', source, style);
 layer.addTo(map, 'watername_ocean');
 
+setInterval(()=>{
+    document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()}`;
+}, 500)
+
 map.on('load', () => {
     let index = 0;//styles.length - 1;
 
