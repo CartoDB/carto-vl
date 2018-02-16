@@ -20,7 +20,7 @@ function setDefaultConfig(config) {
 }
 
 /**
- * Get default authentication
+ * Get default config
  * @return {object}
  */
 function getDefaultConfig() {

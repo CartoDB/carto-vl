@@ -54,7 +54,7 @@ export default class Style {
      * @api
      */
     constructor(definition) {
-        const styleSpec = this._parseStyleDefinition(definition);
+        const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
         this._styleSpec = styleSpec;
 
@@ -66,11 +66,11 @@ export default class Style {
         this._styleSpec.strokeColor.parent = this;
         this._styleSpec.strokeWidth.parent = this;
         this._styleSpec.order.parent = this;
-        this._styleSpec.color.notify = this._changed;
-        this._styleSpec.width.notify = this._changed;
-        this._styleSpec.strokeColor.notify = this._changed;
-        this._styleSpec.strokeWidth.notify = this._changed;
-        this._styleSpec.order.notify = this._changed;
+        this._styleSpec.color.notify = this._changed.bind(this);
+        this._styleSpec.width.notify = this._changed.bind(this);
+        this._styleSpec.strokeColor.notify = this._changed.bind(this);
+        this._styleSpec.strokeWidth.notify = this._changed.bind(this);
+        this._styleSpec.order.notify = this._changed.bind(this);
         // ^^
     }
 
@@ -229,7 +229,7 @@ export default class Style {
      * @param  {string|object} definition
      * @return {StyleSpec}
      */
-    _parseStyleDefinition(definition) {
+    _getStyleDefinition(definition) {
         if (_.isUndefined(definition)) {
             return this._setDefaults({});
         }
