@@ -35,7 +35,8 @@ function parseStyleNamedExpr(styleSpec, node) {
         throw new Error('Invalid syntax');
     }
     const value = parseNode(node.right);
-    styleSpec[name] = implicitCast(value);
+    // Don't cast resolution properties implicitly since they must be of type Number
+    styleSpec[name] = name == 'resolution' ? value : implicitCast(value);
 }
 
 export function parseStyleDefinition(str) {
