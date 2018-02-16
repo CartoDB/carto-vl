@@ -17954,8 +17954,8 @@ class Base {
         this._client._bindLayer(...args);
     }
 
-    requestData(viewport, mns) {
-        return this._client._getData(viewport, mns);
+    requestData(viewport, mns, resolution) {
+        return this._client._getData(viewport, mns, resolution);
     }
 
     free() {
@@ -23483,10 +23483,11 @@ class Windshaft {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    _getData(viewport, MNS) {
-        if (!__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS)) {
+    _getData(viewport, MNS, resolution) {
+        if (!__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution) {
             this._MNS = MNS;
-            return this._instantiate();
+            this.resolution = resolution;
+            return this._instantiate(MNS, resolution);
         }
         if (!this.url) {
             // Instantiation is in progress, nothing to do yet
@@ -23527,15 +23528,14 @@ class Windshaft {
         return this._numCategories;
     }
 
-    _instantiate() {
+    _instantiate(MNS, resolution) {
         this._oldDataframes = [];
         this.cache.reset();
         this.url = null;
 
-        const MNS = this._MNS;
         let agg = {
             threshold: 1,
-            resolution: 1,//TODO style.resolution
+            resolution: resolution,
             columns: {},
             dimensions: {}
         };
@@ -28216,11 +28216,16 @@ class Layer {
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema());
+        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
+            this._style.getResolution());
         if (r) {
             this.metadataPromise = r;
             r.then(() => this._styleChanged());
         }
+    }
+
+    getNumFeatures() {
+        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
     //TODO free layer resources
@@ -28311,7 +28316,8 @@ function parseStyleNamedExpr(styleSpec, node) {
         throw new Error('Invalid syntax');
     }
     const value = parseNode(node.right);
-    styleSpec[name] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["b" /* implicitCast */])(value);
+    // Don't cast resolution properties implicitly since they must be of type Number
+    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["b" /* implicitCast */])(value);
 }
 
 function parseStyleDefinition(str) {
