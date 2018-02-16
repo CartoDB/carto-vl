@@ -96,761 +96,19 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="rToW"><span class="type-signature"></span>rToW<span class="signature">(r, x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#RPoint">RPoint</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>R coordinates to World</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>r</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#RSys">RSys</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>ref. of the passed coordinates</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>x coordinate in r</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>y</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>y coordinate in r</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>World coordinates</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#RPoint">RPoint</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="rZoom"><span class="type-signature"></span>rZoom<span class="signature">(rsys)</span><span class="type-signature"> &rarr; {number}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Minimum zoom level for which tiles are no larger than the RSys rectangle</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>rsys</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#RSys">RSys</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">number</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="tileRsys"><span class="type-signature"></span>tileRsys<span class="signature">(x, y, z)</span><span class="type-signature"> &rarr; {<a href="global.html#RSys">RSys</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>TC x coordinate</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>y</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>TC y coordinate</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>z</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Tile zoom level</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#RSys">RSys</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="wToR"><span class="type-signature"></span>wToR<span class="signature">(x, y, r)</span><span class="type-signature"> &rarr; {<a href="global.html#RPoint">RPoint</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>World coordinates to local RSys</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>x W-coordinate</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>y</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>y W-coordinate</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>r</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#RSys">RSys</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>target ref. system</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>R coordinates</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#RPoint">RPoint</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Type Definitions</h3>
 
         
                 
-<h4 class="name" id="Dataframe">Dataframe</h4>
+<h4 class="name" id="CartoError">CartoError</h4>
 
 
 
 
 <div class="description">
-    <p>Point in renderer coordinates space</p>
+    <p>Represents an error in the carto library.</p>
 </div>
 
 
@@ -895,13 +153,13 @@
 
         <tr>
             
-                <td class="name"><code>center</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#RPoint">RPoint</a></span>
+<span class="param-type">string</span>
 
 
             
@@ -911,20 +169,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>A short error description</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>scale</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             
@@ -934,20 +192,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The name of the error &quot;CartoError&quot;</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>geometry</code></td>
+                <td class="name"><code>origin</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">geom</span>
+<span class="param-type">string</span>
 
 
             
@@ -957,20 +215,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>Where the error was originated: 'validation'</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>properties</code></td>
+                <td class="name"><code>originalError</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Properties</span>
+<span class="param-type">object</span>
 
 
             
@@ -980,7 +238,53 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>An object containing the internal/original error</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>stack</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Error stack trace</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Error type</p></td>
         </tr>
 
     
@@ -1032,14 +336,10 @@
 
             
                 
-<h4 class="name" id="RPoint">RPoint</h4>
+<h4 class="name" id="StyleSpec">StyleSpec</h4>
 
 
 
-
-<div class="description">
-    <p>Point in renderer coordinates space</p>
-</div>
 
 
 
@@ -1083,7 +383,7 @@
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>resolution</code></td>
             
 
             <td class="type">
@@ -1106,13 +406,13 @@
 
         <tr>
             
-                <td class="name"><code>y</code></td>
+                <td class="name"><code>color</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">carto.style.expression.Base</span>
 
 
             
@@ -1126,115 +426,16 @@
         </tr>
 
     
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-            
-                
-<h4 class="name" id="RSys">RSys</h4>
-
-
-
-
-<div class="description">
-    <p>An RSys defines a local coordinate system that maps the coordinates
-in the range -1 &lt;= x &lt;= +1; -1 &lt;= y &lt;= +1 to an arbitrary rectangle
-in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
-It is the combination of a translation and anisotropic scaling.</p>
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">object</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
 
         <tr>
             
-                <td class="name"><code>center</code></td>
+                <td class="name"><code>width</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#RPoint">RPoint</a></span>
+<span class="param-type">carto.style.expression.Base</span>
 
 
             
@@ -1244,20 +445,20 @@ It is the combination of a translation and anisotropic scaling.</p>
 
             
 
-            <td class="description last"><p>Position of the local system in external coordinates</p></td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>scale</code></td>
+                <td class="name"><code>strokeColor</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">carto.style.expression.Base</span>
 
 
             
@@ -1267,7 +468,53 @@ It is the combination of a translation and anisotropic scaling.</p>
 
             
 
-            <td class="description last"><p>Y-scale (local Y-distance / external Y-distance)</p></td>
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strokeWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">carto.style.expression.Base</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">carto.style.expression.Base</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
         </tr>
 
     
@@ -1331,13 +578,13 @@ It is the combination of a translation and anisotropic scaling.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module.exports_module.exports.html">module.exports#module.exports</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li></ul><h3>Global</h3><ul><li><a href="global.html#rToW">rToW</a></li><li><a href="global.html#rZoom">rZoom</a></li><li><a href="global.html#tileRsys">tileRsys</a></li><li><a href="global.html#wToR">wToR</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 15 2018 18:52:15 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Feb 16 2018 14:46:08 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
