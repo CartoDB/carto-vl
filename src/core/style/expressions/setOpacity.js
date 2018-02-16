@@ -3,7 +3,6 @@ import { float } from '../functions';
 
 export default class SetOpacity extends Expression {
     /**
-     * @api
      * @description Override the input color opacity
      * @param {*} color input color
      * @param {*} opacity new opacity

@@ -1,4 +1,4 @@
-import * as R from '../core/renderer';
+import * as R from '../../core/renderer';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -43,7 +43,7 @@ class MGLIntegrator {
     addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
         const callbackID = `_cartoGL_${uid++}`;
         this._registerMoveObserver(callbackID, moveCallback);
-        this.map.repaint = true;
+        this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateMGLWebGLState) {
                 this.invalidateMGLWebGLState = invalidate;
@@ -61,7 +61,7 @@ class MGLIntegrator {
         this.move();
     }
     needRefresh() {
-        this.map.repaint = true;
+        this.map.repaint = true; // FIXME: add logic to manage repaint flag
     }
     move() {
         var c = this.map.getCenter();

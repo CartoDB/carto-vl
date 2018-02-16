@@ -1,14 +1,12 @@
 import * as shaders from './shaders';
-import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
-import * as ordering from './style/expressions/ordering';
+import { Asc, Desc } from './style/functions';
 
 const HISTOGRAM_BUCKETS = 1000;
 
 /**
- * @api
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
@@ -134,7 +132,6 @@ Renderer.prototype.setZoom = function (zoom) {
 
 /**
  * Removes a dataframe for the renderer. Freeing its resources.
- * @api
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
@@ -411,10 +408,10 @@ Renderer.prototype._computeDrawMetadata = function () {
         columns: []
     };
     let requiredColumns = tiles.map(d => {
-        const widthRequirements = d.style._width._getDrawMetadataRequirements();
-        const colorRequirements = d.style._color._getDrawMetadataRequirements();
-        const strokeWidthRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
-        const strokeColorRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
         return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
             reduce(schema.union, schema.IDENTITY);
     }).reduce(schema.union, schema.IDENTITY).columns;
@@ -565,10 +562,10 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
-    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
+    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
 
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
@@ -582,14 +579,14 @@ Renderer.prototype.refresh = function (timestamp) {
     // TODO remove hack
     let orderer = null;
     if (tiles.length > 0) {
-        orderer =tiles[0].style._order;
+        orderer = tiles[0].style.getOrder();
     }
     let orderingMins = null;
     let orderingMaxs = null;
-    if (orderer instanceof ordering.Asc) {
+    if (orderer instanceof Asc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
-    } else if (orderer instanceof ordering.Desc) {
+    } else if (orderer instanceof Desc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
     }else{
@@ -671,7 +668,7 @@ Renderer.prototype.refresh = function (timestamp) {
     this.computePool = [];
 
     tiles.forEach(t => {
-        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
+        if (t.style.getColor().isAnimated() || t.style.getWidth().isAnimated()) {
             this._RAF();
         }
     });
@@ -696,4 +693,4 @@ Renderer.prototype.compute = function (type, expressions) {
 };
 
 
-export { Renderer, Style, Dataframe, schema };
+export { Renderer, Dataframe, schema };

@@ -4,7 +4,6 @@ import Expression from './expression';
 
 export default class Blend extends Expression {
     /**
-     * @api
      * @description Interpolate from *a* to *b* based on *mix*
      * @param {*} a can be a color or a number
      * @param {*} b type must match a's type

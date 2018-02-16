@@ -1,7 +1,6 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import { schema } from '../renderer';
 import {implicitCast} from './expressions/utils';
 // TODO use Schema classes
 
@@ -27,7 +26,7 @@ export function parseStyleExpression(str, schema) {
     return r;
 }
 
-function parseStyleNamedExpr(style, node) {
+function parseStyleNamedExpr(styleSpec, node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
@@ -36,32 +35,23 @@ function parseStyleNamedExpr(style, node) {
         throw new Error('Invalid syntax');
     }
     const value = parseNode(node.right);
-    style[name] = implicitCast(value);
+    styleSpec[name] = implicitCast(value);
 }
 
-class Style {
-    constructor() {
-    }
-    getMinimumNeededSchema() {
-        const exprs = [this.width, this.color, this.strokeColor, this.strokeWidth].filter(x => x && x._getMinimumNeededSchema);
-        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
-    }
-}
-
-export function parseStyle(str) {
+export function parseStyleDefinition(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp(':', 1);
     jsep.addBinaryOp('^', 10);
     const ast = jsep(str);
-    let style = new Style();
+    let styleSpec = {};
     if (ast.type == 'Compound') {
-        ast.body.map(node => parseStyleNamedExpr(style, node));
+        ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
     } else {
-        parseStyleNamedExpr(style, ast);
+        parseStyleNamedExpr(styleSpec, ast);
     }
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
-    return style;
+    return styleSpec;
 }
 
 function parseNode(node) {
