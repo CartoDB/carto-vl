@@ -24,10 +24,28 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 
 ## Development
 
+### Install the dependencies
+
+```
+yarn
+```
+
 ### Run the tests
 
 ```
-npm test
+yarn test
+```
+
+To watch the unit tests
+
+```
+yarn test:watch
+```
+
+To launch the unit tests in the browser
+
+```
+yarn test:browser
 ```
 
 Note: you need to configure the CHROME_BIN variable before running the tests, for example:
@@ -39,23 +57,23 @@ export CHROME_BIN=/usr/bin/chromium-browser
 ### Build the library
 
 ```
-npm run build
+yarn build
 ```
 
 To watch the files
 
 ```
-npm run build:watch
+yarn build:watch
 ```
 
 ### Generate the docs
 
 ```
-npm run docs
+yarn docs
 ```
 
 To generate all the docs
 
 ```
-npm run docs:all
+yarn docs:all
 ```
