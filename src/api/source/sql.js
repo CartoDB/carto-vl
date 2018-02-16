@@ -13,8 +13,8 @@ export default class SQL extends Base {
      * @param {object} auth
      * @param {string} auth.apiKey - API key used to authenticate against CARTO
      * @param {string} auth.user - Name of the user
-     * @param {object} options
-     * @param {string} [options.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {object} config
+     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
      *
      * @example
      * new carto.source.SQL('SELECT * FROM european_cities', {
@@ -29,11 +29,11 @@ export default class SQL extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(query, auth, options) {
+    constructor(query, auth, config) {
         super();
         this._checkQuery(query);
         this._query = query;
-        this.initialize(auth, options);
+        this.initialize(auth, config);
     }
 
     _checkQuery(query) {

@@ -28,8 +28,7 @@ export default class Style {
     /**
      * Create a carto.Style.
      *
-     *
-     * @param {string|object} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
+     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
      *
      * @example
      * new carto.Style(`
@@ -71,6 +70,8 @@ export default class Style {
      * Return the resolution.
      *
      * @return {number}
+     *
+     * @memberof carto.Style
      * @api
      */
     getResolution() {
@@ -81,6 +82,8 @@ export default class Style {
      * Return the color expression.
      *
      * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
      * @api
      */
     getColor() {
@@ -91,6 +94,8 @@ export default class Style {
      * Return the width expression.
      *
      * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
      * @api
      */
     getWidth() {
@@ -101,6 +106,8 @@ export default class Style {
      * Return the strokeColor expression.
      *
      * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
      * @api
      */
     getStrokeColor() {
@@ -111,6 +118,8 @@ export default class Style {
      * Return the strokeWidth expression.
      *
      * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
      * @api
      */
     getStrokeWidth() {
@@ -121,6 +130,8 @@ export default class Style {
      * Return the order expression.
      *
      * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
      * @api
      */
     getOrder() {

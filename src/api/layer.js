@@ -13,6 +13,23 @@ import CartoValidationError from './error-handling/carto-validation-error';
 
 export default class Layer {
 
+    /**
+     * Create a carto.Layer.
+     *
+     *
+     * @param {string} id
+     * @param {carto.source.Base} source
+     * @param {carto.Style} style
+     *
+     * @example
+     * new carto.Layer('layer0', source, style);
+     *
+     * @fires CartoError
+     *
+     * @constructor Layer
+     * @memberof carto
+     * @api
+     */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -35,6 +52,7 @@ export default class Layer {
      *
      * @param {carto.source.Base} source - New source
      *
+     * @memberof carto.Layer
      * @api
      */
     setSource(source) {
@@ -62,6 +80,7 @@ export default class Layer {
      *
      * @param {carto.Style} style - New style
      *
+     * @memberof carto.Layer
      * @api
      */
     setStyle(style) {
@@ -81,6 +100,7 @@ export default class Layer {
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
      *
+     * @memberof carto.Layer
      * @api
      */
     addTo(map, beforeLayerID) {

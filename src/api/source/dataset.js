@@ -13,8 +13,8 @@ export default class Dataset extends Base {
      * @param {object} auth
      * @param {string} auth.apiKey - API key used to authenticate against CARTO
      * @param {string} auth.user - Name of the user
-     * @param {object} options
-     * @param {string} [options.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {object} config
+     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
      *
      * @example
      * new carto.source.Dataset('european_cities', {
@@ -29,11 +29,11 @@ export default class Dataset extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(tableName, auth, options) {
+    constructor(tableName, auth, config) {
         super();
         this._checkTableName(tableName);
         this._tableName = tableName;
-        this.initialize(auth, options);
+        this.initialize(auth, config);
     }
 
     _checkTableName(tableName) {
