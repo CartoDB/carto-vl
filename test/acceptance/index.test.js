@@ -5,7 +5,7 @@ const chai = require('chai');
 chai.use(require('chai-as-promised'));
 
 const expect = chai.expect;
-const DELAY = 4000;
+const DELAY = 8000;
 
 const references = _flatten(_getReferences('reference'));
 
@@ -23,16 +23,16 @@ function test({ folder, file }) {
         const output = path.resolve(__dirname, `reference/${folder}/${file}_out.png`);
         const filepath = path.resolve(__dirname, `../../example/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.1 })).to.eventually.be.true;
+        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.5, headless: true })).to.eventually.be.true;
     });
 }
 
 // Return an array reference objects, a reference object has 2 fields, the folder and the reference itself.
 function _getReferences(referencesFolder) {
-    const folders = fs.readdirSync(path.join(__dirname, `/${referencesFolder}`)).filter(folder => folder !== '.gitignore');
+    const folders = fs.readdirSync(path.join(__dirname, `${referencesFolder}`)).filter(folder => folder !== '.gitignore');
 
     return folders.map(folder => {
-        return fs.readdirSync(path.join(__dirname, `/${referencesFolder}/${folder}`))
+        return fs.readdirSync(path.join(__dirname, `${referencesFolder}/${folder}`))
             .filter(filename => filename.endsWith('.png') && !filename.endsWith('_out.png'))
             .map(file => {
                 return {

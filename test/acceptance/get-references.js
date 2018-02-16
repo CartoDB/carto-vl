@@ -3,7 +3,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const FOLDERS = ['basic', 'styling'];
-const DELAY = 4000;
+const DELAY = 8000;
 
 FOLDERS.forEach(getReferences);
 
@@ -18,7 +18,8 @@ function getReferences(folder) {
     files.forEach(file => {
         const filepath = path.resolve(__dirname, `../../example/${folder}/${file}`);
         if (file.endsWith('.html')) {
-            execSync(`$(npm bin)/exquisite-sst --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
+            console.log(`Taking reference from ${file}`);
+            execSync(`$(npm bin)/exquisite-sst --headless --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
         }
     });
 }
