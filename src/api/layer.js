@@ -118,7 +118,7 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        map.on('load', () => {
+        const onMapLoaded = () => {
             this._mglIntegrator = getMGLIntegrator(map);
             this._mglIntegrator.addLayer(this._id, beforeLayerID, this._getData.bind(this), () => {
                 this._dataframes.map(
@@ -132,7 +132,13 @@ export default class Layer {
                         dataframe.visible = false;
                     });
             });
-        });
+        };
+
+        if (map.loaded()) {
+            onMapLoaded();
+        } else {
+            map.on('load', onMapLoaded);
+        }
     }
 
     _styleChanged() {
