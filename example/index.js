@@ -84,10 +84,18 @@ const texts = [
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
+const BASEMAPS = {
+    DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+};
+
+// function load(basemap = 'DarkMatter') {
+var basemap = 'DarkMatter';
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
+    style: BASEMAPS[basemap], // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
 });
@@ -269,4 +277,25 @@ map.on('load', () => {
     } else {
         barcelona();
     }
+});
+
+const basemapSelector = document.querySelector('#basemap');
+Object.keys(BASEMAPS).forEach(id => {
+    const l = document.createElement('label');
+
+    const i = document.createElement('input');
+    i.type = 'radio';
+    i.name = 'basemap';
+    i.value = id;
+    i.onclick = () => {
+        map.setStyle(BASEMAPS[id]);
+    };
+    i.selected = 'selected';
+    l.appendChild(i);
+
+    const s = document.createElement('span');
+    s.innerText = id;
+    l.appendChild(s);
+
+    basemapSelector.appendChild(l);
 });

@@ -63,6 +63,18 @@
             display: none;
         }
 
+        #basemap {
+            float: right;
+            margin: 8px 0 0;
+        }
+        #basemap label {
+            display: inline;
+            margin: 0 16px;
+        }
+        #basemap input {
+            margin: 0 8px;
+        }
+
         .step {
             height: 180px;
             display: none;
@@ -95,6 +107,9 @@
                 <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
                 <button id='barcelona'>Barcelona (with tutorial)</button>
             </div>
+
+            <div id="basemap"></div>
+
             <h3>Style</h3>
 
             <h5 id='tutorial'></h5>
@@ -111,5 +126,7 @@
                 <textarea class="four columns" id="dataset">tx_0125_copy_copy</textarea>
                 <textarea class="four columns" id="serverURL">https://{user}.carto.com</textarea>
             </div>
-
+        </div>
+    </div>
+</body>
 </html>
