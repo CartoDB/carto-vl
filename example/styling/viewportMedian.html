@@ -23,7 +23,7 @@
         mapboxgl.accessToken = 'pk.eyJ1IjoiZG1hbnphbmFyZXMiLCJhIjoiY2o5cHRhOGg5NWdzbTJxcXltb2g2dmE5NyJ9.RVto4DnlLzQc26j9H0g9_A';
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            style: {             "version": 8,             "sources": {},             "layers": []         },
             center: [2.17, 41.38],
             zoom: 0,
         });
@@ -46,6 +46,6 @@
             console.log(median.getValue());
         });
 
-        layer.addTo(map, 'watername_ocean');
+        layer.addTo(map);
     </script>
 </html>
