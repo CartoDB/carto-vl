@@ -90,7 +90,6 @@ const BASEMAPS = {
     Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
 };
 
-// function load(basemap = 'DarkMatter') {
 var basemap = 'DarkMatter';
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
