@@ -5,14 +5,14 @@ const path = require('path');
 const FOLDERS = ['basic', 'styling'];
 const DELAY = 8000;
 // Headless chrome with GPU only works with linux
-const HEADLESS_FLAG = (process.platfom === 'linux') ? '--headless' : '';
+const HEADLESS_FLAG = (process.platform === 'linux') ? '--headless' : '';
 
 FOLDERS.forEach(getReferences);
 
 
 /**
  * Uses exquisite-sst from the command line to take screenshots of all html files on a folder
- * @param {*} folder 
+ * @param {*} folder
  */
 function getReferences(folder) {
     const files = fs.readdirSync(path.join(__dirname, `../../example/${folder}`));
