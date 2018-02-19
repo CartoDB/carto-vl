@@ -85,6 +85,22 @@ Renderer.prototype._initGL = function (gl) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    this._AATex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        800, 800, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    this._AAFB = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
 };
 
 /**
@@ -573,6 +589,29 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
+        const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+
+        if (w != this._width || h != this._height) {
+            console.log(w,h);
+            this._AATex = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                w*2, h*2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
+
+            [this._width, this._height] = [w, h];
+
+        }
+        gl.viewport(0, 0, w*2, h*2);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
 
     const s = 1. / this._zoom;
 
@@ -589,10 +628,12 @@ Renderer.prototype.refresh = function (timestamp) {
     } else if (orderer instanceof Desc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
-    }else{
+    } else {
         orderingMins = [0];
         orderingMaxs = [1000];
     }
+
+
 
     const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -664,6 +705,35 @@ Renderer.prototype.refresh = function (timestamp) {
         renderDrawPass(orderingIndex);
     });
 
+
+    //TODO if not points =>
+    /*
+        bind fb 0
+        use fsBlend program
+        bind aaFBtex to texture unit
+        render full screen
+    */
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        gl.useProgram(this._aaBlendShader.program);
+
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+        gl.uniform1i(this._aaBlendShader.readTU, 0);
+
+
+        gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+        gl.vertexAttribPointer(this._aaBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+    }
+
+
     this.computePool.map(job => job.work(this));
     this.computePool = [];
 
@@ -682,6 +752,7 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
     this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
     this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
+    this._aaBlendShader = new shaders.AABlender(this.gl);
 };
 
 Renderer.prototype.compute = function (type, expressions) {
