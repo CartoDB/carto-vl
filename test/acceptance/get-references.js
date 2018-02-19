@@ -7,6 +7,8 @@ const DELAY = 8000;
 // Headless chrome with GPU only works with linux
 const HEADLESS_FLAG = (process.platform === 'linux') ? '--headless' : '';
 
+const BLACKLIST_FILES = ['ships.html', 'now.html'];
+
 FOLDERS.forEach(getReferences);
 
 
@@ -19,7 +21,7 @@ function getReferences(folder) {
 
     files.forEach(file => {
         const filepath = path.resolve(__dirname, `../../example/${folder}/${file}`);
-        if (file.endsWith('.html')) {
+        if (file.endsWith('.html') && !BLACKLIST_FILES.includes(file)) {
             console.log(`Taking reference from ${file}`);
             execSync(`$(npm bin)/exquisite-sst ${HEADLESS_FLAG} --reference --url file://${filepath} --output ./test/acceptance/reference/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
         }
