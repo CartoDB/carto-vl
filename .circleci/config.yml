@@ -22,8 +22,14 @@ jobs:
           - v1-dependencies-
 
       - run: yarn install
+      - run: sudo apt install mesa-utils --yes
+      - run: "export DISPLAY=:99.0"
+      - run: glxinfo | grep "OpenGL version"
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: yarn test
+      - run: yarn test:acceptance
