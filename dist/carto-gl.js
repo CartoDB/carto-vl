@@ -669,7 +669,7 @@ function genUnaryOp(jsFn, glsl) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(70);
 
 
 /**
@@ -18121,9 +18121,9 @@ module.exports = g;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_earcut__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dataframe__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dataframe__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__style_functions__ = __webpack_require__(1);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_3__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -18214,6 +18214,12 @@ Renderer.prototype._initGL = function (gl) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    this._AATex = gl.createTexture();
+    this._AAFB = gl.createFramebuffer();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
 };
 
 /**
@@ -18635,6 +18641,26 @@ Renderer.prototype._computeDrawMetadata = function () {
     return drawMetadata;
 };
 
+function getOrderingRenderBuckets(tiles) {
+    let orderer = null;
+    if (tiles.length > 0) {
+        orderer = tiles[0].style.getOrder();
+    }
+    let orderingMins = [0];
+    let orderingMaxs = [1000];
+    if (orderer instanceof __WEBPACK_IMPORTED_MODULE_4__style_functions__["Asc"]) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
+    } else if (orderer instanceof __WEBPACK_IMPORTED_MODULE_4__style_functions__["Desc"]) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
+    }
+    return {
+        orderingMins,
+        orderingMaxs
+    };
+}
+
 Renderer.prototype.refresh = function (timestamp) {
     const gl = this.gl;
     // Don't re-render more than once per animation frame
@@ -18702,26 +18728,29 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
+        const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+
+        if (w != this._width || h != this._height) {
+            gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
+
+            [this._width, this._height] = [w, h];
+        }
+        gl.viewport(0, 0, w * 2, h * 2);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
 
     const s = 1. / this._zoom;
 
-    // TODO remove hack
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer = tiles[0].style.getOrder();
-    }
-    let orderingMins = null;
-    let orderingMaxs = null;
-    if (orderer instanceof __WEBPACK_IMPORTED_MODULE_4__style_functions__["Asc"]) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
-    } else if (orderer instanceof __WEBPACK_IMPORTED_MODULE_4__style_functions__["Desc"]) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
-    }else{
-        orderingMins = [0];
-        orderingMaxs = [1000];
-    }
+    const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
     const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -18793,6 +18822,25 @@ Renderer.prototype.refresh = function (timestamp) {
         renderDrawPass(orderingIndex);
     });
 
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        gl.useProgram(this._aaBlendShader.program);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+        gl.uniform1i(this._aaBlendShader.readTU, 0);
+
+        gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+        gl.vertexAttribPointer(this._aaBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+    }
+
+
     this.computePool.map(job => job.work(this));
     this.computePool = [];
 
@@ -18808,9 +18856,10 @@ Renderer.prototype.refresh = function (timestamp) {
  * Initialize static shaders
  */
 Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createPointShader(this.gl);
-    this.triRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createTriShader(this.gl);
-    this.lineRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* renderer */].createLineShader(this.gl);
+    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
+    this.triRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createTriShader(this.gl);
+    this.lineRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createLineShader(this.gl);
+    this._aaBlendShader = new __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* AABlender */](this.gl);
 };
 
 Renderer.prototype.compute = function (type, expressions) {
@@ -18830,10 +18879,13 @@ Renderer.prototype.compute = function (type, expressions) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return styler; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(54);
+
 
 
 
@@ -18862,6 +18914,14 @@ function compileProgram(gl, glslVS, glslFS) {
     gl.deleteShader(FS);
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+}
+
+class AABlender {
+    constructor(gl) {
+        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_2__aaBlender__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_2__aaBlender__["a" /* FS */]);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
     }
 }
 
@@ -19210,7 +19270,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(68);
+var Point = __webpack_require__(69);
 
 module.exports = VectorTileFeature;
 
@@ -19617,8 +19677,8 @@ function _checkServerURL(serverURL) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(5);
 
@@ -19793,28 +19853,28 @@ class Style {
 
     _compileColorShader(gl, metadata) {
         this._styleSpec.color._bind(metadata);
-        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.color, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["b" /* styler */].createColorShader);
+        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.color, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["c" /* styler */].createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;
     }
 
     _compileWidthShader(gl, metadata) {
         this._styleSpec.width._bind(metadata);
-        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.width, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["b" /* styler */].createWidthShader);
+        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.width, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["c" /* styler */].createWidthShader);
         this.propertyWidthTID = r.tid;
         this.widthShader = r.shader;
     }
 
     _compileStrokeColorShader(gl, metadata) {
         this._styleSpec.strokeColor._bind(metadata);
-        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.strokeColor, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["b" /* styler */].createColorShader);
+        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.strokeColor, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["c" /* styler */].createColorShader);
         this.propertyStrokeColorTID = r.tid;
         this.strokeColorShader = r.shader;
     }
 
     _compileStrokeWidthShader(gl, metadata) {
         this._styleSpec.strokeWidth._bind(metadata);
-        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.strokeWidth, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["b" /* styler */].createWidthShader);
+        const r = Object(__WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__["a" /* compileShader */])(gl, this._styleSpec.strokeWidth, __WEBPACK_IMPORTED_MODULE_3__core_shaders__["c" /* styler */].createWidthShader);
         this.propertyStrokeWidthTID = r.tid;
         this.strokeWidthShader = r.shader;
     }
@@ -19934,8 +19994,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_layer__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_layer__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_style__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_setup_auth_service__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_config_service__ = __webpack_require__(19);
@@ -23421,12 +23481,12 @@ module.exports = function(module) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(58);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__ = __webpack_require__(67);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__);
 
 
@@ -24257,6 +24317,44 @@ void main(void) {
 
 /***/ }),
 /* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+const VS = `
+
+precision highp float;
+attribute vec2 vertex;
+
+varying  vec2 uv;
+
+void main(void) {
+    uv = vertex*0.5+vec2(0.5);
+    gl_Position = vec4(vertex, 0.5, 1.);
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["b"] = VS;
+
+
+const FS = `
+
+precision highp float;
+
+varying  vec2 uv;
+
+uniform sampler2D aaTex;
+
+void main(void) {
+    vec4 aa = texture2D(aaTex, uv);
+    gl_FragColor = aa;
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["a"] = FS;
+
+
+
+/***/ }),
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24913,7 +25011,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24956,7 +25054,7 @@ class Dataframe {
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -25105,7 +25203,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25113,7 +25211,7 @@ function getRsysFromTile(x, y, z) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(58);
+var ieee754 = __webpack_require__(59);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -25730,7 +25828,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -25820,7 +25918,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25830,11 +25928,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(60)
-var util = __webpack_require__(62)
+var Map = __webpack_require__(61)
+var util = __webpack_require__(63)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(65)
+var Yallist = __webpack_require__(66)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -26294,7 +26392,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -26304,13 +26402,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(61)
+  module.exports = __webpack_require__(62)
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -26429,7 +26527,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -26957,7 +27055,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(63);
+exports.isBuffer = __webpack_require__(64);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -27001,7 +27099,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(64);
+exports.inherits = __webpack_require__(65);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -27022,7 +27120,7 @@ function hasOwnProperty(obj, prop) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(15)))
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -27033,7 +27131,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -27062,7 +27160,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -27438,16 +27536,16 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(67);
+module.exports.VectorTile = __webpack_require__(68);
 module.exports.VectorTileFeature = __webpack_require__(17);
 module.exports.VectorTileLayer = __webpack_require__(16);
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27471,7 +27569,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27790,12 +27888,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(71);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -27877,7 +27975,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28010,7 +28108,7 @@ const validation = {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28018,7 +28116,7 @@ const validation = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__integration_mapbox_gl__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__integration_mapbox_gl__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(5);
 
 
@@ -28235,7 +28333,7 @@ class Layer {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28269,13 +28367,13 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 }
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(75);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(2);
@@ -28395,7 +28493,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -29082,7 +29180,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -29185,7 +29283,7 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
