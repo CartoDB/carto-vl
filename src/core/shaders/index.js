@@ -1,5 +1,6 @@
 import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
+import * as aaBlenderGLSL from './aaBlender';
 
 const NUM_TEXTURE_LOCATIONS = 4;
 
@@ -26,6 +27,14 @@ function compileProgram(gl, glslVS, glslFS) {
     gl.deleteShader(FS);
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+}
+
+class AABlender {
+    constructor(gl) {
+        compileProgram.call(this, gl, aaBlenderGLSL.VS, aaBlenderGLSL.FS);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
     }
 }
 
@@ -106,4 +115,4 @@ const styler = {
     }
 };
 
-export { renderer, styler };
+export { renderer, styler, AABlender };
