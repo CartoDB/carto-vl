@@ -5,7 +5,7 @@ const path = require('path');
 
 const OUTPUT_DIR = path.join(__dirname, './references');
 const DELAY = 8000;
-const FOLDERS = ['basic'];
+const FOLDERS = ['basic', 'style'];
 const BLACKLIST_FILES = [''];
 // Headless chrome with GPU only works with linux
 const HEADLESS_FLAG = (process.platform === 'linux') ? '--headless' : '';
