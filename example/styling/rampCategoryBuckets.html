@@ -32,7 +32,7 @@
 <script>
     const map = new mapboxgl.Map({
         container: 'map',
-        style: {             "version": 8,             "sources": {},             "layers": []         },
+        style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
         center: [2.1734, 41.3851],
         zoom: 12,
     });
@@ -49,7 +49,7 @@
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
 
-    layer.addTo(map);
+    layer.addTo(map, 'watername_ocean');
 </script>
 
 </html>
