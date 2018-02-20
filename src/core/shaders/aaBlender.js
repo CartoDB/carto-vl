@@ -1,4 +1,3 @@
-//TODO Discuss size scaling constant, maybe we need to remap using an exponential map
 
 export const VS = `
 
@@ -23,6 +22,6 @@ uniform sampler2D aaTex;
 
 void main(void) {
     vec4 aa = texture2D(aaTex, uv);
-    gl_FragColor = aa;//vec4(0,1,0,1);
+    gl_FragColor = aa;
 }
 `;

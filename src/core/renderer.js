@@ -87,14 +87,6 @@ Renderer.prototype._initGL = function (gl) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
     this._AATex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this._AATex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        800, 800, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
     this._AAFB = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
@@ -594,8 +586,6 @@ Renderer.prototype.refresh = function (timestamp) {
         const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
         if (w != this._width || h != this._height) {
-            console.log(w,h);
-            this._AATex = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this._AATex);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 w*2, h*2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -606,12 +596,10 @@ Renderer.prototype.refresh = function (timestamp) {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
 
             [this._width, this._height] = [w, h];
-
         }
         gl.viewport(0, 0, w*2, h*2);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
-
 
     const s = 1. / this._zoom;
 
@@ -705,25 +693,15 @@ Renderer.prototype.refresh = function (timestamp) {
         renderDrawPass(orderingIndex);
     });
 
-
-    //TODO if not points =>
-    /*
-        bind fb 0
-        use fsBlend program
-        bind aaFBtex to texture unit
-        render full screen
-    */
     if (tiles.length && tiles[0].type != 'point') {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         gl.useProgram(this._aaBlendShader.program);
 
-
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this._AATex);
         gl.uniform1i(this._aaBlendShader.readTU, 0);
-
 
         gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
