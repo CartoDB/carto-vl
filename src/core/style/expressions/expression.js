@@ -106,7 +106,7 @@ export default class Expression {
         blender.notify();
     }
 
-    blendFrom(final, duration = 500, interpolator = Cubic) {
+    blendFrom(final, duration = 500, interpolator = null) {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);

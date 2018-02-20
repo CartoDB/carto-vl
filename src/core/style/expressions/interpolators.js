@@ -3,11 +3,11 @@ import Expression from './expression';
 
 
 export class ILinear extends genInterpolator(inner => inner) { }
-export class Cubic extends genInterpolator(inner => `BounceEaseIn(${inner})`,
+export class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
     `
-    #ifndef CUBIC
-    #define CUBIC
-    float BounceEaseOut(float p)
+    #ifndef BOUNCE_EASE_IN
+    #define BOUNCE_EASE_IN
+    float BounceEaseIn_BounceEaseOut(float p)
     {
         if(p < 4./11.0)
         {
@@ -33,7 +33,7 @@ export class Cubic extends genInterpolator(inner => `BounceEaseIn(${inner})`,
     #endif
 
 `) { }
-export class Cubic2 extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+export class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
     #define CUBIC
@@ -51,11 +51,10 @@ export class Cubic2 extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
 
 // Interpolators
 function genInterpolator(inlineMaker, preface) {
-    return class Interpolator extends Expression {
+    const fn = class Interpolator extends Expression {
         constructor(m) {
             m = implicitCast(m);
             super({ m: m });
-            this.isInterpolator = true; //TODO remove this hack
         }
         _compile(meta) {
             super._compile(meta);
@@ -66,5 +65,7 @@ function genInterpolator(inlineMaker, preface) {
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
     };
+    fn.type = 'interpolator';
+    return fn;
 
 }

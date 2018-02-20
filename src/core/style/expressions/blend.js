@@ -14,7 +14,7 @@ export default class Blend extends Expression {
         b = implicitCast(b);
         mix = implicitCast(mix);
         if (interpolator) {
-            mix = new interpolator(mix);
+            mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });
     }

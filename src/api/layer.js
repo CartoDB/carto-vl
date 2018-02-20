@@ -4,6 +4,7 @@ import SourceBase from './source/base';
 import Style from './style';
 import getMGLIntegrator from './integration/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
+import { cubic } from '../core/style/functions';
 
 /**
  * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
@@ -102,7 +103,7 @@ export default class Layer {
      * @memberof carto.Layer
      * @api
      */
-    blendToStyle(style, ms = 3000, interpolator = undefined) {
+    blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
         if (this._style) {
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
