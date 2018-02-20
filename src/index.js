@@ -12,13 +12,14 @@ import Dataset from './api/source/dataset';
 import Layer from './api/layer';
 import SQL from './api/source/sql';
 import JSON from './api/source/json';
+import BQ from './api/source/bq';
 import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 
 // Namespaces
 const style = { expressions };
-const source = { Dataset, SQL, JSON };
+const source = { Dataset, SQL, JSON, BQ };
 
 export {
     source,

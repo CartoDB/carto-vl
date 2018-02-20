@@ -137,4 +137,4 @@ function getRsysFromTile(x, y, z) {
     };
 }
 
-export { rTiles, getRsysFromTile };
+export { rTiles, getRsysFromTile, wToR };
