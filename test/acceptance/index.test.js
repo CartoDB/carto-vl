@@ -3,12 +3,13 @@ const exquisite = require('exquisite-sst');
 const path = require('path');
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
-
 const expect = chai.expect;
+
+const REFERENCES_FOLDER = 'references';
 const DELAY = 8000;
 // Headless chrome with GPU only works with linux
 const HEADLESS = (process.platform === 'linux');
-const references = _flatten(_getReferences('reference'));
+const references = _flatten(_getReferences(REFERENCES_FOLDER));
 
 
 describe('Screenshot tests:', () => {
@@ -20,9 +21,9 @@ describe('Screenshot tests:', () => {
 function test({ folder, file }) {
     file = file.replace('.png', '');
     it(file, () => {
-        const input = path.resolve(__dirname, `reference/${folder}/${file}.png`);
-        const output = path.resolve(__dirname, `reference/${folder}/${file}_out.png`);
-        const filepath = path.resolve(__dirname, `../../example/${folder}/${file}.html`);
+        const input = path.resolve(__dirname, `./${REFERENCES_FOLDER}/${folder}/${file}.png`);
+        const output = path.resolve(__dirname, `./${REFERENCES_FOLDER}/${folder}/${file}_out.png`);
+        const filepath = path.resolve(__dirname, `./test-cases/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
         return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.5, headless: HEADLESS })).to.eventually.be.true;
     });
