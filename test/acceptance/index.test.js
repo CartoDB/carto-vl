@@ -6,7 +6,7 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 
 const REFERENCES_FOLDER = 'references';
-const DELAY = 8000;
+const DELAY = 3000;
 // Headless chrome with GPU only works with linux
 const HEADLESS = (process.platform === 'linux');
 const references = _flatten(_getReferences(REFERENCES_FOLDER));
@@ -14,7 +14,7 @@ const references = _flatten(_getReferences(REFERENCES_FOLDER));
 
 describe('Screenshot tests:', () => {
     references.forEach(test);
-    // test({ folder: 'styling', file: 'rampCategoryAuto' });
+    // test({ folder: 'styling', file: 'rampCategoryAuto' }); // Running a single test
 });
 
 // Wrapper to perform a single test.
@@ -25,7 +25,7 @@ function test({ folder, file }) {
         const output = path.resolve(__dirname, `./${REFERENCES_FOLDER}/${folder}/${file}_out.png`);
         const filepath = path.resolve(__dirname, `./test-cases/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.5, headless: HEADLESS })).to.eventually.be.true;
+        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.1, headless: HEADLESS })).to.eventually.be.true;
     });
 }
 
