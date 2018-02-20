@@ -169,9 +169,9 @@ export default class Layer {
         if (_.isUndefined(source)) {
             throw new CartoValidationError('layer', 'sourceRequired');
         }
-        if (!(source instanceof SourceBase)) {
+        /*if (!(source instanceof SourceBase)) {
             throw new CartoValidationError('layer', 'nonValidSource');
-        }
+        }*/
     }
 
     _checkStyle(style) {
