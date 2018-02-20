@@ -88,8 +88,6 @@ Renderer.prototype._initGL = function (gl) {
 
     this._AATex = gl.createTexture();
     this._AAFB = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
@@ -514,6 +512,26 @@ Renderer.prototype._computeDrawMetadata = function () {
     return drawMetadata;
 };
 
+function getOrderingRenderBuckets(tiles) {
+    let orderer = null;
+    if (tiles.length > 0) {
+        orderer = tiles[0].style.getOrder();
+    }
+    let orderingMins = [0];
+    let orderingMaxs = [1000];
+    if (orderer instanceof Asc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
+    } else if (orderer instanceof Desc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
+    }
+    return {
+        orderingMins,
+        orderingMaxs
+    };
+}
+
 Renderer.prototype.refresh = function (timestamp) {
     const gl = this.gl;
     // Don't re-render more than once per animation frame
@@ -588,7 +606,7 @@ Renderer.prototype.refresh = function (timestamp) {
         if (w != this._width || h != this._height) {
             gl.bindTexture(gl.TEXTURE_2D, this._AATex);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                w*2, h*2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -597,31 +615,13 @@ Renderer.prototype.refresh = function (timestamp) {
 
             [this._width, this._height] = [w, h];
         }
-        gl.viewport(0, 0, w*2, h*2);
+        gl.viewport(0, 0, w * 2, h * 2);
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
     const s = 1. / this._zoom;
 
-    // TODO remove hack
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer = tiles[0].style.getOrder();
-    }
-    let orderingMins = null;
-    let orderingMaxs = null;
-    if (orderer instanceof Asc) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
-    } else if (orderer instanceof Desc) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
-    } else {
-        orderingMins = [0];
-        orderingMaxs = [1000];
-    }
-
-
+    const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
     const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
