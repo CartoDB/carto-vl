@@ -285,6 +285,73 @@ function decodeGeom(geomType, geom) {
     }
 }
 
+
+function getCluster(src, k) {
+    const points = src.geom;
+
+    const map = new Map();
+
+    for (let i = 0; i < src.size * 2; i += 2) {
+        const x = Math.floor(points[i] * k) / k;
+        const y = Math.floor(points[i + 1] * k) / k;
+        const id = `${x}:${y}`;
+        if (map.get(id) === undefined) {
+            map.set(id, []);
+        }
+        map.get(id).push({ x: points[i], y: points[i + 1], cat: src.properties.Industry[i / 2] });
+    }
+
+    let geom = new Float32Array(map.size * 2);
+    const counts = new Float32Array(map.size + 1024);
+    const cats = src.metadata.columns[0].categoryNames;
+    let catCounts = {};
+    cats.map(cat => {
+        catCounts[src.metadata.categoryIDs[cat]] = new Float32Array(map.size + 1024);
+    });
+    let i = 0;
+    for (const [, points] of map) {
+        let x = 0;
+        let y = 0;
+        points.map(p => {
+            x += p.x;
+            y += p.y;
+            catCounts[p.cat][i]++;
+        });
+        x /= points.length;
+        y /= points.length;
+        geom[2 * i + 0] = x;
+        geom[2 * i + 1] = y;
+        counts[i] = points.length;
+        i++;
+    }
+
+    const properties = {
+        _cartogl_count: counts
+    };
+
+
+    const subDataframe = {
+        type: 'point',
+        size: map.size,
+        geom,
+        properties,
+        active: true,
+        visible: true,
+        center: src.center,
+        scale: src.scale,
+        clusterK: k,
+    };
+    cats.map(cat => {
+        subDataframe.properties['Industry:' + cat] = catCounts[src.metadata.categoryIDs[cat]];
+        src.metadata.columns.push({
+            name: 'Industry:' + cat,
+            type: 'float',
+        });
+    });
+    src._subDataframes.push(subDataframe);
+    return subDataframe;
+}
+
 /**
  * @description Adds a new dataframe to the renderer.
  *
@@ -294,9 +361,51 @@ function decodeGeom(geomType, geom) {
  * @returns {BoundDataframe}
  */
 Renderer.prototype.addDataframe = function (dataframe) {
-    const gl = this.gl;
-    //this.ext.bindVertexArrayOES(this.vao);
+
+    // One cluster per zoom
+    // Each cluster has two geometries
+    dataframe._subDataframes = [];
     this.dataframes.push(dataframe);
+    const originalDataframe = dataframe;
+
+    let bks = [];
+    let acc = 15;
+    for (let i = 0; i < 5; i++) {
+        bks.push(acc);
+        acc *= 2;
+    }
+    bks.push(20000);
+
+    bks.map(k => {
+        getCluster(dataframe, k);
+    });
+
+    dataframe._getDataframe = () => {
+        const zoom = this.getZoom();
+        let passZoom = 1;
+        for (let i = 0; i < originalDataframe._subDataframes.length; i++) {
+            if (zoom > passZoom) {
+                return originalDataframe._subDataframes[i];
+            }
+            passZoom *= 0.5;
+        }
+        return originalDataframe._subDataframes[originalDataframe._subDataframes.length - 1];
+    };
+
+    dataframe.setStyle = (style) => {
+        originalDataframe.style = style;
+        originalDataframe._subDataframes.map(d => d.style = style);
+        this._RAF();
+    };
+
+    bks.map((k, index) => {
+        this._uploadDataframe(dataframe._subDataframes[index]);
+    });
+};
+
+Renderer.prototype._uploadDataframe = function (dataframe) {
+    const gl = this.gl;
+
     dataframe.propertyTex = [];
 
     const level = 0;
@@ -332,10 +441,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
         }
     }
 
-    dataframe.setStyle = (style) => {
-        dataframe.style = style;
-        this._RAF();
-    };
     dataframe.style = null;
 
     dataframe.vertexBuffer = gl.createBuffer();
@@ -370,7 +475,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     this._RAF();
     return dataframe;
-};
+}
 
 Renderer.prototype._RAF = function () {
     //window.requestAnimationFrame(this.refresh.bind(this));
@@ -396,7 +501,7 @@ class ComputeJob {
     }
 }
 Renderer.prototype.getStyledTiles = function () {
-    return this.dataframes.filter(tile => tile.style && tile.visible);
+    return this.dataframes.filter(tile => tile.style && tile.visible).map(tile => tile._getDataframe());
 };
 
 Renderer.prototype._computeDrawMetadata = function () {
@@ -589,7 +694,7 @@ Renderer.prototype.refresh = function (timestamp) {
     } else if (orderer instanceof Desc) {
         orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
-    }else{
+    } else {
         orderingMins = [0];
         orderingMaxs = [1000];
     }

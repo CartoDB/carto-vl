@@ -1,6 +1,5 @@
 import * as R from '../../core/renderer';
 import * as rsys from '../../client/rsys';
-import Property from '../../core/style/expressions/property';
 
 
 const DEG2RAD = Math.PI / 180;
@@ -8,7 +7,7 @@ const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
-const PROPERTY = 'BillingCity';
+const PROPERTY = 'Industry';
 
 // Webmercator projection
 function Wmxy(latLng) {
@@ -59,24 +58,24 @@ export default class JSON {
                     counts[id]++;
                 }
             }
-
+            let metadata = {
+                featureCount: 1000,
+                columns: [
+                    {
+                        name: PROPERTY,
+                        type: 'category',
+                        categoryNames: names,
+                        categoryCounts: counts
+                    }
+                ],
+                categoryIDs: {},
+            };
+            names.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            console.log(metadata);
+            this.metadata = metadata;
 
             return new Promise(resolve => {
-                let metadata = {
-                    featureCount: 1000,
-                    columns: [
-                        {
-                            name: PROPERTY,
-                            type: 'category',
-                            categoryNames: names,
-                            categoryCounts: counts
-                        }
-                    ],
-                    categoryIDs: {},
-                };
-                names.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
-                console.log(metadata);
-                resolve(metadata);
+                resolve(this.metadata);
             });
         } else if (!this.dataInit) {
             const numFeatures = this.data.length;
@@ -103,7 +102,7 @@ export default class JSON {
             dataframe.type = 'point';
             dataframe.active = true;
             dataframe.size = numFeatures;
-            console.log(123);
+            dataframe.metadata = this.metadata;
             this._addDataframe(dataframe);
             this.dataInit = true;
         }

@@ -169,6 +169,7 @@ export default class Style {
     }
 
     _compileColorShader(gl, metadata) {
+        this.metadata = metadata;
         this._styleSpec.color._bind(metadata);
         const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
@@ -290,7 +291,7 @@ export default class Style {
         if (!(styleSpec.order instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[order]');
         }
-        _.forOwn(styleSpec, function(value, key) {
+        _.forOwn(styleSpec, function (value, key) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
