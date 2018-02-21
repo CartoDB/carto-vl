@@ -1,5 +1,5 @@
 import { implicitCast } from './utils';
-import { blend, animate, Cubic } from '../functions';
+import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
 
