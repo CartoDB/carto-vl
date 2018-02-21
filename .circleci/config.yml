@@ -22,6 +22,7 @@ jobs:
           - v1-dependencies-
 
       - run: yarn install
+      - run: yarn build
       - run: sudo apt install mesa-utils --yes
       - run: "export DISPLAY=:99.0"
       - run: glxinfo | grep "OpenGL version"
