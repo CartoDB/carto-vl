@@ -10,11 +10,12 @@ let uid = 0;
 // TODO This needs to be separated by each mgl map to support multi map pages
 let integrator = null;
 export default function getMGLIntegrator(map) {
-    if (integrator) {
-        return integrator;
+    if (!integrator) {
+        integrator = new MGLIntegrator(map);
     }
-    return integrator ? integrator : new MGLIntegrator(map);
+    return integrator;
 }
+
 
 /**
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
@@ -23,7 +24,7 @@ class MGLIntegrator {
     constructor(map) {
         this.renderer = new R.Renderer();
         this.map = map;
-        this.invalidateMGLWebGLState = null;
+        this.invalidateWebGLState = null;
 
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
@@ -45,8 +46,8 @@ class MGLIntegrator {
         this._registerMoveObserver(callbackID, moveCallback);
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (!this.invalidateMGLWebGLState) {
-                this.invalidateMGLWebGLState = invalidate;
+            if (!this.invalidateWebGLState) {
+                this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
             }

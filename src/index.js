@@ -15,6 +15,8 @@ import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 
+import SimpleMap from './api/map/simple-map';
+
 // Namespaces
 const style = { expressions };
 const source = { Dataset, SQL };
@@ -25,5 +27,6 @@ export {
     setDefaultAuth,
     setDefaultConfig,
     style,
-    Style
+    Style,
+    SimpleMap
 };
