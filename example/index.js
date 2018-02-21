@@ -210,6 +210,7 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
+        layer.setStyle(new carto.Style());
         layer.setSource(new carto.source.Dataset(
             $('#dataset').val(),
             {
