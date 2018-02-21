@@ -26,9 +26,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
+      - run: yarn install
+      - run: yarn build
+      - run: sudo apt install mesa-utils --yes
+
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: yarn test
-      - run: DISPLAY=:98 yarn test:acceptance
+      - run: xvfb-run -a yarn test:acceptance
