@@ -13,6 +13,11 @@ jobs:
 
     steps:
       - checkout
+      - run: yarn install
+      - run: yarn build
+      - run: sudo apt install mesa-utils --yes
+      - run: glxinfo | grep "OpenGL version"
+      - run: Xvfb :98 &
 
       # Download and cache dependencies
       - restore_cache:
@@ -24,7 +29,6 @@ jobs:
       - run: yarn install
       - run: yarn build
       - run: sudo apt install mesa-utils --yes
-      - run: glxinfo | grep "OpenGL version"
 
       - save_cache:
           paths:
