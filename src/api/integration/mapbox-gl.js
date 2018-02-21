@@ -10,10 +10,10 @@ let uid = 0;
 // TODO This needs to be separated by each mgl map to support multi map pages
 let integrator = null;
 export default function getMGLIntegrator(map) {
-    if (integrator) {
-        return integrator;
+    if (!integrator) {
+        integrator = new MGLIntegrator(map);
     }
-    return integrator ? integrator : new MGLIntegrator(map);
+    return integrator;
 }
 
 /**

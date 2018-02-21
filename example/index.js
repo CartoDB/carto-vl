@@ -108,7 +108,7 @@ const style = new carto.Style();
 const layer = new carto.Layer('myCartoLayer', source, style);
 layer.addTo(map, 'watername_ocean');
 
-setInterval(()=>{
+setInterval(() => {
     document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
 }, 500)
 
@@ -288,6 +288,13 @@ Object.keys(BASEMAPS).forEach(id => {
     i.value = id;
     i.onclick = () => {
         map.setStyle(BASEMAPS[id]);
+        let added = false;
+        map.on('sourcedata', event => {
+            if (map.isStyleLoaded() && !added) {
+                layer.addTo(map, 'watername_ocean');
+                added = true;
+            }
+        });
     };
     i.selected = 'selected';
     l.appendChild(i);
