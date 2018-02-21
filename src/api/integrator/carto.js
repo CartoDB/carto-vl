@@ -18,6 +18,6 @@ class CartoMapIntegrator {
     addLayer(layerId, moveCallback, paintCallback) {
         moveCallback();
         this.renderer._initGL(this.map._gl);
-        this.map.addLayer(paintCallback);
+        this.map.addLayer(layerId, paintCallback);
     }
 }

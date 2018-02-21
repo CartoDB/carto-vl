@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 
 export default class Map {
 
@@ -13,7 +15,7 @@ export default class Map {
             }
         }
 
-        this._paintCallback = null;
+        this._paintCallbacks = {};
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
@@ -21,11 +23,11 @@ export default class Map {
         // Repaint: true
         setInterval(() => {
             this.update();
-        }, 100);
+        }, 10);
     }
 
-    addLayer(paintCallback) {
-        this._paintCallback = paintCallback;
+    addLayer(layerId, paintCallback) {
+        this._paintCallbacks[layerId] = paintCallback;
     }
 
     update() {
@@ -36,9 +38,11 @@ export default class Map {
         this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
         this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 
-        if (this._paintCallback) {
-            this._paintCallback();
-        }
+        _.forOwn(this._paintCallbacks, function(callback) {
+            if (callback) {
+                callback();
+            }
+        });
     }
 
     _createCanvas() {
