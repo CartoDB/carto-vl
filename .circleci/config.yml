@@ -2,32 +2,33 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-
-defaults: &defaults
-  docker:
-      # specify the version you desire here
-      - image: circleci/node:8-browsers
-  working_directory: ~/cartogl
-
 version: 2
 jobs:
   lint:
-    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8-browsers
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
       - run: yarn lint
   test-unit:
-    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8-browsers
+    working_directory: ~/repo
     steps:
       - checkout
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
       - run: yarn test:unit
@@ -36,13 +37,17 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
   test-acceptance:
-    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8-browsers
+    working_directory: ~/repo
     steps:
       - checkout
       - run: Xvfb :98 & 
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
       - run: yarn build
