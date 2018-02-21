@@ -6,9 +6,9 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 
 const REFERENCES_FOLDER = 'references';
-const DELAY = 5000;
+const DELAY = 3500;
 // Headless chrome with GPU only works with linux
-const HEADLESS = false;//(process.platform === 'linux');
+const HEADLESS = (process.platform === 'linux');
 const references = _flatten(_getReferences(REFERENCES_FOLDER));
 
 
