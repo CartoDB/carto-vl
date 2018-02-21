@@ -30,7 +30,4 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      # - run: yarn test
-      # - run: Xvfb :98 &
-      # - run: "export DISPLAY=:98"
-      - run: yarn test:acceptance
+      - run: xvfb-run yarn test:acceptance
