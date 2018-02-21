@@ -13,6 +13,11 @@ jobs:
 
     steps:
       - checkout
+      - run: yarn install
+      - run: yarn build
+      - run: sudo apt install mesa-utils --yes
+      - run: glxinfo | grep "OpenGL version"
+      - run: Xvfb :98 &
 
       # Download and cache dependencies
       - restore_cache:
@@ -21,16 +26,9 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn install
-      - run: yarn build
-      - run: sudo apt install mesa-utils --yes
-      - run: "export DISPLAY=:99.0"
-      - run: glxinfo | grep "OpenGL version"
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-
       - run: yarn test
-      - run: yarn test:acceptance
+      - run: DISPLAY=:98 yarn test:acceptance
