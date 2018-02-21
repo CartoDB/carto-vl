@@ -1,5 +1,5 @@
 
-export default class SimpleMap {
+export default class Map {
 
     constructor(options) {
         options = options || {};
@@ -11,17 +11,12 @@ export default class SimpleMap {
             } else {
                 this._container = container;
             }
-        } else if (options.container instanceof HTMLElement) {
-            this._container = options.container;
-        } else {
-            throw new Error('Invalid type: \'container\' must be a String or HTMLElement.');
         }
 
+        this._paintCallback = null;
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
-
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
-        this._paintCallback = null;
 
         // Repaint: true
         setInterval(() => {
@@ -38,7 +33,6 @@ export default class SimpleMap {
         this._resizeCanvas(width, height);
 
         // Draw background
-        this._gl.viewport(0, 0, this._gl.drawingBufferWidth, this._gl.drawingBufferHeight);
         this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
         this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 

@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 
 import SourceBase from './source/base';
 import Style from './style';
-import SimpleMap from './map/simple-map';
-import getSMIntegrator from './integrator/simple';
+import CartoMap from './map';
+import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 
@@ -119,19 +119,17 @@ export default class Layer {
      * @api
      */
     addTo(map, beforeLayerID) {
-        if (this._isSimpleMap(map)) {
-            this._addToSimpleMap(map);
-        }
-        else if (this._isMGLMap(map)) {
+        if (this._isCartoMap(map)) {
+            this._addToCartoMap(map);
+        } else if (this._isMGLMap(map)) {
             this._addToMGLMap(map, beforeLayerID);
-        }
-        else {
+        } else {
             throw new CartoValidationError('layer', 'nonValidMap');
         }
     }
 
-    _isSimpleMap(map) {
-        return map instanceof SimpleMap;
+    _isCartoMap(map) {
+        return map instanceof CartoMap;
     }
 
     _isMGLMap() {
@@ -139,8 +137,8 @@ export default class Layer {
         return true;
     }
 
-    _addToSimpleMap(map) {
-        this._integrator = getSMIntegrator(map);
+    _addToCartoMap(map) {
+        this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this._id, this._moveCallback, this._paintCallback);
     }
 

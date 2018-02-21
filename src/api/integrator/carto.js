@@ -1,14 +1,14 @@
 import * as R from '../../core/renderer';
 
 let integrator = null;
-export default function getSMIntegrator(map) {
+export default function getCartoMapIntegrator(map) {
     if (!integrator) {
-        integrator = new SimpleMapIntegrator(map);
+        integrator = new CartoMapIntegrator(map);
     }
     return integrator;
 }
 
-class SimpleMapIntegrator {
+class CartoMapIntegrator {
     constructor(map) {
         this.map = map;
         this.renderer = new R.Renderer();

@@ -14,8 +14,7 @@ import SQL from './api/source/sql';
 import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
-
-import SimpleMap from './api/map/simple-map';
+import Map from './api/map';
 
 // Namespaces
 const style = { expressions };
@@ -28,5 +27,5 @@ export {
     setDefaultConfig,
     style,
     Style,
-    SimpleMap
+    Map
 };
