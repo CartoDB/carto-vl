@@ -4,13 +4,8 @@
         <title>Single layer | CARTO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
-        <script src="../hide-attribution.js"></script>
         <!-- Include CARTO GL JS -->
         <script src="../../dist/carto-gl.js"></script>
-        <!-- Include Mapbox GL JS -->
-        <script src="../../vendor/mapbox-gl-dev.js"></script>
-        <!-- Include Mapbox GL CSS -->
-        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
         <style>
             body { margin: 0; padding: 0; }
             #map { position: absolute; height: 100%; width: 100%; }
@@ -20,24 +15,19 @@
         <div id='map'></div>
     </body>
     <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-            center: [2.17, 41.38],
-            zoom: 0,
+        const map = new carto.Map({
+            container: 'map'
         });
 
-        const auth = {
+        carto.setDefaultAuth({
             user: 'dmanzanares',
             apiKey: 'YOUR_API_KEY'
-        };
+        });
 
-        carto.setDefaultAuth(auth);
-
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
+        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
         const style = new carto.Style();
         const layer = new carto.Layer('myCartoLayer', source, style);
 
-        layer.addTo(map, 'watername_ocean');
+        layer.addTo(map);
     </script>
 </html>

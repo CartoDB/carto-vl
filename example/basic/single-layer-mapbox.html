@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Multi layer | CARTO</title>
+        <title>Single layer | CARTO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
-        <script src="../hide-attribution.js"></script>
         <!-- Include CARTO GL JS -->
         <script src="../../dist/carto-gl.js"></script>
         <!-- Include Mapbox GL JS -->
@@ -24,24 +23,18 @@
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
             center: [2.17, 41.38],
-            zoom: 0,
+            zoom: 0
         });
 
-        const auth = {
+        carto.setDefaultAuth({
             user: 'dmanzanares',
             apiKey: 'YOUR_API_KEY'
-        };
+        });
 
-        const source0 = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-        const style0 = new carto.Style();
-        const layer0 = new carto.Layer('layer0', source0, style0);
+        const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
+        const style = new carto.Style();
+        const layer = new carto.Layer('myCartoLayer', source, style);
 
-        layer0.addTo(map, 'watername_ocean');
-
-        const source1 = new carto.source.SQL('SELECT * FROM world_borders', auth);
-        const style1 = new carto.Style();
-        const layer1 = new carto.Layer('layer1', source1, style1);
-
-        layer1.addTo(map, 'watername_ocean');
+        layer.addTo(map, 'watername_ocean');
     </script>
 </html>
