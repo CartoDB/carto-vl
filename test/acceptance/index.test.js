@@ -25,7 +25,7 @@ function test({ folder, file }) {
         const output = path.resolve(__dirname, `./${REFERENCES_FOLDER}/${folder}/${file}_out.png`);
         const filepath = path.resolve(__dirname, `./test-cases/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.2, headless: HEADLESS })).to.eventually.be.true;
+        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.25, headless: HEADLESS })).to.eventually.be.true;
     });
 }
 
