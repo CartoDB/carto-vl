@@ -30,4 +30,4 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: xvfb-run yarn test:acceptance
+      - run: xvfb-run -a yarn test:acceptance
