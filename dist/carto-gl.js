@@ -194,6 +194,15 @@ class Expression {
         blender.notify();
     }
 
+    blendFrom(final, duration = 500, interpolator = null) {
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(final);
+        const parent = this.parent;
+        const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
+        this._metaBindings.map(m => blender._bind(m));
+        parent._replaceChild(this, blender);
+        blender.notify();
+    }
+
     /**
      * @returns a list with the expression children
      */
@@ -239,6 +248,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_aggregation__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_interpolators__ = __webpack_require__(11);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_22__expressions_interpolators__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_viewportAggregation__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ordering__ = __webpack_require__(45);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
@@ -295,6 +305,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 // Interpolators
+
+
+
 
 
 
@@ -468,6 +481,7 @@ const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions
 
 const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_viewportAggregation__["e" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
+
 
 
 
@@ -18048,6 +18062,38 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 class ILinear extends genInterpolator(inner => inner) { }
 /* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
 
+class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
+    `
+    #ifndef BOUNCE_EASE_IN
+    #define BOUNCE_EASE_IN
+    float BounceEaseIn_BounceEaseOut(float p)
+    {
+        if(p < 4./11.0)
+        {
+            return (121. * p * p)/16.0;
+        }
+        else if(p < 8./11.0)
+        {
+            return (363./40.0 * p * p) - (99./10.0 * p) + 17./5.0;
+        }
+        else if(p < 9./10.0)
+        {
+            return (4356./361.0 * p * p) - (35442./1805.0 * p) + 16061./1805.0;
+        }
+        else
+        {
+            return (54./5.0 * p * p) - (513./25.0 * p) + 268./25.0;
+        }
+    }
+    float BounceEaseIn(float p)
+    {
+        return 1. - BounceEaseOut(1. - p);
+    }
+    #endif
+
+`) { }
+/* unused harmony export BounceEaseIn */
+
 class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
@@ -18068,11 +18114,10 @@ class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
 
 // Interpolators
 function genInterpolator(inlineMaker, preface) {
-    return class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+    const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(m) {
             m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
             super({ m: m });
-            this.isInterpolator = true; //TODO remove this hack
         }
         _compile(meta) {
             super._compile(meta);
@@ -18083,6 +18128,8 @@ function genInterpolator(inlineMaker, preface) {
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
     };
+    fn.type = 'interpolator';
+    return fn;
 
 }
 
@@ -22302,7 +22349,7 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
         a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(a);
         b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(b);
         mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(mix);
-        if (interpolator && interpolator.isInterpolator) {
+        if (interpolator) {
             mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });
@@ -22631,6 +22678,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
         super({ input, min, max });
     }
     _compile(metadata) {
+        this.type = 'float';
         super._compile(metadata);
         this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
     }
@@ -24245,6 +24293,7 @@ varying lowp vec4 color;
 
 void main(void) {
     color = texture2D(colorTex, featureID);
+    color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normal*0.001*size-vertexOffset, 0.5, 1.);
@@ -28118,6 +28167,8 @@ const validation = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__integration_mapbox_gl__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_functions__ = __webpack_require__(1);
+
 
 
 
@@ -28206,6 +28257,29 @@ class Layer {
     setStyle(style) {
         this._checkStyle(style);
         if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+        // Force style changed event
+        this._styleChanged();
+    }
+
+    /**
+     * Blend the current style with another style
+     *
+     * @param {carto.Style} style - style to blend to
+     *
+     * @memberof carto.Layer
+     * @api
+     */
+    blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_5__core_style_functions__["cubic"]) {
+        this._checkStyle(style);
+        if (this._style) {
+            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
+            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
+            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
+            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
             this._style.onChange(null);
         }
         this._style = style;
