@@ -8,6 +8,7 @@ export default class Linear extends Expression {
         super({ input, min, max });
     }
     _compile(metadata) {
+        this.type = 'float';
         super._compile(metadata);
         this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
     }

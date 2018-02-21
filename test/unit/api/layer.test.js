@@ -4,7 +4,7 @@ import Layer from '../../../src/api/layer';
 
 describe('api/layer', () => {
     let source;
-    let style;
+    let style, style2;
 
     beforeEach(function () {
         source = new Dataset('ne_10m_populated_places_simple', {
@@ -12,6 +12,7 @@ describe('api/layer', () => {
             apiKey: '1234567890'
         });
         style = new Style();
+        style2 = new Style();
     });
 
     describe('constructor', () => {
@@ -59,6 +60,24 @@ describe('api/layer', () => {
 
     describe('.setStyle', () => {
 
+    });
+
+    describe('.blendToStyle', () => {
+        it('should not throw an error if a valid style is passed', () => {
+            const layer = new Layer('layer0', source, style);
+            expect(function () {
+                layer.blendToStyle(style2);
+            }).not.toThrow();
+        });
+        it('should throw an error if style is not valid', function () {
+            const layer = new Layer('layer0', source, style);
+            expect(function () {
+                layer.blendToStyle();
+            }).toThrowError('`style` property required.');
+            expect(function () {
+                layer.blendToStyle(2);
+            }).toThrowError('The given object is not a valid style. See "carto.Style".');
+        });
     });
 
     describe('.addTo', () => {
