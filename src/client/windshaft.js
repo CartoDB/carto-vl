@@ -56,6 +56,7 @@ export default class Windshaft {
     _getData(viewport, MNS, resolution) {
         if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution) {
             const promise = this.inProgressInstantiations[JSON.stringify({ MNS, resolution })];
+            // Only instantiate if the same map is not being resintantiated now
             if (!promise) {
                 const p = this._instantiate(MNS, resolution);
                 this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
@@ -160,18 +161,6 @@ export default class Windshaft {
                 reject(err);
             });
         });
-        /*
-        return (async () => {
-            try {
-                const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
-                const metadata = await this.metadataPromise;
-                this.url = await urlPromise;
-                return metadata;
-            } catch (err) {
-                console.warn(err);
-                throw new Error('Invalid source' + errID++);
-            }
-        })();*/
     }
 
     free() {

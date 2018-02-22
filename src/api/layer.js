@@ -193,7 +193,7 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    initCallback(){
+    initCallback() {
         this._styleChanged(this._style);
         this.requestData();
     }
@@ -216,10 +216,11 @@ export default class Layer {
         }
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
-            const metadata = this.metadata;
-            recompile(metadata);
+            // The previous stored metadata is still valid
+            recompile(this.metadata);
             return Promise.resolve(undefined);
         }
+        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
             this.metadata = metadata;
             recompile(metadata);
