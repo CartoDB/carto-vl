@@ -1,8 +1,18 @@
-import * as _ from 'lodash';
-
+/**
+ * @description A simple non-interactive map.
+ */
 
 export default class Map {
 
+    /**
+     * Create a simple carto.Map by specifying a container `id`.
+     *
+     * @param  {object} options
+     * @param  {string} options.container The element's string `id`.
+     *
+     * @constructor Map
+     * @memberof carto
+     */
     constructor(options) {
         options = options || {};
 
@@ -15,34 +25,39 @@ export default class Map {
             }
         }
 
-        this._paintCallbacks = {};
+        this._layers = [];
+        this._repaint = true;
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
 
-        // Repaint: true
-        setInterval(() => {
-            this.update();
-        }, 10);
+        this._resizeCanvas(this._containerDimensions());
     }
 
-    addLayer(layerId, paintCallback) {
-        this._paintCallbacks[layerId] = paintCallback;
+    addLayer(layer) {
+        layer.getData();
+        this._layers.push(layer);
+        window.requestAnimationFrame(this.update.bind(this));
     }
 
     update() {
-        const { width, height } = this._containerDimensions();
-        this._resizeCanvas(width, height);
-
         // Draw background
         this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
         this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 
-        _.forOwn(this._paintCallbacks, function(callback) {
-            if (callback) {
-                callback();
+        let loaded = true;
+        this._layers.forEach((layer) => {
+            const hasData = layer.hasDataframes();
+            if (hasData) {
+                layer.paintCallback();
             }
+            loaded = loaded && hasData;
         });
+
+        // Update until all layers are loaded
+        if (!loaded) {
+            window.requestAnimationFrame(this.update.bind(this));
+        }
     }
 
     _createCanvas() {
@@ -66,13 +81,13 @@ export default class Map {
         return { width, height };
     }
 
-    _resizeCanvas(width, height) {
+    _resizeCanvas(size) {
         const pixelRatio = window.devicePixelRatio || 1;
 
-        this._canvas.width = pixelRatio * width;
-        this._canvas.height = pixelRatio * height;
+        this._canvas.width = pixelRatio * size.width;
+        this._canvas.height = pixelRatio * size.height;
 
-        this._canvas.style.width = `${width}px`;
-        this._canvas.style.height = `${height}px`;
+        this._canvas.style.width = `${size.width}px`;
+        this._canvas.style.height = `${size.height}px`;
     }
 }

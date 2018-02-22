@@ -12,12 +12,11 @@ class CartoMapIntegrator {
     constructor(map) {
         this.map = map;
         this.renderer = new R.Renderer();
+        this.renderer._initGL(this.map._gl);
         this.invalidateWebGLState = () => {};
     }
 
-    addLayer(layerId, moveCallback, paintCallback) {
-        moveCallback();
-        this.renderer._initGL(this.map._gl);
-        this.map.addLayer(layerId, paintCallback);
+    addLayer(layerId, layer) {
+        this.map.addLayer(layerId, layer);
     }
 }

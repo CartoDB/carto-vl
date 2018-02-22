@@ -41,14 +41,13 @@ export default class Layer {
         this._integrator = null;
         this._dataframes = [];
 
-        this._id = id;
+        this.id = id;
         this.setSource(source);
         this.setStyle(style);
 
         console.log('L', this);
 
-        this._moveCallback = this._getData.bind(this);
-        this._paintCallback = () => {
+        this.paintCallback = () => {
             this._dataframes.map(
                 dataframe => {
                     dataframe.setStyle(this._style);
@@ -127,6 +126,10 @@ export default class Layer {
             throw new CartoValidationError('layer', 'nonValidMap');
         }
     }
+    
+    hasDataframes() {
+        return this._dataframes.length > 0;
+    }
 
     _isCartoMap(map) {
         return map instanceof CartoMap;
@@ -139,13 +142,13 @@ export default class Layer {
 
     _addToCartoMap(map) {
         this._integrator = getCMIntegrator(map);
-        this._integrator.addLayer(this._id, this._moveCallback, this._paintCallback);
+        this._integrator.addLayer(this);
     }
 
     _addToMGLMap(map, beforeLayerID) {
         map.on('load', () => {
             this._integrator = getMGLIntegrator(map);
-            this._integrator.addLayer(this._id, beforeLayerID, this._moveCallback, this._paintCallback);
+            this._integrator.addLayer(this, beforeLayerID);
         });
     }
 
@@ -153,7 +156,7 @@ export default class Layer {
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return;
         }
-        this._getData();
+        this.getData();
         const originalPromise = this.metadataPromise;
         this.metadataPromise.then(metadata => {
             // We should only compile the shaders if the metadata came from the original promise
@@ -204,7 +207,7 @@ export default class Layer {
         throw new Error('?');
     }
 
-    _getData() {
+    getData() {
         if (!this._integrator.invalidateWebGLState) {
             return;
         }

@@ -41,24 +41,24 @@ class MGLIntegrator {
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
-    addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
+    addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
-        this._registerMoveObserver(callbackID, moveCallback);
+        this._registerMoveObserver(callbackID, layer.getData.bind(layer));
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
-        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
+        this.map.setCustomWebGLDrawCallback(layer.id, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
             }
-            paintCallback();
+            layer.paintCallback();
             invalidate();
         });
         this.map.addLayer({
-            id: layerId,
+            id: layer.id,
             type: 'custom-webgl'
         }, beforeLayerID);
-        this._layers.push(layerId);
+        this._layers.push(layer.id);
         this.move();
     }
     needRefresh() {
