@@ -147,7 +147,10 @@ export default class Style {
     }
 
     isAnimated() {
-        return this.getColor().isAnimated() || this.getWidth().isAnimated();
+        return this.getColor().isAnimated() ||
+               this.getWidth().isAnimated() ||
+               this.getStrokeColor().isAnimated() ||
+               this.getStrokeWidth().isAnimated();
     }
 
     // REVIEW THIS vv
