@@ -211,7 +211,7 @@ export default class Layer {
             style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
             style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
         };
-        if (!(this._integrator && this._integrator.invalidateMGLWebGLState)) {
+        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return Promise.resolve(undefined);
         }
         const originalPromise = this.requestData(style);
@@ -266,7 +266,7 @@ export default class Layer {
 
     requestData(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateMGLWebGLState) {
+        if (!this._integrator.invalidateWebGLState) {
             return;
         }
         const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
