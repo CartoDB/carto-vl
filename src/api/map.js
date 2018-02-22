@@ -24,6 +24,7 @@ export default class Map {
                 this._container = container;
             }
         }
+        this._background = options.background || '';
 
         this._layers = [];
         this._repaint = true;
@@ -49,9 +50,7 @@ export default class Map {
     }
 
     update() {
-        // Draw background
-        // this._gl.clearColor(0, 0, 0, 1.0);
-        // this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+        this._drawBackground(this._background);
 
         let loaded = true;
         let animated = false;
@@ -68,6 +67,29 @@ export default class Map {
         // Update until all layers are loaded or there is an animation
         if (!loaded || animated) {
             window.requestAnimationFrame(this.update.bind(this));
+        }
+    }
+
+    _drawBackground(color) {
+        switch (color) {
+        case 'black':
+            this._gl.clearColor(0, 0, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'red':
+            this._gl.clearColor(1, 0, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'green':
+            this._gl.clearColor(0, 1, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'blue':
+            this._gl.clearColor(0, 0, 1, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        default:
+            // white
         }
     }
 
