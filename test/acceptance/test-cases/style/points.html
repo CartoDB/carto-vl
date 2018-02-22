@@ -11,16 +11,8 @@
     <!-- Include Mapbox GL CSS -->
     <link href='../mapbox-gl-v0.42.2.css' rel='stylesheet' />
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; height: 100%; width: 100%; }
     </style>
 </head>
 
@@ -31,8 +23,8 @@
     const map = new mapboxgl.Map({
         container: 'map',
         style: { "version": 8, "sources": {}, "layers": [] },
-        center: [-20.061035156250004, 33.211116472416855],
-        zoom: 4,
+        center: [-20, 33],
+        zoom: 2
     });
 
     const auth = {

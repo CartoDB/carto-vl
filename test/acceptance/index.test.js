@@ -7,6 +7,9 @@ const expect = chai.expect;
 
 const REFERENCES_FOLDER = 'references';
 const DELAY = 4000;
+const WIDTH = 400;
+const HEIGHT = 300;
+const THRESHOLD = 0.1;
 // Headless chrome with GPU only works with linux
 const HEADLESS = (process.platform === 'linux');
 const references = _flatten(_getReferences(REFERENCES_FOLDER));
@@ -25,7 +28,17 @@ function test({ folder, file }) {
         const output = path.resolve(__dirname, `./${REFERENCES_FOLDER}/${folder}/${file}_out.png`);
         const filepath = path.resolve(__dirname, `./test-cases/${folder}/${file}.html`);
         const URL = `file://${filepath}`;
-        return expect(exquisite.test({ input, output, url: URL, delay: DELAY, threshold: 0.1, headless: HEADLESS })).to.eventually.be.true;
+        const options = {
+            input,
+            output,
+            url: URL,
+            delay: DELAY,
+            threshold: THRESHOLD,
+            headless: HEADLESS,
+            viewportWidth: WIDTH,
+            viewportHeight: HEIGHT
+        };
+        return expect(exquisite.test(options)).to.eventually.be.true;
     });
 }
 
