@@ -12,7 +12,6 @@ import { VectorTile } from '@mapbox/vector-tile';
 // Requrest SQL API (temp)
 // Cache dataframe
 
-var errID = 0;
 export default class Windshaft {
 
     constructor(source) {
@@ -407,7 +406,6 @@ async function getColumnTypes(query, conf) {
 }
 
 async function getGeometryType(query, conf) {
-    console.log('QUERY', query);
     const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
     const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
     const json = await response.json();
