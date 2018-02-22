@@ -167,6 +167,35 @@ class Renderer {
         return texture;
     }
 
+    _genDataframePropertyTextures(dataframe){
+        const gl = this.gl;
+        const width = RTT_WIDTH;
+        const height = Math.ceil(dataframe.numFeatures / width);
+
+        dataframe.height = height;
+        dataframe.propertyID = {}; //Name => PID
+        dataframe.propertyCount = 0;
+        dataframe.renderer = this;
+        for (var k in dataframe.properties) {
+            if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
+                var propertyID = dataframe.propertyID[k];
+                if (propertyID === undefined) {
+                    propertyID = dataframe.propertyCount;
+                    dataframe.propertyCount++;
+                    dataframe.propertyID[k] = propertyID;
+                }
+                dataframe.propertyTex[propertyID] = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, height, 0, gl.ALPHA, gl.FLOAT,
+                    dataframe.properties[k]);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            }
+        }
+    }
 
     /**
      * @description Adds a new dataframe to the renderer.
@@ -182,38 +211,15 @@ class Renderer {
         this.dataframes.push(dataframe);
         dataframe.propertyTex = [];
 
-        const level = 0;
-        const width = RTT_WIDTH;
         const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
         var points = decodedGeom.geometry;
         dataframe.numVertex = points.length / 2;
         dataframe.breakpointList = decodedGeom.breakpointList;
-
         dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
+        this._genDataframePropertyTextures(dataframe);
+
+        const width = RTT_WIDTH;
         const height = Math.ceil(dataframe.numFeatures / width);
-        dataframe.height = height;
-        dataframe.propertyID = {}; //Name => PID
-        dataframe.propertyCount = 0;
-        dataframe.renderer = this;
-        for (var k in dataframe.properties) {
-            if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
-                var propertyID = dataframe.propertyID[k];
-                if (propertyID === undefined) {
-                    propertyID = dataframe.propertyCount;
-                    dataframe.propertyCount++;
-                    dataframe.propertyID[k] = propertyID;
-                }
-                dataframe.propertyTex[propertyID] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
-                gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-                    width, height, 0, gl.ALPHA, gl.FLOAT,
-                    dataframe.properties[k]);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-        }
 
         dataframe.setStyle = (style) => {
             dataframe.style = style;
