@@ -34,10 +34,11 @@
 
         const source = new carto.source.BQ('ne_10m_populated_places_simple', auth);
         const s = carto.style.expressions;
-        const style = new carto.Style({
-            color: s.rgba(1,0,0, 1),
-            width: s.float(20)
-        });
+
+        const style = new carto.Style(`
+          width: greaterThan($feature_count,300)*(0.0005*zoom()+2)
+          color: ramp($feature_count/5000, sunset)
+        `);
         const layer = new carto.Layer('myCartoLayer', source, style);
 
         layer.addTo(map, 'watername_ocean');

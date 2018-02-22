@@ -1,0 +1,18 @@
+{
+  "name": "bq_server",
+  "version": "0.0.0",
+  "description": "BigQuery test server",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@google-cloud/bigquery": "1.0.0",
+    "@google-cloud/storage": "1.5.1",
+    "yargs": "10.0.3"
+  },
+  "devDependencies": {
+  },
+  "main": "bq_server.js",
+  "scripts": {
+    "server": "node bq_server.js",
+    "test": "node test.js"
+  }
+}
