@@ -29,7 +29,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "eslint": "^4.15.0",
-    "exquisite-sst": "IagoLast/Exquisite#master",
+    "exquisite-sst": "CartoDB/Exquisite#node-6",
     "jasmine-core": "^2.99.1",
     "jsdoc": "^3.5.5",
     "karma": "^2.0.0",

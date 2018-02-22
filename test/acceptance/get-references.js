@@ -23,8 +23,9 @@ function getReferences(folder) {
     files.forEach(file => {
         const filepath = path.resolve(__dirname, `./test-cases/${folder}/${file}`);
         if (file.endsWith('.html') && !BLACKLIST_FILES.includes(file)) {
-            console.log(`Taking reference from ${file}`);
-            execSync(`$(npm bin)/exquisite-sst ${HEADLESS_FLAG} --reference --url file://${filepath} --output ${OUTPUT_DIR}/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
+            process.stdout.write(`Taking reference from ${file} `);
+            const stdout = execSync(`$(npm bin)/exquisite-sst ${HEADLESS_FLAG} --reference --url file://${filepath} --output ${OUTPUT_DIR}/${folder}/${file.replace('.html', '.png')} --delay ${DELAY}`);
+            process.stdout.write(stdout.toString());
         }
     });
 }
