@@ -121,9 +121,9 @@ function parseNode(node) {
     } else if (node.type == 'BinaryExpression') {
         return parseBinaryOperation(node);
     } else if (node.type == 'UnaryExpression') {
-        parseUnaryOperation(node);
+        return parseUnaryOperation(node);
     } else if (node.type == 'Identifier') {
-        parseIdentifier(node);
+        return parseIdentifier(node);
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
