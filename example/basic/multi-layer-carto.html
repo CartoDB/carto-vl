@@ -26,16 +26,16 @@
 
         const source0 = new carto.source.Dataset('ne_10m_populated_places_simple');
         const style0 = new carto.Style(`
-          color: rgba(0,0,0,1)
+          color: rgba(1,0,0,0.5)
         `);
         const layer0 = new carto.Layer('layer0', source0, style0);
 
         layer0.addTo(map);
-  
+
         const source1 = new carto.source.SQL('SELECT * FROM world_borders');
         const style1 = new carto.Style();
         const layer1 = new carto.Layer('layer1', source1, style1);
 
-        layer1.addTo(map);
+        layer1.addTo(map, 'layer0');
     </script>
 </html>

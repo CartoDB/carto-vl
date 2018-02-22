@@ -119,7 +119,7 @@ export default class Layer {
      */
     addTo(map, beforeLayerID) {
         if (this._isCartoMap(map)) {
-            this._addToCartoMap(map);
+            this._addToCartoMap(map, beforeLayerID);
         } else if (this._isMGLMap(map)) {
             this._addToMGLMap(map, beforeLayerID);
         } else {
@@ -140,9 +140,9 @@ export default class Layer {
         return true;
     }
 
-    _addToCartoMap(map) {
+    _addToCartoMap(map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
-        this._integrator.addLayer(this);
+        this._integrator.addLayer(this, beforeLayerID);
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -156,7 +156,7 @@ export default class Layer {
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return;
         }
-        this.getData();
+        this.requestData();
         const originalPromise = this.metadataPromise;
         this.metadataPromise.then(metadata => {
             // We should only compile the shaders if the metadata came from the original promise
@@ -207,7 +207,7 @@ export default class Layer {
         throw new Error('?');
     }
 
-    getData() {
+    requestData() {
         if (!this._integrator.invalidateWebGLState) {
             return;
         }

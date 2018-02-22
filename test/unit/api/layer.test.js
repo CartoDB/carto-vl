@@ -17,7 +17,7 @@ describe('api/layer', () => {
     describe('constructor', () => {
         it('should build a new Layer with (id, source, style)', () => {
             const layer = new Layer('layer0', source, style);
-            expect(layer._id).toEqual('layer0');
+            expect(layer.id).toEqual('layer0');
             expect(layer._source).toEqual(source);
             expect(layer._style).toEqual(style);
         });

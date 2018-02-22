@@ -34,16 +34,24 @@ export default class Map {
         this._resizeCanvas(this._containerDimensions());
     }
 
-    addLayer(layer) {
-        layer.getData();
-        this._layers.push(layer);
+    addLayer(layer, beforeLayerID) {
+        layer.requestData();
+
+        let index;
+        for (index = 0; index < this._layers.length; index++) {
+            if (this._layers[index].id === beforeLayerID) {
+                break;
+            }
+        }
+        this._layers.splice(index, 0, layer);
+
         window.requestAnimationFrame(this.update.bind(this));
     }
 
     update() {
         // Draw background
-        this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
-        this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+        // this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
+        // this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 
         let loaded = true;
         this._layers.forEach((layer) => {
