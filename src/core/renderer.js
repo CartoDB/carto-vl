@@ -108,7 +108,6 @@ Renderer.prototype.getCenter = function () {
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
-    this._RAF();
 };
 /**
  * Get Renderer visualization bounds
@@ -133,7 +132,6 @@ Renderer.prototype.getZoom = function () {
  */
 Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
-    this._RAF();
 };
 
 /**
@@ -340,7 +338,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        this._RAF();
     };
     dataframe.style = null;
 
@@ -373,13 +370,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
-
-    this._RAF();
     return dataframe;
-};
-
-Renderer.prototype._RAF = function () {
-    //window.requestAnimationFrame(this.refresh.bind(this));
 };
 
 Renderer.prototype.getAspect = function () {
@@ -715,11 +706,6 @@ Renderer.prototype.refresh = function (timestamp) {
     this.computePool.map(job => job.work(this));
     this.computePool = [];
 
-    tiles.forEach(t => {
-        if (t.style.isAnimated()) {
-            this._RAF();
-        }
-    });
     gl.disable(gl.CULL_FACE);
 };
 
