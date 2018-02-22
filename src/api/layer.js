@@ -87,14 +87,12 @@ export default class Layer {
      */
     setStyle(style) {
         this._checkStyle(style);
-        if (this._style) {
-            this._style.onChange(null);
-        }
-        // Force style changed event
         return this._styleChanged(style).then(r => {
             console.log('success set', r);
+            if (this._style) {
+                this._style.onChange(null);
+            }
             this._style = style;
-            this._style.onChange(null);
             this._style.onChange(() => {
                 this._styleChanged(style);
             });
@@ -112,7 +110,6 @@ export default class Layer {
      */
     blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
-        // Force style changed event
         if (this._style) {
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
@@ -122,9 +119,10 @@ export default class Layer {
 
         return this._styleChanged(style).then(r => {
             console.log('success blend', r);
-
+            if (this._style) {
+                this._style.onChange(null);
+            }
             this._style = style;
-            this._style.onChange(null);
             this._style.onChange(() => {
                 this._styleChanged(style);
             });
@@ -177,26 +175,24 @@ export default class Layer {
     }
 
     _styleChanged(style) {
+        const recompile = (metadata) => {
+            style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+        };
         if (!(this._mglIntegrator && this._mglIntegrator.invalidateMGLWebGLState)) {
             return Promise.resolve(undefined);
         }
         const originalPromise = this._getData(style);
         if (!originalPromise) {
             const metadata = this.metadata;
-            style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            recompile(metadata);
             return Promise.resolve(undefined);
         }
         return originalPromise.then(metadata => {
             this.metadata = metadata;
-            // We should only compile the shaders if the metadata came from the original promise
-            // if not, we would be compiling with a stale metadata
-            style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            recompile(metadata);
         });
     }
 
