@@ -39,7 +39,7 @@ export default class Map {
 
         let index;
         for (index = 0; index < this._layers.length; index++) {
-            if (this._layers[index].id === beforeLayerID) {
+            if (this._layers[index].getId() === beforeLayerID) {
                 break;
             }
         }
@@ -50,20 +50,23 @@ export default class Map {
 
     update() {
         // Draw background
-        // this._gl.clearColor(0.5, 0.5, 0.5, 1.0);
+        // this._gl.clearColor(0, 0, 0, 1.0);
         // this._gl.clear(this._gl.COLOR_BUFFER_BIT);
 
         let loaded = true;
+        let animated = false;
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
-            if (hasData) {
+            const hasAnimation = layer.getStyle().isAnimated();
+            if (hasData || hasAnimation) {
                 layer.paintCallback();
             }
             loaded = loaded && hasData;
+            animated = animated || hasAnimation;
         });
 
-        // Update until all layers are loaded
-        if (!loaded) {
+        // Update until all layers are loaded or there is an animation
+        if (!loaded || animated) {
             window.requestAnimationFrame(this.update.bind(this));
         }
     }

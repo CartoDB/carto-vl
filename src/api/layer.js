@@ -41,7 +41,7 @@ export default class Layer {
         this._integrator = null;
         this._dataframes = [];
 
-        this.id = id;
+        this._id = id;
         this.setSource(source);
         this.setStyle(style);
 
@@ -129,6 +129,18 @@ export default class Layer {
     
     hasDataframes() {
         return this._dataframes.length > 0;
+    }
+    
+    getId() {
+        return this._id;
+    }
+    
+    getSource() {
+        return this._source;
+    }
+    
+    getStyle() {
+        return this._style;
     }
 
     _isCartoMap(map) {

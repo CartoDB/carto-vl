@@ -146,6 +146,10 @@ export default class Style {
         return this._styleSpec.order;
     }
 
+    isAnimated() {
+        return this.getColor().isAnimated() || this.getWidth().isAnimated();
+    }
+
     // REVIEW THIS vv
 
     onChange(callback) {

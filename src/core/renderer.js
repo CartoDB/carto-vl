@@ -668,7 +668,7 @@ Renderer.prototype.refresh = function (timestamp) {
     this.computePool = [];
 
     tiles.forEach(t => {
-        if (t.style.getColor().isAnimated() || t.style.getWidth().isAnimated()) {
+        if (t.style.isAnimated()) {
             this._RAF();
         }
     });

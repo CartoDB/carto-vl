@@ -43,9 +43,10 @@ class MGLIntegrator {
     }
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
+        const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
-        this.map.setCustomWebGLDrawCallback(layer.id, (gl, invalidate) => {
+        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
@@ -55,10 +56,10 @@ class MGLIntegrator {
             invalidate();
         });
         this.map.addLayer({
-            id: layer.id,
+            id: layerId,
             type: 'custom-webgl'
         }, beforeLayerID);
-        this._layers.push(layer.id);
+        this._layers.push(layerId);
         this.move();
     }
     needRefresh() {

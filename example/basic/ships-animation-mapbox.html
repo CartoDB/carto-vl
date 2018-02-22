@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Multi layer | CARTO</title>
+        <title>Single layer | CARTO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <!-- Include CARTO GL JS -->
@@ -23,25 +23,22 @@
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
             center: [2.17, 41.38],
-            zoom: 0
+            zoom: 0,
         });
 
         carto.setDefaultAuth({
-            user: 'dmanzanares',
+            user: 'cartogl',
             apiKey: 'YOUR_API_KEY'
         });
 
-        const source0 = new carto.source.Dataset('ne_10m_populated_places_simple');
-        const style0 = new carto.Style(`
-          color: rgba(1,0,0,0.8)
-        `);
-        const layer0 = new carto.Layer('layer0', source0, style0);
+        const source = new carto.source.Dataset('wwi');
+        const s = carto.style.expressions;
+        const style = new carto.Style({
+            width:  s.floatMul(s.blend(1,2, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
+            color:  s.opacity(s.ramp(s.linear(s.avg(s.property('temp')), 0,30), s.palettes.tealrose()), s.blend(0.005,1, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic))
+        });
+        const layer = new carto.Layer('myCartoLayer', source, style);
 
-        const source1 = new carto.source.SQL('SELECT * FROM world_borders');
-        const style1 = new carto.Style();
-        const layer1 = new carto.Layer('layer1', source1, style1);
-
-        layer0.addTo(map, 'watername_ocean');
-        layer1.addTo(map, 'layer0');
+        layer.addTo(map, 'watername_ocean');
     </script>
 </html>
