@@ -269,14 +269,13 @@ export default class Layer {
         if (!this._integrator.invalidateMGLWebGLState) {
             return;
         }
-        var r;
-        r = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
+        const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
             style.getResolution());
-        if (r) {
-            r.then(() => {
+        if (promise) {
+            promise.then(() => {
                 this.requestData(style);
             }, err => { console.log(err); });
-            return r;
+            return promise;
         }
     }
 
