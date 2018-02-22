@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <!-- Include CARTO GL JS -->
-        <script src="../hide-attribution.js"></script>
         <script src="../../dist/carto-gl.js"></script>
         <!-- Include Mapbox GL JS -->
         <script src="../../vendor/mapbox-gl-dev.js"></script>
@@ -35,7 +34,7 @@
         const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
         const s = carto.style.expressions;
         const style = new carto.Style({
-            color: s.opacity(s.rgba(1,1,1,1), 0.2)
+            color: s.opacity(s.rgba(0,0,0,1), 0.2)
         });
         const layer = new carto.Layer('myCartoLayer', source, style);
 

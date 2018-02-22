@@ -1,5 +1,6 @@
 *.log
-
+*_out.png
+.DS_Store
 .vscode/
 docs/
 dist/
