@@ -113,7 +113,7 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            layer.setStyle(new carto.Style(v));
+            layer.blendToStyle(new carto.Style(v));
             document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
@@ -210,6 +210,7 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
+        layer.setStyle(new carto.Style());
         layer.setSource(new carto.source.Dataset(
             $('#dataset').val(),
             {
