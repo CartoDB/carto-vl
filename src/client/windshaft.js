@@ -60,7 +60,7 @@ export default class Windshaft {
             if (!promise) {
                 const p = this._instantiate(MNS, resolution);
                 this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
-                console.warn('INS', JSON.stringify(MNS));
+                console.log('Instantiating map:', JSON.stringify(MNS));
                 p.finally(() => {
                     this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = null;
                 }, () => { }).catch(err => console.log(err));
@@ -142,8 +142,6 @@ export default class Windshaft {
         return new Promise((resolve, reject) => {
             this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
                 metadataPromise.then((metadata) => {
-                    console.log(111, metadata.columns.map(c => c.name));
-
                     this._oldDataframes = [];
                     this.cache.reset();
                     this.url = url;
@@ -158,6 +156,7 @@ export default class Windshaft {
                 });
             }).catch(err => {
                 metadataPromise.catch(err => console.log(123, err));
+
                 reject(err);
             });
         });

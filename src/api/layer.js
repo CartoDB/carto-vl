@@ -102,7 +102,6 @@ export default class Layer {
     setStyle(style) {
         this._checkStyle(style);
         return this._styleChanged(style).then(r => {
-            console.log('success set', r);
             if (this._style) {
                 this._style.onChange(null);
             }
@@ -132,7 +131,6 @@ export default class Layer {
         }
 
         return this._styleChanged(style).then(r => {
-            console.log('success blend', r);
             if (this._style) {
                 this._style.onChange(null);
             }
@@ -212,13 +210,13 @@ export default class Layer {
             style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
         };
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve(undefined);
+            return Promise.resolve();
         }
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
             recompile(this.metadata);
-            return Promise.resolve(undefined);
+            return Promise.resolve();
         }
         // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
