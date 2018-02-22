@@ -40,7 +40,7 @@ class MGLIntegrator {
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
-    addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
+    addLayer(layerId, beforeLayerID, moveCallback, paintCallback, initCallback) {
         const callbackID = `_cartoGL_${uid++}`;
         this._registerMoveObserver(callbackID, moveCallback);
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
@@ -49,6 +49,7 @@ class MGLIntegrator {
                 this.invalidateMGLWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
+                initCallback();
             }
             paintCallback();
             invalidate();

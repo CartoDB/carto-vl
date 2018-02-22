@@ -42,6 +42,7 @@ export default class Layer {
         this._dataframes = [];
 
         this._id = id;
+        this.metadata = null;
         this.setSource(source);
         this.setStyle(style);
 
@@ -89,10 +90,16 @@ export default class Layer {
         if (this._style) {
             this._style.onChange(null);
         }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
         // Force style changed event
-        this._styleChanged();
+        return this._styleChanged(style).then(r => {
+            console.log('success set', r);
+            this._style = style;
+            this._style.onChange(null);
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -105,17 +112,24 @@ export default class Layer {
      */
     blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
+        // Force style changed event
         if (this._style) {
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            this._style.onChange(null);
         }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-        // Force style changed event
-        this._styleChanged();
+
+        return this._styleChanged(style).then(r => {
+            console.log('success blend', r);
+
+            this._style = style;
+            this._style.onChange(null);
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -155,25 +169,34 @@ export default class Layer {
                     dataframe => {
                         dataframe.visible = false;
                     });
+            }, () => {
+                this._styleChanged(this._style);
+                this._getData();
             });
         });
     }
 
-    _styleChanged() {
+    _styleChanged(style) {
         if (!(this._mglIntegrator && this._mglIntegrator.invalidateMGLWebGLState)) {
-            return;
+            return Promise.resolve(undefined);
         }
-        this._getData();
-        const originalPromise = this.metadataPromise;
-        this.metadataPromise.then(metadata => {
+        const originalPromise = this._getData(style);
+        if (!originalPromise) {
+            const metadata = this.metadata;
+            style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            return Promise.resolve(undefined);
+        }
+        return originalPromise.then(metadata => {
+            this.metadata = metadata;
             // We should only compile the shaders if the metadata came from the original promise
             // if not, we would be compiling with a stale metadata
-            if (originalPromise == this.metadataPromise) {
-                this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            }
+            style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
+            style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
         });
     }
 
@@ -214,15 +237,19 @@ export default class Layer {
         throw new Error('?');
     }
 
-    _getData() {
+    _getData(style) {
+        style = style || this._style;
         if (!this._mglIntegrator.invalidateMGLWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
-            this._style.getResolution());
+        var r;
+        r = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
+            style.getResolution());
         if (r) {
-            this.metadataPromise = r;
-            r.then(() => this._styleChanged());
+            r.then(() => {
+                this._getData(style);
+            }, err => { console.log(err); });
+            return r;
         }
     }
 
