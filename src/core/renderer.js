@@ -48,7 +48,6 @@ class Renderer {
         this.RTT_WIDTH = RTT_WIDTH;
         console.log('R', this);
         this.dataframes = [];
-        this.computePool = []; //TODO hack, refactor needed
     }
 
     _initGL(gl) {
@@ -461,10 +460,6 @@ class Renderer {
             gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
         }
 
-
-        this.computePool.map(job => job.work(this));
-        this.computePool = [];
-
         gl.disable(gl.CULL_FACE);
     }
 
@@ -477,28 +472,6 @@ class Renderer {
         this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
         this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
         this._aaBlendShader = new shaders.AABlender(this.gl);
-    }
-
-    compute(type, expressions) {
-        // TODO remove this
-        const promise = new Promise((resolve) => {
-            this.computePool.push(new ComputeJob(type, expressions, resolve));
-        });
-        return promise;
-    }
-
-}
-
-class ComputeJob {
-    constructor(type, expressions, resolve) {
-        this.resolve = resolve;
-    }
-    work(renderer) {
-        let sum = 0;
-        renderer.dataframes.filter(t => t.style).map(t => {
-            sum += t.numFeatures;
-        });
-        this.resolve(sum);
     }
 }
 
