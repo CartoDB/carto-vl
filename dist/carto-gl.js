@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -225,32 +225,32 @@ class Expression {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_hsv__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_rgba__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_opacity__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_top__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_xyz__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_zoom__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_quantiles__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_hsv__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_rgba__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_opacity__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_top__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_xyz__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_zoom__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_quantiles__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_unary__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_aggregation__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_interpolators__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_interpolators__ = __webpack_require__(12);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_22__expressions_interpolators__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_viewportAggregation__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ordering__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_viewportAggregation__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ordering__ = __webpack_require__(46);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_24__expressions_ordering__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_24__expressions_ordering__["b"]; });
@@ -504,10 +504,10 @@ function implicitCast(value) {
     if (Number.isFinite(value)) {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
     }
-    if (typeof value == 'string'){
+    if (typeof value == 'string') {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
     }
-    if (!( value instanceof __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */]) && !value.length){
+    if (!(value instanceof __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */]) && value.type != 'paletteGenerator') {
         throw new Error('value cannot be casted');
     }
     return value;
@@ -683,7 +683,7 @@ function genUnaryOp(jsFn, glsl) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(71);
 
 
 /**
@@ -17807,7 +17807,7 @@ class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(47)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(48)(module)))
 
 /***/ }),
 /* 7 */
@@ -17921,7 +17921,7 @@ function equals(a,b){
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__client_windshaft__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__client_windshaft__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__setup_auth_service__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_config_service__ = __webpack_require__(19);
@@ -17999,178 +17999,12 @@ class Base {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-
-
-
-//TODO refactor to use uniformfloat class
-class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
-    constructor(duration) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Animate only supports number literals');
-        }
-        super({});
-        this.aTime = Date.now();
-        this.bTime = this.aTime + Number(duration);
-    }
-    _compile() {
-        this.type = 'float';
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
-    }
-    _preDraw(drawMetadata, gl) {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
-        } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
-        }
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
-
-
-
-
-class ILinear extends genInterpolator(inner => inner) { }
-/* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
-
-class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
-    `
-    #ifndef BOUNCE_EASE_IN
-    #define BOUNCE_EASE_IN
-    float BounceEaseIn_BounceEaseOut(float p)
-    {
-        if(p < 4./11.0)
-        {
-            return (121. * p * p)/16.0;
-        }
-        else if(p < 8./11.0)
-        {
-            return (363./40.0 * p * p) - (99./10.0 * p) + 17./5.0;
-        }
-        else if(p < 9./10.0)
-        {
-            return (4356./361.0 * p * p) - (35442./1805.0 * p) + 16061./1805.0;
-        }
-        else
-        {
-            return (54./5.0 * p * p) - (513./25.0 * p) + 268./25.0;
-        }
-    }
-    float BounceEaseIn(float p)
-    {
-        return 1. - BounceEaseOut(1. - p);
-    }
-    #endif
-
-`) { }
-/* unused harmony export BounceEaseIn */
-
-class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
-    `
-    #ifndef CUBIC
-    #define CUBIC
-    float cubicEaseInOut(float p){
-        if (p < 0.5) {
-            return 4. * p * p * p;
-        }else {
-            float f = ((2. * p) - 2.);
-            return 0.5 * f * f * f + 1.;
-        }
-    }
-    #endif
-`) { }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
-
-
-
-// Interpolators
-function genInterpolator(inlineMaker, preface) {
-    const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
-        constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
-            super({ m: m });
-        }
-        _compile(meta) {
-            super._compile(meta);
-            if (this.m.type != 'float') {
-                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
-            }
-            this.type = 'float';
-            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
-        }
-    };
-    fn.type = 'interpolator';
-    return fn;
-
-}
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_earcut__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dataframe__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dataframe__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__style_functions__ = __webpack_require__(1);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_3__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -18210,133 +18044,556 @@ const RTT_WIDTH = 1024;
  * @constructor
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
-function Renderer(canvas) {
-    if (canvas) {
-        this.gl = canvas.getContext('webgl');
-        if (!this.gl) {
-            throw new Error('WebGL 1 is unsupported');
+
+class Renderer {
+    constructor(canvas) {
+        if (canvas) {
+            this.gl = canvas.getContext('webgl');
+            if (!this.gl) {
+                throw new Error('WebGL 1 is unsupported');
+            }
+            this._initGL(this.gl);
         }
-        this._initGL(this.gl);
+        this._center = { x: 0, y: 0 };
+        this._zoom = 1;
+        console.log('R', this);
+        this.dataframes = [];
+        this.computePool = []; //TODO hack, refactor needed
     }
-    this._center = { x: 0, y: 0 };
-    this._zoom = 1;
-    console.log('R', this);
-    this.dataframes = [];
-    this.computePool = []; //TODO hack, refactor needed
+
+    _initGL(gl) {
+        this.gl = gl;
+        const OES_texture_float = gl.getExtension('OES_texture_float');
+        if (!OES_texture_float) {
+            throw new Error('WebGL extension OES_texture_float is unsupported');
+        }
+        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+        if (supportedRTT < RTT_WIDTH) {
+            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+        }
+        this._initShaders();
+
+        this.auxFB = gl.createFramebuffer();
+
+        // Create a VBO that covers the entire screen
+        // Use a "big" triangle instead of a square for performance and simplicity
+        this.bigTriangleVBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+        var vertices = [
+            10.0, -10.0,
+            0.0, 10.0,
+            -10.0, -10.0,
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        // Create a 1x1 RGBA texture set to [0,0,0,0]
+        // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
+        this.zeroTex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            new Uint8Array(4));
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+        this._AATex = gl.createTexture();
+        this._AAFB = gl.createFramebuffer();
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
+    }
+
+    /**
+    * Get Renderer visualization center
+    * @return {RPoint}
+    */
+    getCenter() {
+        return { x: this._center.x, y: this._center.y };
+    }
+
+    /**
+     * Set Renderer visualization center
+     * @param {number} x
+     * @param {number} y
+     */
+    setCenter(x, y) {
+        this._center.x = x;
+        this._center.y = y;
+    }
+
+    /**
+     * Get Renderer visualization bounds
+     * @return {*}
+     */
+    getBounds() {
+        const center = this.getCenter();
+        const sx = this.getZoom() * this.getAspect();
+        const sy = this.getZoom();
+        return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
+    }
+
+    /**
+     * Get Renderer visualization zoom
+     * @return {number}
+     */
+    getZoom() {
+        return this._zoom;
+    }
+
+    /**
+     * Set Renderer visualization zoom
+     * @param {number} zoom
+     */
+    setZoom(zoom) {
+        this._zoom = zoom;
+    }
+
+
+    /**
+     * Removes a dataframe for the renderer. Freeing its resources.
+     * @param {*} tile
+     */
+    removeDataframe(dataframe) {
+        this.dataframes = this.dataframes.filter(t => t !== dataframe);
+    }
+
+    createStyleTileTexture(numFeatures) {
+        // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
+        // since RGB components are discarded
+        const gl = this.gl;
+        const width = RTT_WIDTH;
+        const height = Math.ceil(numFeatures / width);
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        return texture;
+    }
+
+    _genDataframePropertyTextures(dataframe){
+        const gl = this.gl;
+        const width = RTT_WIDTH;
+        const height = Math.ceil(dataframe.numFeatures / width);
+
+        dataframe.height = height;
+        dataframe.propertyID = {}; //Name => PID
+        dataframe.propertyCount = 0;
+        dataframe.renderer = this;
+        for (var k in dataframe.properties) {
+            if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
+                var propertyID = dataframe.propertyID[k];
+                if (propertyID === undefined) {
+                    propertyID = dataframe.propertyCount;
+                    dataframe.propertyCount++;
+                    dataframe.propertyID[k] = propertyID;
+                }
+                dataframe.propertyTex[propertyID] = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, height, 0, gl.ALPHA, gl.FLOAT,
+                    dataframe.properties[k]);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            }
+        }
+    }
+
+    /**
+     * @description Adds a new dataframe to the renderer.
+     *
+     * Performance-intensive. The required allocation and copy of resources will happen synchronously.
+     * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
+     * @param {Dataframe} dataframe
+     * @returns {BoundDataframe}
+     */
+    addDataframe(dataframe) {
+        const gl = this.gl;
+        //this.ext.bindVertexArrayOES(this.vao);
+        this.dataframes.push(dataframe);
+        dataframe.propertyTex = [];
+
+        const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
+        var points = decodedGeom.geometry;
+        dataframe.numVertex = points.length / 2;
+        dataframe.breakpointList = decodedGeom.breakpointList;
+        dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
+        this._genDataframePropertyTextures(dataframe);
+
+        const width = RTT_WIDTH;
+        const height = Math.ceil(dataframe.numFeatures / width);
+
+        dataframe.setStyle = (style) => {
+            dataframe.style = style;
+        };
+        dataframe.style = null;
+
+        dataframe.vertexBuffer = gl.createBuffer();
+        dataframe.featureIDBuffer = gl.createBuffer();
+
+        dataframe.texColor = this.createStyleTileTexture(dataframe.numFeatures);
+        dataframe.texWidth = this.createStyleTileTexture(dataframe.numFeatures);
+        dataframe.texStrokeColor = this.createStyleTileTexture(dataframe.numFeatures);
+        dataframe.texStrokeWidth = this.createStyleTileTexture(dataframe.numFeatures);
+
+        var ids = new Float32Array(points.length);
+        let index = 0;
+        for (var i = 0; i < points.length; i += 2) {
+            if ((!dataframe.breakpointList.length && i > 0) || i == dataframe.breakpointList[index]) {
+                index++;
+            }
+            ids[i + 0] = ((index) % width) / (width - 1);
+            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+        if (decodedGeom.normals) {
+            dataframe.normalBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
+
+        return dataframe;
+    }
+
+    getAspect() {
+        if (this.gl) {
+            return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+        }
+        return 1;
+    }
+
+
+    getStyledTiles() {
+        return this.dataframes.filter(tile => tile.style && tile.visible);
+    }
+
+
+    _computeDrawMetadata() {
+        const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+        const tiles = this.getStyledTiles();
+        let drawMetadata = {
+            freeTexUnit: 4,
+            zoom: 1. / this._zoom,
+            columns: []
+        };
+        let requiredColumns = tiles.map(d => {
+            const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
+            const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
+            const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
+            const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
+            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
+                reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]);
+        }).reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
+
+        requiredColumns.map(column => {
+            drawMetadata.columns.push(
+                {
+                    name: column,
+                    min: Number.POSITIVE_INFINITY,
+                    max: Number.NEGATIVE_INFINITY,
+                    avg: undefined,
+                    count: 0,
+                    sum: 0,
+                    histogramBuckets: HISTOGRAM_BUCKETS,
+                    histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
+                    accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
+                }
+            );
+        });
+
+        const s = 1. / this._zoom;
+        tiles.map(d => {
+            requiredColumns.map(column => {
+                const values = d.properties[column];
+                let min = Number.POSITIVE_INFINITY;
+                let max = Number.NEGATIVE_INFINITY;
+                let sum = 0;
+                let count = 0;
+                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+                for (let i = 0; i < d.numFeatures; i++) {
+                    const x = d.geom[2 * i + 0];
+                    const y = d.geom[2 * i + 1];
+                    if (x > minx && x < maxx && y > miny && y < maxy) {
+                        const v = values[i];
+                        if (!Number.isFinite(v)) {
+                            continue;
+                        }
+                        sum += v;
+                        min = Math.min(min, v);
+                        max = Math.max(max, v);
+                        count++;
+                    }
+                }
+                const metaColumn = drawMetadata.columns.find(c => c.name == column);
+                metaColumn.min = Math.min(min, metaColumn.min);
+                metaColumn.max = Math.max(max, metaColumn.max);
+                metaColumn.count += count;
+                metaColumn.sum += sum;
+            });
+        });
+        requiredColumns.map(column => {
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            metaColumn.avg = metaColumn.sum / metaColumn.count;
+        });
+        tiles.map(d => {
+            requiredColumns.map(column => {
+                const values = d.properties[column];
+                const metaColumn = drawMetadata.columns.find(c => c.name == column);
+                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+                const vmin = metaColumn.min;
+                const vmax = metaColumn.max;
+                const vdiff = vmax - vmin;
+                for (let i = 0; i < d.numFeatures; i++) {
+                    const x = d.geom[2 * i + 0];
+                    const y = d.geom[2 * i + 1];
+                    if (x > minx && x < maxx && y > miny && y < maxy) {
+                        const v = values[i];
+                        if (!Number.isFinite(v)) {
+                            continue;
+                        }
+                        metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
+                    }
+                }
+            });
+        });
+        requiredColumns.map(column => {
+            const metaColumn = drawMetadata.columns.find(c => c.name == column);
+            for (let i = 1; i < metaColumn.histogramBuckets; i++) {
+                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
+            }
+        });
+        return drawMetadata;
+    }
+
+    refresh(timestamp) {
+        const gl = this.gl;
+        // Don't re-render more than once per animation frame
+        if (this.lastFrame === timestamp) {
+            return;
+        }
+
+        var width = gl.canvas.clientWidth;
+        var height = gl.canvas.clientHeight;
+        if (gl.canvas.width != width ||
+            gl.canvas.height != height) {
+            gl.canvas.width = width;
+            gl.canvas.height = height;
+        }
+        var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+
+        gl.enable(gl.CULL_FACE);
+
+        gl.disable(gl.BLEND);
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.STENCIL_TEST);
+        gl.depthMask(false);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+
+        const tiles = this.getStyledTiles();
+
+        const drawMetadata = this._computeDrawMetadata();
+
+        const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
+            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            gl.useProgram(shader.program);
+            for (let i = 0; i < 16; i++) {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
+                gl.uniform1i(shader.textureLocations[i], 0);
+            }
+
+            drawMetadata.freeTexUnit = 4;
+            styleExpr._preDraw(drawMetadata, gl);
+
+            Object.keys(TID).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.uniform1i(shader.textureLocations[i], i);
+            });
+
+            gl.enableVertexAttribArray(shader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+            gl.vertexAttribPointer(shader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.disableVertexAttribArray(shader.vertexAttribute);
+        };
+        tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
+        tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
+
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.enable(gl.BLEND);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        if (tiles.length && tiles[0].type != 'point') {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
+            const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+
+            if (w != this._width || h != this._height) {
+                gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                    w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
+
+                [this._width, this._height] = [w, h];
+            }
+            gl.viewport(0, 0, w * 2, h * 2);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+        }
+
+        const s = 1. / this._zoom;
+
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
+
+        const renderDrawPass = orderingIndex => tiles.forEach(tile => {
+
+            let renderer = null;
+            if (tile.type == 'point') {
+                renderer = this.finalRendererProgram;
+            } else if (tile.type == 'line') {
+                renderer = this.lineRendererProgram;
+            } else {
+                renderer = this.triRendererProgram;
+            }
+            gl.useProgram(renderer.program);
+
+            //Set filtering condition on "... AND feature is in current order bucket"
+            gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
+            gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
+
+            gl.uniform2f(renderer.vertexScaleUniformLocation,
+                (s / aspect) * tile.scale,
+                s * tile.scale);
+            gl.uniform2f(renderer.vertexOffsetUniformLocation,
+                (s / aspect) * (this._center.x - tile.center.x),
+                s * (this._center.y - tile.center.y));
+
+            tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
+
+            tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+
+            gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
+
+
+            gl.enableVertexAttribArray(renderer.featureIdAttr);
+            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
+
+            if (tile.type == 'line') {
+                gl.enableVertexAttribArray(renderer.normalAttr);
+                gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
+                gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
+            }
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.uniform1i(renderer.colorTexture, 0);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.uniform1i(renderer.widthTexture, 1);
+
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+            gl.uniform1i(renderer.colorStrokeTexture, 2);
+
+            gl.activeTexture(gl.TEXTURE3);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+            gl.uniform1i(renderer.strokeWidthTexture, 3);
+
+            gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+
+            gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
+            gl.disableVertexAttribArray(renderer.featureIdAttr);
+            if (tile.type == 'line') {
+                gl.disableVertexAttribArray(renderer.normalAttr);
+            }
+        });
+        orderingMins.map((_, orderingIndex) => {
+            renderDrawPass(orderingIndex);
+        });
+
+        if (tiles.length && tiles[0].type != 'point') {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+            gl.useProgram(this._aaBlendShader.program);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+            gl.uniform1i(this._aaBlendShader.readTU, 0);
+
+            gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+            gl.vertexAttribPointer(this._aaBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+        }
+
+
+        this.computePool.map(job => job.work(this));
+        this.computePool = [];
+
+        gl.disable(gl.CULL_FACE);
+    }
+
+
+    /**
+     * Initialize static shaders
+     */
+    _initShaders() {
+        this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
+        this.triRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createTriShader(this.gl);
+        this.lineRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createLineShader(this.gl);
+        this._aaBlendShader = new __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* AABlender */](this.gl);
+    }
+
+    compute(type, expressions) {
+        // TODO remove this
+        const promise = new Promise((resolve) => {
+            this.computePool.push(new ComputeJob(type, expressions, resolve));
+        });
+        return promise;
+    }
+
 }
-
-Renderer.prototype._initGL = function (gl) {
-    this.gl = gl;
-    const OES_texture_float = gl.getExtension('OES_texture_float');
-    if (!OES_texture_float) {
-        throw new Error('WebGL extension OES_texture_float is unsupported');
-    }
-    const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-    if (supportedRTT < RTT_WIDTH) {
-        throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-    }
-    this._initShaders();
-
-    this.auxFB = gl.createFramebuffer();
-
-    // Create a VBO that covers the entire screen
-    // Use a "big" triangle instead of a square for performance and simplicity
-    this.bigTriangleVBO = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-    var vertices = [
-        10.0, -10.0,
-        0.0, 10.0,
-        -10.0, -10.0,
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    // Create a 1x1 RGBA texture set to [0,0,0,0]
-    // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
-    this.zeroTex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array(4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    this._AATex = gl.createTexture();
-    this._AAFB = gl.createFramebuffer();
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-};
-
-/**
- * Get Renderer visualization center
- * @return {RPoint}
- */
-Renderer.prototype.getCenter = function () {
-    return { x: this._center.x, y: this._center.y };
-};
-/**
- * Set Renderer visualization center
- * @param {number} x
- * @param {number} y
- */
-Renderer.prototype.setCenter = function (x, y) {
-    this._center.x = x;
-    this._center.y = y;
-    this._RAF();
-};
-/**
- * Get Renderer visualization bounds
- * @return {*}
- */
-Renderer.prototype.getBounds = function () {
-    const center = this.getCenter();
-    const sx = this.getZoom() * this.getAspect();
-    const sy = this.getZoom();
-    return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
-};
-/**
- * Get Renderer visualization zoom
- * @return {number}
- */
-Renderer.prototype.getZoom = function () {
-    return this._zoom;
-};
-/**
- * Set Renderer visualization zoom
- * @param {number} zoom
- */
-Renderer.prototype.setZoom = function (zoom) {
-    this._zoom = zoom;
-    this._RAF();
-};
-
-/**
- * Removes a dataframe for the renderer. Freeing its resources.
- * @param {*} tile
- */
-Renderer.prototype.removeDataframe = function (dataframe) {
-    this.dataframes = this.dataframes.filter(t => t !== dataframe);
-};
-
-Renderer.prototype.createStyleTileTexture = function (numFeatures) {
-    // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
-    // since RGB components are discarded
-    const gl = this.gl;
-    const width = RTT_WIDTH;
-    const height = Math.ceil(numFeatures / width);
-    const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    return texture;
-};
 
 
 function getLineNormal(a, b) {
@@ -18467,103 +18724,7 @@ function decodeGeom(geomType, geom) {
     }
 }
 
-/**
- * @description Adds a new dataframe to the renderer.
- *
- * Performance-intensive. The required allocation and copy of resources will happen synchronously.
- * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
- * @param {Dataframe} dataframe
- * @returns {BoundDataframe}
- */
-Renderer.prototype.addDataframe = function (dataframe) {
-    const gl = this.gl;
-    //this.ext.bindVertexArrayOES(this.vao);
-    this.dataframes.push(dataframe);
-    dataframe.propertyTex = [];
 
-    const level = 0;
-    const width = RTT_WIDTH;
-    const decodedGeom = decodeGeom(dataframe.type, dataframe.geom);
-    var points = decodedGeom.geometry;
-    dataframe.numVertex = points.length / 2;
-    dataframe.breakpointList = decodedGeom.breakpointList;
-
-    dataframe.numFeatures = dataframe.breakpointList.length || dataframe.numVertex;
-    const height = Math.ceil(dataframe.numFeatures / width);
-    dataframe.height = height;
-    dataframe.propertyID = {}; //Name => PID
-    dataframe.propertyCount = 0;
-    dataframe.renderer = this;
-    for (var k in dataframe.properties) {
-        if (dataframe.properties.hasOwnProperty(k) && dataframe.properties[k].length > 0) {
-            var propertyID = dataframe.propertyID[k];
-            if (propertyID === undefined) {
-                propertyID = dataframe.propertyCount;
-                dataframe.propertyCount++;
-                dataframe.propertyID[k] = propertyID;
-            }
-            dataframe.propertyTex[propertyID] = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex[propertyID]);
-            gl.texImage2D(gl.TEXTURE_2D, level, gl.ALPHA,
-                width, height, 0, gl.ALPHA, gl.FLOAT,
-                dataframe.properties[k]);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-    }
-
-    dataframe.setStyle = (style) => {
-        dataframe.style = style;
-        this._RAF();
-    };
-    dataframe.style = null;
-
-    dataframe.vertexBuffer = gl.createBuffer();
-    dataframe.featureIDBuffer = gl.createBuffer();
-
-    dataframe.texColor = this.createStyleTileTexture(dataframe.numFeatures);
-    dataframe.texWidth = this.createStyleTileTexture(dataframe.numFeatures);
-    dataframe.texStrokeColor = this.createStyleTileTexture(dataframe.numFeatures);
-    dataframe.texStrokeWidth = this.createStyleTileTexture(dataframe.numFeatures);
-
-    var ids = new Float32Array(points.length);
-    let index = 0;
-    for (var i = 0; i < points.length; i += 2) {
-        if ((!dataframe.breakpointList.length && i > 0) || i == dataframe.breakpointList[index]) {
-            index++;
-        }
-        ids[i + 0] = ((index) % width) / (width - 1);
-        ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-    if (decodedGeom.normals) {
-        dataframe.normalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
-    }
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-
-
-    this._RAF();
-    return dataframe;
-};
-
-Renderer.prototype._RAF = function () {
-    //window.requestAnimationFrame(this.refresh.bind(this));
-};
-
-Renderer.prototype.getAspect = function () {
-    if (this.gl) {
-        return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-    }
-    return 1;
-};
 
 class ComputeJob {
     constructor(type, expressions, resolve) {
@@ -18577,116 +18738,6 @@ class ComputeJob {
         this.resolve(sum);
     }
 }
-Renderer.prototype.getStyledTiles = function () {
-    return this.dataframes.filter(tile => tile.style && tile.visible);
-};
-
-Renderer.prototype._computeDrawMetadata = function () {
-    const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-    const tiles = this.getStyledTiles();
-    let drawMetadata = {
-        freeTexUnit: 4,
-        zoom: 1. / this._zoom,
-        columns: []
-    };
-    let requiredColumns = tiles.map(d => {
-        const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
-        const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
-        const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
-        const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
-        return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
-            reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]);
-    }).reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
-
-    requiredColumns.map(column => {
-        drawMetadata.columns.push(
-            {
-                name: column,
-                min: Number.POSITIVE_INFINITY,
-                max: Number.NEGATIVE_INFINITY,
-                avg: undefined,
-                count: 0,
-                sum: 0,
-                histogramBuckets: HISTOGRAM_BUCKETS,
-                histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-            }
-        );
-    });
-
-    const s = 1. / this._zoom;
-    tiles.map(d => {
-        requiredColumns.map(column => {
-            const values = d.properties[column];
-            let min = Number.POSITIVE_INFINITY;
-            let max = Number.NEGATIVE_INFINITY;
-            let sum = 0;
-            let count = 0;
-            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-            for (let i = 0; i < d.numFeatures; i++) {
-                const x = d.geom[2 * i + 0];
-                const y = d.geom[2 * i + 1];
-                if (x > minx && x < maxx && y > miny && y < maxy) {
-                    const v = values[i];
-                    if (!Number.isFinite(v)) {
-                        continue;
-                    }
-                    sum += v;
-                    min = Math.min(min, v);
-                    max = Math.max(max, v);
-                    count++;
-                }
-            }
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            metaColumn.min = Math.min(min, metaColumn.min);
-            metaColumn.max = Math.max(max, metaColumn.max);
-            metaColumn.count += count;
-            metaColumn.sum += sum;
-        });
-    });
-    requiredColumns.map(column => {
-        const metaColumn = drawMetadata.columns.find(c => c.name == column);
-        metaColumn.avg = metaColumn.sum / metaColumn.count;
-    });
-    tiles.map(d => {
-        requiredColumns.map(column => {
-            const values = d.properties[column];
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-            const vmin = metaColumn.min;
-            const vmax = metaColumn.max;
-            const vdiff = vmax - vmin;
-            for (let i = 0; i < d.numFeatures; i++) {
-                const x = d.geom[2 * i + 0];
-                const y = d.geom[2 * i + 1];
-                if (x > minx && x < maxx && y > miny && y < maxy) {
-                    const v = values[i];
-                    if (!Number.isFinite(v)) {
-                        continue;
-                    }
-                    metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
-                }
-            }
-        });
-    });
-    requiredColumns.map(column => {
-        const metaColumn = drawMetadata.columns.find(c => c.name == column);
-        for (let i = 1; i < metaColumn.histogramBuckets; i++) {
-            metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
-        }
-    });
-    return drawMetadata;
-};
 
 function getOrderingRenderBuckets(tiles) {
     let orderer = null;
@@ -18708,217 +18759,173 @@ function getOrderingRenderBuckets(tiles) {
     };
 }
 
-Renderer.prototype.refresh = function (timestamp) {
-    const gl = this.gl;
-    // Don't re-render more than once per animation frame
-    if (this.lastFrame === timestamp) {
-        return;
-    }
 
-    var width = gl.canvas.clientWidth;
-    var height = gl.canvas.clientHeight;
-    if (gl.canvas.width != width ||
-        gl.canvas.height != height) {
-        gl.canvas.width = width;
-        gl.canvas.height = height;
-    }
-    var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
-    gl.enable(gl.CULL_FACE);
 
-    gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.STENCIL_TEST);
-    gl.depthMask(false);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-    const tiles = this.getStyledTiles();
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
-    const drawMetadata = this._computeDrawMetadata();
 
-    const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
-        gl.viewport(0, 0, RTT_WIDTH, tile.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.useProgram(shader.program);
-        for (let i = 0; i < 16; i++) {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-            gl.uniform1i(shader.textureLocations[i], 0);
+//TODO refactor to use uniformfloat class
+class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
+     */
+    constructor(duration) {
+        if (!Number.isFinite(duration)) {
+            throw new Error('Animate only supports number literals');
         }
-
-        drawMetadata.freeTexUnit = 4;
-        styleExpr._preDraw(drawMetadata, gl);
-
-        Object.keys(TID).forEach((name, i) => {
-            gl.activeTexture(gl.TEXTURE0 + i);
-            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-            gl.uniform1i(shader.textureLocations[i], i);
-        });
-
-        gl.enableVertexAttribArray(shader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        gl.vertexAttribPointer(shader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        gl.disableVertexAttribArray(shader.vertexAttribute);
-    };
-    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
-    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
-
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.BLEND);
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-    if (tiles.length && tiles[0].type != 'point') {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
-        const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
-
-        if (w != this._width || h != this._height) {
-            gl.bindTexture(gl.TEXTURE_2D, this._AATex);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
-
-            [this._width, this._height] = [w, h];
-        }
-        gl.viewport(0, 0, w * 2, h * 2);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        super({});
+        this.aTime = Date.now();
+        this.bTime = this.aTime + Number(duration);
     }
-
-    const s = 1. / this._zoom;
-
-    const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
-
-    const renderDrawPass = orderingIndex => tiles.forEach(tile => {
-
-        let renderer = null;
-        if (tile.type == 'point') {
-            renderer = this.finalRendererProgram;
-        } else if (tile.type == 'line') {
-            renderer = this.lineRendererProgram;
+    _compile() {
+        this.type = 'float';
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float anim${this._uniformID};\n`,
+            inline: `anim${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+    }
+    _preDraw(drawMetadata, gl) {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (this.mix > 1.) {
+            gl.uniform1f(this._uniformLocation, 1);
         } else {
-            renderer = this.triRendererProgram;
+            gl.uniform1f(this._uniformLocation, this.mix);
         }
-        gl.useProgram(renderer.program);
-
-        //Set filtering condition on "... AND feature is in current order bucket"
-        gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
-        gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
-
-        gl.uniform2f(renderer.vertexScaleUniformLocation,
-            (s / aspect) * tile.scale,
-            s * tile.scale);
-        gl.uniform2f(renderer.vertexOffsetUniformLocation,
-            (s / aspect) * (this._center.x - tile.center.x),
-            s * (this._center.y - tile.center.y));
-
-        tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
-
-        tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
-
-        gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
-        gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
-
-
-        gl.enableVertexAttribArray(renderer.featureIdAttr);
-        gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
-        gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
-
-        if (tile.type == 'line') {
-            gl.enableVertexAttribArray(renderer.normalAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
-            gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
-        }
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-        gl.uniform1i(renderer.colorTexture, 0);
-
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-        gl.uniform1i(renderer.widthTexture, 1);
-
-        gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-        gl.uniform1i(renderer.colorStrokeTexture, 2);
-
-        gl.activeTexture(gl.TEXTURE3);
-        gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-        gl.uniform1i(renderer.strokeWidthTexture, 3);
-
-        gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
-
-        gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
-        gl.disableVertexAttribArray(renderer.featureIdAttr);
-        if (tile.type == 'line') {
-            gl.disableVertexAttribArray(renderer.normalAttr);
-        }
-    });
-    orderingMins.map((_, orderingIndex) => {
-        renderDrawPass(orderingIndex);
-    });
-
-    if (tiles.length && tiles[0].type != 'point') {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        gl.useProgram(this._aaBlendShader.program);
-
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this._AATex);
-        gl.uniform1i(this._aaBlendShader.readTU, 0);
-
-        gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        gl.vertexAttribPointer(this._aaBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
     }
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
 
 
-    this.computePool.map(job => job.work(this));
-    this.computePool = [];
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-    tiles.forEach(t => {
-        if (t.style.getColor().isAnimated() || t.style.getWidth().isAnimated()) {
-            this._RAF();
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+
+class ILinear extends genInterpolator(inner => inner) { }
+/* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
+
+class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
+    `
+    #ifndef BOUNCE_EASE_IN
+    #define BOUNCE_EASE_IN
+    float BounceEaseIn_BounceEaseOut(float p)
+    {
+        if(p < 4./11.0)
+        {
+            return (121. * p * p)/16.0;
         }
-    });
-    gl.disable(gl.CULL_FACE);
-};
+        else if(p < 8./11.0)
+        {
+            return (363./40.0 * p * p) - (99./10.0 * p) + 17./5.0;
+        }
+        else if(p < 9./10.0)
+        {
+            return (4356./361.0 * p * p) - (35442./1805.0 * p) + 16061./1805.0;
+        }
+        else
+        {
+            return (54./5.0 * p * p) - (513./25.0 * p) + 268./25.0;
+        }
+    }
+    float BounceEaseIn(float p)
+    {
+        return 1. - BounceEaseOut(1. - p);
+    }
+    #endif
 
-/**
- * Initialize static shaders
- */
-Renderer.prototype._initShaders = function () {
-    this.finalRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createPointShader(this.gl);
-    this.triRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createTriShader(this.gl);
-    this.lineRendererProgram = __WEBPACK_IMPORTED_MODULE_0__shaders__["b" /* renderer */].createLineShader(this.gl);
-    this._aaBlendShader = new __WEBPACK_IMPORTED_MODULE_0__shaders__["a" /* AABlender */](this.gl);
-};
+`) { }
+/* unused harmony export BounceEaseIn */
 
-Renderer.prototype.compute = function (type, expressions) {
-    // TODO remove this
-    const promise = new Promise((resolve) => {
-        this.computePool.push(new ComputeJob(type, expressions, resolve));
-    });
-    return promise;
-};
+class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`) { }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
 
 
 
+// Interpolators
+function genInterpolator(inlineMaker, preface) {
+    const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+        constructor(m) {
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
+            super({ m: m });
+        }
+        _compile(meta) {
+            super._compile(meta);
+            if (this.m.type != 'float') {
+                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+            }
+            this.type = 'float';
+            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+        }
+    };
+    fn.type = 'interpolator';
+    return fn;
+
+}
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
@@ -18929,9 +18936,9 @@ Renderer.prototype.compute = function (type, expressions) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(55);
 
 
 
@@ -19317,7 +19324,7 @@ VectorTileLayer.prototype.feature = function(i) {
 "use strict";
 
 
-var Point = __webpack_require__(69);
+var Point = __webpack_require__(70);
 
 module.exports = VectorTileFeature;
 
@@ -19724,8 +19731,8 @@ function _checkServerURL(serverURL) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(73);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(75);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(5);
 
@@ -19874,6 +19881,13 @@ class Style {
      */
     getOrder() {
         return this._styleSpec.order;
+    }
+
+    isAnimated() {
+        return this.getColor().isAnimated() ||
+               this.getWidth().isAnimated() ||
+               this.getStrokeColor().isAnimated() ||
+               this.getStrokeWidth().isAnimated();
     }
 
     // REVIEW THIS vv
@@ -20036,20 +20050,157 @@ class Style {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/**
+ * @description A simple non-interactive map.
+ */
+
+class Map {
+
+    /**
+     * Create a simple carto.Map by specifying a container `id`.
+     *
+     * @param  {object} options
+     * @param  {string} options.container The element's string `id`.
+     *
+     * @constructor Map
+     * @memberof carto
+     */
+    constructor(options) {
+        options = options || {};
+
+        if (typeof options.container === 'string') {
+            const container = window.document.getElementById(options.container);
+            if (!container) {
+                throw new Error(`Container '${options.container}' not found.`);
+            } else {
+                this._container = container;
+            }
+        }
+        this._background = options.background || '';
+
+        this._layers = [];
+        this._repaint = true;
+        this._canvas = this._createCanvas();
+        this._container.appendChild(this._canvas);
+        this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
+
+        this._resizeCanvas(this._containerDimensions());
+    }
+
+    addLayer(layer, beforeLayerID) {
+        layer.requestData();
+
+        let index;
+        for (index = 0; index < this._layers.length; index++) {
+            if (this._layers[index].getId() === beforeLayerID) {
+                break;
+            }
+        }
+        this._layers.splice(index, 0, layer);
+
+        window.requestAnimationFrame(this.update.bind(this));
+    }
+
+    update() {
+        this._drawBackground(this._background);
+
+        let loaded = true;
+        let animated = false;
+        this._layers.forEach((layer) => {
+            const hasData = layer.hasDataframes();
+            const hasAnimation = layer.getStyle().isAnimated();
+            if (hasData || hasAnimation) {
+                layer.paintCallback();
+            }
+            loaded = loaded && hasData;
+            animated = animated || hasAnimation;
+        });
+
+        // Update until all layers are loaded or there is an animation
+        if (!loaded || animated) {
+            window.requestAnimationFrame(this.update.bind(this));
+        }
+    }
+
+    _drawBackground(color) {
+        switch (color) {
+        case 'black':
+            this._gl.clearColor(0, 0, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'red':
+            this._gl.clearColor(1, 0, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'green':
+            this._gl.clearColor(0, 1, 0, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        case 'blue':
+            this._gl.clearColor(0, 0, 1, 1);
+            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+            break;
+        default:
+            // white
+        }
+    }
+
+    _createCanvas() {
+        const canvas = window.document.createElement('canvas');
+
+        canvas.className = 'canvas';
+        canvas.style.position = 'absolute';
+
+        return canvas;
+    }
+
+    _containerDimensions() {
+        let width = 0;
+        let height = 0;
+
+        if (this._container) {
+            width = this._container.offsetWidth || 400;
+            height = this._container.offsetHeight || 300;
+        }
+
+        return { width, height };
+    }
+
+    _resizeCanvas(size) {
+        const pixelRatio = window.devicePixelRatio || 1;
+
+        this._canvas.width = pixelRatio * size.width;
+        this._canvas.height = pixelRatio * size.height;
+
+        this._canvas.style.width = `${size.width}px`;
+        this._canvas.style.height = `${size.height}px`;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
+
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_layer__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_layer__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(79);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_style__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_setup_auth_service__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_config_service__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_map__ = __webpack_require__(21);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_2__api_layer__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_5__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_config_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_4__api_style__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return __WEBPACK_IMPORTED_MODULE_7__api_map__["a"]; });
 /**
  *  @api
  *  @namespace carto
@@ -20067,6 +20218,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 // Namespaces
 const style = { expressions: __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ };
 const source = { Dataset: __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__["a" /* default */], SQL: __WEBPACK_IMPORTED_MODULE_3__api_source_sql__["a" /* default */] };
@@ -20075,41 +20227,49 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return palettes; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 
 
-const palettes = {};
-Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
-    const s = __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name];
-    var defaultFound = false;
-    for (let i = 20; i >= 0; i--) {
-        if (s[i]) {
-            if (!defaultFound) {
-                palettes[name.toLowerCase()] = () => s[i];
-                defaultFound = true;
+class PaletteGenerator {
+    constructor(name, subPalettes) {
+        this.type = 'paletteGenerator';
+        this.name = name;
+        this.subPalettes = subPalettes;
+        this.tags = subPalettes.tags;
+    }
+    getLongestSubPalette(){
+        const s = this.subPalettes;
+        for (let i = 20; i >= 0; i--) {
+            if (s[i]) {
+                return s[i];
             }
-            palettes[`${name.toLowerCase()}_${i}`] = () => s[i];
         }
     }
+}
+
+const palettes = {};
+
+Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
+    palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name]);
 });
 
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(24);
+module.exports = __webpack_require__(25);
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -21962,7 +22122,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(25);
+var colorbrewer = __webpack_require__(26);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -21995,14 +22155,14 @@ if (true) {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(26);
+module.exports = __webpack_require__(27);
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -22327,12 +22487,12 @@ if (true) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
@@ -22380,7 +22540,7 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22406,6 +22566,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         this.bucketUID = bucketUID++;
         this.numCategories = args.length + 1;
         this.args = args;
+        this.othersBucket = false;
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -22424,12 +22585,12 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         const cmp = this.input.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
-                return ${index + 1}.;
+                return ${index}.;
             }`;
         const funcBody = this.args.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return 0.;
+            return ${this.numCategories - 1}.;
         }`;
 
         return {
@@ -22442,7 +22603,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22518,7 +22679,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22562,7 +22723,7 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22607,7 +22768,7 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22663,7 +22824,7 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22688,7 +22849,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22734,7 +22895,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22770,7 +22931,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22812,7 +22973,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22837,7 +22998,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             minKey = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(minKey);
             maxKey = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(maxKey);
         }
-        var values = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(palette);
+        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(palette);
         super({ input: input });
         if (minKey === undefined) {
             minKey = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["float"])(0);
@@ -22845,7 +23006,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         }
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
-        this.values = values;
+        this.palette = palette;
     }
     _compile(meta) {
         super._compile(meta);
@@ -22869,6 +23030,30 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
+    _getColorsFromPalette(input, palette) {
+        if (palette.type == 'paletteGenerator') {
+            let colors;
+            if (input.numCategories) {
+                // If we are not gonna pop the others we don't need to get the extra color
+                const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
+                if (palette.subPalettes[subPalette]) {
+                    colors = palette.subPalettes[subPalette];
+                } else {
+                    // More categories than palettes, new colors will be created by linear interpolation
+                    colors = palette.getLongestSubPalette();
+                }
+            } else {
+                colors = palette.getLongestSubPalette();
+            }
+            // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
+            if (palette.tags.includes('qualitative') && !input.othersBucket) {
+                colors = colors.slice(0, colors.length - 1);
+            }
+            return colors;
+        } else {
+            return palette;
+        }
+    }
     _postShaderCompile(program, gl) {
         if (!this.init) {
             this.init = true;
@@ -22882,13 +23067,14 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
-            const values = this.values;
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+
             for (var i = 0; i < width; i++) {
-                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
                 const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).b, 255];
                 const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).b, 255];
-                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
                 pixel[4 * i + 1] = v[1];
@@ -22923,7 +23109,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22964,7 +23150,7 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22999,7 +23185,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23019,6 +23205,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         }
         this.type = 'category';
         this.numCategories = this.buckets + 1;
+        this.othersBucket = true;
         this._meta = metadata;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
@@ -23069,7 +23256,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23151,7 +23338,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23182,7 +23369,7 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23269,7 +23456,7 @@ class Quantiles extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23382,7 +23569,7 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23433,7 +23620,7 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23496,7 +23683,7 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -23524,17 +23711,17 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(57);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__ = __webpack_require__(68);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__);
 
 
@@ -23568,7 +23755,6 @@ class Windshaft {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                        console.log('FREE', dataframe);
                         dataframe.free();
                         this._removeDataframe(dataframe);
                     }
@@ -23577,6 +23763,7 @@ class Windshaft {
             , maxAge: 1000 * 60 * 60
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
+        this.inProgressInstantiations = {};
     }
 
     _bindLayer(addDataframe, removeDataframe) {
@@ -23593,9 +23780,18 @@ class Windshaft {
      */
     _getData(viewport, MNS, resolution) {
         if (!__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution) {
-            this._MNS = MNS;
-            this.resolution = resolution;
-            return this._instantiate(MNS, resolution);
+            const promise = this.inProgressInstantiations[JSON.stringify({ MNS, resolution })];
+            // Only instantiate if the same map is not being resintantiated now
+            if (!promise) {
+                const p = this._instantiate(MNS, resolution);
+                this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
+                console.log('Instantiating map:', JSON.stringify(MNS));
+                p.finally(() => {
+                    this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = null;
+                }, () => { }).catch(err => console.log(err));
+                return p;
+            }
+            return promise;
         }
         if (!this.url) {
             // Instantiation is in progress, nothing to do yet
@@ -23637,10 +23833,6 @@ class Windshaft {
     }
 
     _instantiate(MNS, resolution) {
-        this._oldDataframes = [];
-        this.cache.reset();
-        this.url = null;
-
         let agg = {
             threshold: 1,
             resolution: resolution,
@@ -23670,18 +23862,29 @@ class Windshaft {
             serverURL: this._source._serverURL
         };
 
-        const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
-        this.metadataPromise = this.getMetadata(query, MNS, conf);
+        const metadataPromise = this.getMetadata(query, MNS, conf);
 
-        return (async () => {
-            try {
-                const metadata = await this.metadataPromise;
-                this.url = await urlPromise;
-                return metadata;
-            } catch (err) {
-                throw new Error('Invalid source');
-            }
-        })();
+        return new Promise((resolve, reject) => {
+            this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
+                metadataPromise.then((metadata) => {
+                    this._oldDataframes = [];
+                    this.cache.reset();
+                    this.url = url;
+                    this.metadata = metadata;
+                    this._MNS = MNS;
+                    this.resolution = resolution;
+
+                    resolve(metadata);
+                }, err => {
+                    console.log(333, err);
+                    reject(err);
+                });
+            }).catch(err => {
+                metadataPromise.catch(err => console.log(123, err));
+
+                reject(err);
+            });
+        });
     }
 
     free() {
@@ -23747,47 +23950,97 @@ class Windshaft {
         return fetch(this.url(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
-                return this.metadataPromise.then(metadata => {
 
-                    if (response.byteLength == 0 || response == 'null') {
-                        return { empty: true };
+                if (response.byteLength == 0 || response == 'null') {
+                    return { empty: true };
+                }
+                var tile = new __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_2_pbf__(response));
+                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                var fieldMap = {};
+
+                const numFields = [];
+                const catFields = [];
+                const catFieldsReal = [];
+                const numFieldsReal = [];
+                this._MNS.columns.map(name => {
+                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
+                        catFields.push(name);
+                        catFieldsReal.push(name);
+                    } else {
+                        numFields.push(name);
+                        numFieldsReal.push(name);
                     }
-                    var tile = new __WEBPACK_IMPORTED_MODULE_4__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_2_pbf__(response));
-                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                    var fieldMap = {};
 
-                    const numFields = [];
-                    const catFields = [];
-                    const catFieldsReal = [];
-                    const numFieldsReal = [];
-                    this._MNS.columns.map(name => {
-                        const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                        if (metadata.columns.find(c => c.name == basename).type == 'category') {
-                            catFields.push(name);
-                            catFieldsReal.push(name);
-                        } else {
-                            numFields.push(name);
-                            numFieldsReal.push(name);
-                        }
+                }
+                );
+                catFieldsReal.map((name, i) => fieldMap[name] = i);
+                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
-                    }
-                    );
-                    catFieldsReal.map((name, i) => fieldMap[name] = i);
-                    numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
 
-                    const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
-
-                    var rs = __WEBPACK_IMPORTED_MODULE_1__rsys__["a" /* getRsysFromTile */](x, y, z);
-                    let dataframeProperties = {};
-                    Object.keys(fieldMap).map((name, pid) => {
-                        dataframeProperties[name] = properties[pid];
-                    });
-                    let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                    const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                    this._addDataframe(dataframe);
-                    return dataframe;
+                var rs = __WEBPACK_IMPORTED_MODULE_1__rsys__["a" /* getRsysFromTile */](x, y, z);
+                let dataframeProperties = {};
+                Object.keys(fieldMap).map((name, pid) => {
+                    dataframeProperties[name] = properties[pid];
                 });
+                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                this._addDataframe(dataframe);
+                return dataframe;
             });
+    }
+
+    _decodePolygons(geom, featureGeometries, mvt_extent){
+        let polygon = null;
+        let geometry = [];
+        /*
+            All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+            It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+            See:
+                https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                https://en.wikipedia.org/wiki/Shoelace_formula
+        */
+        for (let j = 0; j < geom.length; j++) {
+            //if exterior
+            //   push current polygon & set new empty
+            //else=> add index to holes
+            if (isClockWise(geom[j])) {
+                if (polygon) {
+                    geometry.push(polygon);
+                }
+                polygon = {
+                    flat: [],
+                    holes: []
+                };
+            } else {
+                if (j == 0) {
+                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+                }
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            for (let k = 0; k < geom[j].length; k++) {
+                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+            }
+        }
+        //if current polygon is not empty=> push it
+        if (polygon && polygon.flat.length > 0) {
+            geometry.push(polygon);
+        }
+        featureGeometries.push(geometry);
+    }
+
+    _decodeLines(geom, featureGeometries, mvt_extent){
+        let geometry = [];
+        geom.map(l => {
+            let line = [];
+            l.map(point => {
+                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+            });
+            geometry.push(line);
+        });
+        featureGeometries.push(geometry);
     }
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
@@ -23799,56 +24052,13 @@ class Windshaft {
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            let geometry = [];
             if (this.geomType == 'point') {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             } else if (this.geomType == 'polygon') {
-                let polygon = null;
-                /*
-                    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-                    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-                    See:
-                        https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                        https://en.wikipedia.org/wiki/Shoelace_formula
-                */
-                for (let j = 0; j < geom.length; j++) {
-                    //if exterior
-                    //   push current polygon & set new empty
-                    //else=> add index to holes
-                    if (isClockWise(geom[j])) {
-                        if (polygon) {
-                            geometry.push(polygon);
-                        }
-                        polygon = {
-                            flat: [],
-                            holes: []
-                        };
-                    } else {
-                        if (j == 0) {
-                            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                        }
-                        polygon.holes.push(polygon.flat.length / 2);
-                    }
-                    for (let k = 0; k < geom[j].length; k++) {
-                        polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                        polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
-                    }
-                }
-                //if current polygon is not empty=> push it
-                if (polygon && polygon.flat.length > 0) {
-                    geometry.push(polygon);
-                }
-                featureGeometries.push(geometry);
+                this._decodePolygons(geom, featureGeometries, mvt_extent);
             } else if (this.geomType == 'line') {
-                geom.map(l => {
-                    let line = [];
-                    l.map(point => {
-                        line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-                    });
-                    geometry.push(line);
-                });
-                featureGeometries.push(geometry);
+                this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
                 throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
             }
@@ -24026,13 +24236,13 @@ const layerUrl = function (layergroup, layerIndex, conf) {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(53);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -24042,7 +24252,7 @@ const layerUrl = function (layergroup, layerIndex, conf) {
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24179,7 +24389,7 @@ void main(void) {
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24268,7 +24478,7 @@ void main(void) {
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24317,7 +24527,7 @@ void main(void) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24365,7 +24575,7 @@ void main(void) {
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24403,7 +24613,7 @@ void main(void) {
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25060,7 +25270,7 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -25103,7 +25313,7 @@ class Dataframe {
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -25252,7 +25462,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25260,7 +25470,7 @@ function getRsysFromTile(x, y, z) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(59);
+var ieee754 = __webpack_require__(60);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -25877,7 +26087,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -25967,7 +26177,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25977,11 +26187,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(61)
-var util = __webpack_require__(63)
+var Map = __webpack_require__(62)
+var util = __webpack_require__(64)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(66)
+var Yallist = __webpack_require__(67)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -26441,7 +26651,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -26451,13 +26661,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(62)
+  module.exports = __webpack_require__(63)
 }
 
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -26576,7 +26786,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -27104,7 +27314,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(64);
+exports.isBuffer = __webpack_require__(65);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -27148,7 +27358,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(65);
+exports.inherits = __webpack_require__(66);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -27166,10 +27376,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(15)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(15)))
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -27180,7 +27390,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -27209,7 +27419,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -27585,16 +27795,16 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(68);
+module.exports.VectorTile = __webpack_require__(69);
 module.exports.VectorTileFeature = __webpack_require__(17);
 module.exports.VectorTileLayer = __webpack_require__(16);
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27618,7 +27828,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -27937,12 +28147,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(72);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -28024,7 +28234,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28157,7 +28367,7 @@ const validation = {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28165,9 +28375,13 @@ const validation = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__integration_mapbox_gl__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_functions__ = __webpack_require__(1);
+
+
 
 
 
@@ -28180,7 +28394,6 @@ const validation = {
  * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
  * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
  */
-
 
 class Layer {
 
@@ -28208,14 +28421,28 @@ class Layer {
 
         this._lastViewport = null;
         this._lastMNS = null;
-        this._mglIntegrator = null;
+        this._integrator = null;
         this._dataframes = [];
 
         this._id = id;
+        this.metadata = null;
         this.setSource(source);
         this.setStyle(style);
 
         console.log('L', this);
+
+        this.paintCallback = () => {
+            this._dataframes.map(
+                dataframe => {
+                    dataframe.setStyle(this._style);
+                    dataframe.visible = dataframe.active;
+                });
+            this._integrator.renderer.refresh(Number.NaN);
+            this._dataframes.map(
+                dataframe => {
+                    dataframe.visible = false;
+                });
+        };
     }
 
     /**
@@ -28231,13 +28458,13 @@ class Layer {
         source.bindLayer(
             dataframe => {
                 this._dataframes.push(dataframe);
-                this._mglIntegrator.renderer.addDataframe(dataframe);
-                this._mglIntegrator.invalidateMGLWebGLState();
+                this._integrator.renderer.addDataframe(dataframe);
+                this._integrator.invalidateWebGLState();
             },
             dataframe => {
                 this._dataframes = this._dataframes.filter(d => d !== dataframe);
-                this._mglIntegrator.renderer.removeDataframe(dataframe);
-                this._mglIntegrator.invalidateMGLWebGLState();
+                this._integrator.renderer.removeDataframe(dataframe);
+                this._integrator.invalidateWebGLState();
             }
         );
         if (this._source && this._source !== source) {
@@ -28256,13 +28483,16 @@ class Layer {
      */
     setStyle(style) {
         this._checkStyle(style);
-        if (this._style) {
-            this._style.onChange(null);
-        }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-        // Force style changed event
-        this._styleChanged();
+        return this._styleChanged(style).then(r => {
+            if (this._style) {
+                this._style.onChange(null);
+            }
+            this._style = style;
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -28273,19 +28503,25 @@ class Layer {
      * @memberof carto.Layer
      * @api
      */
-    blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_5__core_style_functions__["cubic"]) {
+    blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_7__core_style_functions__["cubic"]) {
         this._checkStyle(style);
         if (this._style) {
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            this._style.onChange(null);
         }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-        // Force style changed event
-        this._styleChanged();
+
+        return this._styleChanged(style).then(r => {
+            if (this._style) {
+                this._style.onChange(null);
+            }
+            this._style = style;
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -28298,12 +28534,33 @@ class Layer {
      * @api
      */
     addTo(map, beforeLayerID) {
-        if (this._isMGLMap(map)) {
+        if (this._isCartoMap(map)) {
+            this._addToCartoMap(map, beforeLayerID);
+        } else if (this._isMGLMap(map)) {
             this._addToMGLMap(map, beforeLayerID);
+        } else {
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidMap');
         }
-        else {
-            throw new Error('layer', 'nonValidMap');
-        }
+    }
+
+    hasDataframes() {
+        return this._dataframes.length > 0;
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getSource() {
+        return this._source;
+    }
+
+    getStyle() {
+        return this._style;
+    }
+
+    _isCartoMap(map) {
+        return map instanceof __WEBPACK_IMPORTED_MODULE_3__map__["a" /* default */];
     }
 
     _isMGLMap() {
@@ -28311,88 +28568,102 @@ class Layer {
         return true;
     }
 
-    _addToMGLMap(map, beforeLayerID) {
-        map.on('load', () => {
-            this._mglIntegrator = Object(__WEBPACK_IMPORTED_MODULE_3__integration_mapbox_gl__["a" /* default */])(map);
-            this._mglIntegrator.addLayer(this._id, beforeLayerID, this._getData.bind(this), () => {
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.setStyle(this._style);
-                        dataframe.visible = dataframe.active;
-                    });
-                this._mglIntegrator.renderer.refresh(Number.NaN);
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.visible = false;
-                    });
-            });
-        });
+    _addToCartoMap(map, beforeLayerID) {
+        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_4__integrator_carto__["a" /* default */])(map);
+        this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged() {
-        if (!(this._mglIntegrator && this._mglIntegrator.invalidateMGLWebGLState)) {
-            return;
+    initCallback() {
+        this._styleChanged(this._style);
+        this.requestData();
+    }
+    _addToMGLMap(map, beforeLayerID) {
+        if (map.isStyleLoaded()) {
+            this._onMapLoaded(map, beforeLayerID);
+        } else {
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
         }
-        this._getData();
-        const originalPromise = this.metadataPromise;
-        this.metadataPromise.then(metadata => {
-            // We should only compile the shaders if the metadata came from the original promise
-            // if not, we would be compiling with a stale metadata
-            if (originalPromise == this.metadataPromise) {
-                this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
-            }
+    }
+
+    _onMapLoaded(map, beforeLayerID) {
+        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__["a" /* default */])(map);
+        this._integrator.addLayer(this, beforeLayerID);
+    }
+
+    _styleChanged(style) {
+        const recompile = (metadata) => {
+            style._compileColorShader(this._integrator.renderer.gl, metadata);
+            style._compileWidthShader(this._integrator.renderer.gl, metadata);
+            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        };
+        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
+            return Promise.resolve();
+        }
+        const originalPromise = this.requestData(style);
+        if (!originalPromise) {
+            // The previous stored metadata is still valid
+            recompile(this.metadata);
+            return Promise.resolve();
+        }
+        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
+        return originalPromise.then(metadata => {
+            this.metadata = metadata;
+            recompile(metadata);
         });
     }
 
     _checkId(id) {
         if (__WEBPACK_IMPORTED_MODULE_0_lodash__["isUndefined"](id)) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'idRequired');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idRequired');
         }
         if (!__WEBPACK_IMPORTED_MODULE_0_lodash__["isString"](id)) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'idStringRequired');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idStringRequired');
         }
         if (__WEBPACK_IMPORTED_MODULE_0_lodash__["isEmpty"](id)) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidId');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidId');
         }
     }
 
     _checkSource(source) {
         if (__WEBPACK_IMPORTED_MODULE_0_lodash__["isUndefined"](source)) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'sourceRequired');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'sourceRequired');
         }
         if (!(source instanceof __WEBPACK_IMPORTED_MODULE_1__source_base__["a" /* default */])) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidSource');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidSource');
         }
     }
 
     _checkStyle(style) {
         if (__WEBPACK_IMPORTED_MODULE_0_lodash__["isUndefined"](style)) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'styleRequired');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'styleRequired');
         }
         if (!(style instanceof __WEBPACK_IMPORTED_MODULE_2__style__["a" /* default */])) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidStyle');
+            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidStyle');
         }
     }
 
     _getViewport() {
-        if (this._mglIntegrator) {
-            return this._mglIntegrator.renderer.getBounds();
+        if (this._integrator) {
+            return this._integrator.renderer.getBounds();
         }
         throw new Error('?');
     }
 
-    _getData() {
-        if (!this._mglIntegrator.invalidateMGLWebGLState) {
+    requestData(style) {
+        style = style || this._style;
+        if (!this._integrator.invalidateWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
-            this._style.getResolution());
-        if (r) {
-            this.metadataPromise = r;
-            r.then(() => this._styleChanged());
+        const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
+            style.getResolution());
+        if (promise) {
+            promise.then(() => {
+                this.requestData(style);
+            }, err => { console.log(err); });
+            return promise;
         }
     }
 
@@ -28407,7 +28678,7 @@ class Layer {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -28441,13 +28712,13 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 }
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(2);
@@ -28508,66 +28779,82 @@ function parseStyleDefinition(str) {
     return styleSpec;
 }
 
+function parseFunctionCall(node) {
+    const name = node.callee.name.toLowerCase();
+    if (aggFns.includes(name)) {
+        //node.arguments[0].name += '_' + name;
+        const args = node.arguments.map(arg => parseNode(arg));
+        return args[0];
+    }
+    const args = node.arguments.map(arg => parseNode(arg));
+    if (lowerCaseFunctions[name]) {
+        return lowerCaseFunctions[name](...args);
+    }
+    throw new Error(`Invalid function name '${node.callee.name}'`);
+}
+
+function parseBinaryOperation(node) {
+    const left = parseNode(node.left);
+    const right = parseNode(node.right);
+    switch (node.operator) {
+    case '*':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
+    case '/':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
+    case '+':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
+    case '-':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
+    case '%':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
+    case '^':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
+    default:
+        throw new Error(`Invalid binary operator '${node.operator}'`);
+    }
+}
+
+function parseUnaryOperation(node) {
+    switch (node.operator) {
+    case '-':
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
+    case '+':
+        return parseNode(node.argument);
+    default:
+        throw new Error(`Invalid unary operator '${node.operator}'`);
+    }
+}
+
+function parseIdentifier(node) {
+    if (node.name[0] == '$') {
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
+    } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()];
+    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+        return lowerCaseFunctions[node.name.toLowerCase()];
+    }
+}
+
 function parseNode(node) {
     if (node.type == 'CallExpression') {
-        const name = node.callee.name.toLowerCase();
-        if (aggFns.includes(name)) {
-            //node.arguments[0].name += '_' + name;
-            const args = node.arguments.map(arg => parseNode(arg));
-            return args[0];
-        }
-        const args = node.arguments.map(arg => parseNode(arg));
-        if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args);
-        }
-        throw new Error(`Invalid function name '${node.callee.name}'`);
+        return parseFunctionCall(node);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
         return node.elements.map(e => parseNode(e));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left);
-        const right = parseNode(node.right);
-        switch (node.operator) {
-        case '*':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
-        case '/':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
-        case '+':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
-        case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
-        case '%':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
-        case '^':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
-        default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
-        }
+        return parseBinaryOperation(node);
     } else if (node.type == 'UnaryExpression') {
-        switch (node.operator) {
-        case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
-        case '+':
-            return parseNode(node.argument);
-        default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
-        }
+        return parseUnaryOperation(node);
     } else if (node.type == 'Identifier') {
-        if (node.name[0] == '$') {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
-        } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]();
-        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-            return lowerCaseFunctions[node.name.toLowerCase()];
-        }
+        return parseIdentifier(node);
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -29254,12 +29541,43 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(10);
+
+
+let integrator = null;
+function getCartoMapIntegrator(map) {
+    if (!integrator) {
+        integrator = new CartoMapIntegrator(map);
+    }
+    return integrator;
+}
+
+class CartoMapIntegrator {
+    constructor(map) {
+        this.map = map;
+        this.renderer = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["b" /* Renderer */]();
+        this.renderer._initGL(this.map._gl);
+        this.invalidateWebGLState = () => {};
+    }
+
+    addLayer(layerId, layer) {
+        this.map.addLayer(layerId, layer);
+    }
+}
+
+
+/***/ }),
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(10);
 
 
 const DEG2RAD = Math.PI / 180;
@@ -29272,11 +29590,12 @@ let uid = 0;
 // TODO This needs to be separated by each mgl map to support multi map pages
 let integrator = null;
 function getMGLIntegrator(map) {
-    if (integrator) {
-        return integrator;
+    if (!integrator) {
+        integrator = new MGLIntegrator(map);
     }
-    return integrator ? integrator : new MGLIntegrator(map);
+    return integrator;
 }
+
 
 /**
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
@@ -29285,7 +29604,7 @@ class MGLIntegrator {
     constructor(map) {
         this.renderer = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["b" /* Renderer */]();
         this.map = map;
-        this.invalidateMGLWebGLState = null;
+        this.invalidateWebGLState = null;
 
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
@@ -29302,17 +29621,19 @@ class MGLIntegrator {
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
-    addLayer(layerId, beforeLayerID, moveCallback, paintCallback) {
+    addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
-        this._registerMoveObserver(callbackID, moveCallback);
+        const layerId = layer.getId();
+        this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (!this.invalidateMGLWebGLState) {
-                this.invalidateMGLWebGLState = invalidate;
+            if (!this.invalidateWebGLState) {
+                this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
+                layer.initCallback();
             }
-            paintCallback();
+            layer.paintCallback();
             invalidate();
         });
         this.map.addLayer({
@@ -29357,7 +29678,7 @@ function Wmxy(latLng) {
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

@@ -18,7 +18,7 @@ module.exports = function (config) {
             devtool: 'inline-source-map'
         },
         customLaunchers: {
-            // https://github.com/karma-runner/karma-chrome-launcher/issues/158
+            // Add no-sandbox flag due a bug. https://github.com/karma-runner/karma-chrome-launcher/issues/158
             ChromeHeadlessNoSandbox: {
                 base: 'ChromeHeadless',
                 flags: ['--no-sandbox']

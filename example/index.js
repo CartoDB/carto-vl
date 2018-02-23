@@ -84,10 +84,17 @@ const texts = [
 
 const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    setopacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
+const BASEMAPS = {
+    DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+};
+
+var basemap = 'DarkMatter';
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
     container: 'map', // container id
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json', // stylesheet location
+    style: BASEMAPS[basemap], // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
 });
@@ -99,27 +106,34 @@ const auth = {
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
 const layer = new carto.Layer('myCartoLayer', source, style);
-layer.addTo(map, 'watername_ocean');
 
-setInterval(()=>{
+setInterval(() => {
     document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
 }, 500)
 
 map.on('load', () => {
+    layer.addTo(map, 'watername_ocean');
+
     let index = 0;//styles.length - 1;
 
+    function handleError(error) {
+        const err = `Invalid style: ${error}:${error.stack}`;
+        console.warn(err);
+        document.getElementById('feedback').value = err;
+        document.getElementById('feedback').style.display = 'block';
+    }
     function updateStyle(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            layer.blendToStyle(new carto.Style(v));
+            const promise = layer.blendToStyle(new carto.Style(v));
             document.getElementById('feedback').style.display = 'none';
+            if (promise) {
+                promise.catch(handleError);
+            }
         } catch (error) {
-            const err = `Invalid style: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById('feedback').value = err;
-            document.getElementById('feedback').style.display = 'block';
+            handleError(error);
         }
     }
 
@@ -210,22 +224,23 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
-        layer.setStyle(new carto.Style());
-        layer.setSource(new carto.source.Dataset(
-            $('#dataset').val(),
-            {
-                user: $('#user').val(),
-                apiKey: 'YOUR_API_KEY'
-            },
-            {
-                serverURL: $('#serverURL').val()
-            }
-        ));
+        layer.setStyle(new carto.Style()).then(() => {
+            layer.setSource(new carto.source.Dataset(
+                $('#dataset').val(),
+                {
+                    user: $('#user').val(),
+                    apiKey: 'YOUR_API_KEY'
+                },
+                {
+                    serverURL: $('#serverURL').val()
+                }
+            ));
 
-        localStorage.setItem('serverURL', $('#serverURL').val());
-        localStorage.setItem('user', $('#user').val());
-        localStorage.setItem('dataset', $('#dataset').val());
-        updateStyle();
+            localStorage.setItem('serverURL', $('#serverURL').val());
+            localStorage.setItem('user', $('#user').val());
+            localStorage.setItem('dataset', $('#dataset').val());
+            updateStyle();
+        });
     };
 
 
@@ -270,4 +285,33 @@ map.on('load', () => {
     } else {
         barcelona();
     }
+});
+
+const basemapSelector = document.querySelector('#basemap');
+Object.keys(BASEMAPS).forEach(id => {
+    const l = document.createElement('label');
+
+    const i = document.createElement('input');
+    i.type = 'radio';
+    i.name = 'basemap';
+    i.value = id;
+    i.checked = id === basemap;
+    i.onclick = () => {
+        map.setStyle(BASEMAPS[id]);
+        let added = false;
+        map.on('sourcedata', event => {
+            if (map.isStyleLoaded() && !added) {
+                layer.addTo(map, 'watername_ocean');
+                added = true;
+            }
+        });
+    };
+    i.selected = 'selected';
+    l.appendChild(i);
+
+    const s = document.createElement('span');
+    s.innerText = id;
+    l.appendChild(s);
+
+    basemapSelector.appendChild(l);
 });

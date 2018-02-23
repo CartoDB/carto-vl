@@ -32,6 +32,8 @@ yarn
 
 ### Run the tests
 
+#### Unit tests
+
 ```
 yarn test
 ```
@@ -48,7 +50,19 @@ To launch the unit tests in the browser
 yarn test:browser
 ```
 
-Note: you need to configure the CHROME_BIN variable before running the tests, for example:
+#### Acceptance tests
+
+```
+yarn test:acceptance
+```
+
+To add more acceptance tests
+
+```
+yarn test:acceptance:prepare
+```
+
+**Note**: you need to configure the CHROME_BIN variable before running the tests, for example:
 
 ```
 export CHROME_BIN=/usr/bin/chromium-browser
