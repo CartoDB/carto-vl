@@ -52,13 +52,10 @@ export default class Ramp extends Expression {
         if (palette.type == 'paletteGenerator') {
             let colors;
             if (input.numCategories) {
-                if (palette.subPalettes[input.numCategories]) {
-                    if (palette.tags.includes('qualitative') && !input.othersBucket) {
-                        colors = palette.subPalettes[input.numCategories];
-                    } else {
-                        // Since we are not gonna pop the others we don't need to get the extra color
-                        colors = palette.subPalettes[input.numCategories - 1];
-                    }
+                // If we are not gonna pop the others we don't need to get the extra color
+                const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
+                if (palette.subPalettes[subPalette]) {
+                    colors = palette.subPalettes[subPalette];
                 } else {
                     // More categories than palettes, new colors will be created by linear interpolation
                     colors = palette.getLongestSubPalette();
