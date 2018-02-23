@@ -1,6 +1,7 @@
 import * as R from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import Property from '../../core/style/expressions/property';
+import * as LRU from 'lru-cache';
 
 const PROPERTIES = ['feature_count', 'total_amount', 'trip_distance'];
 
@@ -16,7 +17,7 @@ function Wmxy(latLng) {
     let lng = latLng.lng * DEG2RAD;
     let x = lng * EARTH_RADIUS;
     let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
+    return { x, y };
 }
 
 function fetchFromServer(url) {
@@ -69,6 +70,23 @@ export default class BQ {
     constructor(table, auth) {
         const query = `SELECT *, 2000 AS feature_count FROM ${table}_sample`
         this.sample = new carto.source.SQL(query, auth);
+
+        const lruOptions = {
+            max: 1000
+            // TODO improve cache length heuristic
+            , length: function () { return 1; }
+            , dispose: (key, promise) => {
+                promise.then(dataframe => {
+                    if (!dataframe.empty) {
+                        dataframe.free();
+                        this._removeDataframe(dataframe);
+                    }
+                });
+            }
+            , maxAge: 1000 * 60 * 60
+        };
+
+        this.cache = LRU(lruOptions);
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -78,29 +96,43 @@ export default class BQ {
     }
 
     requestData(viewport, mns, resolution) {
-        // TODO: based on viewport determine if current dataframes are OK, or
-        // we need more detailed ones, etc.
-
         if (!this.metadataInit) {
             this.metadataInit = true;
             // relay to preview data
-            this.sample.requestData(viewport, mns, resolution);
-            return fetchFromServer('http://localhost:3000/metadata/')
+            const previewMeta = this.sample.requestData(viewport, mns, resolution);
+            const realMeta = fetchFromServer('http://localhost:3000/metadata/')
+            return previewMeta;
         }
         else if (!this.dataInit) {
-            fetchDataframe('http://localhost:3000/').then(dataframe => {
-                // TODO: remove or deactivate preview dataframes
-                this._addDataframe(dataframe);
-            });
-
+            const tiles = rsys.rTiles(viewport);
             // while we wait, provide some preview data
-            return this.sample.requestData(viewport, mns, resolution);
+            this.sample.requestData(viewport, mns, resolution);
+            tiles.forEach(t => this._getDataframe(t.x, t.y, t.z));
         }
+    }
+
+    _getDataframe(x, y, z) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            // c.then(dataframe => dataframe.active = true);
+            return c;
+        }
+        const promise = fetchDataframe(`http://localhost:3000/tile/${z}/${x}/${y}`).then(dataframe => {
+                console.log("DATAFRAME",x,y,z)
+                this.sample._client.deactivate(x, y, z)
+                // this.sample._client.remove(t.x, t.y, t.z)
+                this._addDataframe(dataframe);
+        });
+
+        this.cache.set(id, promise);
+        return promise;
     }
 
 
     free() {
         this._client.free();
+        this.cache.reset();
         this.sample.free();
     }
 }

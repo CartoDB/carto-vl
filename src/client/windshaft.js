@@ -146,6 +146,20 @@ export default class Windshaft {
         })();
     }
 
+    deactivate(x, y, z) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            c.then(df => df.active = false);
+        }
+    }
+
+    remove(x, y, z) {
+        const id = `${x},${y},${z}`;
+        this.cache.del(id);
+    }
+
+
     free() {
         this.cache.reset();
     }
