@@ -18,6 +18,7 @@ void main(void) {
     if (color.a==0.){
         p.x=10000.;
     }
+    color.rgb * = color.a;
     gl_Position  = p;
 }`;
 
