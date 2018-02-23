@@ -1,4 +1,4 @@
-import { palettes } from './expressions/palettes';
+import { palettes, Inverse } from './expressions/palettes';
 import Animate from './expressions/animate';
 import Blend from './expressions/blend';
 import Buckets from './expressions/buckets';
@@ -117,6 +117,7 @@ export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const inverse = (...args) => new Inverse(...args);
 
 
 export { palettes, Asc, Desc };
