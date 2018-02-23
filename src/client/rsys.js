@@ -3,7 +3,6 @@
  * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
  * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
  * It is the combination of a translation and anisotropic scaling.
- * @api
  * @typedef {object} RSys - Renderer relative coordinate system
  * @property {RPoint} center - Position of the local system in external coordinates
  * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
@@ -45,7 +44,6 @@
 
 /**
  * R coordinates to World
- * @api
  * @param {RSys} r - ref. of the passed coordinates
  * @param {number} x - x coordinate in r
  * @param {number} y - y coordinate in r
@@ -57,7 +55,6 @@ function rToW(r, x, y) {
 
 /**
  * World coordinates to local RSys
- * @api
  * @param {number} x - x W-coordinate
  * @param {number} y - y W-coordinate
  * @param {RSys} r - target ref. system
@@ -69,7 +66,6 @@ function wToR(x, y, r) {
 
 /**
  * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
- * @api
  * @param {number} x - TC x coordinate
  * @param {number} y - TC y coordinate
  * @param {number} z - Tile zoom level
@@ -82,7 +78,6 @@ function tileRsys(x, y, z) {
 
 /**
  * Minimum zoom level for which tiles are no larger than the RSys rectangle
- * @api
  * @param {RSys} rsys
  * @return {number}
  */
@@ -143,4 +138,3 @@ function getRsysFromTile(x, y, z) {
 }
 
 export { rTiles, getRsysFromTile };
-

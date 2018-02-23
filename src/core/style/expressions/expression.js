@@ -5,7 +5,6 @@ import * as schema from '../../schema';
 
 export default class Expression {
     /**
-     * @api
      * @hideconstructor
      * @param {*} children
      * @param {*} inlineMaker
@@ -102,6 +101,15 @@ export default class Expression {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
+        this._metaBindings.map(m => blender._bind(m));
+        parent._replaceChild(this, blender);
+        blender.notify();
+    }
+
+    blendFrom(final, duration = 500, interpolator = null) {
+        final = implicitCast(final);
+        const parent = this.parent;
+        const blender = blend(final, this, animate(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
         parent._replaceChild(this, blender);
         blender.notify();

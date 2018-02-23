@@ -1,14 +1,12 @@
 import * as shaders from './shaders';
-import * as Style from './style';
 import * as schema from './schema';
 import * as earcut from 'earcut';
 import Dataframe from './dataframe';
-import * as ordering from './style/expressions/ordering';
+import { Asc, Desc } from './style/functions';
 
 const HISTOGRAM_BUCKETS = 1000;
 
 /**
- * @api
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
@@ -87,6 +85,12 @@ Renderer.prototype._initGL = function (gl) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    this._AATex = gl.createTexture();
+    this._AAFB = gl.createFramebuffer();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
 };
 
 /**
@@ -104,7 +108,6 @@ Renderer.prototype.getCenter = function () {
 Renderer.prototype.setCenter = function (x, y) {
     this._center.x = x;
     this._center.y = y;
-    this._RAF();
 };
 /**
  * Get Renderer visualization bounds
@@ -129,12 +132,10 @@ Renderer.prototype.getZoom = function () {
  */
 Renderer.prototype.setZoom = function (zoom) {
     this._zoom = zoom;
-    this._RAF();
 };
 
 /**
  * Removes a dataframe for the renderer. Freeing its resources.
- * @api
  * @param {*} tile
  */
 Renderer.prototype.removeDataframe = function (dataframe) {
@@ -337,7 +338,6 @@ Renderer.prototype.addDataframe = function (dataframe) {
 
     dataframe.setStyle = (style) => {
         dataframe.style = style;
-        this._RAF();
     };
     dataframe.style = null;
 
@@ -370,13 +370,7 @@ Renderer.prototype.addDataframe = function (dataframe) {
     gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
 
-
-    this._RAF();
     return dataframe;
-};
-
-Renderer.prototype._RAF = function () {
-    //window.requestAnimationFrame(this.refresh.bind(this));
 };
 
 Renderer.prototype.getAspect = function () {
@@ -411,10 +405,10 @@ Renderer.prototype._computeDrawMetadata = function () {
         columns: []
     };
     let requiredColumns = tiles.map(d => {
-        const widthRequirements = d.style._width._getDrawMetadataRequirements();
-        const colorRequirements = d.style._color._getDrawMetadataRequirements();
-        const strokeWidthRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
-        const strokeColorRequirements = d.style._strokeWidth._getDrawMetadataRequirements();
+        const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
         return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
             reduce(schema.union, schema.IDENTITY);
     }).reduce(schema.union, schema.IDENTITY).columns;
@@ -509,6 +503,26 @@ Renderer.prototype._computeDrawMetadata = function () {
     return drawMetadata;
 };
 
+function getOrderingRenderBuckets(tiles) {
+    let orderer = null;
+    if (tiles.length > 0) {
+        orderer = tiles[0].style.getOrder();
+    }
+    let orderingMins = [0];
+    let orderingMaxs = [1000];
+    if (orderer instanceof Asc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
+    } else if (orderer instanceof Desc) {
+        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
+        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
+    }
+    return {
+        orderingMins,
+        orderingMaxs
+    };
+}
+
 Renderer.prototype.refresh = function (timestamp) {
     const gl = this.gl;
     // Don't re-render more than once per animation frame
@@ -565,10 +579,10 @@ Renderer.prototype.refresh = function (timestamp) {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         gl.disableVertexAttribArray(shader.vertexAttribute);
     };
-    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style._color, tile.style.propertyColorTID));
-    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style._width, tile.style.propertyWidthTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style._strokeColor, tile.style.propertyStrokeColorTID));
-    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style._strokeWidth, tile.style.propertyStrokeWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
+    tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
+    tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
 
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     gl.enable(gl.BLEND);
@@ -576,26 +590,29 @@ Renderer.prototype.refresh = function (timestamp) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
+        const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+
+        if (w != this._width || h != this._height) {
+            gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
+
+            [this._width, this._height] = [w, h];
+        }
+        gl.viewport(0, 0, w * 2, h * 2);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
 
     const s = 1. / this._zoom;
 
-    // TODO remove hack
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer =tiles[0].style._order;
-    }
-    let orderingMins = null;
-    let orderingMaxs = null;
-    if (orderer instanceof ordering.Asc) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => (15 - i) * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 0 ? 1000 : (15 - i + 1) * 2);
-    } else if (orderer instanceof ordering.Desc) {
-        orderingMins = Array.from({ length: 16 }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: 16 }, (_, i) => i == 15 ? 1000 : (i + 1) * 2);
-    }else{
-        orderingMins = [0];
-        orderingMaxs = [1000];
-    }
+    const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
     const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -667,14 +684,28 @@ Renderer.prototype.refresh = function (timestamp) {
         renderDrawPass(orderingIndex);
     });
 
+    if (tiles.length && tiles[0].type != 'point') {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        gl.useProgram(this._aaBlendShader.program);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this._AATex);
+        gl.uniform1i(this._aaBlendShader.readTU, 0);
+
+        gl.enableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+        gl.vertexAttribPointer(this._aaBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
+    }
+
+
     this.computePool.map(job => job.work(this));
     this.computePool = [];
 
-    tiles.forEach(t => {
-        if (t.style._color.isAnimated() || t.style._width.isAnimated()) {
-            this._RAF();
-        }
-    });
     gl.disable(gl.CULL_FACE);
 };
 
@@ -685,6 +716,7 @@ Renderer.prototype._initShaders = function () {
     this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
     this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
     this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
+    this._aaBlendShader = new shaders.AABlender(this.gl);
 };
 
 Renderer.prototype.compute = function (type, expressions) {
@@ -696,4 +728,4 @@ Renderer.prototype.compute = function (type, expressions) {
 };
 
 
-export { Renderer, Style, Dataframe, schema };
+export { Renderer, Dataframe, schema };

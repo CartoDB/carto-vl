@@ -4,7 +4,6 @@ import Expression from './expression';
 
 export default class Blend extends Expression {
     /**
-     * @api
      * @description Interpolate from *a* to *b* based on *mix*
      * @param {*} a can be a color or a number
      * @param {*} b type must match a's type
@@ -14,7 +13,7 @@ export default class Blend extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
-        if (interpolator && interpolator.isInterpolator) {
+        if (interpolator) {
             mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });

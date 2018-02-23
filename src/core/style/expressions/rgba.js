@@ -4,7 +4,6 @@ import { float } from '../functions';
 //TODO refactor to uniformcolor, write color (plain, literal)
 export default class RGBA extends Expression {
     /**
-     * @api
      * @description RGBA color constructor
      * @param {*} r red component in the [0,1] range
      * @param {*} g green component in the [0,1] range

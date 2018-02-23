@@ -23,24 +23,25 @@
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
             center: [2.17, 41.38],
-            zoom: 0,
+            zoom: 0
         });
 
-        const auth = {
+        carto.setDefaultAuth({
             user: 'dmanzanares',
-            apiKey: ''
-        };
+            apiKey: 'YOUR_API_KEY'
+        });
 
-        const source0 = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-        const style0 = new carto.Style();
+        const source0 = new carto.source.Dataset('ne_10m_populated_places_simple');
+        const style0 = new carto.Style(`
+          color: rgba(1,0,0,0.8)
+        `);
         const layer0 = new carto.Layer('layer0', source0, style0);
 
-        layer0.addTo(map, 'watername_ocean');
-
-        const source1 = new carto.source.Dataset('world_borders', auth);
+        const source1 = new carto.source.SQL('SELECT * FROM world_borders');
         const style1 = new carto.Style();
         const layer1 = new carto.Layer('layer1', source1, style1);
 
-        layer1.addTo(map, 'watername_ocean');
+        layer0.addTo(map, 'watername_ocean');
+        layer1.addTo(map, 'layer0');
     </script>
 </html>
