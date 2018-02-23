@@ -61,9 +61,6 @@ class Tri {
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
         this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
     }
 }
 class Line {
