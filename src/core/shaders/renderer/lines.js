@@ -18,6 +18,7 @@ varying lowp vec4 color;
 
 void main(void) {
     color = texture2D(colorTex, featureID);
+    color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normal*0.001*size-vertexOffset, 0.5, 1.);

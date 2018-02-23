@@ -106,13 +106,14 @@ const auth = {
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
 const layer = new carto.Layer('myCartoLayer', source, style);
-layer.addTo(map, 'watername_ocean');
 
 setInterval(() => {
     document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
 }, 500)
 
 map.on('load', () => {
+    layer.addTo(map, 'watername_ocean');
+
     let index = 0;//styles.length - 1;
 
     function updateStyle(v) {
@@ -120,7 +121,7 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            layer.setStyle(new carto.Style(v));
+            layer.blendToStyle(new carto.Style(v));
             document.getElementById('feedback').style.display = 'none';
         } catch (error) {
             const err = `Invalid style: ${error}:${error.stack}`;
@@ -217,6 +218,7 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
+        layer.setStyle(new carto.Style());
         layer.setSource(new carto.source.Dataset(
             $('#dataset').val(),
             {

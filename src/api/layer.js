@@ -2,14 +2,16 @@ import * as _ from 'lodash';
 
 import SourceBase from './source/base';
 import Style from './style';
-import getMGLIntegrator from './integration/mapbox-gl';
+import CartoMap from './map';
+import getCMIntegrator from './integrator/carto';
+import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
+import { cubic } from '../core/style/functions';
 
 /**
  * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
  * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
  */
-
 
 export default class Layer {
 
@@ -37,7 +39,7 @@ export default class Layer {
 
         this._lastViewport = null;
         this._lastMNS = null;
-        this._mglIntegrator = null;
+        this._integrator = null;
         this._dataframes = [];
 
         this._id = id;
@@ -45,6 +47,19 @@ export default class Layer {
         this.setStyle(style);
 
         console.log('L', this);
+
+        this.paintCallback = () => {
+            this._dataframes.map(
+                dataframe => {
+                    dataframe.setStyle(this._style);
+                    dataframe.visible = dataframe.active;
+                });
+            this._integrator.renderer.refresh(Number.NaN);
+            this._dataframes.map(
+                dataframe => {
+                    dataframe.visible = false;
+                });
+        };
     }
 
     /**
@@ -60,13 +75,13 @@ export default class Layer {
         source.bindLayer(
             dataframe => {
                 this._dataframes.push(dataframe);
-                this._mglIntegrator.renderer.addDataframe(dataframe);
-                this._mglIntegrator.invalidateMGLWebGLState();
+                this._integrator.renderer.addDataframe(dataframe);
+                this._integrator.invalidateWebGLState();
             },
             dataframe => {
                 this._dataframes = this._dataframes.filter(d => d !== dataframe);
-                this._mglIntegrator.renderer.removeDataframe(dataframe);
-                this._mglIntegrator.invalidateMGLWebGLState();
+                this._integrator.renderer.removeDataframe(dataframe);
+                this._integrator.invalidateWebGLState();
             }
         );
         if (this._source && this._source !== source) {
@@ -95,6 +110,29 @@ export default class Layer {
     }
 
     /**
+     * Blend the current style with another style
+     *
+     * @param {carto.Style} style - style to blend to
+     *
+     * @memberof carto.Layer
+     * @api
+     */
+    blendToStyle(style, ms = 400, interpolator = cubic) {
+        this._checkStyle(style);
+        if (this._style) {
+            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
+            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
+            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
+            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+            this._style.onChange(null);
+        }
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+        // Force style changed event
+        this._styleChanged();
+    }
+
+    /**
      * Add this layer to a map.
      *
      * @param {mapboxgl.Map} map
@@ -104,12 +142,33 @@ export default class Layer {
      * @api
      */
     addTo(map, beforeLayerID) {
-        if (this._isMGLMap(map)) {
+        if (this._isCartoMap(map)) {
+            this._addToCartoMap(map, beforeLayerID);
+        } else if (this._isMGLMap(map)) {
             this._addToMGLMap(map, beforeLayerID);
+        } else {
+            throw new CartoValidationError('layer', 'nonValidMap');
         }
-        else {
-            throw new Error('layer', 'nonValidMap');
-        }
+    }
+
+    hasDataframes() {
+        return this._dataframes.length > 0;
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getSource() {
+        return this._source;
+    }
+
+    getStyle() {
+        return this._style;
+    }
+
+    _isCartoMap(map) {
+        return map instanceof CartoMap;
     }
 
     _isMGLMap() {
@@ -117,44 +176,40 @@ export default class Layer {
         return true;
     }
 
-    _addToMGLMap(map, beforeLayerID) {
-        const onMapLoaded = () => {
-            this._mglIntegrator = getMGLIntegrator(map);
-            this._mglIntegrator.addLayer(this._id, beforeLayerID, this._getData.bind(this), () => {
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.setStyle(this._style);
-                        dataframe.visible = dataframe.active;
-                    });
-                this._mglIntegrator.renderer.refresh(Number.NaN);
-                this._dataframes.map(
-                    dataframe => {
-                        dataframe.visible = false;
-                    });
-            });
-        };
+    _addToCartoMap(map, beforeLayerID) {
+        this._integrator = getCMIntegrator(map);
+        this._integrator.addLayer(this, beforeLayerID);
+    }
 
+    _addToMGLMap(map, beforeLayerID) {
         if (map.isStyleLoaded()) {
-            onMapLoaded();
+            this._onMapLoaded(map, beforeLayerID);
         } else {
-            map.on('load', onMapLoaded);
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
         }
     }
 
+    _onMapLoaded(map, beforeLayerID) {
+        this._integrator = getMGLIntegrator(map);
+        this._integrator.addLayer(this, beforeLayerID);
+    }
+
     _styleChanged() {
-        if (!(this._mglIntegrator && this._mglIntegrator.invalidateMGLWebGLState)) {
+        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return;
         }
-        this._getData();
+        this.requestData();
         const originalPromise = this.metadataPromise;
         this.metadataPromise.then(metadata => {
             // We should only compile the shaders if the metadata came from the original promise
             // if not, we would be compiling with a stale metadata
             if (originalPromise == this.metadataPromise) {
-                this._style._compileColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileWidthShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeColorShader(this._mglIntegrator.renderer.gl, metadata);
-                this._style._compileStrokeWidthShader(this._mglIntegrator.renderer.gl, metadata);
+                this._style._compileColorShader(this._integrator.renderer.gl, metadata);
+                this._style._compileWidthShader(this._integrator.renderer.gl, metadata);
+                this._style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+                this._style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
             }
         });
     }
@@ -190,14 +245,14 @@ export default class Layer {
     }
 
     _getViewport() {
-        if (this._mglIntegrator) {
-            return this._mglIntegrator.renderer.getBounds();
+        if (this._integrator) {
+            return this._integrator.renderer.getBounds();
         }
         throw new Error('?');
     }
 
-    _getData() {
-        if (!this._mglIntegrator.invalidateMGLWebGLState) {
+    requestData() {
+        if (!this._integrator.invalidateWebGLState) {
             return;
         }
         const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),

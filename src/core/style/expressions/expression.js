@@ -106,6 +106,15 @@ export default class Expression {
         blender.notify();
     }
 
+    blendFrom(final, duration = 500, interpolator = null) {
+        final = implicitCast(final);
+        const parent = this.parent;
+        const blender = blend(final, this, animate(duration), interpolator);
+        this._metaBindings.map(m => blender._bind(m));
+        parent._replaceChild(this, blender);
+        blender.notify();
+    }
+
     /**
      * @returns a list with the expression children
      */
