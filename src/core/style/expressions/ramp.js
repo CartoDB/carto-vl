@@ -16,7 +16,7 @@ export default class Ramp extends Expression {
             minKey = implicitCast(minKey);
             maxKey = implicitCast(maxKey);
         }
-        var values = implicitCast(palette);
+        palette = implicitCast(palette);
         super({ input: input });
         if (minKey === undefined) {
             minKey = float(0);
@@ -24,7 +24,7 @@ export default class Ramp extends Expression {
         }
         this.minKey = minKey.expr;
         this.maxKey = maxKey.expr;
-        this.values = values;
+        this.palette = palette;
     }
     _compile(meta) {
         super._compile(meta);
@@ -48,6 +48,30 @@ export default class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
+    _getColorsFromPalette(input, palette) {
+        if (palette.type == 'paletteGenerator') {
+            let colors;
+            if (input.numCategories) {
+                // If we are not gonna pop the others we don't need to get the extra color
+                const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
+                if (palette.subPalettes[subPalette]) {
+                    colors = palette.subPalettes[subPalette];
+                } else {
+                    // More categories than palettes, new colors will be created by linear interpolation
+                    colors = palette.getLongestSubPalette();
+                }
+            } else {
+                colors = palette.getLongestSubPalette();
+            }
+            // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
+            if (palette.tags.includes('qualitative') && !input.othersBucket) {
+                colors = colors.slice(0, colors.length - 1);
+            }
+            return colors;
+        } else {
+            return palette;
+        }
+    }
     _postShaderCompile(program, gl) {
         if (!this.init) {
             this.init = true;
@@ -61,13 +85,14 @@ export default class Ramp extends Expression {
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
-            const values = this.values;
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+
             for (var i = 0; i < width; i++) {
-                const vlowRaw = values[Math.floor(i / width * (values.length - 1))];
-                const vhighRaw = values[Math.ceil(i / width * (values.length - 1))];
+                const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
                 const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
                 const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-                const m = i / width * (values.length - 1) - Math.floor(i / width * (values.length - 1));
+                const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
                 pixel[4 * i + 1] = v[1];
