@@ -150,19 +150,19 @@ export default class Layer {
             throw new CartoValidationError('layer', 'nonValidMap');
         }
     }
-    
+
     hasDataframes() {
         return this._dataframes.length > 0;
     }
-    
+
     getId() {
         return this._id;
     }
-    
+
     getSource() {
         return this._source;
     }
-    
+
     getStyle() {
         return this._style;
     }
@@ -182,16 +182,18 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        const onMapLoaded = () => {
-            this._integrator = getMGLIntegrator(map);
-            this._integrator.addLayer(this, beforeLayerID);
-        };
-
         if (map.loaded()) {
-            onMapLoaded();
+            this._onMapLoaded(map, beforeLayerID);
         } else {
-            map.on('load', onMapLoaded);
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
         }
+    }
+
+    _onMapLoaded(map, beforeLayerID) {
+        this._integrator = getMGLIntegrator(map);
+        this._integrator.addLayer(this, beforeLayerID);
     }
 
     _styleChanged() {
