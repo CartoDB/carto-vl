@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-
+import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
 
@@ -41,10 +40,10 @@ function cleanDefaultAuth() {
  * @param  {object} auth
  */
 function checkAuth(auth) {
-    if (_.isUndefined(auth)) {
+    if (util.isUndefined(auth)) {
         throw new CartoValidationError('setup', 'authRequired');
     }
-    if (!_.isObject(auth)) {
+    if (!util.isObject(auth)) {
         throw new CartoValidationError('setup', 'authObjectRequired');
     }
     auth.username = auth.user; // API adapter
@@ -53,25 +52,25 @@ function checkAuth(auth) {
 }
 
 function checkApiKey(apiKey) {
-    if (_.isUndefined(apiKey)) {
+    if (util.isUndefined(apiKey)) {
         throw new CartoValidationError('setup', 'apiKeyRequired');
     }
-    if (!_.isString(apiKey)) {
+    if (!util.isString(apiKey)) {
         throw new CartoValidationError('setup', 'apiKeyStringRequired');
     }
-    if (_.isEmpty(apiKey)) {
+    if (apiKey === '') {
         throw new CartoValidationError('setup', 'nonValidApiKey');
     }
 }
 
 function checkUsername(username) {
-    if (_.isUndefined(username)) {
+    if (util.isUndefined(username)) {
         throw new CartoValidationError('setup', 'usernameRequired');
     }
-    if (!_.isString(username)) {
+    if (!util.isString(username)) {
         throw new CartoValidationError('setup', 'usernameStringRequired');
     }
-    if (_.isEmpty(username)) {
+    if (username === '') {
         throw new CartoValidationError('setup', 'nonValidUsername');
     }
 }

@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-
+import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
 
@@ -41,7 +40,7 @@ function cleanDefaultConfig() {
  */
 function checkConfig(config) {
     if (config) {
-        if (!_.isObject(config)) {
+        if (!util.isObject(config)) {
             throw new CartoValidationError('setup', 'configObjectRequired');
         }
         _checkServerURL(config.serverURL);
@@ -49,7 +48,7 @@ function checkConfig(config) {
 }
 
 function _checkServerURL(serverURL) {
-    if (!_.isString(serverURL)) {
+    if (!util.isString(serverURL)) {
         throw new CartoValidationError('setup', 'serverURLStringRequired');
     }
 }

@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-
+import * as util from '../util';
 import Base from './base';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
@@ -37,13 +36,13 @@ export default class Dataset extends Base {
     }
 
     _checkTableName(tableName) {
-        if (_.isUndefined(tableName)) {
+        if (util.isUndefined(tableName)) {
             throw new CartoValidationError('source', 'tableNameRequired');
         }
-        if (!_.isString(tableName)) {
+        if (!util.isString(tableName)) {
             throw new CartoValidationError('source', 'tableNameStringRequired');
         }
-        if (_.isEmpty(tableName)) {
+        if (tableName === '') {
             throw new CartoValidationError('source', 'nonValidTableName');
         }
     }
