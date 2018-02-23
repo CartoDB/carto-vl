@@ -38,60 +38,72 @@ class AABlender {
     }
 }
 
-function Point(gl) {
-    compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
-    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-    this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
-    this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
-}
-function Tri(gl) {
-    compileProgram.call(this, gl, rendererGLSL.tris.VS, rendererGLSL.tris.FS);
-    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-}
-function Line(gl) {
-    compileProgram.call(this, gl, rendererGLSL.line.VS, rendererGLSL.line.FS);
-    this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-    this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-    this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-    this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-    this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-    this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-    this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-    this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-    this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-}
-function GenericStyler(gl, glsl, preface, inline) {
-    const VS = glsl.VS;
-    let FS = glsl.FS;
-    FS = FS.replace('$PREFACE', preface);
-    FS = FS.replace('$INLINE', inline);
-    //console.log(FS)
-    compileProgram.call(this, gl, VS, FS);
-    this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-    this.textureLocations = [];
-    for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-        this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+class Point {
+    constructor(gl) {
+        compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
+        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
     }
 }
-function Color(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL, preface, inline);
+class Tri {
+    constructor(gl) {
+        compileProgram.call(this, gl, rendererGLSL.tris.VS, rendererGLSL.tris.FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+    }
 }
-function Width(gl, preface, inline) {
-    GenericStyler.call(this, gl, stylerGLSL, preface, `vec4((${inline})/64.)`);
+class Line {
+    constructor(gl) {
+        compileProgram.call(this, gl, rendererGLSL.line.VS, rendererGLSL.line.FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+    }
+}
+class GenericStyler {
+    constructor(gl, glsl, preface, inline) {
+        const VS = glsl.VS;
+        let FS = glsl.FS;
+        FS = FS.replace('$PREFACE', preface);
+        FS = FS.replace('$INLINE', inline);
+        //console.log(FS)
+        compileProgram.call(this, gl, VS, FS);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.textureLocations = [];
+        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
+            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+        }
+    }
+}
+class Color extends GenericStyler{
+    constructor(gl, preface, inline){
+        super(gl, stylerGLSL, preface, inline);
+    }
+}
+class Width extends GenericStyler{
+    constructor(gl, preface, inline){
+        super(gl, stylerGLSL, preface, `vec4((${inline})/64.)`);
+    }
 }
 
 const renderer = {
