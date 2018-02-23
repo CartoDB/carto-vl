@@ -20,6 +20,7 @@ describe('api/layer', () => {
             const layer = new Layer('layer0', source, style);
             expect(layer.getId()).toEqual('layer0');
             expect(layer.getSource()).toEqual(source);
+            pending('Layer constructor can fail asynchronously, therefore, we must have some way to detect load event');
             expect(layer.getStyle()).toEqual(style);
         });
 
@@ -89,20 +90,20 @@ describe('api/layer', () => {
             });
 
             it('should call onMapLoaded when the map is loaded', () => {
-                const mapMock = { loaded: () => true };
+                const mapMock = { isStyleLoaded: () => true };
                 this.layer._addToMGLMap(mapMock);
                 expect(this.layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
             });
 
             it('should not call onMapLoaded when the map is not loaded', () => {
-                const mapMock = { loaded: () => false, on: () => {} };
+                const mapMock = { isStyleLoaded: () => false, on: () => {} };
                 this.layer._addToMGLMap(mapMock);
                 expect(this.layer._onMapLoaded).not.toHaveBeenCalled();
             });
 
             it('should call onMapLoaded when the map `load` event is triggered', () => {
                 const mapMock = {
-                    loaded: () => false,
+                    isStyleLoaded: () => false,
                     on: (id, callback) => {
                         if (id === 'load') {
                             callback();
@@ -115,7 +116,7 @@ describe('api/layer', () => {
 
             it('should not call onMapLoaded when other the map event is triggered', () => {
                 const mapMock = {
-                    loaded: () => false,
+                    isStyleLoaded: () => false,
                     on: (id, callback) => {
                         if (id === 'other') {
                             callback();

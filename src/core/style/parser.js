@@ -1,7 +1,7 @@
 
 import jsep from 'jsep';
 import * as functions from './functions';
-import {implicitCast} from './expressions/utils';
+import { implicitCast } from './expressions/utils';
 // TODO use Schema classes
 
 const aggFns = [];
@@ -55,59 +55,75 @@ export function parseStyleDefinition(str) {
     return styleSpec;
 }
 
+function parseFunctionCall(node) {
+    const name = node.callee.name.toLowerCase();
+    if (aggFns.includes(name)) {
+        //node.arguments[0].name += '_' + name;
+        const args = node.arguments.map(arg => parseNode(arg));
+        return args[0];
+    }
+    const args = node.arguments.map(arg => parseNode(arg));
+    if (lowerCaseFunctions[name]) {
+        return lowerCaseFunctions[name](...args);
+    }
+    throw new Error(`Invalid function name '${node.callee.name}'`);
+}
+
+function parseBinaryOperation(node) {
+    const left = parseNode(node.left);
+    const right = parseNode(node.right);
+    switch (node.operator) {
+    case '*':
+        return functions.floatMul(left, right);
+    case '/':
+        return functions.floatDiv(left, right);
+    case '+':
+        return functions.floatAdd(left, right);
+    case '-':
+        return functions.floatSub(left, right);
+    case '%':
+        return functions.floatMod(left, right);
+    case '^':
+        return functions.floatPow(left, right);
+    default:
+        throw new Error(`Invalid binary operator '${node.operator}'`);
+    }
+}
+
+function parseUnaryOperation(node) {
+    switch (node.operator) {
+    case '-':
+        return functions.floatMul(-1, parseNode(node.argument));
+    case '+':
+        return parseNode(node.argument);
+    default:
+        throw new Error(`Invalid unary operator '${node.operator}'`);
+    }
+}
+
+function parseIdentifier(node) {
+    if (node.name[0] == '$') {
+        return functions.property(node.name.substring(1));
+    } else if (functions.palettes[node.name.toLowerCase()]) {
+        return functions.palettes[node.name.toLowerCase()];
+    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+        return lowerCaseFunctions[node.name.toLowerCase()];
+    }
+}
+
 function parseNode(node) {
     if (node.type == 'CallExpression') {
-        const name = node.callee.name.toLowerCase();
-        if (aggFns.includes(name)) {
-            //node.arguments[0].name += '_' + name;
-            const args = node.arguments.map(arg => parseNode(arg));
-            return args[0];
-        }
-        const args = node.arguments.map(arg => parseNode(arg));
-        if (lowerCaseFunctions[name]) {
-            return lowerCaseFunctions[name](...args);
-        }
-        throw new Error(`Invalid function name '${node.callee.name}'`);
+        return parseFunctionCall(node);
     } else if (node.type == 'Literal') {
         return node.value;
     } else if (node.type == 'ArrayExpression') {
         return node.elements.map(e => parseNode(e));
     } else if (node.type == 'BinaryExpression') {
-        const left = parseNode(node.left);
-        const right = parseNode(node.right);
-        switch (node.operator) {
-        case '*':
-            return functions.floatMul(left, right);
-        case '/':
-            return functions.floatDiv(left, right);
-        case '+':
-            return functions.floatAdd(left, right);
-        case '-':
-            return functions.floatSub(left, right);
-        case '%':
-            return functions.floatMod(left, right);
-        case '^':
-            return functions.floatPow(left, right);
-        default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
-        }
+        return parseBinaryOperation(node);
     } else if (node.type == 'UnaryExpression') {
-        switch (node.operator) {
-        case '-':
-            return functions.floatMul(-1, parseNode(node.argument));
-        case '+':
-            return parseNode(node.argument);
-        default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
-        }
+        return parseUnaryOperation(node);
     } else if (node.type == 'Identifier') {
-        if (node.name[0] == '$') {
-            return functions.property(node.name.substring(1));
-        } else if (functions.palettes[node.name.toLowerCase()]) {
-            return functions.palettes[node.name.toLowerCase()];
-        } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-            return lowerCaseFunctions[node.name.toLowerCase()];
-        }
+        return parseIdentifier(node);
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
