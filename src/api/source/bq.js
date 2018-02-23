@@ -2,7 +2,7 @@ import * as R from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import Property from '../../core/style/expressions/property';
 
-const PROPERTY = 'feature_count';
+const PROPERTIES = ['feature_count', 'total_amount', 'trip_distance'];
 
 
 const DEG2RAD = Math.PI / 180;
@@ -35,7 +35,7 @@ function fetchDataframe(url) {
         // console.log(numFeatures);
         const geometry = new Float32Array(numFeatures * 2);
         const properties = {};
-        properties[PROPERTY] = new Float32Array(numFeatures + 1024);
+        PROPERTIES.map(prop => properties[prop] = new Float32Array(numFeatures + 1024))
         // the target coordsys is not tile relative but world relative; since the mapping from long,lat is anisotropic,
         // we'll go through Webmercator
         const tsys = { scale: WM_2R/2, center: { x: 0, y: 0 } };
@@ -48,7 +48,7 @@ function fetchDataframe(url) {
             const r = rsys.wToR(wm.x, wm.y, tsys);
             geometry[2 * i + 0] = r.x;
             geometry[2 * i + 1] = r.y;
-            properties[PROPERTY][i] = f[PROPERTY];
+            PROPERTIES.map(prop => properties[prop][i] = f[prop]);
         }
         const dataframe = new R.Dataframe(
             { x: 0, y: 0 },
@@ -66,12 +66,15 @@ function fetchDataframe(url) {
 var previewDataframe = null;
 
 export default class BQ {
-    constructor() {
+    constructor(table, auth) {
+        const query = `SELECT *, 2000 AS feature_count FROM ${table}_sample`
+        this.sample = new carto.source.SQL(query, auth);
     }
 
     bindLayer(addDataframe, removeDataframe) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
+        this.sample.bindLayer(addDataframe, removeDataframe)
     }
 
     requestData(viewport, mns, resolution) {
@@ -80,36 +83,24 @@ export default class BQ {
 
         if (!this.metadataInit) {
             this.metadataInit = true;
+            // relay to preview data
+            this.sample.requestData(viewport, mns, resolution);
             return fetchFromServer('http://localhost:3000/metadata/')
         }
         else if (!this.dataInit) {
-
-            this.dataInit = true;
-            this.preview = false;
-            this.finalView = false;
-
             fetchDataframe('http://localhost:3000/').then(dataframe => {
-                if (this.preview) {
-                    this._removeDataframe(previewDataframe)
-                    this.preview = false
-                }
-                this.finalView = true
+                // TODO: remove or deactivate preview dataframes
                 this._addDataframe(dataframe);
             });
 
             // while we wait, provide some preview data
-            fetchDataframe('http://localhost:3000/preview/').then(dataframe => {
-                if (!this.finalView) {
-                    previewDataframe = dataframe;
-                    this._addDataframe(dataframe);
-                    this.preview = true;
-                }
-            });
+            return this.sample.requestData(viewport, mns, resolution);
         }
     }
 
 
     free() {
         this._client.free();
+        this.sample.free();
     }
 }

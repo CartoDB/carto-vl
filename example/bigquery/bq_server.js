@@ -28,8 +28,8 @@ const table = '`nyc-tlc.yellow.trips`';
 const x_column = 'pickup_longitude';
 const y_column = 'pickup_latitude';
 const aggregate_columns = {
-    amount: 'AVG(total_amount)',
-    distance: 'AVG(trip_distance)',
+    total_amount: 'AVG(total_amount)',
+    trip_distance: 'AVG(trip_distance)',
     feature_count: 'COUNT(*)'
 };
 
@@ -72,8 +72,8 @@ function randomPoint(min_x, min_y, max_x, max_y) {
     return {
         pickup_longitude: Math.random()*(max_x - min_x) + min_x,
         pickup_latitude: Math.random()*(max_y - min_y) + min_y,
-        amount: Math.random()*150,
-        distance: Math.random()*100,
+        total_amount: Math.random()*150,
+        trip_distance: Math.random()*100,
         feature_count: Math.random()*5500
     }
 }

@@ -7,6 +7,14 @@ the results to the browser. Since data is aggregated for
 visualization the additional processing and tranference
 is not a significant overhead.
 
+Data used: `nyc-tlc.yellow.trips` table.
+We're using a sample of this table imported into a CARTO account
+as `trips_sample` and created with:
+```
+SELECT * FROM `nyc-tlc.yellow.trips` WHERE RAND() < 1000.0/1108779463.0
+```
+
+
 To run this test:
 
 0. Point this env. var to BigQuery credentials :
