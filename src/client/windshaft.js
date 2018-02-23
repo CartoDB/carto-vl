@@ -30,7 +30,6 @@ export default class Windshaft {
             , dispose: (key, promise) => {
                 promise.then(dataframe => {
                     if (!dataframe.empty) {
-                        console.log('FREE', dataframe);
                         dataframe.free();
                         this._removeDataframe(dataframe);
                     }
@@ -39,6 +38,7 @@ export default class Windshaft {
             , maxAge: 1000 * 60 * 60
         };
         this.cache = LRU(lruOptions);
+        this.inProgressInstantiations = {};
     }
 
     _bindLayer(addDataframe, removeDataframe) {
@@ -55,9 +55,18 @@ export default class Windshaft {
      */
     _getData(viewport, MNS, resolution) {
         if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution) {
-            this._MNS = MNS;
-            this.resolution = resolution;
-            return this._instantiate(MNS, resolution);
+            const promise = this.inProgressInstantiations[JSON.stringify({ MNS, resolution })];
+            // Only instantiate if the same map is not being resintantiated now
+            if (!promise) {
+                const p = this._instantiate(MNS, resolution);
+                this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
+                console.log('Instantiating map:', JSON.stringify(MNS));
+                p.finally(() => {
+                    this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = null;
+                }, () => { }).catch(err => console.log(err));
+                return p;
+            }
+            return promise;
         }
         if (!this.url) {
             // Instantiation is in progress, nothing to do yet
@@ -99,10 +108,6 @@ export default class Windshaft {
     }
 
     _instantiate(MNS, resolution) {
-        this._oldDataframes = [];
-        this.cache.reset();
-        this.url = null;
-
         let agg = {
             threshold: 1,
             resolution: resolution,
@@ -132,18 +137,29 @@ export default class Windshaft {
             serverURL: this._source._serverURL
         };
 
-        const urlPromise = this._getUrlPromise(query, conf, agg, aggSQL);
-        this.metadataPromise = this.getMetadata(query, MNS, conf);
+        const metadataPromise = this.getMetadata(query, MNS, conf);
 
-        return (async () => {
-            try {
-                const metadata = await this.metadataPromise;
-                this.url = await urlPromise;
-                return metadata;
-            } catch (err) {
-                throw new Error('Invalid source');
-            }
-        })();
+        return new Promise((resolve, reject) => {
+            this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
+                metadataPromise.then((metadata) => {
+                    this._oldDataframes = [];
+                    this.cache.reset();
+                    this.url = url;
+                    this.metadata = metadata;
+                    this._MNS = MNS;
+                    this.resolution = resolution;
+
+                    resolve(metadata);
+                }, err => {
+                    console.log(333, err);
+                    reject(err);
+                });
+            }).catch(err => {
+                metadataPromise.catch(err => console.log(123, err));
+
+                reject(err);
+            });
+        });
     }
 
     free() {
@@ -209,46 +225,44 @@ export default class Windshaft {
         return fetch(this.url(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
-                return this.metadataPromise.then(metadata => {
 
-                    if (response.byteLength == 0 || response == 'null') {
-                        return { empty: true };
+                if (response.byteLength == 0 || response == 'null') {
+                    return { empty: true };
+                }
+                var tile = new VectorTile(new Protobuf(response));
+                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                var fieldMap = {};
+
+                const numFields = [];
+                const catFields = [];
+                const catFieldsReal = [];
+                const numFieldsReal = [];
+                this._MNS.columns.map(name => {
+                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
+                        catFields.push(name);
+                        catFieldsReal.push(name);
+                    } else {
+                        numFields.push(name);
+                        numFieldsReal.push(name);
                     }
-                    var tile = new VectorTile(new Protobuf(response));
-                    const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                    var fieldMap = {};
 
-                    const numFields = [];
-                    const catFields = [];
-                    const catFieldsReal = [];
-                    const numFieldsReal = [];
-                    this._MNS.columns.map(name => {
-                        const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                        if (metadata.columns.find(c => c.name == basename).type == 'category') {
-                            catFields.push(name);
-                            catFieldsReal.push(name);
-                        } else {
-                            numFields.push(name);
-                            numFieldsReal.push(name);
-                        }
+                }
+                );
+                catFieldsReal.map((name, i) => fieldMap[name] = i);
+                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
-                    }
-                    );
-                    catFieldsReal.map((name, i) => fieldMap[name] = i);
-                    numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
 
-                    const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields);
-
-                    var rs = rsys.getRsysFromTile(x, y, z);
-                    let dataframeProperties = {};
-                    Object.keys(fieldMap).map((name, pid) => {
-                        dataframeProperties[name] = properties[pid];
-                    });
-                    let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                    const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                    this._addDataframe(dataframe);
-                    return dataframe;
+                var rs = rsys.getRsysFromTile(x, y, z);
+                let dataframeProperties = {};
+                Object.keys(fieldMap).map((name, pid) => {
+                    dataframeProperties[name] = properties[pid];
                 });
+                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                this._addDataframe(dataframe);
+                return dataframe;
             });
     }
 

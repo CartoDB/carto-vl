@@ -43,6 +43,7 @@ export default class Layer {
         this._dataframes = [];
 
         this._id = id;
+        this.metadata = null;
         this.setSource(source);
         this.setStyle(style);
 
@@ -100,13 +101,16 @@ export default class Layer {
      */
     setStyle(style) {
         this._checkStyle(style);
-        if (this._style) {
-            this._style.onChange(null);
-        }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-        // Force style changed event
-        this._styleChanged();
+        return this._styleChanged(style).then(r => {
+            if (this._style) {
+                this._style.onChange(null);
+            }
+            this._style = style;
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -124,12 +128,18 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            this._style.onChange(null);
         }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-        // Force style changed event
-        this._styleChanged();
+
+        return this._styleChanged(style).then(r => {
+            if (this._style) {
+                this._style.onChange(null);
+            }
+            this._style = style;
+            this._style.onChange(() => {
+                this._styleChanged(style);
+            });
+            return r;
+        });
     }
 
     /**
@@ -181,6 +191,10 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
+    initCallback() {
+        this._styleChanged(this._style);
+        this.requestData();
+    }
     _addToMGLMap(map, beforeLayerID) {
         if (map.isStyleLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
@@ -196,21 +210,26 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged() {
+    _styleChanged(style) {
+        const recompile = (metadata) => {
+            style._compileColorShader(this._integrator.renderer.gl, metadata);
+            style._compileWidthShader(this._integrator.renderer.gl, metadata);
+            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        };
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return;
+            return Promise.resolve();
         }
-        this.requestData();
-        const originalPromise = this.metadataPromise;
-        this.metadataPromise.then(metadata => {
-            // We should only compile the shaders if the metadata came from the original promise
-            // if not, we would be compiling with a stale metadata
-            if (originalPromise == this.metadataPromise) {
-                this._style._compileColorShader(this._integrator.renderer.gl, metadata);
-                this._style._compileWidthShader(this._integrator.renderer.gl, metadata);
-                this._style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-                this._style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            }
+        const originalPromise = this.requestData(style);
+        if (!originalPromise) {
+            // The previous stored metadata is still valid
+            recompile(this.metadata);
+            return Promise.resolve();
+        }
+        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
+        return originalPromise.then(metadata => {
+            this.metadata = metadata;
+            recompile(metadata);
         });
     }
 
@@ -251,15 +270,18 @@ export default class Layer {
         throw new Error('?');
     }
 
-    requestData() {
+    requestData(style) {
+        style = style || this._style;
         if (!this._integrator.invalidateWebGLState) {
             return;
         }
-        const r = this._source.requestData(this._getViewport(), this._style.getMinimumNeededSchema(),
-            this._style.getResolution());
-        if (r) {
-            this.metadataPromise = r;
-            r.then(() => this._styleChanged());
+        const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
+            style.getResolution());
+        if (promise) {
+            promise.then(() => {
+                this.requestData(style);
+            }, err => { console.log(err); });
+            return promise;
         }
     }
 

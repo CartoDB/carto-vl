@@ -116,18 +116,24 @@ map.on('load', () => {
 
     let index = 0;//styles.length - 1;
 
+    function handleError(error) {
+        const err = `Invalid style: ${error}:${error.stack}`;
+        console.warn(err);
+        document.getElementById('feedback').value = err;
+        document.getElementById('feedback').style.display = 'block';
+    }
     function updateStyle(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            layer.blendToStyle(new carto.Style(v));
+            const promise = layer.blendToStyle(new carto.Style(v));
             document.getElementById('feedback').style.display = 'none';
+            if (promise) {
+                promise.catch(handleError);
+            }
         } catch (error) {
-            const err = `Invalid style: ${error}:${error.stack}`;
-            console.warn(err);
-            document.getElementById('feedback').value = err;
-            document.getElementById('feedback').style.display = 'block';
+            handleError(error);
         }
     }
 
@@ -218,22 +224,23 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
-        layer.setStyle(new carto.Style());
-        layer.setSource(new carto.source.Dataset(
-            $('#dataset').val(),
-            {
-                user: $('#user').val(),
-                apiKey: 'YOUR_API_KEY'
-            },
-            {
-                serverURL: $('#serverURL').val()
-            }
-        ));
+        layer.setStyle(new carto.Style()).then(() => {
+            layer.setSource(new carto.source.Dataset(
+                $('#dataset').val(),
+                {
+                    user: $('#user').val(),
+                    apiKey: 'YOUR_API_KEY'
+                },
+                {
+                    serverURL: $('#serverURL').val()
+                }
+            ));
 
-        localStorage.setItem('serverURL', $('#serverURL').val());
-        localStorage.setItem('user', $('#user').val());
-        localStorage.setItem('dataset', $('#dataset').val());
-        updateStyle();
+            localStorage.setItem('serverURL', $('#serverURL').val());
+            localStorage.setItem('user', $('#user').val());
+            localStorage.setItem('dataset', $('#dataset').val());
+            updateStyle();
+        });
     };
 
 

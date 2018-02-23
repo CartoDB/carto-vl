@@ -20,6 +20,7 @@ describe('api/layer', () => {
             const layer = new Layer('layer0', source, style);
             expect(layer.getId()).toEqual('layer0');
             expect(layer.getSource()).toEqual(source);
+            pending('Layer constructor can fail asynchronously, therefore, we must have some way to detect load event');
             expect(layer.getStyle()).toEqual(style);
         });
 
