@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-
+import * as util from './util';
 import * as s from '../core/style/functions';
 import * as schema from '../core/schema';
 import * as shaders from '../core/shaders';
@@ -237,13 +236,13 @@ export default class Style {
      * @return {StyleSpec}
      */
     _getStyleDefinition(definition) {
-        if (_.isUndefined(definition)) {
+        if (util.isUndefined(definition)) {
             return this._setDefaults({});
         }
-        if (_.isObject(definition)) {
+        if (util.isObject(definition)) {
             return this._setDefaults(definition);
         }
-        if (_.isString(definition)) {
+        if (util.isString(definition)) {
             return this._setDefaults(parseStyleDefinition(definition));
         }
         throw new CartoValidationError('style', 'nonValidDefinition');
@@ -256,7 +255,7 @@ export default class Style {
      * @return {StyleSpec}
      */
     _setDefaults(styleSpec) {
-        styleSpec.resolution = _.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
+        styleSpec.resolution = util.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
         styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION;
         styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
@@ -279,7 +278,7 @@ export default class Style {
 
         // TODO: Check expression types ie: color is not a number expression!
 
-        if (!_.isNumber(styleSpec.resolution)) {
+        if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
         }
         if (!(styleSpec.color instanceof Expression)) {
@@ -297,10 +296,10 @@ export default class Style {
         if (!(styleSpec.order instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[order]');
         }
-        _.forOwn(styleSpec, function(value, key) {
+        for (let key in styleSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
-        });
+        }
     }
 }

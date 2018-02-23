@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-
+import * as util from './util';
 import SourceBase from './source/base';
 import Style from './style';
 import CartoMap from './map';
@@ -234,19 +233,19 @@ export default class Layer {
     }
 
     _checkId(id) {
-        if (_.isUndefined(id)) {
+        if (util.isUndefined(id)) {
             throw new CartoValidationError('layer', 'idRequired');
         }
-        if (!_.isString(id)) {
+        if (!util.isString(id)) {
             throw new CartoValidationError('layer', 'idStringRequired');
         }
-        if (_.isEmpty(id)) {
+        if (id === '') {
             throw new CartoValidationError('layer', 'nonValidId');
         }
     }
 
     _checkSource(source) {
-        if (_.isUndefined(source)) {
+        if (util.isUndefined(source)) {
             throw new CartoValidationError('layer', 'sourceRequired');
         }
         if (!(source instanceof SourceBase)) {
@@ -255,7 +254,7 @@ export default class Layer {
     }
 
     _checkStyle(style) {
-        if (_.isUndefined(style)) {
+        if (util.isUndefined(style)) {
             throw new CartoValidationError('layer', 'styleRequired');
         }
         if (!(style instanceof Style)) {
