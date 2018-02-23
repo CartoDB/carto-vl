@@ -288,6 +288,7 @@ Object.keys(BASEMAPS).forEach(id => {
     i.type = 'radio';
     i.name = 'basemap';
     i.value = id;
+    i.checked = id === basemap;
     i.onclick = () => {
         map.setStyle(BASEMAPS[id]);
         let added = false;
