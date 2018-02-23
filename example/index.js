@@ -99,13 +99,14 @@ const auth = {
 const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
 const style = new carto.Style();
 const layer = new carto.Layer('myCartoLayer', source, style);
-layer.addTo(map, 'watername_ocean');
 
 setInterval(()=>{
     document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
 }, 500)
 
 map.on('load', () => {
+    layer.addTo(map, 'watername_ocean');
+
     let index = 0;//styles.length - 1;
 
     function updateStyle(v) {
