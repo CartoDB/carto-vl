@@ -13,6 +13,7 @@ export default class Top extends Expression {
         }
         this.type = 'category';
         this.numCategories = this.buckets + 1;
+        this.othersBucket = true;
         this._meta = metadata;
     }
     _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {

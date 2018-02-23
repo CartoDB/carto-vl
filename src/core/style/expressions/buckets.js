@@ -18,6 +18,7 @@ export default class Buckets extends Expression {
         this.bucketUID = bucketUID++;
         this.numCategories = args.length + 1;
         this.args = args;
+        this.othersBucket = false;
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -43,7 +44,6 @@ export default class Buckets extends Expression {
             ${funcBody}
             return ${this.numCategories - 1}.;
         }`;
-        console.log(preface);
 
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,

@@ -48,6 +48,33 @@ export default class Ramp extends Expression {
             inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
+    _getColorsFromPalette(input, palette) {
+        if (palette.type == 'paletteGenerator') {
+            let colors;
+            if (input.numCategories) {
+                if (palette.subPalettes[input.numCategories]) {
+                    if (palette.tags.includes('qualitative') && !input.othersBucket) {
+                        colors = palette.subPalettes[input.numCategories];
+                    } else {
+                        // Since we are not gonna pop the others we don't need to get the extra color
+                        colors = palette.subPalettes[input.numCategories - 1];
+                    }
+                } else {
+                    // More categories than palettes, new colors will be created by linear interpolation
+                    colors = palette.getLongestSubPalette();
+                }
+            } else {
+                colors = palette.getLongestSubPalette();
+            }
+            // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
+            if (palette.tags.includes('qualitative') && !input.othersBucket) {
+                colors = colors.slice(0, colors.length - 1);
+            }
+            return colors;
+        } else {
+            return palette;
+        }
+    }
     _postShaderCompile(program, gl) {
         if (!this.init) {
             this.init = true;
@@ -61,33 +88,14 @@ export default class Ramp extends Expression {
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
-            let palette = this.palette;
-            if (this.palette.type == 'paletteGenerator') {
-                if (this.input.numCategories){
-                    palette = palette.subPalettes[this.input.numCategories];
-                    //TODO if others && palette.tags.contains('qualitative)
-                    palette.pop();
-                }else{
-                    //TODO getLargerSubPalette()
-                    palette = palette.subPalettes['7'];
-                }
-            }
-            /*
-    if palette is cartocolor then
-          if input contains "others" bucket  then
-                 apply cartocolor subscheme
-          else if input doesn't contain ''others" bucket then
-                  if cartocolor has "qualitative" tag then
-                         apply cartocolor subscheme with one extra bucket to ignore the last bucket
-                  else if cartocolor doesn't have "qualitative" tag then
-                        apply cartocolor subscheme
-            */
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+
             for (var i = 0; i < width; i++) {
-                const vlowRaw = palette[Math.floor(i / width * (palette.length - 1))];
-                const vhighRaw = palette[Math.ceil(i / width * (palette.length - 1))];
+                const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
                 const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
                 const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
-                const m = i / width * (palette.length - 1) - Math.floor(i / width * (palette.length - 1));
+                const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
                 pixel[4 * i + 1] = v[1];
