@@ -6,8 +6,6 @@ export default class Ramp extends Expression {
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
      * @param {*} palette
-     * @param {*} minKey Optional
-     * @param {*} maxKey Optional
      */
     constructor(input, palette, ...args) {
         if (args.length > 0) {
