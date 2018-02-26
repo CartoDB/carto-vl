@@ -78,7 +78,7 @@ function genQuantiles(global) {
                 });
             }
             if (r > 0.99) {
-                console.log(this.breakpoints.map(br=>br.expr));
+                console.log(this.breakpoints.map(br => br.expr));
             }
             super._preDraw(drawMetadata, gl);
         }

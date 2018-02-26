@@ -141,7 +141,7 @@ export default class Windshaft {
             serverURL: this._source._serverURL
         };
 
-        const metadataPromise = this.getMetadata(query, MNS, conf, this._source._tableName);
+        const metadataPromise = this.getMetadata(query, MNS, conf);
 
         return new Promise((resolve, reject) => {
             this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
@@ -352,7 +352,7 @@ export default class Windshaft {
 
         return { properties, points, featureGeometries };
     }
-    async getMetadata(query, proto, conf, table) {
+    async getMetadata(query, proto, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type
@@ -376,10 +376,7 @@ export default class Windshaft {
         metadata.featureCount = await this.getFeatureCount(query, conf);
         const numericsTypes = await this.getNumericTypes(numerics, query, conf);
         const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
-        let sampling = SAMPLE_ROWS / metadata.featureCount;
-        if (sampling > 100) {
-            sampling = 100;
-        }
+        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
         const sample = await this.getSample(conf, sampling);
 
         numerics.map((name, index) => {
