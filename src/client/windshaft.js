@@ -6,6 +6,8 @@ import * as LRU from 'lru-cache';
 
 import { VectorTile } from '@mapbox/vector-tile';
 
+const SAMPLE_ROWS = 1000;
+
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
 // Instantiate map Windshaft
@@ -139,7 +141,7 @@ export default class Windshaft {
             serverURL: this._source._serverURL
         };
 
-        const metadataPromise = this.getMetadata(query, MNS, conf);
+        const metadataPromise = this.getMetadata(query, MNS, conf, this._source._tableName);
 
         return new Promise((resolve, reject) => {
             this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
@@ -268,7 +270,7 @@ export default class Windshaft {
             });
     }
 
-    _decodePolygons(geom, featureGeometries, mvt_extent){
+    _decodePolygons(geom, featureGeometries, mvt_extent) {
         let polygon = null;
         let geometry = [];
         /*
@@ -308,7 +310,7 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeLines(geom, featureGeometries, mvt_extent){
+    _decodeLines(geom, featureGeometries, mvt_extent) {
         let geometry = [];
         geom.map(l => {
             let line = [];
@@ -350,14 +352,13 @@ export default class Windshaft {
 
         return { properties, points, featureGeometries };
     }
-    async getMetadata(query, proto, conf) {
+    async getMetadata(query, proto, conf, table) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type
         //Get category names and counts by grouping by
         //Assign ids
         const metadata = {
-            featureCount: 1000,
             columns: [],
         };
         const fields = await getColumnTypes(query, conf);
@@ -367,21 +368,26 @@ export default class Windshaft {
             const type = fields[name].type;
             if (type == 'number') {
                 numerics.push(name);
-                //proto[name].type = 'number';
             } else if (type == 'string') {
                 categories.push(name);
-                //proto[name].type = 'category';
             }
         });
 
+        metadata.featureCount = await getFeatureCount(query, conf);
         const numericsTypes = await getNumericTypes(numerics, query, conf);
         const categoriesTypes = await getCategoryTypes(categories, query, conf);
+        let sampling = SAMPLE_ROWS * 100 / metadata.featureCount;
+        if (sampling > 100) {
+            sampling = 100;
+        }
+        const sample = await getSample(query, conf, table, sampling);
 
         numerics.map((name, index) => {
             const t = numericsTypes[index];
             metadata.columns.push(t);
         });
         metadata.categoryIDs = {};
+        metadata.sample = sample;
         categories.map((name, index) => {
             const t = categoriesTypes[index];
             t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
@@ -391,11 +397,20 @@ export default class Windshaft {
     }
 }
 
+async function getSample(query, conf, table, sampling) {
+    const q = `SELECT * FROM ${table} TABLESAMPLE BERNOULLI (${sampling}) REPEATABLE (0);`;
+    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+    const json = await response.json();
+    console.log(json);
+    return json.fields;
+}
 
-
-
-
-
+async function getFeatureCount(query, conf) {
+    const q = `SELECT COUNT(*) FROM ${query};`;
+    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+    const json = await response.json();
+    return json.rows[0].count;
+}
 
 async function getColumnTypes(query, conf) {
     const columnListQuery = `select * from ${query} limit 0;`;
