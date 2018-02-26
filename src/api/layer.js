@@ -46,6 +46,9 @@ export default class Layer {
         this.setSource(source);
         this.setStyle(style);
 
+        this._listeners = {};
+
+        this.state = 'init';
         console.log('L', this);
 
         this.paintCallback = () => {
@@ -59,7 +62,30 @@ export default class Layer {
                 dataframe => {
                     dataframe.visible = false;
                 });
+            if (this.state == 'dataLoaded') {
+                this.state = 'dataPainted';
+                this._fire('loaded');
+            }
         };
+    }
+
+    _fire(eventType, eventData) {
+        if (!this._listeners[eventType]) {
+            return;
+        }
+        this._listeners[eventType].map(listener => listener(eventData));
+    }
+
+    on(eventType, callback) {
+        if (!this._listeners[eventType]) {
+            this._listeners[eventType] = [callback];
+        } else {
+            this._listeners[eventType].push(callback);
+        }
+    }
+    off(eventType, callback) {
+        const index = this._listeners[eventType].indexOf(callback);
+        this._listeners[eventType].splice(index, 1);
     }
 
     /**
@@ -82,6 +108,9 @@ export default class Layer {
                 this._dataframes = this._dataframes.filter(d => d !== dataframe);
                 this._integrator.renderer.removeDataframe(dataframe);
                 this._integrator.invalidateWebGLState();
+            },
+            () => {
+                this.state = 'dataLoaded';
             }
         );
         if (this._source && this._source !== source) {
