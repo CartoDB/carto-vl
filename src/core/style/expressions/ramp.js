@@ -1,6 +1,5 @@
 import Expression from './expression';
 import { implicitCast, hexToRgb } from './utils';
-import { float } from '../functions';
 
 export default class Ramp extends Expression {
     /**
