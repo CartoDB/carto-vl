@@ -37,8 +37,6 @@
         `);
     const layer = new carto.Layer('layer', source, style);
 
-    layer.on('loaded', () => console.log('Layer loaded!'));
-
     layer.addTo(map);
 </script>
 
