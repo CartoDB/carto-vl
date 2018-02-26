@@ -131,7 +131,7 @@ export default class Windshaft {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? this._source._query : this._source._tableName}`;
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
@@ -400,7 +400,7 @@ export default class Windshaft {
         } else {
             // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
             q = `WITH _rndseed as (SELECT setseed(0.5))
-                    SELECT * FROM ${this._source._query} WHERE random() < ${sampling};`;
+                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
         }
 
         const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
