@@ -42,6 +42,7 @@
         strokeWidth: s.float(10),
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
+    layer.on('loaded', () => window.mapLoaded = true); // Used by screenshot testing utility
     layer.addTo(map);
 </script>
 

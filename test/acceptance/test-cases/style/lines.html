@@ -40,6 +40,7 @@
         color: s.hsv(0.2, 1, .9),
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
+    layer.on('loaded', () => window.mapLoaded = true); // Used by screenshot testing utility
     layer.addTo(map);
 </script>
 
