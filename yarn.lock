@@ -1579,9 +1579,9 @@ expand-range@^1.8.1:
   dependencies:
     fill-range "^2.1.0"
 
-exquisite-sst@CartoDB/Exquisite#node-6:
+exquisite-sst@IagoLast/Exquisite#master:
   version "1.2.0-next"
-  resolved "https://codeload.github.com/CartoDB/Exquisite/tar.gz/1015dd3ed4f1c1ff0e4db536963b5824e3cab2a6"
+  resolved "https://codeload.github.com/IagoLast/Exquisite/tar.gz/a8dd0b3575d66bb402aede7d4c6da9679ec6229a"
   dependencies:
     cloudinary "^1.9.0"
     minimist "^1.2.0"
