@@ -6,6 +6,8 @@ import * as LRU from 'lru-cache';
 
 import { VectorTile } from '@mapbox/vector-tile';
 
+const SAMPLE_ROWS = 1000;
+
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
 // Instantiate map Windshaft
@@ -129,7 +131,7 @@ export default class Windshaft {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = this._source._query ? this._source._query : `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._tableName}`;
+        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
@@ -181,7 +183,7 @@ export default class Windshaft {
         return dataframe;
     }
     async _getUrlPromise(query, conf, agg, aggSQL) {
-        this.geomType = await getGeometryType(query, conf);
+        this.geomType = await this.getGeometryType(query, conf);
         if (this.geomType != 'point') {
             agg = false;
         }
@@ -268,7 +270,7 @@ export default class Windshaft {
             });
     }
 
-    _decodePolygons(geom, featureGeometries, mvt_extent){
+    _decodePolygons(geom, featureGeometries, mvt_extent) {
         let polygon = null;
         let geometry = [];
         /*
@@ -308,7 +310,7 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeLines(geom, featureGeometries, mvt_extent){
+    _decodeLines(geom, featureGeometries, mvt_extent) {
         let geometry = [];
         geom.map(l => {
             let line = [];
@@ -357,31 +359,32 @@ export default class Windshaft {
         //Get category names and counts by grouping by
         //Assign ids
         const metadata = {
-            featureCount: 1000,
             columns: [],
         };
-        const fields = await getColumnTypes(query, conf);
+        const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
         let categories = [];
         Object.keys(fields).map(name => {
             const type = fields[name].type;
             if (type == 'number') {
                 numerics.push(name);
-                //proto[name].type = 'number';
             } else if (type == 'string') {
                 categories.push(name);
-                //proto[name].type = 'category';
             }
         });
 
-        const numericsTypes = await getNumericTypes(numerics, query, conf);
-        const categoriesTypes = await getCategoryTypes(categories, query, conf);
+        metadata.featureCount = await this.getFeatureCount(query, conf);
+        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
+        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
+        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
+        const sample = await this.getSample(conf, sampling);
 
         numerics.map((name, index) => {
             const t = numericsTypes[index];
             metadata.columns.push(t);
         });
         metadata.categoryIDs = {};
+        metadata.sample = sample;
         categories.map((name, index) => {
             const t = categoriesTypes[index];
             t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
@@ -389,83 +392,95 @@ export default class Windshaft {
         });
         return metadata;
     }
-}
 
+    async getSample(conf, sampling) {
+        let q;
+        if (this._source._tableName) {
+            q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
+        } else {
+            // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
+            q = `WITH _rndseed as (SELECT setseed(0.5))
+                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
+        }
 
-
-
-
-
-
-async function getColumnTypes(query, conf) {
-    const columnListQuery = `select * from ${query} limit 0;`;
-    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-    const json = await response.json();
-    return json.fields;
-}
-
-async function getGeometryType(query, conf) {
-    const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-    const json = await response.json();
-    const type = json.rows[0].type;
-    switch (type) {
-    case 'ST_MultiPolygon':
-        return 'polygon';
-    case 'ST_Point':
-        return 'point';
-    case 'ST_MultiLineString':
-        return 'line';
-    default:
-        throw new Error(`Unimplemented geometry type ''${type}'`);
-    }
-}
-
-async function getNumericTypes(names, query, conf) {
-    const aggFns = ['min', 'max', 'sum', 'avg'];
-    const numericsSelect = names.map(name =>
-        aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-    ).concat(['COUNT(*)']).join();
-    const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-    const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
-    const json = await response.json();
-    return names.map(name => {
-        return {
-            name,
-            type: 'float',
-            min: json.rows[0][`${name}_min`],
-            max: json.rows[0][`${name}_max`],
-            avg: json.rows[0][`${name}_avg`],
-            sum: json.rows[0][`${name}_sum`],
-        };
-    }
-    );
-}
-
-async function getCategoryTypes(names, query, conf) {
-    return Promise.all(names.map(async name => {
-        const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
         const json = await response.json();
-        let counts = [];
-        let names = [];
-        json.rows.map(row => {
-            counts.push(row.count);
-            names.push(row.name);
-        });
-        return {
-            name,
-            type: 'category',
-            categoryNames: names,
-            categoryCounts: counts
-        };
-    }));
+        console.log(json);
+        return json.rows;
+    }
+
+    async getFeatureCount(query, conf) {
+        const q = `SELECT COUNT(*) FROM ${query};`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const json = await response.json();
+        return json.rows[0].count;
+    }
+
+    async getColumnTypes(query, conf) {
+        const columnListQuery = `select * from ${query} limit 0;`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const json = await response.json();
+        return json.fields;
+    }
+
+    async getGeometryType(query, conf) {
+        const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const json = await response.json();
+        const type = json.rows[0].type;
+        switch (type) {
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
+        }
+    }
+
+    async getNumericTypes(names, query, conf) {
+        const aggFns = ['min', 'max', 'sum', 'avg'];
+        const numericsSelect = names.map(name =>
+            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
+        ).concat(['COUNT(*)']).join();
+        const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const json = await response.json();
+        return names.map(name => {
+            return {
+                name,
+                type: 'float',
+                min: json.rows[0][`${name}_min`],
+                max: json.rows[0][`${name}_max`],
+                avg: json.rows[0][`${name}_avg`],
+                sum: json.rows[0][`${name}_sum`],
+            };
+        }
+        );
+    }
+
+    async getCategoryTypes(names, query, conf) {
+        return Promise.all(names.map(async name => {
+            const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
+            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+            const json = await response.json();
+            let counts = [];
+            let names = [];
+            json.rows.map(row => {
+                counts.push(row.count);
+                names.push(row.name);
+            });
+            return {
+                name,
+                type: 'category',
+                categoryNames: names,
+                categoryCounts: counts
+            };
+        }));
+    }
 }
-
-
-
-
-
 
 
 function isClockWise(vertices) {
