@@ -31,7 +31,7 @@ export default class SQL extends Base {
     constructor(query, auth, config) {
         super();
         this._checkQuery(query);
-        this._query = query;
+        this._query = `(${query}) as _cdb_query_wrapper`;
         this.initialize(auth, config);
     }
 
