@@ -1,43 +1,32 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <script src="../../../dist/carto-gl.js"></script>
+        <style>
+            body { margin: 0; padding: 0; }
+            #map { position: absolute; height:100%; width: 100%; }
+        </style>
+    </head>
+    <body>
+        <div id='map'></div>
+    </body>
+    <script>
+        carto.setDefaultAuth({
+            user: 'arroyo-carto',
+            apiKey: 'YOUR_API_KEY'
+        });
 
-<head>
-    <script src="../../../dist/carto-gl.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
+        const map = new carto.Map({
+            container: 'map'
+        });
 
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div id='map'></div>
-</body>
-<script>
-    carto.setDefaultAuth({
-        user: 'arroyo-carto',
-        apiKey: 'YOUR_API_KEY'
-    });
-
-    const map = new carto.Map({
-        container: 'map'
-    });
-
-    const source = new carto.source.Dataset('route');
-    const style = new carto.Style(`
+        const source = new carto.source.Dataset('route');
+        const style = new carto.Style(`
             width: 10
             color: rgba(1,1,0,1)
         `);
-    const layer = new carto.Layer('layer', source, style);
+        const layer = new carto.Layer('layer', source, style);
 
-    layer.addTo(map);
-</script>
-
+        layer.addTo(map);
+    </script>
 </html>
