@@ -6,7 +6,6 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 
 const REFERENCES_FOLDER = 'references';
-const DELAY = 4000;
 const WIDTH = 400;
 const HEIGHT = 300;
 const THRESHOLD = 0.1;
@@ -32,11 +31,12 @@ function test({ folder, file }) {
             input,
             output,
             url: URL,
-            delay: DELAY,
             threshold: THRESHOLD,
             headless: HEADLESS,
             viewportWidth: WIDTH,
-            viewportHeight: HEIGHT
+            viewportHeight: HEIGHT,
+            waitForFn: () => window.mapLoaded,
+
         };
         return expect(exquisite.test(options)).to.eventually.be.true;
     });
