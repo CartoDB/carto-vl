@@ -16,7 +16,6 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
-import Quantiles from './expressions/quantiles';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -47,6 +46,9 @@ import { Min } from './expressions/aggregation';
 import { Avg } from './expressions/aggregation';
 import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
+
+// Classifiers
+import {Quantiles, GlobalQuantiles} from './expressions/quantiles';
 
 // Interpolators
 import { ILinear } from './expressions/interpolators';
@@ -110,6 +112,7 @@ export const equals = (...args) => new Equals(...args);
 export const notEquals = (...args) => new NotEquals(...args);
 export const buckets = (...args) => new Buckets(...args);
 export const quantiles = (...args) => new Quantiles(...args);
+export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
 export const viewportMax = (...args) => new ViewportMax(...args);
 export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportAvg = (...args) => new ViewportAvg(...args);

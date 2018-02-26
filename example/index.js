@@ -225,7 +225,8 @@ map.on('load', () => {
             location.hash = getConfig();
         }
         layer.setStyle(new carto.Style()).then(() => {
-            layer.setSource(new carto.source.Dataset(
+            const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
+            layer.setSource(new SourceClass(
                 $('#dataset').val(),
                 {
                     user: $('#user').val(),
