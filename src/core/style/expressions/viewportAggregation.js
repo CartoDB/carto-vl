@@ -7,7 +7,13 @@ export const ViewportAvg = generateViewportExpression('avg');
 export const ViewportSum = generateViewportExpression('sum');
 export const ViewportCount = generateViewportExpression('count');
 
-function generateViewportExpression(metadataPropertyName) {
+export const GlobalMax = generateViewportExpression('max', true);
+export const GlobalMin = generateViewportExpression('min', true);
+export const GlobalAvg = generateViewportExpression('avg', true);
+export const GlobalSum = generateViewportExpression('sum', true);
+export const GlobalCount = generateViewportExpression('count', true);
+
+function generateViewportExpression(metadataPropertyName, global) {
     return class ViewportAggregattion extends Expression {
         /**
          * @jsapi
@@ -18,10 +24,14 @@ function generateViewportExpression(metadataPropertyName) {
             this.property = property;
         }
         _compile(metadata) {
+            console.log(metadata);
             super._compile(metadata);
             this.property._compile(metadata);
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
+            if (global){
+                this.value.expr = metadata.columns.find(c => c.name == this.property.name)[metadataPropertyName];
+            }
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
@@ -31,9 +41,11 @@ function generateViewportExpression(metadataPropertyName) {
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
-            this.value.expr = column[metadataPropertyName];
+            if (!global) {
+                this.value.expr = column[metadataPropertyName];
+            }
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, column[metadataPropertyName], drawMetadata);
+                console.log(metadataPropertyName, this.property.name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }

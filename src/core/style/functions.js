@@ -48,16 +48,19 @@ import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
 
 // Classifiers
-import {Quantiles, GlobalQuantiles} from './expressions/quantiles';
+import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
 
 // Interpolators
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
-export {Cubic};
+export { Cubic };
 
 
-import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
+import {
+    ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
+    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount
+}
     from './expressions/viewportAggregation';
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
@@ -119,6 +122,11 @@ export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const globalMax = (...args) => new GlobalMax(...args);
+export const globalMin = (...args) => new GlobalMin(...args);
+export const globalAvg = (...args) => new GlobalAvg(...args);
+export const globalSum = (...args) => new GlobalSum(...args);
+export const globalCount = (...args) => new GlobalCount(...args);
 export const inverse = (...args) => new Inverse(...args);
 
 
