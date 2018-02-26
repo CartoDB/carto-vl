@@ -41,9 +41,10 @@ export default class Windshaft {
         this.inProgressInstantiations = {};
     }
 
-    _bindLayer(addDataframe, removeDataframe) {
+    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     /**
@@ -93,6 +94,7 @@ export default class Windshaft {
                     this._oldDataframes.map(d => d.active = false);
                     completedTiles.map(d => d.active = true);
                     this._oldDataframes = completedTiles;
+                    this._dataLoadedCallback();
                 }
             });
         });
