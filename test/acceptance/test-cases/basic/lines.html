@@ -37,6 +37,7 @@
     const source = new carto.source.SQL('SELECT ST_Multi(the_geom_webmercator) as the_geom_webmercator, ST_Multi(the_geom) as the_geom FROM lines_0', auth);
     const style = new carto.Style();
     const layer = new carto.Layer('myCartoLayer', source, style);
+    layer.on('loaded', () => window.mapLoaded = true); // Used by screenshot testing utility
     layer.addTo(map);
 </script>
 
