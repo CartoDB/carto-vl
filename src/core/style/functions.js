@@ -84,7 +84,6 @@ export const rgba = (...args) => new RGBA(...args);
 export const property = (...args) => new Property(...args);
 export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
-export const setOpacity = (...args) => new Opacity(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
 export const float = (...args) => new Float(...args);

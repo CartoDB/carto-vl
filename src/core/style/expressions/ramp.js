@@ -1,29 +1,21 @@
 import Expression from './expression';
 import { implicitCast, hexToRgb } from './utils';
-import { float } from '../functions';
 
 export default class Ramp extends Expression {
     /**
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
      * @param {*} palette
-     * @param {*} minKey Optional
-     * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey) {
-        input = implicitCast(input);
-        if (minKey !== undefined) {
-            minKey = implicitCast(minKey);
-            maxKey = implicitCast(maxKey);
+    constructor(input, palette, ...args) {
+        if (args.length > 0) {
+            throw new Error('ramp(input, palette) only accepts two parameters');
         }
+        input = implicitCast(input);
         palette = implicitCast(palette);
         super({ input: input });
-        if (minKey === undefined) {
-            minKey = float(0);
-            maxKey = float(1);
-        }
-        this.minKey = minKey.expr;
-        this.maxKey = maxKey.expr;
+        this.minKey = 0;
+        this.maxKey = 1;
         this.palette = palette;
     }
     _compile(meta) {
