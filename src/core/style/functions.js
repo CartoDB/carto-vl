@@ -4,6 +4,7 @@ import Blend from './expressions/blend';
 import Buckets from './expressions/buckets';
 import CIELab from './expressions/CIELab';
 import Float from './expressions/float';
+import FloatConstant from './expressions/floatConstant';
 import Category from './expressions/category';
 import HSV from './expressions/hsv';
 import Linear from './expressions/linear';
@@ -124,8 +125,8 @@ export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 export const inverse = (...args) => new Inverse(...args);
 
-export const TRUE = new Float(1);
-export const FALSE = new Float(0);
+export const TRUE = new FloatConstant(1);
+export const FALSE = new FloatConstant(0);
 export const and = (...args) => new FloatMul(...args);
 export const or = (...args) => new Or(...args);
 export const not = (...args) => new Not(...args);
