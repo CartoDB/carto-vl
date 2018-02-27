@@ -59,7 +59,7 @@ export { Cubic };
 
 import {
     ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
-    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount
+    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount, GlobalPercentile
 }
     from './expressions/viewportAggregation';
 
@@ -122,6 +122,7 @@ export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const globalPercentile = (...args) => new GlobalPercentile(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);

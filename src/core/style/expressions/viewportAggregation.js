@@ -78,7 +78,7 @@ function generatePercentile(global) {
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
             if (global) {
-                const copy = metadata.sample.map(s => s[this.input.name]);
+                const copy = metadata.sample.map(s => s[this.property.name]);
                 copy.sort((x, y) => x - y);
                 const p = this.percentile / 100;
                 this.value.expr = copy[Math.floor(p * copy.length)];
