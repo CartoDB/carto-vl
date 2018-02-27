@@ -59,10 +59,11 @@ uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D colorStrokeTex;
 uniform sampler2D strokeWidthTex;
+uniform sampler2D filterTex;
 //TODO order bucket texture
 
-varying lowp vec4 color;
-varying lowp vec4 stroke;
+varying highp vec4 color;
+varying highp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
 varying highp float fillScale;
@@ -71,6 +72,9 @@ varying highp float strokeScale;
 void main(void) {
     color = texture2D(colorTex, featureID);
     stroke = texture2D(colorStrokeTex, featureID);
+    float filtering = texture2D(filterTex, featureID).a;
+    color.a *= filtering;
+    stroke.a *= filtering;
 
     float size = 64.*texture2D(widthTex, featureID).a;
     float fillSize = size;

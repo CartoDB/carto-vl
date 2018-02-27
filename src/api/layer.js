@@ -156,6 +156,7 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+            style.filter.blendFrom(this._style.filter, ms, interpolator);
         }
 
         return this._styleChanged(style).then(r => {
@@ -244,6 +245,7 @@ export default class Layer {
             style._compileWidthShader(this._integrator.renderer.gl, metadata);
             style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
             style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+            style._compileFilterShader(this._integrator.renderer.gl, metadata);
         };
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return Promise.resolve();

@@ -12,7 +12,7 @@ export function compileShader(gl, styleRootExpr, shaderCreator) {
         tid[name] = Object.keys(tid).length;
         return tid[name];
     });
-    if (cache[JSON.stringify(colorModifier)]) {
+    if (false && cache[JSON.stringify(colorModifier)]) {
         shader = cache[JSON.stringify(colorModifier)];
     } else {
         shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);

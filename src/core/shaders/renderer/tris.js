@@ -9,12 +9,15 @@ uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 
 uniform sampler2D colorTex;
+uniform sampler2D filterTex;
 
 varying highp vec4 color;
 
 
 void main(void) {
     vec4 c = texture2D(colorTex, featureID);
+    float filtering = texture2D(filterTex, featureID).a;
+    c.a *= filtering;
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
     if (c.a==0.){
         p.x=10000.;
