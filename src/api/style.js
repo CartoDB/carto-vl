@@ -5,7 +5,6 @@ import * as shaders from '../core/shaders';
 import { compileShader } from '../core/style/shader-compiler';
 import { parseStyleDefinition } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
-import * as s from '../core/style/functions';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 
@@ -57,7 +56,7 @@ export default class Style {
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
-        this._styleSpec = this._handleFilters(styleSpec)
+        this._styleSpec = this._handleFilters(styleSpec);
 
         // REVIEW THIS vv
         this.updated = true;
@@ -286,7 +285,7 @@ export default class Style {
      */
     _handleFilters(styleSpec) {
         if (styleSpec.filter) {
-            styleSpec.color = s.opacity(styleSpec.color, s.floatMul(styleSpec.color.a, styleSpec.filter))
+            styleSpec.color = s.opacity(styleSpec.color, s.floatMul(styleSpec.color.a, styleSpec.filter));
         }
         return styleSpec;
     }
