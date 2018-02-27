@@ -9,7 +9,7 @@ const aggFns = [];
 var lowerCaseFunctions = {};
 Object.keys(functions)
     .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
-    .map(name => {lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];});
+    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 
@@ -89,6 +89,16 @@ function parseBinaryOperation(node) {
         return functions.floatMod(left, right);
     case '^':
         return functions.floatPow(left, right);
+    case '>':
+        return functions.greaterThan(left, right);
+    case '>=':
+        return functions.greaterThanOrEqualTo(left, right);
+    case '<':
+        return functions.lessThan(left, right);
+    case '<=':
+        return functions.lessThanOrEqualTo(left, right);
+    case '==':
+        return functions.equals(left, right);
     default:
         throw new Error(`Invalid binary operator '${node.operator}'`);
     }
@@ -112,7 +122,7 @@ function parseIdentifier(node) {
         return functions.palettes[node.name.toLowerCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
-    } 
+    }
 }
 
 function parseNode(node) {
