@@ -19,6 +19,8 @@ export const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) =>
 export const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
 export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
 
+export const Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
+
 function genBinaryOp(jsFn, glsl) {
     return class BinaryOperation extends Expression {
         /**

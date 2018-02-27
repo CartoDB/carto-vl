@@ -7,11 +7,11 @@ import { implicitCast } from './expressions/utils';
 const aggFns = [];
 
 var lowerCaseFunctions = {};
-Object.keys(functions).filter(
-    name => name[0] == name[0].toLowerCase()
-).map(name => {
-    lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
-});
+Object.keys(functions)
+    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
+    .map(name => {lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];});
+lowerCaseFunctions.true = functions.TRUE;
+lowerCaseFunctions.false = functions.FALSE;
 
 /**
  * @jsapi
@@ -43,6 +43,8 @@ export function parseStyleDefinition(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp(':', 1);
     jsep.addBinaryOp('^', 10);
+    jsep.removeLiteral('true');
+    jsep.removeLiteral('false');
     const ast = jsep(str);
     let styleSpec = {};
     if (ast.type == 'Compound') {
@@ -52,6 +54,8 @@ export function parseStyleDefinition(str) {
     }
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
+    jsep.addLiteral('true');
+    jsep.addLiteral('false');
     return styleSpec;
 }
 
@@ -108,7 +112,7 @@ function parseIdentifier(node) {
         return functions.palettes[node.name.toLowerCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
-    }
+    } 
 }
 
 function parseNode(node) {

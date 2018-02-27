@@ -12,10 +12,9 @@ export default class Float extends Expression {
         }
         super({});
         this.expr = x;
-    }
-    _compile() {
         this.type = 'float';
     }
+
     _applyToShaderSource(uniformIDMaker) {
         this._uniformID = uniformIDMaker();
         return {
@@ -23,12 +22,15 @@ export default class Float extends Expression {
             inline: `float${this._uniformID}`
         };
     }
+
     _postShaderCompile(program, gl) {
         this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
     }
+
     _preDraw(drawMetadata, gl) {
         gl.uniform1f(this._uniformLocation, this.expr);
     }
+
     isAnimated() {
         return false;
     }

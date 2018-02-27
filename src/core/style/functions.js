@@ -25,6 +25,7 @@ import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
 import { Abs } from './expressions/unary';
+import { Not } from './expressions/unary';
 
 // Binary ops
 import { FloatMul } from './expressions/binary';
@@ -39,6 +40,8 @@ import { LessThan } from './expressions/binary';
 import { LessThanOrEqualTo } from './expressions/binary';
 import { Equals } from './expressions/binary';
 import { NotEquals } from './expressions/binary';
+import { Or } from './expressions/binary';
+
 
 // Aggregation ops
 import { Max } from './expressions/aggregation';
@@ -48,13 +51,13 @@ import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
 
 // Classifiers
-import {Quantiles, GlobalQuantiles} from './expressions/quantiles';
+import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
 
 // Interpolators
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
-export {Cubic};
+export { Cubic };
 
 
 import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
@@ -122,5 +125,10 @@ export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 export const inverse = (...args) => new Inverse(...args);
 
+export const TRUE = new Float(1);
+export const FALSE = new Float(0);
+export const and = (...args) => new FloatMul(...args);
+export const or = (...args) => new Or(...args);
+export const not = (...args) => new Not(...args);
 
 export { palettes, Asc, Desc };
