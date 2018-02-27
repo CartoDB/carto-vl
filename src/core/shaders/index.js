@@ -4,7 +4,16 @@ import * as aaBlenderGLSL from './aaBlender';
 
 const NUM_TEXTURE_LOCATIONS = 4;
 
+// We keep a shader cache per webgl context
+const caches = new WeakMap();
+
 function compileShader(gl, sourceCode, type) {
+    if (caches.has(gl)) {
+        let cache = caches.get(gl);
+        if (cache[sourceCode]) {
+            return cache[sourceCode];
+        }
+    }
     const shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
@@ -13,6 +22,16 @@ function compileShader(gl, sourceCode, type) {
         gl.deleteShader(shader);
         throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
     }
+
+    if (caches.has(gl)) {
+        let cache = caches.get(gl);
+        cache[sourceCode] = shader;
+    } else {
+        let cache = {};
+        cache[sourceCode] = shader;
+        caches.set(gl, cache);
+    }
+
     return shader;
 }
 
