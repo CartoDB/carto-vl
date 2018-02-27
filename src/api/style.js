@@ -14,6 +14,7 @@ const DEFAULT_WIDTH_EXPRESSION = s.float(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();
+const DEFAULT_FILTER_EXPRESSION = s.float(1);
 const SUPPORTED_PROPERTIES = [
     'resolution',
     'color',
@@ -56,9 +57,8 @@ export default class Style {
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
-        this._styleSpec = this._handleFilters(styleSpec);
+        this._styleSpec = styleSpec;
 
-        // REVIEW THIS vv
         this.updated = true;
         this._changeCallback = null;
         this._styleSpec.color.parent = this;
@@ -66,12 +66,13 @@ export default class Style {
         this._styleSpec.strokeColor.parent = this;
         this._styleSpec.strokeWidth.parent = this;
         this._styleSpec.order.parent = this;
+        this._styleSpec.filter.parent = this;
         this._styleSpec.color.notify = this._changed.bind(this);
         this._styleSpec.width.notify = this._changed.bind(this);
         this._styleSpec.strokeColor.notify = this._changed.bind(this);
         this._styleSpec.strokeWidth.notify = this._changed.bind(this);
         this._styleSpec.order.notify = this._changed.bind(this);
-        // ^^
+        this._styleSpec.filter.notify = this._changed.bind(this);
     }
 
     /**
@@ -146,26 +147,17 @@ export default class Style {
         return this._styleSpec.order;
     }
 
-    /**
-     * Return the filter expression.
-     *
-     * @return {carto.style.expression}
-     *
-     * @memberof carto.Style
-     * @api
-     */
-    getFilter() {
+    get filter(){
         return this._styleSpec.filter;
     }
 
     isAnimated() {
         return this.getColor().isAnimated() ||
-            this.getWidth().isAnimated() ||
-            this.getStrokeColor().isAnimated() ||
-            this.getStrokeWidth().isAnimated();
+               this.getWidth().isAnimated() ||
+               this.getStrokeColor().isAnimated() ||
+               this.getStrokeWidth().isAnimated() ||
+               this.filter.isAnimated();
     }
-
-    // REVIEW THIS vv
 
     onChange(callback) {
         this._changeCallback = callback;
@@ -182,7 +174,8 @@ export default class Style {
             this._styleSpec.color,
             this._styleSpec.width,
             this._styleSpec.strokeColor,
-            this._styleSpec.strokeWidth
+            this._styleSpec.strokeWidth,
+            this._styleSpec.filter,
         ].filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
@@ -215,6 +208,13 @@ export default class Style {
         this.strokeWidthShader = r.shader;
     }
 
+    _compileFilterShader(gl, metadata) {
+        this._styleSpec.filter._bind(metadata);
+        const r = compileShader(gl, this._styleSpec.filter, shaders.styler.createFilterShader);
+        this.propertyFilterTID = r.tid;
+        this.filterShader = r.shader;
+    }
+
     _replaceChild(toReplace, replacer) {
         if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
@@ -230,6 +230,10 @@ export default class Style {
             replacer.notify = toReplace.notify;
         } else if (toReplace == this._styleSpec.strokeWidth) {
             this._styleSpec.strokeWidth = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this._styleSpec.filter) {
+            this._styleSpec.filter = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -274,19 +278,7 @@ export default class Style {
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
         styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION;
         styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION;
-        return styleSpec;
-    }
-
-    /** 
-     * If the style contains a filter update the color to take the filter into account.
-     * When an element is filitered out its opacity will be 0 so it wont be painted.
-     * @param {StyleSpec} styleSpec
-     * @return {StyleSpec}
-     */
-    _handleFilters(styleSpec) {
-        if (styleSpec.filter) {
-            styleSpec.color = s.opacity(styleSpec.color, s.floatMul(styleSpec.color.a, styleSpec.filter));
-        }
+        styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION;
         return styleSpec;
     }
 
@@ -321,6 +313,9 @@ export default class Style {
         }
         if (!(styleSpec.order instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[order]');
+        }
+        if (!(styleSpec.filter instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression[filter]');
         }
         for (let key in styleSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
