@@ -12,7 +12,8 @@ export function compileShader(gl, styleRootExpr, shaderCreator) {
         tid[name] = Object.keys(tid).length;
         return tid[name];
     });
-    if (false && cache[JSON.stringify(colorModifier)]) {
+    // eslint-disable-next-line 
+    if (false && cache[JSON.stringify(colorModifier)]) {  //TODO: we need a cache for each shader
         shader = cache[JSON.stringify(colorModifier)];
     } else {
         shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
