@@ -98,25 +98,38 @@ export default class Layer {
      */
     setSource(source) {
         this._checkSource(source);
-        source.bindLayer(
-            dataframe => {
-                this._dataframes.push(dataframe);
-                this._integrator.renderer.addDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            dataframe => {
-                this._dataframes = this._dataframes.filter(d => d !== dataframe);
-                this._integrator.renderer.removeDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            () => {
-                this.state = 'dataLoaded';
-            }
-        );
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+    }
+
+    /**
+     * Callback executed when the client adds a new dataframe
+     * @param {Dataframe} dataframe 
+     */
+    _onDataframeAdded(dataframe) {
+        this._dataframes.push(dataframe);
+        this._integrator.renderer.addDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+     * Callback executed when the client removes dataframe
+     * @param {Dataframe} dataframe 
+     */
+    _onDataFrameRemoved(dataframe) {
+        this._dataframes = this._dataframes.filter(d => d !== dataframe);
+        this._integrator.renderer.removeDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+    * Callback executed when the client finishes loading data
+    */
+    _onDataLoaded() {
+        this.state = 'dataLoaded';
     }
 
     /**
@@ -223,6 +236,7 @@ export default class Layer {
         this._styleChanged(this._style);
         this.requestData();
     }
+
     _addToMGLMap(map, beforeLayerID) {
         if (map.isStyleLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
