@@ -51,6 +51,7 @@ class Point {
         this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
         this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
         this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
     }
 }
 class Tri {
@@ -61,6 +62,7 @@ class Tri {
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
         this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
     }
 }
 class Line {
@@ -72,9 +74,8 @@ class Line {
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
         this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
         this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
     }
 }
 class GenericStyler {
@@ -83,7 +84,6 @@ class GenericStyler {
         let FS = glsl.FS;
         FS = FS.replace('$PREFACE', preface);
         FS = FS.replace('$INLINE', inline);
-        //console.log(FS)
         compileProgram.call(this, gl, VS, FS);
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
         this.textureLocations = [];
@@ -92,14 +92,20 @@ class GenericStyler {
         }
     }
 }
-class Color extends GenericStyler{
-    constructor(gl, preface, inline){
-        super(gl, stylerGLSL, preface, inline);
+class Color extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, stylerGLSL, '/*Color*/' + preface, inline);
     }
 }
-class Width extends GenericStyler{
-    constructor(gl, preface, inline){
-        super(gl, stylerGLSL, preface, `vec4((${inline})/64.)`);
+class Width extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, stylerGLSL, '/*Width*/' + preface, `vec4((${inline})/64.)`);
+    }
+}
+
+class Filter extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, stylerGLSL, '/*Filter*/' + preface, `vec4(${inline})`);
     }
 }
 
@@ -121,6 +127,9 @@ const styler = {
     },
     createWidthShader: function (gl, preface, inline) {
         return new Width(gl, preface, inline);
+    },
+    createFilterShader: function (gl, preface, inline) {
+        return new Filter(gl, preface, inline);
     }
 };
 

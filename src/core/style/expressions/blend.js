@@ -13,10 +13,12 @@ export default class Blend extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
+        const originalMix = mix;
         if (interpolator) {
             mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });
+        this.originalMix = originalMix;
     }
     _compile(meta) {
         super._compile(meta);
@@ -34,7 +36,7 @@ export default class Blend extends Expression {
     }
     _preDraw(...args) {
         super._preDraw(...args);
-        if (this.mix instanceof Animate && !this.mix.isAnimated()) {
+        if (this.originalMix instanceof Animate && !this.originalMix.isAnimated()) {
             this.parent._replaceChild(this, this.b);
         }
     }
