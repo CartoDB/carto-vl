@@ -39,7 +39,6 @@
         const style = new carto.Style({
             filter: s.gt($population, 1000000),
         });
-
         const layer = new carto.Layer('myCartoLayer', source, style);
         layer.addTo(map, 'watername_ocean');
     </script>

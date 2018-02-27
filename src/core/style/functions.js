@@ -105,6 +105,7 @@ export const cielab = (...args) => new CIELab(...args);
 export const xyz = (...args) => new XYZ(...args);
 export const abs = (...args) => new Abs(...args);
 export const greaterThan = (...args) => new GreaterThan(...args);
+export const gt = greaterThan;
 export const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
 export const lessThan = (...args) => new LessThan(...args);
 export const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);

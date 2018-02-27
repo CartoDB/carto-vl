@@ -5,6 +5,7 @@ import * as shaders from '../core/shaders';
 import { compileShader } from '../core/style/shader-compiler';
 import { parseStyleDefinition } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
+import * as s from '../core/style/functions';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 
@@ -20,7 +21,8 @@ const SUPPORTED_PROPERTIES = [
     'width',
     'strokeColor',
     'strokeWidth',
-    'order'
+    'order',
+    'filter'
 ];
 
 /**
@@ -55,7 +57,7 @@ export default class Style {
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
-        this._styleSpec = styleSpec;
+        this._styleSpec = this._handleFilters(styleSpec)
 
         // REVIEW THIS vv
         this.updated = true;
@@ -145,11 +147,23 @@ export default class Style {
         return this._styleSpec.order;
     }
 
+    /**
+     * Return the filter expression.
+     *
+     * @return {carto.style.expression}
+     *
+     * @memberof carto.Style
+     * @api
+     */
+    getFilter() {
+        return this._styleSpec.filter;
+    }
+
     isAnimated() {
         return this.getColor().isAnimated() ||
-               this.getWidth().isAnimated() ||
-               this.getStrokeColor().isAnimated() ||
-               this.getStrokeWidth().isAnimated();
+            this.getWidth().isAnimated() ||
+            this.getStrokeColor().isAnimated() ||
+            this.getStrokeWidth().isAnimated();
     }
 
     // REVIEW THIS vv
@@ -261,6 +275,19 @@ export default class Style {
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
         styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION;
         styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION;
+        return styleSpec;
+    }
+
+    /** 
+     * If the style contains a filter update the color to take the filter into account.
+     * When an element is filitered out its opacity will be 0 so it wont be painted.
+     * @param {StyleSpec} styleSpec
+     * @return {StyleSpec}
+     */
+    _handleFilters(styleSpec) {
+        if (styleSpec.filter) {
+            styleSpec.color = s.opacity(styleSpec.color, s.floatMul(styleSpec.color.a, styleSpec.filter))
+        }
         return styleSpec;
     }
 
