@@ -261,12 +261,14 @@ const requestHandler = (request, response) => {
         }
         console.log(x,y,z,resolution,webmercator);
         let start_t = new Date().getTime();
+        let columns = webmercator ? ['x', 'y'] : ['pickup_longitude', 'pickup_latitude'];
+        columns = columns.concat(Object.keys(aggregate_columns));
 
         asyncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
             response.write('[\n')
             // response.on('finish',()=>response.write(']'));
             results.pipe(through2.obj(function (row, enc, next) {
-                const txt = JSON.stringify(row) + ',\n';
+                const txt = JSON.stringify(columns.map(c=>row[c])) + ',\n';
                 this.push(txt);
                 next();
             }))
@@ -275,7 +277,7 @@ const requestHandler = (request, response) => {
                 response.write(chunk);
             })
             .on('end', () => {
-                response.end('{}]');
+                response.end('[]]');
             });
         })
         .catch(err => {

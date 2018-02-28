@@ -4,7 +4,7 @@ import * as rsys from '../../client/rsys';
 import Property from '../../core/style/expressions/property';
 import * as LRU from 'lru-cache';
 
-const PROPERTIES = ['feature_count', 'total_amount', 'trip_distance'];
+const PROPERTIES = ['total_amount', 'trip_distance', 'feature_count'];
 
 
 const DEG2RAD = Math.PI / 180;
@@ -46,17 +46,17 @@ function fetchDataframe(url, webmercator=false) {
             const f = data[i];
             let wm = null;
             if (webmercator) {
-                wm = { x: f.x, y: f.y };
+                wm = { x: f[0], y: f[1] };
             }
             else {
-                const lng = f.pickup_longitude;
-                const lat = f.pickup_latitude;
+                const lng = f[0];
+                const lat = f[1];
                 wm = Wmxy({ lat, lng });
             }
             const r = rsys.wToR(wm.x, wm.y, tsys);
             geometry[2 * i + 0] = r.x;
             geometry[2 * i + 1] = r.y;
-            PROPERTIES.map(prop => properties[prop][i] = f[prop]);
+            PROPERTIES.map((prop, index) => properties[prop][i] = f[index+2]);
         }
         const dataframe = new R.Dataframe(
             { x: 0, y: 0 },
