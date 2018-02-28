@@ -64,6 +64,10 @@ function genInterpolator(inlineMaker, preface) {
             this.type = 'float';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
+        eval(feature){
+            //TODO FIXME
+            return this.m.eval(feature);
+        }
     };
     fn.type = 'interpolator';
     return fn;
