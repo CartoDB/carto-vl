@@ -9,13 +9,44 @@ import Property from '../core/style/expressions/property';
 /**
  * Returns supported windshaft filters for the style
  * @param {*} style 
+ * @returns {Filtering}
  */
 export function getFiltering(style) {
     return getFilter(style.filter);
 }
 
-export function getFilteredSQL(aggSQL, filtering) {
-    return 2;
+/**
+ *
+ * @param {Filtering} filtering
+ */
+export function getSQLWhere(filtering) {
+    if (!filtering) {
+        return '';
+    }
+    return 'WHERE ' + filtering.map(filter => getSQL(filter)).join(' AND ');
+
+}
+
+function getSQL(f) {
+    return getBetweenSQL(f) || getInSQL(f) || getNinSQL(f) || '';
+}
+
+function getBetweenSQL(f) {
+    if (f.type == 'between') {
+        return `(${f.property} BETWEEN ${f.lowerLimit} AND ${f.upperLimit})`;
+    }
+}
+
+function getInSQL(f) {
+    if (f.type == 'in') {
+        return `(${f.property} IN (${f.whitelist.map(cat => `'${cat}'`).join()}))`;
+    }
+}
+
+function getNinSQL(f) {
+    if (f.type == 'nin') {
+        return `(${f.property} NOT IN (${f.blacklist.map(cat => `'${cat}'`).join()}))`;
+    }
 }
 
 function getFilter(f) {

@@ -3,6 +3,52 @@ import Style from '../../../src/api/style';
 import * as s from '../../../src/core/style/functions';
 
 describe('src/client/windshaft-filtering', () => {
+    describe('getSQLWhere', () => {
+        describe('when the filter does not exists', () => {
+            it('should return an empty string', () => {
+                expect(f.getSQLWhere(null)).toEqual('');
+            });
+        });
+        describe('when the filter does exists', () => {
+            it('should return a BETWEEN clause with a between() filter', () => {
+                expect(f.getSQLWhere([{
+                    type: 'between',
+                    property: 'numericProperty',
+                    lowerLimit: 10,
+                    upperLimit: 20,
+                }])).toEqual('WHERE (numericProperty BETWEEN 10 AND 20)');
+            });
+            it('should return a IN clause with an in() filter', () => {
+                expect(f.getSQLWhere([{
+                    type: 'in',
+                    property: 'categoricalProperty',
+                    whitelist: ['red', 'blue']
+                }])).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\'))');
+            });
+            it('should return a NOT IN clause with an nin() filter', () => {
+                expect(f.getSQLWhere([{
+                    type: 'nin',
+                    property: 'categoricalProperty',
+                    blacklist: ['red', 'blue']
+                }])).toEqual('WHERE (categoricalProperty NOT IN (\'red\',\'blue\'))');
+            });
+            it('should compose sub-filter with non-unary filters', () => {
+                expect(f.getSQLWhere([
+                    {
+                        type: 'in',
+                        property: 'categoricalProperty',
+                        whitelist: ['red', 'blue']
+                    },
+                    {
+                        type: 'between',
+                        property: 'numericProperty',
+                        lowerLimit: 10,
+                        upperLimit: 20,
+                    }
+                ])).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\')) AND (numericProperty BETWEEN 10 AND 20)');
+            });
+        });
+    });
     describe('getFiltering', () => {
         describe('when the filter is complete and exists', () => {
             it('`between($numericProperty, 10,20) `', () => {
