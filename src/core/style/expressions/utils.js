@@ -9,7 +9,7 @@ export function implicitCast(value) {
     if (typeof value == 'string') {
         return category(value);
     }
-    if (!(value instanceof Expression) && value.type != 'paletteGenerator') {
+    if (!(value instanceof Expression) && value.type !== 'paletteGenerator' && value.type !== 'float') {
         throw new Error('value cannot be casted');
     }
     return value;

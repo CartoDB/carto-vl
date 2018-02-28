@@ -42,6 +42,7 @@ export default class Dataframe {
         this.texWidth = this._createStyleTileTexture(this.numFeatures);
         this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
         this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
+        this.texFilter = this._createStyleTileTexture(this.numFeatures);
 
         var ids = new Float32Array(points.length);
         let index = 0;
@@ -117,11 +118,14 @@ export default class Dataframe {
             gl.deleteTexture(this.texStrokeColor);
             gl.deleteTexture(this.texWidth);
             gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteTexture(this.texFilter);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
             this.texColor = 'freed';
+            this.texWidth = 'freed';
             this.texStrokeColor = 'freed';
             this.texStrokeWidth = 'freed';
+            this.texFilter = 'freed';
             this.vertexBuffer = 'freed';
             this.featureIDBuffer = 'freed';
             this.propertyTex = null;

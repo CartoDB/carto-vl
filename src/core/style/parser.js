@@ -7,11 +7,11 @@ import { implicitCast } from './expressions/utils';
 const aggFns = [];
 
 var lowerCaseFunctions = {};
-Object.keys(functions).filter(
-    name => name[0] == name[0].toLowerCase()
-).map(name => {
-    lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name];
-});
+Object.keys(functions)
+    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
+    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
+lowerCaseFunctions.true = functions.TRUE;
+lowerCaseFunctions.false = functions.FALSE;
 
 /**
  * @jsapi
@@ -41,8 +41,12 @@ function parseStyleNamedExpr(styleSpec, node) {
 
 export function parseStyleDefinition(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp(':', 1);
-    jsep.addBinaryOp('^', 10);
+    jsep.addBinaryOp(':', 0);
+    jsep.addBinaryOp('^', 11);
+    jsep.addBinaryOp('or', 1);
+    jsep.addBinaryOp('and', 2);
+    jsep.removeLiteral('true');
+    jsep.removeLiteral('false');
     const ast = jsep(str);
     let styleSpec = {};
     if (ast.type == 'Compound') {
@@ -50,8 +54,12 @@ export function parseStyleDefinition(str) {
     } else {
         parseStyleNamedExpr(styleSpec, ast);
     }
+    jsep.removeBinaryOp('and');
+    jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
+    jsep.addLiteral('true');
+    jsep.addLiteral('false');
     return styleSpec;
 }
 
@@ -85,6 +93,20 @@ function parseBinaryOperation(node) {
         return functions.floatMod(left, right);
     case '^':
         return functions.floatPow(left, right);
+    case '>':
+        return functions.greaterThan(left, right);
+    case '>=':
+        return functions.greaterThanOrEqualTo(left, right);
+    case '<':
+        return functions.lessThan(left, right);
+    case '<=':
+        return functions.lessThanOrEqualTo(left, right);
+    case '==':
+        return functions.equals(left, right);
+    case 'and':
+        return functions.and(left, right);
+    case 'or':
+        return functions.or(left, right);
     default:
         throw new Error(`Invalid binary operator '${node.operator}'`);
     }

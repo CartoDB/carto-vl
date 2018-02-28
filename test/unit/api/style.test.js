@@ -144,4 +144,17 @@ describe('api/style', () => {
             });
         });
     });
+
+    describe('.filter', () => {
+        it('should return the current filter', () => {
+            const expected = s.gt(s.property('fake_property'), 1000);
+            const style = new Style({
+                filter: expected,
+            });
+
+            const actual = style.filter;
+
+            expect(actual).toEqual(expected);
+        });
+    });
 });

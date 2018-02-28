@@ -9,6 +9,7 @@ export const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
 export const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
 export const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 export const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
+export const Not = genUnaryOp(x => 1 - x, x => `1.0 - ${x}`);
 
 function genUnaryOp(jsFn, glsl) {
     return class UnaryOperation extends Expression {
