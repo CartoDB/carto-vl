@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const OUTPUT_DIR = path.join(__dirname, './references');
-const FOLDERS = ['basic', 'style'];
+const FOLDERS = ['basic', 'style', 'filtering'];
 const BLACKLIST_FILES = [''];
 const DELAY = 4000;
 const WIDTH = 400;
