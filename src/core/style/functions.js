@@ -3,8 +3,6 @@
  *  @namespace carto.style.expressions
  *
  *  @description
- *  # CARTO GL
- *  All the library features are exposed through the `carto` namespace.
  */
 
 import { palettes, Inverse } from './expressions/palettes';
