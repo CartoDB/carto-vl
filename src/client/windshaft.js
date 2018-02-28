@@ -3,10 +3,11 @@ import * as rsys from './rsys';
 
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
-import * as filtering from './windshaft-filtering';
+import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 
 const SAMPLE_ROWS = 1000;
+const MIN_FILTERING = 500000;
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -59,13 +60,19 @@ export default class Windshaft {
      */
     getData(viewport, style) {
         const MNS = style.getMinimumNeededSchema();
-        const resolution = style.getResolution();   
-        const filtering = null; ///getFiltering(style);
-        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (filtering != this.filtering && this.metadata.featureCount > 500000)) {
-            const promise = this.inProgressInstantiations[JSON.stringify({ MNS, resolution })];
+        const resolution = style.getResolution();
+        const filtering = windshaftFiltering.getFiltering(style);
+        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution ||
+            (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING)) {
+            const promise = this.inProgressInstantiations[JSON.stringify(
+                {
+                    MNS,
+                    resolution,
+                    filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+                })];
             // Only instantiate if the same map is not being resintantiated now
             if (!promise) {
-                const p = this._instantiate(MNS, resolution);
+                const p = this._instantiate(MNS, resolution, filtering);
                 this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
                 console.log('Instantiating map:', JSON.stringify(MNS));
                 p.finally(() => {
@@ -115,7 +122,7 @@ export default class Windshaft {
         return this._numCategories;
     }
 
-    _instantiate(MNS, resolution) {
+    _instantiate(MNS, resolution, filtering) {
         let agg = {
             threshold: 1,
             resolution: resolution,
@@ -135,7 +142,7 @@ export default class Windshaft {
             }
         });
         const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        const aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+        let aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
         agg.placement = 'centroid';
         const query = `(${aggSQL}) AS tmp`;
 
@@ -148,28 +155,31 @@ export default class Windshaft {
         const metadataPromise = this.getMetadata(query, MNS, conf);
 
         return new Promise((resolve, reject) => {
-            /*if (metadata.featureCount>500000){
-                aggSQL = getFilteredSQL(aggSQL, filtering);
-            }*/
-            this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
-                metadataPromise.then((metadata) => {
-                    this._oldDataframes = [];
-                    this.cache.reset();
-                    this.url = url;
-                    this.metadata = metadata;
-                    this._MNS = MNS;
-                    this.resolution = resolution;
+            metadataPromise.then(metadata => {
+                if (metadata.featureCount > MIN_FILTERING) {
+                    aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filtering)}`;
+                }
+                this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
+                    metadataPromise.then((metadata) => {
+                        this._oldDataframes = [];
+                        this.cache.reset();
+                        this.url = url;
+                        this.metadata = metadata;
+                        this._MNS = MNS;
+                        this.filtering = filtering;
+                        this.resolution = resolution;
 
-                    resolve(metadata);
-                }, err => {
-                    console.log(333, err);
+                        resolve(metadata);
+                    }, err => {
+                        console.log(333, err);
+                        reject(err);
+                    });
+                }).catch(err => {
+                    metadataPromise.catch(err => console.log(123, err));
+
                     reject(err);
                 });
-            }).catch(err => {
-                metadataPromise.catch(err => console.log(123, err));
-
-                reject(err);
-            });
+            }).catch(err => reject(err));
         });
     }
 

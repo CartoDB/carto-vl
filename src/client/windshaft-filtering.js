@@ -4,6 +4,9 @@ import Between from '../core/style/expressions/between';
 import Category from '../core/style/expressions/category';
 import Float from '../core/style/expressions/float';
 import Property from '../core/style/expressions/property';
+import Blend from '../core/style/expressions/blend';
+import Animate from '../core/style/expressions/animate';
+import FloatConstant from '../core/style/expressions/floatConstant';
 
 
 /**
@@ -50,13 +53,18 @@ function getNinSQL(f) {
 }
 
 function getFilter(f) {
-    return getAndFilter(f) || getInFilter(f) || getNinFilter(f) || getBetweenFilter(f) || null;
+    return getAndFilter(f) || getInFilter(f) || getNinFilter(f) || getBetweenFilter(f) || getBlendFilter(f) || null;
 }
 
 function getAndFilter(f) {
     if (f instanceof And) {
-        debugger;
         return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y));
+    }
+}
+
+function getBlendFilter(f) {
+    if (f instanceof Blend && f.originalMix instanceof Animate) {
+        return getFilter(f.b);
     }
 }
 
@@ -81,11 +89,7 @@ function getNinFilter(f) {
 }
 
 function getBetweenFilter(f) {
-    if (f instanceof Between &&
-        f.value instanceof Property &&
-        f.lowerLimit instanceof Float &&
-        f.upperLimit instanceof Float
-    ) {
+    if (isBetweenFilter(f)) {
         return [{
             type: 'between',
             property: f.value.name,
@@ -93,4 +97,11 @@ function getBetweenFilter(f) {
             upperLimit: f.upperLimit.expr,
         }];
     }
+}
+
+function isBetweenFilter(f) {
+    return f instanceof Between
+        && f.value instanceof Property
+        && (f.lowerLimit instanceof Float || f.lowerLimit instanceof FloatConstant)
+        && (f.upperLimit instanceof Float || f.upperLimit instanceof FloatConstant);
 }

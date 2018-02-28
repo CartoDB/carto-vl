@@ -65,7 +65,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
-            xit('`between($numericProperty, 10,20) with constantFloats`', () => {
+            it('`between($numericProperty, 10,20) with constantFloats`', () => {
                 const expected = [
                     {
                         type: 'between',
@@ -141,6 +141,37 @@ describe('src/client/windshaft-filtering', () => {
                     )
                 }));
                 expect(actual).toEqual(expected);
+            });
+        });
+
+        describe('when the filter is a blend', () => {
+            it('should skip the animation, applying the final filter, when the mix is an Animation', () => {
+                const expected = [
+                    {
+                        type: 'between',
+                        property: 'numericProperty',
+                        lowerLimit: 10,
+                        upperLimit: 20,
+                    }
+                ];
+                const actual = f.getFiltering(new Style({
+                    filter: s.blend(
+                        s.FALSE,
+                        s.between(s.property('numericProperty'), 10, 20),
+                        s.animate(100)
+                    )
+                }));
+                expect(actual).toEqual(expected);
+            });
+            it('should return null when the mix factor is not an Animation', () => {
+                const actual = f.getFiltering(new Style({
+                    filter: s.blend(
+                        s.between(s.property('numericProperty'), 10, 20),
+                        s.FALSE,
+                        0.5
+                    )
+                }));
+                expect(actual).toBeNull();
             });
         });
 
