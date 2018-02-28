@@ -41,8 +41,10 @@ function parseStyleNamedExpr(styleSpec, node) {
 
 export function parseStyleDefinition(str) {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp(':', 1);
-    jsep.addBinaryOp('^', 10);
+    jsep.addBinaryOp(':', 0);
+    jsep.addBinaryOp('^', 11);
+    jsep.addBinaryOp('or', 1);
+    jsep.addBinaryOp('and', 2);
     jsep.removeLiteral('true');
     jsep.removeLiteral('false');
     const ast = jsep(str);
@@ -52,6 +54,8 @@ export function parseStyleDefinition(str) {
     } else {
         parseStyleNamedExpr(styleSpec, ast);
     }
+    jsep.removeBinaryOp('and');
+    jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
     jsep.addLiteral('true');
@@ -99,6 +103,10 @@ function parseBinaryOperation(node) {
         return functions.lessThanOrEqualTo(left, right);
     case '==':
         return functions.equals(left, right);
+    case 'and':
+        return functions.and(left, right);
+    case 'or':
+        return functions.or(left, right);
     default:
         throw new Error(`Invalid binary operator '${node.operator}'`);
     }
