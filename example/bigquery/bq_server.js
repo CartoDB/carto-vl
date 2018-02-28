@@ -1,3 +1,4 @@
+const through2 = require('through2');
 const http = require('http')
 const port = 3000
 const n_points = 20000;
@@ -20,6 +21,48 @@ function syncQuery(sqlQuery) {
     return bigquery.query(options)
 }
 
+
+function asyncQuery(sqlQuery) {
+    const BigQuery = require('@google-cloud/bigquery');
+
+    const bigquery = new BigQuery({
+      projectId: projectId,
+    });
+
+    const options = {
+      query: sqlQuery,
+      useLegacySql: false, // Use standard SQL syntax for queries.
+    };
+
+    let job;
+
+    // Runs the query as a job
+    return bigquery
+      .createQueryJob(options)
+      .then(results => {
+        job = results[0];
+        console.log(`Job ${job.id} started.`);
+        return job.promise();
+      })
+      .then(() => {
+        // Get the job's status
+        return job.getMetadata();
+      })
+      .then(metadata => {
+        // Check the job's status for errors
+        const errors = metadata[0].status.errors;
+        if (errors && errors.length > 0) {
+          throw errors;
+        }
+      })
+      .catch(err => {
+        console.error('ERROR:', err);
+      })
+      .then(() => {
+        console.log(`Job ${job.id} completed.`);
+        return job.getQueryResultsStream();
+      })
+  }
 
 
 const DEG2RAD = Math.PI / 180;
@@ -218,10 +261,22 @@ const requestHandler = (request, response) => {
         }
         console.log(x,y,z,resolution,webmercator);
         let start_t = new Date().getTime();
-        syncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
-            let end_t = new Date().getTime();
-            console.log("OK",x,y,z,resolution,"ROWS:",results[0].length,"time:",(end_t-start_t)/1000);
-            response.end(JSON.stringify(results[0]));
+
+        asyncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
+            response.write('[\n')
+            // response.on('finish',()=>response.write(']'));
+            results.pipe(through2.obj(function (row, enc, next) {
+                const txt = JSON.stringify(row) + ',\n';
+                this.push(txt);
+                next();
+            }))
+            // .pipe(response)
+            .on('data', (chunk) => {
+                response.write(chunk);
+            })
+            .on('end', () => {
+                response.end('{}]');
+            });
         })
         .catch(err => {
             console.error('ERROR:', err);
