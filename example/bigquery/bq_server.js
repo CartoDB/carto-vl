@@ -5,6 +5,9 @@ const n_points = 20000;
 
 const projectId = 'cdb-gcp-europe';
 
+const streamming = process.argv[2] == 'stream'
+console.log("STREAMMING:", streamming)
+
 function syncQuery(sqlQuery) {
     const BigQuery = require('@google-cloud/bigquery');
 
@@ -264,25 +267,37 @@ const requestHandler = (request, response) => {
         let columns = webmercator ? ['x', 'y'] : ['pickup_longitude', 'pickup_latitude'];
         columns = columns.concat(Object.keys(aggregate_columns));
 
-        asyncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
-            response.write('[\n')
-            // response.on('finish',()=>response.write(']'));
-            results.pipe(through2.obj(function (row, enc, next) {
-                const txt = JSON.stringify(columns.map(c=>row[c])) + ',\n';
-                this.push(txt);
-                next();
-            }))
-            // .pipe(response)
-            .on('data', (chunk) => {
-                response.write(chunk);
+        if (streamming) {
+            asyncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
+                response.write('[\n')
+                // response.on('finish',()=>response.write(']'));
+                results.pipe(through2.obj(function (row, enc, next) {
+                    const txt = JSON.stringify(columns.map(c=>row[c])) + ',\n';
+                    this.push(txt);
+                    next();
+                }))
+                // .pipe(response)
+                .on('data', (chunk) => {
+                    response.write(chunk);
+                })
+                .on('end', () => {
+                    response.end('[]]');
+                });
             })
-            .on('end', () => {
-                response.end('[]]');
+            .catch(err => {
+                console.error('ERROR:', err);
             });
-        })
-        .catch(err => {
-            console.error('ERROR:', err);
-        });
+        }
+        else {
+            syncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
+                let end_t = new Date().getTime();
+                console.log("OK",x,y,z,resolution,"ROWS:",results[0].length,"time:",(end_t-start_t)/1000);
+                response.end(JSON.stringify(results[0].map(row => columns.map(c=>row[c]))))
+            })
+            .catch(err => {
+                console.error('ERROR:', err);
+            });
+        }
     }
     else {
         console.error('ERROR',request.url)
