@@ -152,7 +152,7 @@ export default class Windshaft {
             serverURL: this._source._serverURL
         };
 
-        const metadataPromise = this.getMetadata(query, MNS, conf);
+        const metadataPromise = this.getMetadata(query, MNS, conf);//TODO pass filtering WHERE clause
 
         return new Promise((resolve, reject) => {
             metadataPromise.then(metadata => {
@@ -391,10 +391,10 @@ export default class Windshaft {
         });
 
         metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
+        const numericsTypes = await this.getNumericTypes(numerics, query, conf);//TODO use filtering WHERE
+        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);//TODO use filtering WHERE
         const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);
+        const sample = await this.getSample(conf, sampling);// TODO pass filtering WHERE
 
         numerics.map((name, index) => {
             const t = numericsTypes[index];
@@ -411,6 +411,7 @@ export default class Windshaft {
     }
 
     async getSample(conf, sampling) {
+        //TODO use filtering WHERE
         let q;
         if (this._source._tableName) {
             q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
@@ -426,6 +427,7 @@ export default class Windshaft {
         return json.rows;
     }
 
+    // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
         const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));

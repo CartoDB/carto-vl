@@ -15,4 +15,8 @@ export default class FloatConstant extends Expression {
         this.type = 'float';
         this.inlineMaker = ()=> `(${x.toFixed(20)})`;
     }
+
+    eval(){
+        return this.expr;
+    }
 }

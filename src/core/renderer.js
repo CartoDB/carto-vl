@@ -209,6 +209,32 @@ class Renderer {
         });
 
         const s = 1. / this._zoom;
+        // TODO go feature by feature instead of column by column
+        tiles.map(d => {
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                // TODO ignore if feature is filtered
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    requiredColumns.map(column => {
+                        const values = d.properties[column];
+                        const v = values[i];
+                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+                        metaColumn.min = Math.min(v, metaColumn.min);
+                        metaColumn.max = Math.max(v, metaColumn.max);
+                        metaColumn.count++;
+                        metaColumn.sum += v;
+                    });
+                }
+            }
+        });
+
         tiles.map(d => {
             requiredColumns.map(column => {
                 const values = d.properties[column];
@@ -227,6 +253,7 @@ class Renderer {
                     const y = d.geom[2 * i + 1];
                     if (x > minx && x < maxx && y > miny && y < maxy) {
                         const v = values[i];
+                        // TODO ignore if feature is filtered
                         if (!Number.isFinite(v)) {
                             continue;
                         }
