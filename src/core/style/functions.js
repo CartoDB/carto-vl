@@ -1,3 +1,12 @@
+/**
+ *  @api
+ *  @namespace carto.style.expressions
+ *
+ *  @description
+ *  # CARTO GL
+ *  All the library features are exposed through the `carto` namespace.
+ */
+
 import { palettes, Inverse } from './expressions/palettes';
 import Animate from './expressions/animate';
 import Blend from './expressions/blend';
@@ -17,6 +26,7 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
+import In from './expressions/in';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -138,5 +148,10 @@ export const lte = lessThanOrEqualTo;
 
 export const eq = equals;
 export const neq = notEquals;
+
+const _in = (...args) => new In(...args);
+
+export { _in as in };
+
 
 export { palettes, Asc, Desc };
