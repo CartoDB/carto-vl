@@ -26,7 +26,7 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
-import In from './expressions/in';
+import { In, Nin } from './expressions/belongs.js';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -145,13 +145,12 @@ export const gt = greaterThan;
 export const gte = greaterThanOrEqualTo;
 export const lt = lessThan;
 export const lte = lessThanOrEqualTo;
+const _in = (...args) => new In(...args);
 
 export const eq = equals;
 export const neq = notEquals;
+export const nin = (...args) => new Nin(...args);
 
-const _in = (...args) => new In(...args);
 
 export { _in as in };
-
-
 export { palettes, Asc, Desc };

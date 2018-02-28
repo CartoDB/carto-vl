@@ -1,6 +1,6 @@
 import ShaderCache from '../../../../src/core/shaders/shader-cache';
 
-fdescribe('src/core/shaders/shader-cache', () => {
+describe('src/core/shaders/shader-cache', () => {
     let shaderCache;
     beforeEach(() => {
         shaderCache = new ShaderCache();
