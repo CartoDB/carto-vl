@@ -76,8 +76,6 @@ import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, View
     from './expressions/viewportAggregation';
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
-import Between from './expressions/between';
-
 
 // Expose classes as constructor functions
 export const asc = (...args) => new Asc(...args);
