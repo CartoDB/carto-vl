@@ -305,8 +305,7 @@ export default class Layer {
         if (!this._integrator.invalidateWebGLState) {
             return;
         }
-        const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
-            style.getResolution());
+        const promise = this._source.requestData(this._getViewport(), style);
         if (promise) {
             promise.then(() => {
                 this.requestData(style);

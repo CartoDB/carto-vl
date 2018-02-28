@@ -3,7 +3,7 @@ import * as rsys from './rsys';
 
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
-
+import * as filtering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 
 const SAMPLE_ROWS = 1000;
@@ -50,14 +50,18 @@ export default class Windshaft {
     }
 
     /**
+     * Should be called whenever the viewport or the style changes
      * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
      * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    _getData(viewport, MNS, resolution) {
-        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution) {
+    getData(viewport, style) {
+        const MNS = style.getMinimumNeededSchema();
+        const resolution = style.getResolution();   
+        const filtering = null; ///getFiltering(style);
+        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (filtering != this.filtering && this.metadata.featureCount > 500000)) {
             const promise = this.inProgressInstantiations[JSON.stringify({ MNS, resolution })];
             // Only instantiate if the same map is not being resintantiated now
             if (!promise) {
@@ -144,6 +148,9 @@ export default class Windshaft {
         const metadataPromise = this.getMetadata(query, MNS, conf);
 
         return new Promise((resolve, reject) => {
+            /*if (metadata.featureCount>500000){
+                aggSQL = getFilteredSQL(aggSQL, filtering);
+            }*/
             this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
                 metadataPromise.then((metadata) => {
                     this._oldDataframes = [];

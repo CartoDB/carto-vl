@@ -20,6 +20,6 @@ export default class Between extends Expression {
         if (this.upperLimit.type != 'float') {
             throw new Error('Between() can only be performed to float properties');
         }
-        this.inlineMaker = inline => `(${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.`;
+        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
 }

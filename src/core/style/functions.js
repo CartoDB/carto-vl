@@ -52,7 +52,7 @@ import { LessThan } from './expressions/binary';
 import { LessThanOrEqualTo } from './expressions/binary';
 import { Equals } from './expressions/binary';
 import { NotEquals } from './expressions/binary';
-import { Or } from './expressions/binary';
+import { Or, And } from './expressions/binary';
 
 
 // Aggregation ops
@@ -138,7 +138,7 @@ export const floatConstant = (...args) => new FloatConstant(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);
-export const and = (...args) => new FloatMul(...args);
+export const and = (...args) => new And(...args);
 export const or = (...args) => new Or(...args);
 export const not = (...args) => new Not(...args);
 
