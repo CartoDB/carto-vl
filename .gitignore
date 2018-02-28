@@ -2,6 +2,5 @@
 *_out.png
 .DS_Store
 .vscode/
-docs/
 dist/
 node_modules/
