@@ -3,8 +3,6 @@
  *  @namespace carto.style.expressions
  *
  *  @description
- *  # CARTO GL
- *  All the library features are exposed through the `carto` namespace.
  */
 
 import { palettes, Inverse } from './expressions/palettes';
@@ -72,7 +70,10 @@ import { Cubic } from './expressions/interpolators';
 export { Cubic };
 
 
-import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
+import {
+    ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
+    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount, GlobalPercentile
+}
     from './expressions/viewportAggregation';
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
@@ -133,6 +134,12 @@ export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const globalPercentile = (...args) => new GlobalPercentile(...args);
+export const globalMax = (...args) => new GlobalMax(...args);
+export const globalMin = (...args) => new GlobalMin(...args);
+export const globalAvg = (...args) => new GlobalAvg(...args);
+export const globalSum = (...args) => new GlobalSum(...args);
+export const globalCount = (...args) => new GlobalCount(...args);
 export const inverse = (...args) => new Inverse(...args);
 export const floatConstant = (...args) => new FloatConstant(...args);
 
