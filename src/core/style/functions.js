@@ -27,6 +27,7 @@ import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 import { In, Nin } from './expressions/belongs.js';
+import Between from './expressions/between';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -75,6 +76,7 @@ import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, View
     from './expressions/viewportAggregation';
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
+import Between from './expressions/between';
 
 
 // Expose classes as constructor functions
@@ -150,6 +152,7 @@ const _in = (...args) => new In(...args);
 export const eq = equals;
 export const neq = notEquals;
 export const nin = (...args) => new Nin(...args);
+export const between = (...args) => new Between(...args);
 
 
 export { _in as in };
