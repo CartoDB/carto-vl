@@ -134,6 +134,7 @@ export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 export const inverse = (...args) => new Inverse(...args);
+export const floatConstant = (...args) => new FloatConstant(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);
