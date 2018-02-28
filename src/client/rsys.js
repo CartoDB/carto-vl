@@ -91,9 +91,15 @@ function rZoom(zoom) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function rTiles(bounds) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
-}
+function rTiles(bounds, dz=0, qz=1) {
+    let z = rZoom((bounds[3] - bounds[1]) / 2.0);
+    z = Math.max(0, z + dz);
+    if (qz > 1) {
+        z = Math.floor(z / qz)*qz;
+    }
+    return wRectangleTiles(z, bounds);
+ }
+
 
 /**
  * TC tiles of a given zoom level that intersect a W rectangle

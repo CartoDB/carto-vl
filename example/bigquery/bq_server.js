@@ -13,7 +13,7 @@ function syncQuery(sqlQuery) {
 
     const options = {
       query: sqlQuery,
-      timeoutMs: 10000, // Time out after 10 seconds.
+      timeoutMs: 30000, // Time out after 30 seconds.
       useLegacySql: false, // Use standard SQL syntax for queries.
     };
 
@@ -26,6 +26,8 @@ const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+const MAX_LAT = 1/2*(4*Math.atan(Math.exp(Math.PI)) - Math.PI)/DEG2RAD;
+
 
 // Webmercator projection
 function Wmxy(latLng) {
@@ -69,6 +71,7 @@ const aggregate_columns = {
     trip_distance: 'AVG(trip_distance)',
     feature_count: 'COUNT(*)'
 };
+const aggregated_columns = ['total_amount', 'trip_distance'];
 
 function metadataQuery() {
     return `
@@ -76,16 +79,20 @@ function metadataQuery() {
    `
 }
 
-function dataQuery(x, y, z, res_factor = 1) {
+function dataQuery(x, y, z, res_factor = 1, webmercator = false) {
+    return webmercator ? dataQueryWm(x, y, z, res_factor) : dataQueryLonLat(x, y, z, res_factor)
+}
+
+function dataQueryLonLat(x, y, z, res_factor = 1) {
     const [min_x, min_y, max_x, max_y] = tileBounds(x, y, z);
     const res_x = (max_x - min_x)/256.0;
     const res_y = (max_y - min_y)/256.0;
 
     const agg_col_names = Object.keys(aggregate_columns).join(',')
     const agg_cols = Object.keys(aggregate_columns).map(col => `${aggregate_columns[col]} AS ${col}`).join(',')
-    const dx = res_x * res_factor;
-    const dy = res_y * res_factor;
-    return `
+    const dx = res_x / res_factor;
+    const dy = res_y / res_factor;
+    const sql = `
         WITH
         _cdb_clusters AS (
         SELECT
@@ -104,7 +111,57 @@ function dataQuery(x, y, z, res_factor = 1) {
         ${agg_col_names}
         FROM _cdb_clusters;
    `
+   return sql
 }
+
+
+function dataQueryWm(x, y, z, res_factor = 1) {
+    const [min_x, min_y, max_x, max_y] = tileBoundsWm(x, y, z);
+    const res_x = (max_x - min_x)/256.0;
+    const res_y = (max_y - min_y)/256.0;
+
+    const agg_col_names = Object.keys(aggregate_columns).join(',')
+    const agg_cols = Object.keys(aggregate_columns).map(col => `${aggregate_columns[col]} AS ${col}`).join(',')
+    const dx = res_x / res_factor;
+    const dy = res_y / res_factor;
+    const sql = `
+        WITH
+        wm_params AS (
+          SELECT
+            pi,
+            pi/180.0 AS deg2rad,
+            r
+          FROM (SELECT ATAN2(0,-1) AS pi, ${EARTH_RADIUS} AS r)
+        ),
+        wm_geom AS (
+          SELECT
+            ${x_column}*deg2rad*r AS x,
+            LN(TAN(${y_column}*deg2rad/2+pi/4))*r AS y,
+            ${aggregated_columns.join(',')}
+          FROM ${table}, wm_params
+          WHERE
+          ${y_column} BETWEEN -${MAX_LAT} AND ${MAX_LAT}
+        ),
+        _cdb_clusters AS (
+          SELECT
+            Floor(x/${dx}) AS _cdb_gx,
+            Floor(y/${dy}) AS _cdb_gy,
+            ${agg_cols}
+          FROM wm_geom
+          WHERE
+            x BETWEEN ${min_x} AND ${max_x} AND
+            y BETWEEN ${min_y} AND ${max_y}
+          GROUP BY _cdb_gx, _cdb_gy
+        )
+        SELECT
+            (_cdb_gx + 0.5)*${dx} AS x,
+            (_cdb_gy + 0.5)*${dy} AS y,
+            ${agg_col_names}
+        FROM _cdb_clusters;
+   `
+   return sql
+}
+
 
 function randomPoint(min_x, min_y, max_x, max_y) {
     return {
@@ -117,6 +174,7 @@ function randomPoint(min_x, min_y, max_x, max_y) {
 }
 
 const requestHandler = (request, response) => {
+    response.socket.setTimeout(10*60*1000);
     console.log(request.url)
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
@@ -149,11 +207,20 @@ const requestHandler = (request, response) => {
         data = Array.apply(null, Array(n_points*2)).map(()=>randomPoint(min_x, min_y, max_x, max_y));
         response.end(JSON.stringify(data));
     }
-    else if (match = request.url.match(/\/tile\/(\d+)\/(\d+)\/(\d+)/i)) {
-        z = Number(match[1])
-        x = Number(match[2])
-        y = Number(match[3])
-        syncQuery(dataQuery(x,y,z)).then(results => {
+    else if (match = request.url.match(/\/tile(wm)?\/(\d+)\/(\d+)\/(\d+)/i)) {
+        const webmercator = !!match[1]
+        const z = Number(match[2])
+        const x = Number(match[3])
+        const y = Number(match[4])
+        let resolution = 1
+        if (match = request.url.match(/\/tile(wm)?\/(\d+)\/(\d+)\/(\d+)\/([\.\d]+)/i)) {
+            resolution = Number(match[5])
+        }
+        console.log(x,y,z,resolution,webmercator);
+        let start_t = new Date().getTime();
+        syncQuery(dataQuery(x,y,z,resolution,webmercator)).then(results => {
+            let end_t = new Date().getTime();
+            console.log("OK",x,y,z,resolution,"ROWS:",results[0].length,"time:",(end_t-start_t)/1000);
             response.end(JSON.stringify(results[0]));
         })
         .catch(err => {

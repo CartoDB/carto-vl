@@ -1,3 +1,4 @@
+
 import * as R from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import Property from '../../core/style/expressions/property';
@@ -10,6 +11,7 @@ const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+const MAX_LAT = 1/2*(4*Math.atan(Math.exp(Math.PI)) - Math.PI)/DEG2RAD;
 
 // Webmercator projection
 function Wmxy(latLng) {
@@ -30,10 +32,9 @@ function fetchFromServer(url) {
     }).then(response => response.json());
 }
 
-function fetchDataframe(url) {
+function fetchDataframe(url, webmercator=false) {
     return fetchFromServer(url).then(data => {
         const numFeatures = data.length;
-        // console.log(numFeatures);
         const geometry = new Float32Array(numFeatures * 2);
         const properties = {};
         PROPERTIES.map(prop => properties[prop] = new Float32Array(numFeatures + 1024))
@@ -43,9 +44,15 @@ function fetchDataframe(url) {
 
         for (let i = 0; i < numFeatures; i++) {
             const f = data[i];
-            const lng = f.pickup_longitude;
-            const lat = f.pickup_latitude;
-            const wm = Wmxy({ lat, lng });
+            let wm = null;
+            if (webmercator) {
+                wm = { x: f.x, y: f.y };
+            }
+            else {
+                const lng = f.pickup_longitude;
+                const lat = f.pickup_latitude;
+                wm = Wmxy({ lat, lng });
+            }
             const r = rsys.wToR(wm.x, wm.y, tsys);
             geometry[2 * i + 0] = r.x;
             geometry[2 * i + 1] = r.y;
@@ -66,6 +73,16 @@ function fetchDataframe(url) {
 
 var previewDataframe = null;
 
+function viewportTiles(viewport, rsys) {
+    // return rsys.rTiles(viewport, -1, 1);
+    return rsys.rTiles(viewport, 0, 4);
+}
+
+function viewportResolution(viewport, res, z) {
+    // return (res || 1)*8;
+    return (res || 1)*2;
+}
+
 export default class BQ {
     constructor(table, auth) {
         const query = `SELECT *, 2000 AS feature_count FROM ${table}_sample`
@@ -73,6 +90,7 @@ export default class BQ {
 
         const lruOptions = {
             max: 1000
+
             // TODO improve cache length heuristic
             , length: function () { return 1; }
             , dispose: (key, promise) => {
@@ -104,23 +122,29 @@ export default class BQ {
             return previewMeta;
         }
         else if (!this.dataInit) {
-            const tiles = rsys.rTiles(viewport);
             // while we wait, provide some preview data
             this.sample.requestData(viewport, mns, resolution);
-            tiles.forEach(t => this._getDataframe(t.x, t.y, t.z));
+
+            const tiles = viewportTiles(viewport, rsys);
+            const bQresolution = viewportResolution(viewport, resolution, tiles[0].z)
+            tiles.forEach(t => this._getDataframe(t.x, t.y, t.z, bQresolution));
         }
     }
 
-    _getDataframe(x, y, z) {
+    _getDataframe(x, y, z, resolution) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
         if (c) {
             // c.then(dataframe => dataframe.active = true);
             return c;
         }
-        const promise = fetchDataframe(`http://localhost:3000/tile/${z}/${x}/${y}`).then(dataframe => {
-                console.log("DATAFRAME",x,y,z)
-                this.sample._client.deactivate(x, y, z)
+        const webmercator = true;
+        const endpoint = webmercator ? 'tilewm' : 'tile';
+
+        const promise = fetchDataframe(`http://localhost:3000/${endpoint}/${z}/${x}/${y}/${resolution}`, webmercator).then(dataframe => {
+                console.log("DATAFRAME",x,y,z,resolution)
+                // this.sample.free();
+                // this.sample._client.deactivate(x, y, z)
                 // this.sample._client.remove(t.x, t.y, t.z)
                 this._addDataframe(dataframe);
         });
