@@ -71,21 +71,8 @@ export default class Windshaft {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
-        if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution ||
-            (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING)) {
-            const promise = this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)];
-            // Only instantiate if the same map is not being resintantiated now
-            if (!promise) {
-                console.log('Instantiation started:', this._source._tableName, this._getInstantiationID(MNS, resolution, filtering));
-                const p = this._instantiate(MNS, resolution, filtering);
-                this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)] = p;
-                p.finally(() => {
-                    console.log('Instantiation completed:', this._source._tableName, this._getInstantiationID(MNS, resolution, filtering));
-                    this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)] = null;
-                }, () => { }).catch(err => console.log(err));
-                return p;
-            }
-            return promise;
+        if (this._needToInstantiate(MNS, resolution, filtering)) {
+            return this._instantiate(MNS, resolution, filtering);
         }
 
         const tiles = rsys.rTiles(viewport);
@@ -111,6 +98,17 @@ export default class Windshaft {
         });
     }
 
+    /**
+     * Check if the map needs to be reinstantiated
+     * This happens:
+     *  - When the minimun required schema changed.
+     *  - When the resolution changed.
+     *  - When the filter conditions changed and the dataset should be server-filtered.
+     */
+    _needToInstantiate(MNS, resolution, filtering) {
+        return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
+    }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
@@ -120,14 +118,20 @@ export default class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
-    async _instantiate(MRS, resolution, filters) {
+    async _instantiate(MNS, resolution, filters) {
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
+            console.warn('cache-hit');
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+        }
+
+
         const conf = this._getConfig();
-        const agg = await this._generateAggregation(MRS, resolution);
-        const select = this._buildSelectClause(MRS);
+        const agg = await this._generateAggregation(MNS, resolution);
+        const select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, MRS, conf);
+        const metadata = await this.getMetadata(query, MNS, conf);
 
         // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
@@ -139,10 +143,12 @@ export default class Windshaft {
         this.cache.reset();
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
-        this._MNS = MRS;
+        this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
 
+        // Store instantiation
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = Promise.resolve(metadata);
         return metadata;
     }
 
