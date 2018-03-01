@@ -6752,12 +6752,21 @@ class Windshaft {
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
         this.inProgressInstantiations = {};
+        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
+    }
+
+    _getInstantiationID(MNS, resolution, filtering) {
+        return JSON.stringify({
+            MNS,
+            resolution,
+            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+        });
     }
 
     /**
@@ -6768,45 +6777,25 @@ class Windshaft {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    getData(viewport, style) {
+    async getData(viewport, style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["a" /* getFiltering */](style);
-        if (!__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution ||
-            (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING)) {
-            const promise = this.inProgressInstantiations[JSON.stringify(
-                {
-                    MNS,
-                    resolution,
-                    filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
-                })];
-            // Only instantiate if the same map is not being resintantiated now
-            if (!promise) {
-                const p = this._instantiate(MNS, resolution, filtering);
-                this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
-                console.log('Instantiating map:', JSON.stringify(MNS));
-                p.finally(() => {
-                    this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = null;
-                }, () => { }).catch(err => console.log(err));
-                return p;
-            }
-            return promise;
-        }
-        if (!this.url) {
-            // Instantiation is in progress, nothing to do yet
-            return;
-        }
-
         const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
+        if (this._needToInstantiate(MNS, resolution, filtering)) {
+            await this._instantiate(MNS, resolution, filtering);
+        }
+        this._getTiles(tiles);
+        return this.metadata;
+    }
+
+    _getTiles(tiles) {
         this._requestGroupID++;
         var completedTiles = [];
         var needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
         tiles.forEach(t => {
-            // TODO object deconstruction
-            const x = t.x;
-            const y = t.y;
-            const z = t.z;
+            const { x, y, z } = t;
             this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
@@ -6823,6 +6812,17 @@ class Windshaft {
         });
     }
 
+    /**
+     * Check if the map needs to be reinstantiated
+     * This happens:
+     *  - When the minimun required schema changed.
+     *  - When the resolution changed.
+     *  - When the filter conditions changed and the dataset should be server-filtered.
+     */
+    _needToInstantiate(MNS, resolution, filtering) {
+        return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
+    }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
@@ -6832,70 +6832,87 @@ class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
-    _instantiate(MNS, resolution, filtering) {
-        let agg = {
-            threshold: 1,
-            resolution: resolution,
-            columns: {},
-            dimensions: {}
-        };
-        MNS.columns.map(name => {
-            if (name.startsWith('_cdb_agg_')) {
-                const base = getBase(name);
-                const fn = getAggFN(name);
-                agg.columns[name] = {
-                    aggregate_function: fn,
-                    aggregated_column: base,
-                };
-            } else {
-                agg.dimensions[name] = name;
-            }
-        });
-        const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        let aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
-        agg.placement = 'centroid';
-        const query = `(${aggSQL}) AS tmp`;
 
-        const conf = {
+    async _instantiateUncached(MNS, resolution, filters){
+        const conf = this._getConfig();
+        const agg = await this._generateAggregation(MNS, resolution);
+        const select = this._buildSelectClause(MNS);
+        let aggSQL = this._buildQuery(select);
+
+        const query = `(${aggSQL}) AS tmp`;
+        const metadata = await this.getMetadata(query, MNS, conf);
+
+        // If the number of features is higher than the minimun, enable server filtering.
+        if (metadata.featureCount > MIN_FILTERING) {
+            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
+        }
+
+        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.urlTemplate = urlTemplate;
+        this.metadata = metadata;
+        this._MNS = MNS;
+        this.filtering = filters;
+        this.resolution = resolution;
+
+        // Store instantiation
+        return metadata;
+    }
+    async _instantiate(MNS, resolution, filters) {
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+        }
+        console.log(this._getInstantiationID(MNS, resolution, filters));
+        const promise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
+        return promise;
+    }
+
+    _generateAggregation(MRS, resolution) {
+        let aggregation = {
+            columns: {},
+            dimensions: {},
+            placement: 'centroid',
+            resolution: resolution,
+            threshold: 1,
+        };
+
+        MRS.columns
+            .forEach(name => {
+                if (name.startsWith('_cdb_agg_')) {
+                    aggregation.columns[name] = {
+                        aggregate_function: getAggFN(name),
+                        aggregated_column: getBase(name)
+                    };
+                } else {
+                    aggregation.dimensions[name] = name;
+                }
+            });
+
+        return aggregation;
+    }
+
+    _buildSelectClause(MRS) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    }
+
+    _buildQuery(select) {
+        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    }
+
+    _getConfig() {
+        return {
             apiKey: this._source._apiKey,
             username: this._source._username,
             serverURL: this._source._serverURL
         };
-
-        const metadataPromise = this.getMetadata(query, MNS, conf);
-
-        return new Promise((resolve, reject) => {
-            metadataPromise.then(metadata => {
-                if (metadata.featureCount > MIN_FILTERING) {
-                    aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["b" /* getSQLWhere */](filtering)}`;
-                }
-                this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
-                    metadataPromise.then((metadata) => {
-                        this._oldDataframes = [];
-                        this.cache.reset();
-                        this.url = url;
-                        this.metadata = metadata;
-                        this._MNS = MNS;
-                        this.filtering = filtering;
-                        this.resolution = resolution;
-
-                        resolve(metadata);
-                    }, err => {
-                        console.log(333, err);
-                        reject(err);
-                    });
-                }).catch(err => {
-                    metadataPromise.catch(err => console.log(123, err));
-
-                    reject(err);
-                });
-            }).catch(err => reject(err));
-        });
     }
 
     free() {
         this.cache.reset();
     }
+
     _generateDataFrame(rs, geometry, properties, size, type) {
         // TODO: Should the dataframe constructor have type and size parameters?
         const dataframe = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["a" /* Dataframe */](
@@ -6909,11 +6926,15 @@ class Windshaft {
 
         return dataframe;
     }
+
     async _getUrlPromise(query, conf, agg, aggSQL) {
+        const LAYER_INDEX = 0;
         this.geomType = await this.getGeometryType(query, conf);
+
         if (this.geomType != 'point') {
             agg = false;
         }
+
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
@@ -6928,17 +6949,23 @@ class Windshaft {
                 }
             ]
         };
-        const response = await fetch(endpoint(conf), {
+        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const layergroup = await response.json();
+        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+    }
+
+    _getRequestConfig(mapConfigAgg) {
+        return {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(mapConfigAgg),
-        });
-        const layergroup = await response.json();
-        return layerUrl(layergroup, 0, conf);
+        };
     }
+
     getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
@@ -6953,7 +6980,7 @@ class Windshaft {
     requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
-        return fetch(this.url(x, y, z))
+        return fetch(this._getTileUrl(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
 
@@ -6995,6 +7022,11 @@ class Windshaft {
                 this._addDataframe(dataframe);
                 return dataframe;
             });
+    }
+
+    _getTileUrl(x, y, z) {
+        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -7235,19 +7267,13 @@ const endpoint = (conf) => {
     return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
 };
 
-const layerUrl = function (layergroup, layerIndex, conf) {
-    let subdomainIndex = 0;
-    return (x, y, z) => {
-        subdomainIndex++;
-        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-            const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
-                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-        }
-        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
-            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-    };
-};
+function getLayerUrl(layergroup, layerIndex, conf) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+    }
+    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+}
 
 /**
  * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
@@ -12095,13 +12121,7 @@ class Layer {
         if (!this._integrator.invalidateWebGLState) {
             return;
         }
-        const promise = this._source.requestData(this._getViewport(), style);
-        if (promise) {
-            promise.then(() => {
-                this.requestData(style);
-            }, err => { console.log(err); });
-            return promise;
-        }
+        return this._source.requestData(this._getViewport(), style);
     }
 
     getNumFeatures() {
