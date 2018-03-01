@@ -52,7 +52,7 @@ function generateAggregattion(metadataPropertyName, global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };
@@ -109,7 +109,7 @@ function generatePercentile(global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };

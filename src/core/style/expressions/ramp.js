@@ -113,4 +113,5 @@ export default class Ramp extends Expression {
         gl.uniform1f(this._keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
     }
+    // TODO eval
 }

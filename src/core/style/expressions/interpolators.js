@@ -2,8 +2,9 @@ import { implicitCast } from './utils';
 import Expression from './expression';
 
 
-export class ILinear extends genInterpolator(inner => inner) { }
-export class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
+export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+export class BounceEaseIn extends genInterpolator(
+    inner => `BounceEaseIn(${inner})`,
     `
     #ifndef BOUNCE_EASE_IN
     #define BOUNCE_EASE_IN
@@ -32,8 +33,11 @@ export class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner
     }
     #endif
 
-`) { }
-export class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+`,
+    inner => inner // TODO FIXME
+) { }
+export class Cubic extends genInterpolator(
+    inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
     #define CUBIC
@@ -46,11 +50,13 @@ export class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
         }
     }
     #endif
-`) { }
+`,
+    inner => inner // TODO FIXME
+) { }
 
 
 // Interpolators
-function genInterpolator(inlineMaker, preface) {
+function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends Expression {
         constructor(m) {
             m = implicitCast(m);
@@ -64,9 +70,8 @@ function genInterpolator(inlineMaker, preface) {
             this.type = 'float';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
-        eval(feature){
-            //TODO FIXME
-            return this.m.eval(feature);
+        eval(feature) {
+            return jsEval(this.m.eval(feature));
         }
     };
     fn.type = 'interpolator';

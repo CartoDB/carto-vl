@@ -50,4 +50,16 @@ export default class Buckets extends Expression {
             inline: `${funcName}(${childInlines.input})`
         };
     }
+    eval(feature) {
+        const v = this.input.eval(feature);
+        let i;
+        for (i = 0; i < this.args.length; i++) {
+            if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
+                return i;
+            } else if (this.input.type == 'float' && v < this.args[i].eval(feature)) {
+                return i;
+            }
+        }
+        return i;
+    }
 }

@@ -25,5 +25,8 @@ function genUnaryOp(jsFn, glsl) {
             this.type = 'float';
             this.inlineMaker = inlines => glsl(inlines.a);
         }
+        eval(feature) {
+            return jsFn(this.a.eval(feature));
+        }
     };
 }

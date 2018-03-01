@@ -29,6 +29,9 @@ function genAggregationOp(aggName) {
                 inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
             };
         }
+        eval(feature) {
+            return feature[`_cdb_agg_${aggName}_${this.property.name}`];
+        }
         _postShaderCompile() { }
         _getMinimumNeededSchema() {
             return {

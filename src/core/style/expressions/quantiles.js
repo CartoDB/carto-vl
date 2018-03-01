@@ -57,6 +57,11 @@ function genQuantiles(global) {
                 inline: `${funcName}(${childInlines.input})`
             };
         }
+        eval(feature) {
+            const input = this.input.eval(feature);
+            const q = this.breakpoints.findIndex(br => input <= br);
+            return q;
+        }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.input.name);
             let i = 0;
