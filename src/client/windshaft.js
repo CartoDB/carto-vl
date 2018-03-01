@@ -42,6 +42,7 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -82,7 +83,7 @@ export default class Windshaft {
             }
             return promise;
         }
-        if (!this.url) {
+        if (!this.urlTemplate) {
             // Instantiation is in progress, nothing to do yet
             return;
         }
@@ -122,70 +123,76 @@ export default class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
-    _instantiate(MNS, resolution, filtering) {
-        let agg = {
-            threshold: 1,
-            resolution: resolution,
-            columns: {},
-            dimensions: {}
-        };
-        MNS.columns.map(name => {
-            if (name.startsWith('_cdb_agg_')) {
-                const base = getBase(name);
-                const fn = getAggFN(name);
-                agg.columns[name] = {
-                    aggregate_function: fn,
-                    aggregated_column: base,
-                };
-            } else {
-                agg.dimensions[name] = name;
-            }
-        });
-        const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        let aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
-        agg.placement = 'centroid';
-        const query = `(${aggSQL}) AS tmp`;
+    async _instantiate(MRS, resolution, filters) {
+        const conf = this._getConfig();
+        const agg = await this._generateAggregation(MRS, resolution);
+        const select = this._buildSelectClause(MRS);
+        let aggSQL = this._buildQuery(select);
 
-        const conf = {
+        const query = `(${aggSQL}) AS tmp`;
+        const metadata = await this.getMetadata(query, MRS, conf);
+
+        // If the number of features is higher than the minimun, enable server filtering.
+        if (metadata.featureCount > MIN_FILTERING) {
+            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
+        }
+
+        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.urlTemplate = urlTemplate;
+        this.metadata = metadata;
+        this._MNS = MRS;
+        this.filtering = filters;
+        this.resolution = resolution;
+
+        return metadata;
+    }
+
+    _generateAggregation(MRS, resolution) {
+        let aggregation = {
+            columns: {},
+            dimensions: {},
+            placement: 'centroid',
+            resolution: resolution,
+            threshold: 1,
+        };
+
+        MRS.columns
+            .forEach(name => {
+                if (name.startsWith('_cdb_agg_')) {
+                    aggregation.columns[name] = {
+                        aggregate_function: getAggFN(name),
+                        aggregated_column: getBase(name)
+                    };
+                } else {
+                    aggregation.dimensions[name] = name;
+                }
+            });
+
+        return aggregation;
+    }
+
+    _buildSelectClause(MRS) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    }
+
+    _buildQuery(select) {
+        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    }
+
+    _getConfig() {
+        return {
             apiKey: this._source._apiKey,
             username: this._source._username,
             serverURL: this._source._serverURL
         };
-
-        const metadataPromise = this.getMetadata(query, MNS, conf);//TODO pass filtering WHERE clause
-
-        return new Promise((resolve, reject) => {
-            metadataPromise.then(metadata => {
-                if (metadata.featureCount > MIN_FILTERING) {
-                    aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filtering)}`;
-                }
-                this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
-                    metadataPromise.then((metadata) => {
-                        this._oldDataframes = [];
-                        this.cache.reset();
-                        this.url = url;
-                        this.metadata = metadata;
-                        this._MNS = MNS;
-                        this.filtering = filtering;
-                        this.resolution = resolution;
-
-                        resolve(metadata);
-                    }, err => {
-                        console.log(333, err);
-                        reject(err);
-                    });
-                }).catch(err => {
-                    metadataPromise.catch(err => console.log(123, err));
-
-                    reject(err);
-                });
-            }).catch(err => reject(err));
-        });
     }
 
     free() {
         this.cache.reset();
     }
+
     _generateDataFrame(rs, geometry, properties, size, type) {
         // TODO: Should the dataframe constructor have type and size parameters?
         const dataframe = new R.Dataframe(
@@ -199,11 +206,15 @@ export default class Windshaft {
 
         return dataframe;
     }
+
     async _getUrlPromise(query, conf, agg, aggSQL) {
+        const LAYER_INDEX = 0;
         this.geomType = await this.getGeometryType(query, conf);
+
         if (this.geomType != 'point') {
             agg = false;
         }
+
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
@@ -218,17 +229,23 @@ export default class Windshaft {
                 }
             ]
         };
-        const response = await fetch(endpoint(conf), {
+        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const layergroup = await response.json();
+        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+    }
+
+    _getRequestConfig(mapConfigAgg) {
+        return {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(mapConfigAgg),
-        });
-        const layergroup = await response.json();
-        return layerUrl(layergroup, 0, conf);
+        };
     }
+
     getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
@@ -243,7 +260,7 @@ export default class Windshaft {
     requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
-        return fetch(this.url(x, y, z))
+        return fetch(this._getTileUrl(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
 
@@ -285,6 +302,11 @@ export default class Windshaft {
                 this._addDataframe(dataframe);
                 return dataframe;
             });
+    }
+
+    _getTileUrl(x, y, z) {
+        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -525,19 +547,13 @@ const endpoint = (conf) => {
     return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
 };
 
-const layerUrl = function (layergroup, layerIndex, conf) {
-    let subdomainIndex = 0;
-    return (x, y, z) => {
-        subdomainIndex++;
-        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-            const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
-                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-        }
-        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
-            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-    };
-};
+function getLayerUrl(layergroup, layerIndex, conf) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+    }
+    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+}
 
 /**
  * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
