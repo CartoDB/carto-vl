@@ -122,70 +122,77 @@ export default class Windshaft {
         return this._numCategories;
     }
 
-    _instantiate(MNS, resolution, filtering) {
+    async _instantiate(minimunRequiredScheme, resolution, filters) {
+        const conf = this._getConfig();
         let agg = {
-            threshold: 1,
-            resolution: resolution,
             columns: {},
-            dimensions: {}
+            dimensions: {},
+            placement: 'centroid',
+            resolution: resolution,
+            threshold: 1,
         };
-        MNS.columns.map(name => {
-            if (name.startsWith('_cdb_agg_')) {
-                const base = getBase(name);
-                const fn = getAggFN(name);
-                agg.columns[name] = {
-                    aggregate_function: fn,
-                    aggregated_column: base,
-                };
-            } else {
-                agg.dimensions[name] = name;
-            }
-        });
-        const select = MNS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-        let aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
-        agg.placement = 'centroid';
-        const query = `(${aggSQL}) AS tmp`;
 
-        const conf = {
+        this._updateAggregationWithMinimunRequiredScheme(agg, minimunRequiredScheme);
+        const select = this._buildSelectClause(minimunRequiredScheme);
+        let aggSQL = this._buildQuery(select);
+
+        const query = `(${aggSQL}) AS tmp`;
+        const metadata = await this.getMetadata(query, minimunRequiredScheme, conf);
+
+        // If the number of features is higher than the minimup set server filtering.
+        if (metadata.featureCount > MIN_FILTERING) {
+            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
+        }
+
+        const url = await this._getUrlPromise(query, conf, agg, aggSQL);
+
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.url = url;
+        this.metadata = metadata;
+        this._MNS = minimunRequiredScheme;
+        this.filtering = filters;
+        this.resolution = resolution;
+
+        return metadata;
+    }
+
+    _updateAggregationWithMinimunRequiredScheme(aggregation, minimunRequiredScheme) {
+        minimunRequiredScheme.columns
+            .forEach(name => {
+                if (name.startsWith('_cdb_agg_')) {
+                    const base = getBase(name);
+                    const fn = getAggFN(name);
+                    aggregation.columns[name] = {
+                        aggregate_function: fn,
+                        aggregated_column: base,
+                    };
+                } else {
+                    aggregation.dimensions[name] = name;
+                }
+            });
+    }
+
+    _buildSelectClause(minimunRequiredScheme) {
+        return minimunRequiredScheme.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    }
+
+    _buildQuery(select) {
+        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    }
+
+    _getConfig() {
+        return {
             apiKey: this._source._apiKey,
             username: this._source._username,
             serverURL: this._source._serverURL
         };
-
-        const metadataPromise = this.getMetadata(query, MNS, conf);
-
-        return new Promise((resolve, reject) => {
-            metadataPromise.then(metadata => {
-                if (metadata.featureCount > MIN_FILTERING) {
-                    aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filtering)}`;
-                }
-                this._getUrlPromise(query, conf, agg, aggSQL).then(url => {
-                    metadataPromise.then((metadata) => {
-                        this._oldDataframes = [];
-                        this.cache.reset();
-                        this.url = url;
-                        this.metadata = metadata;
-                        this._MNS = MNS;
-                        this.filtering = filtering;
-                        this.resolution = resolution;
-
-                        resolve(metadata);
-                    }, err => {
-                        console.log(333, err);
-                        reject(err);
-                    });
-                }).catch(err => {
-                    metadataPromise.catch(err => console.log(123, err));
-
-                    reject(err);
-                });
-            }).catch(err => reject(err));
-        });
     }
 
     free() {
         this.cache.reset();
     }
+
     _generateDataFrame(rs, geometry, properties, size, type) {
         // TODO: Should the dataframe constructor have type and size parameters?
         const dataframe = new R.Dataframe(
@@ -199,6 +206,7 @@ export default class Windshaft {
 
         return dataframe;
     }
+
     async _getUrlPromise(query, conf, agg, aggSQL) {
         this.geomType = await this.getGeometryType(query, conf);
         if (this.geomType != 'point') {
@@ -229,6 +237,7 @@ export default class Windshaft {
         const layergroup = await response.json();
         return layerUrl(layergroup, 0, conf);
     }
+
     getDataframe(x, y, z) {
         const id = `${x},${y},${z}`;
         const c = this.cache.get(id);
