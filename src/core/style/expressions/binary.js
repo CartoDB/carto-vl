@@ -20,6 +20,7 @@ export const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${
 export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
 
 export const Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
+export const And = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
 
 function genBinaryOp(jsFn, glsl) {
     return class BinaryOperation extends Expression {

@@ -21,9 +21,9 @@ function NIN_INLINE_MAKER(categories) {
 export const In = generateBelongsExpression(IN_INLINE_MAKER);
 
 /**
- * Check if property does not belong to the acceptedCategories list of categories
+ * Check if property does not belong to the categories list of categories
  * @param {*} property 
- * @param {*} acceptedCategories 
+ * @param {*} categories 
  * @memberof carto.style.expressions
  * @name nin
  * @api
@@ -36,15 +36,15 @@ export const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
 function generateBelongsExpression(inlineMaker) {
 
     return class BelongExpression extends Expression {
-        constructor(property, ...acceptedCategories) {
-            acceptedCategories = acceptedCategories.map(implicitCast);
+        constructor(property, ...categories) {
+            categories = categories.map(implicitCast);
             let children = {
                 property
             };
-            acceptedCategories.map((arg, index) => children[`arg${index}`] = arg);
+            categories.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
-            this.acceptedCategories = acceptedCategories;
-            this.inlineMaker = inlineMaker(this.acceptedCategories);
+            this.categories = categories;
+            this.inlineMaker = inlineMaker(this.categories);
         }
 
         _compile(meta) {
@@ -52,7 +52,7 @@ function generateBelongsExpression(inlineMaker) {
             if (this.property.type != 'category') {
                 throw new Error('In() can only be performed to categorical properties');
             }
-            this.acceptedCategories.map(cat => {
+            this.categories.map(cat => {
                 if (cat.type != 'category') {
                     throw new Error('In() can only be performed to categorical properties');
                 }

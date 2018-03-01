@@ -41,8 +41,8 @@ export default class Base {
         this._client._bindLayer(...args);
     }
 
-    requestData(viewport, mns, resolution) {
-        return this._client._getData(viewport, mns, resolution);
+    requestData(viewport, style) {
+        return this._client.getData(viewport, style);
     }
 
     free() {
