@@ -131,7 +131,7 @@ export default class Windshaft {
         const query = `(${aggSQL}) AS tmp`;
         const metadata = await this.getMetadata(query, MRS, conf);
 
-        // If the number of features is higher than the minimup set server filtering.
+        // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
             aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
         }
