@@ -122,14 +122,14 @@ export default class Windshaft {
         return this._numCategories;
     }
 
-    async _instantiate(minimunRequiredScheme, resolution, filters) {
+    async _instantiate(MRS, resolution, filters) {
         const conf = this._getConfig();
-        const agg = await this._generateAggregation(minimunRequiredScheme, resolution);
-        const select = this._buildSelectClause(minimunRequiredScheme);
+        const agg = await this._generateAggregation(MRS, resolution);
+        const select = this._buildSelectClause(MRS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, minimunRequiredScheme, conf);
+        const metadata = await this.getMetadata(query, MRS, conf);
 
         // If the number of features is higher than the minimup set server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
@@ -141,14 +141,14 @@ export default class Windshaft {
         this.cache.reset();
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
-        this._MNS = minimunRequiredScheme;
+        this._MNS = MRS;
         this.filtering = filters;
         this.resolution = resolution;
 
         return metadata;
     }
 
-    _generateAggregation(minimunRequiredScheme, resolution) {
+    _generateAggregation(MRS, resolution) {
         let aggregation = {
             columns: {},
             dimensions: {},
@@ -157,7 +157,7 @@ export default class Windshaft {
             threshold: 1,
         };
 
-        minimunRequiredScheme.columns
+        MRS.columns
             .forEach(name => {
                 if (name.startsWith('_cdb_agg_')) {
                     aggregation.columns[name] = {
@@ -172,8 +172,8 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(minimunRequiredScheme) {
-        return minimunRequiredScheme.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    _buildSelectClause(MRS) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
     }
 
     _buildQuery(select) {
