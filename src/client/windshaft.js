@@ -51,6 +51,14 @@ export default class Windshaft {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
+    _getInstantiationID(MNS, resolution, filtering) {
+        return JSON.stringify({
+            MNS,
+            resolution,
+            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+        });
+    }
+
     /**
      * Should be called whenever the viewport or the style changes
      * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
@@ -65,19 +73,15 @@ export default class Windshaft {
         const filtering = windshaftFiltering.getFiltering(style);
         if (!R.schema.equals(this._MNS, MNS) || resolution != this.resolution ||
             (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING)) {
-            const promise = this.inProgressInstantiations[JSON.stringify(
-                {
-                    MNS,
-                    resolution,
-                    filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
-                })];
+            const promise = this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)];
             // Only instantiate if the same map is not being resintantiated now
             if (!promise) {
+                console.log('Instantiation started:', this._source._tableName, this._getInstantiationID(MNS, resolution, filtering));
                 const p = this._instantiate(MNS, resolution, filtering);
-                this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = p;
-                console.log('Instantiating map:', JSON.stringify(MNS));
+                this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)] = p;
                 p.finally(() => {
-                    this.inProgressInstantiations[JSON.stringify({ MNS, resolution })] = null;
+                    console.log('Instantiation completed:', this._source._tableName, this._getInstantiationID(MNS, resolution, filtering));
+                    this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filtering)] = null;
                 }, () => { }).catch(err => console.log(err));
                 return p;
             }
