@@ -124,15 +124,7 @@ export default class Windshaft {
 
     async _instantiate(minimunRequiredScheme, resolution, filters) {
         const conf = this._getConfig();
-        let agg = {
-            columns: {},
-            dimensions: {},
-            placement: 'centroid',
-            resolution: resolution,
-            threshold: 1,
-        };
-
-        this._updateAggregationWithMinimunRequiredScheme(agg, minimunRequiredScheme);
+        const agg = this._generateAggregation(minimunRequiredScheme, resolution);
         const select = this._buildSelectClause(minimunRequiredScheme);
         let aggSQL = this._buildQuery(select);
 
@@ -157,20 +149,28 @@ export default class Windshaft {
         return metadata;
     }
 
-    _updateAggregationWithMinimunRequiredScheme(aggregation, minimunRequiredScheme) {
+    _generateAggregation(minimunRequiredScheme, resolution) {
+        let aggregation = {
+            columns: {},
+            dimensions: {},
+            placement: 'centroid',
+            resolution: resolution,
+            threshold: 1,
+        };
+
         minimunRequiredScheme.columns
             .forEach(name => {
                 if (name.startsWith('_cdb_agg_')) {
-                    const base = getBase(name);
-                    const fn = getAggFN(name);
                     aggregation.columns[name] = {
-                        aggregate_function: fn,
-                        aggregated_column: base,
+                        aggregate_function: getAggFN(name),
+                        aggregated_column: getBase(name)
                     };
                 } else {
                     aggregation.dimensions[name] = name;
                 }
             });
+
+        return aggregation;
     }
 
     _buildSelectClause(minimunRequiredScheme) {
@@ -455,14 +455,14 @@ export default class Windshaft {
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            case 'ST_MultiPolygon':
+                return 'polygon';
+            case 'ST_Point':
+                return 'point';
+            case 'ST_MultiLineString':
+                return 'line';
+            default:
+                throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
