@@ -475,14 +475,14 @@ export default class Windshaft {
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-            case 'ST_MultiPolygon':
-                return 'polygon';
-            case 'ST_Point':
-                return 'point';
-            case 'ST_MultiLineString':
-                return 'line';
-            default:
-                throw new Error(`Unimplemented geometry type ''${type}'`);
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
