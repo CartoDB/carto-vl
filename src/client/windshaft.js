@@ -42,6 +42,7 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -304,7 +305,7 @@ export default class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        const s = this._subdomains[Math.floor(Math.random() * this._subdomains.length) + 0];
+        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
         return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
     }
 
@@ -467,14 +468,14 @@ export default class Windshaft {
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            case 'ST_MultiPolygon':
+                return 'polygon';
+            case 'ST_Point':
+                return 'point';
+            case 'ST_MultiLineString':
+                return 'line';
+            default:
+                throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
