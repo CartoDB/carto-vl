@@ -420,10 +420,10 @@ export default class Windshaft {
         });
 
         metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);//TODO use filtering WHERE
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);//TODO use filtering WHERE
+        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
+        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
         const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);// TODO pass filtering WHERE
+        const sample = await this.getSample(conf, sampling);
 
         numerics.map((name, index) => {
             const t = numericsTypes[index];
@@ -440,7 +440,6 @@ export default class Windshaft {
     }
 
     async getSample(conf, sampling) {
-        //TODO use filtering WHERE
         let q;
         if (this._source._tableName) {
             q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
