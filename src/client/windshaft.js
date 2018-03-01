@@ -67,15 +67,19 @@ export default class Windshaft {
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    getData(viewport, style) {
+    async getData(viewport, style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
-        if (this._needToInstantiate(MNS, resolution, filtering)) {
-            return this._instantiate(MNS, resolution, filtering);
-        }
-
         const tiles = rsys.rTiles(viewport);
+        if (this._needToInstantiate(MNS, resolution, filtering)) {
+            await this._instantiate(MNS, resolution, filtering);
+        }
+        this._getTiles(tiles);
+        return this.metadata;
+    }
+
+    _getTiles(tiles) {
         this._requestGroupID++;
         var completedTiles = [];
         var needToComplete = tiles.length;
@@ -471,14 +475,14 @@ export default class Windshaft {
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            case 'ST_MultiPolygon':
+                return 'polygon';
+            case 'ST_Point':
+                return 'point';
+            case 'ST_MultiLineString':
+                return 'line';
+            default:
+                throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
