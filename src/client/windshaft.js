@@ -87,10 +87,6 @@ export default class Windshaft {
             }
             return promise;
         }
-        if (!this.urlTemplate) {
-            // Instantiation is in progress, nothing to do yet
-            return;
-        }
 
         const tiles = rsys.rTiles(viewport);
         this._requestGroupID++;
@@ -98,10 +94,7 @@ export default class Windshaft {
         var needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
         tiles.forEach(t => {
-            // TODO object deconstruction
-            const x = t.x;
-            const y = t.y;
-            const z = t.z;
+            const { x, y, z } = t;
             this.getDataframe(x, y, z).then(dataframe => {
                 if (dataframe.empty) {
                     needToComplete--;
