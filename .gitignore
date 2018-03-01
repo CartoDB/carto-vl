@@ -1,5 +1,5 @@
-node_modules/
 *_out.png
 .DS_Store
 .vscode/
 *.log
+node_modules/

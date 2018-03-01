@@ -170,7 +170,7 @@ class Renderer {
 
 
     getStyledTiles() {
-        return this.dataframes.filter(tile => tile.style && tile.visible);
+        return this.dataframes.filter(tile => tile.style && tile.visible && tile.style.colorShader);
     }
 
 
@@ -187,7 +187,8 @@ class Renderer {
             const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
             const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
             const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
-            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements].
+            const filterRequirements = d.style.filter._getDrawMetadataRequirements();
+            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].
                 reduce(schema.union, schema.IDENTITY);
         }).reduce(schema.union, schema.IDENTITY).columns;
 
@@ -341,6 +342,7 @@ class Renderer {
         tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
         tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
         tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texFilter, tile.style.filterShader, tile.style.filter, tile.style.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -422,13 +424,21 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
             gl.uniform1i(renderer.widthTexture, 1);
 
-            gl.activeTexture(gl.TEXTURE2);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-            gl.uniform1i(renderer.colorStrokeTexture, 2);
 
-            gl.activeTexture(gl.TEXTURE3);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-            gl.uniform1i(renderer.strokeWidthTexture, 3);
+            gl.activeTexture(gl.TEXTURE2);
+            gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
+            gl.uniform1i(renderer.filterTexture, 2);
+
+            if (tile.type == 'point') {
+                // Lines and polygons don't support stroke
+                gl.activeTexture(gl.TEXTURE3);
+                gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+                gl.uniform1i(renderer.colorStrokeTexture, 3);
+
+                gl.activeTexture(gl.TEXTURE4);
+                gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+                gl.uniform1i(renderer.strokeWidthTexture, 4);
+            }
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 

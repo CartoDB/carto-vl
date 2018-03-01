@@ -11,13 +11,14 @@ uniform vec2 vertexOffset;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
-uniform sampler2D colorStrokeTex;
-uniform sampler2D strokeWidthTex;
+uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
 void main(void) {
     color = texture2D(colorTex, featureID);
+    float filtering = texture2D(filterTex, featureID).a;
+    color.a *= filtering;
     color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 

@@ -27,6 +27,7 @@ uniform sampler2D property2;
 uniform sampler2D property3;
 
 void main(void) {
+    // TODO texture reads should be dynamic to improve Texture Unit utilization
     float p0=texture2D(property0, uv).a;
     float p1=texture2D(property1, uv).a;
     float p2=texture2D(property2, uv).a;

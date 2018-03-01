@@ -46,6 +46,9 @@ export default class Layer {
         this.setSource(source);
         this.setStyle(style);
 
+        this._listeners = {};
+
+        this.state = 'init';
         console.log('L', this);
 
         this.paintCallback = () => {
@@ -59,7 +62,30 @@ export default class Layer {
                 dataframe => {
                     dataframe.visible = false;
                 });
+            if (this.state == 'dataLoaded') {
+                this.state = 'dataPainted';
+                this._fire('loaded');
+            }
         };
+    }
+
+    _fire(eventType, eventData) {
+        if (!this._listeners[eventType]) {
+            return;
+        }
+        this._listeners[eventType].map(listener => listener(eventData));
+    }
+
+    on(eventType, callback) {
+        if (!this._listeners[eventType]) {
+            this._listeners[eventType] = [callback];
+        } else {
+            this._listeners[eventType].push(callback);
+        }
+    }
+    off(eventType, callback) {
+        const index = this._listeners[eventType].indexOf(callback);
+        this._listeners[eventType].splice(index, 1);
     }
 
     /**
@@ -82,6 +108,9 @@ export default class Layer {
                 this._dataframes = this._dataframes.filter(d => d !== dataframe);
                 this._integrator.renderer.removeDataframe(dataframe);
                 this._integrator.invalidateWebGLState();
+            },
+            () => {
+                this.state = 'dataLoaded';
             }
         );
         if (this._source && this._source !== source) {
@@ -127,6 +156,7 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+            style.filter.blendFrom(this._style.filter, ms, interpolator);
         }
 
         return this._styleChanged(style).then(r => {
@@ -215,6 +245,7 @@ export default class Layer {
             style._compileWidthShader(this._integrator.renderer.gl, metadata);
             style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
             style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+            style._compileFilterShader(this._integrator.renderer.gl, metadata);
         };
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return Promise.resolve();
@@ -274,8 +305,7 @@ export default class Layer {
         if (!this._integrator.invalidateWebGLState) {
             return;
         }
-        const promise = this._source.requestData(this._getViewport(), style.getMinimumNeededSchema(),
-            style.getResolution());
+        const promise = this._source.requestData(this._getViewport(), style);
         if (promise) {
             promise.then(() => {
                 this.requestData(style);

@@ -1,29 +1,21 @@
 import Expression from './expression';
 import { implicitCast, hexToRgb } from './utils';
-import { float } from '../functions';
 
 export default class Ramp extends Expression {
     /**
      * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
      * @param {*} input
      * @param {*} palette
-     * @param {*} minKey Optional
-     * @param {*} maxKey Optional
      */
-    constructor(input, palette, minKey, maxKey) {
-        input = implicitCast(input);
-        if (minKey !== undefined) {
-            minKey = implicitCast(minKey);
-            maxKey = implicitCast(maxKey);
+    constructor(input, palette, ...args) {
+        if (args.length > 0) {
+            throw new Error('ramp(input, palette) only accepts two parameters');
         }
+        input = implicitCast(input);
         palette = implicitCast(palette);
         super({ input: input });
-        if (minKey === undefined) {
-            minKey = float(0);
-            maxKey = float(1);
-        }
-        this.minKey = minKey.expr;
-        this.maxKey = maxKey.expr;
+        this.minKey = 0;
+        this.maxKey = 1;
         this.palette = palette;
     }
     _compile(meta) {
@@ -86,7 +78,7 @@ export default class Ramp extends Expression {
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
             const colors = this._getColorsFromPalette(this.input, this.palette);
-
+            // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
             for (var i = 0; i < width; i++) {
                 const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                 const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];

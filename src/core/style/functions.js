@@ -1,9 +1,17 @@
+/**
+ *  @api
+ *  @namespace carto.style.expressions
+ *
+ *  @description
+ */
+
 import { palettes, Inverse } from './expressions/palettes';
 import Animate from './expressions/animate';
 import Blend from './expressions/blend';
 import Buckets from './expressions/buckets';
 import CIELab from './expressions/CIELab';
 import Float from './expressions/float';
+import FloatConstant from './expressions/floatConstant';
 import Category from './expressions/category';
 import HSV from './expressions/hsv';
 import Linear from './expressions/linear';
@@ -16,7 +24,8 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
-import Quantiles from './expressions/quantiles';
+import { In, Nin } from './expressions/belongs.js';
+import Between from './expressions/between';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -26,6 +35,7 @@ import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
 import { Abs } from './expressions/unary';
+import { Not } from './expressions/unary';
 
 // Binary ops
 import { FloatMul } from './expressions/binary';
@@ -40,6 +50,8 @@ import { LessThan } from './expressions/binary';
 import { LessThanOrEqualTo } from './expressions/binary';
 import { Equals } from './expressions/binary';
 import { NotEquals } from './expressions/binary';
+import { Or, And } from './expressions/binary';
+
 
 // Aggregation ops
 import { Max } from './expressions/aggregation';
@@ -48,18 +60,23 @@ import { Avg } from './expressions/aggregation';
 import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
 
+// Classifiers
+import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
+
 // Interpolators
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
-export {Cubic};
+export { Cubic };
 
 
-import { ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile }
+import {
+    ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
+    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount, GlobalPercentile
+}
     from './expressions/viewportAggregation';
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
-
 
 // Expose classes as constructor functions
 export const asc = (...args) => new Asc(...args);
@@ -84,7 +101,6 @@ export const rgba = (...args) => new RGBA(...args);
 export const property = (...args) => new Property(...args);
 export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
-export const setOpacity = (...args) => new Opacity(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
 export const float = (...args) => new Float(...args);
@@ -111,13 +127,39 @@ export const equals = (...args) => new Equals(...args);
 export const notEquals = (...args) => new NotEquals(...args);
 export const buckets = (...args) => new Buckets(...args);
 export const quantiles = (...args) => new Quantiles(...args);
+export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
 export const viewportMax = (...args) => new ViewportMax(...args);
 export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const globalPercentile = (...args) => new GlobalPercentile(...args);
+export const globalMax = (...args) => new GlobalMax(...args);
+export const globalMin = (...args) => new GlobalMin(...args);
+export const globalAvg = (...args) => new GlobalAvg(...args);
+export const globalSum = (...args) => new GlobalSum(...args);
+export const globalCount = (...args) => new GlobalCount(...args);
 export const inverse = (...args) => new Inverse(...args);
+export const floatConstant = (...args) => new FloatConstant(...args);
+
+export const TRUE = new FloatConstant(1);
+export const FALSE = new FloatConstant(0);
+export const and = (...args) => new And(...args);
+export const or = (...args) => new Or(...args);
+export const not = (...args) => new Not(...args);
+
+export const gt = greaterThan;
+export const gte = greaterThanOrEqualTo;
+export const lt = lessThan;
+export const lte = lessThanOrEqualTo;
+const _in = (...args) => new In(...args);
+
+export const eq = equals;
+export const neq = notEquals;
+export const nin = (...args) => new Nin(...args);
+export const between = (...args) => new Between(...args);
 
 
+export { _in as in };
 export { palettes, Asc, Desc };
