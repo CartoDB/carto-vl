@@ -119,12 +119,12 @@ export default class Windshaft {
     }
 
     _getCategoryIDFromString(category) {
-        if (this._categoryStringToIDMap[category]) {
+        if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
         }
-        this._numCategories++;
         this._categoryStringToIDMap[category] = this._numCategories;
-        return this._numCategories;
+        this._numCategories++;
+        return this._categoryStringToIDMap[category];
     }
 
     async _instantiate(MRS, resolution, filters) {

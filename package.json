@@ -1,6 +1,6 @@
 {
   "name": "carto-gl",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "CARTO Vector library",
   "repository": {
     "type": "git",
@@ -13,7 +13,10 @@
   "contributors": [
     "David Manzanares <dmanzanares@carto.com>",
     "Iago Lastra <iago@carto.com>",
-    "Jesús Arroyo Torrens <jarroyo@carto.com>"
+    "Jesús Arroyo Torrens <jarroyo@carto.com>",
+    "Javier Goizueta <jgoizueta@carto.com>",
+    "Mamata Akella <makella@carto.com>",
+    "Raúl Ochoa <rochoa@carto.com>"
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
