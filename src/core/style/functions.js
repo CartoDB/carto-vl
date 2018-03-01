@@ -2,7 +2,6 @@
  *  @api
  *  @namespace carto.style.expressions
  *
- *  @description
  */
 
 import { palettes, Inverse } from './expressions/palettes';

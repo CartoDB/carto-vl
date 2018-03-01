@@ -78,7 +78,7 @@ export default class Ramp extends Expression {
             const srcType = gl.UNSIGNED_BYTE;
             const pixel = new Uint8Array(4 * width);
             const colors = this._getColorsFromPalette(this.input, this.palette);
-
+            // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
             for (var i = 0; i < width; i++) {
                 const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                 const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];

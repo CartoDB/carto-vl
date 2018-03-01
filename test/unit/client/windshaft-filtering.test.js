@@ -9,6 +9,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(f.getSQLWhere(null)).toEqual('');
             });
         });
+
         describe('when the filter does exists', () => {
             it('should return a BETWEEN clause with a between() filter', () => {
                 expect(f.getSQLWhere([{
@@ -18,6 +19,7 @@ describe('src/client/windshaft-filtering', () => {
                     upperLimit: 20,
                 }])).toEqual('WHERE (numericProperty BETWEEN 10 AND 20)');
             });
+
             it('should return a IN clause with an in() filter', () => {
                 expect(f.getSQLWhere([{
                     type: 'in',
@@ -25,6 +27,7 @@ describe('src/client/windshaft-filtering', () => {
                     whitelist: ['red', 'blue']
                 }])).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\'))');
             });
+
             it('should return a NOT IN clause with an nin() filter', () => {
                 expect(f.getSQLWhere([{
                     type: 'nin',
@@ -32,6 +35,7 @@ describe('src/client/windshaft-filtering', () => {
                     blacklist: ['red', 'blue']
                 }])).toEqual('WHERE (categoricalProperty NOT IN (\'red\',\'blue\'))');
             });
+
             it('should compose sub-filter with non-unary filters', () => {
                 expect(f.getSQLWhere([
                     {
@@ -49,6 +53,7 @@ describe('src/client/windshaft-filtering', () => {
             });
         });
     });
+
     describe('getFiltering', () => {
         describe('when the filter is complete and exists', () => {
             it('`between($numericProperty, 10,20) `', () => {
@@ -65,6 +70,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
+
             it('`between($numericProperty, 10,20) with constantFloats`', () => {
                 const expected = [
                     {
@@ -79,6 +85,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
+            
             it('`in($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -92,6 +99,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
+            
             it('`nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -125,6 +133,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
+            
             it('`$numericProperty<now() and between($numericProperty, 10,20)`', () => {
                 const expected = [
                     {
@@ -163,6 +172,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
+            
             it('should return null when the mix factor is not an Animation', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.blend(
@@ -197,6 +207,7 @@ describe('src/client/windshaft-filtering', () => {
                     filter: s.between(s.property('property'), 0, s.now())
                 }))).toBeNull();
             });
+            
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.or(

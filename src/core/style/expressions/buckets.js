@@ -18,11 +18,11 @@ export default class Buckets extends Expression {
         this.bucketUID = bucketUID++;
         this.numCategories = args.length + 1;
         this.args = args;
-        this.othersBucket = false;
     }
     _compile(metadata) {
         super._compile(metadata);
         this.type = 'category';
+        this.othersBucket = this.input.type == 'category';
         this.args.map(breakpoint => {
             if (breakpoint.type != this.input.type) {
                 throw new Error('Buckets() argument types mismatch');
