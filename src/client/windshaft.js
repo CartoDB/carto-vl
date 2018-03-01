@@ -82,7 +82,7 @@ export default class Windshaft {
             }
             return promise;
         }
-        if (!this.url) {
+        if (!this.urlTemplate) {
             // Instantiation is in progress, nothing to do yet
             return;
         }
@@ -124,7 +124,7 @@ export default class Windshaft {
 
     async _instantiate(minimunRequiredScheme, resolution, filters) {
         const conf = this._getConfig();
-        const agg = this._generateAggregation(minimunRequiredScheme, resolution);
+        const agg = await this._generateAggregation(minimunRequiredScheme, resolution);
         const select = this._buildSelectClause(minimunRequiredScheme);
         let aggSQL = this._buildQuery(select);
 
@@ -136,11 +136,10 @@ export default class Windshaft {
             aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
         }
 
-        const url = await this._getUrlPromise(query, conf, agg, aggSQL);
-
+        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
         this._oldDataframes = [];
         this.cache.reset();
-        this.url = url;
+        this.urlTemplate = urlTemplate;
         this.metadata = metadata;
         this._MNS = minimunRequiredScheme;
         this.filtering = filters;
@@ -208,10 +207,13 @@ export default class Windshaft {
     }
 
     async _getUrlPromise(query, conf, agg, aggSQL) {
+        const LAYER_INDEX = 0;
         this.geomType = await this.getGeometryType(query, conf);
+
         if (this.geomType != 'point') {
             agg = false;
         }
+
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 0
@@ -226,16 +228,21 @@ export default class Windshaft {
                 }
             ]
         };
-        const response = await fetch(endpoint(conf), {
+        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const layergroup = await response.json();
+        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+    }
+
+    _getRequestConfig(mapConfigAgg) {
+        return {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(mapConfigAgg),
-        });
-        const layergroup = await response.json();
-        return layerUrl(layergroup, 0, conf);
+        };
     }
 
     getDataframe(x, y, z) {
@@ -252,7 +259,7 @@ export default class Windshaft {
     requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
-        return fetch(this.url(x, y, z))
+        return fetch(this._getTileUrl(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
 
@@ -294,6 +301,11 @@ export default class Windshaft {
                 this._addDataframe(dataframe);
                 return dataframe;
             });
+    }
+
+    _getTileUrl(x, y, z) {
+        const s = this._subdomains[Math.floor(Math.random() * this._subdomains.length) + 0];
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -455,14 +467,14 @@ export default class Windshaft {
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-            case 'ST_MultiPolygon':
-                return 'polygon';
-            case 'ST_Point':
-                return 'point';
-            case 'ST_MultiLineString':
-                return 'line';
-            default:
-                throw new Error(`Unimplemented geometry type ''${type}'`);
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
@@ -532,19 +544,13 @@ const endpoint = (conf) => {
     return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
 };
 
-const layerUrl = function (layergroup, layerIndex, conf) {
-    let subdomainIndex = 0;
-    return (x, y, z) => {
-        subdomainIndex++;
-        if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-            const urlTemplates = layergroup.cdn_url.templates.https;
-            return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt?api_key=${conf.apiKey}`.replace('{s}',
-                layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-        }
-        return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/${z}/${x}/${y}.mvt`.replace('{s}',
-            layergroup.cdn_url.templates.https.subdomains[subdomainIndex % layergroup.cdn_url.templates.https.subdomains.length]);
-    };
-};
+function getLayerUrl(layergroup, layerIndex, conf) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+    }
+    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+}
 
 /**
  * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
