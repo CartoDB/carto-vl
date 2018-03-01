@@ -170,7 +170,7 @@ class Renderer {
 
 
     getStyledTiles() {
-        return this.dataframes.filter(tile => tile.style && tile.visible);
+        return this.dataframes.filter(tile => tile.style && tile.visible && tile.style.colorShader);
     }
 
 
