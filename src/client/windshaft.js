@@ -184,7 +184,7 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MRS) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat([]);
     }
 
     _buildQuery(select) {
@@ -219,30 +219,30 @@ export default class Windshaft {
 
     async _getUrlPromise(query, conf, agg, aggSQL) {
         const LAYER_INDEX = 0;
-        this.geomType = await this.getGeometryType(query, conf);
+        this.geomType = 'point';//await this.getGeometryType(query, conf);
 
-        if (this.geomType != 'point') {
-            agg = false;
-        }
+        // if (this.geomType != 'point') {
+        //     agg = false;
+        // }
 
-        const mapConfigAgg = {
-            buffersize: {
-                'mvt': 0
-            },
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        sql: aggSQL,
-                        aggregation: agg
-                    }
-                }
-            ]
-        };
-        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
-        const layergroup = await response.json();
-        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
-        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+        // const mapConfigAgg = {
+        //     buffersize: {
+        //         'mvt': 0
+        //     },
+        //     layers: [
+        //         {
+        //             type: 'mapnik',
+        //             options: {
+        //                 sql: aggSQL,
+        //                 aggregation: agg
+        //             }
+        //         }
+        //     ]
+        // };
+        // const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        // const layergroup = await response.json();
+        //this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        return getLayerUrl();
     }
 
     _getRequestConfig(mapConfigAgg) {
@@ -315,7 +315,7 @@ export default class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
+        const s = '';//this._subdomains[this._subdomainCounter++ % this._subdomains.length];
         return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
     }
 
@@ -333,7 +333,7 @@ export default class Windshaft {
             //if exterior
             //   push current polygon & set new empty
             //else=> add index to holes
-            if (isClockWise(geom[j])) {
+            if (true || isClockWise(geom[j])) {
                 if (polygon) {
                     geometry.push(polygon);
                 }
@@ -439,6 +439,7 @@ export default class Windshaft {
             t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
             metadata.columns.push(t);
         });
+
         return metadata;
     }
 
@@ -452,29 +453,30 @@ export default class Windshaft {
                     SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
         }
 
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(q));
         const json = await response.json();
         console.log(json);
         return json.rows;
     }
 
     async getFeatureCount(query, conf) {
+        return 1e7;
         const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(q));
         const json = await response.json();
         return json.rows[0].count;
     }
 
     async getColumnTypes(query, conf) {
         const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
         const json = await response.json();
         return json.fields;
     }
 
     async getGeometryType(query, conf) {
         const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
@@ -495,7 +497,7 @@ export default class Windshaft {
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
         ).concat(['COUNT(*)']).join();
         const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
         const json = await response.json();
         return names.map(name => {
             return {
@@ -513,7 +515,7 @@ export default class Windshaft {
     async getCategoryTypes(names, query, conf) {
         return Promise.all(names.map(async name => {
             const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+            const response = await fetch(`${conf.serverURL}:8080/api/v2/sql?q=` + encodeURIComponent(catQuery));
             const json = await response.json();
             let counts = [];
             let names = [];
@@ -552,15 +554,15 @@ function getAggFN(name) {
 }
 
 const endpoint = (conf) => {
-    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
+    return `${conf.serverURL}:8181/api/v1/map?api_key=${conf.apiKey}`;
 };
 
 function getLayerUrl(layergroup, layerIndex, conf) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
-    }
-    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+    // if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+    //     const urlTemplates = layergroup.cdn_url.templates.https;
+    //     return `${urlTemplates.url}/${conf.username}:8181/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+    // }
+    return `http://localhost:8887/gps/{z}/{x}/{y}.mvt`;
 }
 
 /**
