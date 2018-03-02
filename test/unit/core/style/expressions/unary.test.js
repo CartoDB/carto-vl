@@ -14,7 +14,7 @@ describe('src/core/style/expressions/unary', () => {
     describe('sqrt', () => {
         test('sqrt', 1, 1);
         test('sqrt', 256, 16);
-        test('sqrt', -256, NaN); // should throw instead?
+        test('sqrt', -256, NaN);
     });
 
     describe('sin', () => {
@@ -26,18 +26,19 @@ describe('src/core/style/expressions/unary', () => {
     describe('cos', () => {
         test('cos', 0, 1);
         test('cos', Math.PI, -1);
-        // test('cos', Math.PI / 2, 6.123233995736766e-17); // 0 with js precission
-        // test('cos', 3 * Math.PI / 2, -1.8369701987210297e-16); // 0 with js precission
+        test('cos', Math.PI / 2, 6.123233995736766e-17);
+        test('cos', 3 * Math.PI / 2, -1.8369701987210297e-16);
     });
 
     describe('tan', () => {
-        // test('tan', Math.PI / 4, 0.9999999999999999); // 1 with js precission
+        test('tan', Math.PI / 4, 0.9999999999999999);
     });
 
     describe('sign', () => {
         test('sign', 10, 1);
         test('sign', -10, -1);
         test('sign', 0, 0);
+        test('sign', -0, -0);
     });
 
     describe('abs', () => {

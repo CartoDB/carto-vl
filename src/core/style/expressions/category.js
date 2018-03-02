@@ -31,7 +31,7 @@ export default class Category extends Expression {
         gl.uniform1f(this._uniformLocation, id);
     }
     eval(){
-        return this.expr;
+        return this._metadata.categoryIDs[this.expr];
     }
     isAnimated() {
         return false;

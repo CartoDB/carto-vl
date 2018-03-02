@@ -12,8 +12,8 @@ function NIN_INLINE_MAKER(categories) {
 
 /**
  * Check if property belongs to the acceptedCategories list of categories
- * @param {*} property 
- * @param {*} acceptedCategories 
+ * @param {*} property
+ * @param {*} acceptedCategories
  * @memberof carto.style.expressions
  * @name in
  * @api
@@ -22,8 +22,8 @@ export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.s
 
 /**
  * Check if property does not belong to the categories list of categories
- * @param {*} property 
- * @param {*} categories 
+ * @param {*} property
+ * @param {*} categories
  * @memberof carto.style.expressions
  * @name nin
  * @api
@@ -58,7 +58,7 @@ function generateBelongsExpression(inlineMaker, jsEval) {
         }
 
         eval(feature) {
-            return jsEval(this.property.eval(feature), this.categories.map(category => category.expr));
+            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
         }
     };
 
