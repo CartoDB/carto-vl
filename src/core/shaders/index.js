@@ -49,6 +49,7 @@ class HMBlender {
         compileProgram.call(this, gl, aaBlenderGLSL.VS, aaBlenderGLSL.FS);
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
         this.readTU = gl.getUniformLocation(this.program, 'aaTex');
+        this.ramp = gl.getUniformLocation(this.program, 'ramp');
     }
 }
 

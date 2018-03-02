@@ -95,6 +95,7 @@ class Renderer {
         this._AAFB = gl.createFramebuffer();
 
         this._HMTex = gl.createTexture();
+        this._HMRamp = gl.createTexture();
         this._HMFB = gl.createFramebuffer();
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -399,6 +400,54 @@ class Renderer {
 
                 [this._width, this._height] = [w, h];
                 console.log('complete: ', gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE);
+
+                const colors = [
+                    '#009392',
+                    '#39b185',
+                    '#9ccb86',
+                    '#e9e29c',
+                    '#eeb479',
+                    '#e88471',
+                    '#cf597e'
+                ];
+                // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
+                function hexToRgb(hex) {
+                    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? {
+                        r: parseInt(result[1], 16),
+                        g: parseInt(result[2], 16),
+                        b: parseInt(result[3], 16)
+                    } : null;
+                }
+                const level = 0;
+                const internalFormat = gl.RGBA;
+                const width = 256;
+                const height = 1;
+                const border = 0;
+                const srcFormat = gl.RGBA;
+                const srcType = gl.UNSIGNED_BYTE;
+                const pixel = new Uint8Array(4 * width);
+                for (var i = 0; i < width; i++) {
+                    const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                    const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
+                    const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
+                    const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                    const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
+                    const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                    pixel[4 * i + 0] = v[0];
+                    pixel[4 * i + 1] = v[1];
+                    pixel[4 * i + 2] = v[2];
+                    pixel[4 * i + 3] = v[3];
+                }
+                gl.bindTexture(gl.TEXTURE_2D, this._HMRamp);
+                gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                    width, height, border, srcFormat, srcType,
+                    pixel);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
             }
             gl.viewport(0, 0, w * scale, h * scale);
             gl.clearColor(0,0,0,0);
@@ -509,6 +558,9 @@ class Renderer {
 
         // BLEND TO FB 0
         if (tiles.length && tiles[0].type == 'point') {
+
+
+
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -519,6 +571,11 @@ class Renderer {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(gl.TEXTURE_2D, this._HMTex);
             gl.uniform1i(this._hmBlendShader.readTU, 0);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, this._HMRamp);
+            gl.uniform1i(this._hmBlendShader.ramp, 1);
+
 
             gl.enableVertexAttribArray(this._hmBlendShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
