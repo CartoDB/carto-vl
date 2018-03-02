@@ -18,7 +18,7 @@ function NIN_INLINE_MAKER(categories) {
  * @name in
  * @api
  */
-export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p));
+export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 
 /**
  * Check if property does not belong to the categories list of categories
@@ -28,7 +28,7 @@ export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.s
  * @name nin
  * @api
  */
-export const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.none(cat => cat == p));
+export const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 
 function generateBelongsExpression(inlineMaker, jsEval) {
 
@@ -58,7 +58,7 @@ function generateBelongsExpression(inlineMaker, jsEval) {
         }
 
         eval(feature) {
-            jsEval(this.property.eval(feature), this.categories);
+            return jsEval(this.property.eval(feature), this.categories.map(category => category.expr));
         }
     };
 
