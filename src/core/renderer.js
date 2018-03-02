@@ -56,6 +56,10 @@ class Renderer {
         if (!OES_texture_float) {
             throw new Error('WebGL extension OES_texture_float is unsupported');
         }
+        const OES_texture_float_linear = gl.getExtension('OES_texture_float_linear');
+        if (!OES_texture_float_linear){
+            throw new Error('WebGL extension OES_texture_float_linear is unsupported');
+        }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
             throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
@@ -89,6 +93,9 @@ class Renderer {
 
         this._AATex = gl.createTexture();
         this._AAFB = gl.createFramebuffer();
+
+        this._HMTex = gl.createTexture();
+        this._HMFB = gl.createFramebuffer();
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
@@ -355,6 +362,7 @@ class Renderer {
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             if (w != this._width || h != this._height) {
+                console.log('creating fb AA');
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -370,12 +378,41 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
+        // RENDER TO HM FB
+        if (tiles.length && tiles[0].type == 'point') {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
+            const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
+
+            const scale = 1/8;
+
+            // FIXME CONDITION
+            if (w != this._width || h != this._height) {
+                console.log('creating fb');
+                gl.bindTexture(gl.TEXTURE_2D, this._HMTex);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                    w * scale, h * scale, 0, gl.RGBA, gl.FLOAT, null);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._HMTex, 0);
+
+                [this._width, this._height] = [w, h];
+                console.log('complete: ', gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE);
+            }
+            gl.viewport(0, 0, w * scale, h * scale);
+            gl.clearColor(0,0,0,0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            // SET ACUMULATIVE BLENDING
+            gl.blendFunc(gl.ONE, gl.ONE);
+            gl.blendEquation(gl.FUNC_ADD);
+        }
+
         const s = 1. / this._zoom;
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
-
             let renderer = null;
             if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
@@ -470,6 +507,27 @@ class Renderer {
             gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
         }
 
+        // BLEND TO FB 0
+        if (tiles.length && tiles[0].type == 'point') {
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+            gl.useProgram(this._hmBlendShader.program);
+
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, this._HMTex);
+            gl.uniform1i(this._hmBlendShader.readTU, 0);
+
+            gl.enableVertexAttribArray(this._hmBlendShader.vertexAttribute);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
+            gl.vertexAttribPointer(this._hmBlendShader.vertexAttribute, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            gl.disableVertexAttribArray(this._hmBlendShader.vertexAttribute);
+        }
+
         gl.disable(gl.CULL_FACE);
     }
 
@@ -482,6 +540,7 @@ class Renderer {
         this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
         this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
         this._aaBlendShader = new shaders.AABlender(this.gl);
+        this._hmBlendShader = new shaders.HMBlender(this.gl);
     }
 }
 

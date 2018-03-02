@@ -126,5 +126,5 @@ void main(void) {
 
     c=s+(1.-s.a)*c;
 
-    gl_FragColor = c;
+    gl_FragColor = vec4(1./5255.);
 }`;

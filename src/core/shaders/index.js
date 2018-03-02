@@ -44,6 +44,14 @@ class AABlender {
     }
 }
 
+class HMBlender {
+    constructor(gl) {
+        compileProgram.call(this, gl, aaBlenderGLSL.VS, aaBlenderGLSL.FS);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
+    }
+}
+
 class Point {
     constructor(gl) {
         compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
@@ -139,4 +147,4 @@ const styler = {
     }
 };
 
-export { renderer, styler, AABlender };
+export { renderer, styler, AABlender, HMBlender };
