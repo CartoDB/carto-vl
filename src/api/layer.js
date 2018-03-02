@@ -279,6 +279,7 @@ export default class Layer {
         if (util.isUndefined(source)) {
             throw new CartoValidationError('layer', 'sourceRequired');
         }
+        return;
         if (!(source instanceof SourceBase)) {
             throw new CartoValidationError('layer', 'nonValidSource');
         }

@@ -50,6 +50,7 @@ class HMBlender {
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
         this.readTU = gl.getUniformLocation(this.program, 'aaTex');
         this.ramp = gl.getUniformLocation(this.program, 'ramp');
+        this.K = gl.getUniformLocation(this.program, 'K');
     }
 }
 

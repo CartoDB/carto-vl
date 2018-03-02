@@ -69,6 +69,10 @@ varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
 
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main(void) {
     color = texture2D(colorTex, featureID);
     stroke = texture2D(colorStrokeTex, featureID);
@@ -85,7 +89,7 @@ void main(void) {
     if (fillScale==strokeScale){
         stroke.a=0.;
     }
-    gl_PointSize = size+2.;
+    gl_PointSize = 2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
 
@@ -93,7 +97,7 @@ void main(void) {
     if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
         p.x=10000.;
     }
-    gl_Position  = p;
+    gl_Position  = p+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.;
 }`;
 
 export const FS = `
@@ -110,6 +114,9 @@ float distanceAntialias(vec2 p){
     return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
 }
 
+float n(vec2 p){
+    return 1.;
+}
 
 void main(void) {
     vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
@@ -126,5 +133,5 @@ void main(void) {
 
     c=s+(1.-s.a)*c;
 
-    gl_FragColor = vec4(1./5255.);
+    gl_FragColor = vec4(n(2.*gl_PointCoord-vec2(1.)) /255.);
 }`;

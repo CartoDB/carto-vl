@@ -11,7 +11,7 @@ import FloatConstant from '../core/style/expressions/floatConstant';
 
 /**
  * Returns supported windshaft filters for the style
- * @param {*} style 
+ * @param {*} style
  * @returns {Filtering}
  */
 export function getFiltering(style) {
@@ -58,7 +58,7 @@ function getFilter(f) {
 
 function getAndFilter(f) {
     if (f instanceof And) {
-        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y));
+        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), null);
     }
 }
 

@@ -15,10 +15,11 @@ import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
+import JSONArray from './api/source/jsonArray';
 
 // Namespaces
 const style = { expressions };
-const source = { Dataset, SQL };
+const source = { Dataset, SQL, JSONArray };
 
 export {
     source,
