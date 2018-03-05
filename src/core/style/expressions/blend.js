@@ -42,9 +42,18 @@ export default class Blend extends Expression {
         }
     }
     eval(feature) {
-        const m = Math.max(Math.min(this.mix.eval(feature), 1), 0);
-        const a = this.a.eval(feature);
-        const b = this.b.eval(feature);
-        return m * a + (1. - m) * b;
+        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const x = this.a.eval(feature);
+        const y = this.b.eval(feature);
+        return _mix(x, y, a);
     }
+}
+
+
+function _mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}
+
+function _clamp(value, min, max) {
+    return Math.max(Math.min(value, max), min);
 }
