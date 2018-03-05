@@ -465,7 +465,7 @@ class Renderer {
         const newS = (Math.pow(2, Math.floor(Math.log2(s * 15 / 16))));
         const sDiff = s / newS;
         s = newS;
-        console.log(s, sDiff);
+        //console.log(s, sDiff);
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
