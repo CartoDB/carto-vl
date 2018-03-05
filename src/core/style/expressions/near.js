@@ -29,18 +29,17 @@ export default class Near extends Expression {
         }
         this.type = 'float';
         this.inlineMaker = (inline) =>
-            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-        0., 1.))`;
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
     }
     eval(feature) {
         const input = this.input.eval(feature);
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1 - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }
 
-function clamp(min, max) {
-    return Math.min(Math.max(this, min), max);
+function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
 }
