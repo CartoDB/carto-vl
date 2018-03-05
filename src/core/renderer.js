@@ -385,7 +385,7 @@ class Renderer {
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             const scale = 1 / 32;
-            const [ws, hs] = [Math.round(w * scale), Math.round(h * scale)];
+            const [ws, hs] = [16,16];[Math.round(w * scale), Math.round(h * scale)];
             this.soff = ws / w / scale;
 
             // FIXME CONDITION
@@ -462,7 +462,7 @@ class Renderer {
         }
 
         let s = 1. / this._zoom * (1 - this.soff * 0);
-        const newS = (Math.pow(2, Math.floor(Math.log2(s))));
+        const newS = (Math.pow(2, Math.floor(Math.log2(s * 15 / 16))));
         const sDiff = s / newS;
         s = newS;
         console.log(s, sDiff);
@@ -597,7 +597,7 @@ class Renderer {
 
 
             gl.uniform2fv(this._hmBlendShader.offset, tiles[0].hmVertexOffset);
-            gl.uniform2fv(this._hmBlendShader.scale, [1/sDiff, 1/sDiff]);
+            gl.uniform2fv(this._hmBlendShader.scale, [1 / sDiff, 1 / sDiff]);
 
             gl.enableVertexAttribArray(this._hmBlendShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
