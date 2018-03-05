@@ -385,13 +385,16 @@ class Renderer {
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             const scale = 1 / 32;
+            const [ws, hs] = [Math.round(w * scale), Math.round(h * scale)];
+            this.soff = ws / w / scale;
 
             // FIXME CONDITION
             if (w != this._width || h != this._height) {
-                console.log('creating fb');
+                console.log('creating fb', w * scale, h * scale, ws, hs);
+                console.log(ws / w / scale);
                 gl.bindTexture(gl.TEXTURE_2D, this._HMTex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    w * scale, h * scale, 0, gl.RGBA, gl.FLOAT, null);
+                    ws, hs, 0, gl.RGBA, gl.FLOAT, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -449,7 +452,8 @@ class Renderer {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
             }
-            gl.viewport(0, 0, w * scale, h * scale);
+            gl.viewport(0, 0, ws, hs);
+
             gl.clearColor(0, 0, 0, 0);
             gl.clear(gl.COLOR_BUFFER_BIT);
             // SET ACUMULATIVE BLENDING
@@ -457,7 +461,7 @@ class Renderer {
             gl.blendEquation(gl.FUNC_ADD);
         }
 
-        const s = 1. / this._zoom;
+        const s = 1. / this._zoom * (1 - this.soff * 0);
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
@@ -479,13 +483,20 @@ class Renderer {
             gl.uniform2f(renderer.vertexScaleUniformLocation,
                 (s / aspect) * tile.scale,
                 s * tile.scale);
-            gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (s / aspect) * (this._center.x - tile.center.x),
-                s * (this._center.y - tile.center.y));
+
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
-            tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+            tile.vertexOffset = [(this._center.x - tile.center.x), (this._center.y - tile.center.y)];
+            tile.vertexOffset = [(s / aspect) * tile.vertexOffset[0], s * tile.vertexOffset[1]];
+
+            const ko = 8;
+            tile.vertexOffset = tile.vertexOffset.map(c => Math.floor(c * ko) / (ko));
+
+
+            gl.uniform2f(renderer.vertexOffsetUniformLocation,
+                tile.vertexOffset[0],
+                tile.vertexOffset[1]);
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);

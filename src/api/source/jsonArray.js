@@ -62,19 +62,25 @@ export default class JSON {
             const geometry = new Float32Array(numFeatures * 2);
             const properties = {};
             properties['count'] = new Float32Array(numFeatures + 1024);
+            const center = [-74.0060, 40.7128];
+            const wmc = Wmxy({ lng: center[0], lat: center[1] });
+
+            const s = 1;
             for (let i = 2; i < numFeatures; i++) {
                 const f = this.data[i];
                 const lat = f[1];
                 const lng = f[0];
                 const wm = Wmxy({ lat, lng });
+                wm.x-=wmc.x;
+                wm.y-=wmc.y;
                 const r = rsys.wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
-                geometry[2 * i + 0] = r.x;
-                geometry[2 * i + 1] = r.y;
+                geometry[2 * i + 0] = r.x/s;
+                geometry[2 * i + 1] = r.y/s;
                 properties['count'][i] = this._getCategoryIDFromString(f[3]);
             }
             const dataframe = new R.Dataframe(
-                { x: 0, y: 0 },
-                1,
+                rsys.wToR(wmc.x, wmc.y, { scale: WM_R, center: { x: 0, y: 0 } }),
+                s,
                 geometry,
                 properties,
             );

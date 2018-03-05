@@ -89,7 +89,7 @@ void main(void) {
     if (fillScale==strokeScale){
         stroke.a=0.;
     }
-    gl_PointSize = 2.;
+    gl_PointSize = 1.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
 
@@ -97,7 +97,9 @@ void main(void) {
     if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
         p.x=10000.;
     }
-    gl_Position  = p+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.*0.;
+    vec2 k = vec2(16, 16);
+    //p.xy=vec2(floor(p.x*k.x)/k.x, floor(p.y*k.y)/k.y);
+    gl_Position  = p;//+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.*0.;
 }`;
 
 export const FS = `
