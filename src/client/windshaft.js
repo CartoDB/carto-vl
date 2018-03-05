@@ -122,13 +122,8 @@ export default class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
-    async _instantiate(MNS, resolution, filters) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
-            console.warn('cache-hit');
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
-        }
 
-
+    async _instantiateUncached(MNS, resolution, filters){
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
         const select = this._buildSelectClause(MNS);
@@ -152,8 +147,16 @@ export default class Windshaft {
         this.resolution = resolution;
 
         // Store instantiation
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = Promise.resolve(metadata);
         return metadata;
+    }
+    async _instantiate(MNS, resolution, filters) {
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+        }
+        console.log(this._getInstantiationID(MNS, resolution, filters));
+        const promise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
+        return promise;
     }
 
     _generateAggregation(MRS, resolution) {
