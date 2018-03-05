@@ -36,10 +36,10 @@ export default class Near extends Expression {
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - _clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }
 
-function clamp(x, min, max) {
+function _clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);
 }
