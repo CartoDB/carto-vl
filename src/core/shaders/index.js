@@ -51,6 +51,7 @@ class HMBlender {
         this.readTU = gl.getUniformLocation(this.program, 'aaTex');
         this.ramp = gl.getUniformLocation(this.program, 'ramp');
         this.K = gl.getUniformLocation(this.program, 'K');
+        this.offset = gl.getUniformLocation(this.program, 'offset');
     }
 }
 

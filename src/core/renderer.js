@@ -491,6 +491,8 @@ class Renderer {
             tile.vertexOffset = [(s / aspect) * tile.vertexOffset[0], s * tile.vertexOffset[1]];
 
             const ko = 8;
+            tile.hmVertexOffset = tile.vertexOffset.map(c => c - Math.floor(c * ko) / (ko));
+            console.log(tile.hmVertexOffset);
             tile.vertexOffset = tile.vertexOffset.map(c => Math.floor(c * ko) / (ko));
 
 
@@ -591,6 +593,7 @@ class Renderer {
             gl.uniform1f(this._hmBlendShader.K, window.K * s / 1000);
 
 
+            gl.uniform2fv(this._hmBlendShader.offset, tiles[0].hmVertexOffset);
 
             gl.enableVertexAttribArray(this._hmBlendShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);

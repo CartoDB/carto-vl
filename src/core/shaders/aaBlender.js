@@ -21,13 +21,14 @@ varying  vec2 uv;
 uniform sampler2D aaTex;
 uniform sampler2D ramp;
 uniform float K;
+uniform vec2 offset;
 
 vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d ){
     return a + b*cos( 6.28318*(c*t+d) );
 }
 
 void main(void) {
-    vec4 aa = texture2D(aaTex, uv);
+    vec4 aa = texture2D(aaTex, uv+offset/2.);
     aa.a*=K;
     aa.a=log(aa.a);
     vec3 c = palette(aa.a, vec3(0.5, 0.5, 0.5),

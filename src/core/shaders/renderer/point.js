@@ -99,7 +99,7 @@ void main(void) {
     }
     vec2 k = vec2(16, 16);
     //p.xy=vec2(floor(p.x*k.x)/k.x, floor(p.y*k.y)/k.y);
-    gl_Position  = p;//+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.*0.;
+    gl_Position  = vec4( p.xy    , p.zw);//+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.*0.;
 }`;
 
 export const FS = `
