@@ -384,7 +384,7 @@ class Renderer {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
-            const scale = 1 / 8;
+            const scale = 1 / 32;
 
             // FIXME CONDITION
             if (w != this._width || h != this._height) {
@@ -576,7 +576,7 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, this._HMRamp);
             gl.uniform1i(this._hmBlendShader.ramp, 1);
 
-            window.K = window.K || 1;
+            window.K = window.K || 10;
             gl.uniform1f(this._hmBlendShader.K, window.K * s / 1000);
 
 

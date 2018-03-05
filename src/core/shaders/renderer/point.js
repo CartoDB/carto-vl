@@ -97,7 +97,7 @@ void main(void) {
     if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
         p.x=10000.;
     }
-    gl_Position  = p+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.;
+    gl_Position  = p+vec4(rand(featureID), rand(featureID.yx), 0., 0.)/100.*0.;
 }`;
 
 export const FS = `
