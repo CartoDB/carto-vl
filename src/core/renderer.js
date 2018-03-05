@@ -461,7 +461,11 @@ class Renderer {
             gl.blendEquation(gl.FUNC_ADD);
         }
 
-        const s = 1. / this._zoom * (1 - this.soff * 0);
+        let s = 1. / this._zoom * (1 - this.soff * 0);
+        const newS = (Math.pow(2, Math.floor(Math.log2(s))));
+        const sDiff = s / newS;
+        s = newS;
+        console.log(s, sDiff);
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
 
@@ -490,9 +494,8 @@ class Renderer {
             tile.vertexOffset = [(this._center.x - tile.center.x), (this._center.y - tile.center.y)];
             tile.vertexOffset = [(s / aspect) * tile.vertexOffset[0], s * tile.vertexOffset[1]];
 
-            const ko = 8;
+            const ko = 16 / 2;
             tile.hmVertexOffset = tile.vertexOffset.map(c => c - Math.floor(c * ko) / (ko));
-            console.log(tile.hmVertexOffset);
             tile.vertexOffset = tile.vertexOffset.map(c => Math.floor(c * ko) / (ko));
 
 
@@ -594,6 +597,7 @@ class Renderer {
 
 
             gl.uniform2fv(this._hmBlendShader.offset, tiles[0].hmVertexOffset);
+            gl.uniform2fv(this._hmBlendShader.scale, [1/sDiff, 1/sDiff]);
 
             gl.enableVertexAttribArray(this._hmBlendShader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);

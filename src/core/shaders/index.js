@@ -52,6 +52,7 @@ class HMBlender {
         this.ramp = gl.getUniformLocation(this.program, 'ramp');
         this.K = gl.getUniformLocation(this.program, 'K');
         this.offset = gl.getUniformLocation(this.program, 'offset');
+        this.scale = gl.getUniformLocation(this.program, 'scale');
     }
 }
 
