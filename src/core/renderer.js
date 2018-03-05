@@ -379,13 +379,14 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
+        const heatmapRes = 128;
         // RENDER TO HM FB
         if (tiles.length && tiles[0].type == 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             const scale = 1 / 32;
-            const [ws, hs] = [16,16];[Math.round(w * scale), Math.round(h * scale)];
+            const [ws, hs] = [heatmapRes,heatmapRes];[Math.round(w * scale), Math.round(h * scale)];
             this.soff = ws / w / scale;
 
             // FIXME CONDITION
@@ -462,7 +463,7 @@ class Renderer {
         }
 
         let s = 1. / this._zoom * (1 - this.soff * 0);
-        const newS = (Math.pow(2, Math.floor(Math.log2(s * 15 / 16))));
+        const newS = (Math.pow(2, Math.floor(Math.log2(s * (heatmapRes-1) / heatmapRes))));
         const sDiff = s / newS;
         s = newS;
         //console.log(s, sDiff);
@@ -494,7 +495,7 @@ class Renderer {
             tile.vertexOffset = [(this._center.x - tile.center.x), (this._center.y - tile.center.y)];
             tile.vertexOffset = [(s / aspect) * tile.vertexOffset[0], s * tile.vertexOffset[1]];
 
-            const ko = 16 / 2;
+            const ko = heatmapRes / 2;
             tile.hmVertexOffset = tile.vertexOffset.map(c => c - Math.floor(c * ko) / (ko));
             tile.vertexOffset = tile.vertexOffset.map(c => Math.floor(c * ko) / (ko));
 

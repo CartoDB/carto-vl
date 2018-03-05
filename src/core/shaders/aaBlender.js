@@ -89,13 +89,14 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, vec2 texSize){
 }
 
 void main(void) {
-    vec4 aa = textureBicubic(aaTex, vec2(0.5)+0.5*((uv*2.-vec2(1.))*scale)    +offset/2., vec2(16.));
+    vec4 aa = textureBicubic(aaTex, vec2(0.5)+0.5*((uv*2.-vec2(1.))*scale)    +offset/2., vec2(128.));
     aa.a*=K;
     aa.a=log(aa.a);
     vec3 c = palette(aa.a, vec3(0.5, 0.5, 0.5),
-    vec3(0.5, 0.5, 0.5),
-    vec3(1.0, 0.7, 0.4),
-    vec3(0.0, 0.15, 0.20));
+                            vec3(0.5, 0.5, 0.5),
+                            vec3(2.0, 1.0, 0.0),
+                            vec3(0.50, 0.20, 0.25)
+                        );
     //c= texture2D(ramp, vec2(aa.a, 0.5)).rgb;
     gl_FragColor = vec4(aa.a*c, aa.a);
     //aa;//vec4(aa.rgb*aa.a, aa.a);
