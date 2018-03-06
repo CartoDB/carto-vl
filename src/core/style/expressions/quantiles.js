@@ -45,12 +45,12 @@ function genQuantiles(global) {
             const funcName = `quantiles${this.quantilesUID}`;
             const elif = (_, index) =>
                 `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-            return ${index + 1}.;
+            return ${index.toFixed(2)};
         }`;
             const funcBody = this.breakpoints.map(elif).join('');
             const preface = `float ${funcName}(float x){
         ${funcBody}
-        return 0.;
+        return ${this.breakpoints.length.toFixed(1)};
     }`;
             return {
                 preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
