@@ -11,21 +11,45 @@ function NIN_INLINE_MAKER(categories) {
 }
 
 /**
- * Check if property belongs to the acceptedCategories list of categories
- * @param {*} property 
- * @param {*} acceptedCategories 
+ * 
+ * Check if property belongs to the categories list given by the categories parameters.
+ * 
+ * @param {carto.style.expressions.property} property - The property in the dataset that is going to be evaluated
+ * @param {...string} categories - Multiple string parameters with the allowed values
+ * @return {carto.style.expressions.float}
+ * 
+ * @example <caption>Display only cities where $type is "metropolis" nor "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.in($type, 'metropolis', 'capital');
+ * });
+ * 
  * @memberof carto.style.expressions
- * @name in
+ * @name nin
+ * @function
  * @api
  */
 export const In = generateBelongsExpression(IN_INLINE_MAKER);
 
 /**
- * Check if property does not belong to the categories list of categories
- * @param {*} property 
- * @param {*} categories 
+ * 
+ * Check if property does not belong to the categories list given by the categories parameters.
+ * 
+ * @param {carto.style.expressions.property} property - The property in the dataset that is going to be evaluated
+ * @param {...string} categories - Multiple string parameters with the excluded values
+ * @return {carto.style.expressions.float}
+ * 
+ * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.nin($type, 'metropolis', 'capital');
+ * });
+ * 
  * @memberof carto.style.expressions
  * @name nin
+ * @function
  * @api
  */
 export const Nin = generateBelongsExpression(NIN_INLINE_MAKER);

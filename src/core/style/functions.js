@@ -1,7 +1,48 @@
 /**
  *  @api
- *  @namespace carto.style.expressions
- *
+ *  @namespace expressions
+ *  @memberof carto.style
+ *  @description
+ *  Expressions are the core of the library, at top level a style is composed of expressions for every stylable property.
+ *  Remember a style has the following attributes:
+ * 
+ *  - **color**: Determine the element fill color.
+ *  - **strokeColor**: Determine the element border color.
+ *  - **width**: Determine the element width: radius when points, thickness when lines, ignored for polygons.
+ *  - **strokeWidth**: Determine the element border size.
+ *  - **filter**: This is a special property used to remove elements that do not meet the expression.
+ * 
+ * For example the point radius could be styled using the `float` expression:
+ * 
+ * ```javascript
+ * const style = new carto.Style({
+ *  width: carto.style.expressions.float(10)
+ * });
+ * ```
+ * 
+ * You can evaluate dataset properties inside an expression. Imagine we are representing cities in a map,
+ * we can set the point width depending on the population using the `property` expression.
+ * 
+ * ```javascript
+ * const style = new carto.Style({
+ *  width: carto.style.expressions.property('population')
+ * });
+ * ```
+ * 
+ * Multiple expressions can be combined to form more powerfull ones,
+ * for example lets divide the population between a float number using the `floatDiv` expression to make points smaller:
+ * 
+ * ```javascript
+ * const s = carto.style.expressions; // We use this alias along documentation.
+ * const style = new carto.Style({
+ *  width: s.floatDiv(
+ *      property('population'),
+ *      s.float(10000)
+ *  ),
+ * });
+ * ```
+ * 
+ * 
  */
 
 import { palettes, Inverse } from './expressions/palettes';
