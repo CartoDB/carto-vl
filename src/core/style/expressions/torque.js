@@ -3,15 +3,28 @@ import { implicitCast, DEFAULT } from './utils';
 import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './property';
 
-class DateRange extends Expression {
-    constructor(from, to) {
-        super({});
-        this.type = 'dateRange';
-        this.inlineMaker = () => undefined;
-    }
-}
 const DEFAULT_FADE = 0.15;
 
+/**
+ * Create a Torque FadeIn/FadeOut configuration
+ *
+ * @param {carto.style.expression.expression|Number} param1 expression of type float or Number
+ * @param {carto.style.expression.expression|Number} param2 expression of type float or Number
+ * @return {carto.style.expressions.fade}
+ *
+ * @example `
+// fadeIn of 0.1 seconds, fadeOut of 0.3 seconds
+filter:       torque($day, 40, fade(0.1, 0.3))
+
+// fadeIn and fadeOut of 0.5 seconds
+filter:       torque($day, 40, fade(0.5))
+
+`
+ *
+ * @memberof carto.style.expressions
+ * @name fade
+ * @function
+*/
 export class Fade extends Expression {
     constructor(param1 = DEFAULT, param2 = DEFAULT) {
         let fadeIn = param1;
