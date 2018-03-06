@@ -12,7 +12,6 @@ class DateRange extends Expression {
 }
 const DEFAULT_FADE = 0.15;
 
-
 export class Fade extends Expression {
     constructor(param1 = DEFAULT, param2 = DEFAULT) {
         let fadeIn = param1;
@@ -23,7 +22,6 @@ export class Fade extends Expression {
         if (param2 == DEFAULT) {
             fadeOut = fadeIn;
         }
-        console.log(fadeIn, fadeOut);
         fadeIn = implicitCast(fadeIn);
         fadeOut = implicitCast(fadeOut);
         super({ fadeIn, fadeOut });
@@ -66,7 +64,7 @@ export class Torque extends Expression {
         const duration = this.duration;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut));
+        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
 }
 

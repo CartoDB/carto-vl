@@ -16,13 +16,17 @@ export default class Now extends Expression {
         super.inlineMaker = inline => inline.now;
     }
     _preDraw(...args) {
-        this.now.expr = (Date.now() - nowInit) / 1000.;
+        this._setTimestamp();
         this.now._preDraw(...args);
+    }
+    _setTimestamp(){
+        this.now.expr = (Date.now() - nowInit) / 1000.;
     }
     isAnimated() {
         return true;
     }
     eval(){
+        this._setTimestamp();
         return this.now.expr;
     }
 }
