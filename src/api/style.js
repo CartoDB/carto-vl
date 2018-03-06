@@ -81,6 +81,7 @@ export default class Style {
      * @return {number}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getResolution() {
@@ -93,6 +94,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getColor() {
@@ -105,6 +107,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getWidth() {
@@ -117,6 +120,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeColor() {
@@ -129,6 +133,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeWidth() {
@@ -141,6 +146,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getOrder() {
