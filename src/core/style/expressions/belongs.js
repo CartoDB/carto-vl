@@ -30,7 +30,7 @@ function NIN_INLINE_MAKER(categories) {
  * @function
  * @api
  */
-export const In = generateBelongsExpression(IN_INLINE_MAKER);
+const In = generateBelongsExpression(IN_INLINE_MAKER);
 
 /**
  * 
@@ -52,7 +52,7 @@ export const In = generateBelongsExpression(IN_INLINE_MAKER);
  * @function
  * @api
  */
-export const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
+const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
 
 
 
@@ -86,3 +86,5 @@ function generateBelongsExpression(inlineMaker) {
     };
 
 }
+
+export { In, Nin };
