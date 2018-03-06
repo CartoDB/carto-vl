@@ -62,6 +62,14 @@ export default class Expression {
     }
 
     /**
+     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+     * @param {Number} timestamp
+     */
+    _setTimestamp(timestamp) {
+        this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
+    }
+
+    /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */

@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/style/functions';
 import { Torque } from '../../../../../src/core/style/expressions/torque';
 
-fdescribe('src/core/style/expressions/torque', () => {
+describe('src/core/style/expressions/torque', () => {
     describe('constructor with valid inputs', () => {
         it('should return valid Torque instances', () => {
             expect(s.torque(0.5) instanceof Torque).toBeTruthy();
@@ -24,14 +24,14 @@ fdescribe('src/core/style/expressions/torque', () => {
                 expect(s.torque(1).eval()).toEqual(0);
             });
             it('should eval close to 1 when the input is 0 and the fading is high', () => {
-                expect(s.torque(0, 10, s.fade(10)).eval()).toBeCloseTo(1, 2);
+                const t = s.torque(0, 10, s.fade(10));
+                t._setTimestamp(0);
+                expect(t.eval()).toEqual(1);
             });
-            it('should eval close to 0.75 when the input is 0 and we have wait a quarter of the animation', (done) => {
+            it('should eval close to 0.75 when the input is 0 and we have wait a quarter of the animation', () => {
                 const t = s.torque(0, 1, s.fade(1));
-                setTimeout(()=>{
-                    expect(t.eval()).toBeCloseTo(0.75, 1);
-                    done();
-                }, 250);
+                t._setTimestamp(0.25);
+                expect(t.eval()).toEqual(0.75);
             });
         });
     });
