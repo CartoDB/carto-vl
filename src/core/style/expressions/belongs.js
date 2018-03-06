@@ -12,28 +12,25 @@ function NIN_INLINE_MAKER(categories) {
 
 /**
  * Check if property belongs to the acceptedCategories list of categories
- * @param {*} property 
- * @param {*} acceptedCategories 
+ * @param {*} property
+ * @param {*} acceptedCategories
  * @memberof carto.style.expressions
  * @name in
  * @api
  */
-export const In = generateBelongsExpression(IN_INLINE_MAKER);
+export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 
 /**
  * Check if property does not belong to the categories list of categories
- * @param {*} property 
- * @param {*} categories 
+ * @param {*} property
+ * @param {*} categories
  * @memberof carto.style.expressions
  * @name nin
  * @api
  */
-export const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
+export const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 
-
-
-
-function generateBelongsExpression(inlineMaker) {
+function generateBelongsExpression(inlineMaker, jsEval) {
 
     return class BelongExpression extends Expression {
         constructor(property, ...categories) {
@@ -58,6 +55,10 @@ function generateBelongsExpression(inlineMaker) {
                 }
             });
             this.type = 'float';
+        }
+
+        eval(feature) {
+            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
         }
     };
 

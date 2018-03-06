@@ -41,4 +41,19 @@ export default class Blend extends Expression {
             this.notify();
         }
     }
+    eval(feature) {
+        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const x = this.a.eval(feature);
+        const y = this.b.eval(feature);
+        return _mix(x, y, a);
+    }
+}
+
+
+function _mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}
+
+function _clamp(value, min, max) {
+    return Math.max(Math.min(value, max), min);
 }

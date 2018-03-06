@@ -4,7 +4,7 @@ CARTO GL is a JavaScript library to create custom location intelligence applicat
 
 It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
-![](./doc/carto-gl-capture.png)
+![](./docs/images/carto-gl-capture.png)
 
 ## Getting Started
 

@@ -30,6 +30,9 @@ export default class Category extends Expression {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
     }
+    eval(){
+        return this._metadata.categoryIDs[this.expr];
+    }
     isAnimated() {
         return false;
     }

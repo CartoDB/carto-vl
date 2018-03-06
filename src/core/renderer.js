@@ -192,7 +192,11 @@ class Renderer {
                 reduce(schema.union, schema.IDENTITY);
         }).reduce(schema.union, schema.IDENTITY).columns;
 
-        requiredColumns.map(column => {
+        if (requiredColumns.length == 0) {
+            return drawMetadata;
+        }
+
+        requiredColumns.forEach(column => {
             drawMetadata.columns.push(
                 {
                     name: column,
@@ -209,46 +213,48 @@ class Renderer {
         });
 
         const s = 1. / this._zoom;
-        tiles.map(d => {
-            requiredColumns.map(column => {
-                const values = d.properties[column];
-                let min = Number.POSITIVE_INFINITY;
-                let max = Number.NEGATIVE_INFINITY;
-                let sum = 0;
-                let count = 0;
-                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-                for (let i = 0; i < d.numFeatures; i++) {
-                    const x = d.geom[2 * i + 0];
-                    const y = d.geom[2 * i + 1];
-                    if (x > minx && x < maxx && y > miny && y < maxy) {
-                        const v = values[i];
-                        if (!Number.isFinite(v)) {
+        // TODO go feature by feature instead of column by column
+        tiles.forEach(d => {
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+
+            const columnNames = d.style.filter._getMinimumNeededSchema().columns;
+            const f = {};
+
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    if (d.style.filter) {
+                        columnNames.forEach(name => {
+                            f[name] = d.properties[name][i];
+                        });
+                        if (d.style.filter.eval(f) < 0.5) {
                             continue;
                         }
-                        sum += v;
-                        min = Math.min(min, v);
-                        max = Math.max(max, v);
-                        count++;
                     }
+                    requiredColumns.forEach(column => {
+                        const values = d.properties[column];
+                        const v = values[i];
+                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+                        metaColumn.min = Math.min(v, metaColumn.min);
+                        metaColumn.max = Math.max(v, metaColumn.max);
+                        metaColumn.count++;
+                        metaColumn.sum += v;
+                    });
                 }
-                const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                metaColumn.min = Math.min(min, metaColumn.min);
-                metaColumn.max = Math.max(max, metaColumn.max);
-                metaColumn.count += count;
-                metaColumn.sum += sum;
-            });
+            }
         });
-        requiredColumns.map(column => {
+        requiredColumns.forEach(column => {
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
             metaColumn.avg = metaColumn.sum / metaColumn.count;
         });
-        tiles.map(d => {
-            requiredColumns.map(column => {
+        tiles.forEach(d => {
+            requiredColumns.forEach(column => {
                 const values = d.properties[column];
                 const metaColumn = drawMetadata.columns.find(c => c.name == column);
                 d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
@@ -273,7 +279,7 @@ class Renderer {
                 }
             });
         });
-        requiredColumns.map(column => {
+        requiredColumns.forEach(column => {
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
             for (let i = 1; i < metaColumn.histogramBuckets; i++) {
                 metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];

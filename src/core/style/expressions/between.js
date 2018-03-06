@@ -22,4 +22,11 @@ export default class Between extends Expression {
         }
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
+
+    eval(feature) {
+        const value = this.value.eval(feature);
+        const lower = this.lowerLimit.eval(feature);
+        const upper = this.upperLimit.eval(feature);
+        return (value >= lower && value <= upper) ? 1 : 0;
+    }
 }
