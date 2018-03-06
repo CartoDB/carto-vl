@@ -33,10 +33,28 @@ export class Fade extends Expression {
     }
 }
 
+/**
+ * Create an animated temporal filter (torque)
+ *
+ * @param {carto.style.expression.expression} input input to base the temporal filter,
+ * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
+ * this can be problematic if outliers are present. Otherwise input must be a float expression in which 0 means beginning of the animation and 1 means end.
+ * @param {Number} duration duration of the animation in seconds
+ * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration
+ * @return {carto.style.expressions.torque}
+ *
+ * @example `width:    2
+color:     ramp(linear(AVG($temp), 0,30), tealrose)
+filter:       torque($day, 40, fade(0.1, 0.3))`
+ *
+ * @memberof carto.style.expressions
+ * @name torque
+ * @function
+*/
 export class Torque extends Expression {
     constructor(input, duration = 10, fade = new Fade()) {
         if (!Number.isFinite(duration)) {
-            throw new Error('Torque duration must be a number');
+            throw new Error('Torque(): invalid second parameter, duration.');
         }
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
@@ -56,7 +74,6 @@ export class Torque extends Expression {
 
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline.input}-${inline._cycle})*${this.duration.toFixed(20)}/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
-
     }
     eval(feature) {
         const input = this.input.eval(feature);
