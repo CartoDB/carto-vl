@@ -214,6 +214,10 @@ class Expression {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__schema__["union"], __WEBPACK_IMPORTED_MODULE_2__schema__["IDENTITY"]);
     }
+    // eslint-disable-next-line no-unused-vars
+    eval(feature) {
+        throw new Error('Unimplemented');
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Expression;
 
@@ -682,6 +686,9 @@ function genBinaryOp(jsFn, glsl) {
                 throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
             }
         }
+        eval(feature){
+            return jsFn(this.a.eval(feature), this.b.eval(feature));
+        }
     };
 }
 
@@ -754,7 +761,7 @@ const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Abs;
 
-const Not = genUnaryOp(x => 1 - x, x => `1.0 - ${x}`);
+const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
 /* harmony export (immutable) */ __webpack_exports__["d"] = Not;
 
 
@@ -771,6 +778,9 @@ function genUnaryOp(jsFn, glsl) {
             }
             this.type = 'float';
             this.inlineMaker = inlines => glsl(inlines.a);
+        }
+        eval(feature) {
+            return jsFn(this.a.eval(feature));
         }
     };
 }
@@ -882,6 +892,9 @@ function genAggregationOp(aggName) {
                 inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
             };
         }
+        eval(feature) {
+            return feature[`_cdb_agg_${aggName}_${this.property.name}`];
+        }
         _postShaderCompile() { }
         _getMinimumNeededSchema() {
             return {
@@ -892,6 +905,7 @@ function genAggregationOp(aggName) {
         }
     };
 } 
+
 
 /***/ }),
 /* 8 */
@@ -939,6 +953,11 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         } else {
             gl.uniform1f(this._uniformLocation, this.mix);
         }
+    }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
     }
     isAnimated() {
         return !this.mix || this.mix <= 1.;
@@ -1280,7 +1299,11 @@ class Renderer {
                 reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]);
         }).reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
 
-        requiredColumns.map(column => {
+        if (requiredColumns.length == 0) {
+            return drawMetadata;
+        }
+
+        requiredColumns.forEach(column => {
             drawMetadata.columns.push(
                 {
                     name: column,
@@ -1297,46 +1320,48 @@ class Renderer {
         });
 
         const s = 1. / this._zoom;
-        tiles.map(d => {
-            requiredColumns.map(column => {
-                const values = d.properties[column];
-                let min = Number.POSITIVE_INFINITY;
-                let max = Number.NEGATIVE_INFINITY;
-                let sum = 0;
-                let count = 0;
-                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-                for (let i = 0; i < d.numFeatures; i++) {
-                    const x = d.geom[2 * i + 0];
-                    const y = d.geom[2 * i + 1];
-                    if (x > minx && x < maxx && y > miny && y < maxy) {
-                        const v = values[i];
-                        if (!Number.isFinite(v)) {
+        // TODO go feature by feature instead of column by column
+        tiles.forEach(d => {
+            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
+            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
+            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
+            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
+            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+
+            const columnNames = d.style.filter._getMinimumNeededSchema().columns;
+            const f = {};
+
+            for (let i = 0; i < d.numFeatures; i++) {
+                const x = d.geom[2 * i + 0];
+                const y = d.geom[2 * i + 1];
+                if (x > minx && x < maxx && y > miny && y < maxy) {
+                    if (d.style.filter) {
+                        columnNames.forEach(name => {
+                            f[name] = d.properties[name][i];
+                        });
+                        if (d.style.filter.eval(f) < 0.5) {
                             continue;
                         }
-                        sum += v;
-                        min = Math.min(min, v);
-                        max = Math.max(max, v);
-                        count++;
                     }
+                    requiredColumns.forEach(column => {
+                        const values = d.properties[column];
+                        const v = values[i];
+                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
+                        metaColumn.min = Math.min(v, metaColumn.min);
+                        metaColumn.max = Math.max(v, metaColumn.max);
+                        metaColumn.count++;
+                        metaColumn.sum += v;
+                    });
                 }
-                const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                metaColumn.min = Math.min(min, metaColumn.min);
-                metaColumn.max = Math.max(max, metaColumn.max);
-                metaColumn.count += count;
-                metaColumn.sum += sum;
-            });
+            }
         });
-        requiredColumns.map(column => {
+        requiredColumns.forEach(column => {
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
             metaColumn.avg = metaColumn.sum / metaColumn.count;
         });
-        tiles.map(d => {
-            requiredColumns.map(column => {
+        tiles.forEach(d => {
+            requiredColumns.forEach(column => {
                 const values = d.properties[column];
                 const metaColumn = drawMetadata.columns.find(c => c.name == column);
                 d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
@@ -1361,7 +1386,7 @@ class Renderer {
                 }
             });
         });
-        requiredColumns.map(column => {
+        requiredColumns.forEach(column => {
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
             for (let i = 1; i < metaColumn.histogramBuckets; i++) {
                 metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
@@ -1647,9 +1672,24 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
             this.notify();
         }
     }
+    eval(feature) {
+        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const x = this.a.eval(feature);
+        const y = this.b.eval(feature);
+        return _mix(x, y, a);
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
 
+
+
+function _mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}
+
+function _clamp(value, min, max) {
+    return Math.max(Math.min(value, max), min);
+}
 
 
 /***/ }),
@@ -1694,6 +1734,10 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
     isAnimated() {
         return false;
     }
+
+    eval(){
+        return this.expr;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Float;
 
@@ -1722,8 +1766,13 @@ class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* def
         this.type = 'float';
         this.inlineMaker = ()=> `(${x.toFixed(20)})`;
     }
+
+    eval(){
+        return this.expr;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = FloatConstant;
+
 
 
 /***/ }),
@@ -1763,6 +1812,9 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
     _preDraw(drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
+    }
+    eval(){
+        return this._metadata.categoryIDs[this.expr];
     }
     isAnimated() {
         return false;
@@ -1809,6 +1861,9 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
             ]
         };
     }
+    eval(feature) {
+        return feature[this.name];
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Property;
 
@@ -1834,32 +1889,29 @@ function NIN_INLINE_MAKER(categories) {
 
 /**
  * Check if property belongs to the acceptedCategories list of categories
- * @param {*} property 
- * @param {*} acceptedCategories 
+ * @param {*} property
+ * @param {*} acceptedCategories
  * @memberof carto.style.expressions
  * @name in
  * @api
  */
-const In = generateBelongsExpression(IN_INLINE_MAKER);
+const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = In;
 
 
 /**
  * Check if property does not belong to the categories list of categories
- * @param {*} property 
- * @param {*} categories 
+ * @param {*} property
+ * @param {*} categories
  * @memberof carto.style.expressions
  * @name nin
  * @api
  */
-const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
+const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Nin;
 
 
-
-
-
-function generateBelongsExpression(inlineMaker) {
+function generateBelongsExpression(inlineMaker, jsEval) {
 
     return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(property, ...categories) {
@@ -1884,6 +1936,10 @@ function generateBelongsExpression(inlineMaker) {
                 }
             });
             this.type = 'float';
+        }
+
+        eval(feature) {
+            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
         }
     };
 
@@ -1920,6 +1976,13 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         }
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
+
+    eval(feature) {
+        const value = this.value.eval(feature);
+        const lower = this.lowerLimit.eval(feature);
+        const upper = this.upperLimit.eval(feature);
+        return (value >= lower && value <= upper) ? 1 : 0;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Between;
 
@@ -1936,10 +1999,11 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 
-class ILinear extends genInterpolator(inner => inner) { }
+class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
 /* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
 
-class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
+class BounceEaseIn extends genInterpolator(
+    inner => `BounceEaseIn(${inner})`,
     `
     #ifndef BOUNCE_EASE_IN
     #define BOUNCE_EASE_IN
@@ -1968,10 +2032,13 @@ class BounceEaseIn extends genInterpolator(inner => `BounceEaseIn(${inner})`,
     }
     #endif
 
-`) { }
+`,
+    inner => inner // TODO FIXME
+) { }
 /* unused harmony export BounceEaseIn */
 
-class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
+class Cubic extends genInterpolator(
+    inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
     #define CUBIC
@@ -1984,13 +2051,15 @@ class Cubic extends genInterpolator(inner => `cubicEaseInOut(${inner})`,
         }
     }
     #endif
-`) { }
+`,
+    inner => inner // TODO FIXME
+) { }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
 
 
 
 // Interpolators
-function genInterpolator(inlineMaker, preface) {
+function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(m) {
             m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
@@ -2003,6 +2072,9 @@ function genInterpolator(inlineMaker, preface) {
             }
             this.type = 'float';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+        }
+        eval(feature) {
+            return jsEval(this.m.eval(feature));
         }
     };
     fn.type = 'interpolator';
@@ -5698,6 +5770,18 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
             inline: `${funcName}(${childInlines.input})`
         };
     }
+    eval(feature) {
+        const v = this.input.eval(feature);
+        let i;
+        for (i = 0; i < this.args.length; i++) {
+            if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
+                return i;
+            } else if (this.input.type == 'float' && v < this.args[i].eval(feature)) {
+                return i;
+            }
+        }
+        return i;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Buckets;
 
@@ -5774,6 +5858,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
         #endif
         `);
     }
+    // TODO EVAL
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = CIELab;
 
@@ -5829,6 +5914,7 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     #endif
     `);
     }
+    // TODO eval
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = HSV;
 
@@ -5843,9 +5929,6 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @description get the current timestamp
-     */
     constructor(input, min, max) {
         super({ input, min, max });
     }
@@ -5853,6 +5936,12 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
         this.type = 'float';
         super._compile(metadata);
         this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
+    }
+    eval(feature) {
+        const v = this.input.eval(feature);
+        const min = this.min.eval(feature);
+        const max = this.max.eval(feature);
+        return (v - min) / (max - min);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Linear;
@@ -5897,12 +5986,22 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         }
         this.type = 'float';
         this.inlineMaker = (inline) =>
-            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},
-        0., 1.))`;
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
+    }
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const center = this.center.eval(feature);
+        const threshold = this.threshold.eval(feature);
+        const falloff = this.falloff.eval(feature);
+        return 1. - _clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Near;
 
+
+function _clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
+}
 
 
 /***/ }),
@@ -5935,6 +6034,9 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     }
     isAnimated() {
         return true;
+    }
+    eval(){
+        return this.now.expr;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Now;
@@ -6063,6 +6165,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         gl.uniform1f(this._keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
     }
+    // TODO eval
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Ramp;
 
@@ -6104,6 +6207,7 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         this.type = 'color'; // TODO this kind of thing can be refactored into Color class and use: extends ColorExpression
         this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
     }
+    // TODO eval
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = RGBA;
 
@@ -6139,6 +6243,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         this.type = 'color';
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
     }
+    // TODO eval
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Opacity;
 
@@ -6175,6 +6280,17 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
             preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
             inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`
         };
+    }
+    eval(feature) {
+        const p = this.property.eval(feature);
+        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        let ret;
+        metaColumn.categoryNames.map((name, i) => {
+            if (i==p){
+                ret = i < this.buckets? i+1:0;
+            }
+        });
+        return ret;
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {
@@ -6382,17 +6498,22 @@ function genQuantiles(global) {
             const funcName = `quantiles${this.quantilesUID}`;
             const elif = (_, index) =>
                 `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-            return ${index + 1}.;
+            return ${index.toFixed(2)};
         }`;
             const funcBody = this.breakpoints.map(elif).join('');
             const preface = `float ${funcName}(float x){
         ${funcBody}
-        return 0.;
+        return ${this.breakpoints.length.toFixed(1)};
     }`;
             return {
                 preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
                 inline: `${funcName}(${childInlines.input})`
             };
+        }
+        eval(feature) {
+            const input = this.input.eval(feature);
+            const q = this.breakpoints.findIndex(br => input <= br);
+            return q;
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.input.name);
@@ -6518,7 +6639,7 @@ function generateAggregattion(metadataPropertyName, global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };
@@ -6559,7 +6680,7 @@ function generatePercentile(global) {
         _preDraw(drawMetadata, gl) {
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name == this.property.name);
-                const total = column.accumHistogram[999];
+                const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
                     if (column.accumHistogram[i] >= this.percentile / 100 * total) {
@@ -6575,7 +6696,7 @@ function generatePercentile(global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };
@@ -6752,7 +6873,6 @@ class Windshaft {
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
         this.inProgressInstantiations = {};
-        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -7025,8 +7145,12 @@ class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
+    }
+
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -7168,6 +7292,7 @@ class Windshaft {
         return json.rows;
     }
 
+    // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
         const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
@@ -11914,25 +12039,38 @@ class Layer {
      */
     setSource(source) {
         this._checkSource(source);
-        source.bindLayer(
-            dataframe => {
-                this._dataframes.push(dataframe);
-                this._integrator.renderer.addDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            dataframe => {
-                this._dataframes = this._dataframes.filter(d => d !== dataframe);
-                this._integrator.renderer.removeDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            () => {
-                this.state = 'dataLoaded';
-            }
-        );
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+    }
+
+    /**
+     * Callback executed when the client adds a new dataframe
+     * @param {Dataframe} dataframe 
+     */
+    _onDataframeAdded(dataframe) {
+        this._dataframes.push(dataframe);
+        this._integrator.renderer.addDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+     * Callback executed when the client removes dataframe
+     * @param {Dataframe} dataframe 
+     */
+    _onDataFrameRemoved(dataframe) {
+        this._dataframes = this._dataframes.filter(d => d !== dataframe);
+        this._integrator.renderer.removeDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+    * Callback executed when the client finishes loading data
+    */
+    _onDataLoaded() {
+        this.state = 'dataLoaded';
     }
 
     /**
@@ -12040,6 +12178,7 @@ class Layer {
         this._styleChanged(this._style);
         this.requestData();
     }
+
     _addToMGLMap(map, beforeLayerID) {
         if (map.isStyleLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
