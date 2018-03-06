@@ -3,6 +3,26 @@ import { implicitCast } from './utils';
 import Expression from './expression';
 
 // Binary ops
+/**
+ * 
+ * Multiply two numbers.
+ * 
+ * @param {carto.style.expressions.float|number} x - First number or float expression to be multiplied
+ * @param {carto.style.expressions.float|number} y - Second number or float expression to be multiplied
+ * @return {carto.style.expressions.float}
+ * 
+ * @example <caption>Simple multiplication.</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  width: s.floatMul(5, 5);  // 25
+ * });
+ * 
+ * @memberof carto.style.expressions
+ * @name floatMul
+ * @function
+ * @api
+ */
 export const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
 export const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 export const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);

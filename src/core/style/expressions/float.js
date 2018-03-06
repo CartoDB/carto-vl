@@ -1,6 +1,24 @@
 import Expression from './expression';
 
 
+/**
+ * 
+ * Represents a number.
+ * 
+ * @param {number} x - A number to be transformed in a float expression
+ * @return {carto.style.expressions.float}
+ * 
+ * @example <caption>Creating a float expression.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.float(15);  // Elements will have width 15
+ * });
+ * 
+ * @memberof carto.style.expressions
+ * @name float
+ * @function
+ * @api
+ */
 export default class Float extends Expression {
     /**
      * @jsapi
