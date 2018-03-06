@@ -66,6 +66,9 @@ import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
+import {Torque, Fade} from './expressions/torque';
+
+
 export { Cubic };
 
 
@@ -141,6 +144,8 @@ export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const inverse = (...args) => new Inverse(...args);
 export const floatConstant = (...args) => new FloatConstant(...args);
+export const torque = (...args) => new Torque(...args);
+export const fade = (...args) => new Fade(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);

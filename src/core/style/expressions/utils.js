@@ -1,6 +1,8 @@
 import { float, category } from '../functions';
 import Expression from './expression';
 
+export const DEFAULT = undefined;
+
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
