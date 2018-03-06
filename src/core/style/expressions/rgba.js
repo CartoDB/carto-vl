@@ -50,4 +50,5 @@ export default class RGBA extends Expression {
         this.type = 'color'; // TODO this kind of thing can be refactored into Color class and use: extends ColorExpression
         this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
     }
+    // TODO eval
 }

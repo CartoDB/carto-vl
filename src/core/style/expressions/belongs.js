@@ -18,7 +18,7 @@ function NIN_INLINE_MAKER(categories) {
  * @param {...string} categories - Multiple string parameters with the allowed values
  * @return {carto.style.expressions.float}
  * 
- * @example <caption>Display only cities where $type is "metropolis" nor "capital".</caption>
+ * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
  * const s = carto.style.expressions;
  * const $type = s.property('type');
  * const style = new carto.Style({
@@ -26,11 +26,12 @@ function NIN_INLINE_MAKER(categories) {
  * });
  * 
  * @memberof carto.style.expressions
- * @name nin
+ * @name in
  * @function
  * @api
  */
-const In = generateBelongsExpression(IN_INLINE_MAKER);
+export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
+
 
 /**
  * 
@@ -52,12 +53,9 @@ const In = generateBelongsExpression(IN_INLINE_MAKER);
  * @function
  * @api
  */
-const Nin = generateBelongsExpression(NIN_INLINE_MAKER);
+export const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 
-
-
-
-function generateBelongsExpression(inlineMaker) {
+function generateBelongsExpression(inlineMaker, jsEval) {
 
     return class BelongExpression extends Expression {
         constructor(property, ...categories) {
@@ -83,8 +81,10 @@ function generateBelongsExpression(inlineMaker) {
             });
             this.type = 'float';
         }
+
+        eval(feature) {
+            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
+        }
     };
 
 }
-
-export { In, Nin };

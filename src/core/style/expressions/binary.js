@@ -373,5 +373,8 @@ function genBinaryOp(jsFn, glsl) {
                 throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
             }
         }
+        eval(feature){
+            return jsFn(this.a.eval(feature), this.b.eval(feature));
+        }
     };
 }

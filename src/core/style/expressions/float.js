@@ -52,4 +52,8 @@ export default class Float extends Expression {
     isAnimated() {
         return false;
     }
+
+    eval(){
+        return this.expr;
+    }
 }

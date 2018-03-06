@@ -39,6 +39,11 @@ export default class Animate extends Expression {
             gl.uniform1f(this._uniformLocation, this.mix);
         }
     }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
+    }
     isAnimated() {
         return !this.mix || this.mix <= 1.;
     }

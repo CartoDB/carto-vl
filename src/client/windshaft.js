@@ -42,7 +42,6 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
-        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -315,8 +314,12 @@ export default class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
+    }
+
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -458,6 +461,7 @@ export default class Windshaft {
         return json.rows;
     }
 
+    // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
         const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));

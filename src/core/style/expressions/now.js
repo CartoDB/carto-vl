@@ -22,4 +22,7 @@ export default class Now extends Expression {
     isAnimated() {
         return true;
     }
+    eval(){
+        return this.now.expr;
+    }
 }

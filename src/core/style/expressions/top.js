@@ -24,6 +24,17 @@ export default class Top extends Expression {
             inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`
         };
     }
+    eval(feature) {
+        const p = this.property.eval(feature);
+        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        let ret;
+        metaColumn.categoryNames.map((name, i) => {
+            if (i==p){
+                ret = i < this.buckets? i+1:0;
+            }
+        });
+        return ret;
+    }
     _postShaderCompile(program, gl) {
         if (!this.init) {
             if (this.buckets > this.property.numCategories) {

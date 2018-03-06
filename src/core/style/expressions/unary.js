@@ -166,7 +166,7 @@ export const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-export const Not = genUnaryOp(x => 1 - x, x => `1.0 - ${x}`);
+export const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
 
 function genUnaryOp(jsFn, glsl) {
     return class UnaryOperation extends Expression {
@@ -181,6 +181,9 @@ function genUnaryOp(jsFn, glsl) {
             }
             this.type = 'float';
             this.inlineMaker = inlines => glsl(inlines.a);
+        }
+        eval(feature) {
+            return jsFn(this.a.eval(feature));
         }
     };
 }

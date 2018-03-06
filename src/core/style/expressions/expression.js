@@ -126,4 +126,8 @@ export default class Expression {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
+    // eslint-disable-next-line no-unused-vars
+    eval(feature) {
+        throw new Error('Unimplemented');
+    }
 }
