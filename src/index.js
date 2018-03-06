@@ -18,16 +18,7 @@ import Map from './api/map';
 
 // Namespaces
 
-/** 
- * @namespace carto.style 
- * @memberof carto
- */
 const style = { expressions };
-
-/** 
- * @namespace carto.source 
- * @memberof carto
- */
 const source = { Dataset, SQL };
 
 export {

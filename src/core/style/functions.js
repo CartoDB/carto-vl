@@ -1,7 +1,6 @@
 /**
  *  @api
- *  @namespace expressions
- *  @memberof carto.style
+ *  @namespace carto.style.expressions
  *  @description
  *  Expressions are the core of the library, at top level a style is composed of expressions for every stylable property.
  *  Remember a style has the following attributes:

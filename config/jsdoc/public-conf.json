@@ -1,24 +1,23 @@
 {
-  "source": {
-    "include": [
-      "src",
-      "docs/README.md"
-    ]
-  },
-  "templates": {
-    "default": {
-      "outputSourceFiles": false
+    "source": {
+        "include": [
+            "src",
+            "docs/README.md"
+        ]
     },
-    "useLongnameInNav": false,
-    "referenceTitle": "CARTO.gl"
-  },
-  "plugins": [
-    "plugins/api",
-    "plugins/markdown"
-  ],
-  "opts": {
-    "recurse": true,
-    "destination": "./docs/public",
-    "template": "config/jsdoc/templates/jsdoc-template"
-  }
+    "templates": {
+        "default": {
+            "outputSourceFiles": false
+        },
+        "referenceTitle": "CARTO.gl"
+    },
+    "plugins": [
+        "plugins/api",
+        "plugins/markdown"
+    ],
+    "opts": {
+        "recurse": true,
+        "destination": "./docs/public",
+        "template": "config/jsdoc/templates/jsdoc-template"
+    }
 }
