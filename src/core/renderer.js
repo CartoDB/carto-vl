@@ -406,13 +406,13 @@ class Renderer {
                 console.log('complete: ', gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE);
 
                 const colors = [
-                    '#009392',
-                    '#39b185',
-                    '#9ccb86',
-                    '#e9e29c',
-                    '#eeb479',
-                    '#e88471',
-                    '#cf597e'
+                    '#4b2991',
+                    '#872ca2',
+                    '#c0369d',
+                    '#ea4f88',
+                    '#fa7876',
+                    '#f6a97a',
+                    '#edd9a3'
                 ];
                 // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
                 function hexToRgb(hex) {

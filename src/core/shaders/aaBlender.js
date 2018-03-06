@@ -97,7 +97,7 @@ void main(void) {
                             vec3(2.0, 1.0, 0.0),
                             vec3(0.50, 0.20, 0.25)
                         );
-    //c= texture2D(ramp, vec2(aa.a, 0.5)).rgb;
+    c= texture2D(ramp, vec2(aa.a, 0.5)).rgb;
     gl_FragColor = vec4(aa.a*c, aa.a);
     //aa;//vec4(aa.rgb*aa.a, aa.a);
 }
