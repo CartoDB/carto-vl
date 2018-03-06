@@ -42,7 +42,7 @@
         const layer = new carto.Layer('myCartoLayer', source, style);
 
         map.on('move', ()=>{
-            console.log(median.getValue());
+            console.log(median.eval());
         });
 
         layer.addTo(map, 'watername_ocean');

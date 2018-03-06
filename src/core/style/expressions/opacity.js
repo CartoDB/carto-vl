@@ -21,4 +21,5 @@ export default class Opacity extends Expression {
         this.type = 'color';
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
     }
+    // TODO eval
 }

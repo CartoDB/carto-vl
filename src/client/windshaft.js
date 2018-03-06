@@ -461,6 +461,7 @@ export default class Windshaft {
         return json.rows;
     }
 
+    // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
         const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));

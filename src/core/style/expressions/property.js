@@ -30,4 +30,7 @@ export default class Property extends Expression {
             ]
         };
     }
+    eval(feature) {
+        return feature[this.name];
+    }
 }
