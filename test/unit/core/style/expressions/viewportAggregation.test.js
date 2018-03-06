@@ -44,6 +44,18 @@ describe('src/core/style/expressions/aggregation', () => {
             globalCount._compile(fakeMetadata);
             expect(globalCount.eval()).toEqual(4);
         });
+
+        it('globalPercentile($price, 30) should return the metadata count', () => {
+            fakeMetadata.sample = [];
+            for (let i = 0; i <= 1000; i++) {
+                fakeMetadata.sample.push({
+                    'price': i / 1000 * (fakeMetadata.columns[0].max - fakeMetadata.columns[0].min) + fakeMetadata.columns[0].min,
+                });
+            }
+            const globalPercentile = s.globalPercentile($price, 30);
+            globalPercentile._compile(fakeMetadata);
+            expect(globalPercentile.eval()).toBeCloseTo(0.3 * (fakeMetadata.columns[0].max - fakeMetadata.columns[0].min) + fakeMetadata.columns[0].min, 2);
+        });
     });
 
     describe('viewport filtering', () => {
@@ -96,9 +108,9 @@ describe('src/core/style/expressions/aggregation', () => {
             for (let i = 0; i < 1000; i++) {
                 fakeDrawMetadata.columns[0].accumHistogram[i] = i + 1;
             }
-            const viewportPercentile = s.viewportPercentile($price, 50);
+            const viewportPercentile = s.viewportPercentile($price, 30);
             viewportPercentile._preDraw(fakeDrawMetadata, fakeGl);
-            expect(viewportPercentile.eval()).toBeCloseTo(0.5 * (fakeDrawMetadata.columns[0].max - fakeDrawMetadata.columns[0].min) + fakeDrawMetadata.columns[0].min, 2);
+            expect(viewportPercentile.eval()).toBeCloseTo(0.3 * (fakeDrawMetadata.columns[0].max - fakeDrawMetadata.columns[0].min) + fakeDrawMetadata.columns[0].min, 2);
         });
     });
 });
