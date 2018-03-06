@@ -1,7 +1,7 @@
 import Expression from './expression';
 import { implicitCast, DEFAULT } from './utils';
-import { floatDiv, floatMod, now } from '../functions';
-
+import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
+import Property from './property';
 
 class DateRange extends Expression {
     constructor(from, to) {
@@ -36,13 +36,15 @@ export class Fade extends Expression {
 }
 
 export class Torque extends Expression {
-    constructor(input, duration = 10, fade = new Fade(), dateRange = DEFAULT) {
+    constructor(input, duration = 10, fade = new Fade()) {
         if (!Number.isFinite(duration)) {
             throw new Error('Torque duration must be a number');
         }
-        dateRange = new DateRange();
+        if (input instanceof Property) {
+            input = linear(input, globalMin(input), globalMax(input));
+        }
         const _cycle = floatDiv(floatMod(now(), duration), duration);
-        super({ input, _cycle, fade, dateRange });
+        super({ input, _cycle, fade });
         this.duration = duration;
     }
     _compile(meta) {
@@ -51,17 +53,21 @@ export class Torque extends Expression {
             throw new Error('Torque(): invalid first parameter, input.');
         } else if (this.fade.type != 'fade') {
             throw new Error('Torque(): invalid third parameter, fade.');
-        } else if (this.dateRange.type != 'dateRange') {
-            throw new Error('Torque(): invalid fourth parameter, dateRange.');
         }
         this.type = 'float';
 
-        // FIXME adjust input to dateRange
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline.input}-${inline._cycle})*${this.duration.toFixed(20)}/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
 
     }
-    // TODO eval
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const cycle = this._cycle.eval(feature);
+        const duration = this.duration;
+        const fadeIn = this.fade.fadeIn.eval(feature);
+        const fadeOut = this.fade.fadeOut.eval(feature);
+        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut));
+    }
 }
 
 function clamp(x, min, max) {
