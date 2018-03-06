@@ -93,7 +93,7 @@ function generatePercentile(global) {
         _preDraw(drawMetadata, gl) {
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name == this.property.name);
-                const total = column.accumHistogram[999];
+                const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
                     if (column.accumHistogram[i] >= this.percentile / 100 * total) {

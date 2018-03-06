@@ -90,14 +90,15 @@ describe('src/core/style/expressions/aggregation', () => {
             expect(viewportCount.eval()).toEqual(4);
         });
 
-        xit('viewportPercentile($price) should return the metadata count', () => {
+        it('viewportPercentile($price) should return the metadata count', () => {
             fakeDrawMetadata.columns[0].accumHistogram = [];
-            for (let i = 0; i <= 1000; i++) {
-                fakeDrawMetadata.columns[0].accumHistogram[i] = i;
+            fakeDrawMetadata.columns[0].histogramBuckets = 1000;
+            for (let i = 0; i < 1000; i++) {
+                fakeDrawMetadata.columns[0].accumHistogram[i] = i + 1;
             }
             const viewportPercentile = s.viewportPercentile($price, 50);
             viewportPercentile._preDraw(fakeDrawMetadata, fakeGl);
-            expect(viewportPercentile.eval()).toEqual(4);
+            expect(viewportPercentile.eval()).toBeCloseTo(0.5 * (fakeDrawMetadata.columns[0].max - fakeDrawMetadata.columns[0].min) + fakeDrawMetadata.columns[0].min, 2);
         });
     });
 });
