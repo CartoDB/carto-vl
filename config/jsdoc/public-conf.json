@@ -7,9 +7,9 @@
   },
   "templates": {
     "default": {
-      "outputSourceFiles": false,
-      "useLongnameInNav": true
+      "outputSourceFiles": false
     },
+    "useLongnameInNav": false,
     "referenceTitle": "CARTO.gl"
   },
   "plugins": [

@@ -7,16 +7,11 @@ import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/style/functions';
 
-/**
- * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
- * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
- */
 
 export default class Layer {
 
     /**
      * Create a carto.Layer.
-     *
      *
      * @param {string} id
      * @param {carto.source.Base} source
@@ -26,7 +21,7 @@ export default class Layer {
      * new carto.Layer('layer0', source, style);
      *
      * @fires CartoError
-     *
+     * 
      * @constructor Layer
      * @memberof carto
      * @api
@@ -92,8 +87,8 @@ export default class Layer {
      * Set a new source for this layer.
      *
      * @param {carto.source.Base} source - New source
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setSource(source) {
@@ -136,8 +131,8 @@ export default class Layer {
      * Set a new style for this layer.
      *
      * @param {carto.Style} style - New style
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setStyle(style) {
@@ -158,8 +153,8 @@ export default class Layer {
      * Blend the current style with another style
      *
      * @param {carto.Style} style - style to blend to
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     blendToStyle(style, ms = 400, interpolator = cubic) {
@@ -189,8 +184,8 @@ export default class Layer {
      *
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     addTo(map, beforeLayerID) {
