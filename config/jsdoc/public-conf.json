@@ -1,14 +1,16 @@
 {
   "source": {
     "include": [
-      "src"
+      "src",
+      "docs/README.md"
     ]
   },
   "templates": {
     "default": {
       "outputSourceFiles": false,
       "useLongnameInNav": true
-    }
+    },
+    "referenceTitle": "CARTO.gl"
   },
   "plugins": [
     "plugins/api",
@@ -16,6 +18,7 @@
   ],
   "opts": {
     "recurse": true,
-    "destination": "./docs/public"
+    "destination": "./docs/public",
+    "template": "config/jsdoc/templates/jsdoc-template"
   }
 }
