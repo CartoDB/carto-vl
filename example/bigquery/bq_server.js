@@ -109,7 +109,7 @@ function tileBounds(x, y, z) {
 
 
 // table to query
-const table = '`nyc-tlc.yellow.trips`';
+const table = '`carto_tests_us.trips`';
 const x_column = 'pickup_longitude';
 const y_column = 'pickup_latitude';
 const aggregate_columns = {
