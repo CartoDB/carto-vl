@@ -12,6 +12,9 @@
     </head>
     <body>
         <div id='map'></div>
+        <script>
+          const geojson = JSON.parse(JSON.stringify(<%= geojson %>));
+        </script>
+        <script src="<%- file %>"></script>
     </body>
-    <script src="<%- file %>"></script>
 </html>

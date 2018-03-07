@@ -18,6 +18,10 @@ function getOutPNG(file) {
     return file.replace('.js', '_out.png');
 }
 
+function getGeoJSON(file) {
+    return file.replace('.js', '.geojson');
+}
+
 function getName(file) {
     return file.substr(
         renderDir.length,
@@ -27,7 +31,7 @@ function getName(file) {
 
 function loadOptions() {
     return {
-        delay: 6000,
+        delay: 1000,
         viewportWidth: 800,
         viewportHeight: 600,
         headless: process.platform === 'linux'
@@ -45,8 +49,10 @@ function loadTemplate() {
 
 function writeTemplate(file, renderTemplate) {
     const mainDir = path.resolve(__dirname, '..', '..');
-    fs.writeFileSync(`${getHTML(file)}`, renderTemplate({
+    const geojson = fs.existsSync(getGeoJSON(file)) ? fs.readFileSync(getGeoJSON(file)) : '';
+    fs.writeFileSync(getHTML(file), renderTemplate({
         file: file,
+        geojson: geojson,
         cartogl: path.resolve(mainDir, 'dist', 'carto-gl.js'),
         mapboxgl: path.resolve(mainDir, 'vendor', 'mapbox-gl-dev.js'),
         mapboxglcss: path.resolve(mainDir, 'vendor', 'mapbox-gl-dev.css')
