@@ -11,21 +11,27 @@ import { cubic } from '../core/style/functions';
 export default class Layer {
 
     /**
-     * Create a carto.Layer.
-     *
-     * @param {string} id
-     * @param {carto.source.Base} source
-     * @param {carto.Style} style
-     *
-     * @example
-     * new carto.Layer('layer0', source, style);
-     *
-     * @fires CartoError
-     * 
-     * @constructor Layer
-     * @memberof carto
-     * @api
-     */
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    * 
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -129,6 +135,8 @@ export default class Layer {
 
     /**
      * Set a new style for this layer.
+     * 
+     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
      * @memberof carto.Layer
@@ -150,9 +158,24 @@ export default class Layer {
     }
 
     /**
-     * Blend the current style with another style
+     * Blend the current style with another style.
+     * 
+     * This allows smooth transforms between two different styles.
+     * 
+     * @example <caption> Smooth transition variating point size </caption>
+     * // We create two different styles varying the width
+     * const style0 = new carto.style({ width: 10 });
+     * const style1 = new carto.style({ width: 20 });
+     * // Create a layer with the first style
+     * const layer = new carto.Layer(source, style);
+     * // We add the layer to the map, the points in this layer will have widh 10
+     * layer.addTo(map, 'layer0');
+     * // The points will be animated from 10px to 20px for 500ms.
+     * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - style to blend to
+     * @param {carto.Style} style - The final style 
+     * @param {number} duration - The animation duration [default:400]
+     * @param {carto.style.expressions.interpolator} interpolator - The interpolation mode used for the animation
      * @memberof carto.Layer
      * @instance
      * @api
