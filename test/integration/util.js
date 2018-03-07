@@ -18,10 +18,6 @@ function getOutPNG(file) {
     return file.replace('.js', '_out.png');
 }
 
-function getGeoJSON(file) {
-    return file.replace('.js', '.geojson');
-}
-
 function getName(file) {
     return file.substr(
         renderDir.length,
@@ -31,9 +27,9 @@ function getName(file) {
 
 function loadOptions() {
     return {
-        delay: 1000,
-        viewportWidth: 800,
-        viewportHeight: 600,
+        delay: 100,
+        viewportWidth: 400,
+        viewportHeight: 300,
         headless: process.platform === 'linux'
         // waitForFn: () => window.mapLoaded
     };
@@ -49,7 +45,8 @@ function loadTemplate() {
 
 function writeTemplate(file, renderTemplate) {
     const mainDir = path.resolve(__dirname, '..', '..');
-    const geojson = fs.existsSync(getGeoJSON(file)) ? fs.readFileSync(getGeoJSON(file)) : '';
+    const geojsonDir = path.resolve(path.dirname(file), '..', 'test.geojson');
+    const geojson = fs.existsSync(geojsonDir) ? fs.readFileSync(geojsonDir) : '';
     fs.writeFileSync(getHTML(file), renderTemplate({
         file: file,
         geojson: geojson,
