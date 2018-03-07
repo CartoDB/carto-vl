@@ -6,26 +6,26 @@ const template = require('lodash.template');
 const fileName = 'test.js';
 const renderDir = path.join(__dirname, 'render');
 
-function getHTML (file) {
+function getHTML(file) {
     return file.replace('.js', '.html');
 }
 
-function getPNG (file) {
+function getPNG(file) {
     return file.replace('.js', '.png');
 }
 
-function getOutPNG (file) {
+function getOutPNG(file) {
     return file.replace('.js', '_out.png');
 }
 
-function getName (file) {
+function getName(file) {
     return file.substr(
         renderDir.length,
         file.length - renderDir.length - fileName.length - 1
     );
 }
 
-function loadOptions () {
+function loadOptions() {
     return {
         delay: 6000,
         viewportWidth: 800,
@@ -35,15 +35,15 @@ function loadOptions () {
     };
 }
 
-function loadFiles () {
+function loadFiles() {
     return glob.sync(path.join(renderDir, '**', fileName));
 }
 
-function loadTemplate () {
+function loadTemplate() {
     return template(fs.readFileSync(path.join(__dirname, 'render.html.tpl')), 'utf8');
 }
 
-function writeTemplate (file, renderTemplate) {
+function writeTemplate(file, renderTemplate) {
     const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(`${getHTML(file)}`, renderTemplate({
         file: file,

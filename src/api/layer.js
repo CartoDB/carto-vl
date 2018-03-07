@@ -1,5 +1,5 @@
 import * as util from './util';
-import SourceBase from './source/base';
+// import SourceBase from './source/base';
 import Style from './style';
 import CartoMap from './map';
 import getCMIntegrator from './integrator/carto';
@@ -293,9 +293,9 @@ export default class Layer {
         if (util.isUndefined(source)) {
             throw new CartoValidationError('layer', 'sourceRequired');
         }
-        if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError('layer', 'nonValidSource');
-        }
+        // if (!(source instanceof SourceBase)) {
+        //     throw new CartoValidationError('layer', 'nonValidSource');
+        // }
     }
 
     _checkStyle(style) {
