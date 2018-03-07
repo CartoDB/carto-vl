@@ -27,7 +27,7 @@ function getName (file) {
 
 function loadOptions () {
     return {
-        delay: 8000,
+        delay: 6000,
         viewportWidth: 800,
         viewportHeight: 600,
         headless: process.platform === 'linux'

@@ -10,7 +10,9 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.Dataset('route');
-const style = new carto.Style();
+const style = new carto.Style(`
+  color: rgba(0,1,1,1)
+`);
 const layer = new carto.Layer('layer', source, style);
 
 layer.addTo(map);

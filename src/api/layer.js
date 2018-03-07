@@ -107,7 +107,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
         this._dataframes.push(dataframe);
@@ -117,7 +117,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
         this._dataframes = this._dataframes.filter(d => d !== dataframe);
