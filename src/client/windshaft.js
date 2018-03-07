@@ -294,9 +294,7 @@ export default class Windshaft {
                         numFields.push(name);
                         numFieldsReal.push(name);
                     }
-
-                }
-                );
+                });
                 catFieldsReal.map((name, i) => fieldMap[name] = i);
                 numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
