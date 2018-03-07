@@ -5,6 +5,8 @@ import { Asc, Desc } from './style/functions';
 
 const HISTOGRAM_BUCKETS = 1000;
 
+const INITIAL_TIMESTAMP = Date.now();
+
 /**
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
@@ -329,6 +331,7 @@ class Renderer {
             }
 
             drawMetadata.freeTexUnit = 4;
+            styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
