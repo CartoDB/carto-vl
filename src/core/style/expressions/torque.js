@@ -12,14 +12,17 @@ const DEFAULT_FADE = 0.15;
  * @param {carto.style.expression.expression|Number} param2 expression of type float or Number
  * @return {carto.style.expressions.fade}
  *
- * @example `
-// fadeIn of 0.1 seconds, fadeOut of 0.3 seconds
-filter:       torque($day, 40, fade(0.1, 0.3))
-
-// fadeIn and fadeOut of 0.5 seconds
-filter:       torque($day, 40, fade(0.5))
-
-`
+ * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
+ * const s = carto.style.expressions;
+ * new carto.Style({
+ *  filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ * });
+ *
+ * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
+ * const s = carto.style.expressions;
+ * new carto.Style({
+ *  filter: s.torque($day, 40, s.fade(0.5))
+ * });
  *
  * @memberof carto.style.expressions
  * @name fade
@@ -56,9 +59,10 @@ export class Fade extends Expression {
  * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration
  * @return {carto.style.expressions.torque}
  *
- * @example `width:    2
-color:     ramp(linear(AVG($temp), 0,30), tealrose)
-filter:       torque($day, 40, fade(0.1, 0.3))`
+ * @example <caption> Temporal map by $day, with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
+ * new carto.Style(`width:    2
+ * color:     ramp(linear(AVG($temp), 0,30), tealrose)
+ * filter:       torque($day, 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.style.expressions
  * @name torque
