@@ -1,0 +1,31 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "MultiLineString",
+    "coordinates": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          50
+        ]
+      ],
+      [
+        [
+          50,
+          0
+        ],
+        [
+          50,
+          50
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "cartodb_id": 1
+  }
+}
