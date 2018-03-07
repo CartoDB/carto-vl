@@ -1,4 +1,4 @@
-import { implicitCast } from './utils';
+import { implicitCast, clamp, mix } from './utils';
 import Animate from './animate';
 import Expression from './expression';
 
@@ -42,18 +42,9 @@ export default class Blend extends Expression {
         }
     }
     eval(feature) {
-        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return _mix(x, y, a);
+        return mix(x, y, a);
     }
-}
-
-
-function _mix(x, y, a) {
-    return x * (1 - a) + y * a;
-}
-
-function _clamp(value, min, max) {
-    return Math.max(Math.min(value, max), min);
 }

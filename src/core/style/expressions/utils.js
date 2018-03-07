@@ -25,3 +25,11 @@ export function hexToRgb(hex) {
         b: parseInt(result[3], 16)
     } : null;
 }
+
+export function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
+}
+
+export function mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}

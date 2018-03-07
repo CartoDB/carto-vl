@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast } from './utils';
+import { implicitCast, clamp } from './utils';
 
 //
 export default class Near extends Expression {
@@ -36,10 +36,6 @@ export default class Near extends Expression {
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - _clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
-}
-
-function _clamp(x, min, max) {
-    return Math.min(Math.max(x, min), max);
 }

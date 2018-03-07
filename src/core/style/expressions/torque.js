@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, DEFAULT } from './utils';
+import { implicitCast, DEFAULT, clamp } from './utils';
 import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './property';
 
@@ -96,8 +96,4 @@ export class Torque extends Expression {
         const fadeOut = this.fade.fadeOut.eval(feature);
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
-}
-
-function clamp(x, min, max) {
-    return Math.min(Math.max(x, min), max);
 }

@@ -63,7 +63,7 @@ export default class Expression {
 
     /**
      * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
-     * @param {Number} timestamp
+     * @param {number} timestamp
      */
     _setTimestamp(timestamp) {
         this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
