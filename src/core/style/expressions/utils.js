@@ -9,7 +9,7 @@ export function implicitCast(value) {
         return float(value);
     }
     if (typeof value == 'string') {
-        if (Date.parse(value)) {
+        if (!Number.isNaN(Date.parse(value))) {
             return time(new Date(value));
         }
         return category(value);
