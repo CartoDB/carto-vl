@@ -25,6 +25,7 @@ import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 import { In, Nin } from './expressions/belongs.js';
 import Between from './expressions/between';
+import Time from './expressions/time';
 
 // Unary ops
 import { Log } from './expressions/unary';
@@ -146,6 +147,7 @@ export const inverse = (...args) => new Inverse(...args);
 export const floatConstant = (...args) => new FloatConstant(...args);
 export const torque = (...args) => new Torque(...args);
 export const fade = (...args) => new Fade(...args);
+export const time = (...args) => new Time(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);
