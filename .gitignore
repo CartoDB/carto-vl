@@ -2,5 +2,8 @@
 *_out.png
 .DS_Store
 .vscode/
+
 dist/
+docs/all
+docs/public
 node_modules/
