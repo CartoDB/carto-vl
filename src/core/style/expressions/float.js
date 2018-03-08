@@ -2,18 +2,18 @@ import Expression from './expression';
 
 
 /**
- * 
- * Represents a number.
- * 
- * @param {number} x - A number to be transformed in a float expression
- * @return {carto.style.expressions.float}
- * 
+ *
+ * Wraps a number.
+ *
+ * @param {number} x - A number to be warped in a numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
  * @example <caption>Creating a float expression.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
  *  width: s.float(15);  // Elements will have width 15
  * });
- * 
+ *
  * @memberof carto.style.expressions
  * @name float
  * @function
