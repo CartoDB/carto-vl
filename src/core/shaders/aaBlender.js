@@ -91,7 +91,11 @@ vec4 textureBicubic(sampler2D sampler, vec2 texCoords, vec2 texSize){
 void main(void) {
     vec4 aa = textureBicubic(aaTex, vec2(0.5)+0.5*((uv*2.-vec2(1.))*scale)    +offset/2., vec2(128.));
     aa.a*=K;
-    aa.a=log(aa.a);
+    if (fract(aa.a)>0.1){
+        //aa.a=0.;
+    }
+    aa.a=aa.a-fract(aa.a);
+    aa.a=(aa.a)*0.03;
     vec3 c = palette(aa.a, vec3(0.5, 0.5, 0.5),
                             vec3(0.5, 0.5, 0.5),
                             vec3(2.0, 1.0, 0.0),

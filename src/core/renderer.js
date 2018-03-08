@@ -379,7 +379,7 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const heatmapRes = 128;
+        const heatmapRes = 64;
         // RENDER TO HM FB
         if (tiles.length && tiles[0].type == 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
