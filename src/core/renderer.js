@@ -379,7 +379,7 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const heatmapRes = 128;
+        const heatmapRes = 32;
         // RENDER TO HM FB
         if (tiles.length && tiles[0].type == 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
@@ -406,13 +406,15 @@ class Renderer {
                 console.log('complete: ', gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE);
 
                 const colors = [
-                    '#4b2991',
-                    '#872ca2',
-                    '#c0369d',
-                    '#ea4f88',
-                    '#fa7876',
-                    '#f6a97a',
-                    '#edd9a3'
+
+                    '#009392',
+                    '#39b185',
+                    '#9ccb86',
+                    '#e9e29c',
+                    '#eeb479',
+                    '#e88471',
+                    '#cf597e'
+
                 ];
                 // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
                 function hexToRgb(hex) {
@@ -496,8 +498,10 @@ class Renderer {
             tile.vertexOffset = [(s / aspect) * tile.vertexOffset[0], s * tile.vertexOffset[1]];
 
             const ko = heatmapRes / 2;
-            tile.hmVertexOffset = tile.vertexOffset.map(c => c - Math.floor(c * ko) / (ko));
-            tile.vertexOffset = tile.vertexOffset.map(c => Math.floor(c * ko) / (ko));
+            //tile.vertexOffset[0]+=1/2/ko;
+            //tile.vertexOffset[1]+=0.125/ko;
+            tile.hmVertexOffset = tile.vertexOffset.map(c => c - Math.round(c * ko) / (ko));
+            tile.vertexOffset = tile.vertexOffset.map(c => Math.round(c * ko) / (ko));
 
 
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
