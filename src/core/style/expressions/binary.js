@@ -160,7 +160,7 @@ export const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}
  *
  * @param {carto.style.expressions.Expression | number} x numeric expression
  * @param {carto.style.expressions.Expression | number} y numeric expression
- * @return {carto.style.expressions.Expression}
+ * @return {carto.style.expressions.Expression} numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price >= 30</caption>
  * const s = carto.style.expressions;
