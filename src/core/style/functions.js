@@ -2,7 +2,7 @@
  *  @api
  *  @namespace carto.style.expressions
  *  @description
- *  Expressions are the core of the library, at top level a style is composed of expressions for every stylable property.
+ *  Expressions are used to define styles, a style is composed of an expression for every configurable attribute.
  *  Remember a style has the following attributes:
  * 
  *  - **color**: Determine the element fill color.
