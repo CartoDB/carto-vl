@@ -31,7 +31,6 @@ function loadOptions() {
         viewportWidth: 400,
         viewportHeight: 300,
         headless: process.platform === 'linux'
-        // waitForFn: () => window.mapLoaded
     };
 }
 
@@ -57,12 +56,12 @@ function writeTemplate(file, renderTemplate) {
 }
 
 module.exports = {
-    getHTML: getHTML,
-    getPNG: getPNG,
-    getOutPNG: getOutPNG,
-    getName: getName,
-    loadFiles: loadFiles,
-    loadOptions: loadOptions,
-    loadTemplate: loadTemplate,
-    writeTemplate: writeTemplate,
+    getHTML,
+    getPNG,
+    getOutPNG,
+    getName,
+    loadFiles,
+    loadOptions,
+    loadTemplate,
+    writeTemplate
 };

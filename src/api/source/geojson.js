@@ -10,17 +10,9 @@ export default class GeoJSON extends Base {
 
     constructor(data) {
         super();
-        data = data || {};
-        if (data.type === 'FeatureCollection') {
-            this._features = data.features || [];
-        } else if (data.type === 'Feature') {
-            this._features = [data];
-        }
-        else {
-            throw Error('No valid GeoJSON data');
-        }
-        this._status = 'init'; // init -> metadata -> data
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
+        this._status = 'init'; // init -> metadata -> data
+        this._features = this._getFeatures(data);
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -39,57 +31,8 @@ export default class GeoJSON extends Base {
             });
         } else if (this._status === 'metadata') {
             this._status = 'data';
-            let geometry = null;
-            const numFeatures = this._features.length;
+            const geometry = this._decodeGeometry();
             const properties = {};
-            for (let i = 0; i < numFeatures; i++) {
-                const feature = this._features[i];
-                if (feature.type === 'Feature') {
-                    const type = feature.geometry.type;
-                    const coordinates = feature.geometry.coordinates;
-                    if (!this._type) {
-                        this._type = type;
-                    } else if (this._type !== type) {
-                        throw Error(`Multiple types not supported: ${this._type}, ${type}`);
-                    }
-                    if (type === 'Point') {
-                        if (!geometry) {
-                            geometry = new Float32Array(numFeatures * 2);
-                        }
-                        const point = this._computePointGeometry(coordinates);
-                        geometry[2 * i + 0] = point.x;
-                        geometry[2 * i + 1] = point.y;
-                    }
-                    else if (type === 'LineString') {
-                        if (!geometry) {
-                            geometry = [];
-                        }
-                        const line = this._computeLineStringGeometry(coordinates);
-                        geometry.push([line]);
-                    }
-                    else if (type === 'MultiLineString') {
-                        if (!geometry) {
-                            geometry = [];
-                        }
-                        const multiline = this._computeMultiLineStringGeometry(coordinates);
-                        geometry.push(multiline);
-                    }
-                    else if (type === 'Polygon') {
-                        if (!geometry) {
-                            geometry = [];
-                        }
-                        const polygon = this._computePolygonGeometry(coordinates);
-                        geometry.push([polygon]);
-                    }
-                    else if (type === 'MultiPolygon') {
-                        if (!geometry) {
-                            geometry = [];
-                        }
-                        const multipolygon = this._computeMultiPolygonGeometry(coordinates);
-                        geometry.push(multipolygon);
-                    }
-                }
-            }
             const dataframe = new Dataframe(
                 { x: 0, y: 0 },
                 1,
@@ -98,8 +41,20 @@ export default class GeoJSON extends Base {
             );
             dataframe.type = this._getDataframeType(this._type);
             dataframe.active = true;
-            dataframe.size = numFeatures;
+            dataframe.size = this._features.length;
             this._addDataframe(dataframe);
+        }
+    }
+
+    _getFeatures(data) {
+        data = data || {};
+        if (data.type === 'FeatureCollection') {
+            return data.features || [];
+        } else if (data.type === 'Feature') {
+            return [data];
+        }
+        else {
+            throw Error('No valid GeoJSON data');
         }
     }
 
@@ -108,6 +63,60 @@ export default class GeoJSON extends Base {
         if (type === 'LineString' || type === 'MultiLineString') return 'line';
         if (type === 'Polygon' || type === 'MultiPolygon') return 'polygon';
         return '';
+    }
+
+    _decodeGeometry() {
+        let geometry = null;
+        const numFeatures = this._features.length;
+        for (let i = 0; i < numFeatures; i++) {
+            const feature = this._features[i];
+            if (feature.type === 'Feature') {
+                const type = feature.geometry.type;
+                const coordinates = feature.geometry.coordinates;
+                if (!this._type) {
+                    this._type = type;
+                } else if (this._type !== type) {
+                    throw Error(`Multiple types not supported: ${this._type}, ${type}`);
+                }
+                if (type === 'Point') {
+                    if (!geometry) {
+                        geometry = new Float32Array(numFeatures * 2);
+                    }
+                    const point = this._computePointGeometry(coordinates);
+                    geometry[2 * i + 0] = point.x;
+                    geometry[2 * i + 1] = point.y;
+                }
+                else if (type === 'LineString') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const line = this._computeLineStringGeometry(coordinates);
+                    geometry.push([line]);
+                }
+                else if (type === 'MultiLineString') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const multiline = this._computeMultiLineStringGeometry(coordinates);
+                    geometry.push(multiline);
+                }
+                else if (type === 'Polygon') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const polygon = this._computePolygonGeometry(coordinates);
+                    geometry.push([polygon]);
+                }
+                else if (type === 'MultiPolygon') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const multipolygon = this._computeMultiPolygonGeometry(coordinates);
+                    geometry.push(multipolygon);
+                }
+            }
+        }
+        return geometry;
     }
 
     _computePointGeometry(data) {
