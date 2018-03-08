@@ -1,9 +1,5 @@
 import * as R from '../../core/renderer';
-
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+import * as util from '../util';
 
 let uid = 0;
 
@@ -69,7 +65,7 @@ class MGLIntegrator {
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
@@ -81,17 +77,8 @@ class MGLIntegrator {
         var c = this.map.getCenter();
         var nw = b.getNorthWest();
         var sw = b.getSouthWest();
-        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        var z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         return z;
     }
-}
-
-// Webmercator projection
-function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
 }

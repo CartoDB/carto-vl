@@ -1,6 +1,6 @@
-import SourceBase from '../../../../src/api/source/base';
+import SourceBase from '../../../../src/api/source/base-windshaft';
 
-describe('api/source/base', () => {
+describe('api/source/base-windshaft', () => {
     const auth = {
         user: 'test',
         apiKey: '1234567890'
@@ -32,7 +32,7 @@ describe('api/source/base', () => {
         it('should build a new Source with (auth) and default config', () => {
             const source = new SourceBase();
             source.initialize(auth);
-            
+
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
             expect(source._serverURL).toEqual('https://test.carto.com');

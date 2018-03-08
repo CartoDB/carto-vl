@@ -40,6 +40,9 @@ export default class Layer {
         this._lastMNS = null;
         this._integrator = null;
         this._dataframes = [];
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
 
         this._id = id;
         this.metadata = null;
@@ -107,7 +110,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
         this._dataframes.push(dataframe);
@@ -117,7 +120,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
         this._dataframes = this._dataframes.filter(d => d !== dataframe);
@@ -234,7 +237,7 @@ export default class Layer {
     }
 
     initCallback() {
-        this._styleChanged(this._style);
+        this._contextInitCallback();
         this.requestData();
     }
 
@@ -253,27 +256,26 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged(style) {
-        const recompile = (metadata) => {
-            style._compileColorShader(this._integrator.renderer.gl, metadata);
-            style._compileWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileFilterShader(this._integrator.renderer.gl, metadata);
-        };
-        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve();
-        }
+    _compileShaders(style, metadata) {
+        style._compileColorShader(this._integrator.renderer.gl, metadata);
+        style._compileWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+    }
+    async _styleChanged(style) {
+        await this._context;
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
-            recompile(this.metadata);
+            this._compileShaders(style, this.metadata);
             return Promise.resolve();
         }
         // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
             this.metadata = metadata;
-            recompile(metadata);
+            this._compileShaders(style, metadata);
+            this.requestData(style);
         });
     }
 
@@ -314,11 +316,12 @@ export default class Layer {
         throw new Error('?');
     }
 
-    requestData(style) {
+    async requestData(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateWebGLState) {
+        if (!style){
             return;
         }
+        await this._context;
         return this._source.requestData(this._getViewport(), style);
     }
 

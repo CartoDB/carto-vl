@@ -1,9 +1,9 @@
 import * as util from '../util';
-import Base from './base';
+import BaseWindshaft from './base-windshaft';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
 
-export default class SQL extends Base {
+export default class SQL extends BaseWindshaft {
 
     /**
      * Create a carto.source.Dataset.
