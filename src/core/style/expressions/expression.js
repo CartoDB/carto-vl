@@ -2,7 +2,13 @@ import { implicitCast } from './utils';
 import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
-
+/**
+ * @description Abstract expression class
+ *
+ * @memberof carto.style.expressions
+ * @name Expression
+ * @api
+ */
 export default class Expression {
     /**
      * @hideconstructor

@@ -2,13 +2,19 @@ import { implicitCast, clamp, mix } from './utils';
 import Animate from './animate';
 import Expression from './expression';
 
+/**
+ * @description Linearly interpolate from *a* to *b* based on *mix*
+ * @param {carto.style.expressions.Expression | number} a numeric or color expression
+ * @param {carto.style.expressions.Expression | number} b numeric or color expression
+ * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.style.expressions.Expression} numeric expression
+ *
+ * @memberof carto.style.expressions
+ * @name blend
+ * @function
+ * @api
+ */
 export default class Blend extends Expression {
-    /**
-     * @description Interpolate from *a* to *b* based on *mix*
-     * @param {*} a can be a color or a number
-     * @param {*} b type must match a's type
-     * @param {*} mix interpolation parameter in the [0,1] range
-     */
     constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);

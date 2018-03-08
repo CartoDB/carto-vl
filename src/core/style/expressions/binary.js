@@ -270,7 +270,7 @@ export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!
 
 /**
  *
- * Perform a binary OR between two numbers.
+ * Perform a binary OR between two numeric expressions.
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
@@ -298,15 +298,15 @@ export const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x}
 
 /**
  *
- * Perform a binary AND between two numbers.
+ * Perform a binary AND between two numeric expressions.
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
  * This returns a float expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.style.expressions.float|number} x numeric expression
- * @param {carto.style.expressions.float|number} y numeric expression
- * @return {carto.style.expressions.float} numeric expression
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
  *
  * @example <caption>Show only elements with price < 30 AND category === 'fruit'</caption>
  * const s = carto.style.expressions;

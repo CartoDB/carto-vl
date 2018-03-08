@@ -1,16 +1,22 @@
 import Expression from './expression';
 
+/**
+ * @description Wrapper around category names
+ * @param {string} categoryName
+ * @returns {carto.style.expressions.Expression} category expression with the category name provided
+ *
+ * @memberof carto.style.expressions
+ * @name category
+ * @function
+ * @api
+ */
 export default class Category extends Expression {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        if (typeof x !== 'string') {
-            throw new Error(`Invalid arguments to Category(): ${x}`);
+    constructor(categoryName) {
+        if (typeof categoryName !== 'string') {
+            throw new Error(`Invalid arguments to Category(): ${categoryName}`);
         }
         super({});
-        this.expr = x;
+        this.expr = categoryName;
     }
     _compile(metadata) {
         this.type = 'category';
@@ -30,7 +36,7 @@ export default class Category extends Expression {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
     }
-    eval(){
+    eval() {
         return this._metadata.categoryIDs[this.expr];
     }
     isAnimated() {
