@@ -4,6 +4,8 @@ import * as rsys from '../../client/rsys';
 import * as util from '../util';
 
 
+// TODO: add docs / API
+
 export default class GeoJSON extends Base {
 
     constructor(data) {
@@ -14,8 +16,11 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         }
+        else {
+            throw Error('No valid GeoJSON data');
+        }
         this._status = 'init'; // init -> metadata -> data
-        this._type = ''; // Point, MultiLineString
+        this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -24,7 +29,7 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
-        // TODO: split in two functions
+        // TODO: split in two functions: (metadata) / (data)
         //
         if (this._status === 'init') {
             this._status = 'metadata';
@@ -40,45 +45,47 @@ export default class GeoJSON extends Base {
             for (let i = 0; i < numFeatures; i++) {
                 const feature = this._features[i];
                 if (feature.type === 'Feature') {
+                    const type = feature.geometry.type;
+                    const coordinates = feature.geometry.coordinates;
                     if (!this._type) {
-                        this._type = feature.geometry.type;
-                    } else if (this._type !== feature.geometry.type) {
-                        throw Error(`Multiple types not supported: ${this._type}, ${feature.geometry.type}`);
+                        this._type = type;
+                    } else if (this._type !== type) {
+                        throw Error(`Multiple types not supported: ${this._type}, ${type}`);
                     }
-                    if (feature.geometry.type === 'Point') {
+                    if (type === 'Point') {
                         if (!geometry) {
                             geometry = new Float32Array(numFeatures * 2);
                         }
-                        const point = this._computePointGeometry(feature);
+                        const point = this._computePointGeometry(coordinates);
                         geometry[2 * i + 0] = point.x;
                         geometry[2 * i + 1] = point.y;
                     }
-                    else if (feature.geometry.type === 'LineString') {
+                    else if (type === 'LineString') {
                         if (!geometry) {
                             geometry = [];
                         }
-                        const line = this._computeLineStringGeometry(feature);
+                        const line = this._computeLineStringGeometry(coordinates);
                         geometry.push([line]);
                     }
-                    else if (feature.geometry.type === 'MultiLineString') {
+                    else if (type === 'MultiLineString') {
                         if (!geometry) {
                             geometry = [];
                         }
-                        const multiline = this._computeMultiLineStringGeometry(feature);
+                        const multiline = this._computeMultiLineStringGeometry(coordinates);
                         geometry.push(multiline);
                     }
-                    else if (feature.geometry.type === 'Polygon') {
+                    else if (type === 'Polygon') {
                         if (!geometry) {
                             geometry = [];
                         }
-                        const polygon = this._computePolygonGeometry(feature);
+                        const polygon = this._computePolygonGeometry(coordinates);
                         geometry.push([polygon]);
                     }
-                    else if (feature.geometry.type === 'MultiPolygon') {
+                    else if (type === 'MultiPolygon') {
                         if (!geometry) {
                             geometry = [];
                         }
-                        const multipolygon = this._computeMultiPolygonGeometry(feature);
+                        const multipolygon = this._computeMultiPolygonGeometry(coordinates);
                         geometry.push(multipolygon);
                     }
                 }
@@ -103,61 +110,47 @@ export default class GeoJSON extends Base {
         return '';
     }
 
-    _computePointGeometry(feature) {
-        const lat = feature.geometry.coordinates[1];
-        const lng = feature.geometry.coordinates[0];
+    _computePointGeometry(data) {
+        const lat = data[1];
+        const lng = data[0];
         const wm = util.wmProjection({ lat, lng });
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    _computeLineStringGeometry(feature) {
+    _computeLineStringGeometry(data) {
         let line = [];
-        for (let j = 0; j < feature.geometry.coordinates.length; j++) {
-            const wm = util.wmProjection({
-                lat: feature.geometry.coordinates[j][1],
-                lng: feature.geometry.coordinates[j][0]
-            });
-            const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+        for (let i = 0; i < data.length; i++) {
+            const point = this._computePointGeometry(data[i]);
             line.push(point.x, point.y);
         }
         return line;
     }
 
-    _computeMultiLineStringGeometry(feature) {
+    _computeMultiLineStringGeometry(data) {
         let multiline = [];
-        for (let i = 0; i < feature.geometry.coordinates.length; i++) {
-            let line = [];
-            for (let j = 0; j < feature.geometry.coordinates[i].length; j++) {
-                const wm = util.wmProjection({
-                    lat: feature.geometry.coordinates[i][j][1],
-                    lng: feature.geometry.coordinates[i][j][0]
-                });
-                const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
-                line.push(point.x, point.y);
+        for (let i = 0; i < data.length; i++) {
+            let line = this._computeLineStringGeometry(data[i]);
+            if (line.length > 0) {
+                multiline.push(line);
             }
-            multiline.push(line);
         }
         return multiline;
     }
 
-    _computePolygonGeometry(feature) {
+    _computePolygonGeometry(data) {
         let polygon = {
             flat: [],
             holes: []
         };
         let holeIndex = 0;
-        for (let j = 0; j < feature.geometry.coordinates.length; j++) {
-            for (let k = 0; k < feature.geometry.coordinates[j].length; k++) {
-                const wm = util.wmProjection({
-                    lat: feature.geometry.coordinates[j][k][1],
-                    lng: feature.geometry.coordinates[j][k][0]
-                });
-                const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+        for (let i = 0; i < data.length; i++) {
+            for (let j = 0; j < data[i].length; j++) {
+                const point = this._computePointGeometry(data[i][j]);
                 polygon.flat.push(point.x, point.y);
             }
-            if (!this._isClockWise(feature.geometry.coordinates[j])) {
-                if (j > 0) {
-                    holeIndex += feature.geometry.coordinates[j - 1].length;
+            if (!this._isClockWise(data[i])) {
+                if (i > 0) {
+                    holeIndex += data[i - 1].length;
                     polygon.holes.push(holeIndex);
                 } else {
                     throw new Error('First polygon ring MUST be external');
@@ -167,32 +160,10 @@ export default class GeoJSON extends Base {
         return polygon;
     }
 
-    _computeMultiPolygonGeometry(feature) {
+    _computeMultiPolygonGeometry(data) {
         let multipolygon = [];
-        for (let i = 0; i < feature.geometry.coordinates.length; i++) {
-            let polygon = {
-                flat: [],
-                holes: []
-            };
-            let holeIndex = 0;
-            for (let j = 0; j < feature.geometry.coordinates[i].length; j++) {
-                for (let k = 0; k < feature.geometry.coordinates[i][j].length; k++) {
-                    const wm = util.wmProjection({
-                        lat: feature.geometry.coordinates[i][j][k][1],
-                        lng: feature.geometry.coordinates[i][j][k][0]
-                    });
-                    const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
-                    polygon.flat.push(point.x, point.y);
-                }
-                if (!this._isClockWise(feature.geometry.coordinates[i][j])) {
-                    if (j > 0) {
-                        holeIndex += feature.geometry.coordinates[i][j - 1].length;
-                        polygon.holes.push(holeIndex);
-                    } else {
-                        throw new Error('First polygon ring MUST be external');
-                    }
-                }
-            }
+        for (let i = 0; i < data.length; i++) {
+            let polygon = this._computePolygonGeometry(data[i]);
             if (polygon.flat.length > 0) {
                 multipolygon.push(polygon);
             }
