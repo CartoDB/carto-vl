@@ -30,6 +30,7 @@ class MGLIntegrator {
         this.moveObservers = {};
 
         this._layers = [];
+        console.log('mgli contructor');
     }
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
@@ -47,6 +48,7 @@ class MGLIntegrator {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
+                console.log('mgli initCallback');
                 layer.initCallback();
             }
             layer.paintCallback();

@@ -40,6 +40,9 @@ export default class Layer {
         this._lastMNS = null;
         this._integrator = null;
         this._dataframes = [];
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
 
         this._id = id;
         this.metadata = null;
@@ -234,7 +237,7 @@ export default class Layer {
     }
 
     initCallback() {
-        this._styleChanged(this._style);
+        this._contextInitCallback();
         this.requestData();
     }
 
@@ -260,10 +263,8 @@ export default class Layer {
         style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
         style._compileFilterShader(this._integrator.renderer.gl, metadata);
     }
-    _styleChanged(style) {
-        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve();
-        }
+    async _styleChanged(style) {
+        await this._context;
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
@@ -274,6 +275,7 @@ export default class Layer {
         return originalPromise.then(metadata => {
             this.metadata = metadata;
             this._compileShaders(style, metadata);
+            this.requestData(style);
         });
     }
 
@@ -314,11 +316,12 @@ export default class Layer {
         throw new Error('?');
     }
 
-    requestData(style) {
+    async requestData(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateWebGLState) {
+        if (!style){
             return;
         }
+        await this._context;
         return this._source.requestData(this._getViewport(), style);
     }
 

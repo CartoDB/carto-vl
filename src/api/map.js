@@ -36,9 +36,7 @@ export default class Map {
     }
 
     addLayer(layer, beforeLayerID) {
-        setTimeout(() => {
-            layer.initCallback();
-        });
+        layer.initCallback();
 
         let index;
         for (index = 0; index < this._layers.length; index++) {
@@ -58,7 +56,7 @@ export default class Map {
         let animated = false;
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
-            const hasAnimation = layer.getStyle().isAnimated();
+            const hasAnimation = layer.getStyle() && layer.getStyle().isAnimated();
             if (hasData || hasAnimation) {
                 layer.paintCallback();
             }
