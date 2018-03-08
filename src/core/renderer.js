@@ -385,7 +385,7 @@ class Renderer {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
-            const scale = 1 / 32;
+            const scale = 1 / 16;
             const [ws, hs] = [heatmapRes,heatmapRes];[Math.round(w * scale), Math.round(h * scale)];
             this.soff = ws / w / scale;
 
@@ -398,8 +398,8 @@ class Renderer {
                     ws, hs, 0, gl.RGBA, gl.FLOAT, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._HMTex, 0);
 
                 [this._width, this._height] = [w, h];
