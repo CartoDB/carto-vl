@@ -1,11 +1,13 @@
+import Base from './base';
 import { Dataframe } from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import * as util from '../util';
 
 
-export default class GeoJSON {
+export default class GeoJSON extends Base {
 
     constructor(data) {
+        super();
         data = data || {};
         if (data.type === 'FeatureCollection') {
             this._features = data.features || [];
