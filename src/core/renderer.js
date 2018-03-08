@@ -379,13 +379,13 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const heatmapRes = 32;
+        const heatmapRes = 64;
         // RENDER TO HM FB
         if (tiles.length && tiles[0].type == 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._HMFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
-            const scale = 1 / 16;
+            const scale = 1 / 32;
             const [ws, hs] = [heatmapRes,heatmapRes];[Math.round(w * scale), Math.round(h * scale)];
             this.soff = ws / w / scale;
 
