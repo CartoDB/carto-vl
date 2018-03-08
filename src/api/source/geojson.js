@@ -53,12 +53,19 @@ export default class GeoJSON extends Base {
                         geometry[2 * i + 0] = point.x;
                         geometry[2 * i + 1] = point.y;
                     }
+                    else if (feature.geometry.type === 'LineString') {
+                        if (!geometry) {
+                            geometry = [];
+                        }
+                        const line = this._computeLineStringGeometry(feature);
+                        geometry.push([line]);
+                    }
                     else if (feature.geometry.type === 'MultiLineString') {
                         if (!geometry) {
                             geometry = [];
                         }
-                        const lines = this._computeMultiLineStringGeometry(feature);
-                        geometry.push(lines);
+                        const multiline = this._computeMultiLineStringGeometry(feature);
+                        geometry.push(multiline);
                     }
                 }
             }
@@ -77,7 +84,7 @@ export default class GeoJSON extends Base {
 
     _getDataframeType(type) {
         if (type === 'Point') return 'point';
-        if (type === 'MultiLineString') return 'line';
+        if (type === 'LineString' || type === 'MultiLineString') return 'line';
         return '';
     }
 
@@ -86,6 +93,19 @@ export default class GeoJSON extends Base {
         const lng = feature.geometry.coordinates[0];
         const wm = util.wmProjection({ lat, lng });
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+    }
+
+    _computeLineStringGeometry(feature) {
+        let line = [];
+        for (let j = 0; j < feature.geometry.coordinates.length; j++) {
+            const wm = util.wmProjection({
+                lat: feature.geometry.coordinates[j][1],
+                lng: feature.geometry.coordinates[j][0]
+            });
+            const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+            line.push(point.x, point.y);
+        }
+        return line;
     }
 
     _computeMultiLineStringGeometry(feature) {
