@@ -30,44 +30,6 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 yarn
 ```
 
-### Run the tests
-
-#### Unit tests
-
-```
-yarn test
-```
-
-To watch the unit tests
-
-```
-yarn test:watch
-```
-
-To launch the unit tests in the browser
-
-```
-yarn test:browser
-```
-
-#### Acceptance tests
-
-```
-yarn test:acceptance
-```
-
-To add more acceptance tests
-
-```
-yarn test:acceptance:prepare
-```
-
-**Note**: you need to configure the CHROME_BIN variable before running the tests, for example:
-
-```
-export CHROME_BIN=/usr/bin/chromium-browser
-```
-
 ### Build the library
 
 ```
@@ -91,3 +53,9 @@ To generate all the docs
 ```
 yarn docs:all
 ```
+
+### Run the tests
+
+- [Unit tests](./test/unit/README.md)
+- [Integration tests](./test/integration/README.md)
+- [Acceptance tests](./test/acceptance/README.md)
