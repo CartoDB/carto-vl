@@ -26,34 +26,37 @@ const SUPPORTED_PROPERTIES = [
 ];
 
 /**
- * @description A Style defines how associated dataframes of a particular renderer should be renderer.
- *
- * Styles are only compatible with dataframes that comply with the same schema.
- * The schema is the interface that a dataframe must comply with.
+ 
  */
 
 export default class Style {
 
     /**
-     * Create a carto.Style.
-     *
-     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
-     *
-     * @example
-     * new carto.Style(`
-     *   color: rgb(0,0,0)
-     * `);
-     *
-     * new carto.Style({
-     *   color: carto.style.expression.rgb(0,0,0)
-     * });
-     *
-     * @fires CartoError
-     *
-     * @constructor Style
-     * @memberof carto
-     * @api
-     */
+    * A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+    * managed through styles. Styles also control the element visibility, ordering or aggregation level.
+    * 
+    * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
+    * Each attribute in the {@link StyleSpec|styleSpec} must be a valid {@link carto.style.expressions|expression}.
+    * Those expressions will be evaluated dinamically for every element in the dataset.
+    *
+    * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
+    *
+    * @example <caption> Create a style with black dots using the string constructor </caption>
+    * new carto.Style(`
+    *   color: rgb(0,0,0)
+    * `);
+    *
+    * @example <caption> Create a style with black dots using the styleSpec constructor </caption>
+    * new carto.Style({
+    *   color: carto.style.expression.rgb(0,0,0)
+    * });
+    *
+    * @fires CartoError
+    *
+    * @constructor Style
+    * @memberof carto
+    * @api
+    */
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
@@ -153,16 +156,16 @@ export default class Style {
         return this._styleSpec.order;
     }
 
-    get filter(){
+    get filter() {
         return this._styleSpec.filter;
     }
 
     isAnimated() {
         return this.getColor().isAnimated() ||
-               this.getWidth().isAnimated() ||
-               this.getStrokeColor().isAnimated() ||
-               this.getStrokeWidth().isAnimated() ||
-               this.filter.isAnimated();
+            this.getWidth().isAnimated() ||
+            this.getStrokeColor().isAnimated() ||
+            this.getStrokeWidth().isAnimated() ||
+            this.filter.isAnimated();
     }
 
     onChange(callback) {

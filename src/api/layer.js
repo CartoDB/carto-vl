@@ -174,8 +174,7 @@ export default class Layer {
      * layer.blendToStyle(style1, 500);
      *
      * @param {carto.Style} style - The final style 
-     * @param {number} duration - The animation duration [default:400]
-     * @param {carto.style.expressions.interpolator} interpolator - The interpolation mode used for the animation
+     * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
      * @api
