@@ -7,8 +7,7 @@ const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
-// Webmercator projection
-function wmProjection(latLng) {
+function projectToWebMercator(latLng) {
     let lat = latLng.lat * DEG2RAD;
     let lng = latLng.lng * DEG2RAD;
     let x = lng * EARTH_RADIUS;
@@ -36,7 +35,7 @@ function isObject(value) {
 export {
     WM_R,
     WM_2R,
-    wmProjection,
+    projectToWebMercator,
     isUndefined,
     isString,
     isNumber,

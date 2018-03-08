@@ -59,10 +59,18 @@ export default class GeoJSON extends Base {
     }
 
     _getDataframeType(type) {
-        if (type === 'Point') return 'point';
-        if (type === 'LineString' || type === 'MultiLineString') return 'line';
-        if (type === 'Polygon' || type === 'MultiPolygon') return 'polygon';
-        return '';
+        switch (type) {
+            case 'Point':
+                return 'point';
+            case 'LineString':
+            case 'MultiLineString':
+                return 'line';
+            case 'Polygon':
+            case 'MultiPolygon':
+                return 'polygon';
+            default:
+                return '';
+        }
     }
 
     _decodeGeometry() {
@@ -122,7 +130,7 @@ export default class GeoJSON extends Base {
     _computePointGeometry(data) {
         const lat = data[1];
         const lng = data[0];
-        const wm = util.wmProjection({ lat, lng });
+        const wm = util.projectToWebMercator({ lat, lng });
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 

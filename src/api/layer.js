@@ -253,27 +253,27 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
+    _compileShaders(style, metadata) {
+        style._compileColorShader(this._integrator.renderer.gl, metadata);
+        style._compileWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+    }
     _styleChanged(style) {
-        const recompile = (metadata) => {
-            style._compileColorShader(this._integrator.renderer.gl, metadata);
-            style._compileWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileFilterShader(this._integrator.renderer.gl, metadata);
-        };
         if (!(this._integrator && this._integrator.invalidateWebGLState)) {
             return Promise.resolve();
         }
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
-            recompile(this.metadata);
+            this._compileShaders(style, this.metadata);
             return Promise.resolve();
         }
         // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
             this.metadata = metadata;
-            recompile(metadata);
+            this._compileShaders(style, metadata);
         });
     }
 

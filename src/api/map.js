@@ -74,23 +74,23 @@ export default class Map {
 
     _drawBackground(color) {
         switch (color) {
-        case 'black':
-            this._gl.clearColor(0, 0, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'red':
-            this._gl.clearColor(1, 0, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'green':
-            this._gl.clearColor(0, 1, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'blue':
-            this._gl.clearColor(0, 0, 1, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        default:
+            case 'black':
+                this._gl.clearColor(0, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'red':
+                this._gl.clearColor(1, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'green':
+                this._gl.clearColor(0, 1, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'blue':
+                this._gl.clearColor(0, 0, 1, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            default:
             // white
         }
     }
