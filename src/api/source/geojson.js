@@ -67,6 +67,13 @@ export default class GeoJSON extends Base {
                         const multiline = this._computeMultiLineStringGeometry(feature);
                         geometry.push(multiline);
                     }
+                    else if (feature.geometry.type === 'Polygon') {
+                        if (!geometry) {
+                            geometry = [];
+                        }
+                        const polygon = this._computePolygonGeometry(feature);
+                        geometry.push([polygon]);
+                    }
                     else if (feature.geometry.type === 'MultiPolygon') {
                         if (!geometry) {
                             geometry = [];
@@ -92,7 +99,7 @@ export default class GeoJSON extends Base {
     _getDataframeType(type) {
         if (type === 'Point') return 'point';
         if (type === 'LineString' || type === 'MultiLineString') return 'line';
-        if (type === 'MultiPolygon') return 'polygon';
+        if (type === 'Polygon' || type === 'MultiPolygon') return 'polygon';
         return '';
     }
 
@@ -131,6 +138,33 @@ export default class GeoJSON extends Base {
             multiline.push(line);
         }
         return multiline;
+    }
+
+    _computePolygonGeometry(feature) {
+        let polygon = {
+            flat: [],
+            holes: []
+        };
+        let holeIndex = 0;
+        for (let j = 0; j < feature.geometry.coordinates.length; j++) {
+            for (let k = 0; k < feature.geometry.coordinates[j].length; k++) {
+                const wm = util.wmProjection({
+                    lat: feature.geometry.coordinates[j][k][1],
+                    lng: feature.geometry.coordinates[j][k][0]
+                });
+                const point = rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+                polygon.flat.push(point.x, point.y);
+            }
+            if (!this._isClockWise(feature.geometry.coordinates[j])) {
+                if (j > 0) {
+                    holeIndex += feature.geometry.coordinates[j - 1].length;
+                    polygon.holes.push(holeIndex);
+                } else {
+                    throw new Error('First polygon ring MUST be external');
+                }
+            }
+        }
+        return polygon;
     }
 
     _computeMultiPolygonGeometry(feature) {
