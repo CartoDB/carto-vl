@@ -4,10 +4,10 @@ import Expression from './expression';
  *
  * Check if a given value is contained within an inclusive range (including the limits).
  *
- * @param {carto.style.expressions.expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {carto.style.expressions.expression | number} lowerLimit - numeric expression with the lower limit of the range
- * @param {carto.style.expressions.expression | number} upperLimit -  numeric expression with the upper limit of the range
- * @return {carto.style.expressions.expression} numeric expression with the result of the check: 1 if value is inside the range, 0 otherwise
+ * @param {carto.style.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {carto.style.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
+ * @param {carto.style.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
  * const s = carto.style.expressions;

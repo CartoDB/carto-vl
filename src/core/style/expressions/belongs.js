@@ -11,20 +11,20 @@ function NIN_INLINE_MAKER(categories) {
 }
 
 /**
- * 
- * Check if property belongs to the categories list given by the categories parameters.
- * 
- * @param {carto.style.expressions.property} property - The property in the dataset that is going to be evaluated
- * @param {...string} categories - Multiple string parameters with the allowed values
- * @return {carto.style.expressions.float}
- * 
+ *
+ * Check if a categorical value belongs to a list of categories.
+ *
+ * @param {carto.style.expressions.expression | string} value - Categorical expression to be tested against the categorical whitelist
+ * @param {...carto.style.expressions.expression | ...string} categories - Multiple categorical expression parameters that will form the whitelist
+ * @return {carto.style.expressions.expression} numeric expression with the result of the check
+ *
  * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
  * const s = carto.style.expressions;
  * const $type = s.property('type');
  * const style = new carto.Style({
  *  filter: s.in($type, 'metropolis', 'capital');
  * });
- * 
+ *
  * @memberof carto.style.expressions
  * @name in
  * @function
@@ -34,20 +34,20 @@ export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.s
 
 
 /**
- * 
+ *
  * Check if property does not belong to the categories list given by the categories parameters.
- * 
- * @param {carto.style.expressions.property} property - The property in the dataset that is going to be evaluated
- * @param {...string} categories - Multiple string parameters with the excluded values
- * @return {carto.style.expressions.float}
- * 
+ *
+ * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
+ * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
+ *
  * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
  * const s = carto.style.expressions;
  * const $type = s.property('type');
  * const style = new carto.Style({
  *  filter: s.nin($type, 'metropolis', 'capital');
  * });
- * 
+ *
  * @memberof carto.style.expressions
  * @name nin
  * @function
