@@ -8,9 +8,10 @@
  */
 
 import * as expressions from './core/style/functions';
+import GeoJSON from './api/source/geojson';
 import Dataset from './api/source/dataset';
-import Layer from './api/layer';
 import SQL from './api/source/sql';
+import Layer from './api/layer';
 import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
@@ -19,7 +20,7 @@ import Map from './api/map';
 // Namespaces
 
 const style = { expressions };
-const source = { Dataset, SQL };
+const source = { Dataset, SQL, GeoJSON };
 
 export {
     source,

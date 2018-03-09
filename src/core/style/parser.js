@@ -81,45 +81,45 @@ function parseBinaryOperation(node) {
     const left = parseNode(node.left);
     const right = parseNode(node.right);
     switch (node.operator) {
-    case '*':
-        return functions.floatMul(left, right);
-    case '/':
-        return functions.floatDiv(left, right);
-    case '+':
-        return functions.floatAdd(left, right);
-    case '-':
-        return functions.floatSub(left, right);
-    case '%':
-        return functions.floatMod(left, right);
-    case '^':
-        return functions.floatPow(left, right);
-    case '>':
-        return functions.greaterThan(left, right);
-    case '>=':
-        return functions.greaterThanOrEqualTo(left, right);
-    case '<':
-        return functions.lessThan(left, right);
-    case '<=':
-        return functions.lessThanOrEqualTo(left, right);
-    case '==':
-        return functions.equals(left, right);
-    case 'and':
-        return functions.and(left, right);
-    case 'or':
-        return functions.or(left, right);
-    default:
-        throw new Error(`Invalid binary operator '${node.operator}'`);
+        case '*':
+            return functions.floatMul(left, right);
+        case '/':
+            return functions.floatDiv(left, right);
+        case '+':
+            return functions.floatAdd(left, right);
+        case '-':
+            return functions.floatSub(left, right);
+        case '%':
+            return functions.floatMod(left, right);
+        case '^':
+            return functions.floatPow(left, right);
+        case '>':
+            return functions.greaterThan(left, right);
+        case '>=':
+            return functions.greaterThanOrEqualTo(left, right);
+        case '<':
+            return functions.lessThan(left, right);
+        case '<=':
+            return functions.lessThanOrEqualTo(left, right);
+        case '==':
+            return functions.equals(left, right);
+        case 'and':
+            return functions.and(left, right);
+        case 'or':
+            return functions.or(left, right);
+        default:
+            throw new Error(`Invalid binary operator '${node.operator}'`);
     }
 }
 
 function parseUnaryOperation(node) {
     switch (node.operator) {
-    case '-':
-        return functions.floatMul(-1, parseNode(node.argument));
-    case '+':
-        return parseNode(node.argument);
-    default:
-        throw new Error(`Invalid unary operator '${node.operator}'`);
+        case '-':
+            return functions.floatMul(-1, parseNode(node.argument));
+        case '+':
+            return parseNode(node.argument);
+        default:
+            throw new Error(`Invalid unary operator '${node.operator}'`);
     }
 }
 
