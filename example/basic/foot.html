@@ -51,6 +51,7 @@
         filter: s.floatDiv(s.property('count'), 3951813)
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
+    window.K = 0.009903520314283059;
 
     layer.addTo(map, 'watername_ocean');
 </script>
