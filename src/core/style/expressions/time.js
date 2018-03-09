@@ -8,8 +8,12 @@ export default class Time extends Expression {
         super({});
         this.type = 'time';
         this.date = date;
+        this.inlineMaker = () => undefined;
     }
     isAnimated() {
         return false;
+    }
+    eval() {
+        return this.date;
     }
 }

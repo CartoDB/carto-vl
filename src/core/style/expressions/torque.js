@@ -92,6 +92,26 @@ export class Torque extends Expression {
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline.input}-${inline._cycle})*${this.duration.toFixed(20)}/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
+    getSimTime() {
+        if (!(this.input.min.eval() instanceof Date)){
+            return null;
+        }
+
+        const c = this._cycle.eval(); //from 0 to duration seconds
+        const min = this.input.min.eval(); //Date
+        const max = this.input.max.eval();
+        if (!min.getTime)
+            debugger;
+        const tmin = min.getTime();
+        const tmax = max.getTime();
+        const m = c;
+        const tmix = tmax * m + (1 - m) * tmin;
+
+        const date = new Date();
+        date.setTime(tmix);
+        return date;
+
+    }
     eval(feature) {
         const input = this.input.eval(feature);
         const cycle = this._cycle.eval(feature);

@@ -125,15 +125,18 @@ export default class Windshaft {
     async _instantiateUncached(MNS, resolution, filters) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        const select = this._buildSelectClause(MNS);
+        let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
         const metadata = await this.getMetadata(query, MNS, conf);
 
+        select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
             aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
+        } else {
+            aggSQL = this._buildQuery(select);
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
@@ -182,8 +185,11 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    _buildSelectClause(MRS, dateFields = []) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+            name => dateFields.includes(name) ? name + '::text' : name
+        )
+            .concat(['the_geom', 'the_geom_webmercator']);
     }
 
     _buildQuery(select) {
@@ -407,11 +413,10 @@ export default class Windshaft {
                 if (Number.isNaN(d)) {
                     throw new Error('invalid MVT date');
                 }
-                const metadataColumn = metadata.columns.find(c => c.name = name);
+                const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
                 const n = (d - min) / (max.getTime() - min.getTime());
-                console.log(n);
                 properties[index + catFields.length + numFields.length][i] = n;
             });
         }
@@ -439,6 +444,8 @@ export default class Windshaft {
                 categories.push(name);
             } else if (type == 'date') {
                 dates.push(name);
+            } else if (type != 'geometry') {
+                throw new Error(`Unsuportted type ${type}`);
             }
         });
 
