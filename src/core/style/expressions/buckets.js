@@ -9,7 +9,7 @@ export default class Buckets extends Expression {
      * Given a property create "sub-groups" based on the given breakpoints.
      * 
      * 
-     * Imagine a trafic dataset with a speed property. We want to divide the roads in
+     * Imagine a traffic dataset with a speed property. We want to divide the roads in
      * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
      * 
      * 
