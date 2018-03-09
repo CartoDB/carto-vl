@@ -208,6 +208,7 @@ export const lt = lessThan;
 export const lte = lessThanOrEqualTo;
 const _in = (...args) => new In(...args);
 
+export const number = float;
 export const add = floatAdd;
 export const sub = floatSub;
 export const mul = floatMul;
