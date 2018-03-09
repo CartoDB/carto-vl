@@ -1,5 +1,26 @@
 import Expression from './expression';
 
+/**
+ * 
+ * Evaluates the value of a column for every row in the dataset.
+ * 
+ * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
+ * The `property('name')` will return the name of the current city for every point in the dataset.
+ * 
+ * @param {string} name - The property in the dataset that is going to be evaluated
+ * @return {carto.style.expressions.property}
+ * 
+ * @example <caption>Display only cities with name different from "London"</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.neq(s.property('name'), 'london'),
+ * });
+ * 
+ * @memberof carto.style.expressions
+ * @name property
+ * @function
+ * @api
+ */
 export default class Property extends Expression {
     /**
      * @jsapi
