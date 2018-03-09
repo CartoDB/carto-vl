@@ -3,10 +3,25 @@ import { implicitCast, hexToRgb } from './utils';
 
 export default class Ramp extends Expression {
     /**
-     * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
-     * @param {*} input
-     * @param {*} palette
-     */
+    * Create a color ramp based on input property.
+    * 
+    * [TODO: detailed explanation]
+    * 
+    * @param {carto.style.expressions.property} TODO:
+    * @param {carto.style.expressions.property} colorScheme - The color scheme that is going to be used in the ramp
+    * @return {carto.style.expressions.expression} 
+    * 
+    * @example <caption> Display points with a different color depending on the `category` property. </caption>
+    * const s = carto.style.expressions;
+    * const style = new carto.Style({
+    *  color: s.ramp(s.prop('category'), PRISM),
+    * });
+    * 
+    * @memberof carto.style.expressions
+    * @name ramp
+    * @function
+    * @api
+    */
     constructor(input, palette, ...args) {
         if (args.length > 0) {
             throw new Error('ramp(input, palette) only accepts two parameters');
