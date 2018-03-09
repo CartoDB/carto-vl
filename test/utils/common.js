@@ -5,7 +5,7 @@ const template = require('lodash.template');
 const exquisite = require('exquisite-sst');
 
 let testsDir = '';
-const testFile = 'test.js';
+const testFile = 'scenario.js';
 
 function loadFiles(directory) {
     testsDir = directory;
@@ -47,7 +47,7 @@ function testSST(file, template, asyncLoad) {
 
 function writeTemplate(file, template) {
     const mainDir = path.resolve(__dirname, '..', '..');
-    const geojsonDir = path.resolve(path.dirname(file), '..', 'test.geojson');
+    const geojsonDir = path.resolve(path.dirname(file), '..', 'data.geojson');
     const geojson = fs.existsSync(geojsonDir) ? fs.readFileSync(geojsonDir) : '';
     fs.writeFileSync(getHTML(file), template({
         file: file,
@@ -58,17 +58,16 @@ function writeTemplate(file, template) {
     }));
 }
 
-
 function getHTML(file) {
-    return file.replace('.js', '.html');
+    return file.replace(testFile, 'scenario.html');
 }
 
 function getPNG(file) {
-    return file.replace('.js', '.png');
+    return file.replace(testFile, 'reference.png');
 }
 
 function getOutPNG(file) {
-    return file.replace('.js', '_out.png');
+    return file.replace(testFile, 'reference_out.png');
 }
 
 function loadOptions() {

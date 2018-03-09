@@ -4,14 +4,14 @@ a.k.a E2E tests
 
 The idea of this tests is to automatically test the **entire stack**, including the library, the renderer and the integration with the backend.
 
-This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. These tests are defined in the `test.js` file:
+This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. These tests are defined in the `scenario.js` file:
 
 ```
 e2e
 ├── test1
-│   └── test.js
+│   └── scenario.js
 └─── test2
-│   └── test.js
+│   └── scenario.js
 ...
 ```
 
@@ -22,13 +22,13 @@ yarn build
 yarn test:e2e:prepare
 ```
 
-After this process the ignored file `test.hml` is created. If the test does not have a `test.png` image, it will be automatically created.
+After this process the ignored file `scenario.hml` is created. If the test does not have a `reference.png` image, it will be automatically created.
 
 ```
 test1
-├── test.html
-├── test.js
-└── test.png
+├── scenario.html
+├── scenario.js
+└── reference.png
 ```
 
 If you want to regenerate all the references run `yarn test:e2e:clean` before.
@@ -40,14 +40,14 @@ yarn build
 yarn test:e2e
 ```
 
-After this process the ignored files `test.hml` and `test_out.png` are created:
+After this process the ignored files `scenario.hml` and `reference_out.png` are created:
 
 ```
 test1
-├── test.html
-├── test.js
-├── test_out.png
-└── test.png
+├── scenario.html
+├── scenario.js
+├── reference_out.png
+└── reference.png
 ```
 
 
