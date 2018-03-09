@@ -33,6 +33,8 @@ export default class GeoJSON extends Base {
      */
     constructor(data) {
         super();
+        this._checkData(data);
+
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._status = 'init'; // init -> metadata -> data
         this._features = this._getFeatures(data);
@@ -51,7 +53,27 @@ export default class GeoJSON extends Base {
             return this._requestMetadata();
         } else if (this._status === 'metadata') {
             this._status = 'data';
-            this.requestData();
+            this._requestData();
+        }
+    }
+
+    _checkData(data) {
+        if (util.isUndefined(data)) {
+            throw new CartoValidationError('source', 'dataRequired');
+        }
+        if (!util.isObject(data)) {
+            throw new CartoValidationError('source', 'dataObjectRequired');
+        }
+    }
+
+    _getFeatures(data) {
+        if (data.type === 'FeatureCollection') {
+            return data.features || [];
+        } else if (data.type === 'Feature') {
+            return [data];
+        }
+        else {
+            throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
     }
 
@@ -75,18 +97,6 @@ export default class GeoJSON extends Base {
         dataframe.active = true;
         dataframe.size = this._features.length;
         this._addDataframe(dataframe);
-    }
-
-    _getFeatures(data) {
-        data = data || {};
-        if (data.type === 'FeatureCollection') {
-            return data.features || [];
-        } else if (data.type === 'Feature') {
-            return [data];
-        }
-        else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
-        }
     }
 
     _getDataframeType(type) {

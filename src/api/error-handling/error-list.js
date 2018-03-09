@@ -104,6 +104,14 @@ const validation = {
             messageRegex: /nonValidSQLQuery$/,
             friendlyMessage: '`query` property must be a SQL query.'
         },
+        'data-required': {
+            messageRegex: /dataRequired/,
+            friendlyMessage: '`data` property is required.'
+        },
+        'data-object-required': {
+            messageRegex: /dataObjectRequired$/,
+            friendlyMessage: '`data` property must be an object.'
+        },
         'non-valid-geojson-data': {
             messageRegex: /nonValidGeoJSONData$/,
             friendlyMessage: '`data` property must be a GeoJSON object.'
@@ -114,7 +122,7 @@ const validation = {
         },
         'first-polygon-external': {
             messageRegex: /firstPolygonExternal$/,
-            friendlyMessage: 'first polygon ring must be external'
+            friendlyMessage: 'first polygon ring must be external.'
         }
     },
     style: {
