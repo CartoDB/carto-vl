@@ -49,9 +49,7 @@ function writeTemplate(file, renderTemplate) {
     fs.writeFileSync(getHTML(file), renderTemplate({
         file: file,
         geojson: geojson,
-        cartogl: path.resolve(mainDir, 'dist', 'carto-gl.js'),
-        mapboxgl: path.resolve(mainDir, 'vendor', 'mapbox-gl-dev.js'),
-        mapboxglcss: path.resolve(mainDir, 'vendor', 'mapbox-gl-dev.css')
+        cartogl: path.resolve(mainDir, 'dist', 'carto-gl.js')
     }));
 }
 

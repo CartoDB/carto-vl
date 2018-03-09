@@ -1,6 +1,6 @@
 const exquisite = require('exquisite-sst');
 const chai = require('chai');
-const util = require('./util');
+const util = require('./render.util');
 
 chai.use(require('chai-as-promised'));
 

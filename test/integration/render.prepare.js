@@ -1,5 +1,5 @@
 const exquisite = require('exquisite-sst');
-const util = require('./util');
+const util = require('./render.util');
 
 let options = util.loadOptions();
 
