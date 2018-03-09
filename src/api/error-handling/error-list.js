@@ -103,6 +103,26 @@ const validation = {
         'non-valid-sql-query': {
             messageRegex: /nonValidSQLQuery$/,
             friendlyMessage: '`query` property must be a SQL query.'
+        },
+        'data-required': {
+            messageRegex: /dataRequired/,
+            friendlyMessage: '`data` property is required.'
+        },
+        'data-object-required': {
+            messageRegex: /dataObjectRequired$/,
+            friendlyMessage: '`data` property must be an object.'
+        },
+        'non-valid-geojson-data': {
+            messageRegex: /nonValidGeoJSONData$/,
+            friendlyMessage: '`data` property must be a GeoJSON object.'
+        },
+        'multiple-feature-types': {
+            messageRegex: /multipleFeatureTypes\[(.+)\]$/,
+            friendlyMessage: 'multiple types not supported: $0.'
+        },
+        'first-polygon-external': {
+            messageRegex: /firstPolygonExternal$/,
+            friendlyMessage: 'first polygon ring must be external.'
         }
     },
     style: {
