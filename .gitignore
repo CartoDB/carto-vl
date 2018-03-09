@@ -7,3 +7,4 @@ dist/
 docs/all
 docs/public
 node_modules/
+test/integration/render/**/*.html
