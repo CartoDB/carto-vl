@@ -8,14 +8,14 @@ import Expression from './expression';
  * @param {number} x - A number to be warped in a numeric expression
  * @return {carto.style.expressions.Expression} numeric expression
  *
- * @example <caption>Creating a float expression.</caption>
+ * @example <caption>Creating a number expression.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.float(15);  // Elements will have width 15
+ *  width: s.number(15);  // Elements will have width 15
  * });
  *
  * @memberof carto.style.expressions
- * @name float
+ * @name number
  * @function
  * @api
  */

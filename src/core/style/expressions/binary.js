@@ -248,7 +248,7 @@ export const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${
  *
  * Compare if x is different than y.
  *
- * This returns a float expression where 0 means `false` and 1 means `true`.
+ * This returns a number expression where 0 means `false` and 1 means `true`.
  *
  * @param {carto.style.expressions.Expression | number} x numeric expression
  * @param {carto.style.expressions.Expression | number} y numeric expression
@@ -274,7 +274,7 @@ export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
- * This returns a float expression where 0 means `false` and 1 means `true`.
+ * This returns a number expression where 0 means `false` and 1 means `true`.
  *
  * @param {carto.style.expressions.Expression | number} x numeric expression
  * @param {carto.style.expressions.Expression | number} y numeric expression
@@ -302,7 +302,7 @@ export const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x}
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
- * This returns a float expression where 0 means `false` and 1 means `true`.
+ * This returns a number expression where 0 means `false` and 1 means `true`.
  *
  * @param {carto.style.expressions.Expression | number} x numeric expression
  * @param {carto.style.expressions.Expression | number} y numeric expression

@@ -11,11 +11,11 @@
  *  - **strokeWidth**: Determine the element border size.
  *  - **filter**: This is a special property used to remove elements that do not meet the expression.
  *
- * For example the point radius could be styled using the `float` expression:
+ * For example the point radius could be styled using the `number` expression:
  *
  * ```javascript
  * const style = new carto.Style({
- *  width: carto.style.expressions.float(10)
+ *  width: carto.style.expressions.number(10)
  * });
  * ```
  *
@@ -29,14 +29,14 @@
  * ```
  *
  * Multiple expressions can be combined to form more powerful ones,
- * for example lets divide the population between a float number using the `floatDiv` expression to make points smaller:
+ * for example lets divide the population between a number using the `div` expression to make points smaller:
  *
  * ```javascript
  * const s = carto.style.expressions; // We use this alias along documentation.
  * const style = new carto.Style({
- *  width: s.floatDiv(
+ *  width: s.div(
  *      property('population'),
- *      s.float(10000)
+ *      s.number(10000)
  *  ),
  * });
  * ```
