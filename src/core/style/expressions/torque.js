@@ -97,11 +97,11 @@ export class Torque extends Expression {
             return null;
         }
 
-        const c = this._cycle.eval(); //from 0 to duration seconds
+        const c = this._cycle.eval(); //from 0 to 1
+
         const min = this.input.min.eval(); //Date
         const max = this.input.max.eval();
-        if (!min.getTime)
-            debugger;
+
         const tmin = min.getTime();
         const tmax = max.getTime();
         const m = c;
