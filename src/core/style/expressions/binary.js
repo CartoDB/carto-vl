@@ -13,11 +13,11 @@ import Expression from './expression';
  * @example <caption>Simple multiplication.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.floatMul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+ *  width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
  * });
  *
  * @memberof carto.style.expressions
- * @name floatMul
+ * @name mul
  * @function
  * @api
  */
@@ -34,11 +34,11 @@ export const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
  * @example <caption>Number division.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.floatDiv(10, 2);   // Upon rendering, width will be evaluated internally to 5
+ *  width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
  * });
  *
  * @memberof carto.style.expressions
- * @name floatDiv
+ * @name div
  * @function
  * @api
  */
@@ -55,11 +55,11 @@ export const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
  * @example <caption>Number addition.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.floatSum(10, 2);  // Upon rendering, width will be evaluated internally to 12
+ *  width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
  * });
  *
  * @memberof carto.style.expressions
- * @name floatAdd
+ * @name add
  * @function
  * @api
  */
@@ -76,11 +76,11 @@ export const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
  * @example <caption>Number subtraction.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.floatSub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+ *  width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
  * });
  *
  * @memberof carto.style.expressions
- * @name floatSub
+ * @name sub
  * @function
  * @api
  */
@@ -101,7 +101,7 @@ export const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
  * });
  *
  * @memberof carto.style.expressions
- * @name floatMod
+ * @name mod
  * @function
  * @api
  */
@@ -119,11 +119,11 @@ export const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`
  * @example <caption>Power of two numbers.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *  width: s.floatPow(2, 3);  // 8
+ *  width: s.pow(2, 3);  // 8
  * });
  *
  * @memberof carto.style.expressions
- * @name floatPow
+ * @name pow
  * @function
  * @api
  */
