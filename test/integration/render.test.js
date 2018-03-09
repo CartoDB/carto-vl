@@ -1,24 +1,19 @@
-const exquisite = require('exquisite-sst');
+const path = require('path');
 const chai = require('chai');
-const util = require('./render.util');
+const util = require('../utils/common');
 
 chai.use(require('chai-as-promised'));
 
-let options = util.loadOptions();
-
-const files = util.loadFiles();
-const renderTemplate = util.loadTemplate();
+const files = util.loadFiles(path.join(__dirname, 'render'));
+const template = util.loadTemplate(path.join(__dirname, 'render.html.tpl'));
 
 describe('Render tests:', () => {
     files.forEach(test);
 });
 
-function test (file) {
+function test(file) {
     it(util.getName(file), () => {
-        util.writeTemplate(file, renderTemplate);
-        options.url = `file://${util.getHTML(file)}`;
-        options.input = `${util.getPNG(file)}`;
-        options.output = `${util.getOutPNG(file)}`;
-        return chai.expect(exquisite.test(options)).to.eventually.be.true;
+        const actual = util.testSST(file, template);
+        return chai.expect(actual).to.eventually.be.true;
     }).timeout(10000);
 }
