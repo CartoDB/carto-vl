@@ -23,21 +23,25 @@ function getName(file) {
     );
 }
 
-function takeReference(file, template) {
-    console.log(`Taking reference from ${getName(file)}`);
-    writeTemplate(file, template);
-    let options = loadOptions();
-    options.url = `file://${getHTML(file)}`;
-    options.output = `${getPNG(file)}`;
-    return exquisite.getReference(options);
+function takeReference(file, template, asyncLoad) {
+    if (!fs.existsSync(getPNG(file))) {
+        console.log(`Taking reference from ${getName(file)}`);
+        writeTemplate(file, template);
+        let options = loadOptions();
+        options.url = `file://${getHTML(file)}`;
+        options.output = `${getPNG(file)}`;
+        if (asyncLoad) options.waitForFn = () => window.loaded;
+        return exquisite.getReference(options);
+    }
 }
 
-function testSST(file, template) {
+function testSST(file, template, asyncLoad) {
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `file://${getHTML(file)}`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
+    if (asyncLoad) options.waitForFn = () => window.loaded;
     return exquisite.test(options);
 }
 
