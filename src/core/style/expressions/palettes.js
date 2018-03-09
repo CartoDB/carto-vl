@@ -1,27 +1,9 @@
 
 import * as cartocolor from 'cartocolor';
 
-class PaletteGenerator {
-    constructor(name, subPalettes) {
-        this.type = 'paletteGenerator';
-        this.name = name;
-        this.subPalettes = subPalettes;
-        this.tags = subPalettes.tags;
-    }
-    getLongestSubPalette() {
-        const s = this.subPalettes;
-        for (let i = 20; i >= 0; i--) {
-            if (s[i]) {
-                return s[i];
-            }
-        }
-    }
-}
-
-
 /**
- * 
  * ### Color palettes
+ * 
  * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
  * Use them with a {@link carto.style.expressions.ramp|ramp}
  * 
@@ -43,6 +25,23 @@ class PaletteGenerator {
  * });
  */
 const palettes = {};
+
+class PaletteGenerator {
+    constructor(name, subPalettes) {
+        this.type = 'paletteGenerator';
+        this.name = name;
+        this.subPalettes = subPalettes;
+        this.tags = subPalettes.tags;
+    }
+    getLongestSubPalette() {
+        const s = this.subPalettes;
+        for (let i = 20; i >= 0; i--) {
+            if (s[i]) {
+                return s[i];
+            }
+        }
+    }
+}
 
 Object.keys(cartocolor).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, cartocolor[name]);
