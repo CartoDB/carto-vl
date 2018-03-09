@@ -13,7 +13,7 @@ Download **CARTO.gl** from a cdn or from **npm**.
     yarn add @carto/cartogl
 
 
-## Drawing a simple map using mapbox.gl
+## Drawing a simple map using MapboxGL
 
 ```html
 <!DOCTYPE html>

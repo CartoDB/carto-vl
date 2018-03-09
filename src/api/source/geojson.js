@@ -4,10 +4,32 @@ import * as rsys from '../../client/rsys';
 import * as util from '../util';
 
 
-// TODO: add docs / API
-
 export default class GeoJSON extends Base {
 
+    /**
+     * Create a carto.source.GeoJSON.
+     *
+     * @param {object} data - A GeoJSON data object
+     *
+     * @example
+     * new carto.source.GeoJSON({
+     *   "type": "Feature",
+     *   "geometry": {
+     *     "type": "Point",
+     *     "coordinates": [ 0, 0 ]
+     *   },
+     *   "properties": {
+     *     "cartodb_id": 1
+     *   }
+     * });
+     *
+     * @fires CartoError
+     *
+     * @constructor GeoJSON
+     * @extends carto.source.Base
+     * @memberof carto.source
+     * @api
+     */
     constructor(data) {
         super();
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
@@ -21,29 +43,37 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
-        // TODO: split in two functions: (metadata) / (data)
+        // TODO: split it in two functions: (metadata) / (data)
         //
         if (this._status === 'init') {
             this._status = 'metadata';
-            return new Promise(resolve => {
-                let metadata = {};
-                resolve(metadata);
-            });
+            return this._requestMetadata();
         } else if (this._status === 'metadata') {
             this._status = 'data';
-            const geometry = this._decodeGeometry();
-            const properties = {};
-            const dataframe = new Dataframe(
-                { x: 0, y: 0 },
-                1,
-                geometry,
-                properties,
-            );
-            dataframe.type = this._getDataframeType(this._type);
-            dataframe.active = true;
-            dataframe.size = this._features.length;
-            this._addDataframe(dataframe);
+            this.requestData();
         }
+    }
+
+    _requestMetadata() {
+        return new Promise(resolve => {
+            let metadata = {};
+            resolve(metadata);
+        });
+    }
+
+    _requestData() {
+        const geometry = this._decodeGeometry();
+        const properties = {};
+        const dataframe = new Dataframe(
+            { x: 0, y: 0 },
+            1,
+            geometry,
+            properties,
+        );
+        dataframe.type = this._getDataframeType(this._type);
+        dataframe.active = true;
+        dataframe.size = this._features.length;
+        this._addDataframe(dataframe);
     }
 
     _getFeatures(data) {
