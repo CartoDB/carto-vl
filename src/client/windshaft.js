@@ -378,13 +378,17 @@ export default class Windshaft {
         if (this.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
+        let mx = 0;
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
+            const count = Object.keys(f.properties).filter(name => name.includes('2017')).map(name => f.properties[name]).reduce((x, y) => x + y, 0);
 
             const x = (geom[0][0].x + geom[0][2].x) / 2;
-            const y = (geom[0][0].x + geom[0][2].x) / 2;
+            const y = (geom[0][0].y + geom[0][2].y) / 2;
+
+            mx = Math.max(mx, count);
 
             points[2 * i + 0] = 2 * (x) / mvt_extent - 1.;
             points[2 * i + 1] = 2 * (1. - (y) / mvt_extent) - 1.;
@@ -394,9 +398,10 @@ export default class Windshaft {
                 properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
             });
             numFields.map((name, index) => {
-                properties[index + catFields.length][i] = Number(f.properties[name]);
+                properties[index + catFields.length][i] = count;
             });
         }
+        console.log('max', mx);
 
         return { properties, points, featureGeometries };
     }

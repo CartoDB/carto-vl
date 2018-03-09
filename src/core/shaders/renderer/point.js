@@ -105,8 +105,8 @@ void main(void) {
 export const FS = `
 precision highp float;
 
-varying lowp vec4 color;
-varying lowp vec4 stroke;
+varying highp vec4 color;
+varying highp vec4 stroke;
 varying highp float dp;
 varying highp float sizeNormalizer;
 varying highp float fillScale;
@@ -135,5 +135,5 @@ void main(void) {
 
     c=s+(1.-s.a)*c;
 
-    gl_FragColor = vec4(n(2.*gl_PointCoord-vec2(1.)) /255.);
+    gl_FragColor = vec4(color.a*n(2.*gl_PointCoord-vec2(1.)) /255.);
 }`;

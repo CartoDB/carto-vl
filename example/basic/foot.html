@@ -44,8 +44,11 @@
 
 
     const source = new carto.source.Dataset('blabbla');
+    const s = carto.style.expressions;
     const style = new carto.Style({
-        width: carto.style.expressions.float(1)
+        width: s.float(1),
+        color: s.rgba(1, 1, 1, 1),
+        filter: s.floatDiv(s.property('count'), 3951813)
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
 
