@@ -1,3 +1,4 @@
+
 import * as cartocolor from 'cartocolor';
 
 class PaletteGenerator {
@@ -17,6 +18,30 @@ class PaletteGenerator {
     }
 }
 
+
+/**
+ * 
+ * ### Color palettes
+ * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
+ * Use them with a {@link carto.style.expressions.ramp|ramp}
+ * 
+ * The following palettes are availiable:
+ *  - Categorical:
+ *      - PRISM
+ *      - EARTH
+ *  - Numeric
+ *      - ...
+ * 
+ * @api
+ * @name carto.style.expressions.palettes
+ * @memberof carto.style.expressions
+ * 
+ * @example <caption> Using a color scheme </caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.ramp(s.property('type'), s.palettes.PRISM);
+ * });
+ */
 const palettes = {};
 
 Object.keys(cartocolor).map(name => {
