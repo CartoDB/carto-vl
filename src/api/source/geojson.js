@@ -2,6 +2,7 @@ import Base from './base';
 import { Dataframe } from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import * as util from '../util';
+import CartoValidationError from '../error-handling/carto-validation-error';
 
 
 export default class GeoJSON extends Base {
@@ -84,7 +85,7 @@ export default class GeoJSON extends Base {
             return [data];
         }
         else {
-            throw Error('No valid GeoJSON data');
+            throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
     }
 
@@ -114,7 +115,7 @@ export default class GeoJSON extends Base {
                 if (!this._type) {
                     this._type = type;
                 } else if (this._type !== type) {
-                    throw Error(`Multiple types not supported: ${this._type}, ${type}`);
+                    throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
                 }
                 if (type === 'Point') {
                     if (!geometry) {
@@ -200,7 +201,7 @@ export default class GeoJSON extends Base {
                     holeIndex += data[i - 1].length;
                     polygon.holes.push(holeIndex);
                 } else {
-                    throw new Error('First polygon ring MUST be external');
+                    throw new CartoValidationError('source', 'firstPolygonExternal');
                 }
             }
         }
