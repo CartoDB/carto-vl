@@ -19,7 +19,7 @@ export default class Windshaft {
 
     constructor(source) {
         this._source = source;
-
+        this.geomType = 'point';
         this._requestGroupID = 0;
         this._oldDataframes = [];
         this._MNS = null;
@@ -123,7 +123,7 @@ export default class Windshaft {
     }
 
 
-    async _instantiateUncached(MNS, resolution, filters){
+    async _instantiateUncached(MNS, resolution, filters) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
         const select = this._buildSelectClause(MNS);
@@ -218,8 +218,10 @@ export default class Windshaft {
     }
 
     async _getUrlPromise(query, conf, agg, aggSQL) {
+        return `https://cartodata.blob.core.windows.net/cartotest2/tile_area/liveramp_nyc/result_diff_4/{z}/{x}/{y}.mvt`;
+
         const LAYER_INDEX = 0;
-        this.geomType = await this.getGeometryType(query, conf);
+        this.geomType = 'point';//await this.getGeometryType(query, conf);
 
         if (this.geomType != 'point') {
             agg = false;
@@ -315,8 +317,8 @@ export default class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', s);
+        //const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z);//.replace('{s}', s);
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -380,16 +382,13 @@ export default class Windshaft {
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (this.geomType == 'point') {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (this.geomType == 'polygon') {
-                this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (this.geomType == 'line') {
-                this._decodeLines(geom, featureGeometries, mvt_extent);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
-            }
+
+            const x = (geom[0][0].x + geom[0][2].x) / 2;
+            const y = (geom[0][0].x + geom[0][2].x) / 2;
+
+            points[2 * i + 0] = 2 * (x) / mvt_extent - 1.;
+            points[2 * i + 1] = 2 * (1. - (y) / mvt_extent) - 1.;
+
 
             catFields.map((name, index) => {
                 properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
@@ -409,6 +408,14 @@ export default class Windshaft {
         //Assign ids
         const metadata = {
             columns: [],
+        };
+        return {
+            columns: [
+                {
+                    name: 'count',
+                    type: 'float'
+                }
+            ]
         };
         const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
