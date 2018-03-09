@@ -208,6 +208,14 @@ export const lt = lessThan;
 export const lte = lessThanOrEqualTo;
 const _in = (...args) => new In(...args);
 
+export const add = floatAdd;
+export const sub = floatSub;
+export const mul = floatMul;
+export const div = floatDiv;
+export const pow = floatPow;
+export const mod = floatMod;
+export const prop = property;
+
 export const eq = equals;
 export const neq = notEquals;
 export const nin = (...args) => new Nin(...args);
