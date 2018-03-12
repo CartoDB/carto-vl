@@ -1,6 +1,24 @@
 import Expression from './expression';
 import { float } from '../functions';
 
+/**
+ *
+ * Override the input color opacity
+ *
+ * @param {number} x - A number to be warped in a numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Creating a number expression.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.number(15);  // Elements will have width 15
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name number
+ * @function
+ * @api
+ */
 export default class Opacity extends Expression {
     /**
      * @description Override the input color opacity

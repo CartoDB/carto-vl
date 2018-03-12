@@ -8,8 +8,8 @@ const DEFAULT_FADE = 0.15;
 /**
  * Create a Torque FadeIn/FadeOut configuration
  *
- * @param {carto.style.expression.expression|Number} param1 expression of type float or Number
- * @param {carto.style.expression.expression|Number} param2 expression of type float or Number
+ * @param {carto.style.expression.expression.number|number} param1 expression of type number or Number
+ * @param {carto.style.expression.expression.number|number} param2 expression of type number or Number
  * @return {carto.style.expressions.fade}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
@@ -54,7 +54,7 @@ export class Fade extends Expression {
  *
  * @param {carto.style.expression.expression} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
- * this can be problematic if outliers are present. Otherwise input must be a float expression in which 0 means beginning of the animation and 1 means end.
+ * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
  * @param {Number} duration duration of the animation in seconds
  * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration
  * @return {carto.style.expressions.torque}

@@ -18,6 +18,7 @@ import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
 
 // Namespaces
+
 const style = { expressions };
 const source = { Dataset, SQL, GeoJSON };
 

@@ -2,14 +2,39 @@ import Base from './base';
 import { Dataframe } from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import * as util from '../util';
+import CartoValidationError from '../error-handling/carto-validation-error';
 
-
-// TODO: add docs / API
 
 export default class GeoJSON extends Base {
 
+    /**
+     * Create a carto.source.GeoJSON.
+     *
+     * @param {object} data - A GeoJSON data object
+     *
+     * @example
+     * new carto.source.GeoJSON({
+     *   "type": "Feature",
+     *   "geometry": {
+     *     "type": "Point",
+     *     "coordinates": [ 0, 0 ]
+     *   },
+     *   "properties": {
+     *     "cartodb_id": 1
+     *   }
+     * });
+     *
+     * @fires CartoError
+     *
+     * @constructor GeoJSON
+     * @extends carto.source.Base
+     * @memberof carto.source
+     * @api
+     */
     constructor(data) {
         super();
+        this._checkData(data);
+
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._status = 'init'; // init -> metadata -> data
         this._features = this._getFeatures(data);
@@ -21,41 +46,57 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
-        // TODO: split in two functions: (metadata) / (data)
+        // TODO: split it in two functions: (metadata) / (data)
         //
         if (this._status === 'init') {
             this._status = 'metadata';
-            return new Promise(resolve => {
-                let metadata = {};
-                resolve(metadata);
-            });
+            return this._requestMetadata();
         } else if (this._status === 'metadata') {
             this._status = 'data';
-            const geometry = this._decodeGeometry();
-            const properties = {};
-            const dataframe = new Dataframe(
-                { x: 0, y: 0 },
-                1,
-                geometry,
-                properties,
-            );
-            dataframe.type = this._getDataframeType(this._type);
-            dataframe.active = true;
-            dataframe.size = this._features.length;
-            this._addDataframe(dataframe);
+            this._requestData();
+        }
+    }
+
+    _checkData(data) {
+        if (util.isUndefined(data)) {
+            throw new CartoValidationError('source', 'dataRequired');
+        }
+        if (!util.isObject(data)) {
+            throw new CartoValidationError('source', 'dataObjectRequired');
         }
     }
 
     _getFeatures(data) {
-        data = data || {};
         if (data.type === 'FeatureCollection') {
             return data.features || [];
         } else if (data.type === 'Feature') {
             return [data];
         }
         else {
-            throw Error('No valid GeoJSON data');
+            throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
+    }
+
+    _requestMetadata() {
+        return new Promise(resolve => {
+            let metadata = {};
+            resolve(metadata);
+        });
+    }
+
+    _requestData() {
+        const geometry = this._decodeGeometry();
+        const properties = {};
+        const dataframe = new Dataframe(
+            { x: 0, y: 0 },
+            1,
+            geometry,
+            properties,
+        );
+        dataframe.type = this._getDataframeType(this._type);
+        dataframe.active = true;
+        dataframe.size = this._features.length;
+        this._addDataframe(dataframe);
     }
 
     _getDataframeType(type) {
@@ -84,7 +125,7 @@ export default class GeoJSON extends Base {
                 if (!this._type) {
                     this._type = type;
                 } else if (this._type !== type) {
-                    throw Error(`Multiple types not supported: ${this._type}, ${type}`);
+                    throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
                 }
                 if (type === 'Point') {
                     if (!geometry) {
@@ -170,7 +211,7 @@ export default class GeoJSON extends Base {
                     holeIndex += data[i - 1].length;
                     polygon.holes.push(holeIndex);
                 } else {
-                    throw new Error('First polygon ring MUST be external');
+                    throw new CartoValidationError('source', 'firstPolygonExternal');
                 }
             }
         }
