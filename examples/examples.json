@@ -1,0 +1,125 @@
+{
+  "main": {
+    "file": {
+      "mapbox": "misc/guide.html"
+    }
+  },
+  "categories": [
+    {
+      "title": "Basics",
+      "samples": [
+        {
+          "title": "Add a layer",
+          "desc": "Add one CARTO layer to your map",
+          "file": {
+            "mapbox": "basics/single-layer.html"
+          }
+        },
+        {
+          "title": "Add more layers",
+          "desc": "Add multiple CARTO layers to your map",
+          "file": {
+            "mapbox": "basics/multi-layer.html"
+          }
+        },
+        {
+          "title": "Change the source",
+          "desc": "Update the source of your layers",
+          "file": {
+            "mapbox": "basics/change-source.html"
+          }
+        },
+        {
+          "title": "Change the style",
+          "desc": "Update the style of your layers",
+          "file": {
+            "mapbox": "basics/change-style.html"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Expressions",
+      "samples": [
+      ]
+    },
+    {
+      "title": "Interactivity",
+      "samples": [
+        {
+          "title": "[TODO] Detect feature click",
+          "desc": "Interact with the features on the click event",
+          "file": {
+            "mapbox": "interactivity/feature-click.html"
+          }
+        },
+        {
+          "title": "[TODO] Detect feature over/out",
+          "desc": "Interact with the features on the over/out events",
+          "file": {
+            "mapbox": "interactivity/feature-over-out.html"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Misc",
+      "samples": [
+        {
+          "title": "[TODO] Guide",
+          "desc": "Full reference guide example",
+          "file": {
+            "mapbox": "misc/guide.html"
+          }
+        },
+        {
+          "title": "[TODO] Pop-Ups",
+          "desc": "Create pop-up information windows and interact with your map",
+          "file": {
+            "mapbox": "misc/popups.html"
+          }
+        },
+        {
+          "title": "[TODO] Legends",
+          "desc": "Create dynamic legends",
+          "file": {
+            "mapbox": "misc/legends.html"
+          }
+        },
+        {
+          "title": "Most/less populated places",
+          "desc": "Filter the 20 most/less populated places in the world",
+          "file": {
+            "mapbox": "misc/populated-places.html"
+          }
+        },
+        {
+          "title": "Edit SQL & Expressions",
+          "desc": "Edit manually the SQL query and the Expressions style",
+          "file": {
+            "mapbox": "misc/edit-sql-expressions.html"
+          }
+        },
+        {
+          "title": "GeoJSON viewer",
+          "desc": "Load and view GeoJSON files",
+          "file": {
+            "mapbox": "misc/geojson-viewer.html"
+          }
+        },
+        {
+          "title": "Simple map",
+          "desc": "Test a simple static map",
+          "file": "misc/simple-map.html"
+        },
+        {
+          "title": "[TODO] Error handling",
+          "desc": "Handle common errors in maps",
+          "file": {
+            "mapbox": "misc/error-handling.html"
+          }
+        }
+      ]
+    }
+  ]
+}
