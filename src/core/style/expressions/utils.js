@@ -39,15 +39,24 @@ function getOrdinalFromIndex(index) {
     return indexToOrdinal[index] || String(index);
 }
 
+export function getStringErrorPreface(expressionName, parameterName, parameterIndex) {
+    return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
+}
 export function throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, actualType) {
-    throw new Error(`${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
 expected type was '${expectedType}', actual type was '${actualType}'`);
 }
 
 export function throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
-    throw new Error(`${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     '${actualInstance}' is not an instance of '${expectedClass.name}'`);
 }
+
+export function throwInvalidNumber(expressionName, parameterName, parameterIndex, number) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${number}' is not a finite number`);
+}
+
 
 export function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
     if (parameter.type != expectedType) {
@@ -60,6 +69,13 @@ export function checkInstance(expressionName, parameterName, parameterIndex, exp
         throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
     }
 }
+
+export function checkNumber(expressionName, parameterName, parameterIndex, number) {
+    if (!Number.isFinite(number)) {
+        throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
+    }
+}
+
 
 export function clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);

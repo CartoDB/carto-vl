@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { checkNumber, getStringErrorPreface } from './utils';
 
 
 //TODO refactor to use uniformfloat class
@@ -10,14 +11,13 @@ export default class Animate extends Expression {
      * @param {*} duration animation duration in milliseconds
      */
     constructor(duration) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Animate only supports number literals');
+        checkNumber('animate', 'duration', 1, duration);
+        if (duration < 0) {
+            throw new Error(getStringErrorPreface('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
         }
         super({});
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
-    }
-    _compile() {
         this.type = 'float';
     }
     _applyToShaderSource(uniformIDMaker) {
