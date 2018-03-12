@@ -8,13 +8,13 @@ import Expression from '../core/style/expressions/expression';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 
-const DEFAULT_RESOLUTION = 1;
-const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = s.float(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
-const DEFAULT_ORDER_EXPRESSION = s.noOrder();
-const DEFAULT_FILTER_EXPRESSION = s.floatConstant(1);
+const DEFAULT_RESOLUTION = () => 1;
+const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_WIDTH_EXPRESSION = () => s.float(5);
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.float(0);
+const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
+const DEFAULT_FILTER_EXPRESSION = () => s.floatConstant(1);
 const SUPPORTED_PROPERTIES = [
     'resolution',
     'color',
@@ -281,13 +281,13 @@ export default class Style {
      * @return {StyleSpec}
      */
     _setDefaults(styleSpec) {
-        styleSpec.resolution = util.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
-        styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION;
-        styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
-        styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
-        styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION;
-        styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION;
-        styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION;
+        styleSpec.resolution = util.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION() : styleSpec.resolution;
+        styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION();
+        styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION();
+        styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
+        styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
+        styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION();
+        styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION();
         return styleSpec;
     }
 

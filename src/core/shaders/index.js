@@ -6,6 +6,8 @@ import ShaderCache from './shader-cache';
 const NUM_TEXTURE_LOCATIONS = 4;
 const shaderCache = new ShaderCache();
 
+let programID = 1;
+
 function compileShader(gl, sourceCode, type) {
     if (shaderCache.has(gl, sourceCode)) {
         return shaderCache.get(gl, sourceCode);
@@ -34,6 +36,7 @@ function compileProgram(gl, glslVS, glslFS) {
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
     }
+    this.programID = programID++;
 }
 
 class AABlender {
