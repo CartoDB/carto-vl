@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Change style | CARTO</title>
+    <title>Populated places | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO GL JS -->
@@ -47,19 +47,19 @@
   </head>
   <body>
     <div id="map"></div>
-    <div id="controls">
-      <ul>
-        <li onclick="setRed()">
-          <input type="radio" name="style" checked id="red">
-          <label for="red">Size 7px - Red</label>
+    <div id="controls" class="column-right">
+      <ul class="actions">
+        <li onclick="setAll()">
+          <input type="radio" name="style" id="all" checked="">
+          <label for="all">ALL Places<label>
         </li>
-        <li onclick="setGreen()">
-          <input type="radio" name="style" id="green">
-          <label for="green">Size 9px - Green</label>
+        <li onclick="setMostPopulated(20)">
+          <input type="radio" name="style" id="most">
+          <label for="most">Most populated places</label>
         </li>
-        <li onclick="setBlue()">
-          <input type="radio" name="style" id="blue">
-          <label for="blue">Size 11px - Blue</label>
+        <li onclick="setLessPopulated(20)">
+          <input type="radio" name="style" id="less">
+          <label for="less">Less populated places</label>
         </li>
       </ul>
     </div>
@@ -77,45 +77,62 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+    const populatedPlacesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
     `);
-    const style = new carto.Style(`
+    const populatedPlacesStyle = new carto.Style(`
       width: 6
       color: rgba(0.93,0.30,0.35,1.0)
       strokeWidth: 1
       strokeColor: rgba(1,1,1,1)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, populatedPlacesStyle);
 
-    layer.addTo(map, 'watername_ocean');
+    populatedPlacesLayer.addTo(map, 'watername_ocean');
 
-
-    function setRed() {
-      layer.setStyle(new carto.Style(`
+    function setAll() {
+      populatedPlacesLayer.blendToStyle(new carto.Style(`
         width: 6
         color: rgba(0.93,0.30,0.35,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `));
+      `)).then(() => {
+        populatedPlacesLayer.setSource(new carto.source.SQL(`
+          SELECT *
+            FROM ne_10m_populated_places_simple
+        `));
+      });
     }
 
-    function setGreen() {
-      layer.setStyle(new carto.Style(`
-        width: 8
-        color: rgba(0.61,0.78,0.23,1.0)
+    function setMostPopulated(limit) {
+      populatedPlacesLayer.blendToStyle(new carto.Style(`
+        width: 11
+        color: rgba(0.41,0.71,0.62,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `));
+      `)).then(() => {
+        populatedPlacesLayer.setSource(new carto.source.SQL(`
+          SELECT *
+            FROM ne_10m_populated_places_simple
+            ORDER BY pop_max DESC LIMIT ${limit}
+        `));
+      });
     }
 
-    function setBlue() {
-      layer.setStyle(new carto.Style(`
-        width: 10
-        color: rgba(0.09,0.52,0.98,1.0)
+    function setLessPopulated(limit) {
+      populatedPlacesLayer.blendToStyle(new carto.Style(`
+        width: 11
+        color: rgba(0.95,0.34,0.26,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `));
+      `)).then(() => {
+        populatedPlacesLayer.setSource(new carto.source.SQL(`
+          SELECT *
+            FROM ne_10m_populated_places_simple
+            ORDER BY pop_max ASC LIMIT ${limit}
+        `));
+      });
     }
   </script>
 </html>

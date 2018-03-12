@@ -46,72 +46,72 @@
     </style>
   </head>
   <body>
-      <div id="map"></div>
-      <div id="controls">
-        <ul>
-          <li onclick="setAllCities()">
-            <input type="radio" name="source" checked id="all">
-            <label for="all">All cities</label>
-          </li>
-          <li onclick="setEuropeanCities()">
-            <input type="radio" name="source" id="europe">
-            <label for="europe">European cities</label>
-          </li>
-          <li onclick="setSpanishCities()">
-            <input type="radio" name="source" id="spain">
-            <label for="spain">Spanish cities</label>
-          </li>
-        </ul>
-      </div>
+    <div id="map"></div>
+    <div id="controls">
+      <ul>
+        <li onclick="setAllCities()">
+          <input type="radio" name="source" checked id="all">
+          <label for="all">All cities</label>
+        </li>
+        <li onclick="setEuropeanCities()">
+          <input type="radio" name="source" id="europe">
+          <label for="europe">European cities</label>
+        </li>
+        <li onclick="setSpanishCities()">
+          <input type="radio" name="source" id="spain">
+          <label for="spain">Spanish cities</label>
+        </li>
+      </ul>
+    </div>
   </body>
   <script>
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: [0, 30],
-        zoom: 2
-      });
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 2
+    });
 
-      carto.setDefaultAuth({
-        user: 'cartogl',
-        apiKey: 'YOUR_API_KEY'
-      });
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
 
-      const source = new carto.source.SQL(`
+    const source = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+    `);
+    const style = new carto.Style(`
+      width: 6
+      color: rgba(0.93,0.30,0.35,1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1,1,1,1)
+    `);
+    const layer = new carto.Layer('layer', source, style);
+
+    layer.addTo(map, 'watername_ocean');
+
+    function setAllCities() {
+      layer.setSource(new carto.source.SQL(`
         SELECT *
           FROM ne_10m_populated_places_simple
-      `);
-      const style = new carto.Style(`
-        width: 6
-        color: rgba(0.93,0.30,0.35,1.0)
-        strokeWidth: 1
-        strokeColor: rgba(1,1,1,1)
-      `);
-      const layer = new carto.Layer('layer', source, style);
+      `));
+    }
 
-      layer.addTo(map, 'watername_ocean');
+    function setEuropeanCities() {
+      layer.setSource(new carto.source.SQL(`
+        SELECT *
+          FROM ne_10m_populated_places_simple
+          WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
+      `));
+    }
 
-      function setAllCities() {
-        layer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-        `));
-      }
-
-      function setEuropeanCities() {
-        layer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-            WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
-        `));
-      }
-
-      function setSpanishCities() {
-        layer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-            WHERE adm0name = \'Spain\'
-        `));
-      }
+    function setSpanishCities() {
+      layer.setSource(new carto.source.SQL(`
+        SELECT *
+          FROM ne_10m_populated_places_simple
+          WHERE adm0name = \'Spain\'
+      `));
+    }
   </script>
 </html>
