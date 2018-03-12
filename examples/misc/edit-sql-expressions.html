@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Edit SQL & Expressions | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO GL JS -->
+    <script src="../../dist/carto-gl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="../../vendor/mapbox-gl-dev.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+    <style>
+      * {
+        margin:0;
+        padding:0;
+        box-sizing: border-box;
+      }
+      *:focus {
+        outline: none;
+      }
+      html {
+        height: 100%;
+      }
+      body {
+        background: #F2F6F9;
+        height: 100%;
+        font-family: 'Open sans'
+      }
+      #container {
+        display: flex;
+        height: 100%;
+      }
+      #map {
+        flex: 1;
+      }
+      #controls {
+        width: 308px;
+      }
+      .control-inner {
+        background: #fff;
+        padding: 20px 24px;
+        border-bottom: 2px solid #F2F6F9;
+      }
+      .control-inner {
+        font-size: 10px;
+        line-height: 14px;
+      }
+      .control-inner p {
+        margin-bottom: 4px;
+        color: #747D82;
+      }
+      .control-inner p:last-child {
+        margin-bottom: 0;
+      }
+      .control-inner h3 {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 22px;
+        margin-bottom: 8px;
+      }
+      .button-update {
+        border: 1px solid #1785FB;
+        color: #1785FB;
+        font-size: 12px;
+        line-height: 16px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-family: 'Open sans';
+        cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .button-update:hover {
+        background: rgba(23,133,251,.08);
+      }
+      textarea {
+        height: 100px; width: 100%; resize: none;
+        padding: 7px 8px 6px;
+        border: 1px solid #DDD;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 16px;
+        font-family: 'Open Sans';
+        color: #6A6A6A;
+        margin-bottom: 8px;
+      }
+      .action-container {
+        display: flex;
+        justify-content: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="map"></div>
+      <div id="controls">
+        <div class="control-inner">
+          <h3>SQL</h3>
+          <textarea id="sql" rows="3">
+SELECT * FROM ne_10m_populated_places_simple
+          </textarea>
+          <div class="action-container">
+            <button class="button-update" onclick="updateSource()">
+              <span>UPDATE SQL</span>
+            </button>
+          </div>
+        </div>
+        <div class="control-inner">
+          <h3>Expressions</h3>
+          <textarea id="expressions" rows="3">
+width: 6
+color: rgba(0.93,0.30,0.35,1.0)
+strokeWidth: 0.5
+strokeColor: rgba(1,1,1,1)
+            </textarea>
+            <div class="action-container">
+              <button class="button-update" onclick="updateStyle()">
+                <span>UPDATE STYLE</span>
+              </button>
+            </div>
+        </div>
+        <div class="control-inner">
+          <p>This example only uses one style and one layer whose content is changed.</p>
+          <p>Since the style and source objects are the same the wont trigger events, you need to use the promise to handle errors.</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 2
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
+
+    const populatedPlacesSource = new carto.source.SQL(getValue('#sql'));
+    const populatedPlacesStyle = new carto.Style(getValue('#expressions'));
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, populatedPlacesStyle);
+
+    populatedPlacesLayer.addTo(map, 'watername_ocean');
+
+    function updateSource() {
+      reset('#sql');
+      populatedPlacesLayer.setSource(new carto.source.SQL(getValue('#sql')))
+        // .catch(cartoError => {
+        //   error('#sql', cartoError);
+        // });
+    }
+
+    function updateStyle() {
+      reset('#expressions')
+      populatedPlacesLayer.setStyle(new carto.Style(getValue('#expressions')))
+        // .catch(cartoError => {
+        //   error('#expressions', cartoError);
+        // });
+    }
+
+    function getValue(id) {
+      return document.querySelector(id).value
+    }
+
+    function reset(id) {
+      document.querySelector(id).style.border = 'default';
+    }
+
+    function error(id, cartoError) {
+      document.querySelector(id).style.border = '1px solid #E57373';
+      alert(cartoError.message);
+    }
+  </script>
+</html>
