@@ -69,20 +69,20 @@ function getBlendFilter(f) {
 }
 
 function getInFilter(f) {
-    if (f instanceof In && f.property instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof In && f.value instanceof Property && f.categories.every(cat => cat instanceof Category)) {
         return [{
             type: 'in',
-            property: f.property.name,
+            property: f.value.name,
             whitelist: f.categories.map(cat => cat.expr)
         }];
     }
 }
 
 function getNinFilter(f) {
-    if (f instanceof Nin && f.property instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof Nin && f.value instanceof Property && f.categories.every(cat => cat instanceof Category)) {
         return [{
             type: 'nin',
-            property: f.property.name,
+            property: f.value.name,
             blacklist: f.categories.map(cat => cat.expr)
         }];
     }

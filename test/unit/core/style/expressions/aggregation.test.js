@@ -55,15 +55,11 @@ describe('src/core/style/expressions/aggregation', () => {
 
     describe('compiled type', ()=>{
         it('max($numericProperty) should be of type float', () => {
-            const max = s.max($price);
-            max._compile(metadata);
-            expect(max.type).toEqual('float');
+            expect(s.max($price).type).toEqual('float');
         });
 
         it('mode($categoryProperty) should be of type category', () => {
-            const mode = s.mode($cat);
-            mode._compile(metadata);
-            expect(mode.type).toEqual('category');
+            expect(s.mode($cat).type).toEqual('category');
         });
     });
 

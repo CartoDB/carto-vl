@@ -14,6 +14,7 @@ function genAggregationOp(aggName, aggType) {
         constructor(property) {
             checkInstance(aggName, 'property', 0, Property, property);
             super({ property: property });
+            this.type = aggType;
         }
         get name() {
             return this.property.name;
@@ -25,7 +26,6 @@ function genAggregationOp(aggName, aggType) {
         _compile(metadata) {
             super._compile(metadata);
             checkType(aggName, 'property', 0, aggType, this.property);
-            this.type = aggType;
         }
         _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
             return {

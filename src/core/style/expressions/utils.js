@@ -57,6 +57,15 @@ export function throwInvalidNumber(expressionName, parameterName, parameterIndex
     '${number}' is not a finite number`);
 }
 
+// Try to check the type, but accept undefined types without throwing
+// This is useful to make constructor-time checks, at contructor-time some types can be already known and errors can be throw.
+// Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
+// they must be loose
+export function checkLooseType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
+    if (parameter.type != expectedType && parameter.type !== undefined) {
+        throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
+    }
+}
 
 export function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
     if (parameter.type != expectedType) {

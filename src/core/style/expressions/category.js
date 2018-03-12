@@ -17,9 +17,9 @@ export default class Category extends Expression {
         }
         super({});
         this.expr = categoryName;
+        this.type = 'category';
     }
     _compile(metadata) {
-        this.type = 'category';
         this._metadata = metadata;
     }
     _applyToShaderSource(uniformIDMaker) {
