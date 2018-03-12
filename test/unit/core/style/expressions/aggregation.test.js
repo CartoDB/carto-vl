@@ -9,30 +9,75 @@ describe('src/core/style/expressions/aggregation', () => {
         _cdb_agg_mode_price: 5,
     };
     const $price = s.property('price');
+    const $cat = s.property('cat');
 
-    it('max($price) should return fakeFeature._cdb_agg_max_price', () => {
-        const actual = s.max($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_max_price);
+    const metadata = {
+        columns: [
+            {
+                name: 'price',
+                type: 'float'
+            },
+            {
+                name: 'cat',
+                type: 'category',
+                categoryNames: ['red', 'blue']
+            }
+        ],
+    };
+
+    describe('eval', () => {
+        it('max($price) should return fakeFeature._cdb_agg_max_price', () => {
+            const actual = s.max($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_max_price);
+        });
+
+        it('min($price) should return fakeFeature._cdb_agg_min_price', () => {
+            const actual = s.min($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_min_price);
+        });
+
+        it('avg($price) should return fakeFeature._cdb_agg_avg_price', () => {
+            const actual = s.avg($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_avg_price);
+        });
+
+        it('sum($price) should return fakeFeature._cdb_agg_sum_price', () => {
+            const actual = s.sum($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
+        });
+
+        it('mode($price) should return fakeFeature._cdb_agg_mode_price', () => {
+            const actual = s.mode($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_mode_price);
+        });
     });
 
-    it('min($price) should return fakeFeature._cdb_agg_min_price', () => {
-        const actual = s.min($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_min_price);
+    describe('error control', () => {
+        it('max(0) should throw at constructor time', () => {
+            expect(() => s.max(0)).toThrow();
+        });
+
+        it('max($categoryProperty) should throw at compile time', () => {
+            expect(() => s.max($cat)._compile(metadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        });
+
+        it('mode($numericProperty) should throw at compile time', () => {
+            expect(() => s.mode($price)._compile(metadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        });
     });
 
-    it('avg($price) should return fakeFeature._cdb_agg_avg_price', () => {
-        const actual = s.avg($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_avg_price);
-    });
+    describe('compile with correct parameters', ()=>{
+        it('max($numericProperty) should not throw', () => {
+            expect(() => s.max($price)._compile(metadata)).not.toThrow();
+        });
 
-    it('sum($price) should return fakeFeature._cdb_agg_sum_price', () => {
-        const actual = s.sum($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
-    });
+        it('mode($categoryProperty) should not throw', () => {
+            expect(() => s.mode($cat)._compile(metadata)).not.toThrow();
+        });
 
-    it('mode($price) should return fakeFeature._cdb_agg_mode_price', () => {
-        const actual = s.mode($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_mode_price);
+        it('max($numericProperty) should not throw', () => {
+            expect(() => s.max($price)._compile(metadata)).not.toThrow();
+        });
     });
 });
 

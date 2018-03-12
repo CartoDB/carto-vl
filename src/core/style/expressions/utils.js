@@ -29,6 +29,38 @@ export function hexToRgb(hex) {
     } : null;
 }
 
+function getOrdinalFromIndex(index) {
+    const indexToOrdinal = {
+        1: 'first',
+        2: 'second',
+        3: 'third',
+        4: 'fourth'
+    };
+    return indexToOrdinal[index] || String(index);
+}
+
+export function throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, actualType) {
+    throw new Error(`${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'
+expected type was '${expectedType}', actual type was '${actualType}'`);
+}
+
+export function throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
+    throw new Error(`${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'
+    '${actualInstance}' is not an instance of '${expectedClass.name}'`);
+}
+
+export function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
+    if (parameter.type != expectedType) {
+        throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
+    }
+}
+
+export function checkInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter) {
+    if (!(parameter instanceof expectedClass)) {
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
+    }
+}
+
 export function clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);
 }
