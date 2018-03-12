@@ -335,7 +335,7 @@ export default class Layer {
 
     async requestData(style) {
         style = style || this._style;
-        if (!style){
+        if (!style) {
             return;
         }
         await this._context;

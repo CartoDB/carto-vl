@@ -1,38 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Single layer | CARTO</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta charset="UTF-8">
-        <!-- Include CARTO GL JS -->
-        <script src="../../dist/carto-gl.js"></script>
-        <style>
-            body { margin: 0; padding: 0; }
-            #map { position: absolute; height: 100%; width: 100%; }
-        </style>
-    </head>
-    <body>
-        <div id='map'></div>
-    </body>
-    <script>
-        const map = new carto.Map({
-            container: 'map',
-            background: 'black'
-        });
 
-        carto.setDefaultAuth({
-            user: 'cartogl',
-            apiKey: 'YOUR_API_KEY'
-        });
+<head>
+    <title>Single layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO GL JS -->
+    <script src="../../dist/carto-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-        const source = new carto.source.Dataset('wwi');
-        const s = carto.style.expressions;
-        const style = new carto.Style({
-            width:  s.floatMul(s.blend(1,2, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
-            color:  s.opacity(s.ramp(s.linear(s.avg(s.property('temp')), 0,30), s.palettes.tealrose()), s.blend(0.005,1, s.near(s.property('day'), s.floatMod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic))
-        });
-        const layer = new carto.Layer('myCartoLayer', source, style);
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
 
-        layer.addTo(map);
-    </script>
+<body>
+    <div id='map'></div>
+</body>
+<script>
+    const map = new carto.Map({
+        container: 'map',
+        background: 'black'
+    });
+
+    carto.setDefaultAuth({
+        user: 'cartogl',
+        apiKey: 'YOUR_API_KEY'
+    });
+
+    const source = new carto.source.Dataset('wwi');
+    const s = carto.style.expressions;
+    const style = new carto.Style({
+        width: s.mul(s.blend(1, 2, s.near(s.property('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
+        color: s.ramp(s.linear(s.avg(s.property('temp')), 0, 30), s.palettes.tealrose),
+        filter: s.blend(0.005, 1, s.near(s.property('day'), s.mod(s.floatMul(25, s.now()), 1000), 0, 10), s.cubic)
+    });
+    const layer = new carto.Layer('myCartoLayer', source, style);
+
+    layer.addTo(map);
+</script>
+
 </html>

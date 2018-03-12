@@ -122,18 +122,21 @@ export default class Windshaft {
     }
 
 
-    async _instantiateUncached(MNS, resolution, filters){
+    async _instantiateUncached(MNS, resolution, filters) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        const select = this._buildSelectClause(MNS);
+        let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
         const metadata = await this.getMetadata(query, MNS, conf);
 
+        select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
             aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
+        } else {
+            aggSQL = this._buildQuery(select);
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
@@ -182,8 +185,11 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    _buildSelectClause(MRS, dateFields = []) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+            name => dateFields.includes(name) ? name + '::text' : name
+        )
+            .concat(['the_geom', 'the_geom_webmercator']);
     }
 
     _buildQuery(select) {
@@ -282,22 +288,26 @@ export default class Windshaft {
 
                 const numFields = [];
                 const catFields = [];
-                const catFieldsReal = [];
-                const numFieldsReal = [];
+                const dateFields = [];
                 this._MNS.columns.map(name => {
                     const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
+                    const type = this.metadata.columns.find(c => c.name == basename).type;
+                    if (type == 'category') {
                         catFields.push(name);
-                        catFieldsReal.push(name);
-                    } else {
+                    } else if (type == 'float') {
                         numFields.push(name);
-                        numFieldsReal.push(name);
+                    } else if (type == 'date') {
+                        dateFields.push(name);
+                    } else {
+                        throw new Error(`Column type '${type}' not supported`);
                     }
-                });
-                catFieldsReal.map((name, i) => fieldMap[name] = i);
-                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
 
-                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
+                });
+                catFields.map((name, i) => fieldMap[name] = i);
+                numFields.map((name, i) => fieldMap[name] = i + catFields.length);
+                dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
+
+                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
                 var rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
@@ -372,7 +382,7 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
         var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
         if (this.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
@@ -398,6 +408,17 @@ export default class Windshaft {
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
+            datesField.map((name, index) => {
+                const d = Date.parse(f.properties[name]);
+                if (Number.isNaN(d)) {
+                    throw new Error('invalid MVT date');
+                }
+                const metadataColumn = metadata.columns.find(c => c.name == name);
+                const min = metadataColumn.min;
+                const max = metadataColumn.max;
+                const n = (d - min) / (max.getTime() - min.getTime());
+                properties[index + catFields.length + numFields.length][i] = n;
+            });
         }
 
         return { properties, points, featureGeometries };
@@ -414,23 +435,33 @@ export default class Windshaft {
         const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
         let categories = [];
+        let dates = [];
         Object.keys(fields).map(name => {
             const type = fields[name].type;
             if (type == 'number') {
                 numerics.push(name);
             } else if (type == 'string') {
                 categories.push(name);
+            } else if (type == 'date') {
+                dates.push(name);
+            } else if (type != 'geometry') {
+                throw new Error(`Unsuportted type ${type}`);
             }
         });
 
         metadata.featureCount = await this.getFeatureCount(query, conf);
         const numericsTypes = await this.getNumericTypes(numerics, query, conf);
+        const datesTypes = await this.getDatesTypes(dates, query, conf);
         const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
         const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
         const sample = await this.getSample(conf, sampling);
 
         numerics.map((name, index) => {
             const t = numericsTypes[index];
+            metadata.columns.push(t);
+        });
+        dates.map((name, index) => {
+            const t = datesTypes[index];
             metadata.columns.push(t);
         });
         metadata.categoryIDs = {};
@@ -440,6 +471,7 @@ export default class Windshaft {
             t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
             metadata.columns.push(t);
         });
+        console.log(metadata);
         return metadata;
     }
 
@@ -507,6 +539,32 @@ export default class Windshaft {
                 max: json.rows[0][`${name}_max`],
                 avg: json.rows[0][`${name}_avg`],
                 sum: json.rows[0][`${name}_sum`],
+            };
+        }
+        );
+    }
+
+    _getDateFromStr(str) {
+        if (Number.isNaN(Date.parse(str))) {
+            throw new Error(`Invalid date: '${str}'`);
+        }
+        return new Date(str);
+    }
+
+    async getDatesTypes(names, query, conf) {
+        const aggFns = ['min', 'max'];
+        const datesSelect = names.map(name =>
+            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
+        ).join();
+        const numericsQuery = `SELECT ${datesSelect} FROM ${query};`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const json = await response.json();
+        return names.map(name => {
+            return {
+                name,
+                type: 'date',
+                min: this._getDateFromStr(json.rows[0][`${name}_min`]),
+                max: this._getDateFromStr(json.rows[0][`${name}_max`]),
             };
         }
         );
