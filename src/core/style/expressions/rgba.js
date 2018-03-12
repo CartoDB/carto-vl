@@ -2,6 +2,29 @@ import Expression from './expression';
 import { float } from '../functions';
 
 //TODO refactor to uniformcolor, write color (plain, literal)
+
+/**
+ *
+ * Evaluates to a rgba color.
+ *
+ * @param {carto.style.expressions.number|number} r - The amount of red in the color
+ * @param {carto.style.expressions.number|number} g - The amount of red in the color
+ * @param {carto.style.expressions.number|number} b - The amount of red in the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.rgba}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  color: s.rgba(0, 1, 0, 1);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name rgba
+ * @function
+ * @api
+ */
 export default class RGBA extends Expression {
     /**
      * @description RGBA color constructor

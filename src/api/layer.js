@@ -7,30 +7,31 @@ import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/style/functions';
 
-/**
- * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
- * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
- */
 
 export default class Layer {
 
     /**
-     * Create a carto.Layer.
-     *
-     *
-     * @param {string} id
-     * @param {carto.source.Base} source
-     * @param {carto.Style} style
-     *
-     * @example
-     * new carto.Layer('layer0', source, style);
-     *
-     * @fires CartoError
-     *
-     * @constructor Layer
-     * @memberof carto
-     * @api
-     */
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    * 
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -40,6 +41,9 @@ export default class Layer {
         this._lastMNS = null;
         this._integrator = null;
         this._dataframes = [];
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
 
         this._id = id;
         this.metadata = null;
@@ -92,8 +96,8 @@ export default class Layer {
      * Set a new source for this layer.
      *
      * @param {carto.source.Base} source - New source
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setSource(source) {
@@ -107,7 +111,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
         this._dataframes.push(dataframe);
@@ -117,7 +121,7 @@ export default class Layer {
 
     /**
      * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
         this._dataframes = this._dataframes.filter(d => d !== dataframe);
@@ -134,10 +138,12 @@ export default class Layer {
 
     /**
      * Set a new style for this layer.
+     * 
+     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setStyle(style) {
@@ -155,11 +161,25 @@ export default class Layer {
     }
 
     /**
-     * Blend the current style with another style
+     * Blend the current style with another style.
+     * 
+     * This allows smooth transforms between two different styles.
+     * 
+     * @example <caption> Smooth transition variating point size </caption>
+     * // We create two different styles varying the width
+     * const style0 = new carto.style({ width: 10 });
+     * const style1 = new carto.style({ width: 20 });
+     * // Create a layer with the first style
+     * const layer = new carto.Layer(source, style);
+     * // We add the layer to the map, the points in this layer will have widh 10
+     * layer.addTo(map, 'layer0');
+     * // The points will be animated from 10px to 20px for 500ms.
+     * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - style to blend to
-     *
+     * @param {carto.Style} style - The final style 
+     * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     blendToStyle(style, ms = 400, interpolator = cubic) {
@@ -189,8 +209,8 @@ export default class Layer {
      *
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     addTo(map, beforeLayerID) {
@@ -234,7 +254,7 @@ export default class Layer {
     }
 
     initCallback() {
-        this._styleChanged(this._style);
+        this._contextInitCallback();
         this.requestData();
     }
 
@@ -253,27 +273,26 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged(style) {
-        const recompile = (metadata) => {
-            style._compileColorShader(this._integrator.renderer.gl, metadata);
-            style._compileWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileFilterShader(this._integrator.renderer.gl, metadata);
-        };
-        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve();
-        }
+    _compileShaders(style, metadata) {
+        style._compileColorShader(this._integrator.renderer.gl, metadata);
+        style._compileWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+    }
+    async _styleChanged(style) {
+        await this._context;
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
-            recompile(this.metadata);
+            this._compileShaders(style, this.metadata);
             return Promise.resolve();
         }
         // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
             this.metadata = metadata;
-            recompile(metadata);
+            this._compileShaders(style, metadata);
+            this.requestData(style);
         });
     }
 
@@ -314,11 +333,12 @@ export default class Layer {
         throw new Error('?');
     }
 
-    requestData(style) {
+    async requestData(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateWebGLState) {
+        if (!style){
             return;
         }
+        await this._context;
         return this._source.requestData(this._getViewport(), style);
     }
 

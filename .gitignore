@@ -3,3 +3,5 @@
 .vscode/
 *.log
 node_modules/
+test/acceptance/e2e/**/*.html
+test/integration/render/**/*.html

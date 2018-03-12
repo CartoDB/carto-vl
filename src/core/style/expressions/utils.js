@@ -1,6 +1,8 @@
 import { float, category } from '../functions';
 import Expression from './expression';
 
+export const DEFAULT = undefined;
+
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
@@ -22,4 +24,12 @@ export function hexToRgb(hex) {
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
     } : null;
+}
+
+export function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
+}
+
+export function mix(x, y, a) {
+    return x * (1 - a) + y * a;
 }

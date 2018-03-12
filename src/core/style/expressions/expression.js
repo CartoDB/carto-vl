@@ -2,7 +2,13 @@ import { implicitCast } from './utils';
 import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
-
+/**
+ * @description Abstract expression class
+ *
+ * @memberof carto.style.expressions
+ * @name Expression
+ * @api
+ */
 export default class Expression {
     /**
      * @hideconstructor
@@ -59,6 +65,14 @@ export default class Expression {
     _getDrawMetadataRequirements() {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(schema.union, schema.IDENTITY);
+    }
+
+    /**
+     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+     * @param {number} timestamp
+     */
+    _setTimestamp(timestamp) {
+        this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
     }
 
     /**

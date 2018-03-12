@@ -1,14 +1,20 @@
-import { implicitCast } from './utils';
+import { implicitCast, clamp, mix } from './utils';
 import Animate from './animate';
 import Expression from './expression';
 
+/**
+ * @description Linearly interpolate from *a* to *b* based on *mix*
+ * @param {carto.style.expressions.Expression | number} a numeric or color expression
+ * @param {carto.style.expressions.Expression | number} b numeric or color expression
+ * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.style.expressions.Expression} numeric expression
+ *
+ * @memberof carto.style.expressions
+ * @name blend
+ * @function
+ * @api
+ */
 export default class Blend extends Expression {
-    /**
-     * @description Interpolate from *a* to *b* based on *mix*
-     * @param {*} a can be a color or a number
-     * @param {*} b type must match a's type
-     * @param {*} mix interpolation parameter in the [0,1] range
-     */
     constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);
@@ -42,18 +48,9 @@ export default class Blend extends Expression {
         }
     }
     eval(feature) {
-        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return _mix(x, y, a);
+        return mix(x, y, a);
     }
-}
-
-
-function _mix(x, y, a) {
-    return x * (1 - a) + y * a;
-}
-
-function _clamp(value, min, max) {
-    return Math.max(Math.min(value, max), min);
 }

@@ -40,7 +40,11 @@ function generateAggregattion(metadataPropertyName, global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
@@ -88,7 +92,11 @@ function generatePercentile(global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             if (!global) {
