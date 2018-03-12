@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -83,14 +83,20 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(10);
 
 
 
 
-
+/**
+ * @description Abstract expression class
+ *
+ * @memberof carto.style.expressions
+ * @name Expression
+ * @api
+ */
 class Expression {
     /**
      * @hideconstructor
@@ -100,7 +106,7 @@ class Expression {
      */
     constructor(children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(children[name]));
+        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(children[name]));
         this._getChildren().map(child => child.parent = this);
         this._metaBindings = [];
         this.preface = '';
@@ -150,6 +156,14 @@ class Expression {
     }
 
     /**
+     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+     * @param {number} timestamp
+     */
+    _setTimestamp(timestamp) {
+        this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
+    }
+
+    /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
@@ -186,7 +200,7 @@ class Expression {
      */
     //TODO blendFunc = 'linear'
     blendTo(final, duration = 500) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
         this._metaBindings.map(m => blender._bind(m));
@@ -195,7 +209,7 @@ class Expression {
     }
 
     blendFrom(final, duration = 500, interpolator = null) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
@@ -230,41 +244,91 @@ class Expression {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return _in; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_linear__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_near__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_now__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_property__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_top__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_linear__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_near__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_now__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_property__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_top__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_between__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_unary__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_binary__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_aggregation__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_quantiles__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_quantiles__ = __webpack_require__(48);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_interpolators__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_torque__ = __webpack_require__(49);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_25__expressions_interpolators__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__ = __webpack_require__(51);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["b"]; });
 /**
  *  @api
  *  @namespace carto.style.expressions
+ *  @description
+ *  Expressions are used to define styles, a style is composed of an expression for every configurable attribute.
+ *  Remember a style has the following attributes:
+ *
+ *  - **color**: Determine the element fill color.
+ *  - **strokeColor**: Determine the element border color.
+ *  - **width**: Determine the element width: radius when points, thickness when lines, ignored for polygons.
+ *  - **strokeWidth**: Determine the element border size.
+ *  - **filter**: This is a special property used to remove elements that do not meet the expression.
+ *
+ * For example the point radius could be styled using the `number` expression:
+ *
+ * ```javascript
+ * const style = new carto.Style({
+ *  width: carto.style.expressions.number(10)
+ * });
+ * ```
+ *
+ * You can evaluate dataset properties inside an expression. Imagine we are representing cities in a map,
+ * we can set the point width depending on the population using the `property` expression.
+ *
+ * ```javascript
+ * const style = new carto.Style({
+ *  width: carto.style.expressions.property('population')
+ * });
+ * ```
+ *
+ * Multiple expressions can be combined to form more powerful ones,
+ * for example lets divide the population between a number using the `div` expression to make points smaller:
+ *
+ * ```javascript
+ * const s = carto.style.expressions; // We use this alias along documentation.
+ * const style = new carto.Style({
+ *  width: s.div(
+ *      property('population'),
+ *      s.number(10000)
+ *  ),
+ * });
+ * ```
+ *
+ * Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
+ * For example, the previous example is valid since we assumed that 'population' is a numeric property, it won't be valid if
+ * it was a categorical property. Each expression defines some restrictions regarding their parameters, particularly, the
+ * type of their parameters.
+ *
+ * The most important types are:
+ *  - **Numeric** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
+ *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
+ *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
  */
 
@@ -337,17 +401,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
+
+
 // Expose classes as constructor functions
-const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["a" /* Asc */](...args);
+const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["a" /* Asc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["asc"] = asc;
 
-const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["b" /* Desc */](...args);
+const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["b" /* Desc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["desc"] = desc;
 
-const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["c" /* NoOrder */](...args);
+const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["c" /* NoOrder */](...args);
 /* harmony export (immutable) */ __webpack_exports__["noOrder"] = noOrder;
 
-const width = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_ordering__["d" /* Width */](...args);
+const width = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_ordering__["d" /* Width */](...args);
 /* harmony export (immutable) */ __webpack_exports__["width"] = width;
 
 const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_binary__["f" /* FloatMul */](...args);
@@ -485,40 +552,40 @@ const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_qua
 const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_quantiles__["a" /* GlobalQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalQuantiles"] = globalQuantiles;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
+const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
-const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
+const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
 
-const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
+const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalPercentile"] = globalPercentile;
 
-const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
+const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMax"] = globalMax;
 
-const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
+const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMin"] = globalMin;
 
-const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
+const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
 
-const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
+const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalSum"] = globalSum;
 
-const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
+const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalCount"] = globalCount;
 
 const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a" /* Inverse */](...args);
@@ -526,6 +593,12 @@ const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palett
 
 const floatConstant = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatConstant"] = floatConstant;
+
+const torque = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_torque__["b" /* Torque */](...args);
+/* harmony export (immutable) */ __webpack_exports__["torque"] = torque;
+
+const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_torque__["a" /* Fade */](...args);
+/* harmony export (immutable) */ __webpack_exports__["fade"] = fade;
 
 
 const TRUE = new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](1);
@@ -558,6 +631,31 @@ const lte = lessThanOrEqualTo;
 
 const _in = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__["a" /* In */](...args);
 
+const number = float;
+/* harmony export (immutable) */ __webpack_exports__["number"] = number;
+
+const add = floatAdd;
+/* harmony export (immutable) */ __webpack_exports__["add"] = add;
+
+const sub = floatSub;
+/* harmony export (immutable) */ __webpack_exports__["sub"] = sub;
+
+const mul = floatMul;
+/* harmony export (immutable) */ __webpack_exports__["mul"] = mul;
+
+const div = floatDiv;
+/* harmony export (immutable) */ __webpack_exports__["div"] = div;
+
+const pow = floatPow;
+/* harmony export (immutable) */ __webpack_exports__["pow"] = pow;
+
+const mod = floatMod;
+/* harmony export (immutable) */ __webpack_exports__["mod"] = mod;
+
+const prop = property;
+/* harmony export (immutable) */ __webpack_exports__["prop"] = prop;
+
+
 const eq = equals;
 /* harmony export (immutable) */ __webpack_exports__["eq"] = eq;
 
@@ -581,57 +679,411 @@ const between = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_betwe
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["d"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["c"] = hexToRgb;
+/* harmony export (immutable) */ __webpack_exports__["b"] = clamp;
+/* harmony export (immutable) */ __webpack_exports__["e"] = mix;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+const DEFAULT = undefined;
+/* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT;
+
+
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
+    }
+    if (typeof value == 'string') {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
+    }
+    if (!(value instanceof __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */]) && value.type !== 'paletteGenerator' && value.type !== 'float') {
+        throw new Error('value cannot be casted');
+    }
+    return value;
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
+}
+
+function mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
 
 
-// Binary ops
+/**
+ *
+ * Multiply two numeric expressions.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Simple multiplication.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name mul
+ * @function
+ * @api
+ */
 const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["f"] = FloatMul;
 
+
+/**
+ *
+ * Divide two numeric expressions.
+ *
+ * @param {carto.style.expressions.Expression | number} numerator - Numerator of the division
+ * @param {carto.style.expressions.Expression | number} denominator - Denominator of the division
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Number division.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name div
+ * @function
+ * @api
+ */
 const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["d"] = FloatDiv;
 
+
+/**
+ *
+ * Add two numeric expressions.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Number addition.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name add
+ * @function
+ * @api
+ */
 const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["c"] = FloatAdd;
 
+
+/**
+ *
+ * Substract two numeric expressions.
+ *
+ * @param {carto.style.expressions.Expression | number} minuend - The minuend of the subtraction
+ * @param {carto.style.expressions.Expression | number} subtrahend - The subtrahend of the subtraction
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Number subtraction.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name sub
+ * @function
+ * @api
+ */
 const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["h"] = FloatSub;
 
+
+/**
+ *
+ * Modulus of two numeric expressions, mod returns a numeric expression with the value of x modulo y. This is computed as x - y * floor(x/y).
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Number modulus.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.mod(10, 6);  // 4
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name mod
+ * @function
+ * @api
+ */
 const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["e"] = FloatMod;
 
+
+/**
+ *
+ * Compute the base to the exponent power, return a numeric expression with the value of the first parameter raised to the power of the second.
+ * The result is undefined if x<0 or if x=0 and y≤0.
+ *
+ * @param {carto.style.expressions.Expression | number} base numeric expression
+ * @param {carto.style.expressions.Expression | number} exponent numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression with base ^ exponent
+ *
+ * @example <caption>Power of two numbers.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.pow(2, 3);  // 8
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name pow
+ * @function
+ * @api
+ */
 const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
 /* harmony export (immutable) */ __webpack_exports__["g"] = FloatPow;
 
 
+/**
+ *
+ * Compare if x is greater than y.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price > 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.gt(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name gt
+ * @function
+ * @api
+ */
 const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["i"] = GreaterThan;
 
+
+/**
+ *
+ * Compare if x is greater than or equal to y.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price >= 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.gte(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name gte
+ * @function
+ * @api
+ */
 const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["j"] = GreaterThanOrEqualTo;
 
 
+/**
+ *
+ * Compare if x is lower than y.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price < 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.lt(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name lt
+ * @function
+ * @api
+ */
 const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["k"] = LessThan;
 
+
+/**
+ *
+ * Compare if x is lower than or equal to y.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price <= 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.lte(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name lte
+ * @function
+ * @api
+ */
 const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["l"] = LessThanOrEqualTo;
 
 
+/**
+ *
+ * Compare if x is equal to a y.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price === 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.eq(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name eq
+ * @function
+ * @api
+ */
 const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Equals;
 
+
+/**
+ *
+ * Compare if x is different than y.
+ *
+ * This returns a number expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Compare two numbers to show only elements with price !== 30</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.neq(s.property('price'), 30);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name neq
+ * @function
+ * @api
+ */
 const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
 /* harmony export (immutable) */ __webpack_exports__["m"] = NotEquals;
 
 
+
+/**
+ *
+ * Perform a binary OR between two numeric expressions.
+ * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
+ * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
+ *
+ * This returns a number expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Show only elements with price < 30 or price > 1000</caption>
+ * const s = carto.style.expressions;
+ * const $price = s.property('price');
+ * const style = new carto.Style({
+ *  filter: s.or(
+ *      s.lt($price, 30)
+ *      s.gt($price, 1000)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name or
+ * @function
+ * @api
+ */
 const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
 /* harmony export (immutable) */ __webpack_exports__["n"] = Or;
 
+
+/**
+ *
+ * Perform a binary AND between two numeric expressions.
+ * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
+ * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
+ *
+ * This returns a number expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.style.expressions.Expression | number} x numeric expression
+ * @param {carto.style.expressions.Expression | number} y numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Show only elements with price < 30 AND category === 'fruit'</caption>
+ * const s = carto.style.expressions;
+ * const $price = s.property('price');
+ * const $category = s.property('category');
+ *
+ * const style = new carto.Style({
+ *  filter: s.and(
+ *      s.lt($price, 30)
+ *      s.eq($category, 'fruit')
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name and
+ * @function
+ * @api
+ */
 const And = genBinaryOp((x, y) => Math.min(x * y, 1), (x, y) => `min(${x} * ${y}, 1.)`);
 /* harmony export (immutable) */ __webpack_exports__["a"] = And;
 
@@ -651,8 +1103,8 @@ function genBinaryOp(jsFn, glsl) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(jsFn(a, b));
             }
-            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(a);
-            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(b);
+            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(a);
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(b);
             if (typeof a === 'string') {
                 [a, b] = [b, a];
             }
@@ -694,73 +1146,194 @@ function genBinaryOp(jsFn, glsl) {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["b"] = implicitCast;
-/* harmony export (immutable) */ __webpack_exports__["a"] = hexToRgb;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
-
-
-
-// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
-    }
-    if (typeof value == 'string') {
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
-    }
-    if (!(value instanceof __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */]) && value.type !== 'paletteGenerator' && value.type !== 'float') {
-        throw new Error('value cannot be casted');
-    }
-    return value;
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
 
 
+/**
+ *
+ * Compute the natural logarithm (base e) of a number x
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the natural logarithm
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Natural Logarithm.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.log(10);  // 2.302585092994046
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name log
+ * @function
+ * @api
+ */
 const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["c"] = Log;
 
+
+/**
+ *
+ * Compute the square root of a number x
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the square root
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Square root.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.sqrt(4);  // 2
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name sqrt
+ * @function
+ * @api
+ */
 const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["g"] = Sqrt;
 
+
+/**
+ *
+ * Compute the sine of a number x
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the sine in radians
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Sin</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.sin(Math.PI/2);  // 1
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name sin
+ * @function
+ * @api
+ */
 const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["f"] = Sin;
 
+
+/**
+ *
+ * Compute the cosine of a number x
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the cosine in radians
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Cos</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.cos(0);  // 1
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name cos
+ * @function
+ * @api
+ */
 const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Cos;
 
+
+/**
+ *
+ * Compute the tangent of a number x
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the tangent in radians
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Tan</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.tan(0);  // 0
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name tan
+ * @function
+ * @api
+ */
 const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["h"] = Tan;
 
+
+/**
+ *
+ * Compute the sign of a number x, indicating whether the number is positive, negative or zero
+ * This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
+ * -0 if the number is -0.
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the sign
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Sign</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.sign(100);  // 1
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name sign
+ * @function
+ * @api
+ */
 const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["e"] = Sign;
 
+
+/**
+ *
+ * Compute the absolute value of a number x.
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the absolute value
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Abs</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.abs(100);  // 1
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name abs
+ * @function
+ * @api
+ */
 const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Abs;
 
+
+/**
+ *
+ * Compute the logical negatioin of the given expression.
+ * This is internally computed as 1 - x preserving boolean behaviour and allowing fuzzy logic.
+ *
+ *  - When x is equal to 1 not(x) will be evaluated to 0
+ *  - When x is equal to 0 not(x) will be evaluated to 1
+ *
+ * @param {carto.style.expressions.number|number} x - Number to compute the absolute value
+ * @return {carto.style.expressions.number}
+ *
+ * @example <caption>Not</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.not(0);  // 1
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name not
+ * @function
+ * @api
+ */
 const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
 /* harmony export (immutable) */ __webpack_exports__["d"] = Not;
 
@@ -768,7 +1341,7 @@ const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
 function genUnaryOp(jsFn, glsl) {
     return class UnaryOperation extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(a) {
-            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(a);
+            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(a);
             super({ a: a });
         }
         _compile(meta) {
@@ -791,39 +1364,29 @@ function genUnaryOp(jsFn, glsl) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(75);
-
-
-/**
- * Utility to build a cartoError related to validation errors.
- *
- * @return {CartoError} A well formed object representing the error.
- */
-class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a" /* CartoError */] {
-    constructor(type, message) {
-        super({
-            origin: 'validation',
-            type: type,
-            message: message
-        });
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = CartoValidationError;
-
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isUndefined; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isNumber; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return WM_R; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WM_2R; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return projectToWebMercator; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isUndefined; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isObject; });
 /**
  * Export util functions
  */
+
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
+const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+
+function projectToWebMercator(latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x, y };
+}
 
 function isUndefined(value) {
     return value === undefined;
@@ -842,6 +1405,32 @@ function isObject(value) {
     return value != null && (type == 'object' || type == 'function');
 }
 
+
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(62);
+
+
+/**
+ * Utility to build a cartoError related to validation errors.
+ *
+ * @return {CartoError} A well formed object representing the error.
+ */
+class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a" /* CartoError */] {
+    constructor(type, message) {
+        super({
+            origin: 'validation',
+            type: type,
+            message: message
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = CartoValidationError;
 
 
 
@@ -912,196 +1501,10 @@ function genAggregationOp(aggName) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-
-
-
-//TODO refactor to use uniformfloat class
-class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
-    constructor(duration) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Animate only supports number literals');
-        }
-        super({});
-        this.aTime = Date.now();
-        this.bTime = this.aTime + Number(duration);
-    }
-    _compile() {
-        this.type = 'float';
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
-    }
-    _preDraw(drawMetadata, gl) {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
-        } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
-        }
-    }
-    eval() {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        return Math.min(this.mix, 1.);
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["union"] = union;
-/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
-// The IDENTITY schema contains zero columns, and it has two interesting properties:
-//      union(a,IDENTITY)=union(IDENTITY, a)=a
-//      contains(x, IDENTITY)=true  (for x = valid schema)
-const IDENTITY = {
-    columns: []
-};
-/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
-
-
-/*
-const schema = {
-    columns: ['temp', 'cat']
-};*/
-
-//TODO
-// Returns true if subsetSchema is a contained by supersetSchema
-// A schema A is contained by the schema B when all columns of A are present in B and
-// all aggregations in A are present in B, if a column is not aggregated in A, it must
-// be not aggregated in B
-//export function contains(supersetSchema, subsetSchema) {
-//}
-
-// Returns the union of a and b schemas
-// The union of two schemas is a schema with all the properties in both schemas and with their
-// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
-// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
-// to null. In this case the function will throw an exception.
-function union(a, b) {
-    const t = a.columns.concat(b.columns);
-    return {
-        columns: t.filter((item, pos) => t.indexOf(item) == pos)
-    };
-}
-
-function equals(a,b){
-    if (!a || !b){
-        return false;
-    }
-    return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
-}
-
-/***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__client_windshaft__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__setup_auth_service__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_config_service__ = __webpack_require__(25);
-
-
-
-
-
-
-const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
-
-class Base {
-
-    /**
-     * Base data source object.
-     *
-     * The methods listed in the {@link carto.source.Base|source.Base} object are availiable in all source objects.
-     *
-     * Use a source to reference the data used in a {@link carto.layer.Base|layer}.
-     *
-     * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset} or {@link carto.source.SQL} instead.
-     *
-     *
-     * @constructor Base
-     * @abstract
-     * @memberof carto.source
-     * @api
-     */
-    constructor() {
-        this._client = new __WEBPACK_IMPORTED_MODULE_0__client_windshaft__["a" /* default */](this);
-    }
-
-    initialize(auth, config) {
-        auth = auth || Object(__WEBPACK_IMPORTED_MODULE_2__setup_auth_service__["b" /* getDefaultAuth */])();
-        config = config || Object(__WEBPACK_IMPORTED_MODULE_3__setup_config_service__["b" /* getDefaultConfig */])();
-        Object(__WEBPACK_IMPORTED_MODULE_2__setup_auth_service__["a" /* checkAuth */])(auth);
-        Object(__WEBPACK_IMPORTED_MODULE_3__setup_config_service__["a" /* checkConfig */])(config);
-        this._apiKey = auth.apiKey;
-        this._username = auth.username;
-        this._serverURL = this._generateURL(auth, config);
-    }
-
-    bindLayer(...args) {
-        this._client._bindLayer(...args);
-    }
-
-    requestData(viewport, style) {
-        return this._client.getData(viewport, style);
-    }
-
-    free() {
-        this._client.free();
-    }
-
-    _generateURL(auth, config) {
-        let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
-        url = url.replace(/{user}/, auth.username);
-        this._validateServerURL(url);
-        return url;
-    }
-
-    _validateServerURL(serverURL) {
-        var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
-        if (!serverURL.match(urlregex)) {
-            throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidServerURL');
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Base;
-
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(60);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(1);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -1111,6 +1514,8 @@ class Base {
 
 
 const HISTOGRAM_BUCKETS = 1000;
+
+const INITIAL_TIMESTAMP = Date.now();
 
 /**
  * @typedef {object} RPoint - Point in renderer coordinates space
@@ -1436,6 +1841,7 @@ class Renderer {
             }
 
             drawMetadata.freeTexUnit = 4;
+            styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
@@ -1622,28 +2028,239 @@ function getOrderingRenderBuckets(tiles) {
 
 
 /***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+
+//TODO refactor to use uniformfloat class
+class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
+     */
+    constructor(duration) {
+        if (!Number.isFinite(duration)) {
+            throw new Error('Animate only supports number literals');
+        }
+        super({});
+        this.aTime = Date.now();
+        this.bTime = this.aTime + Number(duration);
+    }
+    _compile() {
+        this.type = 'float';
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float anim${this._uniformID};\n`,
+            inline: `anim${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+    }
+    _preDraw(drawMetadata, gl) {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (this.mix > 1.) {
+            gl.uniform1f(this._uniformLocation, 1);
+        } else {
+            gl.uniform1f(this._uniformLocation, this.mix);
+        }
+    }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
+    }
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["union"] = union;
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+const IDENTITY = {
+    columns: []
+};
+/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
+
+
+/*
+const schema = {
+    columns: ['temp', 'cat']
+};*/
+
+//TODO
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+//export function contains(supersetSchema, subsetSchema) {
+//}
+
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+function union(a, b) {
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+    };
+}
+
+function equals(a,b){
+    if (!a || !b){
+        return false;
+    }
+    return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
+}
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+
+
+/**
+ * 
+ * Evaluates the value of a column for every row in the dataset.
+ * 
+ * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
+ * The `prop('name')` will return the name of the current city for every point in the dataset.
+ * 
+ * @param {string} name - The property in the dataset that is going to be evaluated
+ * @return {carto.style.expressions.property}
+ * 
+ * @example <caption>Display only cities with name different from "London"</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.neq(s.prop('name'), 'london'),
+ * });
+ * 
+ * @memberof carto.style.expressions
+ * @name prop
+ * @function
+ * @api
+ */
+class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} name Property/column name
+     */
+    constructor(name) {
+        if (typeof name !== 'string' || name == '') {
+            throw new Error(`Invalid property name '${name}'`);
+        }
+        super({});
+        this.name = name;
+    }
+    _compile(meta) {
+        const metaColumn = meta.columns.find(c => c.name == this.name);
+        if (!metaColumn) {
+            throw new Error(`Property '${this.name}' does not exist`);
+        }
+        this.type = metaColumn.type;
+        if (this.type == 'category') {
+            this.numCategories = metaColumn.categoryNames.length;
+        }
+        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+    }
+    _getMinimumNeededSchema() {
+        return {
+            columns: [
+                this.name
+            ]
+        };
+    }
+    eval(feature) {
+        return feature[this.name];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Property;
+
+
+
+/***/ }),
 /* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(8);
+
+class Base {
+
+    /**
+     * Base data source object.
+     *
+     * The methods listed in the {@link carto.source.Base|source.Base} object are availiable in all source objects.
+     *
+     * Use a source to reference the data used in a {@link carto.layer.Base|layer}.
+     *
+     * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset}, {@link carto.source.SQL} of {@link carto.source.GeoJSON} instead.
+     *
+     *
+     * @constructor Base
+     * @abstract
+     * @memberof carto.source
+     * @api
+     */
+    constructor() {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Base;
+
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
 
 
+/**
+ * @description Linearly interpolate from *a* to *b* based on *mix*
+ * @param {carto.style.expressions.Expression | number} a numeric or color expression
+ * @param {carto.style.expressions.Expression | number} b numeric or color expression
+ * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.style.expressions.Expression} numeric expression
+ *
+ * @memberof carto.style.expressions
+ * @name blend
+ * @function
+ * @api
+ */
 class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
-    /**
-     * @description Interpolate from *a* to *b* based on *mix*
-     * @param {*} a can be a color or a number
-     * @param {*} b type must match a's type
-     * @param {*} mix interpolation parameter in the [0,1] range
-     */
     constructor(a, b, mix, interpolator) {
-        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(b);
-        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(mix);
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(mix);
         const originalMix = mix;
         if (interpolator) {
             mix = interpolator(mix);
@@ -1673,27 +2290,18 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
         }
     }
     eval(feature) {
-        const a = _clamp(this.mix.eval(feature), 0, 1);
+        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* clamp */])(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return _mix(x, y, a);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* mix */])(x, y, a);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
 
 
 
-function _mix(x, y, a) {
-    return x * (1 - a) + y * a;
-}
-
-function _clamp(value, min, max) {
-    return Math.max(Math.min(value, max), min);
-}
-
-
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1701,6 +2309,24 @@ function _clamp(value, min, max) {
 
 
 
+/**
+ *
+ * Wraps a number.
+ *
+ * @param {number} x - A number to be warped in a numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Creating a number expression.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.number(15);  // Elements will have width 15
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name number
+ * @function
+ * @api
+ */
 class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
      * @jsapi
@@ -1744,7 +2370,7 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1776,24 +2402,30 @@ class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* def
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
 
+/**
+ * @description Wrapper around category names
+ * @param {string} categoryName
+ * @returns {carto.style.expressions.Expression} category expression with the category name provided
+ *
+ * @memberof carto.style.expressions
+ * @name category
+ * @function
+ * @api
+ */
 class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        if (typeof x !== 'string') {
-            throw new Error(`Invalid arguments to Category(): ${x}`);
+    constructor(categoryName) {
+        if (typeof categoryName !== 'string') {
+            throw new Error(`Invalid arguments to Category(): ${categoryName}`);
         }
         super({});
-        this.expr = x;
+        this.expr = categoryName;
     }
     _compile(metadata) {
         this.type = 'category';
@@ -1813,7 +2445,7 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
     }
-    eval(){
+    eval() {
         return this._metadata.categoryIDs[this.expr];
     }
     isAnimated() {
@@ -1824,56 +2456,11 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 16 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-
-
-class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
-    constructor(name) {
-        if (typeof name !== 'string' || name == '') {
-            throw new Error(`Invalid property name '${name}'`);
-        }
-        super({});
-        this.name = name;
-    }
-    _compile(meta) {
-        const metaColumn = meta.columns.find(c => c.name == this.name);
-        if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
-        }
-        this.type = metaColumn.type;
-        if (this.type == 'category') {
-            this.numCategories = metaColumn.categoryNames.length;
-        }
-        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
-    }
-    _getMinimumNeededSchema() {
-        return {
-            columns: [
-                this.name
-            ]
-        };
-    }
-    eval(feature) {
-        return feature[this.name];
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Property;
-
-
-/***/ }),
 /* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -1888,23 +2475,48 @@ function NIN_INLINE_MAKER(categories) {
 }
 
 /**
- * Check if property belongs to the acceptedCategories list of categories
- * @param {*} property
- * @param {*} acceptedCategories
+ *
+ * Check if a categorical value belongs to a list of categories.
+ *
+ * @param {carto.style.expressions.expression | string} value - Categorical expression to be tested against the categorical whitelist
+ * @param {...carto.style.expressions.expression | ...string} categories - Multiple categorical expression parameters that will form the whitelist
+ * @return {carto.style.expressions.expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.in($type, 'metropolis', 'capital');
+ * });
+ *
  * @memberof carto.style.expressions
  * @name in
+ * @function
  * @api
  */
 const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = In;
 
 
+
 /**
- * Check if property does not belong to the categories list of categories
- * @param {*} property
- * @param {*} categories
+ *
+ * Check if property does not belong to the categories list given by the categories parameters.
+ *
+ * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
+ * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.nin($type, 'metropolis', 'capital');
+ * });
+ *
  * @memberof carto.style.expressions
  * @name nin
+ * @function
  * @api
  */
 const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
@@ -1915,7 +2527,7 @@ function generateBelongsExpression(inlineMaker, jsEval) {
 
     return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(property, ...categories) {
-            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */]);
+            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */]);
             let children = {
                 property
             };
@@ -1954,8 +2566,26 @@ function generateBelongsExpression(inlineMaker, jsEval) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
 
-/** 
- * Check if a given value belongs to an inclusive range (including limits).
+/**
+ *
+ * Check if a given value is contained within an inclusive range (including the limits).
+ *
+ * @param {carto.style.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {carto.style.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
+ * @param {carto.style.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
+ * const s = carto.style.expressions;
+ * const $dn = s.property('populationDensity');
+ * const style = new carto.Style({
+ *  filter: s.between($dn, 50, 100);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name in
+ * @function
+ * @api
  */
 class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(value, lowerLimit, upperLimit) {
@@ -1993,7 +2623,7 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -2062,7 +2692,7 @@ class Cubic extends genInterpolator(
 function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* implicitCast */])(m);
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(m);
             super({ m: m });
         }
         _compile(meta) {
@@ -2090,10 +2720,10 @@ function genInterpolator(inlineMaker, preface, jsEval) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(59);
 
 
 
@@ -2240,6 +2870,222 @@ const styler = {
 
 /***/ }),
 /* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rTiles; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRsysFromTile; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return wToR; });
+/**
+ * An RSys defines a local coordinate system that maps the coordinates
+ * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
+ * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
+ * It is the combination of a translation and anisotropic scaling.
+ * @typedef {object} RSys - Renderer relative coordinate system
+ * @property {RPoint} center - Position of the local system in external coordinates
+ * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
+*/
+
+/*
+ * Random notes
+ *
+ * We can redefine Dataframe to use a Rsys instead of center, scale
+ * and we can use an Rsys for the Renderer's canvas.
+ *
+ * Some interesting World coordinate systems:
+ *
+ * WM (Webmercator): represents a part of the world (excluding polar regions)
+ * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)
+ *
+ * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*
+ * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
+ * by WM_R. (positive orientation: E,N)
+ *
+ * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
+ * (positive orientation: E,S)
+ *
+ * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
+ * the range +/-1.
+ *
+ * When an RSys external coordinate system is WM or NWMC, we can compute:
+ * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
+ *   Math.ceil(Math.log2(1 / r.scale));
+ * * Maximum zoom level for which tiles are no smaller than the rectangle:
+ *   Math.floor(Math.log2(1 / r.scale));
+ * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
+ *
+ * We'll use the term World coordinates below for the *external* reference system
+ * of an RSys (usually NWMC).
+ */
+
+/*eslint no-unused-vars: ["off"] */
+
+/**
+ * R coordinates to World
+ * @param {RSys} r - ref. of the passed coordinates
+ * @param {number} x - x coordinate in r
+ * @param {number} y - y coordinate in r
+ * @return {RPoint} World coordinates
+ */
+function rToW(r, x, y) {
+    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
+}
+
+/**
+ * World coordinates to local RSys
+ * @param {number} x - x W-coordinate
+ * @param {number} y - y W-coordinate
+ * @param {RSys} r - target ref. system
+ * @return {RPoint} R coordinates
+ */
+function wToR(x, y, r) {
+    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
+}
+
+/**
+ * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
+ * @param {number} x - TC x coordinate
+ * @param {number} y - TC y coordinate
+ * @param {number} z - Tile zoom level
+ * @return {RSys}
+ */
+function tileRsys(x, y, z) {
+    let max = Math.pow(2, z);
+    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
+}
+
+/**
+ * Minimum zoom level for which tiles are no larger than the RSys rectangle
+ * @param {RSys} rsys
+ * @return {number}
+ */
+function rZoom(zoom) {
+    return Math.ceil(Math.log2(1. / zoom));
+}
+
+/**
+ * TC tiles that intersect the local rectangle of an RSys
+ * (with the largest tile size no larger than the rectangle)
+ * @param {RSys} rsys
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function rTiles(bounds) {
+    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
+}
+
+/**
+ * TC tiles of a given zoom level that intersect a W rectangle
+ * @param {number} z
+ * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
+ * @return {Array} - array of TC tiles {x, y, z}
+ */
+function wRectangleTiles(z, wr) {
+    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
+    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
+
+    const clamp = x => Math.min(Math.max(x, 0), n - 1);
+    // compute tile coordinate ranges
+    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
+    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
+    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
+    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
+    let tiles = [];
+    for (let x = t_minx; x <= t_maxx; ++x) {
+        for (let y = t_miny; y <= t_maxy; ++y) {
+            tiles.push({ x: x, y: y, z: z });
+        }
+    }
+    return tiles;
+}
+
+/**
+ * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
+ * @param {*} x
+ * @param {*} y
+ * @param {*} z
+ * @returns {RSys}
+ */
+function getRsysFromTile(x, y, z) {
+    return {
+        center: {
+            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
+            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+        },
+        scale: 1 / Math.pow(2, z)
+    };
+}
+
+
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(27);
+
+
+
+
+
+
+
+const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
+
+class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+
+    constructor() {
+        super();
+        this._client = new __WEBPACK_IMPORTED_MODULE_1__client_windshaft__["a" /* default */](this);
+    }
+
+    initialize(auth, config) {
+        auth = auth || Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["b" /* getDefaultAuth */])();
+        config = config || Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["b" /* getDefaultConfig */])();
+        Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["a" /* checkAuth */])(auth);
+        Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["a" /* checkConfig */])(config);
+        this._apiKey = auth.apiKey;
+        this._username = auth.username;
+        this._serverURL = this._generateURL(auth, config);
+    }
+
+    bindLayer(...args) {
+        this._client._bindLayer(...args);
+    }
+
+    requestData(viewport, style) {
+        return this._client.getData(viewport, style);
+    }
+
+    free() {
+        this._client.free();
+    }
+
+    _generateURL(auth, config) {
+        let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
+        url = url.replace(/{user}/, auth.username);
+        this._validateServerURL(url);
+        return url;
+    }
+
+    _validateServerURL(serverURL) {
+        var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+        if (!serverURL.match(urlregex)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidServerURL');
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseWindshaft;
+
+
+
+/***/ }),
+/* 23 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2429,13 +3275,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(23);
+var VectorTileFeature = __webpack_require__(25);
 
 module.exports = VectorTileLayer;
 
@@ -2497,13 +3343,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(74);
+var Point = __webpack_require__(79);
 
 module.exports = VectorTileFeature;
 
@@ -2554,7 +3400,7 @@ VectorTileFeature.prototype.loadGeometry = function() {
         line;
 
     while (pbf.pos < end) {
-        if (!length) {
+        if (length <= 0) {
             var cmdLen = pbf.readVarint();
             cmd = cmdLen & 0x7;
             length = cmdLen >> 3;
@@ -2605,7 +3451,7 @@ VectorTileFeature.prototype.bbox = function() {
         y2 = -Infinity;
 
     while (pbf.pos < end) {
-        if (!length) {
+        if (length <= 0) {
             var cmdLen = pbf.readVarint();
             cmd = cmdLen & 0x7;
             length = cmdLen >> 3;
@@ -2737,7 +3583,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2745,8 +3591,8 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultAuth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkAuth; });
 /* unused harmony export cleanDefaultAuth */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -2789,10 +3635,10 @@ function cleanDefaultAuth() {
  * @param  {object} auth
  */
 function checkAuth(auth) {
-    if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](auth)) {
+    if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](auth)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'authRequired');
     }
-    if (!__WEBPACK_IMPORTED_MODULE_0__util__["b" /* isObject */](auth)) {
+    if (!__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isObject */](auth)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'authObjectRequired');
     }
     auth.username = auth.user; // API adapter
@@ -2801,10 +3647,10 @@ function checkAuth(auth) {
 }
 
 function checkApiKey(apiKey) {
-    if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](apiKey)) {
+    if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](apiKey)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'apiKeyRequired');
     }
-    if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](apiKey)) {
+    if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](apiKey)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'apiKeyStringRequired');
     }
     if (apiKey === '') {
@@ -2813,10 +3659,10 @@ function checkApiKey(apiKey) {
 }
 
 function checkUsername(username) {
-    if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](username)) {
+    if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](username)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'usernameRequired');
     }
-    if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](username)) {
+    if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](username)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'usernameStringRequired');
     }
     if (username === '') {
@@ -2828,7 +3674,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2836,8 +3682,8 @@ function checkUsername(username) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultConfig; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkConfig; });
 /* unused harmony export cleanDefaultConfig */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -2880,7 +3726,7 @@ function cleanDefaultConfig() {
  */
 function checkConfig(config) {
     if (config) {
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["b" /* isObject */](config)) {
+        if (!__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isObject */](config)) {
             throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'configObjectRequired');
         }
         _checkServerURL(config.serverURL);
@@ -2888,7 +3734,7 @@ function checkConfig(config) {
 }
 
 function _checkServerURL(serverURL) {
-    if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](serverURL)) {
+    if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](serverURL)) {
         throw new __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__["a" /* default */]('setup', 'serverURLStringRequired');
     }
 }
@@ -2897,18 +3743,18 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(78);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(83);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -2937,34 +3783,37 @@ const SUPPORTED_PROPERTIES = [
 ];
 
 /**
- * @description A Style defines how associated dataframes of a particular renderer should be renderer.
- *
- * Styles are only compatible with dataframes that comply with the same schema.
- * The schema is the interface that a dataframe must comply with.
+ 
  */
 
 class Style {
 
     /**
-     * Create a carto.Style.
-     *
-     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
-     *
-     * @example
-     * new carto.Style(`
-     *   color: rgb(0,0,0)
-     * `);
-     *
-     * new carto.Style({
-     *   color: carto.style.expression.rgb(0,0,0)
-     * });
-     *
-     * @fires CartoError
-     *
-     * @constructor Style
-     * @memberof carto
-     * @api
-     */
+    * A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+    * managed through styles. Styles also control the element visibility, ordering or aggregation level.
+    * 
+    * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
+    * Each attribute in the {@link StyleSpec|styleSpec} must be a valid {@link carto.style.expressions|expression}.
+    * Those expressions will be evaluated dinamically for every element in the dataset.
+    *
+    * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
+    *
+    * @example <caption> Create a style with black dots using the string constructor </caption>
+    * new carto.Style(`
+    *   color: rgb(0,0,0)
+    * `);
+    *
+    * @example <caption> Create a style with black dots using the styleSpec constructor </caption>
+    * new carto.Style({
+    *   color: carto.style.expression.rgb(0,0,0)
+    * });
+    *
+    * @fires CartoError
+    *
+    * @constructor Style
+    * @memberof carto
+    * @api
+    */
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
@@ -2992,6 +3841,7 @@ class Style {
      * @return {number}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getResolution() {
@@ -3004,6 +3854,7 @@ class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getColor() {
@@ -3016,6 +3867,7 @@ class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getWidth() {
@@ -3028,6 +3880,7 @@ class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeColor() {
@@ -3040,6 +3893,7 @@ class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeWidth() {
@@ -3052,22 +3906,23 @@ class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getOrder() {
         return this._styleSpec.order;
     }
 
-    get filter(){
+    get filter() {
         return this._styleSpec.filter;
     }
 
     isAnimated() {
         return this.getColor().isAnimated() ||
-               this.getWidth().isAnimated() ||
-               this.getStrokeColor().isAnimated() ||
-               this.getStrokeWidth().isAnimated() ||
-               this.filter.isAnimated();
+            this.getWidth().isAnimated() ||
+            this.getStrokeColor().isAnimated() ||
+            this.getStrokeWidth().isAnimated() ||
+            this.filter.isAnimated();
     }
 
     onChange(callback) {
@@ -3164,13 +4019,13 @@ class Style {
      * @return {StyleSpec}
      */
     _getStyleDefinition(definition) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](definition)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](definition)) {
             return this._setDefaults({});
         }
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["b" /* isObject */](definition)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isObject */](definition)) {
             return this._setDefaults(definition);
         }
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](definition)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](definition)) {
             return this._setDefaults(Object(__WEBPACK_IMPORTED_MODULE_5__core_style_parser__["a" /* parseStyleDefinition */])(definition));
         }
         throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('style', 'nonValidDefinition');
@@ -3183,7 +4038,7 @@ class Style {
      * @return {StyleSpec}
      */
     _setDefaults(styleSpec) {
-        styleSpec.resolution = __WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
+        styleSpec.resolution = __WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
         styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION;
         styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
         styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
@@ -3207,7 +4062,7 @@ class Style {
 
         // TODO: Check expression types ie: color is not a number expression!
 
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["a" /* isNumber */](styleSpec.resolution)) {
+        if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isNumber */](styleSpec.resolution)) {
             throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('style', 'resolutionNumberRequired');
         }
         if (!(styleSpec.color instanceof __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__["a" /* default */])) {
@@ -3240,7 +4095,7 @@ class Style {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3282,7 +4137,7 @@ class Map {
     }
 
     addLayer(layer, beforeLayerID) {
-        layer.requestData();
+        layer.initCallback();
 
         let index;
         for (index = 0; index < this._layers.length; index++) {
@@ -3302,7 +4157,7 @@ class Map {
         let animated = false;
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
-            const hasAnimation = layer.getStyle().isAnimated();
+            const hasAnimation = layer.getStyle() && layer.getStyle().isAnimated();
             if (hasData || hasAnimation) {
                 layer.paintCallback();
             }
@@ -3318,23 +4173,23 @@ class Map {
 
     _drawBackground(color) {
         switch (color) {
-        case 'black':
-            this._gl.clearColor(0, 0, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'red':
-            this._gl.clearColor(1, 0, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'green':
-            this._gl.clearColor(0, 1, 0, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        case 'blue':
-            this._gl.clearColor(0, 0, 1, 1);
-            this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-            break;
-        default:
+            case 'black':
+                this._gl.clearColor(0, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'red':
+                this._gl.clearColor(1, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'green':
+                this._gl.clearColor(0, 1, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'blue':
+                this._gl.clearColor(0, 0, 1, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            default:
             // white
         }
     }
@@ -3375,7 +4230,7 @@ class Map {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3383,18 +4238,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_layer__ = __webpack_require__(77);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_style__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_setup_auth_service__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_config_service__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_map__ = __webpack_require__(27);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_2__api_layer__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_5__api_setup_auth_service__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_config_service__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_4__api_style__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return __WEBPACK_IMPORTED_MODULE_7__api_map__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(29);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_4__api_layer__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_5__api_style__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return __WEBPACK_IMPORTED_MODULE_8__api_map__["a"]; });
 /**
  *  @api
  *  @namespace carto
@@ -3413,23 +4269,51 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 // Namespaces
+
 const style = { expressions: __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ };
-const source = { Dataset: __WEBPACK_IMPORTED_MODULE_1__api_source_dataset__["a" /* default */], SQL: __WEBPACK_IMPORTED_MODULE_3__api_source_sql__["a" /* default */] };
+const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" /* default */], SQL: __WEBPACK_IMPORTED_MODULE_3__api_source_sql__["a" /* default */], GeoJSON: __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__["a" /* default */] };
 
 
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return palettes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 
+
+
+/**
+ * ### Color palettes
+ * 
+ * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
+ * Use them with a {@link carto.style.expressions.ramp|ramp}
+ * 
+ * The following palettes are availiable:
+ *  - Categorical:
+ *      - PRISM
+ *      - EARTH
+ *  - Numeric
+ *      - ...
+ * 
+ * @api
+ * @name carto.style.expressions.palettes
+ * @memberof carto.style.expressions
+ * 
+ * @example <caption> Using a color scheme </caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.ramp(s.property('type'), s.palettes.PRISM);
+ * });
+ */
+const palettes = {};
 
 class PaletteGenerator {
     constructor(name, subPalettes) {
@@ -3447,8 +4331,6 @@ class PaletteGenerator {
         }
     }
 }
-
-const palettes = {};
 
 Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name]);
@@ -3487,14 +4369,14 @@ class Inverse {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(31);
+module.exports = __webpack_require__(33);
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -5347,7 +6229,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(32);
+var colorbrewer = __webpack_require__(34);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -5380,14 +6262,14 @@ if (true) {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(33);
+module.exports = __webpack_require__(35);
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -5712,24 +6594,73 @@ if (true) {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
 let bucketUID = 0;
 
 class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /*
-        If input is numeric => args is a breakpoint list
-        If input is categorical => args is a list of category names to map input
-    */
+
+    /**
+     * Given a property create "sub-groups" based on the given breakpoints.
+     * 
+     * 
+     * Imagine a traffic dataset with a speed property. We want to divide the roads in
+     * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
+     * 
+     * 
+     * We´ll need:
+     *  - A {@link carto.style.expressions.ramp|ramp } to add a color for every bucket.
+     *  - A {@link carto.style.expressions.palettes|colorPalette } to define de color scheme.
+     * 
+     * 
+     * ```javascript
+     *  const s = carto.style.expressions;
+     *  const $speed = s.prop('speed');
+     *  const style = new carto.Style({
+     *  color: s.ramp(
+     *      s.buckets($speed, 30, 80, 120),
+     *      s.palettes.PRISM),
+     * });
+     * ```
+     * 
+     * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
+     *  - From 0 to 29 
+     *  - From 30 to 79
+     *  - From 80 to 120
+     * 
+     * Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
+     *
+     * This expression can be used for categorical properties, imagine the previous example with the data already
+     * procesed in a new categorical `procesedSpeed` column:
+     * 
+     * ```javascript
+     *  const s = carto.style.expressions;
+     *  const $procesedSpeed = s.prop('procesedSpeed');
+     *  const style = new carto.Style({
+     *  color: s.ramp(
+     *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+     *      s.palettes.PRISM),
+     * });
+     * ```
+     * 
+     * @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
+     * @param {...carto.style.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
+     * @return {carto.style.expressions.expression} 
+     * 
+     * @memberof carto.style.expressions
+     * @name buckets
+     * @function
+     * @api
+     */
     constructor(input, ...args) {
-        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */]);
+        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */]);
         let children = {
             input
         };
@@ -5786,21 +6717,22 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 /* harmony export (immutable) */ __webpack_exports__["a"] = Buckets;
 
 
+
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
 class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(l, a, b) {
-        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(l);
-        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(b);
+        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(l);
+        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(b);
         super({ l: l, a: a, b: b });
     }
     _compile(meta) {
@@ -5864,12 +6796,12 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5881,9 +6813,9 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
      * @param {*} value value (brightness) of the color in the [0,1] range
      */
     constructor(h, s, v) {
-        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(h);
-        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(s);
-        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(v);
+        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(h);
+        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(s);
+        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(v);
         super({ h: h, s: s, v: v });
     }
     _compile(metadata) {
@@ -5921,13 +6853,32 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 
 
+/**
+* Linearly interpolates the value of a given property between min and max.
+* 
+* @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
+* @param {carto.style.expressions.expression} min - Numeric expression pointing to the lower limit
+* @param {carto.style.expressions.expression} max - Numeric expression pointing to the higher limit
+* @return {carto.style.expressions.expression} 
+* 
+* @example <caption> Display points with a different color depending on the `category` property. </caption>
+* const s = carto.style.expressions;
+* const style = new carto.Style({
+*  color: s.ramp(s.linear(s.prop('speed', 10, 100), PRISM),
+* });
+* 
+* @memberof carto.style.expressions
+* @name ramp
+* @function
+* @api
+*/
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(input, min, max) {
         super({ input, min, max });
@@ -5949,12 +6900,12 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
@@ -5973,10 +6924,10 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
      * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
      */
     constructor(input, center, threshold, falloff) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(input);
-        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(center);
-        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(threshold);
-        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(falloff);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(input);
+        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(center);
+        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(threshold);
+        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(falloff);
         super({ input: input, center: center, threshold: threshold, falloff: falloff });
     }
     _compile(meta) {
@@ -5993,19 +6944,15 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - _clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Near;
 
 
-function _clamp(x, min, max) {
-    return Math.min(Math.max(x, min), max);
-}
-
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6013,8 +6960,6 @@ function _clamp(x, min, max) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
 
 
-
-const nowInit = Date.now();
 
 class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
@@ -6029,8 +6974,10 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         super.inlineMaker = inline => inline.now;
     }
     _preDraw(...args) {
-        this.now.expr = (Date.now() - nowInit) / 1000.;
         this.now._preDraw(...args);
+    }
+    _setTimestamp(timestamp){
+        this.now.expr = timestamp;
     }
     isAnimated() {
         return true;
@@ -6044,27 +6991,49 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
 class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
-     * @description Creates a color ramp based on input and within the range defined by *minKey* and *maxKey*
-     * @param {*} input
-     * @param {*} palette
-     */
+    * Create a color ramp based on input property.
+    * 
+    * This expression will asign a color to every possible value in the property.
+    * If there are more values than colors in the palette, new colors will be generated by linear interpolation.
+    * 
+    * @param {carto.style.expressions.expression} input - The input expression to give a color
+    * @param {carto.style.expressions.palettes} palette - The color palette that is going to be used
+    * @return {carto.style.expressions.expression} 
+    * 
+    * @example <caption> Display points with a different color depending on the `category` property. (We assume category has discrete values) </caption>
+    * const s = carto.style.expressions;
+    * const style = new carto.Style({
+    *  color: s.ramp(s.prop('category'), PRISM),
+    * });
+    * 
+    * @example <caption> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</caption>
+    * const s = carto.style.expressions;
+    * const style = new carto.Style({
+    *  color: s.ramp(s.prop('speed'), PRISM),
+    * });
+    * 
+    * @memberof carto.style.expressions
+    * @name ramp
+    * @function
+    * @api
+    */
     constructor(input, palette, ...args) {
         if (args.length > 0) {
             throw new Error('ramp(input, palette) only accepts two parameters');
         }
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(input);
-        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(palette);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(input);
+        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(palette);
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
@@ -6134,8 +7103,8 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             for (var i = 0; i < width; i++) {
                 const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                 const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vlowRaw).b, 255];
-                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* hexToRgb */])(vhighRaw).b, 255];
+                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).b, 255];
+                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).b, 255];
                 const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
@@ -6172,7 +7141,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6182,6 +7151,29 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 //TODO refactor to uniformcolor, write color (plain, literal)
+
+/**
+ *
+ * Evaluates to a rgba color.
+ *
+ * @param {carto.style.expressions.number|number} r - The amount of red in the color
+ * @param {carto.style.expressions.number|number} g - The amount of red in the color
+ * @param {carto.style.expressions.number|number} b - The amount of red in the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.rgba}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  color: s.rgba(0, 1, 0, 1);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name rgba
+ * @function
+ * @api
+ */
 class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
      * @description RGBA color constructor
@@ -6214,7 +7206,7 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6223,6 +7215,24 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 
+/**
+ *
+ * Override the input color opacity
+ *
+ * @param {number} x - A number to be warped in a numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Creating a number expression.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.number(15);  // Elements will have width 15
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name number
+ * @function
+ * @api
+ */
 class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
      * @description Override the input color opacity
@@ -6250,7 +7260,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6332,21 +7342,21 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
 
 
 
 
 class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(x, y, z) {
-        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(x);
-        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(y);
-        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* implicitCast */])(z);
+        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(x);
+        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(y);
+        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(z);
         super({ x: x, y: y, z: z });
     }
     _compile(meta) {
@@ -6414,7 +7424,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6445,7 +7455,7 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6555,7 +7565,125 @@ const GlobalQuantiles = genQuantiles(true);
 
 
 /***/ }),
-/* 47 */
+/* 49 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(11);
+
+
+
+
+
+const DEFAULT_FADE = 0.15;
+
+/**
+ * Create a Torque FadeIn/FadeOut configuration
+ *
+ * @param {carto.style.expression.expression.number|number} param1 expression of type number or Number
+ * @param {carto.style.expression.expression.number|number} param2 expression of type number or Number
+ * @return {carto.style.expressions.fade}
+ *
+ * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
+ * const s = carto.style.expressions;
+ * new carto.Style({
+ *  filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ * });
+ *
+ * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
+ * const s = carto.style.expressions;
+ * new carto.Style({
+ *  filter: s.torque($day, 40, s.fade(0.5))
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name fade
+ * @function
+*/
+class Fade extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(param1 = __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */], param2 = __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
+        let fadeIn = param1;
+        let fadeOut = param2;
+        if (param1 == __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
+            fadeIn = DEFAULT_FADE;
+        }
+        if (param2 == __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
+            fadeOut = fadeIn;
+        }
+        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(fadeIn);
+        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(fadeOut);
+        super({ fadeIn, fadeOut });
+        this.type = 'fade';
+        this.inlineMaker = (inline) => ({
+            in: inline.fadeIn,
+            out: inline.fadeOut,
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Fade;
+
+
+/**
+ * Create an animated temporal filter (torque)
+ *
+ * @param {carto.style.expression.expression} input input to base the temporal filter,
+ * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
+ * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
+ * @param {Number} duration duration of the animation in seconds
+ * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration
+ * @return {carto.style.expressions.torque}
+ *
+ * @example <caption> Temporal map by $day, with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
+ * new carto.Style(`width:    2
+ * color:     ramp(linear(AVG($temp), 0,30), tealrose)
+ * filter:       torque($day, 40, fade(0.1, 0.3))`);
+ *
+ * @memberof carto.style.expressions
+ * @name torque
+ * @function
+*/
+class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(input, duration = 10, fade = new Fade()) {
+        if (!Number.isFinite(duration)) {
+            throw new Error('Torque(): invalid second parameter, duration.');
+        }
+        if (input instanceof __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */]) {
+            input = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["linear"])(input, Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMin"])(input), Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMax"])(input));
+        }
+        const _cycle = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["floatDiv"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["floatMod"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["now"])(), duration), duration);
+        super({ input, _cycle, fade });
+        this.duration = duration;
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.input.type != 'float') {
+            throw new Error('Torque(): invalid first parameter, input.');
+        } else if (this.fade.type != 'fade') {
+            throw new Error('Torque(): invalid third parameter, fade.');
+        }
+        this.type = 'float';
+
+        this.inlineMaker = (inline) =>
+            `(1.- clamp(abs(${inline.input}-${inline._cycle})*${this.duration.toFixed(20)}/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+    }
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const cycle = this._cycle.eval(feature);
+        const duration = this.duration;
+        const fadeIn = this.fade.fadeIn.eval(feature);
+        const fadeOut = this.fade.fadeOut.eval(feature);
+        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = Torque;
+
+
+
+/***/ }),
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6627,7 +7755,11 @@ function generateAggregattion(metadataPropertyName, global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
@@ -6675,7 +7807,11 @@ function generatePercentile(global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             if (!global) {
@@ -6704,7 +7840,7 @@ function generatePercentile(global) {
 
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6755,664 +7891,269 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 49 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
 
 
-class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
+
+
+class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
     /**
-     * Create a carto.source.Dataset.
+     * Create a carto.source.GeoJSON.
      *
-     * @param {string} tableName - The name of an existing table
-     * @param {object} auth
-     * @param {string} auth.apiKey - API key used to authenticate against CARTO
-     * @param {string} auth.user - Name of the user
-     * @param {object} config
-     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {object} data - A GeoJSON data object
      *
      * @example
-     * new carto.source.Dataset('european_cities', {
-     *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     * new carto.source.GeoJSON({
+     *   "type": "Feature",
+     *   "geometry": {
+     *     "type": "Point",
+     *     "coordinates": [ 0, 0 ]
+     *   },
+     *   "properties": {
+     *     "cartodb_id": 1
+     *   }
      * });
      *
      * @fires CartoError
      *
-     * @constructor Dataset
+     * @constructor GeoJSON
      * @extends carto.source.Base
      * @memberof carto.source
      * @api
      */
-    constructor(tableName, auth, config) {
+    constructor(data) {
         super();
-        this._checkTableName(tableName);
-        this._tableName = tableName;
-        this.initialize(auth, config);
+        this._checkData(data);
+
+        this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
+        this._status = 'init'; // init -> metadata -> data
+        this._features = this._getFeatures(data);
     }
 
-    _checkTableName(tableName) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](tableName)) {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'tableNameRequired');
-        }
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](tableName)) {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'tableNameStringRequired');
-        }
-        if (tableName === '') {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidTableName');
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Dataset;
-
-
-
-/***/ }),
-/* 50 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__);
-
-
-
-
-
-
-
-
-const SAMPLE_ROWS = 1000;
-const MIN_FILTERING = 500000;
-
-// Get dataframes <- MVT <- Windshaft
-// Get metadata
-// Instantiate map Windshaft
-// Requrest SQL API (temp)
-// Cache dataframe
-
-class Windshaft {
-
-    constructor(source) {
-        this._source = source;
-
-        this._requestGroupID = 0;
-        this._oldDataframes = [];
-        this._MNS = null;
-        this._promiseMNS = null;
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
-        const lruOptions = {
-            max: 1000
-            // TODO improve cache length heuristic
-            , length: function () { return 1; }
-            , dispose: (key, promise) => {
-                promise.then(dataframe => {
-                    if (!dataframe.empty) {
-                        dataframe.free();
-                        this._removeDataframe(dataframe);
-                    }
-                });
-            }
-            , maxAge: 1000 * 60 * 60
-        };
-        this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
-        this.inProgressInstantiations = {};
-    }
-
-    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+    bindLayer(addDataframe, removeDataframe) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    _getInstantiationID(MNS, resolution, filtering) {
-        return JSON.stringify({
-            MNS,
-            resolution,
-            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+    requestData() {
+        // TODO: split it in two functions: (metadata) / (data)
+        //
+        if (this._status === 'init') {
+            this._status = 'metadata';
+            return this._requestMetadata();
+        } else if (this._status === 'metadata') {
+            this._status = 'data';
+            this._requestData();
+        }
+    }
+
+    _checkData(data) {
+        if (__WEBPACK_IMPORTED_MODULE_3__util__["f" /* isUndefined */](data)) {
+            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'dataRequired');
+        }
+        if (!__WEBPACK_IMPORTED_MODULE_3__util__["d" /* isObject */](data)) {
+            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'dataObjectRequired');
+        }
+    }
+
+    _getFeatures(data) {
+        if (data.type === 'FeatureCollection') {
+            return data.features || [];
+        } else if (data.type === 'Feature') {
+            return [data];
+        }
+        else {
+            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidGeoJSONData');
+        }
+    }
+
+    _requestMetadata() {
+        return new Promise(resolve => {
+            let metadata = {};
+            resolve(metadata);
         });
     }
 
-    /**
-     * Should be called whenever the viewport or the style changes
-     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
-     * @param {*} viewport
-     * @param {*} MNS
-     * @param {*} addDataframe
-     * @param {*} styleDataframe
-     */
-    async getData(viewport, style) {
-        const MNS = style.getMinimumNeededSchema();
-        const resolution = style.getResolution();
-        const filtering = __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["a" /* getFiltering */](style);
-        const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
-        if (this._needToInstantiate(MNS, resolution, filtering)) {
-            await this._instantiate(MNS, resolution, filtering);
-        }
-        this._getTiles(tiles);
-        return this.metadata;
-    }
-
-    _getTiles(tiles) {
-        this._requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
-        const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
-            this.getDataframe(x, y, z).then(dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.map(d => d.active = false);
-                    completedTiles.map(d => d.active = true);
-                    this._oldDataframes = completedTiles;
-                    this._dataLoadedCallback();
-                }
-            });
-        });
-    }
-
-    /**
-     * Check if the map needs to be reinstantiated
-     * This happens:
-     *  - When the minimun required schema changed.
-     *  - When the resolution changed.
-     *  - When the filter conditions changed and the dataset should be server-filtered.
-     */
-    _needToInstantiate(MNS, resolution, filtering) {
-        return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
-    }
-
-    _getCategoryIDFromString(category) {
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
-    }
-
-
-    async _instantiateUncached(MNS, resolution, filters){
-        const conf = this._getConfig();
-        const agg = await this._generateAggregation(MNS, resolution);
-        const select = this._buildSelectClause(MNS);
-        let aggSQL = this._buildQuery(select);
-
-        const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, MNS, conf);
-
-        // If the number of features is higher than the minimun, enable server filtering.
-        if (metadata.featureCount > MIN_FILTERING) {
-            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
-        }
-
-        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
-        this._oldDataframes = [];
-        this.cache.reset();
-        this.urlTemplate = urlTemplate;
-        this.metadata = metadata;
-        this._MNS = MNS;
-        this.filtering = filters;
-        this.resolution = resolution;
-
-        // Store instantiation
-        return metadata;
-    }
-    async _instantiate(MNS, resolution, filters) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
-        }
-        console.log(this._getInstantiationID(MNS, resolution, filters));
-        const promise = this._instantiateUncached(MNS, resolution, filters);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
-        return promise;
-    }
-
-    _generateAggregation(MRS, resolution) {
-        let aggregation = {
-            columns: {},
-            dimensions: {},
-            placement: 'centroid',
-            resolution: resolution,
-            threshold: 1,
-        };
-
-        MRS.columns
-            .forEach(name => {
-                if (name.startsWith('_cdb_agg_')) {
-                    aggregation.columns[name] = {
-                        aggregate_function: getAggFN(name),
-                        aggregated_column: getBase(name)
-                    };
-                } else {
-                    aggregation.dimensions[name] = name;
-                }
-            });
-
-        return aggregation;
-    }
-
-    _buildSelectClause(MRS) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
-    }
-
-    _buildQuery(select) {
-        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
-    }
-
-    _getConfig() {
-        return {
-            apiKey: this._source._apiKey,
-            username: this._source._username,
-            serverURL: this._source._serverURL
-        };
-    }
-
-    free() {
-        this.cache.reset();
-    }
-
-    _generateDataFrame(rs, geometry, properties, size, type) {
-        // TODO: Should the dataframe constructor have type and size parameters?
-        const dataframe = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["a" /* Dataframe */](
-            rs.center,
-            rs.scale,
+    _requestData() {
+        const geometry = this._decodeGeometry();
+        const properties = {};
+        const dataframe = new __WEBPACK_IMPORTED_MODULE_1__core_renderer__["a" /* Dataframe */](
+            { x: 0, y: 0 },
+            1,
             geometry,
             properties,
         );
-        dataframe.type = type;
-        dataframe.size = size;
-
-        return dataframe;
+        dataframe.type = this._getDataframeType(this._type);
+        dataframe.active = true;
+        dataframe.size = this._features.length;
+        this._addDataframe(dataframe);
     }
 
-    async _getUrlPromise(query, conf, agg, aggSQL) {
-        const LAYER_INDEX = 0;
-        this.geomType = await this.getGeometryType(query, conf);
-
-        if (this.geomType != 'point') {
-            agg = false;
-        }
-
-        const mapConfigAgg = {
-            buffersize: {
-                'mvt': 0
-            },
-            layers: [
-                {
-                    type: 'mapnik',
-                    options: {
-                        sql: aggSQL,
-                        aggregation: agg
-                    }
-                }
-            ]
-        };
-        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
-        const layergroup = await response.json();
-        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
-        return getLayerUrl(layergroup, LAYER_INDEX, conf);
-    }
-
-    _getRequestConfig(mapConfigAgg) {
-        return {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(mapConfigAgg),
-        };
-    }
-
-    getDataframe(x, y, z) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            return c;
-        }
-        const promise = this.requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        return promise;
-    }
-
-    requestDataframe(x, y, z) {
-        const mvt_extent = 4096;
-
-        return fetch(this._getTileUrl(x, y, z))
-            .then(rawData => rawData.arrayBuffer())
-            .then(response => {
-
-                if (response.byteLength == 0 || response == 'null') {
-                    return { empty: true };
-                }
-                var tile = new __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_2_pbf__(response));
-                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {};
-
-                const numFields = [];
-                const catFields = [];
-                const catFieldsReal = [];
-                const numFieldsReal = [];
-                this._MNS.columns.map(name => {
-                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
-                        catFields.push(name);
-                        catFieldsReal.push(name);
-                    } else {
-                        numFields.push(name);
-                        numFieldsReal.push(name);
-                    }
-
-                }
-                );
-                catFieldsReal.map((name, i) => fieldMap[name] = i);
-                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
-
-                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
-
-                var rs = __WEBPACK_IMPORTED_MODULE_1__rsys__["a" /* getRsysFromTile */](x, y, z);
-                let dataframeProperties = {};
-                Object.keys(fieldMap).map((name, pid) => {
-                    dataframeProperties[name] = properties[pid];
-                });
-                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
-                this._addDataframe(dataframe);
-                return dataframe;
-            });
-    }
-
-    _getTileUrl(x, y, z) {
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
-    }
-
-    _getSubdomain(x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
-    }
-
-    _decodePolygons(geom, featureGeometries, mvt_extent) {
-        let polygon = null;
-        let geometry = [];
-        /*
-            All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-            It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-            See:
-                https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                https://en.wikipedia.org/wiki/Shoelace_formula
-        */
-        for (let j = 0; j < geom.length; j++) {
-            //if exterior
-            //   push current polygon & set new empty
-            //else=> add index to holes
-            if (isClockWise(geom[j])) {
-                if (polygon) {
-                    geometry.push(polygon);
-                }
-                polygon = {
-                    flat: [],
-                    holes: []
-                };
-            } else {
-                if (j == 0) {
-                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                }
-                polygon.holes.push(polygon.flat.length / 2);
-            }
-            for (let k = 0; k < geom[j].length; k++) {
-                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
-            }
-        }
-        //if current polygon is not empty=> push it
-        if (polygon && polygon.flat.length > 0) {
-            geometry.push(polygon);
-        }
-        featureGeometries.push(geometry);
-    }
-
-    _decodeLines(geom, featureGeometries, mvt_extent) {
-        let geometry = [];
-        geom.map(l => {
-            let line = [];
-            l.map(point => {
-                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-            });
-            geometry.push(line);
-        });
-        featureGeometries.push(geometry);
-    }
-
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
-        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
-        if (this.geomType == 'point') {
-            var points = new Float32Array(mvtLayer.length * 2);
-        }
-        let featureGeometries = [];
-        for (var i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            const geom = f.loadGeometry();
-            if (this.geomType == 'point') {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (this.geomType == 'polygon') {
-                this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (this.geomType == 'line') {
-                this._decodeLines(geom, featureGeometries, mvt_extent);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
-            }
-
-            catFields.map((name, index) => {
-                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
-            });
-            numFields.map((name, index) => {
-                properties[index + catFields.length][i] = Number(f.properties[name]);
-            });
-        }
-
-        return { properties, points, featureGeometries };
-    }
-    async getMetadata(query, proto, conf) {
-        //Get column names and types with a limit 0
-        //Get min,max,sum and count of numerics
-        //for each category type
-        //Get category names and counts by grouping by
-        //Assign ids
-        const metadata = {
-            columns: [],
-        };
-        const fields = await this.getColumnTypes(query, conf);
-        let numerics = [];
-        let categories = [];
-        Object.keys(fields).map(name => {
-            const type = fields[name].type;
-            if (type == 'number') {
-                numerics.push(name);
-            } else if (type == 'string') {
-                categories.push(name);
-            }
-        });
-
-        metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
-        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);
-
-        numerics.map((name, index) => {
-            const t = numericsTypes[index];
-            metadata.columns.push(t);
-        });
-        metadata.categoryIDs = {};
-        metadata.sample = sample;
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
-            metadata.columns.push(t);
-        });
-        return metadata;
-    }
-
-    async getSample(conf, sampling) {
-        let q;
-        if (this._source._tableName) {
-            q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
-        } else {
-            // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
-            q = `WITH _rndseed as (SELECT setseed(0.5))
-                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
-        }
-
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
-        const json = await response.json();
-        console.log(json);
-        return json.rows;
-    }
-
-    // Returns the total feature count, including possibly filtered features
-    async getFeatureCount(query, conf) {
-        const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
-        const json = await response.json();
-        return json.rows[0].count;
-    }
-
-    async getColumnTypes(query, conf) {
-        const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-        const json = await response.json();
-        return json.fields;
-    }
-
-    async getGeometryType(query, conf) {
-        const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
-        const json = await response.json();
-        const type = json.rows[0].type;
+    _getDataframeType(type) {
         switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            case 'Point':
+                return 'point';
+            case 'LineString':
+            case 'MultiLineString':
+                return 'line';
+            case 'Polygon':
+            case 'MultiPolygon':
+                return 'polygon';
+            default:
+                return '';
         }
     }
 
-    async getNumericTypes(names, query, conf) {
-        const aggFns = ['min', 'max', 'sum', 'avg'];
-        const numericsSelect = names.map(name =>
-            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-        ).concat(['COUNT(*)']).join();
-        const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
-        const json = await response.json();
-        return names.map(name => {
-            return {
-                name,
-                type: 'float',
-                min: json.rows[0][`${name}_min`],
-                max: json.rows[0][`${name}_max`],
-                avg: json.rows[0][`${name}_avg`],
-                sum: json.rows[0][`${name}_sum`],
-            };
+    _decodeGeometry() {
+        let geometry = null;
+        const numFeatures = this._features.length;
+        for (let i = 0; i < numFeatures; i++) {
+            const feature = this._features[i];
+            if (feature.type === 'Feature') {
+                const type = feature.geometry.type;
+                const coordinates = feature.geometry.coordinates;
+                if (!this._type) {
+                    this._type = type;
+                } else if (this._type !== type) {
+                    throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', `multipleFeatureTypes[${this._type}, ${type}]`);
+                }
+                if (type === 'Point') {
+                    if (!geometry) {
+                        geometry = new Float32Array(numFeatures * 2);
+                    }
+                    const point = this._computePointGeometry(coordinates);
+                    geometry[2 * i + 0] = point.x;
+                    geometry[2 * i + 1] = point.y;
+                }
+                else if (type === 'LineString') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const line = this._computeLineStringGeometry(coordinates);
+                    geometry.push([line]);
+                }
+                else if (type === 'MultiLineString') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const multiline = this._computeMultiLineStringGeometry(coordinates);
+                    geometry.push(multiline);
+                }
+                else if (type === 'Polygon') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const polygon = this._computePolygonGeometry(coordinates);
+                    geometry.push([polygon]);
+                }
+                else if (type === 'MultiPolygon') {
+                    if (!geometry) {
+                        geometry = [];
+                    }
+                    const multipolygon = this._computeMultiPolygonGeometry(coordinates);
+                    geometry.push(multipolygon);
+                }
+            }
         }
-        );
+        return geometry;
     }
 
-    async getCategoryTypes(names, query, conf) {
-        return Promise.all(names.map(async name => {
-            const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
-            const json = await response.json();
-            let counts = [];
-            let names = [];
-            json.rows.map(row => {
-                counts.push(row.count);
-                names.push(row.name);
-            });
-            return {
-                name,
-                type: 'category',
-                categoryNames: names,
-                categoryCounts: counts
-            };
-        }));
+    _computePointGeometry(data) {
+        const lat = data[1];
+        const lng = data[0];
+        const wm = __WEBPACK_IMPORTED_MODULE_3__util__["g" /* projectToWebMercator */]({ lat, lng });
+        return __WEBPACK_IMPORTED_MODULE_2__client_rsys__["c" /* wToR */](wm.x, wm.y, { scale: __WEBPACK_IMPORTED_MODULE_3__util__["b" /* WM_R */], center: { x: 0, y: 0 } });
+    }
+
+    _computeLineStringGeometry(data) {
+        let line = [];
+        for (let i = 0; i < data.length; i++) {
+            const point = this._computePointGeometry(data[i]);
+            line.push(point.x, point.y);
+        }
+        return line;
+    }
+
+    _computeMultiLineStringGeometry(data) {
+        let multiline = [];
+        for (let i = 0; i < data.length; i++) {
+            let line = this._computeLineStringGeometry(data[i]);
+            if (line.length > 0) {
+                multiline.push(line);
+            }
+        }
+        return multiline;
+    }
+
+    _computePolygonGeometry(data) {
+        let polygon = {
+            flat: [],
+            holes: []
+        };
+        let holeIndex = 0;
+        for (let i = 0; i < data.length; i++) {
+            for (let j = 0; j < data[i].length; j++) {
+                const point = this._computePointGeometry(data[i][j]);
+                polygon.flat.push(point.x, point.y);
+            }
+            if (!this._isClockWise(data[i])) {
+                if (i > 0) {
+                    holeIndex += data[i - 1].length;
+                    polygon.holes.push(holeIndex);
+                } else {
+                    throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'firstPolygonExternal');
+                }
+            }
+        }
+        return polygon;
+    }
+
+    _computeMultiPolygonGeometry(data) {
+        let multipolygon = [];
+        for (let i = 0; i < data.length; i++) {
+            let polygon = this._computePolygonGeometry(data[i]);
+            if (polygon.flat.length > 0) {
+                multipolygon.push(polygon);
+            }
+        }
+        return multipolygon;
+    }
+
+    _isClockWise(vertices) {
+        let total = 0;
+        let pt1 = vertices[0], pt2;
+        for (let i = 0; i < vertices.length - 1; i++) {
+            pt2 = vertices[i + 1];
+            total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
+            pt1 = pt2;
+        }
+        return total >= 0;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Windshaft;
+/* harmony export (immutable) */ __webpack_exports__["a"] = GeoJSON;
 
-
-
-function isClockWise(vertices) {
-    let a = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        let j = (i + 1) % vertices.length;
-        a += vertices[i].x * vertices[j].y;
-        a -= vertices[j].x * vertices[i].y;
-    }
-    return a > 0;
-}
-
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
-}
-
-const endpoint = (conf) => {
-    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
-};
-
-function getLayerUrl(layergroup, layerIndex, conf) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
-    }
-    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
-}
-
-/**
- * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
- */
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(56);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -7422,7 +8163,7 @@ function getLayerUrl(layergroup, layerIndex, conf) {
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7563,7 +8304,7 @@ void main(void) {
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7610,7 +8351,7 @@ void main(void) {
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7660,7 +8401,7 @@ void main(void) {
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7709,7 +8450,7 @@ void main(void) {
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7747,7 +8488,7 @@ void main(void) {
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7790,11 +8531,11 @@ class ShaderCache {
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
@@ -8064,7 +8805,7 @@ function decodeGeom(geomType, geom) {
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8721,156 +9462,896 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return rTiles; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return getRsysFromTile; });
-/**
- * An RSys defines a local coordinate system that maps the coordinates
- * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
- * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
- * It is the combination of a translation and anisotropic scaling.
- * @typedef {object} RSys - Renderer relative coordinate system
- * @property {RPoint} center - Position of the local system in external coordinates
- * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
-*/
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(63);
 
-/*
- * Random notes
- *
- * We can redefine Dataframe to use a Rsys instead of center, scale
- * and we can use an Rsys for the Renderer's canvas.
- *
- * Some interesting World coordinate systems:
- *
- * WM (Webmercator): represents a part of the world (excluding polar regions)
- * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)
- *
- * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*
- * with coordinates in the range +/-1. Results from dividing Webmercator coordinates
- * by WM_R. (positive orientation: E,N)
- *
- * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.
- * (positive orientation: E,S)
- *
- * An RSys's rectangle (its bounds) is the area covered by the local coordinates in
- * the range +/-1.
- *
- * When an RSys external coordinate system is WM or NWMC, we can compute:
- * * Minimum zoom level for which tiles are no larger than the RSys rectangle:
- *   Math.ceil(Math.log2(1 / r.scale));
- * * Maximum zoom level for which tiles are no smaller than the rectangle:
- *   Math.floor(Math.log2(1 / r.scale));
- * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)
- *
- * We'll use the term World coordinates below for the *external* reference system
- * of an RSys (usually NWMC).
- */
 
-/*eslint no-unused-vars: ["off"] */
+const UNEXPECTED_ERROR = 'unexpected error';
+const GENERIC_ORIGIN = 'generic';
 
 /**
- * R coordinates to World
- * @param {RSys} r - ref. of the passed coordinates
- * @param {number} x - x coordinate in r
- * @param {number} y - y coordinate in r
- * @return {RPoint} World coordinates
+ * Represents an error in the carto library.
+ *
+ * @typedef {object} CartoError
+ * @property {string} message - A short error description
+ * @property {string} name - The name of the error "CartoError"
+ * @property {string} origin - Where the error was originated: 'validation'
+ * @property {object} originalError - An object containing the internal/original error
+ * @property {object} stack - Error stack trace
+ * @property {string} type - Error type
+ * @api
  */
-function rToW(r, x, y) {
-    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
-}
+class CartoError extends Error {
+    /**
+     * Build a cartoError from a generic error.
+     * @constructor
+     *
+     * @return {CartoError} A well formed object representing the error.
+     */
+    constructor(error) {
+        super((error && error.message) || UNEXPECTED_ERROR);
 
-/**
- * World coordinates to local RSys
- * @param {number} x - x W-coordinate
- * @param {number} y - y W-coordinate
- * @param {RSys} r - target ref. system
- * @return {RPoint} R coordinates
- */
-function wToR(x, y, r) {
-    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
-}
+        this.name = 'CartoError';
+        this.originalError = error;
+        // this.stack = (new Error()).stack;
+        this.type = (error && error.type) || '';
+        this.origin = (error && error.origin) || GENERIC_ORIGIN;
 
-/**
- * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)
- * @param {number} x - TC x coordinate
- * @param {number} y - TC y coordinate
- * @param {number} z - Tile zoom level
- * @return {RSys}
- */
-function tileRsys(x, y, z) {
-    let max = Math.pow(2, z);
-    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
-}
-
-/**
- * Minimum zoom level for which tiles are no larger than the RSys rectangle
- * @param {RSys} rsys
- * @return {number}
- */
-function rZoom(zoom) {
-    return Math.ceil(Math.log2(1. / zoom));
-}
-
-/**
- * TC tiles that intersect the local rectangle of an RSys
- * (with the largest tile size no larger than the rectangle)
- * @param {RSys} rsys
- * @return {Array} - array of TC tiles {x, y, z}
- */
-function rTiles(bounds) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
-}
-
-/**
- * TC tiles of a given zoom level that intersect a W rectangle
- * @param {number} z
- * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
- * @return {Array} - array of TC tiles {x, y, z}
- */
-function wRectangleTiles(z, wr) {
-    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
-    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
-
-    const clamp = x => Math.min(Math.max(x, 0), n - 1);
-    // compute tile coordinate ranges
-    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
-    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
-    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
-    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
-    let tiles = [];
-    for (let x = t_minx; x <= t_maxx; ++x) {
-        for (let y = t_miny; y <= t_maxy; ++y) {
-            tiles.push({ x: x, y: y, z: z });
-        }
+        // Add extra fields
+        var extraFields = this._getExtraFields();
+        this.message = extraFields.friendlyMessage;
     }
-    return tiles;
-}
 
-/**
- * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.
- * @param {*} x
- * @param {*} y
- * @param {*} z
- * @returns {RSys}
- */
-function getRsysFromTile(x, y, z) {
-    return {
-        center: {
-            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
-            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
-        },
-        scale: 1 / Math.pow(2, z)
-    };
+    _getExtraFields() {
+        const errorList = this._getErrorList();
+        for (let key in errorList) {
+            const error = errorList[key];
+            if (!(error.messageRegex instanceof RegExp)) {
+                throw new Error(`MessageRegex on ${key} is not a RegExp.`);
+            }
+            if (error.messageRegex.test(this.message)) {
+                return {
+                    friendlyMessage: this._replaceRegex(error)
+                };
+            }
+        }
+
+        // When cartoError not found return generic values
+        return {
+            friendlyMessage: this.message || ''
+        };
+    }
+
+    _getErrorList() {
+        return __WEBPACK_IMPORTED_MODULE_0__error_list__[this.origin] && __WEBPACK_IMPORTED_MODULE_0__error_list__[this.origin][this.type];
+    }
+
+    /**
+     * Replace $0 with the proper paramter in the listedError regex to build a friendly message.
+     */
+    _replaceRegex (error) {
+        if (!error.friendlyMessage) {
+            return this.message;
+        }
+        var match = this.message && this.message.match(error.messageRegex);
+        if (match && match.length > 1) {
+            return error.friendlyMessage.replace('$0', match[1]);
+        }
+        return error.friendlyMessage;
+    }
 }
 
 
 
 
 /***/ }),
-/* 61 */
+/* 63 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validation", function() { return validation; });
+const validation = {
+    layer: {
+        'id-required': {
+            messageRegex: /idRequired/,
+            friendlyMessage: '`id` property required.'
+        },
+        'id-string-required': {
+            messageRegex: /idStringRequired/,
+            friendlyMessage: '`id` property must be a string.'
+        },
+        'non-valid-id': {
+            messageRegex: /nonValidId/,
+            friendlyMessage: '`id` property must be not empty.'
+        },
+        'source-required': {
+            messageRegex: /sourceRequired/,
+            friendlyMessage: '`source` property required.'
+        },
+        'non-valid-source': {
+            messageRegex: /nonValidSource/,
+            friendlyMessage: 'The given object is not a valid source. See "carto.source.Base".'
+        },
+        'style-required': {
+            messageRegex: /styleRequired/,
+            friendlyMessage: '`style` property required.'
+        },
+        'non-valid-style': {
+            messageRegex: /nonValidStyle/,
+            friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
+        }
+    },
+    setup: {
+        'auth-required': {
+            messageRegex: /authRequired/,
+            friendlyMessage: '`auth` property is required.'
+        },
+        'auth-object-required': {
+            messageRegex: /authObjectRequired/,
+            friendlyMessage: '`auth` property must be an object.'
+        },
+        'api-key-required': {
+            messageRegex: /apiKeyRequired/,
+            friendlyMessage: '`apiKey` property is required.'
+        },
+        'api-key-string-required': {
+            messageRegex: /apiKeyStringRequired/,
+            friendlyMessage: '`apiKey` property must be a string.'
+        },
+        'non-valid-api-key': {
+            messageRegex: /nonValidApiKey/,
+            friendlyMessage: '`apiKey` property must be not empty.'
+        },
+        'username-required': {
+            messageRegex: /usernameRequired/,
+            friendlyMessage: '`username` property is required.'
+        },
+        'username-string-required': {
+            messageRegex: /usernameStringRequired/,
+            friendlyMessage: '`username` property must be a string.'
+        },
+        'non-valid-username': {
+            messageRegex: /nonValidUsername/,
+            friendlyMessage: '`username` property must be not empty.'
+        },
+        'config-object-required': {
+            messageRegex: /configObjectRequired/,
+            friendlyMessage: '`config` property must be an object.'
+        },
+        'server-url-string-required': {
+            messageRegex: /serverURLStringRequired/,
+            friendlyMessage: '`serverURL` property must be a string.'
+        }
+    },
+    source: {
+        'non-valid-server-url': {
+            messageRegex: /nonValidServerURL/,
+            friendlyMessage: '`serverURL` property is not a valid URL.'
+        },
+        'table-name-required': {
+            messageRegex: /tableNameRequired/,
+            friendlyMessage: '`tableName` property is required.'
+        },
+        'table-name-string-required': {
+            messageRegex: /tableNameStringRequired$/,
+            friendlyMessage: '`tableName` property must be a string.'
+        },
+        'non-valid-table-name': {
+            messageRegex: /nonValidTableName$/,
+            friendlyMessage: '`tableName` property must be not empty.'
+        },
+        'query-required': {
+            messageRegex: /queryRequired/,
+            friendlyMessage: '`query` property is required.'
+        },
+        'query-string-required': {
+            messageRegex: /queryStringRequired$/,
+            friendlyMessage: '`query` property must be a string.'
+        },
+        'non-valid-query': {
+            messageRegex: /nonValidQuery$/,
+            friendlyMessage: '`query` property must be not empty.'
+        },
+        'non-valid-sql-query': {
+            messageRegex: /nonValidSQLQuery$/,
+            friendlyMessage: '`query` property must be a SQL query.'
+        },
+        'data-required': {
+            messageRegex: /dataRequired/,
+            friendlyMessage: '`data` property is required.'
+        },
+        'data-object-required': {
+            messageRegex: /dataObjectRequired$/,
+            friendlyMessage: '`data` property must be an object.'
+        },
+        'non-valid-geojson-data': {
+            messageRegex: /nonValidGeoJSONData$/,
+            friendlyMessage: '`data` property must be a GeoJSON object.'
+        },
+        'multiple-feature-types': {
+            messageRegex: /multipleFeatureTypes\[(.+)\]$/,
+            friendlyMessage: 'multiple types not supported: $0.'
+        },
+        'first-polygon-external': {
+            messageRegex: /firstPolygonExternal$/,
+            friendlyMessage: 'first polygon ring must be external.'
+        }
+    },
+    style: {
+        'non-valid-definition': {
+            messageRegex: /nonValidDefinition$/,
+            friendlyMessage: 'style definition should be a styleSpec object or a valid style string.'
+        },
+        'non-valid-expression': {
+            messageRegex: /nonValidExpression\[(.+)\]$/,
+            friendlyMessage: '`$0` parameter is not a valid style Expresion.'
+        },
+        'resolution-number-required': {
+            messageRegex: /resolutionNumberRequired$/,
+            friendlyMessage: '`resolution` must be a number.'
+        }
+    }
+};
+
+
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
+
+
+
+
+
+class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default */] {
+
+    /**
+     * Create a carto.source.Dataset.
+     *
+     * @param {string} tableName - The name of an existing table
+     * @param {object} auth
+     * @param {string} auth.apiKey - API key used to authenticate against CARTO
+     * @param {string} auth.user - Name of the user
+     * @param {object} config
+     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     *
+     * @example
+     * new carto.source.Dataset('european_cities', {
+     *   apiKey: 'YOUR_API_KEY_HERE',
+     *   user: 'YOUR_USERNAME_HERE'
+     * });
+     *
+     * @fires CartoError
+     *
+     * @constructor Dataset
+     * @extends carto.source.Base
+     * @memberof carto.source
+     * @api
+     */
+    constructor(tableName, auth, config) {
+        super();
+        this._checkTableName(tableName);
+        this._tableName = tableName;
+        this.initialize(auth, config);
+    }
+
+    _checkTableName(tableName) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](tableName)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'tableNameRequired');
+        }
+        if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](tableName)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'tableNameStringRequired');
+        }
+        if (tableName === '') {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidTableName');
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Dataset;
+
+
+
+/***/ }),
+/* 65 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_pbf__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__);
+
+
+
+
+
+
+
+
+const SAMPLE_ROWS = 1000;
+const MIN_FILTERING = 500000;
+
+// Get dataframes <- MVT <- Windshaft
+// Get metadata
+// Instantiate map Windshaft
+// Requrest SQL API (temp)
+// Cache dataframe
+
+class Windshaft {
+
+    constructor(source) {
+        this._source = source;
+
+        this._requestGroupID = 0;
+        this._oldDataframes = [];
+        this._MNS = null;
+        this._promiseMNS = null;
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
+        const lruOptions = {
+            max: 1000
+            // TODO improve cache length heuristic
+            , length: function () { return 1; }
+            , dispose: (key, promise) => {
+                promise.then(dataframe => {
+                    if (!dataframe.empty) {
+                        dataframe.free();
+                        this._removeDataframe(dataframe);
+                    }
+                });
+            }
+            , maxAge: 1000 * 60 * 60
+        };
+        this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
+        this.inProgressInstantiations = {};
+    }
+
+    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+        this._addDataframe = addDataframe;
+        this._removeDataframe = removeDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
+    }
+
+    _getInstantiationID(MNS, resolution, filtering) {
+        return JSON.stringify({
+            MNS,
+            resolution,
+            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+        });
+    }
+
+    /**
+     * Should be called whenever the viewport or the style changes
+     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * @param {*} viewport
+     * @param {*} MNS
+     * @param {*} addDataframe
+     * @param {*} styleDataframe
+     */
+    async getData(viewport, style) {
+        const MNS = style.getMinimumNeededSchema();
+        const resolution = style.getResolution();
+        const filtering = __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["a" /* getFiltering */](style);
+        const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
+        if (this._needToInstantiate(MNS, resolution, filtering)) {
+            await this._instantiate(MNS, resolution, filtering);
+        }
+        this._getTiles(tiles);
+        return this.metadata;
+    }
+
+    _getTiles(tiles) {
+        this._requestGroupID++;
+        var completedTiles = [];
+        var needToComplete = tiles.length;
+        const requestGroupID = this._requestGroupID;
+        tiles.forEach(t => {
+            const { x, y, z } = t;
+            this.getDataframe(x, y, z).then(dataframe => {
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
+                    this._oldDataframes.map(d => d.active = false);
+                    completedTiles.map(d => d.active = true);
+                    this._oldDataframes = completedTiles;
+                    this._dataLoadedCallback();
+                }
+            });
+        });
+    }
+
+    /**
+     * Check if the map needs to be reinstantiated
+     * This happens:
+     *  - When the minimun required schema changed.
+     *  - When the resolution changed.
+     *  - When the filter conditions changed and the dataset should be server-filtered.
+     */
+    _needToInstantiate(MNS, resolution, filtering) {
+        return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
+    }
+
+    _getCategoryIDFromString(category) {
+        if (this._categoryStringToIDMap[category] !== undefined) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._categoryStringToIDMap[category] = this._numCategories;
+        this._numCategories++;
+        return this._categoryStringToIDMap[category];
+    }
+
+
+    async _instantiateUncached(MNS, resolution, filters){
+        const conf = this._getConfig();
+        const agg = await this._generateAggregation(MNS, resolution);
+        const select = this._buildSelectClause(MNS);
+        let aggSQL = this._buildQuery(select);
+
+        const query = `(${aggSQL}) AS tmp`;
+        const metadata = await this.getMetadata(query, MNS, conf);
+
+        // If the number of features is higher than the minimun, enable server filtering.
+        if (metadata.featureCount > MIN_FILTERING) {
+            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
+        }
+
+        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._oldDataframes = [];
+        this.cache.reset();
+        this.urlTemplate = urlTemplate;
+        this.metadata = metadata;
+        this._MNS = MNS;
+        this.filtering = filters;
+        this.resolution = resolution;
+
+        // Store instantiation
+        return metadata;
+    }
+    async _instantiate(MNS, resolution, filters) {
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+        }
+        console.log(this._getInstantiationID(MNS, resolution, filters));
+        const promise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
+        return promise;
+    }
+
+    _generateAggregation(MRS, resolution) {
+        let aggregation = {
+            columns: {},
+            dimensions: {},
+            placement: 'centroid',
+            resolution: resolution,
+            threshold: 1,
+        };
+
+        MRS.columns
+            .forEach(name => {
+                if (name.startsWith('_cdb_agg_')) {
+                    aggregation.columns[name] = {
+                        aggregate_function: getAggFN(name),
+                        aggregated_column: getBase(name)
+                    };
+                } else {
+                    aggregation.dimensions[name] = name;
+                }
+            });
+
+        return aggregation;
+    }
+
+    _buildSelectClause(MRS) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    }
+
+    _buildQuery(select) {
+        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    }
+
+    _getConfig() {
+        return {
+            apiKey: this._source._apiKey,
+            username: this._source._username,
+            serverURL: this._source._serverURL
+        };
+    }
+
+    free() {
+        this.cache.reset();
+    }
+
+    _generateDataFrame(rs, geometry, properties, size, type) {
+        // TODO: Should the dataframe constructor have type and size parameters?
+        const dataframe = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["a" /* Dataframe */](
+            rs.center,
+            rs.scale,
+            geometry,
+            properties,
+        );
+        dataframe.type = type;
+        dataframe.size = size;
+
+        return dataframe;
+    }
+
+    async _getUrlPromise(query, conf, agg, aggSQL) {
+        const LAYER_INDEX = 0;
+        this.geomType = await this.getGeometryType(query, conf);
+
+        if (this.geomType != 'point') {
+            agg = false;
+        }
+
+        const mapConfigAgg = {
+            buffersize: {
+                'mvt': 0
+            },
+            layers: [
+                {
+                    type: 'mapnik',
+                    options: {
+                        sql: aggSQL,
+                        aggregation: agg
+                    }
+                }
+            ]
+        };
+        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const layergroup = await response.json();
+        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+    }
+
+    _getRequestConfig(mapConfigAgg) {
+        return {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mapConfigAgg),
+        };
+    }
+
+    getDataframe(x, y, z) {
+        const id = `${x},${y},${z}`;
+        const c = this.cache.get(id);
+        if (c) {
+            return c;
+        }
+        const promise = this.requestDataframe(x, y, z);
+        this.cache.set(id, promise);
+        return promise;
+    }
+
+    requestDataframe(x, y, z) {
+        const mvt_extent = 4096;
+
+        return fetch(this._getTileUrl(x, y, z))
+            .then(rawData => rawData.arrayBuffer())
+            .then(response => {
+
+                if (response.byteLength == 0 || response == 'null') {
+                    return { empty: true };
+                }
+                var tile = new __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_2_pbf__(response));
+                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+                var fieldMap = {};
+
+                const numFields = [];
+                const catFields = [];
+                const catFieldsReal = [];
+                const numFieldsReal = [];
+                this._MNS.columns.map(name => {
+                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
+                        catFields.push(name);
+                        catFieldsReal.push(name);
+                    } else {
+                        numFields.push(name);
+                        numFieldsReal.push(name);
+                    }
+                });
+                catFieldsReal.map((name, i) => fieldMap[name] = i);
+                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+
+                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
+
+                var rs = __WEBPACK_IMPORTED_MODULE_1__rsys__["a" /* getRsysFromTile */](x, y, z);
+                let dataframeProperties = {};
+                Object.keys(fieldMap).map((name, pid) => {
+                    dataframeProperties[name] = properties[pid];
+                });
+                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                this._addDataframe(dataframe);
+                return dataframe;
+            });
+    }
+
+    _getTileUrl(x, y, z) {
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
+    }
+
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
+    }
+
+    _decodePolygons(geom, featureGeometries, mvt_extent) {
+        let polygon = null;
+        let geometry = [];
+        /*
+            All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
+            It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
+            See:
+                https://github.com/mapbox/vector-tile-spec/tree/master/2.1
+                https://en.wikipedia.org/wiki/Shoelace_formula
+        */
+        for (let j = 0; j < geom.length; j++) {
+            //if exterior
+            //   push current polygon & set new empty
+            //else=> add index to holes
+            if (isClockWise(geom[j])) {
+                if (polygon) {
+                    geometry.push(polygon);
+                }
+                polygon = {
+                    flat: [],
+                    holes: []
+                };
+            } else {
+                if (j == 0) {
+                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+                }
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            for (let k = 0; k < geom[j].length; k++) {
+                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
+                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+            }
+        }
+        //if current polygon is not empty=> push it
+        if (polygon && polygon.flat.length > 0) {
+            geometry.push(polygon);
+        }
+        featureGeometries.push(geometry);
+    }
+
+    _decodeLines(geom, featureGeometries, mvt_extent) {
+        let geometry = [];
+        geom.map(l => {
+            let line = [];
+            l.map(point => {
+                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
+            });
+            geometry.push(line);
+        });
+        featureGeometries.push(geometry);
+    }
+
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
+        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+        if (this.geomType == 'point') {
+            var points = new Float32Array(mvtLayer.length * 2);
+        }
+        let featureGeometries = [];
+        for (var i = 0; i < mvtLayer.length; i++) {
+            const f = mvtLayer.feature(i);
+            const geom = f.loadGeometry();
+            if (this.geomType == 'point') {
+                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+            } else if (this.geomType == 'polygon') {
+                this._decodePolygons(geom, featureGeometries, mvt_extent);
+            } else if (this.geomType == 'line') {
+                this._decodeLines(geom, featureGeometries, mvt_extent);
+            } else {
+                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
+            }
+
+            catFields.map((name, index) => {
+                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
+            });
+            numFields.map((name, index) => {
+                properties[index + catFields.length][i] = Number(f.properties[name]);
+            });
+        }
+
+        return { properties, points, featureGeometries };
+    }
+    async getMetadata(query, proto, conf) {
+        //Get column names and types with a limit 0
+        //Get min,max,sum and count of numerics
+        //for each category type
+        //Get category names and counts by grouping by
+        //Assign ids
+        const metadata = {
+            columns: [],
+        };
+        const fields = await this.getColumnTypes(query, conf);
+        let numerics = [];
+        let categories = [];
+        Object.keys(fields).map(name => {
+            const type = fields[name].type;
+            if (type == 'number') {
+                numerics.push(name);
+            } else if (type == 'string') {
+                categories.push(name);
+            }
+        });
+
+        metadata.featureCount = await this.getFeatureCount(query, conf);
+        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
+        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
+        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
+        const sample = await this.getSample(conf, sampling);
+
+        numerics.map((name, index) => {
+            const t = numericsTypes[index];
+            metadata.columns.push(t);
+        });
+        metadata.categoryIDs = {};
+        metadata.sample = sample;
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            metadata.columns.push(t);
+        });
+        return metadata;
+    }
+
+    async getSample(conf, sampling) {
+        let q;
+        if (this._source._tableName) {
+            q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
+        } else {
+            // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
+            q = `WITH _rndseed as (SELECT setseed(0.5))
+                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
+        }
+
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const json = await response.json();
+        console.log(json);
+        return json.rows;
+    }
+
+    // Returns the total feature count, including possibly filtered features
+    async getFeatureCount(query, conf) {
+        const q = `SELECT COUNT(*) FROM ${query};`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const json = await response.json();
+        return json.rows[0].count;
+    }
+
+    async getColumnTypes(query, conf) {
+        const columnListQuery = `select * from ${query} limit 0;`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const json = await response.json();
+        return json.fields;
+    }
+
+    async getGeometryType(query, conf) {
+        const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const json = await response.json();
+        const type = json.rows[0].type;
+        switch (type) {
+            case 'ST_MultiPolygon':
+                return 'polygon';
+            case 'ST_Point':
+                return 'point';
+            case 'ST_MultiLineString':
+                return 'line';
+            default:
+                throw new Error(`Unimplemented geometry type ''${type}'`);
+        }
+    }
+
+    async getNumericTypes(names, query, conf) {
+        const aggFns = ['min', 'max', 'sum', 'avg'];
+        const numericsSelect = names.map(name =>
+            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
+        ).concat(['COUNT(*)']).join();
+        const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
+        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const json = await response.json();
+        return names.map(name => {
+            return {
+                name,
+                type: 'float',
+                min: json.rows[0][`${name}_min`],
+                max: json.rows[0][`${name}_max`],
+                avg: json.rows[0][`${name}_avg`],
+                sum: json.rows[0][`${name}_sum`],
+            };
+        }
+        );
+    }
+
+    async getCategoryTypes(names, query, conf) {
+        return Promise.all(names.map(async name => {
+            const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
+            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+            const json = await response.json();
+            let counts = [];
+            let names = [];
+            json.rows.map(row => {
+                counts.push(row.count);
+                names.push(row.name);
+            });
+            return {
+                name,
+                type: 'category',
+                categoryNames: names,
+                categoryCounts: counts
+            };
+        }));
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Windshaft;
+
+
+
+function isClockWise(vertices) {
+    let a = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        let j = (i + 1) % vertices.length;
+        a += vertices[i].x * vertices[j].y;
+        a -= vertices[j].x * vertices[i].y;
+    }
+    return a > 0;
+}
+
+function getBase(name) {
+    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
+}
+
+function getAggFN(name) {
+    let s = name.substr('_cdb_agg_'.length);
+    return s.substr(0, s.indexOf('_'));
+}
+
+const endpoint = (conf) => {
+    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
+};
+
+function getLayerUrl(layergroup, layerIndex, conf) {
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+    }
+    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+}
+
+/**
+ * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
+ */
+
+
+/***/ }),
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8878,7 +10359,7 @@ function getRsysFromTile(x, y, z) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(62);
+var ieee754 = __webpack_require__(67);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -9495,7 +10976,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 62 */
+/* 67 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -9585,7 +11066,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 63 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9595,11 +11076,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(64)
-var util = __webpack_require__(66)
+var Map = __webpack_require__(69)
+var util = __webpack_require__(71)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(70)
+var Yallist = __webpack_require__(75)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -10059,7 +11540,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 64 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -10069,13 +11550,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(65)
+  module.exports = __webpack_require__(70)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
 
 /***/ }),
-/* 65 */
+/* 70 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -10194,7 +11675,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 66 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -10722,7 +12203,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(68);
+exports.isBuffer = __webpack_require__(73);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -10766,7 +12247,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(69);
+exports.inherits = __webpack_require__(74);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -10784,10 +12265,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67), __webpack_require__(21)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(72), __webpack_require__(23)))
 
 /***/ }),
-/* 67 */
+/* 72 */
 /***/ (function(module, exports) {
 
 var g;
@@ -10814,7 +12295,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 68 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -10825,7 +12306,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 69 */
+/* 74 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -10854,7 +12335,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 70 */
+/* 75 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -11230,21 +12711,21 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 71 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getFiltering;
 /* harmony export (immutable) */ __webpack_exports__["b"] = getSQLWhere;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(15);
 
 
 
@@ -11355,22 +12836,22 @@ function isBetweenFilter(f) {
 
 
 /***/ }),
-/* 72 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(73);
-module.exports.VectorTileFeature = __webpack_require__(23);
-module.exports.VectorTileLayer = __webpack_require__(22);
+module.exports.VectorTile = __webpack_require__(78);
+module.exports.VectorTileFeature = __webpack_require__(25);
+module.exports.VectorTileLayer = __webpack_require__(24);
 
 
 /***/ }),
-/* 73 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(22);
+var VectorTileLayer = __webpack_require__(24);
 
 module.exports = VectorTile;
 
@@ -11388,7 +12869,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 74 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11707,237 +13188,82 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 75 */
+/* 80 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
-const UNEXPECTED_ERROR = 'unexpected error';
-const GENERIC_ORIGIN = 'generic';
 
-/**
- * Represents an error in the carto library.
- *
- * @typedef {object} CartoError
- * @property {string} message - A short error description
- * @property {string} name - The name of the error "CartoError"
- * @property {string} origin - Where the error was originated: 'validation'
- * @property {object} originalError - An object containing the internal/original error
- * @property {object} stack - Error stack trace
- * @property {string} type - Error type
- * @api
- */
-class CartoError extends Error {
+
+
+class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default */] {
+
     /**
-     * Build a cartoError from a generic error.
-     * @constructor
+     * Create a carto.source.Dataset.
      *
-     * @return {CartoError} A well formed object representing the error.
+     * @param {string} query - A SQL query containing a SELECT statement
+     * @param {object} auth
+     * @param {string} auth.apiKey - API key used to authenticate against CARTO
+     * @param {string} auth.user - Name of the user
+     * @param {object} config
+     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     *
+     * @example
+     * new carto.source.SQL('SELECT * FROM european_cities', {
+     *   apiKey: 'YOUR_API_KEY_HERE',
+     *   user: 'YOUR_USERNAME_HERE'
+     * });
+     *
+     * @fires CartoError
+     *
+     * @constructor SQL
+     * @extends carto.source.Base
+     * @memberof carto.source
+     * @api
      */
-    constructor(error) {
-        super((error && error.message) || UNEXPECTED_ERROR);
-
-        this.name = 'CartoError';
-        this.originalError = error;
-        // this.stack = (new Error()).stack;
-        this.type = (error && error.type) || '';
-        this.origin = (error && error.origin) || GENERIC_ORIGIN;
-
-        // Add extra fields
-        var extraFields = this._getExtraFields();
-        this.message = extraFields.friendlyMessage;
+    constructor(query, auth, config) {
+        super();
+        this._checkQuery(query);
+        this._query = query;
+        this.initialize(auth, config);
     }
 
-    _getExtraFields() {
-        const errorList = this._getErrorList();
-        for (let key in errorList) {
-            const error = errorList[key];
-            if (!(error.messageRegex instanceof RegExp)) {
-                throw new Error(`MessageRegex on ${key} is not a RegExp.`);
-            }
-            if (error.messageRegex.test(this.message)) {
-                return {
-                    friendlyMessage: this._replaceRegex(error)
-                };
-            }
+    _checkQuery(query) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](query)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'queryRequired');
         }
-
-        // When cartoError not found return generic values
-        return {
-            friendlyMessage: this.message || ''
-        };
-    }
-
-    _getErrorList() {
-        return __WEBPACK_IMPORTED_MODULE_0__error_list__[this.origin] && __WEBPACK_IMPORTED_MODULE_0__error_list__[this.origin][this.type];
-    }
-
-    /**
-     * Replace $0 with the proper paramter in the listedError regex to build a friendly message.
-     */
-    _replaceRegex (error) {
-        if (!error.friendlyMessage) {
-            return this.message;
+        if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](query)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'queryStringRequired');
         }
-        var match = this.message && this.message.match(error.messageRegex);
-        if (match && match.length > 1) {
-            return error.friendlyMessage.replace('$0', match[1]);
+        if (query === '') {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidQuery');
         }
-        return error.friendlyMessage;
+        var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
+        if (!query.match(sqlRegex)) {
+            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidSQLQuery');
+        }
     }
 }
-
-
-
-
-/***/ }),
-/* 76 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validation", function() { return validation; });
-const validation = {
-    layer: {
-        'id-required': {
-            messageRegex: /idRequired/,
-            friendlyMessage: '`id` property required.'
-        },
-        'id-string-required': {
-            messageRegex: /idStringRequired/,
-            friendlyMessage: '`id` property must be a string.'
-        },
-        'non-valid-id': {
-            messageRegex: /nonValidId/,
-            friendlyMessage: '`id` property must be not empty.'
-        },
-        'source-required': {
-            messageRegex: /sourceRequired/,
-            friendlyMessage: '`source` property required.'
-        },
-        'non-valid-source': {
-            messageRegex: /nonValidSource/,
-            friendlyMessage: 'The given object is not a valid source. See "carto.source.Base".'
-        },
-        'style-required': {
-            messageRegex: /styleRequired/,
-            friendlyMessage: '`style` property required.'
-        },
-        'non-valid-style': {
-            messageRegex: /nonValidStyle/,
-            friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
-        }
-    },
-    setup: {
-        'auth-required': {
-            messageRegex: /authRequired/,
-            friendlyMessage: '`auth` property is required.'
-        },
-        'auth-object-required': {
-            messageRegex: /authObjectRequired/,
-            friendlyMessage: '`auth` property must be an object.'
-        },
-        'api-key-required': {
-            messageRegex: /apiKeyRequired/,
-            friendlyMessage: '`apiKey` property is required.'
-        },
-        'api-key-string-required': {
-            messageRegex: /apiKeyStringRequired/,
-            friendlyMessage: '`apiKey` property must be a string.'
-        },
-        'non-valid-api-key': {
-            messageRegex: /nonValidApiKey/,
-            friendlyMessage: '`apiKey` property must be not empty.'
-        },
-        'username-required': {
-            messageRegex: /usernameRequired/,
-            friendlyMessage: '`username` property is required.'
-        },
-        'username-string-required': {
-            messageRegex: /usernameStringRequired/,
-            friendlyMessage: '`username` property must be a string.'
-        },
-        'non-valid-username': {
-            messageRegex: /nonValidUsername/,
-            friendlyMessage: '`username` property must be not empty.'
-        },
-        'config-object-required': {
-            messageRegex: /configObjectRequired/,
-            friendlyMessage: '`config` property must be an object.'
-        },
-        'server-url-string-required': {
-            messageRegex: /serverURLStringRequired/,
-            friendlyMessage: '`serverURL` property must be a string.'
-        }
-    },
-    source: {
-        'non-valid-server-url': {
-            messageRegex: /nonValidServerURL/,
-            friendlyMessage: '`serverURL` property is not a valid URL.'
-        },
-        'table-name-required': {
-            messageRegex: /tableNameRequired/,
-            friendlyMessage: '`tableName` property is required.'
-        },
-        'table-name-string-required': {
-            messageRegex: /tableNameStringRequired$/,
-            friendlyMessage: '`tableName` property must be a string.'
-        },
-        'non-valid-table-name': {
-            messageRegex: /nonValidTableName$/,
-            friendlyMessage: '`tableName` property must be not empty.'
-        },
-        'query-required': {
-            messageRegex: /queryRequired/,
-            friendlyMessage: '`query` property is required.'
-        },
-        'query-string-required': {
-            messageRegex: /queryStringRequired$/,
-            friendlyMessage: '`query` property must be a string.'
-        },
-        'non-valid-query': {
-            messageRegex: /nonValidQuery$/,
-            friendlyMessage: '`query` property must be not empty.'
-        },
-        'non-valid-sql-query': {
-            messageRegex: /nonValidSQLQuery$/,
-            friendlyMessage: '`query` property must be a SQL query.'
-        }
-    },
-    style: {
-        'non-valid-definition': {
-            messageRegex: /nonValidDefinition$/,
-            friendlyMessage: 'style definition should be a styleSpec object or a valid style string.'
-        },
-        'non-valid-expression': {
-            messageRegex: /nonValidExpression\[(.+)\]$/,
-            friendlyMessage: '`$0` parameter is not a valid style Expresion.'
-        },
-        'resolution-number-required': {
-            messageRegex: /resolutionNumberRequired$/,
-            friendlyMessage: '`resolution` must be a number.'
-        }
-    }
-};
-
+/* harmony export (immutable) */ __webpack_exports__["a"] = SQL;
 
 
 
 /***/ }),
-/* 77 */
+/* 81 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(82);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_functions__ = __webpack_require__(1);
 
 
@@ -11948,30 +13274,31 @@ const validation = {
 
 
 
-/**
- * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
- * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
- */
 
 class Layer {
 
     /**
-     * Create a carto.Layer.
-     *
-     *
-     * @param {string} id
-     * @param {carto.source.Base} source
-     * @param {carto.Style} style
-     *
-     * @example
-     * new carto.Layer('layer0', source, style);
-     *
-     * @fires CartoError
-     *
-     * @constructor Layer
-     * @memberof carto
-     * @api
-     */
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    * 
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -11981,6 +13308,9 @@ class Layer {
         this._lastMNS = null;
         this._integrator = null;
         this._dataframes = [];
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
 
         this._id = id;
         this.metadata = null;
@@ -12033,8 +13363,8 @@ class Layer {
      * Set a new source for this layer.
      *
      * @param {carto.source.Base} source - New source
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setSource(source) {
@@ -12048,7 +13378,7 @@ class Layer {
 
     /**
      * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
         this._dataframes.push(dataframe);
@@ -12058,7 +13388,7 @@ class Layer {
 
     /**
      * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe 
+     * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
         this._dataframes = this._dataframes.filter(d => d !== dataframe);
@@ -12075,10 +13405,12 @@ class Layer {
 
     /**
      * Set a new style for this layer.
+     * 
+     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setStyle(style) {
@@ -12096,11 +13428,25 @@ class Layer {
     }
 
     /**
-     * Blend the current style with another style
+     * Blend the current style with another style.
+     * 
+     * This allows smooth transforms between two different styles.
+     * 
+     * @example <caption> Smooth transition variating point size </caption>
+     * // We create two different styles varying the width
+     * const style0 = new carto.style({ width: 10 });
+     * const style1 = new carto.style({ width: 20 });
+     * // Create a layer with the first style
+     * const layer = new carto.Layer(source, style);
+     * // We add the layer to the map, the points in this layer will have widh 10
+     * layer.addTo(map, 'layer0');
+     * // The points will be animated from 10px to 20px for 500ms.
+     * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - style to blend to
-     *
+     * @param {carto.Style} style - The final style 
+     * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_7__core_style_functions__["cubic"]) {
@@ -12130,8 +13476,8 @@ class Layer {
      *
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     addTo(map, beforeLayerID) {
@@ -12175,7 +13521,7 @@ class Layer {
     }
 
     initCallback() {
-        this._styleChanged(this._style);
+        this._contextInitCallback();
         this.requestData();
     }
 
@@ -12194,35 +13540,34 @@ class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged(style) {
-        const recompile = (metadata) => {
-            style._compileColorShader(this._integrator.renderer.gl, metadata);
-            style._compileWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileFilterShader(this._integrator.renderer.gl, metadata);
-        };
-        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve();
-        }
+    _compileShaders(style, metadata) {
+        style._compileColorShader(this._integrator.renderer.gl, metadata);
+        style._compileWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+    }
+    async _styleChanged(style) {
+        await this._context;
         const originalPromise = this.requestData(style);
         if (!originalPromise) {
             // The previous stored metadata is still valid
-            recompile(this.metadata);
+            this._compileShaders(style, this.metadata);
             return Promise.resolve();
         }
         // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
         return originalPromise.then(metadata => {
             this.metadata = metadata;
-            recompile(metadata);
+            this._compileShaders(style, metadata);
+            this.requestData(style);
         });
     }
 
     _checkId(id) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](id)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](id)) {
             throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idRequired');
         }
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](id)) {
+        if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](id)) {
             throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idStringRequired');
         }
         if (id === '') {
@@ -12231,7 +13576,7 @@ class Layer {
     }
 
     _checkSource(source) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](source)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](source)) {
             throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'sourceRequired');
         }
         if (!(source instanceof __WEBPACK_IMPORTED_MODULE_1__source_base__["a" /* default */])) {
@@ -12240,7 +13585,7 @@ class Layer {
     }
 
     _checkStyle(style) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](style)) {
+        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](style)) {
             throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'styleRequired');
         }
         if (!(style instanceof __WEBPACK_IMPORTED_MODULE_2__style__["a" /* default */])) {
@@ -12255,11 +13600,12 @@ class Layer {
         throw new Error('?');
     }
 
-    requestData(style) {
+    async requestData(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateWebGLState) {
+        if (!style){
             return;
         }
+        await this._context;
         return this._source.requestData(this._getViewport(), style);
     }
 
@@ -12274,7 +13620,7 @@ class Layer {
 
 
 /***/ }),
-/* 78 */
+/* 82 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12299,16 +13645,16 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 79 */
+/* 83 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(84);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(2);
 
 
 
@@ -12347,7 +13693,7 @@ function parseStyleNamedExpr(styleSpec, node) {
     }
     const value = parseNode(node.right);
     // Don't cast resolution properties implicitly since they must be of type Number
-    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["b" /* implicitCast */])(value);
+    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["d" /* implicitCast */])(value);
 }
 
 function parseStyleDefinition(str) {
@@ -12392,45 +13738,45 @@ function parseBinaryOperation(node) {
     const left = parseNode(node.left);
     const right = parseNode(node.right);
     switch (node.operator) {
-    case '*':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
-    case '/':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
-    case '+':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
-    case '-':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
-    case '%':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
-    case '^':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
-    case '>':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"](left, right);
-    case '>=':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"](left, right);
-    case '<':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"](left, right);
-    case '<=':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"](left, right);
-    case '==':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"](left, right);
-    case 'and':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["and"](left, right);
-    case 'or':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["or"](left, right);
-    default:
-        throw new Error(`Invalid binary operator '${node.operator}'`);
+        case '*':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
+        case '/':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
+        case '+':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
+        case '-':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
+        case '%':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
+        case '^':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
+        case '>':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"](left, right);
+        case '>=':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"](left, right);
+        case '<':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"](left, right);
+        case '<=':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"](left, right);
+        case '==':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"](left, right);
+        case 'and':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["and"](left, right);
+        case 'or':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["or"](left, right);
+        default:
+            throw new Error(`Invalid binary operator '${node.operator}'`);
     }
 }
 
 function parseUnaryOperation(node) {
     switch (node.operator) {
-    case '-':
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
-    case '+':
-        return parseNode(node.argument);
-    default:
-        throw new Error(`Invalid unary operator '${node.operator}'`);
+        case '-':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
+        case '+':
+            return parseNode(node.argument);
+        default:
+            throw new Error(`Invalid unary operator '${node.operator}'`);
     }
 }
 
@@ -12463,7 +13809,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 80 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -13150,12 +14496,12 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 81 */
+/* 85 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
 
 
 let integrator = null;
@@ -13181,18 +14527,15 @@ class CartoMapIntegrator {
 
 
 /***/ }),
-/* 82 */
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
 
 
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
 let uid = 0;
 
@@ -13258,7 +14601,7 @@ class MGLIntegrator {
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_1__util__["b" /* WM_R */]);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
@@ -13270,85 +14613,11 @@ class MGLIntegrator {
         var c = this.map.getCenter();
         var nw = b.getNorthWest();
         var sw = b.getSouthWest();
-        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        var z = (__WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](nw).y - __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](sw).y) / __WEBPACK_IMPORTED_MODULE_1__util__["a" /* WM_2R */];
+        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_1__util__["b" /* WM_R */]);
         return z;
     }
 }
-
-// Webmercator projection
-function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
-}
-
-
-/***/ }),
-/* 83 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(5);
-
-
-
-
-
-class SQL extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
-
-    /**
-     * Create a carto.source.Dataset.
-     *
-     * @param {string} query - A SQL query containing a SELECT statement
-     * @param {object} auth
-     * @param {string} auth.apiKey - API key used to authenticate against CARTO
-     * @param {string} auth.user - Name of the user
-     * @param {object} config
-     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
-     *
-     * @example
-     * new carto.source.SQL('SELECT * FROM european_cities', {
-     *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
-     * });
-     *
-     * @fires CartoError
-     *
-     * @constructor SQL
-     * @extends carto.source.Base
-     * @memberof carto.source
-     * @api
-     */
-    constructor(query, auth, config) {
-        super();
-        this._checkQuery(query);
-        this._query = query;
-        this.initialize(auth, config);
-    }
-
-    _checkQuery(query) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["d" /* isUndefined */](query)) {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'queryRequired');
-        }
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isString */](query)) {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'queryStringRequired');
-        }
-        if (query === '') {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidQuery');
-        }
-        var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
-        if (!query.match(sqlRegex)) {
-            throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidSQLQuery');
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = SQL;
-
 
 
 /***/ })

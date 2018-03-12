@@ -50,7 +50,11 @@
 
 
 <div class="description">
-    <p>Create a carto.Style.</p>
+    <p>A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+managed through styles. Styles also control the element visibility, ordering or aggregation level.</p>
+<p>A Style is created from an <a href="global.html#StyleSpec">styleSpec</a> object or from a string.
+Each attribute in the <a href="global.html#StyleSpec">styleSpec</a> must be a valid <a href="carto.style.expressions.html">expression</a>.
+Those expressions will be evaluated dinamically for every element in the dataset.</p>
 </div>
 
 
@@ -173,13 +177,17 @@
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption"> Create a style with black dots using the string constructor </p>
     
     <pre class="prettyprint"><code>new carto.Style(`
   color: rgb(0,0,0)
-`);
+`);</code></pre>
 
-new carto.Style({
+        <p class="code-caption"> Create a style with black dots using the styleSpec constructor </p>
+    
+    <pre class="prettyprint"><code>new carto.Style({
   color: carto.style.expression.rgb(0,0,0)
 });</code></pre>
 
@@ -211,7 +219,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getColor"><span class="type-signature">(static) </span>getColor<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
+    <h4 class="name" id="getColor"><span class="type-signature"></span>getColor<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
     
 
     
@@ -310,7 +318,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getOrder"><span class="type-signature">(static) </span>getOrder<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
+    <h4 class="name" id="getOrder"><span class="type-signature"></span>getOrder<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
     
 
     
@@ -409,7 +417,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getResolution"><span class="type-signature">(static) </span>getResolution<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id="getResolution"><span class="type-signature"></span>getResolution<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
     
 
     
@@ -508,7 +516,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getStrokeColor"><span class="type-signature">(static) </span>getStrokeColor<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
+    <h4 class="name" id="getStrokeColor"><span class="type-signature"></span>getStrokeColor<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
     
 
     
@@ -607,7 +615,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getStrokeWidth"><span class="type-signature">(static) </span>getStrokeWidth<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
+    <h4 class="name" id="getStrokeWidth"><span class="type-signature"></span>getStrokeWidth<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
     
 
     
@@ -706,7 +714,7 @@ new carto.Style({
     
 
     
-    <h4 class="name" id=".getWidth"><span class="type-signature">(static) </span>getWidth<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
+    <h4 class="name" id="getWidth"><span class="type-signature"></span>getWidth<span class="signature">()</span><span class="type-signature"> &rarr; {carto.style.expression}</span></h4>
     
 
     
@@ -815,13 +823,13 @@ new carto.Style({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">carto.style.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">Layer</a></li><li><a href="carto.source.Base.html">Base</a></li><li><a href="carto.source.Dataset.html">Dataset</a></li><li><a href="carto.source.GeoJSON.html">GeoJSON</a></li><li><a href="carto.source.SQL.html">SQL</a></li><li><a href="carto.Style.html">Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 06 2018 19:30:06 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Mar 12 2018 17:23:17 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -50,7 +50,12 @@
 
 
 <div class="description">
-    <p>Create a carto.Layer.</p>
+    <p>A Layer is the primary way to visualize geospatial data.</p>
+<p>To create a layer a <a href="carto.source.Base.html">source</a> and <a href="carto.Style.html">style</a> are required:</p>
+<ul>
+<li>The <a href="carto.source.Base.html">source</a> is used to know <strong>what</strong> data will be displayed in the Layer.</li>
+<li>The <a href="carto.Style.html">style</a> is used to know <strong>how</strong> to draw the data in the Layer.</li>
+</ul>
 </div>
 
 
@@ -248,7 +253,7 @@
     
 
     
-    <h4 class="name" id=".addTo"><span class="type-signature">(static) </span>addTo<span class="signature">(map, beforeLayerID)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addTo"><span class="type-signature"></span>addTo<span class="signature">(map, beforeLayerID)</span><span class="type-signature"></span></h4>
     
 
     
@@ -401,7 +406,7 @@
     
 
     
-    <h4 class="name" id=".blendToStyle"><span class="type-signature">(static) </span>blendToStyle<span class="signature">(style)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="blendToStyle"><span class="type-signature"></span>blendToStyle<span class="signature">(style, duration)</span><span class="type-signature"></span></h4>
     
 
     
@@ -409,7 +414,8 @@
 
 
 <div class="description">
-    <p>Blend the current style with another style</p>
+    <p>Blend the current style with another style.</p>
+<p>This allows smooth transforms between two different styles.</p>
 </div>
 
 
@@ -461,7 +467,30 @@
 
             
 
-            <td class="description last"><p>style to blend to</p></td>
+            <td class="description last"><p>The final style</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The animation duration in milliseconds [default:400]</p></td>
         </tr>
 
     
@@ -524,6 +553,21 @@
 
 
 
+    <h5>Example</h5>
+    
+        <p class="code-caption"> Smooth transition variating point size </p>
+    
+    <pre class="prettyprint"><code>// We create two different styles varying the width
+const style0 = new carto.style({ width: 10 });
+const style1 = new carto.style({ width: 20 });
+// Create a layer with the first style
+const layer = new carto.Layer(source, style);
+// We add the layer to the map, the points in this layer will have widh 10
+layer.addTo(map, 'layer0');
+// The points will be animated from 10px to 20px for 500ms.
+layer.blendToStyle(style1, 500);</code></pre>
+
+
 
         
             
@@ -531,7 +575,7 @@
     
 
     
-    <h4 class="name" id=".setSource"><span class="type-signature">(static) </span>setSource<span class="signature">(source)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setSource"><span class="type-signature"></span>setSource<span class="signature">(source)</span><span class="type-signature"></span></h4>
     
 
     
@@ -661,7 +705,7 @@
     
 
     
-    <h4 class="name" id=".setStyle"><span class="type-signature">(static) </span>setStyle<span class="signature">(style)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setStyle"><span class="type-signature"></span>setStyle<span class="signature">(style)</span><span class="type-signature"></span></h4>
     
 
     
@@ -670,6 +714,7 @@
 
 <div class="description">
     <p>Set a new style for this layer.</p>
+<p>This transition happens instantly, for smooth animations use <a href="carto.Layer.html#blendToStyle">blendToStyle</a></p>
 </div>
 
 
@@ -801,13 +846,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">carto.style.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">Layer</a></li><li><a href="carto.source.Base.html">Base</a></li><li><a href="carto.source.Dataset.html">Dataset</a></li><li><a href="carto.source.GeoJSON.html">GeoJSON</a></li><li><a href="carto.source.SQL.html">SQL</a></li><li><a href="carto.Style.html">Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 06 2018 19:30:06 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Mar 12 2018 17:23:17 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
