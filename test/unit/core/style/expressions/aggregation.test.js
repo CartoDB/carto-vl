@@ -79,6 +79,20 @@ describe('src/core/style/expressions/aggregation', () => {
             expect(() => s.max($price)._compile(metadata)).not.toThrow();
         });
     });
+
+    describe('returned type', ()=>{
+        it('max($numericProperty) should be of type float', () => {
+            const max = s.max($price);
+            max._compile(metadata);
+            expect(max.type).toEqual('float');
+        });
+
+        it('mode($categoryProperty) should be of type category', () => {
+            const mode = s.mode($cat);
+            mode._compile(metadata);
+            expect(mode.type).toEqual('category');
+        });
+    });
 });
 
 
