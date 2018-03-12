@@ -44,7 +44,7 @@
     const source = new carto.source.Dataset('mnmappluto', auth);
     const s = carto.style.expressions;
     const style = new carto.Style({
-        color: s.ramp(s.buckets(s.property('numfloors'), 1, 4, 7, 15), s.palettes.prism())
+        color: s.ramp(s.buckets(s.property('numfloors'), 1, 4, 7, 15), s.palettes.prism)
     });
     const layer = new carto.Layer('myCartoLayer', source, style);
 

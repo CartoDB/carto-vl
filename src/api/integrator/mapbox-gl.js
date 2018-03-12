@@ -47,7 +47,7 @@ class MGLIntegrator {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-                layer.initCallback();
+                this._layers.map(layer => layer.initCallback());
             }
             layer.paintCallback();
             invalidate();
@@ -56,7 +56,7 @@ class MGLIntegrator {
             id: layerId,
             type: 'custom-webgl'
         }, beforeLayerID);
-        this._layers.push(layerId);
+        this._layers.push(layer);
         this.move();
     }
     needRefresh() {
