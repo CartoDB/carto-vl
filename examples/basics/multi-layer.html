@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Multi layer | CARTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <!-- Include CARTO GL JS -->
+        <script src="../../dist/carto-gl.js"></script>
+        <!-- Include Mapbox GL JS -->
+        <script src="../../vendor/mapbox-gl-dev.js"></script>
+        <!-- Include Mapbox GL CSS -->
+        <link href='../../vendor/mapbox-gl-dev.css' rel='stylesheet' />
+        <style>
+            body { margin: 0; padding: 0; }
+            #map { position: absolute; height: 100%; width: 100%; }
+        </style>
+    </head>
+    <body>
+        <div id='map'></div>
+    </body>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            center: [0, 40],
+            zoom: 4
+        });
+
+        carto.setDefaultAuth({
+            user: 'cartogl',
+            apiKey: 'YOUR_API_KEY'
+        });
+
+        const spainCitiesSource = new carto.source.SQL(`
+          SELECT *
+            FROM ne_10m_populated_places_simple
+            WHERE adm0name = \'Spain\'
+        `);
+        const spainCitiesStyle = new carto.Style(`
+          width: 6
+          color: rgba(0.93,0.30,0.35,1.0)
+          strokeWidth: 1
+          strokeColor: rgba(1,1,1,1)
+        `);
+        const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesStyle);
+
+        const europeCountriesSource = new carto.source.Dataset(`
+          ne_adm0_europe
+        `);
+        const europeCountriesStyle = new carto.Style(`
+          color: rgba(0.5,0.43,0.73,0.8)
+        `);
+        const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesStyle);
+
+        spainCitiesLayer.addTo(map, 'watername_ocean');
+        europeCountriesLayer.addTo(map, 'spainCitiesLayer');
+    </script>
+</html>
