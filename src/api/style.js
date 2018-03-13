@@ -32,7 +32,7 @@ const SUPPORTED_PROPERTIES = [
 export default class Style {
 
     /**
-    * A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+    * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through styles. Styles also control the element visibility, ordering or aggregation level.
     * 
     * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
