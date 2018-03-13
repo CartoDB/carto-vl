@@ -68,6 +68,6 @@
     "test:e2e:prepare": "node test/acceptance/e2e.prepare.js ",
     "serve": "http-server",
     "loc": "sloc src/ examples/",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master"
   }
 }
