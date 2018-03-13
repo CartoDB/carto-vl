@@ -56,15 +56,15 @@
     <ul>
       <li>
         <input type="radio" name="pop" onclick="setAll()" id="all" checked>
-        <label for="all">ALL Places<label>
+        <label for="all">All places<label>
       </li>
       <li>
         <input type="radio" name="pop" onclick="setMostPopulated(20)" id="most">
-        <label for="most">Most populated places</label>
+        <label for="most">Very populated places</label>
       </li>
       <li>
         <input type="radio" name="pop" onclick="setLessPopulated(20)" id="less">
-        <label for="less">Less populated places</label>
+        <label for="less">Low populated places</label>
       </li>
     </ul>
   </div>
@@ -81,15 +81,13 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const populatedPlacesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-    `);
+    const populatedPlacesSource = new carto.source.Dataset('ne_10m_populated_places_simple');
     const populatedPlacesStyle = new carto.Style(`
       width: 6
       color: rgba(0.93,0.30,0.35,1.0)
       strokeWidth: 1
       strokeColor: rgba(1,1,1,1)
+      filter: $pop_max >= 0
     `);
     const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, populatedPlacesStyle);
 
@@ -101,12 +99,8 @@
         color: rgba(0.93,0.30,0.35,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `)).then(() => {
-        populatedPlacesLayer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-        `));
-      });
+        filter: $pop_max >= 0
+      `));
     }
 
     function setMostPopulated(limit) {
@@ -115,13 +109,8 @@
         color: rgba(0.41,0.71,0.62,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `)).then(() => {
-        populatedPlacesLayer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-            ORDER BY pop_max DESC LIMIT ${limit}
-        `));
-      });
+        filter: $pop_max > 10000000
+      `));
     }
 
     function setLessPopulated(limit) {
@@ -130,13 +119,8 @@
         color: rgba(0.95,0.34,0.26,1.0)
         strokeWidth: 1
         strokeColor: rgba(1,1,1,1)
-      `)).then(() => {
-        populatedPlacesLayer.setSource(new carto.source.SQL(`
-          SELECT *
-            FROM ne_10m_populated_places_simple
-            ORDER BY pop_max ASC LIMIT ${limit}
-        `));
-      });
+        filter: $pop_max < 10000
+      `));
     }
   </script>
 </body>
