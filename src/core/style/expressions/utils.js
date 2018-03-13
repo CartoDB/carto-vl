@@ -54,6 +54,11 @@ export function throwInvalidNumber(expressionName, parameterName, parameterIndex
     '${number}' is not a finite number`);
 }
 
+export function throwInvalidString(expressionName, parameterName, parameterIndex, str) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${str}' is not a string`);
+}
+
 // Try to check the type, but accept undefined types without throwing
 // This is useful to make constructor-time checks, at contructor-time some types can be already known and errors can be throw.
 // Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
@@ -79,6 +84,12 @@ export function checkInstance(expressionName, parameterName, parameterIndex, exp
 export function checkNumber(expressionName, parameterName, parameterIndex, number) {
     if (!Number.isFinite(number)) {
         throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
+    }
+}
+
+export function checkString(expressionName, parameterName, parameterIndex, str) {
+    if (typeof str !== 'string') {
+        throwInvalidString(expressionName, parameterName, parameterIndex, str);
     }
 }
 

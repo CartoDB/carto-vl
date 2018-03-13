@@ -11,7 +11,7 @@ export default class Animate extends Expression {
      * @param {*} duration animation duration in milliseconds
      */
     constructor(duration) {
-        checkNumber('animate', 'duration', 1, duration);
+        checkNumber('animate', 'duration', 0, duration);
         if (duration < 0) {
             throw new Error(getStringErrorPreface('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
         }

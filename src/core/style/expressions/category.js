@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { checkString } from './utils';
 
 /**
  * @description Wrapper around category names
@@ -12,9 +13,7 @@ import Expression from './expression';
  */
 export default class Category extends Expression {
     constructor(categoryName) {
-        if (typeof categoryName !== 'string') {
-            throw new Error(`Invalid arguments to Category(): ${categoryName}`);
-        }
+        checkString('category', 'categoryName', 0, categoryName);
         super({});
         this.expr = categoryName;
         this.type = 'category';
