@@ -1,11 +1,11 @@
-/* global carto geojson */
+/* global carto sources */
 
 const map = new carto.Map({
     container: 'map',
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(geojson);
+const source = new carto.source.GeoJSON(sources['polygon']);
 const style = new carto.Style();
 const layer = new carto.Layer('layer', source, style);
 
