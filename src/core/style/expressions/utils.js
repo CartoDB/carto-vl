@@ -9,9 +9,6 @@ export function implicitCast(value) {
         return float(value);
     }
     if (typeof value == 'string') {
-        if (!Number.isNaN(Date.parse(value))) {
-            return time(new Date(value));
-        }
         return category(value);
     }
     if (!(value instanceof Expression) && value.type !== 'paletteGenerator' && value.type !== 'float') {
