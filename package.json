@@ -67,7 +67,7 @@
     "test:e2e": "mocha test/acceptance/e2e.test.js",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "node test/acceptance/e2e.prepare.js ",
-    "serve:examples": "opn http://127.0.0.1:8080 && http-server examples/",
+    "serve": "opn http://127.0.0.1:8080 && http-server",
     "loc": "sloc src/ examples/",
     "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
     "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"

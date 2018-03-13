@@ -9,7 +9,7 @@
         "default": {
             "outputSourceFiles": false
         },
-        "referenceTitle": "CARTO.gl"
+        "referenceTitle": "CARTO GL"
     },
     "plugins": [
         "plugins/api",

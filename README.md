@@ -54,6 +54,12 @@ To generate all the docs
 yarn docs:all
 ```
 
+### Serve docs and examples
+
+```
+yarn serve
+```
+
 ### Run the tests
 
 - [Unit tests](./test/unit/README.md)
