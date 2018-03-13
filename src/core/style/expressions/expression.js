@@ -4,6 +4,7 @@ import * as schema from '../../schema';
 
 /**
  * Abstract expression class
+ * 
  * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
  * they can be used where an Expression is required as long as the types match. 
  * 
