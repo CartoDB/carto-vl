@@ -294,7 +294,7 @@ export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!
  * @function
  * @api
  */
-export const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
+export const Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
 
 /**
  *
@@ -343,28 +343,15 @@ function genBinaryOp(jsFn, glsl) {
             }
             a = implicitCast(a);
             b = implicitCast(b);
-            if (typeof a === 'string') {
-                [a, b] = [b, a];
-            }
-            if (typeof b === 'string') {
-                super({ a: a, auxFloat: float(0) });
-                this.b = b;
-            } else {
-                super({ a: a, b: b });
-            }
 
+            super({ a: a, b: b });
         }
         _compile(meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
             this.inlineMaker = inline => glsl(inline.a, inline.b);
             // TODO this logic is operation dependant
-            if (typeof b === 'string' && a.type == 'category' && a.name) {
-                const id = meta.categoryIDs[b];
-                this.auxFloat.expr = id;
-                this.type = 'float';
-                this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
-            } else if (a.type == 'float' && b.type == 'float') {
+            if (a.type == 'float' && b.type == 'float') {
                 this.type = 'float';
             } else if (a.type == 'color' && b.type == 'color') {
                 this.type = 'color';
@@ -376,7 +363,7 @@ function genBinaryOp(jsFn, glsl) {
                 throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
             }
         }
-        eval(feature){
+        eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
     };
