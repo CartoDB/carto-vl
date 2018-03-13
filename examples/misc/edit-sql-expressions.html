@@ -75,7 +75,7 @@
       background: rgba(23,133,251,.08);
     }
     textarea {
-      height: 100px; width: 100%; resize: none;
+      height: 120px; width: 100%; resize: none;
       padding: 7px 8px 6px;
       border: 1px solid #DDD;
       border-radius: 4px;
@@ -110,9 +110,10 @@ SELECT * FROM ne_10m_populated_places_simple
         <h3>Expressions</h3>
         <textarea id="expressions" rows="3">
 width: 6
-color: rgba(0.93,0.30,0.35,1.0)
+color: rgba(0.93, 0.30, 0.35, 1.0)
 strokeWidth: 0.5
-strokeColor: rgba(1,1,1,1)
+strokeColor: rgba(1, 1, 1, 1)
+filter: $pop_max > 10000
           </textarea>
           <div class="action-container">
             <button class="button-update" onclick="updateStyle()">
@@ -155,7 +156,7 @@ strokeColor: rgba(1,1,1,1)
 
     function updateStyle() {
       reset('#expressions')
-      populatedPlacesLayer.setStyle(new carto.Style(getValue('#expressions')))
+      populatedPlacesLayer.blendToStyle(new carto.Style(getValue('#expressions')))
         // .catch(cartoError => {
         //   error('#expressions', cartoError);
         // });

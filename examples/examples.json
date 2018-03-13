@@ -16,7 +16,7 @@
                     }
                 },
                 {  
-                    "title": "Add more layers",
+                    "title": "Add multiple layers",
                     "desc": "Add multiple CARTO layers to your map",
                     "file": {  
                         "mapbox": "basics/multi-layer.html"
@@ -169,11 +169,6 @@
                     "file": {  
                         "mapbox": "misc/geojson-viewer.html"
                     }
-                },
-                {  
-                    "title": "Simple map",
-                    "desc": "Test a simple static map",
-                    "file": "misc/simple-map.html"
                 },
                 {  
                     "title": "[TODO] Error handling",

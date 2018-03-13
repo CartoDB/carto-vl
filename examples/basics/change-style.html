@@ -84,41 +84,38 @@
     const source = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
-    const style = new carto.Style(`
+    const styleRed = new carto.Style(`
       width: 6
-      color: rgba(0.93,0.30,0.35,1.0)
+      color: rgba(0.93, 0.30, 0.35, 1.0)
       strokeWidth: 1
-      strokeColor: rgba(1,1,1,1)
+      strokeColor: rgba(1, 1, 1, 1)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const styleGreen = new carto.Style(`
+      width: 8
+      color: rgba(0.61, 0.78, 0.23, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+    `);
+    const styleBlue = new carto.Style(`
+      width: 10
+      color: rgba(0.09, 0.52, 0.98, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+    `);
+    const layer = new carto.Layer('layer', source, styleRed);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRed() {
-      layer.blendToStyle(new carto.Style(`
-        width: 6
-        color: rgba(0.93,0.30,0.35,1.0)
-        strokeWidth: 1
-        strokeColor: rgba(1,1,1,1)
-      `));
+      layer.blendToStyle(styleRed);
     }
 
     function setGreen() {
-      layer.blendToStyle(new carto.Style(`
-        width: 8
-        color: rgba(0.61,0.78,0.23,1.0)
-        strokeWidth: 1
-        strokeColor: rgba(1,1,1,1)
-      `));
+      layer.blendToStyle(styleGreen);
     }
 
     function setBlue() {
-      layer.blendToStyle(new carto.Style(`
-        width: 10
-        color: rgba(0.09,0.52,0.98,1.0)
-        strokeWidth: 1
-        strokeColor: rgba(1,1,1,1)
-      `));
+      layer.blendToStyle(styleBlue);
     }
   </script>
 </body>

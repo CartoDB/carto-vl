@@ -67,7 +67,7 @@
         <label for="blue">HSV - Blue</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setOpacity()" id="green">
+        <input type="radio" name="style" onclick="setOpacityGreen()" id="green">
         <label for="green">Opacity - Green</label>
       </li>
     </ul>
@@ -88,35 +88,36 @@
     const source = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
-    const style = new carto.Style(`
-      color: rgba(1.0,0.0,0.0,1.0)
+    const styleRed = new carto.Style(`
+      color: rgba(1.0, 0.0, 0.0, 1.0)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const styleYellow = new carto.Style(`
+      color: cielab(90,10,60)
+    `);
+    const styleBlue = new carto.Style(`
+      color: hsv(0.59, 0.89, 1.0)
+    `);
+    const styleGreen = new carto.Style(`
+      color: opacity(hsv(0.3, 1.0, 1.0), 0.2)
+    `);
+    const layer = new carto.Layer('layer', source, styleRed);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRGBARed() {
-      layer.blendToStyle(new carto.Style(`
-        color: rgba(1.0,0.0,0.0,1.0)
-      `));
+      layer.blendToStyle(styleRed);
     }
 
     function setCIELABYellow() {
-      layer.blendToStyle(new carto.Style(`
-        color: cielab(90,10,60)
-      `));
+      layer.blendToStyle(styleYellow);
     }
 
     function setHSVBlue() {
-      layer.blendToStyle(new carto.Style(`
-        color: hsv(0.59,0.89,1.0)
-      `));
+      layer.blendToStyle(styleBlue);
     }
     
-    function setOpacity() {
-      layer.blendToStyle(new carto.Style(`
-        color: opacity(hsv(0.3,1.0,1.0), 0.2)
-      `));
+    function setOpacityGreen() {
+      layer.blendToStyle(styleGreen);
     }
   </script>
 </body>

@@ -59,7 +59,7 @@
         <label for="all">All places<label>
       </li>
       <li>
-        <input type="radio" name="pop" onclick="setMostPopulated()" id="most">
+        <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
         <label for="most">Very populated places</label>
       </li>
       <li>
@@ -81,32 +81,30 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const populatedPlacesSource = new carto.source.Dataset('ne_10m_populated_places_simple');
-    
+    const populatedPlacesSource = new carto.source.Dataset(`
+      ne_10m_populated_places_simple
+    `);
     const allPlacesStyle = new carto.Style(`
       width: 6
-      color: rgba(0.93,0.30,0.35,1.0)
+      color: rgba(0.93, 0.30, 0.35, 1.0)
       strokeWidth: 1
-      strokeColor: rgba(1,1,1,1)
+      strokeColor: rgba(1, 1, 1, 1)
       filter: $pop_max >= 0
     `);
-
-    const lessPopulatedStyle = new carto.Style(`
-      width: 11
-      color: rgba(0.95,0.34,0.26,1.0)
-      strokeWidth: 1
-      strokeColor: rgba(1,1,1,1)
-      filter: $pop_max < 100
-    `);
-
     const veryPopulatedStyle = new carto.Style(`
       width: 11
-      color: rgba(0.41,0.71,0.62,1.0)
+      color: rgba(0.41, 0.71, 0.62, 1.0)
       strokeWidth: 1
-      strokeColor: rgba(1,1,1,1)
+      strokeColor: rgba(1, 1, 1, 1)
       filter: $pop_max > 5000000
     `);
-
+    const lessPopulatedStyle = new carto.Style(`
+      width: 11
+      color: rgba(0.95, 0.34, 0.26, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+      filter: $pop_max < 100
+    `);
 
     const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesStyle);
 
@@ -116,7 +114,7 @@
       populatedPlacesLayer.blendToStyle(allPlacesStyle);
     }
 
-    function setMostPopulated() {
+    function setVeryPopulated() {
       populatedPlacesLayer.blendToStyle(veryPopulatedStyle);
     }
 

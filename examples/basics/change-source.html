@@ -81,41 +81,40 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const source = new carto.source.SQL(`
+    const allCitiesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_10m_populated_places_simple
     `);
-    const style = new carto.Style(`
-      width: 6
-      color: rgba(0.93,0.30,0.35,1.0)
-      strokeWidth: 1
-      strokeColor: rgba(1,1,1,1)
+    const europeanCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const spanishCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name = \'Spain\'
+    `);
+    const citiesStyle = new carto.Style(`
+      width: 6
+      color: rgba(0.93, 0.30, 0.35, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+    `);
+    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesStyle);
 
-    layer.addTo(map, 'watername_ocean');
+    citiesLayer.addTo(map, 'watername_ocean');
 
     function setAllCities() {
-      layer.setSource(new carto.source.SQL(`
-        SELECT *
-          FROM ne_10m_populated_places_simple
-      `));
+      citiesLayer.setSource(allCitiesSource);
     }
 
     function setEuropeanCities() {
-      layer.setSource(new carto.source.SQL(`
-        SELECT *
-          FROM ne_10m_populated_places_simple
-          WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
-      `));
+      citiesLayer.setSource(europeanCitiesSource);
     }
 
     function setSpanishCities() {
-      layer.setSource(new carto.source.SQL(`
-        SELECT *
-          FROM ne_10m_populated_places_simple
-          WHERE adm0name = \'Spain\'
-      `));
+      citiesLayer.setSource(spanishCitiesSource);
     }
   </script>
 </body>
