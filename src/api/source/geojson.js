@@ -37,6 +37,8 @@ export default class GeoJSON extends Base {
 
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._status = 'init'; // init -> metadata -> data
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
         this._features = this._getFeatures(data);
     }
 
@@ -86,7 +88,7 @@ export default class GeoJSON extends Base {
 
     _requestData() {
         const geometry = this._decodeGeometry();
-        const properties = {};
+        const properties = this._decodeProperties();
         const dataframe = new Dataframe(
             { x: 0, y: 0 },
             1,
@@ -97,6 +99,38 @@ export default class GeoJSON extends Base {
         dataframe.active = true;
         dataframe.size = this._features.length;
         this._addDataframe(dataframe);
+    }
+
+    _decodeProperties() {
+        // TODO Fixed number of properties due to the renderer limit of 4
+        const properties = [
+            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
+            new Float32Array(this._features.length + 1024),
+            new Float32Array(this._features.length + 1024),
+            new Float32Array(this._features.length + 1024),
+            new Float32Array(this._features.length + 1024)
+        ];
+        for (var i = 0; i < this._features.length; i++) {
+            const f = this._features[i];
+
+            this.catFields.map((name, index) => {
+                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
+            });
+            this.numFields.map((name, index) => {
+                properties[index + this.catFields.length][i] = Number(f.properties[name]);
+            });
+            // TODO support date / timestamp properties
+        }
+        return properties;
+    }
+
+    _getCategoryIDFromString(category) {
+        if (this._categoryStringToIDMap[category] !== undefined) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._categoryStringToIDMap[category] = this._numCategories;
+        this._numCategories++;
+        return this._categoryStringToIDMap[category];
     }
 
     _getDataframeType(type) {

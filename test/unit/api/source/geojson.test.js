@@ -1,6 +1,9 @@
 import GeoJSON from '../../../../src/api/source/geojson';
 
-describe('api/source/geojson', () => {
+fdescribe('api/source/geojson', () => {
+    describe('_decodeProperties()', ()=>{
+
+    });
     describe('constructor', () => {
         it('should build a new Source with (data) as a Feature', () => {
             const data = {
@@ -14,6 +17,7 @@ describe('api/source/geojson', () => {
                 }
             };
             const source = new GeoJSON(data);
+            console.log(JSON.stringify(source, null, 4));
             expect(source._features).toEqual([data]);
         });
 
