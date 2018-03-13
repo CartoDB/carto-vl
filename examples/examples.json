@@ -68,6 +68,13 @@
                     "file": {  
                         "mapbox": "expressions/filter.html"
                     }
+                },
+                {  
+                    "title": "Animated dataset",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/animation.html"
+                    }
                 }
             ]
         },
