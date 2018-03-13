@@ -295,11 +295,11 @@ export default class Style {
         /**
          * @typedef {object} StyleSpec
          * @property {number} resolution
-         * @property {carto.style.expression.Base} color
-         * @property {carto.style.expression.Base} width
-         * @property {carto.style.expression.Base} strokeColor
-         * @property {carto.style.expression.Base} strokeWidth
-         * @property {carto.style.expression.Base} order
+         * @property {carto.style.expressions.Expression} color
+         * @property {carto.style.expressions.Expression} width
+         * @property {carto.style.expressions.Expression} strokeColor
+         * @property {carto.style.expressions.Expression} strokeWidth
+         * @property {carto.style.expressions.Expression} order
          * @api
          */
 
