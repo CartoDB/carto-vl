@@ -1,11 +1,9 @@
-/* global carto geojson */
-
 const map = new carto.Map({
     container: 'map',
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(geojson);
+const source = new carto.source.GeoJSON(sources['point']);
 const style = new carto.Style(`
     strokeWidth: 1,
     strokeColor: rgba(1, 0, 0, 1)

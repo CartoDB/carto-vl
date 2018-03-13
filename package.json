@@ -33,6 +33,7 @@
     "eslint": "^4.15.0",
     "exquisite-sst": "IagoLast/Exquisite#master",
     "glob": "^7.1.2",
+    "http-server": "^0.11.1",
     "jasmine-core": "^2.99.1",
     "jsdoc": "^3.5.5",
     "karma": "^2.0.0",
@@ -65,8 +66,8 @@
     "test:e2e": "mocha test/acceptance/e2e.test.js",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "node test/acceptance/e2e.prepare.js ",
+    "serve": "http-server",
     "loc": "sloc src/ examples/",
-    "publish": "git checkout gh-pages && git merge master && npm run build && npm run build-doc && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master",
-    "ghpublish": "git checkout gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push && git checkout master"
+    "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master"
   }
 }

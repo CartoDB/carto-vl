@@ -83,4 +83,3 @@ workflows:
       - lint
       - test-unit
       - test-integration
-      - test-acceptance

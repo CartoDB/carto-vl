@@ -1,0 +1,6 @@
+{
+    "globals": {
+        "carto": true,
+        "mapboxgl": true
+    }
+}
