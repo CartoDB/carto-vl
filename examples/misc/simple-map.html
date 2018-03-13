@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Simple map | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <!-- Include CARTO GL JS -->
-    <script src="../../dist/carto-gl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="../../vendor/mapbox-gl-dev.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
-    <style>
-      body { margin: 0; padding: 0; }
-      #map { position: absolute; height: 100%; width: 100%; }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-  </body>
+<head>
+  <title>Simple map | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO GL JS -->
+  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
   <script>
     const map = new carto.Map({
       container: 'map'
@@ -41,4 +47,5 @@
 
     layer.addTo(map);
   </script>
+</body>
 </html>

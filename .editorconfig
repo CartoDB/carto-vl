@@ -6,7 +6,7 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 
-# Javascript and json files are formated with 2 spaces with ut8 encoding
+# Javascript and JSON files are formatted with 4 spaces with ut8 encoding
 [*.{js,json}]
 charset = utf-8
 indent_style = space

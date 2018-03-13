@@ -1,69 +1,73 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Change style | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <!-- Include CARTO GL JS -->
-    <script src="../../dist/carto-gl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="../../vendor/mapbox-gl-dev.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      #map { position: absolute; height: 100%; width: 100%; }
-      #controls {
-        position: absolute;
-        padding: 20px;
-        background: white;
-        top: 12px;
-        right: 12px;
-        box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-        border-radius: 4px;
-        width: 200px;
-        color: #2E3C43;
-      }
-      #controls li {
-        list-style-type: none;
-        margin: 0 0 8px 0;
-        display: flex;
-        vertical-align: middle;
-      }
-      #controls li input {
-        margin: 0 8px 0 0;
-      }
-      #controls li label {
-        font: 12px/16px 'Open Sans';
-        cursor: pointer;
-      }
-      #controls li:last-child {
-        margin-bottom: 0;
-      }
-      #controls li:hover {
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <div id="controls">
-      <ul>
-        <li onclick="setRed()">
-          <input type="radio" name="style" checked id="red">
-          <label for="red">Size 7px - Red</label>
-        </li>
-        <li onclick="setGreen()">
-          <input type="radio" name="style" id="green">
-          <label for="green">Size 9px - Green</label>
-        </li>
-        <li onclick="setBlue()">
-          <input type="radio" name="style" id="blue">
-          <label for="blue">Size 11px - Blue</label>
-        </li>
-      </ul>
-    </div>
-  </body>
+<head>
+  <title>Change style | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO GL JS -->
+  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #controls {
+      position: absolute;
+      padding: 20px;
+      background: white;
+      top: 12px;
+      right: 12px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      width: 200px;
+      color: #2E3C43;
+    }
+    #controls li {
+      list-style-type: none;
+      margin: 0 0 8px 0;
+      display: flex;
+      vertical-align: middle;
+    }
+    #controls li input {
+      margin: 0 8px 0 0;
+    }
+    #controls li label {
+      font: 12px/16px 'Open Sans';
+      cursor: pointer;
+    }
+    #controls li:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <ul>
+      <li>
+        <input type="radio" name="style" onclick="setRed()" id="red" checked>
+        <label for="red">Size 7px - Red</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setGreen()" id="green">
+        <label for="green">Size 9px - Green</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setBlue()" id="blue">
+        <label for="blue">Size 11px - Blue</label>
+      </li>
+    </ul>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -90,9 +94,8 @@
 
     layer.addTo(map, 'watername_ocean');
 
-
     function setRed() {
-      layer.setStyle(new carto.Style(`
+      layer.blendToStyle(new carto.Style(`
         width: 6
         color: rgba(0.93,0.30,0.35,1.0)
         strokeWidth: 1
@@ -101,7 +104,7 @@
     }
 
     function setGreen() {
-      layer.setStyle(new carto.Style(`
+      layer.blendToStyle(new carto.Style(`
         width: 8
         color: rgba(0.61,0.78,0.23,1.0)
         strokeWidth: 1
@@ -110,7 +113,7 @@
     }
 
     function setBlue() {
-      layer.setStyle(new carto.Style(`
+      layer.blendToStyle(new carto.Style(`
         width: 10
         color: rgba(0.09,0.52,0.98,1.0)
         strokeWidth: 1
@@ -118,4 +121,5 @@
       `));
     }
   </script>
+</body>
 </html>
