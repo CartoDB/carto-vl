@@ -56,6 +56,20 @@
                     }
                 },
                 {  
+                    "title": "Use category ramp",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/ramp-category.html"
+                    }
+                },
+                {  
+                    "title": "Use numeric ramp",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/ramp-numeric.html"
+                    }
+                },
+                {  
                     "title": "Setup ordering",
                     "desc": "",
                     "file": {  
