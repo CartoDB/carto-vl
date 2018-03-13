@@ -1,4 +1,4 @@
-import { float, category, time } from '../functions';
+import { float, category } from '../functions';
 import Expression from './expression';
 
 export const DEFAULT = undefined;
