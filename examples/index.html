@@ -10,9 +10,9 @@
   <div id="container" style="margin-left:48px;"></div>
   <script>
     $(function () {
-      $.getJSON('./examples.json').done(function(data) {
-        renderCategories(data.categories);
-      });
+      fetch('./examples.json')
+        .then(data => data.json())
+        .then(data => renderCategories(data.categories));
 
       function renderCategories(categories) {
         var $container = $('#container');
