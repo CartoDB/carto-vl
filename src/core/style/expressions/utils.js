@@ -26,7 +26,7 @@ export function hexToRgb(hex) {
     } : null;
 }
 
-function getOrdinalFromIndex(index) {
+export function getOrdinalFromIndex(index) {
     const indexToOrdinal = {
         1: 'first',
         2: 'second',
