@@ -91,7 +91,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /**
- * @description Abstract expression class
+ * Abstract expression class
+ * 
+ * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
+ * they can be used where an Expression is required as long as the types match. 
+ * 
+ * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.style.expressions
  * @name Expression
@@ -3800,7 +3805,7 @@ const SUPPORTED_PROPERTIES = [
 class Style {
 
     /**
-    * A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+    * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through styles. Styles also control the element visibility, ordering or aggregation level.
     * 
     * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
@@ -4063,11 +4068,11 @@ class Style {
         /**
          * @typedef {object} StyleSpec
          * @property {number} resolution
-         * @property {carto.style.expression.Base} color
-         * @property {carto.style.expression.Base} width
-         * @property {carto.style.expression.Base} strokeColor
-         * @property {carto.style.expression.Base} strokeWidth
-         * @property {carto.style.expression.Base} order
+         * @property {carto.style.expressions.Expression} color
+         * @property {carto.style.expressions.Expression} width
+         * @property {carto.style.expressions.Expression} strokeColor
+         * @property {carto.style.expressions.Expression} strokeWidth
+         * @property {carto.style.expressions.Expression} order
          * @api
          */
 
@@ -4267,8 +4272,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  *  @namespace carto
  *
  *  @description
- *  # CARTO GL
- *  All the library features are exposed through the `carto` namespace.
+ *  The carto-gl functionality is exposed through the **carto** namespace including:
+ * 
+ * - carto.source
+ *  - {@link carto.source.Dataset|carto.source.Dataset} 
+ *  - {@link carto.source.SQL|carto.source.SQL}
+ *  - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - carto.style
+ *  -   {@link carto.style.expressions|carto.style.expressions}
+ * - {@link carto.Layer|carto.Layer}
+ * - {@link carto.Style|carto.Style}
+ * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
+ * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
 
 
@@ -9791,7 +9806,19 @@ const validation = {
 class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default */] {
 
     /**
-     * Create a carto.source.Dataset.
+     * A dataset defines the data that will be displayed in a layer and is equivalent
+     * to a table in the server.
+     * 
+     * If you have a table named `european_cities` in your CARTO account you could load all the
+     * data in a layer using a `carto.Dataset`. 
+     * 
+     * If you want to load data applying a SQL query see {@link carto.source.SQL|carto.source.SQL}.
+     * 
+     * Since tables in the server are protected you must provide valid credentials in order to get access to the data.
+     * This can be done {@link carto.setDefaultAuth|setting the default auth} in the carto object or providing an `auth` 
+     * object with your username and apiKey.
+     * 
+     * If your server is not hosted by CARTO you must add a third parameter that includes the serverURL.
      *
      * @param {string} tableName - The name of an existing table
      * @param {object} auth
@@ -13335,7 +13362,26 @@ Point.convert = function (a) {
 class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default */] {
 
     /**
-     * Create a carto.source.Dataset.
+     * A SQL defines the data that will be displayed in a layer.
+     * 
+     * Imagine you have a table named `european_cities` and you only want to download data from european cities with population > 100000
+     * 
+     * ```javascript
+     * new carto.source.SQL(`SELECT * FROM european_cities WHERE country like 'europe' AND population > 10000`, {
+     *   apiKey: 'YOUR_API_KEY_HERE',
+     *   user: 'YOUR_USERNAME_HERE'
+     * });
+     * ````
+     * 
+     * This only downloads the data you need from the server reducing data usage. 
+     * 
+     * If you need all the data see {@link carto.source.Dataset|carto.source.Dataset}
+     * 
+     * Since tables in the server are protected you must provide valid credentials in order to get access to the data.
+     * This can be done {@link carto.setDefaultAuth|setting the default auth} in the carto object or providing an `auth` 
+     * object with your username and apiKey.
+     * 
+     * If your server is not hosted by CARTO you must add a third parameter that includes the serverURL.
      *
      * @param {string} query - A SQL query containing a SELECT statement
      * @param {object} auth
