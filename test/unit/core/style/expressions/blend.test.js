@@ -31,45 +31,54 @@ describe('src/core/style/expressions/blend', () => {
 
     describe('error control', () => {
         it('blend(\'red\', 0, 0) should throw at constructor time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => s.blend('red', 0, 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
         it('blend(0, \'red\', 0) should throw at constructor time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => s.blend(0, 'red', 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
         it('blend(0, 0, \'red\') should throw at constructor time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => s.blend(0, 0, 'red')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
 
         it('blend($cat, 0, 0) should throw at compile time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => compile(s.blend($cat, 0, 0))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
         it('blend(0, $cat, 0) should throw at compile time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => compile(s.blend(0, $cat, 0))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
         it('blend(0, 0, $cat) should throw at compile time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => compile(s.blend(0, 0, $cat))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
 
         it('blend(0, hsv(0,0,0), 0) should throw at constructor time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => s.blend(0, s.hsv(0, 0, 0), 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
         });
     });
-    
+
     describe('compile with correct parameters', () => {
         it('blend(hsv(0,0,0), hsv(0,0,0), 0) should not throw', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => compile(s.blend(s.hsv(0, 0, 0), s.hsv(0, 0, 0), 0))).not.toThrow();
         });
         it('blend(3, 4, 0) should not throw', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(() => compile(s.blend(3, 4, 0))).not.toThrow();
+        });
+        it('blend($price, 4, 0) should not throw', () => {
+            expect(() => compile(s.blend($price, 4, 0))).not.toThrow();
         });
     });
-    
+
     describe('compiled type', () => {
         it('blend(hsv(0,0,0), hsv(0,0,0), 0) should be of type color', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(s.blend(s.hsv(0, 0, 0), s.hsv(0, 0, 0), 0).type).toEqual('color');
         });
         it('blend(3, 4, 0) should be of type float', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+            expect(s.blend(3, 4, 0).type).toEqual('float');
+        });
+        it('blend(3, 4, $price) should be of type float', () => {
+            expect(s.blend(3, 4, $price).type).toEqual('float');
+        });
+        it('blend($price, 4, 0) should be of type float at compile time', () => {
+            expect(compile(s.blend($price, 4, 0)).type).toEqual('float');
         });
     });
 
