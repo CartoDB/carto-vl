@@ -56,10 +56,17 @@
                     }
                 },
                 {  
-                    "title": "Configure ordering",
+                    "title": "Setup ordering",
                     "desc": "",
                     "file": {  
                         "mapbox": "expressions/order.html"
+                    }
+                },
+                {  
+                    "title": "Filter metadata",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/filter.html"
                     }
                 }
             ]
