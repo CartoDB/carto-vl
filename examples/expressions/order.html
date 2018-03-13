@@ -86,13 +86,10 @@
     `);
     const s = carto.style.expressions;
     const style = new carto.Style({
-        width: s.mul(
-            s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
-            s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
-        ),
+        width: s.sqrt('amount'),
         color: s.ramp(s.prop('category'), s.palettes.prism),
-        strokeColor: s.rgba(0, 0, 0, 0.7),
-        strokeWidth: s.div(s.zoom(), 10000),
+        strokeColor: s.rgba(1, 1, 1, 0.7),
+        strokeWidth: 1,
     });
     const layer = new carto.Layer('layer', source, style);
 
@@ -100,38 +97,29 @@
 
     function setDefaultOrder() {
       layer.blendToStyle(new carto.Style({
-          width: s.mul(
-              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
-              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
-          ),
+          width: s.sqrt('amount'),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(0, 0, 0, 0.7),
-          strokeWidth: s.div(s.zoom(), 10000),
+          strokeColor: s.rgba(1, 1, 1, 0.7),
+          strokeWidth: 1,
       }));
     }
 
     function setAscOrder() {
       layer.blendToStyle(new carto.Style({
-          width: s.mul(
-              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
-              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
-          ),
+          width: s.sqrt('amount'),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(0, 0, 0, 0.7),
-          strokeWidth: s.div(s.zoom(), 10000),
+          strokeColor: s.rgba(1, 1, 1, 0.7),
+          strokeWidth: 1,
           order: s.asc(s.width())
       }));
     }
 
     function setDescOrder() {
       layer.blendToStyle(new carto.Style({
-          width: s.mul(
-              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
-              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
-          ),
+          width: s.sqrt('amount'),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(0, 0, 0, 0.7),
-          strokeWidth: s.div(s.zoom(), 10000),
+          strokeColor: s.rgba(1, 1, 1, 0.7),
+          strokeWidth: 1,
           order: s.desc(s.width())
       }));
     }
