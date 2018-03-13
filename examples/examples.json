@@ -54,6 +54,13 @@
                     "file": {  
                         "mapbox": "expressions/color.html"
                     }
+                },
+                {  
+                    "title": "Configure ordering",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/order.html"
+                    }
                 }
             ]
         },

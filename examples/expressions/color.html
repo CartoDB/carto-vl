@@ -66,6 +66,10 @@
         <input type="radio" name="style" onclick="setHSVBlue()" id="blue">
         <label for="blue">HSV - Blue</label>
       </li>
+      <li>
+        <input type="radio" name="style" onclick="setOpacity()" id="green">
+        <label for="green">Opacity - Green</label>
+      </li>
     </ul>
   </div>
   <script>
@@ -106,6 +110,12 @@
     function setHSVBlue() {
       layer.blendToStyle(new carto.Style(`
         color: hsv(0.59,0.89,1.0)
+      `));
+    }
+    
+    function setOpacity() {
+      layer.blendToStyle(new carto.Style(`
+        color: opacity(hsv(0.3,1.0,1.0), 0.2)
       `));
     }
   </script>
