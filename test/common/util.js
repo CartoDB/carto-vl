@@ -6,10 +6,25 @@ const exquisite = require('exquisite-sst');
 
 let testsDir = '';
 const testFile = 'scenario.js';
+const sources = loadGeoJSONSources();
 
 function loadFiles(directory) {
     testsDir = directory;
-    return glob.sync(path.join(directory, '**', testFile));
+    let files = [];
+    let fFiles = [];
+    const allFiles = glob.sync(path.join(directory, '**', testFile));
+    allFiles.forEach(function (file) {
+        const name = getName(file);
+        if (!name.includes('/x-')) {
+            if (name.includes('/f-')) {
+                fFiles.push(file);
+            } else {
+                files.push(file);
+            }
+        }
+    });
+    if (fFiles.length > 0) return fFiles;
+    return files;
 }
 
 function loadTemplate(file) {
@@ -47,15 +62,24 @@ function testSST(file, template, asyncLoad) {
 
 function writeTemplate(file, template) {
     const mainDir = path.resolve(__dirname, '..', '..');
-    const geojsonDir = path.resolve(path.dirname(file), '..', 'data.geojson');
-    const geojson = fs.existsSync(geojsonDir) ? fs.readFileSync(geojsonDir) : '';
     fs.writeFileSync(getHTML(file), template({
         file: file,
-        geojson: geojson,
+        sources: sources,
         cartogl: path.join(mainDir, 'dist', 'carto-gl.js'),
         mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
         mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
     }));
+}
+
+function loadGeoJSONSources() {
+    const sourcesDir = path.resolve(__dirname, 'sources');
+    const geojsonFiles = glob.sync(path.join(sourcesDir, '*.geojson'));
+    let sources = {};
+    geojsonFiles.forEach(function(geojsonFile) {
+        const fileName = path.basename(geojsonFile, '.geojson');
+        sources[fileName] = JSON.parse(fs.readFileSync(geojsonFile));
+    });
+    return JSON.stringify(sources);
 }
 
 function getHTML(file) {
