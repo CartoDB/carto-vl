@@ -83,6 +83,13 @@
                         "mapbox": "expressions/filter.html"
                     }
                 },
+                {
+                    "title": "Viewport interactivity",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/viewport.html"
+                    }
+                },
                 {  
                     "title": "Animated dataset",
                     "desc": "",
@@ -90,11 +97,11 @@
                         "mapbox": "expressions/animation.html"
                     }
                 },
-                {
-                    "title": "Viewport interactivity",
+                {  
+                    "title": "Torque",
                     "desc": "",
                     "file": {  
-                        "mapbox": "expressions/viewport.html"
+                        "mapbox": "expressions/torque.html"
                     }
                 }
             ]

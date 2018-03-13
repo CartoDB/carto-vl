@@ -34,18 +34,27 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const source = new carto.source.Dataset(`
+    const sourcePopulation = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
-    const style = new carto.Style(`
-      width: add(3 * mod(now(), 5), 1)
+    const stylePopulation = new carto.Style(`
+      width: 3
       color: rgba(0.93,0.30,0.35,1.0)
       strokeWidth: 1
       strokeColor: rgba(1,1,1,1)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layerPopulation = new carto.Layer('layerPopulation', sourcePopulation, stylePopulation);
+    
+    const sourceCountries = new carto.source.Dataset(`
+      world_borders
+    `);
+    const styleCountries = new carto.Style(`
+      color: rgba(0,1,0,0.5)
+    `);
+    const layerCountries = new carto.Layer('layerCountries', sourceCountries, styleCountries);
 
-    layer.addTo(map);
+    layerPopulation.addTo(map);
+    layerCountries.addTo(map, 'layerPopulation');
   </script>
 </body>
 </html>
