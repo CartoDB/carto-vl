@@ -5,11 +5,18 @@ const template = require('lodash.template');
 const exquisite = require('exquisite-sst');
 
 let testsDir = '';
-const testFile = 'scenario.js';
+let testFile = '';
 
 function loadFiles(directory) {
     testsDir = directory;
-    return glob.sync(path.join(directory, '**', testFile));
+    testFile = 'fscenario.js';
+    let files = glob.sync(path.join(directory, '**', testFile));
+    if (files.length === 0) {
+        // If there are no fscenario.js files load all scenario.js files
+        testFile = 'scenario.js';
+        files = glob.sync(path.join(directory, '**', testFile));
+    }
+    return files;
 }
 
 function loadTemplate(file) {
