@@ -89,6 +89,13 @@
                     "file": {  
                         "mapbox": "expressions/animation.html"
                     }
+                },
+                {
+                    "title": "Viewport interactivity",
+                    "desc": "",
+                    "file": {  
+                        "mapbox": "expressions/viewport.html"
+                    }
                 }
             ]
         },

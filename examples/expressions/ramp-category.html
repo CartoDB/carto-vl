@@ -66,6 +66,10 @@
         <input type="radio" name="style" onclick="setRampTop()" id="top">
         <label for="top">Ramp top</label>
       </li>
+      <li>
+        <input type="radio" name="style" onclick="setRampQuantiles()" id="quantiles">
+        <label for="quantiles">Ramp quantiles</label>
+      </li>
     </ul>
   </div>
   <script>
@@ -107,6 +111,12 @@
     function setRampTop() {
       layer.blendToStyle(new carto.Style({
         color: s.ramp(s.top(s.prop('category'), 3), s.palettes.prism)
+      }));
+    }
+    
+    function setRampQuantiles() {
+      layer.blendToStyle(new carto.Style({
+        color: s.ramp(s.quantiles(s.prop('daytime'), 3), s.palettes.earth)
       }));
     }
   </script>
