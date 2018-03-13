@@ -3,7 +3,7 @@
 
 a.k.a Render tests
 
-The idea of this tests is to automatically test the **renderer** using local data sources (GeoJSON) and a static map.
+The idea of these tests is to automatically test the **renderer** using local data sources (GeoJSON) and a static map. The local GeoJSON files are located in the `common/sources` directory.
 
 This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. These tests are defined in the `scenario.js` file:
 
@@ -12,9 +12,9 @@ render
 ├── category
 │   ├── test1
 │   │   └── scenario.js
-│   ├── test2
-│   │   └── scenario.js
-│   └── data.geojson
+│   └── test2
+│       └── scenario.js
+│
 ...
 ```
 
@@ -52,6 +52,14 @@ test1
 ├── reference_out.png
 └── reference.png
 ```
+
+## Filtering tests
+
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
+
+## Ignoring tests
+
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 
 **Note**: you may need to configure the CHROME_BIN variable before running the tests, for example:

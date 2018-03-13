@@ -5,18 +5,23 @@ const template = require('lodash.template');
 const exquisite = require('exquisite-sst');
 
 let testsDir = '';
-let testFile = '';
+const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
 
 function loadFiles(directory) {
     testsDir = directory;
-    testFile = 'fscenario.js';
-    let files = glob.sync(path.join(directory, '**', testFile));
-    if (files.length === 0) {
-        // If there are no fscenario.js files load all scenario.js files
-        testFile = 'scenario.js';
-        files = glob.sync(path.join(directory, '**', testFile));
-    }
+    let files = [];
+    let fFiles = [];
+    const allFiles = glob.sync(path.join(directory, '**', testFile));
+    allFiles.forEach(function (file) {
+        const name = getName(file);
+        if (name.indexOf('/f-') !== -1) {
+            fFiles.push(file);
+        } else if (name.indexOf('/x-') === -1) {
+            files.push(file);
+        }
+    });
+    if (fFiles.length > 0) return fFiles;
     return files;
 }
 

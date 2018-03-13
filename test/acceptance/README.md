@@ -2,7 +2,7 @@
 
 a.k.a E2E tests
 
-The idea of this tests is to automatically test the **entire stack**, including the library, the renderer and the integration with the backend.
+The idea of these tests is to automatically test the **entire stack**, including the library, the renderer and the integration with the backend.
 
 This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. These tests are defined in the `scenario.js` file:
 
@@ -49,6 +49,14 @@ test1
 ├── reference_out.png
 └── reference.png
 ```
+
+## Filtering tests
+
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
+
+## Ignoring tests
+
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 
 **Note**: you may need to configure the CHROME_BIN variable before running the tests, for example:
