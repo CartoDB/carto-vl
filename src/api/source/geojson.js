@@ -4,6 +4,7 @@ import * as rsys from '../../client/rsys';
 import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
+const SAMPLE_TARGET_SIZE = 1000;
 
 export default class GeoJSON extends Base {
 
@@ -107,7 +108,7 @@ export default class GeoJSON extends Base {
         const metadata = {
             columns: [],
             categoryIDs: {},
-            // TODO sample
+            sample: [],
             featureCount: this._features.length,
         };
         for (var i = 0; i < this._features.length; i++) {
@@ -121,6 +122,7 @@ export default class GeoJSON extends Base {
                     this._addCategoryPropertyToMetadata(name, value, metadata);
                 }
             });
+            this._sampleFeatureOnMetadata(properties, metadata, this._features.length);
         }
         this._numFields.map(name => {
             const column = metadata.columns.find(c => c.name == name);
@@ -132,6 +134,16 @@ export default class GeoJSON extends Base {
         });
         this._metadata = metadata;
         return metadata;
+    }
+
+    _sampleFeatureOnMetadata(feature, metadata, featureCount) {
+        if (featureCount > SAMPLE_TARGET_SIZE) {
+            const sampling = SAMPLE_TARGET_SIZE / featureCount;
+            if (Math.random() > sampling) {
+                return;
+            }
+        }
+        metadata.sample.push(feature);
     }
 
     _addNumericPropertyToMetadata(propertyName, value, metadata) {

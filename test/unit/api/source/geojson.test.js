@@ -97,6 +97,16 @@ describe('api/source/geojson', () => {
                     blue: 1
                 },
                 featureCount: 2,
+                sample: [
+                    {
+                        numeric: 1,
+                        category: 'red'
+                    },
+                    {
+                        numeric: 2,
+                        category: 'blue'
+                    }
+                ]
             };
             expect(source._metadata).toEqual(expected);
         });
