@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Examples | CARTO</title>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 </head>
+
 <body>
   <h1 class="page-title">Examples</h1>
   <div id="container" style="margin-left:48px;"></div>
   <script>
-    $(function () {
-      fetch('./examples.json')
-        .then(data => data.json())
-        .then(data => renderCategories(data.categories));
+    fetch('./examples.json')
+      .then(data => data.json())
+      .then(data => renderCategories(data.categories));
 
-      function renderCategories(categories) {
-        var $container = $('#container');
+    function renderCategories(categories) {
+      document.getElementById('container').innerHTML = categories.map(renderCategory).join('\n');
+    }
 
-        categories.forEach(function (category) {
-          const $category = $(`<h2>${category.title}</h2>`);
-          const $samples = $(`<ul></ul>`);
-          if (category.samples) {
-            category.samples.forEach(function (sample) {
-              let link = ''
-              if (typeof sample.file === 'string') {
-                link = `(<a href="${sample.file}">Link</a>)`;
-              } else {
-                link = `(<a href="${sample.file.mapbox}">Link</a>)`;
-              }
-              const $sample = $(`<li><h3>${sample.title} <span style="font-size:0.8em;">${link}</span></h3></li>`);
-              $samples.append($sample);
-            });
-          }
-          $container.append($category);
-          $container.append($samples);
-        });
-      }
-    });
+    function renderCategory(category) {
+      return `<h2> ${category.title} </h2>
+          <ul>
+            ${category.samples.map(renderSample).join('\n')}
+          </ul>
+        `;
+    }
+
+    function renderSample(sample) {
+      let link = (typeof sample.file === 'string') ? `(<a href="${sample.file}">Link</a>)` : `(<a href="${sample.file.mapbox}">Link</a>)`;
+      return `<li><h3>${sample.title} <span style="font-size:0.8em;">${link}</span></h3></li>`;
+    }
   </script>
 </body>
+
 </html>
