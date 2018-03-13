@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Order | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO GL JS -->
+  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #controls {
+      position: absolute;
+      padding: 20px;
+      background: white;
+      top: 12px;
+      right: 12px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      width: 200px;
+      color: #2E3C43;
+    }
+    #controls li {
+      list-style-type: none;
+      margin: 0 0 8px 0;
+      display: flex;
+      vertical-align: middle;
+    }
+    #controls li input {
+      margin: 0 8px 0 0;
+    }
+    #controls li label {
+      font: 12px/16px 'Open Sans';
+      cursor: pointer;
+    }
+    #controls li:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <ul>
+      <li>
+        <input type="radio" name="style" onclick="setDefaultOrder()" id="default" checked>
+        <label for="default">Default</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setAscOrder()" id="asc">
+        <label for="asc">Ascending</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setDescOrder()" id="des">
+        <label for="des">Descending</label>
+      </li>
+    </ul>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [2.1734, 41.3851],
+      zoom: 14
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
+
+    const source = new carto.source.Dataset(`
+      tx_0125_copy_copy
+    `);
+    const s = carto.style.expressions;
+    const style = new carto.Style({
+        width: s.mul(
+            s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
+            s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
+        ),
+        color: s.ramp(s.prop('category'), s.palettes.prism),
+        strokeColor: s.rgba(0, 0, 0, 0.7),
+        strokeWidth: s.div(s.zoom(), 10000),
+    });
+    const layer = new carto.Layer('layer', source, style);
+
+    layer.addTo(map, 'watername_ocean');
+
+    function setDefaultOrder() {
+      layer.blendToStyle(new carto.Style({
+          width: s.mul(
+              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
+              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
+          ),
+          color: s.ramp(s.prop('category'), s.palettes.prism),
+          strokeColor: s.rgba(0, 0, 0, 0.7),
+          strokeWidth: s.div(s.zoom(), 10000),
+      }));
+    }
+
+    function setAscOrder() {
+      layer.blendToStyle(new carto.Style({
+          width: s.mul(
+              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
+              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
+          ),
+          color: s.ramp(s.prop('category'), s.palettes.prism),
+          strokeColor: s.rgba(0, 0, 0, 0.7),
+          strokeWidth: s.div(s.zoom(), 10000),
+          order: s.asc(s.width())
+      }));
+    }
+
+    function setDescOrder() {
+      layer.blendToStyle(new carto.Style({
+          width: s.mul(
+              s.mul(s.sqrt(s.div(s.prop('amount'), 5000)), 20),
+              s.mul(s.add(s.div(s.zoom(), 4000), 0.01), 1.5)
+          ),
+          color: s.ramp(s.prop('category'), s.palettes.prism),
+          strokeColor: s.rgba(0, 0, 0, 0.7),
+          strokeWidth: s.div(s.zoom(), 10000),
+          order: s.desc(s.width())
+      }));
+    }
+  </script>
+</body>
+</html>

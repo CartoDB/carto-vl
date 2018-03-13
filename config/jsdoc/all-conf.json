@@ -1,20 +1,20 @@
 {
-  "source": {
-    "include": [
-      "src"
-    ]
-  },
-  "templates": {
-    "default": {
-      "outputSourceFiles": false,
-      "useLongnameInNav": true
+    "source": {
+        "include": [
+            "src"
+        ]
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false,
+            "useLongnameInNav": true
+        }
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "opts": {
+        "recurse": true,
+        "destination": "./docs/all"
     }
-  },
-  "plugins": [
-    "plugins/markdown"
-  ],
-  "opts": {
-    "recurse": true,
-    "destination": "./docs/all"
-  }
 }
