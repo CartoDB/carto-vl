@@ -1,5 +1,3 @@
-/* global carto sources */
-
 const map = new carto.Map({
     container: 'map',
     background: 'black'
