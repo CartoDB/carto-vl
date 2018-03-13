@@ -2,6 +2,13 @@ import { float } from '../functions';
 import { implicitCast } from './utils';
 import Expression from './expression';
 
+// Each binary expression can have a set of the following signatures (OR'ed flags)
+const UNSUPPORTED_SIGNATURE = 0;
+const FLOATS_TO_FLOAT = 1;
+const FLOAT_AND_COLOR_TO_COLOR = 2;
+const COLORS_TO_COLOR = 4;
+const CATEGORIES_TO_FLOAT = 8;
+
 /**
  *
  * Multiply two numeric expressions.
@@ -21,7 +28,11 @@ import Expression from './expression';
  * @function
  * @api
  */
-export const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+export const FloatMul = genBinaryOp('mul',
+    FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    (x, y) => x * y,
+    (x, y) => `(${x} * ${y})`
+);
 
 /**
  *
@@ -42,7 +53,11 @@ export const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
  * @function
  * @api
  */
-export const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+export const FloatDiv = genBinaryOp('div',
+    FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    (x, y) => x / y,
+    (x, y) => `(${x} / ${y})`
+);
 
 /**
  *
@@ -63,7 +78,11 @@ export const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
  * @function
  * @api
  */
-export const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+export const FloatAdd = genBinaryOp('add',
+    FLOATS_TO_FLOAT | COLORS_TO_COLOR,
+    (x, y) => x + y,
+    (x, y) => `(${x} + ${y})`
+);
 
 /**
  *
@@ -84,7 +103,11 @@ export const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
  * @function
  * @api
  */
-export const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+export const FloatSub = genBinaryOp('sub',
+    FLOATS_TO_FLOAT | COLORS_TO_COLOR,
+    (x, y) => x - y,
+    (x, y) => `(${x} - ${y})`
+);
 
 /**
  *
@@ -105,7 +128,11 @@ export const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
  * @function
  * @api
  */
-export const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`);
+export const FloatMod = genBinaryOp('mod',
+    FLOATS_TO_FLOAT,
+    (x, y) => x % y,
+    (x, y) => `mod(${x}, ${y})`
+);
 
 /**
  *
@@ -127,7 +154,11 @@ export const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`
  * @function
  * @api
  */
-export const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+export const FloatPow = genBinaryOp('pow',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.pow(x, y),
+    (x, y) => `pow(${x}, ${y})`
+);
 
 /**
  *
@@ -150,7 +181,11 @@ export const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x
  * @function
  * @api
  */
-export const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
+export const GreaterThan = genBinaryOp('greaterThan',
+    FLOATS_TO_FLOAT,
+    (x, y) => x > y ? 1 : 0,
+    (x, y) => `(${x}>${y}? 1.:0.)`
+);
 
 /**
  *
@@ -173,7 +208,11 @@ export const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}
  * @function
  * @api
  */
-export const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
+export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
+    FLOATS_TO_FLOAT,
+    (x, y) => x >= y ? 1 : 0,
+    (x, y) => `(${x}>=${y}? 1.:0.)`
+);
 
 /**
  *
@@ -196,7 +235,11 @@ export const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y)
  * @function
  * @api
  */
-export const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
+export const LessThan = genBinaryOp('lessThan',
+    FLOATS_TO_FLOAT,
+    (x, y) => x < y ? 1 : 0,
+    (x, y) => `(${x}<${y}? 1.:0.)`
+);
 
 /**
  *
@@ -219,7 +262,11 @@ export const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${
  * @function
  * @api
  */
-export const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
+export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
+    FLOATS_TO_FLOAT,
+    (x, y) => x <= y ? 1 : 0,
+    (x, y) => `(${x}<=${y}? 1.:0.)`
+);
 
 /**
  *
@@ -242,7 +289,11 @@ export const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) =>
  * @function
  * @api
  */
-export const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
+export const Equals = genBinaryOp('equals',
+    FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT,
+    (x, y) => x == y ? 1 : 0,
+    (x, y) => `(${x}==${y}? 1.:0.)`
+);
 
 /**
  *
@@ -265,7 +316,11 @@ export const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${
  * @function
  * @api
  */
-export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
+export const NotEquals = genBinaryOp('notEquals',
+    FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT,
+    (x, y) => x != y ? 1 : 0,
+    (x, y) => `(${x}!=${y}? 1.:0.)`
+);
 
 
 /**
@@ -294,7 +349,11 @@ export const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!
  * @function
  * @api
  */
-export const Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
+export const Or = genBinaryOp('or',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.min(x + y, 1),
+    (x, y) => `min(${x} + ${y}, 1.)`
+);
 
 /**
  *
@@ -324,9 +383,13 @@ export const Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} 
  * @function
  * @api
  */
-export const And = genBinaryOp((x, y) => Math.min(x * y, 1), (x, y) => `min(${x} * ${y}, 1.)`);
+export const And = genBinaryOp('and',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.min(x * y, 1),
+    (x, y) => `min(${x} * ${y}, 1.)`
+);
 
-function genBinaryOp(jsFn, glsl) {
+function genBinaryOp(name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends Expression {
         /**
          * @jsapi
@@ -344,27 +407,60 @@ function genBinaryOp(jsFn, glsl) {
             a = implicitCast(a);
             b = implicitCast(b);
 
+            const signature = getSignature(a, b);
+            if (signature !== undefined) {
+                if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+                    throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
+                }
+            }
+
             super({ a: a, b: b });
+            this.type = getReturnTypeFromSignature(signature);
         }
         _compile(meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
-            this.inlineMaker = inline => glsl(inline.a, inline.b);
-            // TODO this logic is operation dependant
-            if (a.type == 'float' && b.type == 'float') {
-                this.type = 'float';
-            } else if (a.type == 'color' && b.type == 'color') {
-                this.type = 'color';
-            } else if (a.type == 'color' && b.type == 'float') {
-                this.type = 'color';
-            } else if (a.type == 'category' && b.type == 'category') {
-                this.type = 'float';
-            } else {
-                throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
+
+            const signature = getSignature(a, b);
+            if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+                throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
+            this.type = getReturnTypeFromSignature(signature);
+
+            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
         eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
     };
+}
+
+function getSignature(a, b) {
+    if (!a.type || !b.type) {
+        return undefined;
+    } else if (a.type == 'float' && b.type == 'float') {
+        return FLOATS_TO_FLOAT;
+    } else if (a.type == 'float' && b.type == 'color') {
+        return FLOAT_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'float') {
+        return FLOAT_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'color') {
+        return COLORS_TO_COLOR;
+    } else if (a.type == 'category' && b.type == 'category') {
+        return CATEGORIES_TO_FLOAT;
+    } else {
+        return UNSUPPORTED_SIGNATURE;
+    }
+}
+
+function getReturnTypeFromSignature(signature) {
+    if (signature == FLOATS_TO_FLOAT) {
+        return 'float';
+    } else if (signature == FLOAT_AND_COLOR_TO_COLOR) {
+        return 'color';
+    } else if (signature == COLORS_TO_COLOR) {
+        return 'color';
+    } else if (signature == CATEGORIES_TO_FLOAT) {
+        return 'float';
+    }
 }

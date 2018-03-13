@@ -13,6 +13,7 @@ export default class HSV extends Expression {
         s = implicitCast(s);
         v = implicitCast(v);
         super({ h: h, s: s, v: v });
+        this.type = 'color';
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -22,7 +23,6 @@ export default class HSV extends Expression {
         if (typeCheck(this.h) || typeCheck(this.s) || typeCheck(this.v)) {
             throw new Error('CIELab() invalid parameters');
         }
-        this.type = 'color';
         const normalize = (v, hue = false) => {
             if (v.type == 'category') {
                 return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
