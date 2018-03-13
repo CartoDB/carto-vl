@@ -1,36 +1,41 @@
 import GeoJSON from '../../../../src/api/source/geojson';
 
-fdescribe('api/source/geojson', () => {
-    it('_decodeProperties() should return a valid dataframe properties object', () => {
-        const data = {
-            type: 'FeatureCollection',
-            features: [{
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [0, 0]
-                },
-                properties: {
-                    numeric: 1
-                }
-            }, {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [1, 0]
-                },
-                properties: {
-                    numeric: 2
-                }
-            }]
-        };
+describe('api/source/geojson', () => {
+    const data = {
+        type: 'FeatureCollection',
+        features: [{
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
+            },
+            properties: {
+                numeric: 1,
+                category: 'red'
+            }
+        }, {
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [1, 0]
+            },
+            properties: {
+                numeric: 2,
+                category: 'blue'
+            }
+        }]
+    };
+    it('_decodeProperties() should return a valid Dataframe properties object', () => {
         const source = new GeoJSON(data);
         const properties = source._decodeProperties();
         const expected = {
             numeric: new Float32Array(2 + 1024),
+            category: new Float32Array(2 + 1024),
         };
         expected.numeric[0] = 1;
         expected.numeric[1] = 2;
+        expected.category[0] = 0;
+        expected.category[1] = 1;
         expect(properties).toEqual(expected);
     });
     describe('constructor', () => {
@@ -65,6 +70,35 @@ fdescribe('api/source/geojson', () => {
             };
             const source = new GeoJSON(data);
             expect(source._features).toEqual(data.features);
+        });
+
+        it('should compute metadata for numeric and category properties', () => {
+            const source = new GeoJSON(data);
+            const expected = {
+                columns: [
+                    {
+                        name: 'numeric',
+                        type: 'float',
+                        min: 1,
+                        max: 2,
+                        avg: 1.5,
+                        sum: 3,
+                        count: 2
+                    },
+                    {
+                        name: 'category',
+                        type: 'category',
+                        categoryNames: ['red', 'blue'],
+                        categoryCounts: [1, 1],
+                    }
+                ],
+                categoryIDs: {
+                    red: 0,
+                    blue: 1
+                },
+                featureCount: 2,
+            };
+            expect(source._metadata).toEqual(expected);
         });
 
         it('should throw an error if data is not valid', function () {

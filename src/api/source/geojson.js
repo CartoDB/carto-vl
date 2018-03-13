@@ -113,36 +113,68 @@ export default class GeoJSON extends Base {
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             Object.keys(properties).map(name => {
-                const type = Number.isFinite(properties[name]) ? 'float' : 'category';
+                const value = properties[name];
+                const type = Number.isFinite(value) ? 'float' : 'category';
                 if (type == 'float') {
-                    if (this._catFields.includes(name)) {
-                        throw new Error(`Unsupported GeoJSON: the property '${name}' has different types in different features.`);
-                    }
-                    if (!this._numFields.includes(name)) {
-                        this._numFields.push(name);
-                        metadata.columns.push({
-                            name,
-                            type: 'float'
-                            // TODO aggs
-                        });
-                    }
+                    this._addNumericPropertyToMetadata(name, value, metadata);
                 } else {
-                    if (this._numFields.includes(name)) {
-                        throw new Error(`Unsupported GeoJSON: the property '${name}' has different types in different features.`);
-                    }
-                    if (!this._catFields.includes(name)) {
-                        this._catFields.push(name);
-                        metadata.columns.push({
-                            name,
-                            type: 'category'
-                            // TODO aggs
-                        });
-                    }
+                    this._addCategoryPropertyToMetadata(name, value, metadata);
                 }
             });
         }
+        this._numFields.map(name => {
+            const column = metadata.columns.find(c => c.name == name);
+            column.avg = column.sum / column.count;
+        });
+        this._catFields.map(name => {
+            const column = metadata.columns.find(c => c.name == name);
+            column.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+        });
         this._metadata = metadata;
         return metadata;
+    }
+
+    _addNumericPropertyToMetadata(propertyName, value, metadata) {
+        if (this._catFields.includes(propertyName)) {
+            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+        }
+        if (!this._numFields.includes(propertyName)) {
+            this._numFields.push(propertyName);
+            metadata.columns.push({
+                name: propertyName,
+                type: 'float',
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+                avg: Number.NaN,
+                sum: 0,
+                count: 0
+            });
+        }
+        const column = metadata.columns.find(c => c.name == propertyName);
+        column.min = Math.min(column.min, value);
+        column.max = Math.max(column.max, value);
+        column.sum += value;
+        column.count++;
+    }
+    _addCategoryPropertyToMetadata(propertyName, value, metadata) {
+        if (this._numFields.includes(propertyName)) {
+            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+        }
+        if (!this._catFields.includes(propertyName)) {
+            this._catFields.push(propertyName);
+            metadata.columns.push({
+                name: propertyName,
+                type: 'category',
+                categoryNames: [],
+                categoryCounts: [],
+            });
+        }
+        const column = metadata.columns.find(c => c.name == propertyName);
+        if (!column.categoryNames.includes(value)) {
+            column.categoryNames.push(value);
+            column.categoryCounts.push(0);
+        }
+        column.categoryCounts[column.categoryNames.indexOf(value)]++;
     }
 
     _decodeProperties() {
