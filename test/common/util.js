@@ -54,15 +54,24 @@ function testSST(file, template, asyncLoad) {
 
 function writeTemplate(file, template) {
     const mainDir = path.resolve(__dirname, '..', '..');
-    const geojsonDir = path.resolve(path.dirname(file), '..', 'data.geojson');
-    const geojson = fs.existsSync(geojsonDir) ? fs.readFileSync(geojsonDir) : '';
     fs.writeFileSync(getHTML(file), template({
         file: file,
-        geojson: geojson,
+        sources: JSON.stringify(loadGeoJSONSources()),
         cartogl: path.join(mainDir, 'dist', 'carto-gl.js'),
         mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
         mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
     }));
+}
+
+function loadGeoJSONSources() {
+    const sourcesDir = path.resolve(__dirname, 'sources');
+    const geojsonFiles = glob.sync(path.join(sourcesDir, '*.geojson'));
+    let sources = {};
+    geojsonFiles.forEach(function(geojsonFile) {
+        const fileName = path.basename(geojsonFile, '.geojson');
+        sources[fileName] = JSON.parse(fs.readFileSync(geojsonFile));
+    });
+    return sources;
 }
 
 function getHTML(file) {
