@@ -47,8 +47,8 @@ describe('src/core/style/expressions/belongs', () => {
     });
 
     describe('compile with correct parameters', () => {
-        it('in($price, \'asd\', \'123\') should not throw at constructor time', () => {
-            expect(() => s.in($price, 'asd', '123')._compile(fakeMetadata)).not.toThrow();
+        it('in($category, \'asd\', \'123\') should not throw at constructor time', () => {
+            expect(() => s.in($category, 'asd', '123')._compile(fakeMetadata)).not.toThrow();
         });
         it('in(\'asd\', 0) should not throw at constructor time', () => {
             expect(() => s.in('asd', 'asd', '123')._compile(fakeMetadata)).not.toThrow();
