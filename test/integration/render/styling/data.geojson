@@ -1,0 +1,16 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [ 0, 0 ]
+      },
+      "properties": {
+        "cartodb_id": 0,
+        "numeric": 5
+      }
+    }
+  ]
+}
