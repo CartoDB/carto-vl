@@ -6,6 +6,7 @@ const exquisite = require('exquisite-sst');
 
 let testsDir = '';
 let testFile = '';
+const sources = loadGeoJSONSources();
 
 function loadFiles(directory) {
     testsDir = directory;
@@ -56,7 +57,7 @@ function writeTemplate(file, template) {
     const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(getHTML(file), template({
         file: file,
-        sources: JSON.stringify(loadGeoJSONSources()),
+        sources: sources,
         cartogl: path.join(mainDir, 'dist', 'carto-gl.js'),
         mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
         mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
@@ -71,7 +72,7 @@ function loadGeoJSONSources() {
         const fileName = path.basename(geojsonFile, '.geojson');
         sources[fileName] = JSON.parse(fs.readFileSync(geojsonFile));
     });
-    return sources;
+    return JSON.stringify(sources);
 }
 
 function getHTML(file) {
