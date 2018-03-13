@@ -84,9 +84,7 @@ export default class GeoJSON extends Base {
     }
 
     _requestMetadata() {
-        return new Promise(resolve => {
-            resolve(this._metadata);
-        });
+        return Promise.resolve(this._metadata);
     }
 
     _requestData() {
