@@ -1,8 +1,37 @@
 import GeoJSON from '../../../../src/api/source/geojson';
 
 fdescribe('api/source/geojson', () => {
-    describe('_decodeProperties()', ()=>{
-
+    it('_decodeProperties() should return a valid dataframe properties object', () => {
+        const data = {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    numeric: 1
+                }
+            }, {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [1, 0]
+                },
+                properties: {
+                    numeric: 2
+                }
+            }]
+        };
+        const source = new GeoJSON(data);
+        const properties = source._decodeProperties();
+        const expected = {
+            numeric: new Float32Array(2 + 1024),
+        };
+        expected.numeric[0] = 1;
+        expected.numeric[1] = 2;
+        expect(properties).toEqual(expected);
     });
     describe('constructor', () => {
         it('should build a new Source with (data) as a Feature', () => {
@@ -10,14 +39,13 @@ fdescribe('api/source/geojson', () => {
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [ 0, 0 ]
+                    coordinates: [0, 0]
                 },
                 properties: {
                     cartodb_id: 1
                 }
             };
             const source = new GeoJSON(data);
-            console.log(JSON.stringify(source, null, 4));
             expect(source._features).toEqual([data]);
         });
 
@@ -28,7 +56,7 @@ fdescribe('api/source/geojson', () => {
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: [ 0, 0 ]
+                        coordinates: [0, 0]
                     },
                     properties: {
                         cartodb_id: 1
@@ -58,7 +86,7 @@ fdescribe('api/source/geojson', () => {
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
-                        coordinates: [ 0, 0 ]
+                        coordinates: [0, 0]
                     },
                     properties: {
                         cartodb_id: 1
@@ -68,7 +96,7 @@ fdescribe('api/source/geojson', () => {
                     type: 'Feature',
                     geometry: {
                         type: 'LineString',
-                        coordinates: [ [ 0, 0 ], [ 1, 1 ] ]
+                        coordinates: [[0, 0], [1, 1]]
                     },
                     properties: {
                         cartodb_id: 2
@@ -85,7 +113,7 @@ fdescribe('api/source/geojson', () => {
                 type: 'Feature',
                 geometry: {
                     type: 'Polygon',
-                    coordinates: [ [ 0, 0 ], [ 0, 1 ], [ 1, 1 ], [ 0, 0 ] ]
+                    coordinates: [[0, 0], [0, 1], [1, 1], [0, 0]]
                 },
                 properties: {
                     cartodb_id: 1

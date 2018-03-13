@@ -39,7 +39,10 @@ export default class GeoJSON extends Base {
         this._status = 'init'; // init -> metadata -> data
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
+        this._numFields = [];
+        this._catFields = [];
         this._features = this._getFeatures(data);
+        this._metadata = this._computeMetadata();
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -81,8 +84,7 @@ export default class GeoJSON extends Base {
 
     _requestMetadata() {
         return new Promise(resolve => {
-            let metadata = {};
-            resolve(metadata);
+            resolve(this._metadata);
         });
     }
 
@@ -101,23 +103,62 @@ export default class GeoJSON extends Base {
         this._addDataframe(dataframe);
     }
 
+    _computeMetadata() {
+        const metadata = {
+            columns: [],
+            categoryIDs: {},
+            // TODO sample
+            featureCount: this._features.length,
+        };
+        for (var i = 0; i < this._features.length; i++) {
+            const properties = this._features[i].properties;
+            Object.keys(properties).map(name => {
+                const type = Number.isFinite(properties[name]) ? 'float' : 'category';
+                if (type == 'float') {
+                    if (this._catFields.includes(name)) {
+                        throw new Error(`Unsupported GeoJSON: the property '${name}' has different types in different features.`);
+                    }
+                    if (!this._numFields.includes(name)) {
+                        this._numFields.push(name);
+                        metadata.columns.push({
+                            name,
+                            type: 'float'
+                            // TODO aggs
+                        });
+                    }
+                } else {
+                    if (this._numFields.includes(name)) {
+                        throw new Error(`Unsupported GeoJSON: the property '${name}' has different types in different features.`);
+                    }
+                    if (!this._catFields.includes(name)) {
+                        this._catFields.push(name);
+                        metadata.columns.push({
+                            name,
+                            type: 'category'
+                            // TODO aggs
+                        });
+                    }
+                }
+            });
+        }
+        this._metadata = metadata;
+        return metadata;
+    }
+
     _decodeProperties() {
-        // TODO Fixed number of properties due to the renderer limit of 4
-        const properties = [
-            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
-            new Float32Array(this._features.length + 1024),
-            new Float32Array(this._features.length + 1024),
-            new Float32Array(this._features.length + 1024),
-            new Float32Array(this._features.length + 1024)
-        ];
+        const properties = {};
+        this._numFields.concat(this._catFields).map(name => {
+            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met            
+            properties[name] = new Float32Array(this._features.length + 1024);
+        });
         for (var i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
-            this.catFields.map((name, index) => {
-                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
+            this._catFields.map(name => {
+                properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
             });
-            this.numFields.map((name, index) => {
-                properties[index + this.catFields.length][i] = Number(f.properties[name]);
+            this._numFields.map(name => {
+                properties[name][i] = Number(f.properties[name]);
             });
             // TODO support date / timestamp properties
         }
