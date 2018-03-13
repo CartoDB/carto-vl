@@ -43,53 +43,52 @@
 
 
     <section>
-        <article><h1>CARTO.gl</h1><p>CARTO.gl is a javascript library to render map data in the browser using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API">webgl</a> capabilities.</p>
-<h2>Getting started</h2><p>Create a <a href="https://carto.com/get-started/">CARTO account</a></p>
-<p>Download <strong>CARTO.gl</strong> from a cdn or from <strong>npm</strong>.</p>
-<pre class="prettyprint source"><code>yarn add @carto/cartogl</code></pre><h2>Drawing a simple map using MapboxGL</h2><pre class="prettyprint source lang-html"><code>&lt;!DOCTYPE html>
+        <article><h1>CARTO GL</h1><p>CARTO GL is a javascript library to render map data in the browser using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API">webgl</a> capabilities.</p>
+<h2>Getting started</h2><p>TBD</p>
+<h2>Drawing a simple map using MapboxGL</h2><pre class="prettyprint source lang-html"><code>&lt;!DOCTYPE html>
 &lt;html>
-    &lt;head>
-        &lt;title>Single layer | CARTO&lt;/title>
-        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
-        &lt;meta charset=&quot;UTF-8&quot;>
-        &lt;!-- Include CARTO GL JS -->
-        &lt;script src=&quot;../../dist/carto-gl.js&quot;>&lt;/script>
-        &lt;!-- Include CARTO Mapbox GL JS fork -->
-        &lt;script src=&quot;../../vendor/mapbox-gl-dev.js&quot;>&lt;/script>
-        &lt;!-- Include Mapbox GL CSS -->
-        &lt;link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
-        &lt;style>
-            body { margin: 0; padding: 0; }
-            #map { position: absolute; height: 100%; width: 100%; }
-        &lt;/style>
-    &lt;/head>
-    &lt;body>
-        &lt;div id='map'>&lt;/div>
-    &lt;/body>
-    &lt;script>
-        // Create a mapbox basemap
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-            center: [2.17, 41.38],
-            zoom: 0
-        });
+&lt;head>
+  &lt;title>Single layer | CARTO&lt;/title>
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+  &lt;meta charset=&quot;UTF-8&quot;>
+  &lt;!-- Include CARTO GL JS -->
+  &lt;script src=&quot;../../dist/carto-gl.js&quot;>&lt;/script>
+  &lt;!-- Include CARTO Mapbox GL JS fork -->
+  &lt;script src=&quot;../../vendor/mapbox-gl-dev.js&quot;>&lt;/script>
+  &lt;!-- Include Mapbox GL CSS -->
+  &lt;link href=&quot;../../vendor/mapbox-gl-dev.css&quot; rel=&quot;stylesheet&quot; />
+  &lt;style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; height: 100%; width: 100%; }
+  &lt;/style>
+&lt;/head>
+&lt;body>
+  &lt;div id=&quot;map&quot;>&lt;/div>
+  &lt;script>
+    // Create a mapbox basemap
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [2.17, 41.38],
+      zoom: 0
+    });
 
-        // Login into your CARTO account
-        carto.setDefaultAuth({
-            user: 'dmanzanares',
-            apiKey: 'YOUR_API_KEY'
-        });
+    // Login into your CARTO account
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
 
-        // Set the source of your data
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-        // Set the look and feel of your data
-        const style = new carto.Style();
-        // Create a new layer
-        const layer = new carto.Layer('myCartoLayer', source, style);
-        // Add the new layer to the map
-        layer.addTo(map, 'watername_ocean');
-    &lt;/script>
+    // Set the source of your data
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    // Set the look and feel of your data
+    const style = new carto.Style();
+    // Create a new layer
+    const layer = new carto.Layer('layer', source, style);
+    // Add the new layer to the map
+    layer.addTo(map, 'watername_ocean');
+  &lt;/script>
+&lt;/body>
 &lt;/html>
 </code></pre></article>
     </section>
@@ -102,13 +101,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">Layer</a></li><li><a href="carto.source.Base.html">Base</a></li><li><a href="carto.source.Dataset.html">Dataset</a></li><li><a href="carto.source.GeoJSON.html">GeoJSON</a></li><li><a href="carto.source.SQL.html">SQL</a></li><li><a href="carto.Style.html">Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">carto.style.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 13 2018 11:00:23 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Mar 13 2018 18:13:47 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
