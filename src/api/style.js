@@ -32,7 +32,7 @@ const SUPPORTED_PROPERTIES = [
 export default class Style {
 
     /**
-    * A Style defines how the data will be displayed: the color of the elements, the size are basic things that can be
+    * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through styles. Styles also control the element visibility, ordering or aggregation level.
     * 
     * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
@@ -295,11 +295,11 @@ export default class Style {
         /**
          * @typedef {object} StyleSpec
          * @property {number} resolution
-         * @property {carto.style.expression.Base} color
-         * @property {carto.style.expression.Base} width
-         * @property {carto.style.expression.Base} strokeColor
-         * @property {carto.style.expression.Base} strokeWidth
-         * @property {carto.style.expression.Base} order
+         * @property {carto.style.expressions.Expression} color
+         * @property {carto.style.expressions.Expression} width
+         * @property {carto.style.expressions.Expression} strokeColor
+         * @property {carto.style.expressions.Expression} strokeWidth
+         * @property {carto.style.expressions.Expression} order
          * @api
          */
 
