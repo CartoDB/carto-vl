@@ -88,17 +88,15 @@ export default class GeoJSON extends Base {
     }
 
     _requestData() {
-        const geometry = this._decodeGeometry();
-        const properties = this._decodeProperties();
-        const dataframe = new Dataframe(
-            { x: 0, y: 0 },
-            1,
-            geometry,
-            properties,
-        );
-        dataframe.type = this._getDataframeType(this._type);
-        dataframe.active = true;
-        dataframe.size = this._features.length;
+        const dataframe = new Dataframe({
+            active: true,
+            center: { x: 0, y: 0 },
+            geom: this._decodeGeometry(),
+            properties: this._decodeProperties(),
+            scale: 1,
+            size: this._features.length,
+            type: this._getDataframeType(this._type)
+        });
         this._addDataframe(dataframe);
     }
 

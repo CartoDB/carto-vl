@@ -1,19 +1,16 @@
 import * as earcut from 'earcut';
 
-/**
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
- */
 export default class Dataframe {
-    constructor(center, scale, geom, properties) {
+    constructor({ center, scale, geom, properties, type, active, size }) {
+        this.active = active;
         this.center = center;
-        this.scale = scale;
         this.geom = geom;
         this.properties = properties;
+        this.scale = scale;
+        this.size = size;
+        this.type = type;
     }
+
     bind(renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
