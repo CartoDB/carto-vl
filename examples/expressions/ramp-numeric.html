@@ -55,8 +55,8 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-        <label for="auto">Ramp auto</label>
+        <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
+        <label for="auto">Ramp quantiles</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
@@ -86,27 +86,27 @@
     `);
     const s = carto.style.expressions;
     const style = new carto.Style({
-      color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+      color: s.ramp(s.quantiles(s.prop('numfloors'), 5), s.palettes.sunset)
     });
     const layer = new carto.Layer('layer', source, style);
 
     layer.addTo(map, 'watername_ocean');
 
-    function setRampAuto() {
+    function setRampQuantiles() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+        color: s.ramp(s.quantiles(s.prop('numfloors'), 5), s.palettes.sunset)
       }));
     }
 
     function setRampBuckets() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.buckets(s.prop('numfloors'), 1, 4, 7, 15), s.palettes.prism)
+        color: s.ramp(s.buckets(s.prop('numfloors'), 1, 4, 7, 15), s.palettes.sunset)
       }));
     }
 
     function setRampLinear() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.linear(s.prop('numfloors'), 1, 40), s.palettes.earth)
+        color: s.ramp(s.linear(s.prop('numfloors'), 1, 40), s.palettes.sunset)
       }));
     }
   </script>
