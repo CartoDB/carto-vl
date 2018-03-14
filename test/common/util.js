@@ -56,6 +56,7 @@ function testSST(file, template, asyncLoad) {
     options.url = `file://${getHTML(file)}`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
+    options.consoleFn = msg => console.log(msg.text());
     if (asyncLoad) options.waitForFn = () => window.loaded;
     return exquisite.test(options);
 }
@@ -75,7 +76,7 @@ function loadGeoJSONSources() {
     const sourcesDir = path.resolve(__dirname, 'sources');
     const geojsonFiles = glob.sync(path.join(sourcesDir, '*.geojson'));
     let sources = {};
-    geojsonFiles.forEach(function(geojsonFile) {
+    geojsonFiles.forEach(function (geojsonFile) {
         const fileName = path.basename(geojsonFile, '.geojson');
         sources[fileName] = JSON.parse(fs.readFileSync(geojsonFile));
     });
