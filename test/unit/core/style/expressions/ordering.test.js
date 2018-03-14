@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/style/functions';
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/style/expressions/category', () => {
+describe('src/core/style/expressions/ordering', () => {
     describe('error control', () => {
         validateStaticTypeErrors('asc', []);
         validateStaticTypeErrors('asc', [undefined]);

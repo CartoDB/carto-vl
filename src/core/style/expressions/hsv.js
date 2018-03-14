@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, checkLooseType, checkExpression } from './utils';
+import { implicitCast, checkExpression } from './utils';
 
 export default class HSV extends Expression {
     /**

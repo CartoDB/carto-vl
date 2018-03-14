@@ -1,6 +1,14 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/property', () => {
+    describe('error control', () => {
+        validateStaticTypeErrors('property', []);
+        validateStaticTypeErrors('property', [undefined]);
+        validateStaticTypeErrors('property', [123]);
+        validateStaticTypeErrors('property', ['float']);
+    });
+
     describe('.eval()', () => {
         it('should return the value from the feature', () => {
             const fakeFeature = {

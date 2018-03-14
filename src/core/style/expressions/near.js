@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, clamp, checkLooseType } from './utils';
+import { implicitCast, clamp } from './utils';
 
 // TODO type checking
 export default class Near extends Expression {

@@ -1,6 +1,6 @@
 import Expression from './expression';
 import { float } from '../functions';
-import { checkLooseType, checkType, checkExpression } from './utils';
+import { checkLooseType, checkType } from './utils';
 
 /**
  *
