@@ -554,7 +554,6 @@ export default class Windshaft {
     }
 
     async getDatesTypes(names, query, conf) {
-        console.log('GETDATAT',conf);
         const aggFns = ['min', 'max'];
         const datesSelect = names.map(name =>
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
