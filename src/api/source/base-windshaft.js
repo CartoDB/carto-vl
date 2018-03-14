@@ -28,8 +28,12 @@ export default class BaseWindshaft extends Base {
         this._client._bindLayer(...args);
     }
 
-    requestData(viewport, style) {
-        return this._client.getData(viewport, style);
+    requestMetadata(style) {
+        return this._client.getMetadata(style);
+    }
+
+    requestData(viewport) {
+        return this._client.getData(viewport);
     }
 
     free() {

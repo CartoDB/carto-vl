@@ -37,7 +37,6 @@ export default class GeoJSON extends Base {
         this._checkData(data);
 
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
-        this._status = 'init'; // init -> metadata -> data
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
         this._numFields = [];
@@ -51,16 +50,23 @@ export default class GeoJSON extends Base {
         this._removeDataframe = removeDataframe;
     }
 
+    requestMetadata() {
+        return Promise.resolve(this._metadata);
+    }
+
     requestData() {
-        // TODO: split it in two functions: (metadata) / (data)
-        //
-        if (this._status === 'init') {
-            this._status = 'metadata';
-            return this._requestMetadata();
-        } else if (this._status === 'metadata') {
-            this._status = 'data';
-            this._requestData();
-        }
+        const geometry = this._decodeGeometry();
+        const properties = this._decodeProperties();
+        const dataframe = new Dataframe(
+            { x: 0, y: 0 },
+            1,
+            geometry,
+            properties,
+        );
+        dataframe.type = this._getDataframeType(this._type);
+        dataframe.active = true;
+        dataframe.size = this._features.length;
+        this._addDataframe(dataframe);
     }
 
     _checkData(data) {
@@ -81,25 +87,6 @@ export default class GeoJSON extends Base {
         else {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
-    }
-
-    _requestMetadata() {
-        return Promise.resolve(this._metadata);
-    }
-
-    _requestData() {
-        const geometry = this._decodeGeometry();
-        const properties = this._decodeProperties();
-        const dataframe = new Dataframe(
-            { x: 0, y: 0 },
-            1,
-            geometry,
-            properties,
-        );
-        dataframe.type = this._getDataframeType(this._type);
-        dataframe.active = true;
-        dataframe.size = this._features.length;
-        this._addDataframe(dataframe);
     }
 
     _computeMetadata() {
