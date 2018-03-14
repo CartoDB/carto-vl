@@ -48,10 +48,6 @@
     `);
     const layer = new carto.Layer('layer', source, style);
 
-    map.on('move', () => {
-        console.log(median.eval());
-    });
-
     layer.addTo(map, 'watername_ocean');
   </script>
 </body>
