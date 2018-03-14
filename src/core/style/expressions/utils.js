@@ -74,6 +74,7 @@ export function checkExpression(expressionName, parameterName, parameterIndex, p
 }
 
 export function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (parameter.type != expectedType) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
     }

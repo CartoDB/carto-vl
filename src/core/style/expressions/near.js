@@ -1,7 +1,7 @@
 import Expression from './expression';
-import { implicitCast, clamp } from './utils';
+import { implicitCast, clamp, checkLooseType } from './utils';
 
-//
+// TODO type checking
 export default class Near extends Expression {
     /**
      * @description Near returns zero for inputs that are far away from center.
@@ -20,6 +20,7 @@ export default class Near extends Expression {
         center = implicitCast(center);
         threshold = implicitCast(threshold);
         falloff = implicitCast(falloff);
+
         super({ input: input, center: center, threshold: threshold, falloff: falloff });
     }
     _compile(meta) {
