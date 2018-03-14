@@ -5,7 +5,7 @@ import * as shaders from '../core/shaders';
 import { compileShader } from '../core/style/shader-compiler';
 import { parseStyleDefinition } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
-import Float from '../core/style/expressions/float';
+import { implicitCast } from '../core/style/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 
@@ -306,6 +306,9 @@ export default class Style {
 
         // TODO: Check expression types ie: color is not a number expression!
 
+        styleSpec.width = implicitCast(styleSpec.width);
+        styleSpec.strokeWidth = implicitCast(styleSpec.strokeWidth);
+
         if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
         }
@@ -315,14 +318,10 @@ export default class Style {
         if (!(styleSpec.strokeColor instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[strokeColor]');
         }
-        if (util.isNumber(styleSpec.width)) {
-            styleSpec.width = new Float(styleSpec.width);
-        } else if (!(styleSpec.width instanceof Expression)) {
+        if (!(styleSpec.width instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[width]');
         }
-        if (util.isNumber(styleSpec.strokeWidth)) {
-            styleSpec.strokeWidth = new Float(styleSpec.strokeWidth);
-        } else if (!(styleSpec.strokeWidth instanceof Expression)) {
+        if (!(styleSpec.strokeWidth instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[strokeWidth]');
         }
         if (!(styleSpec.order instanceof Expression)) {
