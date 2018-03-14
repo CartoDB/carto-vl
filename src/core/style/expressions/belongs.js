@@ -3,10 +3,16 @@ import Expression from './expression';
 
 
 function IN_INLINE_MAKER(categories) {
+    if (categories.length == 0) {
+        return () => '0.';
+    }
     return inline => `(${categories.map((cat, index) => `(${inline.property} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
 }
 
 function NIN_INLINE_MAKER(categories) {
+    if (categories.length == 0) {
+        return () => '1.';
+    }
     return inline => `(${categories.map((cat, index) => `(${inline.property} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
