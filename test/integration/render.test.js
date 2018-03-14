@@ -14,6 +14,6 @@ describe('Render tests:', () => {
 function test(file) {
     it(util.getName(file), () => {
         const actual = util.testSST(file, template);
-        return chai.expect(actual).to.eventually.eq(0);
+        return chai.expect(actual).to.eventually.be.at.most(1);
     }).timeout(10000);
 }
