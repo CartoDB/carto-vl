@@ -27,7 +27,7 @@ export default class Layer {
     * new carto.Layer('layer0', source, style);
     *
     * @fires CartoError
-    * 
+    *
     * @constructor Layer
     * @memberof carto
     * @api
@@ -138,7 +138,7 @@ export default class Layer {
 
     /**
      * Set a new style for this layer.
-     * 
+     *
      * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
@@ -162,9 +162,9 @@ export default class Layer {
 
     /**
      * Blend the current style with another style.
-     * 
+     *
      * This allows smooth transforms between two different styles.
-     * 
+     *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different styles varying the width
      * const style0 = new carto.style({ width: 10 });
@@ -176,7 +176,7 @@ export default class Layer {
      * // The points will be animated from 10px to 20px for 500ms.
      * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - The final style 
+     * @param {carto.Style} style - The final style
      * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
