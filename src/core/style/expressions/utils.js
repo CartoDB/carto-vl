@@ -81,6 +81,7 @@ export function checkType(expressionName, parameterName, parameterIndex, expecte
 }
 
 export function checkInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter) {
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (!(parameter instanceof expectedClass)) {
         throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
     }
