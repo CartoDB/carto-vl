@@ -1,5 +1,4 @@
 import { float, category, time } from '../functions';
-import Expression from './expression';
 
 export const DEFAULT = undefined;
 
@@ -13,9 +12,6 @@ export function implicitCast(value) {
             return time(new Date(value));
         }
         return category(value);
-    }
-    if (!(value instanceof Expression) && value.type !== 'paletteGenerator' && value.type !== 'float') {
-        throw new Error('value cannot be casted');
     }
     return value;
 }
