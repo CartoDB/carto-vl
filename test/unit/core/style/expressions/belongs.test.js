@@ -30,10 +30,18 @@ describe('src/core/style/expressions/belongs', () => {
             const actual = sIn.eval(fakeFeature);
             expect(actual).toEqual(1);
         });
+
+        it('in($category) should return 0', () => {
+            const fakeFeature = { category: 0 };
+            const sIn = s.in($category);
+            sIn._compile(fakeMetadata);
+            const actual = sIn.eval(fakeFeature);
+            expect(actual).toEqual(0);
+        });
     });
 
     describe('nin', () => {
-        it('nin($category,, "cat1", "cat2") should return 1', () => {
+        it('nin($category, "cat1", "cat2") should return 1', () => {
             const fakeFeature = { category: 0 };
             const nin = s.nin($category, 'cat1', 'cat2');
             nin._compile(fakeMetadata);
@@ -41,12 +49,20 @@ describe('src/core/style/expressions/belongs', () => {
             expect(actual).toEqual(1);
         });
 
-        it('nin($category,, "cat1", "cat2") should return 0', () => {
+        it('nin($category, "cat1", "cat2") should return 0', () => {
             const fakeFeature = { category: 1 };
             const nin = s.nin($category, 'cat1', 'cat2');
             nin._compile(fakeMetadata);
             const actual = nin.eval(fakeFeature);
             expect(actual).toEqual(0);
+        });
+
+        it('nin($category) should return 1', () => {
+            const fakeFeature = { category: 1 };
+            const nin = s.nin($category);
+            nin._compile(fakeMetadata);
+            const actual = nin.eval(fakeFeature);
+            expect(actual).toEqual(1);
         });
     });
 
