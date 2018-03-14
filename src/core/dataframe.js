@@ -27,9 +27,6 @@ export default class Dataframe {
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
 
-        this.setStyle = (style) => {
-            this.style = style;
-        };
         this.style = null;
 
         this.vertexBuffer = gl.createBuffer();
@@ -62,6 +59,11 @@ export default class Dataframe {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
+
+    setStyle(style) {
+        this.style = style;
+    }
+
     _genDataframePropertyTextures() {
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
