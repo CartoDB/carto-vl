@@ -38,14 +38,14 @@
     });
 
     const source = new carto.source.Dataset(`
-      pop_density_points
+      tx_0125_copy_copy
     `);
-    const s = carto.style.expressions;
-    const median = s.viewportPercentile(s.prop('dn'), 50);
-    const style = new carto.Style({
-        color: s.ramp(s.quantiles(s.prop('dn'), 4), s.palettes.earth),
-        width: s.sub(median, 90)
-    });
+    const style = new carto.Style(`
+        width: sqrt($amount)/2
+        color: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),bluyl)
+        strokeColor: rgba(0.2,0.2,0.2,0.3)
+        strokeWidth: 1
+    `);
     const layer = new carto.Layer('layer', source, style);
 
     map.on('move', () => {
