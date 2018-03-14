@@ -86,7 +86,7 @@
     `);
     const s = carto.style.expressions;
     const style = new carto.Style({
-      color: s.ramp(s.property('category'), s.palettes.vivid)
+      color: s.ramp(s.prop('category'), s.palettes.vivid)
     });
     const layer = new carto.Layer('layer', source, style);
 
