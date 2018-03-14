@@ -44,7 +44,7 @@
     const avg = s.viewportAvg(s.prop('dn'));
     const style = new carto.Style({
         color: s.ramp(s.buckets(s.prop('dn'), avg), s.palettes.prism),
-        filter: s.between(s.property('dn'), 60, 70)
+        filter: s.between(s.prop('dn'), 60, 70)
 
     });
     const layer = new carto.Layer('layer', source, style);
