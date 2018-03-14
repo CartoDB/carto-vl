@@ -554,6 +554,9 @@ export default class Windshaft {
     }
 
     async getDatesTypes(names, query, conf) {
+        if (names.length == 0) {
+            return [];
+        }
         const aggFns = ['min', 'max'];
         const datesSelect = names.map(name =>
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
@@ -613,7 +616,7 @@ function getAggFN(name) {
     return s.substr(0, s.indexOf('_'));
 }
 
-const endpoint = (conf, path='') => {
+const endpoint = (conf, path = '') => {
     let url = `${conf.mapsServerURL}/api/v1/map`;
     if (path) {
         url += '/' + path;
