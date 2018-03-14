@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ramp numeric | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO GL JS -->
+  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #controls {
+      position: absolute;
+      padding: 20px;
+      background: white;
+      top: 12px;
+      right: 12px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      width: 200px;
+      color: #2E3C43;
+    }
+    #controls li {
+      list-style-type: none;
+      margin: 0 0 8px 0;
+      display: flex;
+      vertical-align: middle;
+    }
+    #controls li input {
+      margin: 0 8px 0 0;
+    }
+    #controls li label {
+      font: 12px/16px 'Open Sans';
+      cursor: pointer;
+    }
+    #controls li:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <ul>
+      <li>
+        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
+        <label for="auto">Ramp auto</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+        <label for="buckets">Ramp buckets</label>
+      </li>
+      <li>
+        <input type="radio" name="style" onclick="setRampLinear()" id="linear">
+        <label for="linear">Ramp linear</label>
+      </li>
+    </ul>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-74.0060, 40.7128],
+      zoom: 12
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
+
+    const source = new carto.source.Dataset(`
+      mnmappluto
+    `);
+    const s = carto.style.expressions;
+    const style = new carto.Style({
+      color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+    });
+    const layer = new carto.Layer('layer', source, style);
+
+    layer.addTo(map, 'watername_ocean');
+
+    function setRampAuto() {
+      layer.blendToStyle(new carto.Style({
+        color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+      }));
+    }
+
+    function setRampBuckets() {
+      layer.blendToStyle(new carto.Style({
+        color: s.ramp(s.buckets(s.prop('numfloors'), 1, 4, 7, 15), s.palettes.prism)
+      }));
+    }
+
+    function setRampLinear() {
+      layer.blendToStyle(new carto.Style({
+        color: s.ramp(s.linear(s.prop('numfloors'), 1, 40), s.palettes.earth)
+      }));
+    }
+  </script>
+</body>
+</html>

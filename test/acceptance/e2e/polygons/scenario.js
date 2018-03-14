@@ -1,5 +1,3 @@
-/* global carto mapboxgl */
-
 const map = new mapboxgl.Map({
     container: 'map',
     style: { version: 8, sources: {}, layers: [] },

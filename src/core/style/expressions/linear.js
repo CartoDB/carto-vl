@@ -39,7 +39,7 @@ export default class Linear extends Expression {
             this.inlineMaker = (inline) => `((${inline.input}-${smin.toFixed(20)})/(${(smax - smin).toFixed(20)}))`;
 
         } else {
-            this.inlineMaker = (inline) => `((${inline.input}-${this.min.value.expr})/(${inline.max}-${inline.min}))`;
+            this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
     }
     eval(feature) {

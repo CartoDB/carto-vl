@@ -1,6 +1,6 @@
 const path = require('path');
 const chai = require('chai');
-const util = require('../utils/common');
+const util = require('../common/util');
 
 chai.use(require('chai-as-promised'));
 

@@ -3,7 +3,12 @@ import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
 /**
- * @description Abstract expression class
+ * Abstract expression class
+ * 
+ * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
+ * they can be used where an Expression is required as long as the types match. 
+ * 
+ * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.style.expressions
  * @name Expression
