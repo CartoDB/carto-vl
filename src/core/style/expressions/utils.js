@@ -11,9 +11,6 @@ export function implicitCast(value) {
     if (typeof value == 'string') {
         return category(value);
     }
-    if (!(value instanceof Expression) && value.type !== 'paletteGenerator' && value.type !== 'float') {
-        throw new Error('value cannot be casted');
-    }
     return value;
 }
 
@@ -66,6 +63,13 @@ export function throwInvalidString(expressionName, parameterName, parameterIndex
 export function checkLooseType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
     if (parameter.type != expectedType && parameter.type !== undefined) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
+    }
+}
+
+export function checkExpression(expressionName, parameterName, parameterIndex, parameter) {
+    if (!(parameter instanceof Expression)) {
+        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        '${parameter}' is not of type Expression`);
     }
 }
 

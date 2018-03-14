@@ -1,6 +1,6 @@
 import Expression from './expression';
 import Property from './property';
-import { checkInstance, checkType } from './utils';
+import { checkInstance, checkType, checkExpression } from './utils';
 
 // Aggregation ops
 export const Max = genAggregationOp('max', 'float');
@@ -12,6 +12,7 @@ export const Mode = genAggregationOp('mode', 'category');
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends Expression {
         constructor(property) {
+            checkExpression(aggName, 'property', 0, property);
             checkInstance(aggName, 'property', 0, Property, property);
             super({ property: property });
             this.type = aggType;
@@ -45,4 +46,4 @@ function genAggregationOp(aggName, aggType) {
             };
         }
     };
-} 
+}

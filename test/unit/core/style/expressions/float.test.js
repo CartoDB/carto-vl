@@ -1,19 +1,15 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/float', () => {
     describe('error control', () => {
-        it('float of undefined should throw', () => {
-            expect(() => s.float(undefined)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*x[\s\S]*/g);
-        });
-        it('float of strings should throw', () => {
-            expect(() => s.float('123')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*x[\s\S]*/g);
-        });
+        validateStaticTypeErrors('float', [undefined]);
+        validateStaticTypeErrors('float', ['123']);
+        validateStaticTypeErrors('float', ['color', 'float']);
     });
 
-    describe('compiled type', ()=>{
-        it('float(100) should be of type float', () => {
-            expect(s.float(100).type).toEqual('float');
-        });
+    describe('type', () => {
+        validateStaticType('float', [123], 'float');
     });
 
     describe('eval', () => {

@@ -1,22 +1,18 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/animate', () => {
     describe('error control', () => {
-        it('animate of undefined should throw', () => {
-            expect(() => s.animate(undefined)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*duration[\s\S]*/g);
-        });
-        it('animate of strings should throw', () => {
-            expect(() => s.animate('123')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*duration[\s\S]*/g);
-        });
-        it('animate of negative durations should throw', () => {
-            expect(() => s.animate(-4)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*duration[\s\S]*/g);
-        });
+        validateStaticTypeErrors('animate', [undefined]);
+        validateStaticTypeErrors('animate', ['123']);
+        validateStaticTypeErrors('animate', [-4]);
+        validateStaticTypeErrors('animate', ['float']);
+        validateStaticTypeErrors('animate', ['color']);
+        validateStaticTypeErrors('animate', ['category']);
     });
 
-    describe('compiled type', ()=>{
-        it('animate(100) should be of type float', () => {
-            expect(s.animate(100).type).toEqual('float');
-        });
+    describe('type', () => {
+        validateStaticType('animate', [100], 'float');
     });
 
     describe('eval', () => {

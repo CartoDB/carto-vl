@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/belongs', () => {
     const fakeMetadata = {
@@ -20,47 +21,22 @@ describe('src/core/style/expressions/belongs', () => {
     };
 
     let $category = null;
-    let $price = null;
 
     beforeEach(() => {
         // Needed a beforeEach to avoid testing against already compiled properties
         $category = s.property('category');
-        $price = s.property('price');
     });
 
     describe('error control', () => {
-        it('in(0, \'asd\') should throw at constructor time', () => {
-            expect(() => s.in(0, 'asd')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
-        it('in(\'asd\', 0) should throw at constructor time', () => {
-            expect(() => s.in('asd', 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
-
-        it('in($price, \'asd\') should throw at compile time', () => {
-            const _in = s.in($price, 'asd');
-            expect(() => _in._compile(fakeMetadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
-        it('in(\'asd\', $price) should throw at compile time', () => {
-            const _in = s.in('asd', $price);
-            expect(() => _in._compile(fakeMetadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
+        validateStaticTypeErrors('in', []);
+        validateStaticTypeErrors('in', ['color']);
+        validateDynamicTypeErrors('in', ['float', 'category']);
+        validateDynamicTypeErrors('in', ['category', 'float']);
     });
 
-    describe('compile with correct parameters', () => {
-        it('in($category, \'asd\', \'123\') should not throw at constructor time', () => {
-            expect(() => s.in($category, 'asd', '123')._compile(fakeMetadata)).not.toThrow();
-        });
-        it('in(\'asd\', 0) should not throw at constructor time', () => {
-            expect(() => s.in('asd', 'asd', '123')._compile(fakeMetadata)).not.toThrow();
-        });
-    });
-
-
-    describe('compiled type', () => {
-        it('nin($price, \'asd\', \'123\') should be of type float at constructor time', () => {
-            const nin = s.nin($category, 'asd', 'qwe');
-            expect(nin.type).toEqual('float');
-        });
+    describe('type', () => {
+        validateStaticType('in', ['category', 'category'], 'float');
+        validateStaticType('in', ['category', 'category', 'category'], 'float');
     });
 
     describe('eval', () => {

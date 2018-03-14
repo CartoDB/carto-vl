@@ -1,4 +1,4 @@
-import { implicitCast, clamp, mix, checkLooseType, checkType } from './utils';
+import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression } from './utils';
 import Animate from './animate';
 import Expression from './expression';
 
@@ -20,11 +20,14 @@ export default class Blend extends Expression {
         b = implicitCast(b);
         mix = implicitCast(mix);
 
+
+        checkExpression('blend', 'a', 0, a);
+        checkExpression('blend', 'b', 1, b);
+        checkExpression('blend', 'mix', 2, mix);
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-
-        checkLooseType('blend', 'mix', 1, 'float', mix);
+        checkLooseType('blend', 'mix', 2, 'float', mix);
 
         // TODO check interpolator type
         const originalMix = mix;

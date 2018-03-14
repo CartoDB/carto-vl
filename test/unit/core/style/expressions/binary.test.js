@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
 
 
 // Add custom toString function to improve test output.
@@ -6,149 +7,67 @@ s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
 
 describe('src/core/style/expressions/binary', () => {
-    const metadata = {
-        columns: [
-            {
-                name: 'price',
-                type: 'float'
-            },
-            {
-                name: 'cat',
-                type: 'category',
-                categoryNames: ['red', 'blue']
-            }
-        ],
-    };
-
-
-    let $cat = null;
-    let $price = null;
-
-    beforeEach(() => {
-        // Needed a beforeEach to avoid testing against already compiled properties
-        $cat = s.property('cat');
-        $price = s.property('price');
-    });
-
     describe('error control', () => {
         describe('Signature FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            it('mul(0, \'asd\') should throw at constructor time', () => {
-                expect(() => s.mul(0, 'asd')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('mul(\'asd\', \'red\') should throw at constructor time', () => {
-                expect(() => s.mul('asd', 'red')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('mul($cat, 1) should throw at compile time', () => {
-                const mul = s.mul($cat, 1);
-                expect(() => mul._compile(metadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
+            validateDynamicTypeErrors('mul', ['float', 'category']);
+            validateDynamicTypeErrors('mul', ['category', 'float']);
+
+            validateDynamicTypeErrors('mul', ['category', 'category']);
         });
 
         describe('Signature FLOATS_TO_FLOAT | COLORS_TO_COLOR', () => {
-            it('add(0, hsv(0,1,1)) should throw at constructor time', () => {
-                expect(() => s.add(0, s.hsv(0, 1, 1))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('add(hsv(0,1,1), 0) should throw at constructor time', () => {
-                expect(() => s.add(s.hsv(0, 1, 1), 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('add(\'asd\', \'red\') should throw at constructor time', () => {
-                expect(() => s.add('asd', 'red')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
+            validateDynamicTypeErrors('add', ['float', 'category']);
+            validateDynamicTypeErrors('add', ['category', 'float']);
+
+            validateDynamicTypeErrors('add', ['category', 'category']);
+
+            validateDynamicTypeErrors('add', ['float', 'color']);
+            validateDynamicTypeErrors('add', ['color', 'float']);
         });
 
         describe('Signature FLOATS_TO_FLOAT', () => {
-            it('mod(hsv(0,1,1), hsv(0,1,1)) should throw at constructor time', () => {
-                expect(() => s.mod(s.hsv(0, 1, 1), s.hsv(0, 1, 1))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('mod(0, hsv(0,1,1)) should throw at constructor time', () => {
-                expect(() => s.mod(0, s.hsv(0, 1, 1))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('mod(hsv(0,1,1), 0) should throw at constructor time', () => {
-                expect(() => s.mod(s.hsv(0, 1, 1), 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('mod(\'asd\', \'red\') should throw at constructor time', () => {
-                expect(() => s.mod('asd', 'red')).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
+            validateDynamicTypeErrors('mod', ['float', 'category']);
+            validateDynamicTypeErrors('mod', ['category', 'float']);
+
+            validateDynamicTypeErrors('mod', ['category', 'category']);
+
+            validateDynamicTypeErrors('mod', ['float', 'color']);
+            validateDynamicTypeErrors('mod', ['color', 'float']);
+
+            validateStaticTypeErrors('mod', ['color', 'color']);
         });
 
         describe('Signature FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT', () => {
-            it('equals(hsv(0,1,1), hsv(0,1,1)) should throw at constructor time', () => {
-                expect(() => s.equals(s.hsv(0, 1, 1), s.hsv(0, 1, 1))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('equals(0, hsv(0,1,1)) should throw at constructor time', () => {
-                expect(() => s.equals(0, s.hsv(0, 1, 1))).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
-            it('equals(hsv(0,1,1), 0) should throw at constructor time', () => {
-                expect(() => s.equals(s.hsv(0, 1, 1), 0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-            });
+            validateDynamicTypeErrors('equals', ['float', 'category']);
+            validateDynamicTypeErrors('equals', ['category', 'float']);
+
+            validateDynamicTypeErrors('equals', ['float', 'color']);
+            validateDynamicTypeErrors('equals', ['color', 'float']);
+
+            validateStaticTypeErrors('equals', ['color', 'color']);
         });
     });
 
-    describe('compile with correct parameters', () => {
+    describe('type', () => {
         describe('Signature FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            it('mul($price, 1) should not throw', () => {
-                expect(() => s.mul($price, 1)._compile(metadata)).not.toThrow();
-            });
-            it('mul(0.5, hsv(1,0,0)) should not throw', () => {
-                expect(() => s.mul(0.5, s.hsv(0, 0, 0))._compile(metadata)).not.toThrow();
-            });
-            it('mul(hsv(1,0,0), hsv(1,$price,0)) should not throw', () => {
-                expect(() => s.mul(s.hsv(1, 0, 0), s.hsv(0, $price, 0))._compile(metadata)).not.toThrow();
-            });
+            validateDynamicType('mul', ['float', 'float'], 'float');
+            validateDynamicType('mul', ['float', 'color'], 'color');
+            validateStaticType('mul', ['color', 'color'], 'color');
         });
 
         describe('Signature FLOATS_TO_FLOAT | COLORS_TO_COLOR', () => {
-            it('add($price, 1) should not throw', () => {
-                expect(() => s.add($price, 1)._compile(metadata)).not.toThrow();
-            });
-            it('add(hsv(1,0,0), hsv(1,$price,0)) should not throw', () => {
-                expect(() => s.add(s.hsv(1, 0, 0), s.hsv(0, $price, 0))._compile(metadata)).not.toThrow();
-            });
+            validateDynamicType('add', ['float', 'float'], 'float');
+            validateDynamicType('add', ['color', 'color'], 'color');
         });
 
         describe('Signature FLOATS_TO_FLOAT', () => {
-            it('mod($price, 1) should not throw', () => {
-                expect(() => s.mod($price, 1)._compile(metadata)).not.toThrow();
-            });
+            validateDynamicType('mod', ['float', 'float'], 'float');
         });
 
         describe('Signature FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT', () => {
-            it('equals($price, 1) should not throw', () => {
-                expect(() => s.equals($price, 1)._compile(metadata)).not.toThrow();
-            });
-            it('equals($cat, \'red\') should not throw', () => {
-                expect(() => s.equals($cat, 'red')._compile(metadata)).not.toThrow();
-            });
+            validateDynamicType('equals', ['float', 'float'], 'float');
+            validateDynamicType('equals', ['category', 'category'], 'float');
         });
-    });
-
-    describe('compiled type', () => {
-        it('Signature FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            expect(s.mul(s.hsv(1, 0, 0), 1).type).toEqual('color');
-            expect(compile(s.mul(s.hsv(0, $price, 0), 1)).type).toEqual('color');
-
-            expect(s.mul(3, 1).type).toEqual('float');
-            expect(compile(s.mul($price, 1)).type).toEqual('float');
-
-            expect(s.mul(s.hsv(1, 0, 0), s.hsv(0, 0, 0)).type).toEqual('color');
-            expect(compile(s.mul(s.hsv(1, 0, 0), s.hsv(0, $price, 0))).type).toEqual('color');
-        });
-        it('Signature FLOATS_TO_FLOAT | COLORS_TO_COLOR', () => {
-            expect(s.add(3, 1).type).toEqual('float');
-            expect(compile(s.add($price, 1)).type).toEqual('float');
-
-            expect(s.add(s.hsv(1, 0, 0), s.hsv(0, 0, 0)).type).toEqual('color');
-            expect(compile(s.add(s.hsv(1, 0, 0), s.hsv(0, $price, 0))).type).toEqual('color');
-        });
-        it('Signature FLOATS_TO_FLOAT', () => {
-            expect(s.mod(3, 1).type).toEqual('float');
-            expect(compile(s.mod($price, 1)).type).toEqual('float');
-        });
-        it('Signature FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT', () => {
-            expect(s.equals('asd', 'red').type).toEqual('float');
-            expect(compile(s.equals($cat, 'red')).type).toEqual('float');
-        });
-
     });
 
     describe('eval', () => {
@@ -278,11 +197,6 @@ describe('src/core/style/expressions/binary', () => {
             });
         }
     });
-
-    function compile(expression) {
-        expression._compile(metadata);
-        return expression;
-    }
 });
 
 

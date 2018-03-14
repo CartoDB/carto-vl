@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/aggregation', () => {
     const fakeFeature = {
@@ -9,66 +10,24 @@ describe('src/core/style/expressions/aggregation', () => {
         _cdb_agg_mode_price: 5,
     };
 
-    const metadata = {
-        columns: [
-            {
-                name: 'price',
-                type: 'float'
-            },
-            {
-                name: 'cat',
-                type: 'category',
-                categoryNames: ['red', 'blue']
-            }
-        ],
-    };
-
-
-    let $cat = null;
     let $price = null;
 
     beforeEach(() => {
         // Needed a beforeEach to avoid testing against already compiled properties
-        $cat = s.property('cat');
         $price = s.property('price');
     });
 
     describe('error control', () => {
-        it('max(0) should throw at constructor time', () => {
-            expect(() => s.max(0)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
-        });
-
-        it('max($categoryProperty) should throw at compile time', () => {
-            expect(() => s.max($cat)._compile(metadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
-
-        it('mode($numericProperty) should throw at compile time', () => {
-            expect(() => s.mode($price)._compile(metadata)).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
-        });
+        validateStaticTypeErrors('max', []);
+        validateStaticTypeErrors('max', ['color']);
+        validateStaticTypeErrors('max', [0]);
+        validateDynamicTypeErrors('max', ['category']);
+        validateDynamicTypeErrors('mode', ['float']);
     });
 
-    describe('compile with correct parameters', () => {
-        it('max($numericProperty) should not throw', () => {
-            expect(() => s.max($price)._compile(metadata)).not.toThrow();
-        });
-
-        it('mode($categoryProperty) should not throw', () => {
-            expect(() => s.mode($cat)._compile(metadata)).not.toThrow();
-        });
-
-        it('max($numericProperty) should not throw', () => {
-            expect(() => s.max($price)._compile(metadata)).not.toThrow();
-        });
-    });
-
-    describe('compiled type', () => {
-        it('max($numericProperty) should be of type float', () => {
-            expect(s.max($price).type).toEqual('float');
-        });
-
-        it('mode($categoryProperty) should be of type category', () => {
-            expect(s.mode($cat).type).toEqual('category');
-        });
+    describe('type', () => {
+        validateStaticType('max', ['float-property'], 'float');
+        validateStaticType('mode', ['category-property'], 'category');
     });
 
     describe('eval', () => {
@@ -98,5 +57,3 @@ describe('src/core/style/expressions/aggregation', () => {
         });
     });
 });
-
-

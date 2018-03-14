@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, checkLooseType, checkType } from './utils';
+import { implicitCast, checkLooseType, checkType, checkExpression } from './utils';
 
 export default class CIELab extends Expression {
     constructor(l, a, b) {
@@ -7,6 +7,9 @@ export default class CIELab extends Expression {
         a = implicitCast(a);
         b = implicitCast(b);
 
+        checkExpression('cielab', 'l', 0, l);
+        checkExpression('cielab', 'a', 1, a);
+        checkExpression('blend', 'b', 2, b);
         checkLooseType('cielab', 'l', 0, 'float', l);
         checkLooseType('cielab', 'a', 1, 'float', a);
         checkLooseType('cielab', 'b', 2, 'float', b);
