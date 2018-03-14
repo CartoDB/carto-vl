@@ -3,12 +3,12 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
-    // This script hides the map attribution when served locally improving screenshot testing precision.
-    if (document.URL.includes('file')) {
-      const styleElement = document.createElement('style');
-      styleElement.innerText = '.mapboxgl-ctrl.mapboxgl-ctrl-attrib {  display: none; }';
-      document.head.appendChild(styleElement);
-    }
+      // This script hides the map attribution when served locally improving screenshot testing precision.
+      if (document.URL.includes('file')) {
+        const styleElement = document.createElement('style');
+        styleElement.innerText = '.mapboxgl-ctrl.mapboxgl-ctrl-attrib {  display: none; }';
+        document.head.appendChild(styleElement);
+      }
     </script>
     <script src="<%- cartogl %>"></script>
     <script src="<%- mapboxgl %>"></script>

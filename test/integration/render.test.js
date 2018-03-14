@@ -14,6 +14,7 @@ describe('Render tests:', () => {
 function test(file) {
     it(util.getName(file), () => {
         const actual = util.testSST(file, template);
-        return chai.expect(actual).to.eventually.be.true;
+        // Temporary threshold (1px) to cover small renderer differences between Mac & Linux
+        return chai.expect(actual).to.eventually.be.at.most(1);
     }).timeout(10000);
 }
