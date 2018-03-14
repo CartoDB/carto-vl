@@ -98,6 +98,8 @@ function getSimpleArg(type) {
             return [s.category('red'), '\'red\''];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
+        case 'palette':
+            return [s.palettes.prism, 'Prism'];
         default:
             return [type, `${type}`];
     }
@@ -112,6 +114,8 @@ function getPropertyArg(type) {
             return [s.property('cat'), '$cat'];
         case 'color':
             return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
+        case 'palette':
+            return [s.palettes.prism, 'Prism'];
         default:
             return [type, `${type}`];
     }
