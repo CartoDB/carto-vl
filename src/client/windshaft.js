@@ -7,7 +7,7 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 
 const SAMPLE_ROWS = 1000;
-const MIN_FILTERING = 500000;
+const MIN_FILTERING = 2000000;
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
