@@ -1,8 +1,6 @@
 {  
     "main": {  
-        "file": {  
-            "mapbox": "misc/guide.html"
-        }
+        "file": "misc/guide.html"
     },
     "categories": [  
         {  
@@ -11,30 +9,22 @@
                 {  
                     "title": "Add a layer",
                     "desc": "Add one CARTO layer to your map",
-                    "file": {  
-                        "mapbox": "basics/single-layer.html"
-                    }
+                    "file": "basics/single-layer.html"
                 },
                 {  
                     "title": "Add multiple layers",
                     "desc": "Add multiple CARTO layers to your map",
-                    "file": {  
-                        "mapbox": "basics/multi-layer.html"
-                    }
+                    "file": "basics/multi-layer.html"
                 },
                 {  
                     "title": "Change the source",
                     "desc": "Update the source of your layers",
-                    "file": {  
-                        "mapbox": "basics/change-source.html"
-                    }
+                    "file": "basics/change-source.html"
                 },
                 {  
                     "title": "Change the style",
                     "desc": "Update the style of your layers",
-                    "file": {  
-                        "mapbox": "basics/change-style.html"
-                    }
+                    "file": "basics/change-style.html"
                 }
             ]
         },
@@ -44,65 +34,47 @@
                 {  
                     "title": "Default style",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/default.html"
-                    }
+                    "file": "expressions/default.html"
                 },
                 {  
                     "title": "Use color expressions",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/color.html"
-                    }
+                    "file": "expressions/color.html"
                 },
                 {  
                     "title": "Use category ramp",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/ramp-category.html"
-                    }
+                    "file": "expressions/ramp-category.html"
                 },
                 {  
                     "title": "Use numeric ramp",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/ramp-numeric.html"
-                    }
+                    "file": "expressions/ramp-numeric.html"
                 },
                 {  
                     "title": "Setup ordering",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/order.html"
-                    }
+                    "file": "expressions/order.html"
                 },
                 {  
                     "title": "Filter metadata",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/filter.html"
-                    }
+                    "file": "expressions/filter.html"
                 },
                 {
                     "title": "Viewport interactivity",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/viewport.html"
-                    }
+                    "file": "expressions/viewport.html"
                 },
                 {  
                     "title": "Animated dataset",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/animation.html"
-                    }
+                    "file": "expressions/animation.html"
                 },
                 {  
                     "title": "Torque",
                     "desc": "",
-                    "file": {  
-                        "mapbox": "expressions/torque.html"
-                    }
+                    "file": "expressions/torque.html"
                 }
             ]
         },
@@ -110,18 +82,14 @@
             "title": "Interactivity",
             "samples": [  
                 {  
-                    "title": "[TODO] Detect feature click",
+                    "title": "Detect feature click",
                     "desc": "Interact with the features on the click event",
-                    "file": {  
-                        "mapbox": "interactivity/feature-click.html"
-                    }
+                    "xfile": "interactivity/feature-click.html"
                 },
                 {  
-                    "title": "[TODO] Detect feature over/out",
+                    "title": "Detect feature over/out",
                     "desc": "Interact with the features on the over/out events",
-                    "file": {  
-                        "mapbox": "interactivity/feature-over-out.html"
-                    }
+                    "xfile": "interactivity/feature-over-out.html"
                 }
             ]
         },
@@ -129,53 +97,39 @@
             "title": "Misc",
             "samples": [  
                 {  
-                    "title": "[TODO] Guide",
+                    "title": "Guide",
                     "desc": "Full reference guide example",
-                    "file": {  
-                        "mapbox": "misc/guide.html"
-                    }
+                    "xfile": "misc/guide.html"
                 },
                 {  
-                    "title": "[TODO] Pop-Ups",
+                    "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
-                    "file": {  
-                        "mapbox": "misc/popups.html"
-                    }
+                    "xfile": "misc/popups.html"
                 },
                 {  
-                    "title": "[TODO] Legends",
+                    "title": "Legends",
                     "desc": "Create dynamic legends",
-                    "file": {  
-                        "mapbox": "misc/legends.html"
-                    }
+                    "xfile": "misc/legends.html"
                 },
                 {  
                     "title": "Most/less populated places",
                     "desc": "Filter the 20 most/less populated places in the world",
-                    "file": {  
-                        "mapbox": "misc/populated-places.html"
-                    }
+                    "file": "misc/populated-places.html"
                 },
                 {  
                     "title": "Edit SQL & Expressions",
                     "desc": "Edit manually the SQL query and the Expressions style",
-                    "file": {  
-                        "mapbox": "misc/edit-sql-expressions.html"
-                    }
+                    "file": "misc/edit-sql-expressions.html"
                 },
                 {  
                     "title": "GeoJSON viewer",
                     "desc": "Load and view GeoJSON files",
-                    "file": {  
-                        "mapbox": "misc/geojson-viewer.html"
-                    }
+                    "file": "misc/geojson-viewer.html"
                 },
                 {  
-                    "title": "[TODO] Error handling",
+                    "title": "Error handling",
                     "desc": "Handle common errors in maps",
-                    "file": {  
-                        "mapbox": "misc/error-handling.html"
-                    }
+                    "xfile": "misc/error-handling.html"
                 }
             ]
         }

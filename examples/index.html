@@ -28,7 +28,7 @@
     }
 
     function renderSample(sample) {
-      let link = (typeof sample.file === 'string') ? `(<a href="${sample.file}">Link</a>)` : `(<a href="${sample.file.mapbox}">Link</a>)`;
+      let link = (typeof sample.file === 'string') ? `(<a href="${sample.file}">Link</a>)` : '()';
       return `<li><h3>${sample.title} <span style="font-size:0.8em;">${link}</span></h3></li>`;
     }
   </script>
