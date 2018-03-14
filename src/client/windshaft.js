@@ -503,7 +503,6 @@ export default class Windshaft {
 
     async getColumnTypes(query, conf) {
         const columnListQuery = `select * from ${query} limit 0;`;
-        console.log('>>>> CT',conf.sqlServerURL,columnListQuery);
         const response = await getSQL(columnListQuery, conf);
         const json = await response.json();
         return json.fields;
