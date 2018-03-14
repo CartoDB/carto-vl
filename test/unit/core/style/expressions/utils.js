@@ -20,11 +20,22 @@ export function validateDynamicTypeErrors(expressionName, argTypes) {
         validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
     });
 }
+
 export function validateStaticTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
-        validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
-        validateConstructorTimeTypeError(expressionName, argTypes.map(getPropertyArg));
+        const simpleArgs = argTypes.map(getSimpleArg);
+        const propertyArgs = argTypes.map(getPropertyArg);
+        validateConstructorTimeTypeError(expressionName, simpleArgs);
+        if (!equalArgs(simpleArgs, propertyArgs)) {
+            validateConstructorTimeTypeError(expressionName, propertyArgs);
+        }
     });
+}
+function equalArgs(argsA, argsB) {
+    if (argsA.length != argsB.length) {
+        return false;
+    }
+    return argsA.every((arg, index) => argsB[index] == arg);
 }
 function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
@@ -46,8 +57,12 @@ function validateCompileTimeTypeError(expressionName, args) {
 
 export function validateStaticType(expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
-        validateConstructorTimeType(expressionName, argTypes.map(getSimpleArg), expectedType);
-        validateConstructorTimeType(expressionName, argTypes.map(getPropertyArg), expectedType);
+        const simpleArgs = argTypes.map(getSimpleArg);
+        const propertyArgs = argTypes.map(getPropertyArg);
+        validateConstructorTimeType(expressionName, simpleArgs, expectedType);
+        if (!equalArgs(simpleArgs, propertyArgs)) {
+            validateConstructorTimeType(expressionName, propertyArgs, expectedType);
+        }
     });
 }
 export function validateDynamicType(expressionName, argTypes, expectedType) {
