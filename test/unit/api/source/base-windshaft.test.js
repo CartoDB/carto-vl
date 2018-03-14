@@ -25,7 +25,8 @@ describe('api/source/base-windshaft', () => {
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
-            expect(source._serverURL).toEqual('https://test.test.com');
+            expect(source._serverURL.maps).toEqual('https://test.test.com');
+            expect(source._serverURL.sql).toEqual('https://test.test.com');
             expect(source._client).toBeDefined();
         });
 
@@ -35,7 +36,8 @@ describe('api/source/base-windshaft', () => {
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
-            expect(source._serverURL).toEqual('https://test.carto.com');
+            expect(source._serverURL.maps).toEqual('https://test.carto.com');
+            expect(source._serverURL.sql).toEqual('https://test.carto.com');
             expect(source._client).toBeDefined();
         });
 

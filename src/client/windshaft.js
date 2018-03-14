@@ -197,10 +197,12 @@ export default class Windshaft {
     }
 
     _getConfig() {
+        // for local environments, which require direct access to Maps and SQL API ports, end the configured URL with "{local}"
         return {
             apiKey: this._source._apiKey,
             username: this._source._username,
-            serverURL: this._source._serverURL
+            mapsServerURL: this._source._serverURL.maps,
+            sqlServerURL: this._source._serverURL.sql
         };
     }
 
@@ -246,7 +248,7 @@ export default class Windshaft {
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
-        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return getLayerUrl(layergroup, LAYER_INDEX, conf);
     }
 
@@ -485,7 +487,7 @@ export default class Windshaft {
                     SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
         }
 
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await getSQL(q, conf);
         const json = await response.json();
         console.log(json);
         return json.rows;
@@ -494,21 +496,21 @@ export default class Windshaft {
     // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await getSQL(q, conf);
         const json = await response.json();
         return json.rows[0].count;
     }
 
     async getColumnTypes(query, conf) {
         const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await getSQL(columnListQuery, conf);
         const json = await response.json();
         return json.fields;
     }
 
     async getGeometryType(query, conf) {
         const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await getSQL(columnListQuery, conf);
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
@@ -529,7 +531,7 @@ export default class Windshaft {
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
         ).concat(['COUNT(*)']).join();
         const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const response = await getSQL(numericsQuery, conf);
         const json = await response.json();
         return names.map(name => {
             return {
@@ -557,7 +559,7 @@ export default class Windshaft {
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
         ).join();
         const numericsQuery = `SELECT ${datesSelect} FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const response = await getSQL(numericsQuery, conf);
         const json = await response.json();
         return names.map(name => {
             return {
@@ -573,7 +575,7 @@ export default class Windshaft {
     async getCategoryTypes(names, query, conf) {
         return Promise.all(names.map(async name => {
             const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+            const response = await getSQL(catQuery, conf);
             const json = await response.json();
             let counts = [];
             let names = [];
@@ -611,16 +613,35 @@ function getAggFN(name) {
     return s.substr(0, s.indexOf('_'));
 }
 
-const endpoint = (conf) => {
-    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
+const endpoint = (conf, path='') => {
+    let url = `${conf.mapsServerURL}/api/v1/map`;
+    if (path) {
+        url += '/' + path;
+    }
+    url = authURL(url, conf);
+    return url;
 };
 
 function getLayerUrl(layergroup, layerIndex, conf) {
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
-        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+        return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
     }
-    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+    return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
+}
+
+function getSQL(query, conf) {
+    let url = `${conf.sqlServerURL}/api/v2/sql?q=` + encodeURIComponent(query);
+    url = authURL(url, conf);
+    return fetch(url);
+}
+
+function authURL(url, conf) {
+    if (conf.apiKey) {
+        const sep = url.includes('?') ? '&' : '?';
+        url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
+    }
+    return url;
 }
 
 /**
