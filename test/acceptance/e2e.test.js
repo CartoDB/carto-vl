@@ -14,6 +14,6 @@ describe('E2E tests:', () => {
 function test(file) {
     it(util.getName(file), () => {
         const actual = util.testSST(file, template, true);
-        return chai.expect(actual).to.eventually.be.true;
+        return chai.expect(actual).to.eventually.eq(0);
     }).timeout(20000);
 }

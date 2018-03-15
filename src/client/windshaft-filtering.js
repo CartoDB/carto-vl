@@ -11,7 +11,7 @@ import FloatConstant from '../core/style/expressions/floatConstant';
 
 /**
  * Returns supported windshaft filters for the style
- * @param {*} style 
+ * @param {*} style
  * @returns {Filtering}
  */
 export function getFiltering(style) {
@@ -69,7 +69,7 @@ function getBlendFilter(f) {
 }
 
 function getInFilter(f) {
-    if (f instanceof In && f.value instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof In && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
         return [{
             type: 'in',
             property: f.value.name,
@@ -79,7 +79,7 @@ function getInFilter(f) {
 }
 
 function getNinFilter(f) {
-    if (f instanceof Nin && f.value instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof Nin && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
         return [{
             type: 'nin',
             property: f.value.name,

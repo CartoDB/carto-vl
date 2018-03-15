@@ -39,8 +39,11 @@ export default class BaseWindshaft extends Base {
     _generateURL(auth, config) {
         let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
         url = url.replace(/{user}/, auth.username);
-        this._validateServerURL(url);
-        return url;
+        this._validateServerURL(url.replace(/{local}/, ''));
+        return {
+            maps: url.replace(/{local}/, ':8181'),
+            sql:  url.replace(/{local}/, ':8080')
+        };
     }
 
     _validateServerURL(serverURL) {

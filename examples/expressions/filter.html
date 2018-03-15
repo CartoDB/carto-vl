@@ -41,11 +41,9 @@
       pop_density_points
     `);
     const s = carto.style.expressions;
-    const avg = s.viewportAvg(s.prop('dn'));
     const style = new carto.Style({
-        color: s.ramp(s.buckets(s.prop('dn'), avg), s.palettes.prism),
-        filter: s.between(s.property('dn'), 60, 70)
-
+        color: s.ramp(s.quantiles(s.prop('dn'), 5), s.palettes.redor),
+        filter: s.between(s.prop('dn'), 100, 150)
     });
     const layer = new carto.Layer('layer', source, style);
 

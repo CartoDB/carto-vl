@@ -55,8 +55,8 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-        <label for="auto">Ramp auto</label>
+        <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
+        <label for="auto">Ramp quantiles</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
@@ -72,8 +72,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [-74.0060, 40.7128],
-      zoom: 12
+      center: [-100.3710, 38.4793],
+      zoom: 4
     });
 
     carto.setDefaultAuth({
@@ -82,31 +82,31 @@
     });
 
     const source = new carto.source.Dataset(`
-      mnmappluto
+      us_county_points
     `);
     const s = carto.style.expressions;
     const style = new carto.Style({
-      color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+      color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.sunsetdark)
     });
     const layer = new carto.Layer('layer', source, style);
 
     layer.addTo(map, 'watername_ocean');
 
-    function setRampAuto() {
+    function setRampQuantiles() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.prop('numfloors'), s.palettes.earth)
+        color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.sunsetdark)
       }));
     }
 
     function setRampBuckets() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.buckets(s.prop('numfloors'), 1, 4, 7, 15), s.palettes.prism)
+        color: s.ramp(s.buckets(s.prop('total_pop'), 10000, 25000, 100000, 500000, 1000000), s.palettes.sunsetdark)
       }));
     }
 
     function setRampLinear() {
       layer.blendToStyle(new carto.Style({
-        color: s.ramp(s.linear(s.prop('numfloors'), 1, 40), s.palettes.earth)
+        color: s.ramp(s.linear(s.prop('total_pop'), 10000, 500000), s.palettes.sunsetdark)
       }));
     }
   </script>
