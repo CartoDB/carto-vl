@@ -454,13 +454,16 @@ function getSignature(a, b) {
 }
 
 function getReturnTypeFromSignature(signature) {
-    if (signature == FLOATS_TO_FLOAT) {
-        return 'float';
-    } else if (signature == FLOAT_AND_COLOR_TO_COLOR) {
-        return 'color';
-    } else if (signature == COLORS_TO_COLOR) {
-        return 'color';
-    } else if (signature == CATEGORIES_TO_FLOAT) {
-        return 'float';
+    switch (signature) {
+        case FLOATS_TO_FLOAT:
+            return 'float';
+        case FLOAT_AND_COLOR_TO_COLOR:
+            return 'color';
+        case COLORS_TO_COLOR:
+            return 'color';
+        case CATEGORIES_TO_FLOAT:
+            return 'float';
+        default:
+            throw new Error('Unimplemented signature');
     }
 }
