@@ -1,4 +1,5 @@
 import Expression from './expression';
+import * as schema from '../../schema';
 
 // Aggregation ops
 export const Max = genAggregationOp('max');
@@ -26,19 +27,19 @@ function genAggregationOp(aggName) {
         _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
             return {
                 preface: '',
-                inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
+                inline: `p${propertyTIDMaker(schema.column.aggColumn(this.property.name, aggName))}`
             };
         }
         eval(feature) {
-            return feature[`_cdb_agg_${aggName}_${this.property.name}`];
+            return feature[schema.column.aggColumn(this.property.name, aggName)];
         }
         _postShaderCompile() { }
         _getMinimumNeededSchema() {
             return {
                 columns: [
-                    `_cdb_agg_${aggName}_${this.property.name}`
+                    schema.column.aggColumn(this.property.name, aggName)
                 ]
             };
         }
     };
-} 
+}

@@ -51,6 +51,9 @@ export const column = {
     getAggFN: function getAggFN(name) {
         let s = name.substr(AGG_PREFIX.length);
         return s.substr(0, s.indexOf('_'));
+    },
+    aggColumn(name, aggFN) {
+        return `${AGG_PREFIX}${aggFN}_${name}`;
     }
 };
 
