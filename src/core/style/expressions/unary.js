@@ -1,4 +1,4 @@
-import { implicitCast } from './utils';
+import { implicitCast, checkLooseType, checkType } from './utils';
 import Expression from './expression';
 
 
@@ -20,7 +20,7 @@ import Expression from './expression';
  * @function
  * @api
  */
-export const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
+export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 
 /**
  *
@@ -40,7 +40,7 @@ export const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
  * @function
  * @api
  */
-export const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 
 /**
  *
@@ -60,7 +60,7 @@ export const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
  * @function
  * @api
  */
-export const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
+export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 
 /**
  *
@@ -80,7 +80,7 @@ export const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
  * @function
  * @api
  */
-export const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
+export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 
 /**
  *
@@ -100,7 +100,7 @@ export const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
  * @function
  * @api
  */
-export const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
+export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 
 /**
  *
@@ -122,7 +122,7 @@ export const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
  * @function
  * @api
  */
-export const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 
 /**
  *
@@ -142,12 +142,12 @@ export const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
  * @function
  * @api
  */
-export const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
+export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 
 /**
  *
- * Compute the logical negatioin of the given expression.
- * This is internally computed as 1 - x preserving boolean behaviour and allowing fuzzy logic.
+ * Compute the logical negation of the given expression.
+ * This is internally computed as 1 - x preserving boolean behavior and allowing fuzzy logic.
  *
  *  - When x is equal to 1 not(x) will be evaluated to 0
  *  - When x is equal to 0 not(x) will be evaluated to 1
@@ -166,20 +166,22 @@ export const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-export const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
+export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
 
-function genUnaryOp(jsFn, glsl) {
+function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends Expression {
         constructor(a) {
             a = implicitCast(a);
+            checkLooseType(name, 'x', 0, 'float', a);
             super({ a: a });
+            this.type = 'float';
         }
         _compile(meta) {
+            checkType(name, 'x', 0, 'float', this.a);
             super._compile(meta);
             if (this.a.type != 'float') {
                 throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
             }
-            this.type = 'float';
             this.inlineMaker = inlines => glsl(inlines.a);
         }
         eval(feature) {
