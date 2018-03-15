@@ -23,7 +23,7 @@ export function getFiltering(style) {
  * @param {Filtering} filtering
  */
 export function getSQLWhere(filtering) {
-    if (!filtering) {
+    if (!filtering || filtering.length == 0) {
         return '';
     }
     return 'WHERE ' + filtering.map(filter => getSQL(filter)).join(' AND ');

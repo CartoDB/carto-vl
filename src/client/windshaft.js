@@ -15,6 +15,8 @@ const MIN_FILTERING = 2000000;
 // Requrest SQL API (temp)
 // Cache dataframe
 
+
+
 export default class Windshaft {
 
     constructor(source) {
@@ -148,11 +150,8 @@ export default class Windshaft {
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
-        if (metadata.featureCount > MIN_FILTERING) {
-            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
-        } else {
-            aggSQL = this._buildQuery(select);
-        }
+        const backendFilters = metadata.featureCount > MIN_FILTERING && this._isAggregated() ? filters : null;
+        aggSQL = this._buildQuery(select, backendFilters);
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
         this._checkLayerMeta(MNS);
@@ -200,10 +199,10 @@ export default class Windshaft {
 
         MRS.columns
             .forEach(name => {
-                if (name.startsWith('_cdb_agg_')) {
+                if (R.schema.column.isAggregated(name)) {
                     aggregation.columns[name] = {
-                        aggregate_function: getAggFN(name),
-                        aggregated_column: getBase(name)
+                        aggregate_function: R.schema.column.getAggFN(name),
+                        aggregated_column: R.schema.column.getBase(name)
                     };
                 } else {
                     aggregation.dimensions[name] = name;
@@ -214,14 +213,16 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+        return MRS.columns.map(name => R.schema.column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
-        )
-            .concat(['the_geom', 'the_geom_webmercator']);
+        ).concat(['the_geom', 'the_geom_webmercator']);
     }
 
-    _buildQuery(select) {
-        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    _buildQuery(select, filters) {
+        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
+        const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
+        return `SELECT ${columns} FROM ${relation} ${condition}`;
     }
 
     _getConfig() {
@@ -321,7 +322,7 @@ export default class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
-                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(name);
@@ -634,15 +635,6 @@ function isClockWise(vertices) {
         a -= vertices[j].x * vertices[i].y;
     }
     return a > 0;
-}
-
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
 }
 
 const endpoint = (conf, path = '') => {
