@@ -464,6 +464,6 @@ function getReturnTypeFromSignature(signature) {
         case CATEGORIES_TO_FLOAT:
             return 'float';
         default:
-            throw new Error('Unimplemented signature');
+            return undefined;
     }
 }
