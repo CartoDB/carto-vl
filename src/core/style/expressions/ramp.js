@@ -37,7 +37,7 @@ export default class Ramp extends Expression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-        checkLooseType('ramp', 'input', 0, input);
+        checkLooseType('ramp', 'input', 0, ['float', 'category'], input);
         checkType('ramp', 'palette', 1, 'palette', palette);
 
         super({ input: input });
@@ -47,6 +47,7 @@ export default class Ramp extends Expression {
         this.type = 'color';
     }
     _compile(meta) {
+        checkType('ramp', 'input', 0, ['float', 'category'], this.input);
         super._compile(meta);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
