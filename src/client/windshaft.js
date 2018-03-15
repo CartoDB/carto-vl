@@ -150,7 +150,7 @@ export default class Windshaft {
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
-        const backendFilters = metadata.featureCount > MIN_FILTERING && this._isAggregated() ? filters : null;
+        const backendFilters = metadata.featureCount > 1 ? filters : null;
         aggSQL = this._buildQuery(select, backendFilters);
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
@@ -185,7 +185,7 @@ export default class Windshaft {
     }
 
     _isAggregated() {
-        return this._layerMeta.aggregation.mvt;
+        return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
     }
 
     _generateAggregation(MRS, resolution) {
