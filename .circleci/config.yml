@@ -75,7 +75,7 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: xvfb-run -a yarn test:e2e
+      - run: xvfb-run -a yarn test:e2e || true
 workflows:
   version: 2
   build_and_test:
@@ -83,3 +83,4 @@ workflows:
       - lint
       - test-unit
       - test-integration
+      - test-acceptance

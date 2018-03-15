@@ -13,7 +13,7 @@ carto.setDefaultAuth({
 const source = new carto.source.SQL('SELECT ST_Multi(the_geom_webmercator) as the_geom_webmercator, ST_Multi(the_geom) as the_geom FROM lines_0');
 const s = carto.style.expressions;
 const style = new carto.Style({
-    width: s.float(20),
+    width: s.float(10),
     color: s.hsv(0.2, 1, .9),
 });
 const layer = new carto.Layer('myCartoLayer', source, style);
