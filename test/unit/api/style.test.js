@@ -157,6 +157,10 @@ describe('api/style', () => {
     });
 
     describe('expression.blendTo()', () => {
+        const dateNow = Date.now;
+        afterEach(function () {
+            Date.now = dateNow;
+        });
         it('should return the new/final expression', () => {
             const float = s.float(1);
             const floatB = s.float(2);
@@ -177,7 +181,7 @@ describe('api/style', () => {
             });
             style.onChange(done);
             float.blendTo(floatB, 10);
-        }, 1);
+        }, 10);
         it('should notify the style after the final blending', done => {
             const float = s.float(1);
             const floatB = s.float(2);
@@ -185,12 +189,12 @@ describe('api/style', () => {
             const style = new Style({
                 filter: expected,
             });
-            float.blendTo(floatB, 1);
+            float.blendTo(floatB, 999);
             style.onChange(done);
-            setTimeout(() => {
-                style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
-            }, 3);
-        }, 5);
+            const t = Date.now() + 1000;
+            Date.now = () => t;
+            style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
+        }, 10);
     });
 
     describe('.filter', () => {
