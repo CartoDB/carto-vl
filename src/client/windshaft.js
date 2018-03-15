@@ -155,6 +155,7 @@ export default class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
@@ -174,6 +175,18 @@ export default class Windshaft {
         const promise = this._instantiateUncached(MNS, resolution, filters);
         this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
         return promise;
+    }
+
+    _checkLayerMeta(MNS) {
+        if (!this._isAggregated()) {
+            if (MNS.columns.some(column => R.schema.column.isAggregated(column))) {
+                throw new Error('Aggregation not supported for this dataset');
+            }
+        }
+    }
+
+    _isAggregated() {
+        return this._layerMeta.aggregation.mvt;
     }
 
     _generateAggregation(MRS, resolution) {
@@ -263,6 +276,7 @@ export default class Windshaft {
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        this._layerMeta = layergroup.metadata.layers[0].meta;
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return getLayerUrl(layergroup, LAYER_INDEX, conf);
     }

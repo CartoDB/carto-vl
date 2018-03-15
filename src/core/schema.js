@@ -36,3 +36,21 @@ export function equals(a,b){
     }
     return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
 }
+
+const AGG_PREFIX = '_cdb_agg_';
+const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
+
+// column information functions
+export const column = {
+    isAggregated: function isAggregated(name) {
+        return name.startsWith(AGG_PREFIX);
+    },
+    getBase: function getBase(name) {
+        return name.replace(AGG_PATTERN, '');
+    },
+    getAggFN: function getAggFN(name) {
+        let s = name.substr(AGG_PREFIX.length);
+        return s.substr(0, s.indexOf('_'));
+    }
+};
+
