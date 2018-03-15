@@ -4,6 +4,7 @@ export default class Top extends Expression {
     constructor(property, buckets) {
         // TODO 'cat'
         super({ property: property });
+        // TODO improve type check
         this.buckets = buckets; //TODO force fixed literal
     }
     _compile(metadata) {

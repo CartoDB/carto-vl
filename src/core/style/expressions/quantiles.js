@@ -1,14 +1,16 @@
 import Expression from './expression';
 import { float } from '../functions';
+import { checkNumber, checkInstance, checkType } from './utils';
+import Property from './property';
 
 let quantilesUID = 0;
 
 function genQuantiles(global) {
     return class Quantiles extends Expression {
         constructor(input, buckets) {
-            if (!Number.isFinite(buckets)) {
-                throw new Error('Quantiles() only accepts a fixed number of buckets');
-            }
+            checkInstance('quantiles', 'input', 0, Property, input);
+            checkNumber('quantiles', 'buckets', 1, buckets);
+
             let children = {
                 input
             };
@@ -22,10 +24,11 @@ function genQuantiles(global) {
             this.numCategories = buckets;
             this.buckets = buckets;
             this.breakpoints = breakpoints;
+            this.type = 'category';
         }
         _compile(metadata) {
             super._compile(metadata);
-            this.type = 'category';
+            checkType('quantiles', 'input', 0, 'float', this.input);
             if (global) {
                 const copy = metadata.sample.map(s => s[this.input.name]);
                 copy.sort((x, y) => x - y);

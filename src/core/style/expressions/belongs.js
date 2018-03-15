@@ -1,4 +1,4 @@
-import { implicitCast } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
 import Expression from './expression';
 
 
@@ -6,14 +6,14 @@ function IN_INLINE_MAKER(categories) {
     if (categories.length == 0) {
         return () => '0.';
     }
-    return inline => `(${categories.map((cat, index) => `(${inline.property} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    return inline => `(${categories.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
 }
 
 function NIN_INLINE_MAKER(categories) {
     if (categories.length == 0) {
         return () => '1.';
     }
-    return inline => `(${categories.map((cat, index) => `(${inline.property} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `(${categories.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
 /**
@@ -36,12 +36,12 @@ function NIN_INLINE_MAKER(categories) {
  * @function
  * @api
  */
-export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
+export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 
 
 /**
  *
- * Check if property does not belong to the categories list given by the categories parameters.
+ * Check if value does not belong to the categories list given by the categories parameters.
  *
  * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
  * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
@@ -59,37 +59,38 @@ export const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.s
  * @function
  * @api
  */
-export const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
+export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 
-function generateBelongsExpression(inlineMaker, jsEval) {
+function generateBelongsExpression(name, inlineMaker, jsEval) {
 
     return class BelongExpression extends Expression {
-        constructor(property, ...categories) {
+        constructor(value, ...categories) {
+            value = implicitCast(value);
+            checkExpression(name, 'value', 0, value);
+
             categories = categories.map(implicitCast);
+
+            checkLooseType(name, 'value', 0, 'category', value);
+            categories.map((cat, index) => checkLooseType(name, '', index + 1, 'category', cat));
+
             let children = {
-                property
+                value
             };
             categories.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
             this.categories = categories;
             this.inlineMaker = inlineMaker(this.categories);
+            this.type = 'float';
         }
 
         _compile(meta) {
             super._compile(meta);
-            if (this.property.type != 'category') {
-                throw new Error('In() can only be performed to categorical properties');
-            }
-            this.categories.map(cat => {
-                if (cat.type != 'category') {
-                    throw new Error('In() can only be performed to categorical properties');
-                }
-            });
-            this.type = 'float';
+            checkType(name, 'value', 0, 'category', this.value);
+            this.categories.map((cat, index) => checkType(name, '', index + 1, 'category', cat));
         }
 
         eval(feature) {
-            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
+            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
         }
     };
 

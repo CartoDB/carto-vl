@@ -29,6 +29,7 @@ function generateAggregattion(metadataPropertyName, global) {
         _compile(metadata) {
             console.log(metadata);
             super._compile(metadata);
+            // TODO improve type check
             this.property._compile(metadata);
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
@@ -73,6 +74,7 @@ function generatePercentile(global) {
                 throw new Error('Percentile must be a fixed literal number');
             }
             super({ value: float(0) });
+            // TODO improve type check
             this.property = property;
             this.percentile = percentile;
         }

@@ -1,5 +1,6 @@
 import Expression from './expression';
 import { float } from '../functions';
+import { checkLooseType, checkType } from './utils';
 
 /**
  *
@@ -29,14 +30,14 @@ export default class Opacity extends Expression {
         if (Number.isFinite(b)) {
             b = float(b);
         }
+        checkType('opacity', 'color', 0, 'color', a);
+        checkLooseType('opacity', 'opacity', 1, 'float', b);
         super({ a: a, b: b });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (!(this.a.type == 'color' && this.b.type == 'float')) {
-            throw new Error(`Opacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
-        }
-        this.type = 'color';
+        checkType('opacity', 'opacity', 1, 'float', this.b);
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
     }
     // TODO eval
