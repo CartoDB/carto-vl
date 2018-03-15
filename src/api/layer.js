@@ -340,7 +340,10 @@ export default class Layer {
         return this._source.requestMetadata(style);
     }
 
-    requestData() {
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
         this._source.requestData(this._getViewport());
     }
 
