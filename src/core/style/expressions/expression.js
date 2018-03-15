@@ -108,6 +108,10 @@ export default class Expression {
         replacer.notify = toReplace.notify;
     }
 
+    notify() {
+        this.parent.notify();
+    }
+
     /**
      * Linear interpolation between this and finalValue with the specified duration
      * @jsapi
