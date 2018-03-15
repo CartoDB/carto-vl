@@ -63,6 +63,7 @@ export function validateStaticType(expressionName, argTypes, expectedType) {
         if (!equalArgs(simpleArgs, propertyArgs)) {
             validateConstructorTimeType(expressionName, propertyArgs, expectedType);
         }
+        validateCompileTimeType(expressionName, propertyArgs, expectedType);
     });
 }
 export function validateDynamicType(expressionName, argTypes, expectedType) {

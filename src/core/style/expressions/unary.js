@@ -177,8 +177,8 @@ function genUnaryOp(name, jsFn, glsl) {
             this.type = 'float';
         }
         _compile(meta) {
-            checkType(name, 'x', 0, 'float', this.a);
             super._compile(meta);
+            checkType(name, 'x', 0, 'float', this.a);
             if (this.a.type != 'float') {
                 throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
             }

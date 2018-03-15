@@ -47,8 +47,8 @@ export default class Ramp extends Expression {
         this.type = 'color';
     }
     _compile(meta) {
-        checkType('ramp', 'input', 0, ['float', 'category'], this.input);
         super._compile(meta);
+        checkType('ramp', 'input', 0, ['float', 'category'], this.input);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
         }
