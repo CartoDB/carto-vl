@@ -59,24 +59,31 @@ export default class Windshaft {
     }
 
     /**
-     * Should be called whenever the viewport or the style changes
-     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * Should be called whenever the style changes (even if metadata is not going to be used)
+     * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
+     * Returns  a promise to a Metadata
      * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    async getData(viewport, style) {
+    async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
-        const tiles = rsys.rTiles(viewport);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
-        this._getTiles(tiles);
         return this.metadata;
     }
+
+    getData(viewport) {
+        if (this._isInstantiated()) {
+            const tiles = rsys.rTiles(viewport);
+            this._getTiles(tiles);
+        }
+    }
+
 
     _getTiles(tiles) {
         this._requestGroupID++;
@@ -112,6 +119,10 @@ export default class Windshaft {
         return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
     }
 
+    _isInstantiated() {
+        return !!this.metadata;
+    }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
@@ -129,7 +140,7 @@ export default class Windshaft {
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, MNS, conf);
+        const metadata = await this._getMetadata(query, MNS, conf);
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
@@ -425,7 +436,7 @@ export default class Windshaft {
 
         return { properties, points, featureGeometries };
     }
-    async getMetadata(query, proto, conf) {
+    async _getMetadata(query, proto, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type

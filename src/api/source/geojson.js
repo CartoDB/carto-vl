@@ -37,7 +37,6 @@ export default class GeoJSON extends Base {
         this._checkData(data);
 
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
-        this._status = 'init'; // init -> metadata -> data
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
         this._numFields = [];
@@ -51,16 +50,21 @@ export default class GeoJSON extends Base {
         this._removeDataframe = removeDataframe;
     }
 
+    requestMetadata() {
+        return Promise.resolve(this._metadata);
+    }
+
     requestData() {
-        // TODO: split it in two functions: (metadata) / (data)
-        //
-        if (this._status === 'init') {
-            this._status = 'metadata';
-            return this._requestMetadata();
-        } else if (this._status === 'metadata') {
-            this._status = 'data';
-            this._requestData();
-        }
+        const dataframe = new Dataframe({
+            active: true,
+            center: { x: 0, y: 0 },
+            geom: this._decodeGeometry(),
+            properties: this._decodeProperties(),
+            scale: 1,
+            size: this._features.length,
+            type: this._getDataframeType(this._type)
+        });
+        this._addDataframe(dataframe);
     }
 
     _checkData(data) {
@@ -81,23 +85,6 @@ export default class GeoJSON extends Base {
         else {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
-    }
-
-    _requestMetadata() {
-        return Promise.resolve(this._metadata);
-    }
-
-    _requestData() {
-        const dataframe = new Dataframe({
-            active: true,
-            center: { x: 0, y: 0 },
-            geom: this._decodeGeometry(),
-            properties: this._decodeProperties(),
-            scale: 1,
-            size: this._features.length,
-            type: this._getDataframeType(this._type)
-        });
-        this._addDataframe(dataframe);
     }
 
     _computeMetadata() {
