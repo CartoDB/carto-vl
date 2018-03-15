@@ -3,6 +3,7 @@ import { Dataframe } from '../../core/renderer';
 import * as rsys from '../../client/rsys';
 import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
+import Metadata from '../../core/metadata';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -88,54 +89,51 @@ export default class GeoJSON extends Base {
     }
 
     _computeMetadata() {
-        const metadata = {
-            columns: [],
-            categoryIDs: {},
-            sample: [],
-            featureCount: this._features.length,
-        };
+        const categoryIDs = {};
+        const columns = [];
+        const sample = [];
+        const featureCount = this._features.length;
+
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             Object.keys(properties).map(name => {
                 const value = properties[name];
-                const type = Number.isFinite(value) ? 'float' : 'category';
-                if (type == 'float') {
-                    this._addNumericPropertyToMetadata(name, value, metadata);
-                } else {
-                    this._addCategoryPropertyToMetadata(name, value, metadata);
-                }
+                Number.isFinite(value) ?
+                    this._addNumericPropertyToMetadata(name, value, columns) :
+                    this._addCategoryPropertyToMetadata(name, value, columns);
             });
-            this._sampleFeatureOnMetadata(properties, metadata, this._features.length);
+            this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
         this._numFields.map(name => {
-            const column = metadata.columns.find(c => c.name == name);
+            const column = columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
         this._catFields.map(name => {
-            const column = metadata.columns.find(c => c.name == name);
-            column.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            const column = columns.find(c => c.name == name);
+            column.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
         });
-        this._metadata = metadata;
-        return metadata;
+
+        this._metadata = new Metadata(categoryIDs, columns, featureCount, sample);
+        return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(feature, metadata, featureCount) {
+    _sampleFeatureOnMetadata(feature, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
                 return;
             }
         }
-        metadata.sample.push(feature);
+        sample.push(feature);
     }
 
-    _addNumericPropertyToMetadata(propertyName, value, metadata) {
+    _addNumericPropertyToMetadata(propertyName, value, columns) {
         if (this._catFields.includes(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._numFields.includes(propertyName)) {
             this._numFields.push(propertyName);
-            metadata.columns.push({
+            columns.push({
                 name: propertyName,
                 type: 'float',
                 min: Number.POSITIVE_INFINITY,
@@ -145,26 +143,26 @@ export default class GeoJSON extends Base {
                 count: 0
             });
         }
-        const column = metadata.columns.find(c => c.name == propertyName);
+        const column = columns.find(c => c.name == propertyName);
         column.min = Math.min(column.min, value);
         column.max = Math.max(column.max, value);
         column.sum += value;
         column.count++;
     }
-    _addCategoryPropertyToMetadata(propertyName, value, metadata) {
+    _addCategoryPropertyToMetadata(propertyName, value, columns) {
         if (this._numFields.includes(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._catFields.includes(propertyName)) {
             this._catFields.push(propertyName);
-            metadata.columns.push({
+            columns.push({
                 name: propertyName,
                 type: 'category',
                 categoryNames: [],
                 categoryCounts: [],
             });
         }
-        const column = metadata.columns.find(c => c.name == propertyName);
+        const column = columns.find(c => c.name == propertyName);
         if (!column.categoryNames.includes(value)) {
             column.categoryNames.push(value);
             column.categoryCounts.push(0);
