@@ -178,19 +178,19 @@ describe('api/style', () => {
             style.onChange(done);
             float.blendTo(floatB, 10);
         }, 1);
-        xit('should notify the style after the final blending', done => {
+        it('should notify the style after the final blending', done => {
             const float = s.float(1);
             const floatB = s.float(2);
-            const expected = s.gt(s.property('fake_property'), float);
+            const expected = s.gt(7, float);
             const style = new Style({
                 filter: expected,
             });
-            float.blendTo(floatB, 10);
-            setTimeout(()=>{
-                style.onChange(done);
-                style._styleSpec.filter._preDraw();
-            }, 1);
-        }, 15);
+            float.blendTo(floatB, 1);
+            style.onChange(done);
+            setTimeout(() => {
+                style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
+            }, 3);
+        }, 5);
     });
 
     describe('.filter', () => {
