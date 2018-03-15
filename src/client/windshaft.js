@@ -1,6 +1,6 @@
 import * as R from '../core/renderer';
 import * as rsys from './rsys';
-
+import Dataframe from '../core/dataframe';
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
@@ -223,15 +223,15 @@ export default class Windshaft {
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
-        // TODO: Should the dataframe constructor have type and size parameters?
-        const dataframe = new R.Dataframe(
-            rs.center,
-            rs.scale,
-            geometry,
-            properties,
-        );
-        dataframe.type = type;
-        dataframe.size = size;
+        const dataframe = new Dataframe({
+            active: false,
+            center: rs.center,
+            geom: geometry,
+            properties: properties,
+            scale: rs.scale,
+            size: size,
+            type: type,
+        });
 
         return dataframe;
     }
