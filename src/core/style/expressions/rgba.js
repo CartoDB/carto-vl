@@ -1,5 +1,6 @@
 import Expression from './expression';
 import { float } from '../functions';
+import { implicitCast, checkLooseType, checkType } from './utils';
 
 //TODO refactor to uniformcolor, write color (plain, literal)
 
@@ -34,20 +35,20 @@ export default class RGBA extends Expression {
      * @param {*} a alpha/opacity component in the [0,1] range
      */
     constructor(r, g, b, a) {
-        var color = [r, g, b, a];
-        color = color.map(x => Number.isFinite(x) ? float(x) : x);
-        r = color[0];
-        g = color[1];
-        b = color[2];
-        a = color[3];
+        [r, g, b, a] = [r, g, b, a].map(implicitCast);
+        checkLooseType('rgba', 'r', 0, 'float', r);
+        checkLooseType('rgba', 'g', 1, 'float', g);
+        checkLooseType('rgba', 'b', 2, 'float', b);
+        checkLooseType('rgba', 'a', 3, 'float', a);
         super({ r, g, b, a });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.r.type != 'float' || this.g.type != 'float' || this.b.type != 'float' || this.a.type != 'float') {
-            throw new Error('Invalid parameters for RGBA()');
-        }
-        this.type = 'color'; // TODO this kind of thing can be refactored into Color class and use: extends ColorExpression
+        checkType('rgba', 'r', 0, 'float', this.r);
+        checkType('rgba', 'g', 1, 'float', this.g);
+        checkType('rgba', 'b', 2, 'float', this.b);
+        checkType('rgba', 'a', 3, 'float', this.a);
         this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
     }
     // TODO eval
