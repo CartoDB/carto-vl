@@ -7,6 +7,7 @@ import Property from '../core/style/expressions/property';
 import Blend from '../core/style/expressions/blend';
 import Animate from '../core/style/expressions/animate';
 import FloatConstant from '../core/style/expressions/floatConstant';
+import { Avg } from '../core/style/expressions/aggregation';
 
 
 /**
@@ -36,6 +37,7 @@ function getSQL(f) {
 
 function getBetweenSQL(f) {
     if (f.type == 'between') {
+        // TODO: support aggrgations (should go to aggregation parameters, not SQL)
         return `(${f.property} BETWEEN ${f.lowerLimit} AND ${f.upperLimit})`;
     }
 }
@@ -92,7 +94,8 @@ function getBetweenFilter(f) {
     if (isBetweenFilter(f)) {
         return [{
             type: 'between',
-            property: f.value.name,
+            property: f.value instanceof Property ? f.value.name : f.value.property.name,
+            aggregation: f.value instanceof Property ? null : f.value._aggName,
             lowerLimit: f.lowerLimit.expr,
             upperLimit: f.upperLimit.expr,
         }];
@@ -101,7 +104,7 @@ function getBetweenFilter(f) {
 
 function isBetweenFilter(f) {
     return f instanceof Between
-        && f.value instanceof Property
+        && (f.value instanceof Property || f.value instanceof Avg) // TODO: add rest of aggregation functions
         && (f.lowerLimit instanceof Float || f.lowerLimit instanceof FloatConstant)
         && (f.upperLimit instanceof Float || f.upperLimit instanceof FloatConstant);
 }

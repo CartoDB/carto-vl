@@ -12,6 +12,7 @@ function genAggregationOp(aggName) {
     return class AggregationOperation extends Expression {
         constructor(property) {
             super({ property: property });
+            this._aggName = aggName;
         }
         get name() {
             return this.property.name;
