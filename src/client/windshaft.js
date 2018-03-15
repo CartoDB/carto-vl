@@ -61,7 +61,7 @@ export default class Windshaft {
     /**
      * Should be called whenever the style changes (even if metadata is not going to be used)
      * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
-     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * Returns  a promise to a Metadata
      * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
@@ -73,9 +73,8 @@ export default class Windshaft {
         const filtering = windshaftFiltering.getFiltering(style);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
-            return this.metadata;
         }
-        return false;
+        return this.metadata;
     }
 
     getData(viewport) {

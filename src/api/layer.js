@@ -282,16 +282,9 @@ export default class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        return this.requestMetadata(style).then(metadata => {
-            if (metadata) {
-                // metadata has changed
-                this.metadata = metadata;
-            }
-            this._compileShaders(style, this.metadata);
-            if (metadata) {
-                this.requestData();
-            }
-        });
+        this.metadata = await this.requestMetadata(style);
+        this._compileShaders(style, this.metadata);
+        return this.requestData();
     }
 
     _checkId(id) {
