@@ -437,6 +437,7 @@ export default class Windshaft {
 
         return { properties, points, featureGeometries };
     }
+
     async _getMetadata(query, proto, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
@@ -446,15 +447,15 @@ export default class Windshaft {
 
         const [{ numerics, categories, dates }, featureCount] = await Promise.all([
             this._getColumnTypes(query, conf),
-            this.getFeatureCount(query, conf)]
-        );
+            this.getFeatureCount(query, conf)]);
 
         const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
-        
-        const sample = await this.getSample(conf, sampling);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const datesTypes = await this.getDatesTypes(dates, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
+
+        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
+            this.getSample(conf, sampling),
+            this.getNumericTypes(numerics, query, conf),
+            this.getDatesTypes(dates, query, conf),
+            this.getCategoryTypes(categories, query, conf)]);
 
         const columns = [];
         numerics.forEach((name, index) => columns.push(numericsTypes[index]));
