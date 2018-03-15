@@ -18,7 +18,6 @@ e2e
 ## Generating the references
 
 ```
-yarn build
 yarn test:e2e:prepare
 ```
 
@@ -36,7 +35,6 @@ If you want to regenerate all the references run `yarn test:e2e:clean` before.
 ## Running the tests
 
 ```
-yarn build
 yarn test:e2e
 ```
 
