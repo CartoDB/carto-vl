@@ -1,5 +1,4 @@
 import Expression from './expression';
-import { float } from '../functions';
 import { implicitCast, checkLooseType, checkType } from './utils';
 
 //TODO refactor to uniformcolor, write color (plain, literal)

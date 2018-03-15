@@ -57,12 +57,13 @@ export function throwInvalidString(expressionName, parameterName, parameterIndex
 }
 
 // Try to check the type, but accept undefined types without throwing
-// This is useful to make constructor-time checks, at contructor-time some types can be already known and errors can be throw.
+// This is useful to make constructor-time checks, at constructor-time some types can be already known and errors can be throw.
 // Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
 // they must be loose
 export function checkLooseType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
-    if (parameter.type != expectedType && parameter.type !== undefined) {
-        throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
+    if (parameter.type !== undefined) {
+        checkType(expressionName, parameterName, parameterIndex, expectedType, parameter);
     }
 }
 
@@ -75,7 +76,15 @@ export function checkExpression(expressionName, parameterName, parameterIndex, p
 
 export function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
-    if (parameter.type != expectedType) {
+    if (Array.isArray(expectedType)) {
+        const ok = expectedType.some(type =>
+            parameter.type == type
+        );
+        if (!ok) {
+            throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+            expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
+        }
+    } else if (parameter.type != expectedType) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
     }
 }

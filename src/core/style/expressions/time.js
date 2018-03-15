@@ -6,6 +6,7 @@ export default class Time extends Expression {
             throw new Error('time(): invalid date parameter');
         }
         super({});
+        // TODO improve type check
         this.type = 'time';
         this.date = date;
         this.inlineMaker = () => undefined;
