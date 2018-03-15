@@ -21,7 +21,6 @@ render
 ## Generating the references
 
 ```
-yarn build
 yarn test:render:prepare
 ```
 
@@ -39,7 +38,6 @@ If you want to regenerate all the references run `yarn test:render:clean` before
 ## Running the tests
 
 ```
-yarn build
 yarn test:render
 ```
 

@@ -255,7 +255,7 @@ export default class Layer {
 
     initCallback() {
         this._contextInitCallback();
-        this.requestData();
+        this.requestMetadata();
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -282,18 +282,9 @@ export default class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        const originalPromise = this.requestData(style);
-        if (!originalPromise) {
-            // The previous stored metadata is still valid
-            this._compileShaders(style, this.metadata);
-            return Promise.resolve();
-        }
-        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
-        return originalPromise.then(metadata => {
-            this.metadata = metadata;
-            this._compileShaders(style, metadata);
-            this.requestData(style);
-        });
+        this.metadata = await this.requestMetadata(style);
+        this._compileShaders(style, this.metadata);
+        return this.requestData();
     }
 
     _checkId(id) {
@@ -333,13 +324,20 @@ export default class Layer {
         throw new Error('?');
     }
 
-    async requestData(style) {
+    async requestMetadata(style) {
         style = style || this._style;
         if (!style) {
             return;
         }
         await this._context;
-        return this._source.requestData(this._getViewport(), style);
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
     }
 
     getNumFeatures() {

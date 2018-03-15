@@ -148,7 +148,7 @@ describe('api/source/geojson', () => {
                 }]
             });
             expect(function () {
-                source._requestData();
+                source.requestData();
             }).toThrowError('multiple types not supported: Point, LineString.');
         });
 
@@ -164,7 +164,7 @@ describe('api/source/geojson', () => {
                 }
             });
             expect(function () {
-                source._requestData();
+                source.requestData();
             }).toThrowError('first polygon ring must be external.');
         });
     });
