@@ -50,7 +50,7 @@ describe('api/style', () => {
                 expect(actual.getStrokeWidth().expr).toEqual(s.float(15).expr);
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
-            
+
             it('should allow the style properties `width` and `strokeWidth` to be numbers', () => {
                 const actual = new Style({
                     width: 1,
@@ -154,6 +154,42 @@ describe('api/style', () => {
                 expect(actual.getOrder()).toEqual(s.asc(s.width()));
             });
         });
+    });
+
+    describe('expression.blendTo()', () => {
+        it('should return the new/final expression', () => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(s.property('fake_property'), float);
+            new Style({
+                filter: expected,
+            });
+
+            const final = float.blendTo(floatB, 10);
+            expect(final).toBe(floatB);
+        });
+        it('should notify the style on change', done => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(s.property('fake_property'), float);
+            const style = new Style({
+                filter: expected,
+            });
+            style.onChange(done);
+            float.blendTo(floatB, 10);
+        }, 1);
+        it('should notify the style after the final blending', done => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(s.property('fake_property'), float);
+            const style = new Style({
+                filter: expected,
+            });
+            float.blendTo(floatB, 10);
+            setTimeout(() => {
+                style.onChange(done);
+            });
+        }, 15);
     });
 
     describe('.filter', () => {
