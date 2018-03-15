@@ -92,36 +92,26 @@ function decodeLine(geom) {
                         normal[1] * 0.5 + nnext[1] * 0.5,
                     ]);
                 }
+
+                // First triangle
+    
                 normals.push(-na[0], -na[1]);
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
 
+                //Second triangle
+    
                 normals.push(na[0], na[1]);
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
-
-                normal = [0, 0];
-
-
-                //First triangle
-                geometry.push(a[0] - 0.01 * normal[0]);
-                geometry.push(a[1] - 0.01 * normal[1]);
-
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-
-                //Second triangle
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] + 0.01 * normal[0]);
-                geometry.push(b[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
+                geometry.push(b[0], b[1]);
             }
         });
         breakpointList.push(geometry.length);
