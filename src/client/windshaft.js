@@ -62,10 +62,7 @@ export default class Windshaft {
      * Should be called whenever the style changes (even if metadata is not going to be used)
      * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
      * Returns  a promise to a Metadata
-     * @param {*} viewport
-     * @param {*} MNS
-     * @param {*} addDataframe
-     * @param {*} styleDataframe
+     * @param {*} style
      */
     async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
@@ -77,6 +74,13 @@ export default class Windshaft {
         return this.metadata;
     }
 
+    /**
+     * After calling getMetadata(), data for a viewport can be obtained with this function.
+     * So long as the style doesn't change, getData() can be called repeatedly for different
+     * viewports. If style changes getMetadata() should be called before requesting data
+     * for the new style.
+     * @param {*} viewport
+     */
     getData(viewport) {
         if (this._isInstantiated()) {
             const tiles = rsys.rTiles(viewport);
