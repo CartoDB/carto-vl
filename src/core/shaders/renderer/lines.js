@@ -8,7 +8,7 @@ attribute vec2 normal;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
-uniform vec2 aspect;
+uniform vec2 normalScale;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -23,7 +23,7 @@ void main(void) {
     color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+aspect*normal*0.001*size-vertexOffset, 0.5, 1.);
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
