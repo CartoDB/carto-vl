@@ -92,6 +92,36 @@ export default class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source && this._source !== source) {
+            this._source.free();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(() => {
+            this._styleChanged(style);
+        });
+        this._compileShaders(style, metadata);
+    }
     /**
      * Set a new source for this layer.
      *
@@ -100,13 +130,24 @@ export default class Layer {
      * @instance
      * @api
      */
-    setSource(source) {
+    async setSource(source) {
         this._checkSource(source);
+        const style = this._style;
+        if (style) {
+            var metadata = await source.requestMetadata(style);
+        }
+        if (this._style !== style) {
+            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+        if (style) {
+            this._styleChanged(style);
+        }
     }
 
     /**
@@ -282,7 +323,12 @@ export default class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        this.metadata = await this.requestMetadata(style);
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         this._compileShaders(style, this.metadata);
         return this.requestData();
     }
