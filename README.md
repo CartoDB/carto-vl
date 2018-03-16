@@ -52,11 +52,6 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
 
-
-## Submitting Contributions
-
-You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
-
 ## Development
 
 ### Install the dependencies
@@ -82,3 +77,7 @@ yarn build:watch
 - [Unit tests](./test/unit/README.md)
 - [Integration tests](./test/integration/README.md)
 - [Acceptance tests](./test/acceptance/README.md)
+
+### Submitting Contributions
+
+You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
