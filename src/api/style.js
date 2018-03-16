@@ -26,19 +26,16 @@ const SUPPORTED_PROPERTIES = [
     'filter'
 ];
 
-/**
- 
- */
 
 export default class Style {
 
     /**
     * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through styles. Styles also control the element visibility, ordering or aggregation level.
-    * 
+    *
     * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
     * Each attribute in the {@link StyleSpec|styleSpec} must be a valid {@link carto.style.expressions|expression}.
-    * Those expressions will be evaluated dinamically for every element in the dataset.
+    * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
     *

@@ -27,7 +27,7 @@ export default class Layer {
     * new carto.Layer('layer0', source, style);
     *
     * @fires CartoError
-    * 
+    *
     * @constructor Layer
     * @memberof carto
     * @api
@@ -92,6 +92,36 @@ export default class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source && this._source !== source) {
+            this._source.free();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(() => {
+            this._styleChanged(style);
+        });
+        this._compileShaders(style, metadata);
+    }
     /**
      * Set a new source for this layer.
      *
@@ -100,13 +130,24 @@ export default class Layer {
      * @instance
      * @api
      */
-    setSource(source) {
+    async setSource(source) {
         this._checkSource(source);
+        const style = this._style;
+        if (style) {
+            var metadata = await source.requestMetadata(style);
+        }
+        if (this._style !== style) {
+            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+        if (style) {
+            this._styleChanged(style);
+        }
     }
 
     /**
@@ -138,7 +179,7 @@ export default class Layer {
 
     /**
      * Set a new style for this layer.
-     * 
+     *
      * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
@@ -162,9 +203,9 @@ export default class Layer {
 
     /**
      * Blend the current style with another style.
-     * 
+     *
      * This allows smooth transforms between two different styles.
-     * 
+     *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different styles varying the width
      * const style0 = new carto.style({ width: 10 });
@@ -176,7 +217,7 @@ export default class Layer {
      * // The points will be animated from 10px to 20px for 500ms.
      * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - The final style 
+     * @param {carto.Style} style - The final style
      * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
@@ -255,7 +296,7 @@ export default class Layer {
 
     initCallback() {
         this._contextInitCallback();
-        this.requestData();
+        this.requestMetadata();
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -282,18 +323,14 @@ export default class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        const originalPromise = this.requestData(style);
-        if (!originalPromise) {
-            // The previous stored metadata is still valid
-            this._compileShaders(style, this.metadata);
-            return Promise.resolve();
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
-        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
-        return originalPromise.then(metadata => {
-            this.metadata = metadata;
-            this._compileShaders(style, metadata);
-            this.requestData(style);
-        });
+        this.metadata = metadata;
+        this._compileShaders(style, this.metadata);
+        return this.requestData();
     }
 
     _checkId(id) {
@@ -333,13 +370,20 @@ export default class Layer {
         throw new Error('?');
     }
 
-    async requestData(style) {
+    async requestMetadata(style) {
         style = style || this._style;
         if (!style) {
             return;
         }
         await this._context;
-        return this._source.requestData(this._getViewport(), style);
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
     }
 
     getNumFeatures() {

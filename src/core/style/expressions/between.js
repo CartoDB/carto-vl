@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { implicitCast, checkLooseType, checkType } from './utils';
 
 /**
  *
@@ -23,21 +24,25 @@ import Expression from './expression';
  */
 export default class Between extends Expression {
     constructor(value, lowerLimit, upperLimit) {
+        value = implicitCast(value);
+        lowerLimit = implicitCast(lowerLimit);
+        upperLimit = implicitCast(upperLimit);
+
+        checkLooseType('between', 'value', 0, 'float', value);
+        checkLooseType('between', 'lowerLimit', 1, 'float', lowerLimit);
+        checkLooseType('between', 'upperLimit', 2, 'float', upperLimit);
+
         super({ value, lowerLimit, upperLimit });
         this.type = 'float';
     }
 
     _compile(meta) {
         super._compile(meta);
-        if (this.value.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
-        if (this.lowerLimit.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
-        if (this.upperLimit.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
+
+        checkType('between', 'value', 0, 'float', this.value);
+        checkType('between', 'lowerLimit', 1, 'float', this.lowerLimit);
+        checkType('between', 'upperLimit', 2, 'float', this.upperLimit);
+
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
 

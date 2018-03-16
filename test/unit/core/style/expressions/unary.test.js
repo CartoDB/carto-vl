@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 
 // Add custom toString function to improve test output.
@@ -6,6 +7,19 @@ s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
 
 describe('src/core/style/expressions/unary', () => {
+    describe('error control', () => {
+        describe('Signature FLOATS_TO_FLOAT', () => {
+            validateDynamicTypeErrors('sin', ['category']);
+            validateStaticTypeErrors('sin', ['color']);
+        });
+    });
+
+    describe('type', () => {
+        describe('Signature FLOATS_TO_FLOAT', () => {
+            validateStaticType('sin', ['float'], 'float');
+        });
+    });
+
     describe('log', () => {
         test('log', 1, 0);
         test('log', Math.E, 1);

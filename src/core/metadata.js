@@ -31,3 +31,12 @@ const metadataExample = {
     ]
 };
 */
+
+export default class Metadata {
+    constructor(categoryIDs, columns, featureCount, sample) {
+        this.categoryIDs = categoryIDs;
+        this.columns = columns;
+        this.featureCount = featureCount;
+        this.sample = sample;
+    }
+}

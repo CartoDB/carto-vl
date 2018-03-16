@@ -3,7 +3,9 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+
 jobs:
+
   lint:
     docker:
       # specify the version you desire here
@@ -18,6 +20,8 @@ jobs:
           - v1-dependencies-
       - run: yarn install
       - run: yarn lint
+      - run: yarn docs
+
   test-unit:
     docker:
       # specify the version you desire here
@@ -36,6 +40,7 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+
   test-integration:
     docker:
       # specify the version you desire here
@@ -50,12 +55,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
-      - run: yarn build
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: xvfb-run -a yarn test:render
+
   test-acceptance:
     docker:
       # specify the version you desire here
@@ -70,12 +75,12 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
-      - run: yarn build
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
       - run: xvfb-run -a yarn test:e2e
+
 workflows:
   version: 2
   build_and_test:

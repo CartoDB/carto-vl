@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/aggregation', () => {
     const fakeFeature = {
@@ -8,32 +9,51 @@ describe('src/core/style/expressions/aggregation', () => {
         _cdb_agg_sum_price: 4,
         _cdb_agg_mode_price: 5,
     };
-    const $price = s.property('price');
 
-    it('max($price) should return fakeFeature._cdb_agg_max_price', () => {
-        const actual = s.max($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_max_price);
+    let $price = null;
+
+    beforeEach(() => {
+        // Needed a beforeEach to avoid testing against already compiled properties
+        $price = s.property('price');
     });
 
-    it('min($price) should return fakeFeature._cdb_agg_min_price', () => {
-        const actual = s.min($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_min_price);
+    describe('error control', () => {
+        validateStaticTypeErrors('max', []);
+        validateStaticTypeErrors('max', ['color']);
+        validateStaticTypeErrors('max', [0]);
+        validateDynamicTypeErrors('max', ['category']);
+        validateDynamicTypeErrors('mode', ['float']);
     });
 
-    it('avg($price) should return fakeFeature._cdb_agg_avg_price', () => {
-        const actual = s.avg($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_avg_price);
+    describe('type', () => {
+        validateStaticType('max', ['float-property'], 'float');
+        validateStaticType('mode', ['category-property'], 'category');
     });
 
-    it('sum($price) should return fakeFeature._cdb_agg_sum_price', () => {
-        const actual = s.sum($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
-    });
+    describe('eval', () => {
+        it('max($price) should return fakeFeature._cdb_agg_max_price', () => {
+            const actual = s.max($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_max_price);
+        });
 
-    it('mode($price) should return fakeFeature._cdb_agg_mode_price', () => {
-        const actual = s.mode($price).eval(fakeFeature);
-        expect(actual).toEqual(fakeFeature._cdb_agg_mode_price);
+        it('min($price) should return fakeFeature._cdb_agg_min_price', () => {
+            const actual = s.min($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_min_price);
+        });
+
+        it('avg($price) should return fakeFeature._cdb_agg_avg_price', () => {
+            const actual = s.avg($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_avg_price);
+        });
+
+        it('sum($price) should return fakeFeature._cdb_agg_sum_price', () => {
+            const actual = s.sum($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
+        });
+
+        it('mode($price) should return fakeFeature._cdb_agg_mode_price', () => {
+            const actual = s.mode($price).eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_agg_mode_price);
+        });
     });
 });
-
-

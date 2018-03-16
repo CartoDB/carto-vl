@@ -54,6 +54,29 @@ describe('api/source/geojson', () => {
             expect(source._features).toEqual([data]);
         });
 
+        it('should requestData just once', () => {
+            const data = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    cartodb_id: 1
+                }
+            };
+            const source = new GeoJSON(data);
+
+            source.bindLayer(_ => _);
+            spyOn(source, '_addDataframe');
+
+            expect(source._addDataframe).toHaveBeenCalledTimes(0);
+            source.requestData();
+            expect(source._addDataframe).toHaveBeenCalledTimes(1);
+            source.requestData();
+            expect(source._addDataframe).toHaveBeenCalledTimes(1);
+        });
+
         it('should build a new Source with (data) as a FeatureCollection', () => {
             const data = {
                 type: 'FeatureCollection',
@@ -108,7 +131,10 @@ describe('api/source/geojson', () => {
                     }
                 ]
             };
-            expect(source._metadata).toEqual(expected);
+            expect(source._metadata.columns).toEqual(expected.columns);
+            expect(source._metadata.categoryIDs).toEqual(expected.categoryIDs);
+            expect(source._metadata.featureCount).toEqual(expected.featureCount);
+            expect(source._metadata.sample).toEqual(expected.sample);
         });
 
         it('should throw an error if data is not valid', function () {
@@ -148,7 +174,7 @@ describe('api/source/geojson', () => {
                 }]
             });
             expect(function () {
-                source._requestData();
+                source.requestData();
             }).toThrowError('multiple types not supported: Point, LineString.');
         });
 
@@ -164,7 +190,7 @@ describe('api/source/geojson', () => {
                 }
             });
             expect(function () {
-                source._requestData();
+                source.requestData();
             }).toThrowError('first polygon ring must be external.');
         });
     });

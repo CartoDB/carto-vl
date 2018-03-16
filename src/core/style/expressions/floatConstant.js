@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { checkNumber } from './utils';
 
 
 export default class FloatConstant extends Expression {
@@ -7,16 +8,14 @@ export default class FloatConstant extends Expression {
      * @param {*} x
      */
     constructor(x) {
-        if (!Number.isFinite(x)) {
-            throw new Error(`Invalid arguments to Float(): ${x}`);
-        }
+        checkNumber('float', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'float';
-        this.inlineMaker = ()=> `(${x.toFixed(20)})`;
+        this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
 
-    eval(){
+    eval() {
         return this.expr;
     }
 }

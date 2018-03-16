@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { checkNumber } from './utils';
 
 
 /**
@@ -25,9 +26,7 @@ export default class Float extends Expression {
      * @param {*} x
      */
     constructor(x) {
-        if (!Number.isFinite(x)) {
-            throw new Error(`Invalid arguments to Float(): ${x}`);
-        }
+        checkNumber('float', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'float';
@@ -53,7 +52,7 @@ export default class Float extends Expression {
         return false;
     }
 
-    eval(){
+    eval() {
         return this.expr;
     }
 }

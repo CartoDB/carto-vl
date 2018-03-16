@@ -4,10 +4,10 @@ import * as schema from '../../schema';
 
 /**
  * Abstract expression class
- * 
+ *
  * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
- * they can be used where an Expression is required as long as the types match. 
- * 
+ * they can be used where an Expression is required as long as the types match.
+ *
  * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.style.expressions
@@ -108,6 +108,10 @@ export default class Expression {
         replacer.notify = toReplace.notify;
     }
 
+    notify() {
+        this.parent.notify();
+    }
+
     /**
      * Linear interpolation between this and finalValue with the specified duration
      * @jsapi
@@ -123,6 +127,7 @@ export default class Expression {
         this._metaBindings.map(m => blender._bind(m));
         parent._replaceChild(this, blender);
         blender.notify();
+        return final;
     }
 
     blendFrom(final, duration = 500, interpolator = null) {
