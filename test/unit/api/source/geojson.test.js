@@ -54,6 +54,28 @@ describe('api/source/geojson', () => {
             expect(source._features).toEqual([data]);
         });
 
+        it('should requestData just once', () => {
+            const data = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    cartodb_id: 1
+                }
+            };
+            const source = new GeoJSON(data);
+
+            source.bindLayer(_ => _);
+            spyOn(source, '_addDataframe');
+
+            source.requestData();
+            source.requestData();
+
+            expect(source._addDataframe).toHaveBeenCalledTimes(1);
+        });
+
         it('should build a new Source with (data) as a FeatureCollection', () => {
             const data = {
                 type: 'FeatureCollection',
