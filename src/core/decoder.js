@@ -74,7 +74,7 @@ function decodeLine(geom) {
                 let nb = normal;
                 
                 if (i > 0) {
-                    const prev = [lineString[i + -2], lineString[i + -1]];
+                    const prev = [lineString[i - 2], lineString[i - 1]];
                     na = getJointNormal(prev, a, b) || na;
                 }
                 if (i < lineString.length - 4) {
