@@ -65,39 +65,36 @@ function decodeLine(geom) {
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
-            
             for (let i = 0; i < lineString.length - 2; i += 2) {
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
                 const normal = getLineNormal(b, a);
                 let na = normal;
                 let nb = normal;
-                
                 if (i > 0) {
                     const prev = [lineString[i - 2], lineString[i - 1]];
-                    na = getJointNormal(prev, a, b) || na;
+                    na = getJointNormal(prev, a, b);
                 }
                 if (i < lineString.length - 4) {
                     const next = [lineString[i + 4], lineString[i + 5]];
-                    nb = getJointNormal(a, b, next) || nb;
+                    nb = getJointNormal(a, b, next);
                 }
 
                 // First triangle
-    
                 normals.push(-na[0], -na[1]);
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
-    
+
                 geometry.push(a[0], a[1]);
                 geometry.push(a[0], a[1]);
                 geometry.push(b[0], b[1]);
 
                 // Second triangle
-    
+
                 normals.push(na[0], na[1]);
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
-    
+
                 geometry.push(a[0], a[1]);
                 geometry.push(b[0], b[1]);
                 geometry.push(b[0], b[1]);
@@ -118,13 +115,32 @@ function getLineNormal(a, b) {
     return normalize([-dy, dx]);
 }
 
+function cross(a, b) {
+    return a[0] * b[1] - a[1] * b[0];
+}
+function intersect(aOrigin, aDir, bOrigin, bDir) {
+    //t = (bOrigin     − aOrigin) × bDir / (aDir × bDir)
+    const t = cross([bOrigin[0] - aOrigin[0], bOrigin[1] - aOrigin[1]], bDir) / cross(aDir, bDir);
+    return [aOrigin[0] + t * aDir[0], aOrigin[1] + t * aDir[1]];
+}
+
 function getJointNormal(a, b, c) {
-    const u = normalize([a[0] - b[0], a[1] - b[1]]);
-    const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = - u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
+    const n1 = getLineNormal(b, a);
+    const n2 = getLineNormal(c, b);
+
+    if (Math.abs(cross(n1, n2)) < 0.00001) {
+        //If AB is in the same line than BC, then return the normal of AC
+        return getLineNormal(a, c);
     }
+
+    const ba = normalize([b[0] - a[0], b[1] - a[1]]);
+    const cb = normalize([c[0] - b[0], c[1] - b[1]]);
+
+    return intersect(
+        [a[0] - b[0] + n1[0], a[1] - b[1] + n1[1]],
+        ba,
+        n2,
+        cb);
 }
 
 function normalize(v) {
