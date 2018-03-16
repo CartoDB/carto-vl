@@ -70,9 +70,10 @@ describe('api/source/geojson', () => {
             source.bindLayer(_ => _);
             spyOn(source, '_addDataframe');
 
+            expect(source._addDataframe).toHaveBeenCalledTimes(0);
             source.requestData();
+            expect(source._addDataframe).toHaveBeenCalledTimes(1);
             source.requestData();
-
             expect(source._addDataframe).toHaveBeenCalledTimes(1);
         });
 
