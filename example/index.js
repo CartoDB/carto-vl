@@ -103,17 +103,15 @@ const auth = {
     user: 'dmanzanares',
     apiKey: 'YOUR_API_KEY'
 };
-const source = new carto.source.Dataset('ne_10m_populated_places_simple', auth);
-const style = new carto.Style();
-const layer = new carto.Layer('myCartoLayer', source, style);
 
+let layer = null;
 setInterval(() => {
-    document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
-}, 500)
+    if (layer) {
+        document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
+    }
+}, 500);
 
 map.on('load', () => {
-    layer.addTo(map, 'watername_ocean');
-
     let index = 0;//styles.length - 1;
 
     function handleError(error) {
@@ -224,24 +222,29 @@ map.on('load', () => {
         if (nosave) {
             location.hash = getConfig();
         }
-        layer.setStyle(new carto.Style()).then(() => {
-            const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
-            layer.setSource(new SourceClass(
-                $('#dataset').val(),
-                {
-                    user: $('#user').val(),
-                    apiKey: 'YOUR_API_KEY'
-                },
-                {
-                    serverURL: $('#serverURL').val()
-                }
-            ));
-
-            localStorage.setItem('serverURL', $('#serverURL').val());
-            localStorage.setItem('user', $('#user').val());
-            localStorage.setItem('dataset', $('#dataset').val());
-            updateStyle();
-        });
+        const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
+        const source = new SourceClass(
+            $('#dataset').val(),
+            {
+                user: $('#user').val(),
+                apiKey: 'YOUR_API_KEY'
+            },
+            {
+                serverURL: $('#serverURL').val()
+            }
+        );
+        const styleStr = document.getElementById('styleEntry').value;
+        const style = new carto.Style(styleStr);
+        if (!layer) {
+            layer = new carto.Layer('myCartoLayer', source, style);
+            layer.addTo(map, 'watername_ocean');
+        } else {
+            layer.setAtomicSourceStyle(source, style).then(() => {
+                localStorage.setItem('serverURL', $('#serverURL').val());
+                localStorage.setItem('user', $('#user').val());
+                localStorage.setItem('dataset', $('#dataset').val());
+            });
+        }
     };
 
 
