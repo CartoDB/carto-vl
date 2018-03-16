@@ -75,11 +75,11 @@ function decodeLine(geom) {
                 
                 if (i > 0) {
                     const prev = [lineString[i + -2], lineString[i + -1]];
-                    na = getCornerVector(prev, a, b) || na;
+                    na = getJointNormal(prev, a, b) || na;
                 }
                 if (i < lineString.length - 4) {
                     const next = [lineString[i + 4], lineString[i + 5]];
-                    nb = getCornerVector(a, b, next) || nb;
+                    nb = getJointNormal(a, b, next) || nb;
                 }
 
                 // First triangle
@@ -118,14 +118,13 @@ function getLineNormal(a, b) {
     return normalize([-dy, dx]);
 }
 
-function getCornerVector(a, b, c) {
+function getJointNormal(a, b, c) {
     const u = normalize([a[0] - b[0], a[1] - b[1]]);
     const v = normalize([c[0] - b[0], c[1] - b[1]]);
     const sin = - u[1] * v[0] + u[0] * v[1];
     if (sin !== 0) {
         return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
     }
-    
 }
 
 function normalize(v) {
