@@ -43,6 +43,8 @@ export default class GeoJSON extends Base {
         this._catFields = [];
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
+
+        this._loaded = false;
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -55,6 +57,10 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
+        if (this._loaded) {
+            return;
+        }
+        this._loaded = true;
         const dataframe = new Dataframe({
             active: true,
             center: { x: 0, y: 0 },
