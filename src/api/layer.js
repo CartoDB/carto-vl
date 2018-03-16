@@ -92,7 +92,7 @@ export default class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
-    async setAtomicSourceStyle(source, style) {
+    async update(source, style) {
         this._checkSource(source);
         this._checkStyle(style);
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;

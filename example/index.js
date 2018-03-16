@@ -239,7 +239,7 @@ map.on('load', () => {
             layer = new carto.Layer('myCartoLayer', source, style);
             layer.addTo(map, 'watername_ocean');
         } else {
-            layer.setAtomicSourceStyle(source, style).then(() => {
+            layer.update(source, style).then(() => {
                 localStorage.setItem('serverURL', $('#serverURL').val());
                 localStorage.setItem('user', $('#user').val());
                 localStorage.setItem('dataset', $('#dataset').val());
