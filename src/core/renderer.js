@@ -405,6 +405,9 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
+            if (tile.type == 'line') {
+                gl.uniform2f(renderer.aspect, 1 / aspect, 1);
+            }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 

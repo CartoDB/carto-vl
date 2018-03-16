@@ -85,6 +85,7 @@ class Line {
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
         this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.aspect = gl.getUniformLocation(this.program, 'aspect');
     }
 }
 class GenericStyler {
