@@ -8,12 +8,12 @@ It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
 ![](./docs/images/carto-gl-capture.png)
 
-### Documentation and examples
+## Documentation and examples
 
 You **need to generate the documentation to have an up to date version**.
 
 
-#### Public documentation
+### Public documentation
 
 This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
  - Getting started introduction with a basic example.
@@ -26,7 +26,15 @@ For generating the public documentation, you should run:
 yarn docs
 ```
 
-#### Internal documentation
+### Serve docs and examples
+
+The recommended way to navigate the documentation and check the examples is running the following command:
+
+```
+yarn serve
+```
+
+### Internal documentation
 
 It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
 
@@ -34,14 +42,6 @@ To generate the docs for the private API, you need to execute:
 
 ```
 yarn docs:all
-```
-
-#### Serve docs and examples
-
-The recommended way to navigate the documentation and check the examples is running the following command:
-
-```
-yarn serve
 ```
 
 ## Versioning
