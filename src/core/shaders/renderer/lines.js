@@ -22,7 +22,7 @@ void main(void) {
     color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normal*0.001*size-vertexOffset, 0.5, 1.);
+    vec4 p = vec4(vertexScale*(vertexPosition+normal*0.001*size)-vertexOffset, 0.5, 1.);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
