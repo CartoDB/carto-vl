@@ -1,6 +1,6 @@
 /*!
  * CARTO GL js https://carto.com/
- * Version: 0.0.0-alpha.1
+ * Version: 0.1.0
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 32);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -83,8 +83,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(10);
 
 
@@ -92,10 +92,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /**
  * Abstract expression class
- * 
+ *
  * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
- * they can be used where an Expression is required as long as the types match. 
- * 
+ * they can be used where an Expression is required as long as the types match.
+ *
  * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.style.expressions
@@ -111,7 +111,7 @@ class Expression {
      */
     constructor(children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(children[name]));
+        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(children[name]));
         this._getChildren().map(child => child.parent = this);
         this._metaBindings = [];
         this.preface = '';
@@ -196,6 +196,10 @@ class Expression {
         replacer.notify = toReplace.notify;
     }
 
+    notify() {
+        this.parent.notify();
+    }
+
     /**
      * Linear interpolation between this and finalValue with the specified duration
      * @jsapi
@@ -205,16 +209,17 @@ class Expression {
      */
     //TODO blendFunc = 'linear'
     blendTo(final, duration = 500) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
         this._metaBindings.map(m => blender._bind(m));
         parent._replaceChild(this, blender);
         blender.notify();
+        return final;
     }
 
     blendFrom(final, duration = 500, interpolator = null) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
@@ -247,39 +252,184 @@ class Expression {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["l"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["k"] = hexToRgb;
+/* harmony export (immutable) */ __webpack_exports__["i"] = getOrdinalFromIndex;
+/* harmony export (immutable) */ __webpack_exports__["j"] = getStringErrorPreface;
+/* unused harmony export throwInvalidType */
+/* unused harmony export throwInvalidInstance */
+/* unused harmony export throwInvalidNumber */
+/* unused harmony export throwInvalidString */
+/* harmony export (immutable) */ __webpack_exports__["d"] = checkLooseType;
+/* harmony export (immutable) */ __webpack_exports__["b"] = checkExpression;
+/* harmony export (immutable) */ __webpack_exports__["g"] = checkType;
+/* harmony export (immutable) */ __webpack_exports__["c"] = checkInstance;
+/* harmony export (immutable) */ __webpack_exports__["e"] = checkNumber;
+/* harmony export (immutable) */ __webpack_exports__["f"] = checkString;
+/* harmony export (immutable) */ __webpack_exports__["h"] = clamp;
+/* harmony export (immutable) */ __webpack_exports__["m"] = mix;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+const DEFAULT = undefined;
+/* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT;
+
+
+// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
+function implicitCast(value) {
+    if (Number.isFinite(value)) {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
+    }
+    if (typeof value == 'string') {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
+    }
+    return value;
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+function getOrdinalFromIndex(index) {
+    const indexToOrdinal = {
+        1: 'first',
+        2: 'second',
+        3: 'third',
+        4: 'fourth'
+    };
+    return indexToOrdinal[index] || String(index);
+}
+
+function getStringErrorPreface(expressionName, parameterName, parameterIndex) {
+    return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
+}
+function throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, actualType) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+expected type was '${expectedType}', actual type was '${actualType}'`);
+}
+
+function throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${actualInstance}' is not an instance of '${expectedClass.name}'`);
+}
+
+function throwInvalidNumber(expressionName, parameterName, parameterIndex, number) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${number}' is not a finite number`);
+}
+
+function throwInvalidString(expressionName, parameterName, parameterIndex, str) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${str}' is not a string`);
+}
+
+// Try to check the type, but accept undefined types without throwing
+// This is useful to make constructor-time checks, at constructor-time some types can be already known and errors can be throw.
+// Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
+// they must be loose
+function checkLooseType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
+    if (parameter.type !== undefined) {
+        checkType(expressionName, parameterName, parameterIndex, expectedType, parameter);
+    }
+}
+
+function checkExpression(expressionName, parameterName, parameterIndex, parameter) {
+    if (!(parameter instanceof __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */])) {
+        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        '${parameter}' is not of type Expression`);
+    }
+}
+
+function checkType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
+    if (Array.isArray(expectedType)) {
+        const ok = expectedType.some(type =>
+            parameter.type == type
+        );
+        if (!ok) {
+            throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+            expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
+        }
+    } else if (parameter.type != expectedType) {
+        throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
+    }
+}
+
+function checkInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter) {
+    checkExpression(expressionName, parameterName, parameterIndex, parameter);
+    if (!(parameter instanceof expectedClass)) {
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
+    }
+}
+
+function checkNumber(expressionName, parameterName, parameterIndex, number) {
+    if (!Number.isFinite(number)) {
+        throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
+    }
+}
+
+function checkString(expressionName, parameterName, parameterIndex, str) {
+    if (typeof str !== 'string') {
+        throwInvalidString(expressionName, parameterName, parameterIndex, str);
+    }
+}
+
+
+function clamp(x, min, max) {
+    return Math.min(Math.max(x, min), max);
+}
+
+function mix(x, y, a) {
+    return x * (1 - a) + y * a;
+}
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return _in; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_linear__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_near__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_now__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_property__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_top__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_linear__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_near__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_now__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_top__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_time__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_time__ = __webpack_require__(50);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_unary__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_quantiles__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_quantiles__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_torque__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_torque__ = __webpack_require__(52);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__ = __webpack_require__(54);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["b"]; });
@@ -685,64 +835,23 @@ const between = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_betwe
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["d"] = implicitCast;
-/* harmony export (immutable) */ __webpack_exports__["c"] = hexToRgb;
-/* harmony export (immutable) */ __webpack_exports__["b"] = clamp;
-/* harmony export (immutable) */ __webpack_exports__["e"] = mix;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
-
-
-const DEFAULT = undefined;
-/* harmony export (immutable) */ __webpack_exports__["a"] = DEFAULT;
-
-
-// To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
-function implicitCast(value) {
-    if (Number.isFinite(value)) {
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
-    }
-    if (typeof value == 'string') {
-        if (!Number.isNaN(Date.parse(value))) {
-            return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["time"])(new Date(value));
-        }
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
-    }
-    return value;
-}
-
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function clamp(x, min, max) {
-    return Math.min(Math.max(x, min), max);
-}
-
-function mix(x, y, a) {
-    return x * (1 - a) + y * a;
-}
-
-
-/***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
 
+
+// Each binary expression can have a set of the following signatures (OR'ed flags)
+const UNSUPPORTED_SIGNATURE = 0;
+const FLOATS_TO_FLOAT = 1;
+const FLOAT_AND_COLOR_TO_COLOR = 2;
+const COLORS_TO_COLOR = 4;
+const CATEGORIES_TO_FLOAT = 8;
 
 /**
  *
@@ -763,7 +872,11 @@ function mix(x, y, a) {
  * @function
  * @api
  */
-const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
+const FloatMul = genBinaryOp('mul',
+    FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    (x, y) => x * y,
+    (x, y) => `(${x} * ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["f"] = FloatMul;
 
 
@@ -786,7 +899,11 @@ const FloatMul = genBinaryOp((x, y) => x * y, (x, y) => `(${x} * ${y})`);
  * @function
  * @api
  */
-const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
+const FloatDiv = genBinaryOp('div',
+    FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    (x, y) => x / y,
+    (x, y) => `(${x} / ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["d"] = FloatDiv;
 
 
@@ -809,7 +926,11 @@ const FloatDiv = genBinaryOp((x, y) => x / y, (x, y) => `(${x} / ${y})`);
  * @function
  * @api
  */
-const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
+const FloatAdd = genBinaryOp('add',
+    FLOATS_TO_FLOAT | COLORS_TO_COLOR,
+    (x, y) => x + y,
+    (x, y) => `(${x} + ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["c"] = FloatAdd;
 
 
@@ -832,7 +953,11 @@ const FloatAdd = genBinaryOp((x, y) => x + y, (x, y) => `(${x} + ${y})`);
  * @function
  * @api
  */
-const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
+const FloatSub = genBinaryOp('sub',
+    FLOATS_TO_FLOAT | COLORS_TO_COLOR,
+    (x, y) => x - y,
+    (x, y) => `(${x} - ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["h"] = FloatSub;
 
 
@@ -855,7 +980,11 @@ const FloatSub = genBinaryOp((x, y) => x - y, (x, y) => `(${x} - ${y})`);
  * @function
  * @api
  */
-const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`);
+const FloatMod = genBinaryOp('mod',
+    FLOATS_TO_FLOAT,
+    (x, y) => x % y,
+    (x, y) => `mod(${x}, ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["e"] = FloatMod;
 
 
@@ -879,7 +1008,11 @@ const FloatMod = genBinaryOp((x, y) => x % y, (x, y) => `mod(${x}, ${y})`);
  * @function
  * @api
  */
-const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y})`);
+const FloatPow = genBinaryOp('pow',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.pow(x, y),
+    (x, y) => `pow(${x}, ${y})`
+);
 /* harmony export (immutable) */ __webpack_exports__["g"] = FloatPow;
 
 
@@ -904,7 +1037,11 @@ const FloatPow = genBinaryOp((x, y) => Math.pow(x, y), (x, y) => `pow(${x}, ${y}
  * @function
  * @api
  */
-const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 1.:0.)`);
+const GreaterThan = genBinaryOp('greaterThan',
+    FLOATS_TO_FLOAT,
+    (x, y) => x > y ? 1 : 0,
+    (x, y) => `(${x}>${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["i"] = GreaterThan;
 
 
@@ -929,7 +1066,11 @@ const GreaterThan = genBinaryOp((x, y) => x > y ? 1 : 0, (x, y) => `(${x}>${y}? 
  * @function
  * @api
  */
-const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `(${x}>=${y}? 1.:0.)`);
+const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
+    FLOATS_TO_FLOAT,
+    (x, y) => x >= y ? 1 : 0,
+    (x, y) => `(${x}>=${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["j"] = GreaterThanOrEqualTo;
 
 
@@ -954,7 +1095,11 @@ const GreaterThanOrEqualTo = genBinaryOp((x, y) => x >= y ? 1 : 0, (x, y) => `($
  * @function
  * @api
  */
-const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:0.)`);
+const LessThan = genBinaryOp('lessThan',
+    FLOATS_TO_FLOAT,
+    (x, y) => x < y ? 1 : 0,
+    (x, y) => `(${x}<${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["k"] = LessThan;
 
 
@@ -979,7 +1124,11 @@ const LessThan = genBinaryOp((x, y) => x < y ? 1 : 0, (x, y) => `(${x}<${y}? 1.:
  * @function
  * @api
  */
-const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}<=${y}? 1.:0.)`);
+const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
+    FLOATS_TO_FLOAT,
+    (x, y) => x <= y ? 1 : 0,
+    (x, y) => `(${x}<=${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["l"] = LessThanOrEqualTo;
 
 
@@ -1004,7 +1153,11 @@ const LessThanOrEqualTo = genBinaryOp((x, y) => x <= y ? 1 : 0, (x, y) => `(${x}
  * @function
  * @api
  */
-const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:0.)`);
+const Equals = genBinaryOp('equals',
+    FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT,
+    (x, y) => x == y ? 1 : 0,
+    (x, y) => `(${x}==${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Equals;
 
 
@@ -1029,7 +1182,11 @@ const Equals = genBinaryOp((x, y) => x == y ? 1 : 0, (x, y) => `(${x}==${y}? 1.:
  * @function
  * @api
  */
-const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 1.:0.)`);
+const NotEquals = genBinaryOp('notEquals',
+    FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT,
+    (x, y) => x != y ? 1 : 0,
+    (x, y) => `(${x}!=${y}? 1.:0.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["m"] = NotEquals;
 
 
@@ -1060,7 +1217,11 @@ const NotEquals = genBinaryOp((x, y) => x != y ? 1 : 0, (x, y) => `(${x}!=${y}? 
  * @function
  * @api
  */
-const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}, 1.)`);
+const Or = genBinaryOp('or',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.min(x + y, 1),
+    (x, y) => `min(${x} + ${y}, 1.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["n"] = Or;
 
 
@@ -1092,11 +1253,15 @@ const  Or = genBinaryOp((x, y) => Math.min(x + y, 1), (x, y) => `min(${x} + ${y}
  * @function
  * @api
  */
-const And = genBinaryOp((x, y) => Math.min(x * y, 1), (x, y) => `min(${x} * ${y}, 1.)`);
+const And = genBinaryOp('and',
+    FLOATS_TO_FLOAT,
+    (x, y) => Math.min(x * y, 1),
+    (x, y) => `min(${x} * ${y}, 1.)`
+);
 /* harmony export (immutable) */ __webpack_exports__["a"] = And;
 
 
-function genBinaryOp(jsFn, glsl) {
+function genBinaryOp(name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
         /**
          * @jsapi
@@ -1111,45 +1276,68 @@ function genBinaryOp(jsFn, glsl) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(jsFn(a, b));
             }
-            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(a);
-            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(b);
-            if (typeof a === 'string') {
-                [a, b] = [b, a];
-            }
-            if (typeof b === 'string') {
-                super({ a: a, auxFloat: Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(0) });
-                this.b = b;
-            } else {
-                super({ a: a, b: b });
+            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
+
+            const signature = getSignature(a, b);
+            if (signature !== undefined) {
+                if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+                    throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
+                }
             }
 
+            super({ a: a, b: b });
+            this.type = getReturnTypeFromSignature(signature);
         }
         _compile(meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
-            this.inlineMaker = inline => glsl(inline.a, inline.b);
-            // TODO this logic is operation dependant
-            if (typeof b === 'string' && a.type == 'category' && a.name) {
-                const id = meta.categoryIDs[b];
-                this.auxFloat.expr = id;
-                this.type = 'float';
-                this.inlineMaker = inline => glsl(inline.a, inline.auxFloat);
-            } else if (a.type == 'float' && b.type == 'float') {
-                this.type = 'float';
-            } else if (a.type == 'color' && b.type == 'color') {
-                this.type = 'color';
-            } else if (a.type == 'color' && b.type == 'float') {
-                this.type = 'color';
-            } else if (a.type == 'category' && b.type == 'category') {
-                this.type = 'float';
-            } else {
-                throw new Error(`Binary operation cannot be performed between types '${a.type}' and '${b.type}'`);
+
+            const signature = getSignature(a, b);
+            if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+                throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
+            this.type = getReturnTypeFromSignature(signature);
+
+            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
-        eval(feature){
+        eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
     };
+}
+
+function getSignature(a, b) {
+    if (!a.type || !b.type) {
+        return undefined;
+    } else if (a.type == 'float' && b.type == 'float') {
+        return FLOATS_TO_FLOAT;
+    } else if (a.type == 'float' && b.type == 'color') {
+        return FLOAT_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'float') {
+        return FLOAT_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'color') {
+        return COLORS_TO_COLOR;
+    } else if (a.type == 'category' && b.type == 'category') {
+        return CATEGORIES_TO_FLOAT;
+    } else {
+        return UNSUPPORTED_SIGNATURE;
+    }
+}
+
+function getReturnTypeFromSignature(signature) {
+    switch (signature) {
+        case FLOATS_TO_FLOAT:
+            return 'float';
+        case FLOAT_AND_COLOR_TO_COLOR:
+            return 'color';
+        case COLORS_TO_COLOR:
+            return 'color';
+        case CATEGORIES_TO_FLOAT:
+            return 'float';
+        default:
+            return undefined;
+    }
 }
 
 
@@ -1158,7 +1346,7 @@ function genBinaryOp(jsFn, glsl) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
@@ -1182,7 +1370,7 @@ function genBinaryOp(jsFn, glsl) {
  * @function
  * @api
  */
-const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
+const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["c"] = Log;
 
 
@@ -1204,7 +1392,7 @@ const Log = genUnaryOp(x => Math.log(x), x => `log(${x})`);
  * @function
  * @api
  */
-const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
+const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["g"] = Sqrt;
 
 
@@ -1226,7 +1414,7 @@ const Sqrt = genUnaryOp(x => Math.sqrt(x), x => `sqrt(${x})`);
  * @function
  * @api
  */
-const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
+const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["f"] = Sin;
 
 
@@ -1248,7 +1436,7 @@ const Sin = genUnaryOp(x => Math.sin(x), x => `sin(${x})`);
  * @function
  * @api
  */
-const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
+const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Cos;
 
 
@@ -1270,7 +1458,7 @@ const Cos = genUnaryOp(x => Math.cos(x), x => `cos(${x})`);
  * @function
  * @api
  */
-const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
+const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["h"] = Tan;
 
 
@@ -1294,7 +1482,7 @@ const Tan = genUnaryOp(x => Math.tan(x), x => `tan(${x})`);
  * @function
  * @api
  */
-const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
+const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["e"] = Sign;
 
 
@@ -1316,14 +1504,14 @@ const Sign = genUnaryOp(x => Math.sign(x), x => `sign(${x})`);
  * @function
  * @api
  */
-const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
+const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Abs;
 
 
 /**
  *
- * Compute the logical negatioin of the given expression.
- * This is internally computed as 1 - x preserving boolean behaviour and allowing fuzzy logic.
+ * Compute the logical negation of the given expression.
+ * This is internally computed as 1 - x preserving boolean behavior and allowing fuzzy logic.
  *
  *  - When x is equal to 1 not(x) will be evaluated to 0
  *  - When x is equal to 0 not(x) will be evaluated to 1
@@ -1342,22 +1530,24 @@ const Abs = genUnaryOp(x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-const Not = genUnaryOp(x => 1 - x, x => `(1.0 - ${x})`);
+const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
 /* harmony export (immutable) */ __webpack_exports__["d"] = Not;
 
 
-function genUnaryOp(jsFn, glsl) {
+function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(a) {
-            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(a);
+            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'x', 0, 'float', a);
             super({ a: a });
+            this.type = 'float';
         }
         _compile(meta) {
             super._compile(meta);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'x', 0, 'float', this.a);
             if (this.a.type != 'float') {
                 throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
             }
-            this.type = 'float';
             this.inlineMaker = inlines => glsl(inlines.a);
         }
         eval(feature) {
@@ -1421,7 +1611,7 @@ function isObject(value) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(65);
 
 
 /**
@@ -1448,29 +1638,105 @@ class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ *
+ * Evaluates the value of a column for every row in the dataset.
+ *
+ * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
+ * The `prop('name')` will return the name of the current city for every point in the dataset.
+ *
+ * @param {string} name - The property in the dataset that is going to be evaluated
+ * @return {carto.style.expressions.property}
+ *
+ * @example <caption>Display only cities with name different from "London"</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.neq(s.prop('name'), 'london'),
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name prop
+ * @function
+ * @api
+ */
+class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} name Property/column name
+     */
+    constructor(name) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('property', 'name', 0, name);
+        if (name == '') {
+            throw new Error('property(): invalid parameter, zero-length string');
+        }
+        super({});
+        this.name = name;
+    }
+    _compile(meta) {
+        const metaColumn = meta.columns.find(c => c.name == this.name);
+        if (!metaColumn) {
+            throw new Error(`Property '${this.name}' does not exist`);
+        }
+        this.type = metaColumn.type;
+        if (this.type == 'category') {
+            this.numCategories = metaColumn.categoryNames.length;
+        }
+        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+    }
+    _getMinimumNeededSchema() {
+        return {
+            columns: [
+                this.name
+            ]
+        };
+    }
+    eval(feature) {
+        return feature[this.name];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Property;
+
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+
+
 
 
 // Aggregation ops
-const Max = genAggregationOp('max');
+const Max = genAggregationOp('max', 'float');
 /* harmony export (immutable) */ __webpack_exports__["b"] = Max;
 
-const Min = genAggregationOp('min');
+const Min = genAggregationOp('min', 'float');
 /* harmony export (immutable) */ __webpack_exports__["c"] = Min;
 
-const Avg = genAggregationOp('avg');
+const Avg = genAggregationOp('avg', 'float');
 /* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
 
-const Sum = genAggregationOp('sum');
+const Sum = genAggregationOp('sum', 'float');
 /* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
 
-const Mode = genAggregationOp('mode');
+const Mode = genAggregationOp('mode', 'category');
 /* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
 
 
-function genAggregationOp(aggName) {
+function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         constructor(property) {
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_1__property__["a" /* default */], property);
             super({ property: property });
+            this.type = aggType;
         }
         get name() {
             return this.property.name;
@@ -1481,7 +1747,7 @@ function genAggregationOp(aggName) {
         //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
         _compile(metadata) {
             super._compile(metadata);
-            this.type = this.property.type;
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
         }
         _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
             return {
@@ -1501,19 +1767,19 @@ function genAggregationOp(aggName) {
             };
         }
     };
-} 
+}
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
 
@@ -1923,6 +2189,9 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
+            if (tile.type == 'line') {
+                gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
@@ -2036,65 +2305,6 @@ function getOrderingRenderBuckets(tiles) {
 
 
 /***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-
-
-
-//TODO refactor to use uniformfloat class
-class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
-    constructor(duration) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Animate only supports number literals');
-        }
-        super({});
-        this.aTime = Date.now();
-        this.bTime = this.aTime + Number(duration);
-    }
-    _compile() {
-        this.type = 'float';
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
-    }
-    _preDraw(drawMetadata, gl) {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
-        } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
-        }
-    }
-    eval() {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        return Math.min(this.mix, 1.);
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
-
-
-/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2140,7 +2350,7 @@ function equals(a,b){
     if (!a || !b){
         return false;
     }
-    return a.columns.length==b.columns.length && a.columns.every((v,i)=> v === b.columns[i]);
+    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
 }
 
 /***/ }),
@@ -2149,64 +2359,58 @@ function equals(a,b){
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
-/**
- * 
- * Evaluates the value of a column for every row in the dataset.
- * 
- * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
- * The `prop('name')` will return the name of the current city for every point in the dataset.
- * 
- * @param {string} name - The property in the dataset that is going to be evaluated
- * @return {carto.style.expressions.property}
- * 
- * @example <caption>Display only cities with name different from "London"</caption>
- * const s = carto.style.expressions;
- * const style = new carto.Style({
- *  filter: s.neq(s.prop('name'), 'london'),
- * });
- * 
- * @memberof carto.style.expressions
- * @name prop
- * @function
- * @api
- */
-class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+
+
+//TODO refactor to use uniformfloat class
+class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
      * @jsapi
-     * @param {*} name Property/column name
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
      */
-    constructor(name) {
-        if (typeof name !== 'string' || name == '') {
-            throw new Error(`Invalid property name '${name}'`);
+    constructor(duration) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('animate', 'duration', 0, duration);
+        if (duration < 0) {
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
         }
         super({});
-        this.name = name;
+        this.aTime = Date.now();
+        this.bTime = this.aTime + Number(duration);
+        this.type = 'float';
     }
-    _compile(meta) {
-        const metaColumn = meta.columns.find(c => c.name == this.name);
-        if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
-        }
-        this.type = metaColumn.type;
-        if (this.type == 'category') {
-            this.numCategories = metaColumn.categoryNames.length;
-        }
-        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
-    }
-    _getMinimumNeededSchema() {
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
         return {
-            columns: [
-                this.name
-            ]
+            preface: `uniform float anim${this._uniformID};\n`,
+            inline: `anim${this._uniformID}`
         };
     }
-    eval(feature) {
-        return feature[this.name];
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+    }
+    _preDraw(drawMetadata, gl) {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (this.mix > 1.) {
+            gl.uniform1f(this._uniformLocation, 1);
+        } else {
+            gl.uniform1f(this._uniformLocation, this.mix);
+        }
+    }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
+    }
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Property;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
 
 
 
@@ -2245,8 +2449,8 @@ class Base {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
 
 
@@ -2266,28 +2470,39 @@ class Base {
  */
 class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
     constructor(a, b, mix, interpolator) {
-        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(b);
-        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(mix);
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(mix);
+
+
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'a', 0, a);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'b', 1, b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'mix', 2, mix);
+        if (a.type && b.type) {
+            abTypeCheck(a, b);
+        }
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])('blend', 'mix', 2, 'float', mix);
+
+        // TODO check interpolator type
         const originalMix = mix;
         if (interpolator) {
             mix = interpolator(mix);
         }
         super({ a: a, b: b, mix: mix });
         this.originalMix = originalMix;
+
+        if (a.type && b.type) {
+            this.type = a.type;
+        }
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.mix.type != 'float') {
-            throw new Error(`Blending cannot be performed by '${this.mix.type}'`);
-        }
-        if (this.a.type == 'float' && this.b.type == 'float') {
-            this.type = 'float';
-        } else if (this.a.type == 'color' && this.b.type == 'color') {
-            this.type = 'color';
-        } else {
-            throw new Error(`Blending cannot be performed between types '${this.a.type}' and '${this.b.type}'`);
-        }
+
+        abTypeCheck(this.a, this.b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])('blend', 'mix', 1, 'float', this.mix);
+
+        this.type = this.a.type;
+
         this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
     _preDraw(...args) {
@@ -2298,14 +2513,20 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
         }
     }
     eval(feature) {
-        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* clamp */])(this.mix.eval(feature), 0, 1);
+        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* mix */])(x, y, a);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* mix */])(x, y, a);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
 
+
+function abTypeCheck(a, b) {
+    if (!((a.type == 'float' && b.type == 'float') || (a.type == 'color' && b.type == 'color'))) {
+        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
+    }
+}
 
 
 /***/ }),
@@ -2314,6 +2535,8 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 
@@ -2341,9 +2564,7 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
      * @param {*} x
      */
     constructor(x) {
-        if (!Number.isFinite(x)) {
-            throw new Error(`Invalid arguments to Float(): ${x}`);
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'float';
@@ -2369,7 +2590,7 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
         return false;
     }
 
-    eval(){
+    eval() {
         return this.expr;
     }
 }
@@ -2383,6 +2604,8 @@ class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 
@@ -2392,16 +2615,14 @@ class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* def
      * @param {*} x
      */
     constructor(x) {
-        if (!Number.isFinite(x)) {
-            throw new Error(`Invalid arguments to Float(): ${x}`);
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'float';
-        this.inlineMaker = ()=> `(${x.toFixed(20)})`;
+        this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
 
-    eval(){
+    eval() {
         return this.expr;
     }
 }
@@ -2415,6 +2636,8 @@ class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* def
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 /**
@@ -2429,14 +2652,12 @@ class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* def
  */
 class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(categoryName) {
-        if (typeof categoryName !== 'string') {
-            throw new Error(`Invalid arguments to Category(): ${categoryName}`);
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('category', 'categoryName', 0, categoryName);
         super({});
         this.expr = categoryName;
+        this.type = 'category';
     }
     _compile(metadata) {
-        this.type = 'category';
         this._metadata = metadata;
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -2463,23 +2684,30 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 /* harmony export (immutable) */ __webpack_exports__["a"] = Category;
 
 
+
 /***/ }),
 /* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
 
 
 function IN_INLINE_MAKER(categories) {
-    return inline => `(${categories.map((cat, index) => `(${inline.property} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    if (categories.length == 0) {
+        return () => '0.';
+    }
+    return inline => `(${categories.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
 }
 
 function NIN_INLINE_MAKER(categories) {
-    return inline => `(${categories.map((cat, index) => `(${inline.property} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    if (categories.length == 0) {
+        return () => '1.';
+    }
+    return inline => `(${categories.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
 /**
@@ -2502,14 +2730,14 @@ function NIN_INLINE_MAKER(categories) {
  * @function
  * @api
  */
-const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
+const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = In;
 
 
 
 /**
  *
- * Check if property does not belong to the categories list given by the categories parameters.
+ * Check if value does not belong to the categories list given by the categories parameters.
  *
  * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
  * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
@@ -2527,39 +2755,40 @@ const In = generateBelongsExpression(IN_INLINE_MAKER, (p, cats) => cats.some(cat
  * @function
  * @api
  */
-const Nin = generateBelongsExpression(NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
+const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Nin;
 
 
-function generateBelongsExpression(inlineMaker, jsEval) {
+function generateBelongsExpression(name, inlineMaker, jsEval) {
 
     return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
-        constructor(property, ...categories) {
-            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */]);
+        constructor(value, ...categories) {
+            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'value', 0, value);
+
+            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */]);
+
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'value', 0, 'category', value);
+            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, '', index + 1, 'category', cat));
+
             let children = {
-                property
+                value
             };
             categories.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
             this.categories = categories;
             this.inlineMaker = inlineMaker(this.categories);
+            this.type = 'float';
         }
 
         _compile(meta) {
             super._compile(meta);
-            if (this.property.type != 'category') {
-                throw new Error('In() can only be performed to categorical properties');
-            }
-            this.categories.map(cat => {
-                if (cat.type != 'category') {
-                    throw new Error('In() can only be performed to categorical properties');
-                }
-            });
-            this.type = 'float';
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'value', 0, 'category', this.value);
+            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, '', index + 1, 'category', cat));
         }
 
         eval(feature) {
-            return jsEval(this.property.eval(feature), this.categories.map(category => category.eval(feature)));
+            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
         }
     };
 
@@ -2572,6 +2801,8 @@ function generateBelongsExpression(inlineMaker, jsEval) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 /**
@@ -2597,21 +2828,25 @@ function generateBelongsExpression(inlineMaker, jsEval) {
  */
 class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(value, lowerLimit, upperLimit) {
+        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(value);
+        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(lowerLimit);
+        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(upperLimit);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'value', 0, 'float', value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'lowerLimit', 1, 'float', lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'upperLimit', 2, 'float', upperLimit);
+
         super({ value, lowerLimit, upperLimit });
         this.type = 'float';
     }
 
     _compile(meta) {
         super._compile(meta);
-        if (this.value.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
-        if (this.lowerLimit.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
-        if (this.upperLimit.type != 'float') {
-            throw new Error('Between() can only be performed to float properties');
-        }
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'value', 0, 'float', this.value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'lowerLimit', 1, 'float', this.lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'upperLimit', 2, 'float', this.upperLimit);
+
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
 
@@ -2631,11 +2866,12 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
 
 
+// TODO type checking
 
 class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
 /* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
@@ -2700,7 +2936,7 @@ class Cubic extends genInterpolator(
 function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
         constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* implicitCast */])(m);
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(m);
             super({ m: m });
         }
         _compile(meta) {
@@ -2728,10 +2964,10 @@ function genInterpolator(inlineMaker, preface, jsEval) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(62);
 
 
 
@@ -2819,6 +3055,7 @@ class Line {
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
         this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
     }
 }
 class GenericStyler {
@@ -2881,6 +3118,150 @@ const styler = {
 
 /***/ }),
 /* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(63);
+
+class Dataframe {
+    constructor({ center, scale, geom, properties, type, active, size }) {
+        this.active = active;
+        this.center = center;
+        this.geom = geom;
+        this.properties = properties;
+        this.scale = scale;
+        this.size = size;
+        this.type = type;
+    }
+
+    bind(renderer) {
+        const gl = renderer.gl;
+        this.renderer = renderer;
+
+        this.propertyTex = [];
+
+        const decodedGeom = __WEBPACK_IMPORTED_MODULE_0__decoder__["a" /* default */].decodeGeom(this.type, this.geom);
+        var points = decodedGeom.geometry;
+        this.numVertex = points.length / 2;
+        this.breakpointList = decodedGeom.breakpointList;
+        this.numFeatures = this.breakpointList.length || this.numVertex;
+        this._genDataframePropertyTextures(gl);
+
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.style = null;
+
+        this.vertexBuffer = gl.createBuffer();
+        this.featureIDBuffer = gl.createBuffer();
+
+        this.texColor = this._createStyleTileTexture(this.numFeatures);
+        this.texWidth = this._createStyleTileTexture(this.numFeatures);
+        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
+        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
+        this.texFilter = this._createStyleTileTexture(this.numFeatures);
+
+        var ids = new Float32Array(points.length);
+        let index = 0;
+        for (var i = 0; i < points.length; i += 2) {
+            if ((!this.breakpointList.length && i > 0) || i == this.breakpointList[index]) {
+                index++;
+            }
+            ids[i + 0] = ((index) % width) / (width - 1);
+            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+        if (decodedGeom.normals) {
+            this.normalBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
+    }
+
+    setStyle(style) {
+        this.style = style;
+    }
+
+    _genDataframePropertyTextures() {
+        const gl = this.renderer.gl;
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.height = height;
+        this.propertyID = {}; //Name => PID
+        this.propertyCount = 0;
+        for (var k in this.properties) {
+            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
+                var propertyID = this.propertyID[k];
+                if (propertyID === undefined) {
+                    propertyID = this.propertyCount;
+                    this.propertyCount++;
+                    this.propertyID[k] = propertyID;
+                }
+                this.propertyTex[propertyID] = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, height, 0, gl.ALPHA, gl.FLOAT,
+                    this.properties[k]);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            }
+        }
+    }
+
+    _createStyleTileTexture(numFeatures) {
+        // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
+        // since RGB components are discarded
+        const gl = this.renderer.gl;
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(numFeatures / width);
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        return texture;
+    }
+
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteTexture(this.texFilter);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+            this.texColor = 'freed';
+            this.texWidth = 'freed';
+            this.texStrokeColor = 'freed';
+            this.texStrokeWidth = 'freed';
+            this.texFilter = 'freed';
+            this.vertexBuffer = 'freed';
+            this.featureIDBuffer = 'freed';
+            this.propertyTex = null;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Dataframe;
+
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3030,15 +3411,68 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// The IDENTITY metadata contains zero columns
+const IDENTITY = {
+    featureCount: 0,
+    columns: []
+};
+/* unused harmony export IDENTITY */
+
+
+/*
+const metadataExample = {
+    featureCount: 0,
+    columns: [
+        {
+            name: 'temp',
+            type: 'float',
+            min: -10,
+            max: 45,
+            avg: 25,
+            histogram: [3, 6, 10, 22, 21, 14, 2, 1],
+            jenks3: [10, 20],
+            jenks4: [8, 15, 22],
+            jenks5: [7, 14, 18, 23],
+            jenks6: [],
+            jenks7: [],
+        },
+        {
+            name: 'cat',
+            type: 'category',
+            categoryNames: ['red', 'blue', 'green'],
+            categoryCount: [10, 30, 15],
+        }
+    ]
+};
+*/
+
+class Metadata {
+    constructor(categoryIDs, columns, featureCount, sample) {
+        this.categoryIDs = categoryIDs;
+        this.columns = columns;
+        this.featureCount = featureCount;
+        this.sample = sample;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Metadata;
+
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(68);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(29);
 
 
 
@@ -3069,8 +3503,12 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
         this._client._bindLayer(...args);
     }
 
-    requestData(viewport, style) {
-        return this._client.getData(viewport, style);
+    requestMetadata(style) {
+        return this._client.getMetadata(style);
+    }
+
+    requestData(viewport) {
+        return this._client.getData(viewport);
     }
 
     free() {
@@ -3099,7 +3537,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -3289,13 +3727,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(25);
+var VectorTileFeature = __webpack_require__(27);
 
 module.exports = VectorTileLayer;
 
@@ -3357,13 +3795,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(80);
+var Point = __webpack_require__(82);
 
 module.exports = VectorTileFeature;
 
@@ -3597,7 +4035,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3688,7 +4126,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3757,18 +4195,18 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(86);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -3798,19 +4236,16 @@ const SUPPORTED_PROPERTIES = [
     'filter'
 ];
 
-/**
- 
- */
 
 class Style {
 
     /**
     * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through styles. Styles also control the element visibility, ordering or aggregation level.
-    * 
+    *
     * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
     * Each attribute in the {@link StyleSpec|styleSpec} must be a valid {@link carto.style.expressions|expression}.
-    * Those expressions will be evaluated dinamically for every element in the dataset.
+    * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
     *
@@ -4078,8 +4513,8 @@ class Style {
 
         // TODO: Check expression types ie: color is not a number expression!
 
-        styleSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__["d" /* implicitCast */])(styleSpec.width);
-        styleSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__["d" /* implicitCast */])(styleSpec.strokeWidth);
+        styleSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__["l" /* implicitCast */])(styleSpec.width);
+        styleSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__["l" /* implicitCast */])(styleSpec.strokeWidth);
 
         if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isNumber */](styleSpec.resolution)) {
             throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('style', 'resolutionNumberRequired');
@@ -4114,7 +4549,7 @@ class Style {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4249,22 +4684,22 @@ class Map {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(81);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(82);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(83);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(31);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_4__api_layer__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
@@ -4308,34 +4743,36 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return palettes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
 
 
 
 /**
  * ### Color palettes
- * 
+ *
  * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
  * Use them with a {@link carto.style.expressions.ramp|ramp}
- * 
+ *
  * The following palettes are availiable:
  *  - Categorical:
  *      - PRISM
  *      - EARTH
  *  - Numeric
  *      - ...
- * 
+ *
  * @api
  * @name carto.style.expressions.palettes
  * @memberof carto.style.expressions
- * 
+ *
  * @example <caption> Using a color scheme </caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
@@ -4344,9 +4781,10 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
  */
 const palettes = {};
 
-class PaletteGenerator {
+class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
     constructor(name, subPalettes) {
-        this.type = 'paletteGenerator';
+        super({});
+        this.type = 'palette';
         this.name = name;
         this.subPalettes = subPalettes;
         this.tags = subPalettes.tags;
@@ -4367,7 +4805,7 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
 
 class Inverse {
     constructor(palette) {
-        this.type = 'paletteGenerator';
+        this.type = 'palette';
         this._originalPalette = palette;
         this.tags = palette.tags;
         this.subPalettes = new Proxy(palette.subPalettes, {
@@ -4398,14 +4836,14 @@ class Inverse {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(33);
+module.exports = __webpack_require__(35);
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -6258,7 +6696,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(34);
+var colorbrewer = __webpack_require__(36);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -6291,14 +6729,14 @@ if (true) {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(37);
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -6623,12 +7061,12 @@ if (true) {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -6638,17 +7076,17 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
     /**
      * Given a property create "sub-groups" based on the given breakpoints.
-     * 
-     * 
+     *
+     *
      * Imagine a traffic dataset with a speed property. We want to divide the roads in
      * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
-     * 
-     * 
+     *
+     *
      * We´ll need:
      *  - A {@link carto.style.expressions.ramp|ramp } to add a color for every bucket.
      *  - A {@link carto.style.expressions.palettes|colorPalette } to define de color scheme.
-     * 
-     * 
+     *
+     *
      * ```javascript
      *  const s = carto.style.expressions;
      *  const $speed = s.prop('speed');
@@ -6658,17 +7096,17 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
      *      s.palettes.PRISM),
      * });
      * ```
-     * 
+     *
      * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
-     *  - From 0 to 29 
+     *  - From 0 to 29
      *  - From 30 to 79
      *  - From 80 to 120
-     * 
+     *
      * Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
      *
      * This expression can be used for categorical properties, imagine the previous example with the data already
      * procesed in a new categorical `procesedSpeed` column:
-     * 
+     *
      * ```javascript
      *  const s = carto.style.expressions;
      *  const $procesedSpeed = s.prop('procesedSpeed');
@@ -6678,18 +7116,38 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
      *      s.palettes.PRISM),
      * });
      * ```
-     * 
+     *
      * @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
      * @param {...carto.style.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
-     * @return {carto.style.expressions.expression} 
-     * 
+     * @return {carto.style.expressions.expression}
+     *
      * @memberof carto.style.expressions
      * @name buckets
      * @function
      * @api
      */
     constructor(input, ...args) {
-        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */]);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+
+        let looseType = undefined;
+        if (input.type) {
+            if (input.type != 'float' && input.type != 'category') {
+                throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
+            }
+            looseType = input.type;
+        }
+        args.map((arg, index) => {
+            if (arg.type) {
+                if (looseType && looseType != arg.type) {
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type` +
+                        `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
+                } else if (arg.type != 'float' && arg.type != 'category') {
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
+                }
+            }
+        });
+
         let children = {
             input
         };
@@ -6698,14 +7156,22 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         this.bucketUID = bucketUID++;
         this.numCategories = args.length + 1;
         this.args = args;
+        this.type = 'category';
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.type = 'category';
         this.othersBucket = this.input.type == 'category';
-        this.args.map(breakpoint => {
-            if (breakpoint.type != this.input.type) {
-                throw new Error('Buckets() argument types mismatch');
+
+        const input = this.input;
+        if (input.type != 'float' && input.type != 'category') {
+            throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
+        }
+        this.args.map((arg, index) => {
+            if (input.type != arg.type) {
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type` +
+                    `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
+            } else if (arg.type != 'float' && arg.type != 'category') {
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
             }
         });
     }
@@ -6748,28 +7214,38 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
 class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(l, a, b) {
-        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(l);
-        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(b);
+        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(l);
+        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'l', 0, l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'a', 1, a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('blend', 'b', 2, b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'l', 0, 'float', l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'a', 1, 'float', a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'b', 2, 'float', b);
+
         super({ l: l, a: a, b: b });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.l.type != 'float' || this.a.type != 'float' || this.b.type != 'float') {
-            throw new Error('CIELab() invalid parameters');
-        }
-        this.type = 'color';
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'l', 0, 'float', this.l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'a', 1, 'float', this.a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'b', 2, 'float', this.b);
+
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
                 vec3(
@@ -6824,13 +7300,14 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 /* harmony export (immutable) */ __webpack_exports__["a"] = CIELab;
 
 
+
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -6842,20 +7319,22 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
      * @param {*} value value (brightness) of the color in the [0,1] range
      */
     constructor(h, s, v) {
-        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(h);
-        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(s);
-        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(v);
+        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(h);
+        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(s);
+        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(v);
+
+        checkType('h', 0, h);
+        checkType('s', 1, s);
+        checkType('v', 2, v);
+
         super({ h: h, s: s, v: v });
+        this.type = 'color';
     }
     _compile(metadata) {
         super._compile(metadata);
-        function typeCheck(v) {
-            return !(v.type == 'float' || v.type == 'category');
-        }
-        if (typeCheck(this.h) || typeCheck(this.s) || typeCheck(this.v)) {
-            throw new Error('CIELab() invalid parameters');
-        }
-        this.type = 'color';
+        checkType('h', 0, this.h);
+        checkType('s', 1, this.s);
+        checkType('v', 2, this.v);
         const normalize = (v, hue = false) => {
             if (v.type == 'category') {
                 return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
@@ -6880,29 +7359,38 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 /* harmony export (immutable) */ __webpack_exports__["a"] = HSV;
 
 
+function checkType(parameterName, parameterIndex, parameter) {
+    Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('hsv', parameterName, parameterIndex, parameter);
+    if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+        throw new Error(`hsv(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+    }
+}
+
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 /**
 * Linearly interpolates the value of a given property between min and max.
-* 
+*
 * @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
 * @param {carto.style.expressions.expression} min - Numeric or date expression pointing to the lower limit
 * @param {carto.style.expressions.expression} max - Numeric or date expression pointing to the higher limit
-* @return {carto.style.expressions.expression} 
-* 
+* @return {carto.style.expressions.expression}
+*
 * @example <caption> Display points with a different color depending on the `category` property. </caption>
 * const s = carto.style.expressions;
 * const style = new carto.Style({
 *  color: s.ramp(s.linear(s.prop('speed', 10, 100), PRISM),
 * });
-* 
+*
 * @memberof carto.style.expressions
 * @name ramp
 * @function
@@ -6910,11 +7398,26 @@ class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 */
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(input, min, max) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(min);
+        max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(max);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'min', 1, min);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'max', 2, max);
+
         super({ input, min, max });
+
+        if (this.min.type != 'time') {
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'input', 0, 'float', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'min', 1, 'float', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'max', 2, 'float', this.max);
+        }
+        this.type = 'float';
     }
     _compile(metadata) {
-        this.type = 'float';
         super._compile(metadata);
+
         if (this.input.type == 'date') {
             const min = this.min.eval().getTime();
             const max = this.max.eval().getTime();
@@ -6928,6 +7431,10 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
             this.inlineMaker = (inline) => `((${inline.input}-${smin.toFixed(20)})/(${(smax - smin).toFixed(20)}))`;
 
         } else {
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'input', 0, 'float', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'min', 1, 'float', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'max', 2, 'float', this.max);
+
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
     }
@@ -6943,16 +7450,16 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
-//
+// TODO type checking
 class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
      * @description Near returns zero for inputs that are far away from center.
@@ -6967,10 +7474,11 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
      * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
      */
     constructor(input, center, threshold, falloff) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(input);
-        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(center);
-        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(threshold);
-        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(falloff);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(center);
+        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(threshold);
+        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(falloff);
+
         super({ input: input, center: center, threshold: threshold, falloff: falloff });
     }
     _compile(meta) {
@@ -6987,7 +7495,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Near;
@@ -6995,12 +7503,12 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 
 
 
@@ -7034,38 +7542,38 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
 class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     /**
     * Create a color ramp based on input property.
-    * 
+    *
     * This expression will asign a color to every possible value in the property.
     * If there are more values than colors in the palette, new colors will be generated by linear interpolation.
-    * 
+    *
     * @param {carto.style.expressions.expression} input - The input expression to give a color
     * @param {carto.style.expressions.palettes} palette - The color palette that is going to be used
-    * @return {carto.style.expressions.expression} 
-    * 
+    * @return {carto.style.expressions.expression}
+    *
     * @example <caption> Display points with a different color depending on the `category` property. (We assume category has discrete values) </caption>
     * const s = carto.style.expressions;
     * const style = new carto.Style({
     *  color: s.ramp(s.prop('category'), PRISM),
     * });
-    * 
+    *
     * @example <caption> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</caption>
     * const s = carto.style.expressions;
     * const style = new carto.Style({
     *  color: s.ramp(s.prop('speed'), PRISM),
     * });
-    * 
+    *
     * @memberof carto.style.expressions
     * @name ramp
     * @function
@@ -7075,16 +7583,22 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         if (args.length > 0) {
             throw new Error('ramp(input, palette) only accepts two parameters');
         }
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(input);
-        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(palette);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(palette);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('ramp', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('ramp', 'input', 0, ['float', 'category'], input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'palette', 1, 'palette', palette);
+
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        this.type = 'color';
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'input', 0, ['float', 'category'], this.input);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
         }
@@ -7105,7 +7619,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         };
     }
     _getColorsFromPalette(input, palette) {
-        if (palette.type == 'paletteGenerator') {
+        if (palette.type == 'palette') {
             let colors;
             if (input.numCategories) {
                 // If we are not gonna pop the others we don't need to get the extra color
@@ -7146,8 +7660,8 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             for (var i = 0; i < width; i++) {
                 const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                 const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vlowRaw).b, 255];
-                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* hexToRgb */])(vhighRaw).b, 255];
+                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).b, 255];
+                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).b, 255];
                 const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];
@@ -7184,12 +7698,12 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
@@ -7226,20 +7740,20 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
      * @param {*} a alpha/opacity component in the [0,1] range
      */
     constructor(r, g, b, a) {
-        var color = [r, g, b, a];
-        color = color.map(x => Number.isFinite(x) ? Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(x) : x);
-        r = color[0];
-        g = color[1];
-        b = color[2];
-        a = color[3];
+        [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'r', 0, 'float', r);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'g', 1, 'float', g);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'b', 2, 'float', b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'a', 3, 'float', a);
         super({ r, g, b, a });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.r.type != 'float' || this.g.type != 'float' || this.b.type != 'float' || this.a.type != 'float') {
-            throw new Error('Invalid parameters for RGBA()');
-        }
-        this.type = 'color'; // TODO this kind of thing can be refactored into Color class and use: extends ColorExpression
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'r', 0, 'float', this.r);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'g', 1, 'float', this.g);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'b', 2, 'float', this.b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'a', 3, 'float', this.a);
         this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
     }
     // TODO eval
@@ -7249,12 +7763,14 @@ class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+
 
 
 
@@ -7286,14 +7802,14 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
         if (Number.isFinite(b)) {
             b = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(b);
         }
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'color', 0, 'color', a);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'opacity', 1, 'float', b);
         super({ a: a, b: b });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (!(this.a.type == 'color' && this.b.type == 'float')) {
-            throw new Error(`Opacity cannot be performed between '${this.a.type}' and '${this.b.type}'`);
-        }
-        this.type = 'color';
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'opacity', 1, 'float', this.b);
         this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
     }
     // TODO eval
@@ -7303,7 +7819,7 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7314,6 +7830,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(property, buckets) {
         // TODO 'cat'
         super({ property: property });
+        // TODO improve type check
         this.buckets = buckets; //TODO force fixed literal
     }
     _compile(metadata) {
@@ -7385,22 +7902,24 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
 
 
+// TODO should this expression be removed?
 class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(x, y, z) {
-        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(x);
-        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(y);
-        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(z);
+        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(x);
+        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(y);
+        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(z);
         super({ x: x, y: y, z: z });
+        // TODO improve type check
     }
     _compile(meta) {
         super._compile(meta);
@@ -7467,12 +7986,12 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 
 
 
@@ -7498,7 +8017,7 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7511,6 +8030,7 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             throw new Error('time(): invalid date parameter');
         }
         super({});
+        // TODO improve type check
         this.type = 'time';
         this.date = date;
         this.inlineMaker = () => undefined;
@@ -7527,12 +8047,16 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(7);
+
+
 
 
 
@@ -7541,9 +8065,9 @@ let quantilesUID = 0;
 function genQuantiles(global) {
     return class Quantiles extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         constructor(input, buckets) {
-            if (!Number.isFinite(buckets)) {
-                throw new Error('Quantiles() only accepts a fixed number of buckets');
-            }
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input);
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
+
             let children = {
                 input
             };
@@ -7557,10 +8081,11 @@ function genQuantiles(global) {
             this.numCategories = buckets;
             this.buckets = buckets;
             this.breakpoints = breakpoints;
+            this.type = 'category';
         }
         _compile(metadata) {
             super._compile(metadata);
-            this.type = 'category';
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('quantiles', 'input', 0, 'float', this.input);
             if (global) {
                 const copy = metadata.sample.map(s => s[this.input.name]);
                 copy.sort((x, y) => x - y);
@@ -7637,14 +8162,14 @@ const GlobalQuantiles = genQuantiles(true);
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(7);
 
 
 
@@ -7685,8 +8210,9 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
         if (param2 == __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
             fadeOut = fadeIn;
         }
-        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(fadeIn);
-        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* implicitCast */])(fadeOut);
+        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeIn);
+        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeOut);
+        // TODO improve type check
         super({ fadeIn, fadeOut });
         this.type = 'fade';
         this.inlineMaker = (inline) => ({
@@ -7727,6 +8253,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
         }
         const _cycle = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["floatDiv"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["floatMod"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["now"])(), duration), duration);
         super({ input, _cycle, fade });
+        // TODO improve type check
         this.duration = duration;
     }
     _compile(meta) {
@@ -7767,7 +8294,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
         const duration = this.duration;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["b"] = Torque;
@@ -7775,12 +8302,12 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 
 
 
@@ -7836,6 +8363,7 @@ function generateAggregattion(metadataPropertyName, global) {
         _compile(metadata) {
             console.log(metadata);
             super._compile(metadata);
+            // TODO improve type check
             this.property._compile(metadata);
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
@@ -7880,6 +8408,7 @@ function generatePercentile(global) {
                 throw new Error('Percentile must be a fixed literal number');
             }
             super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(0) });
+            // TODO improve type check
             this.property = property;
             this.percentile = percentile;
         }
@@ -7932,11 +8461,13 @@ function generatePercentile(global) {
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
 
 
 class Width extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
@@ -7951,9 +8482,7 @@ class Width extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */]
 class Asc extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(by) {
         super({});
-        if (!(by instanceof Width)) {
-            throw new Error('Asc() only accepts \'width()\' for now');
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -7963,9 +8492,7 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 class Desc extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(by) {
         super({});
-        if (!(by instanceof Width)) {
-            throw new Error('Desc() only accepts \'width()\' for now');
-        }
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -7983,15 +8510,17 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(23);
+
 
 
 
@@ -8031,13 +8560,14 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._checkData(data);
 
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
-        this._status = 'init'; // init -> metadata -> data
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
         this._numFields = [];
         this._catFields = [];
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
+
+        this._loaded = false;
     }
 
     bindLayer(addDataframe, removeDataframe) {
@@ -8045,16 +8575,25 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._removeDataframe = removeDataframe;
     }
 
+    requestMetadata() {
+        return Promise.resolve(this._metadata);
+    }
+
     requestData() {
-        // TODO: split it in two functions: (metadata) / (data)
-        //
-        if (this._status === 'init') {
-            this._status = 'metadata';
-            return this._requestMetadata();
-        } else if (this._status === 'metadata') {
-            this._status = 'data';
-            this._requestData();
+        if (this._loaded) {
+            return;
         }
+        this._loaded = true;
+        const dataframe = new __WEBPACK_IMPORTED_MODULE_1__core_renderer__["a" /* Dataframe */]({
+            active: true,
+            center: { x: 0, y: 0 },
+            geom: this._decodeGeometry(),
+            properties: this._decodeProperties(),
+            scale: 1,
+            size: this._features.length,
+            type: this._getDataframeType(this._type)
+        });
+        this._addDataframe(dataframe);
     }
 
     _checkData(data) {
@@ -8077,74 +8616,52 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
     }
 
-    _requestMetadata() {
-        return Promise.resolve(this._metadata);
-    }
-
-    _requestData() {
-        const geometry = this._decodeGeometry();
-        const properties = this._decodeProperties();
-        const dataframe = new __WEBPACK_IMPORTED_MODULE_1__core_renderer__["a" /* Dataframe */](
-            { x: 0, y: 0 },
-            1,
-            geometry,
-            properties,
-        );
-        dataframe.type = this._getDataframeType(this._type);
-        dataframe.active = true;
-        dataframe.size = this._features.length;
-        this._addDataframe(dataframe);
-    }
-
     _computeMetadata() {
-        const metadata = {
-            columns: [],
-            categoryIDs: {},
-            sample: [],
-            featureCount: this._features.length,
-        };
+        const categoryIDs = {};
+        const columns = [];
+        const sample = [];
+        const featureCount = this._features.length;
+
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             Object.keys(properties).map(name => {
                 const value = properties[name];
-                const type = Number.isFinite(value) ? 'float' : 'category';
-                if (type == 'float') {
-                    this._addNumericPropertyToMetadata(name, value, metadata);
-                } else {
-                    this._addCategoryPropertyToMetadata(name, value, metadata);
-                }
+                Number.isFinite(value) ?
+                    this._addNumericPropertyToMetadata(name, value, columns) :
+                    this._addCategoryPropertyToMetadata(name, value, columns);
             });
-            this._sampleFeatureOnMetadata(properties, metadata, this._features.length);
+            this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
         this._numFields.map(name => {
-            const column = metadata.columns.find(c => c.name == name);
+            const column = columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
         this._catFields.map(name => {
-            const column = metadata.columns.find(c => c.name == name);
-            column.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            const column = columns.find(c => c.name == name);
+            column.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
         });
-        this._metadata = metadata;
-        return metadata;
+
+        this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, sample);
+        return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(feature, metadata, featureCount) {
+    _sampleFeatureOnMetadata(feature, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
                 return;
             }
         }
-        metadata.sample.push(feature);
+        sample.push(feature);
     }
 
-    _addNumericPropertyToMetadata(propertyName, value, metadata) {
+    _addNumericPropertyToMetadata(propertyName, value, columns) {
         if (this._catFields.includes(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._numFields.includes(propertyName)) {
             this._numFields.push(propertyName);
-            metadata.columns.push({
+            columns.push({
                 name: propertyName,
                 type: 'float',
                 min: Number.POSITIVE_INFINITY,
@@ -8154,26 +8671,26 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
                 count: 0
             });
         }
-        const column = metadata.columns.find(c => c.name == propertyName);
+        const column = columns.find(c => c.name == propertyName);
         column.min = Math.min(column.min, value);
         column.max = Math.max(column.max, value);
         column.sum += value;
         column.count++;
     }
-    _addCategoryPropertyToMetadata(propertyName, value, metadata) {
+    _addCategoryPropertyToMetadata(propertyName, value, columns) {
         if (this._numFields.includes(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._catFields.includes(propertyName)) {
             this._catFields.push(propertyName);
-            metadata.columns.push({
+            columns.push({
                 name: propertyName,
                 type: 'category',
                 categoryNames: [],
                 categoryCounts: [],
             });
         }
-        const column = metadata.columns.find(c => c.name == propertyName);
+        const column = columns.find(c => c.name == propertyName);
         if (!column.categoryNames.includes(value)) {
             column.categoryNames.push(value);
             column.categoryCounts.push(0);
@@ -8356,13 +8873,13 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(59);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -8372,7 +8889,7 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8513,7 +9030,7 @@ void main(void) {
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8560,7 +9077,7 @@ void main(void) {
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8575,6 +9092,7 @@ attribute vec2 normal;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
+uniform vec2 normalScale;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -8589,7 +9107,7 @@ void main(void) {
     color.rgb *= color.a;
     float size = 64.*texture2D(widthTex, featureID).a;
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normal*0.001*size-vertexOffset, 0.5, 1.);
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
@@ -8609,8 +9127,9 @@ void main(void) {
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
 
 
+
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8659,7 +9178,7 @@ void main(void) {
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8697,7 +9216,7 @@ void main(void) {
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8740,160 +9259,16 @@ class ShaderCache {
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(62);
+/* unused harmony export decodeGeom */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
-/**
- * @typedef {object} Dataframe - Point in renderer coordinates space
- * @property {RPoint} center
- * @property {number} scale
- * @property {geom} geometry
- * @property {Properties} properties
- */
-class Dataframe {
-    constructor(center, scale, geom, properties) {
-        this.center = center;
-        this.scale = scale;
-        this.geom = geom;
-        this.properties = properties;
-    }
-    bind(renderer) {
-        const gl = renderer.gl;
-        this.renderer = renderer;
 
-        this.propertyTex = [];
-
-        const decodedGeom = decodeGeom(this.type, this.geom);
-        var points = decodedGeom.geometry;
-        this.numVertex = points.length / 2;
-        this.breakpointList = decodedGeom.breakpointList;
-        this.numFeatures = this.breakpointList.length || this.numVertex;
-        this._genDataframePropertyTextures(gl);
-
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.setStyle = (style) => {
-            this.style = style;
-        };
-        this.style = null;
-
-        this.vertexBuffer = gl.createBuffer();
-        this.featureIDBuffer = gl.createBuffer();
-
-        this.texColor = this._createStyleTileTexture(this.numFeatures);
-        this.texWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texFilter = this._createStyleTileTexture(this.numFeatures);
-
-        var ids = new Float32Array(points.length);
-        let index = 0;
-        for (var i = 0; i < points.length; i += 2) {
-            if ((!this.breakpointList.length && i > 0) || i == this.breakpointList[index]) {
-                index++;
-            }
-            ids[i + 0] = ((index) % width) / (width - 1);
-            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-        if (decodedGeom.normals) {
-            this.normalBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
-        }
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-    }
-    _genDataframePropertyTextures() {
-        const gl = this.renderer.gl;
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.height = height;
-        this.propertyID = {}; //Name => PID
-        this.propertyCount = 0;
-        for (var k in this.properties) {
-            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                var propertyID = this.propertyID[k];
-                if (propertyID === undefined) {
-                    propertyID = this.propertyCount;
-                    this.propertyCount++;
-                    this.propertyID[k] = propertyID;
-                }
-                this.propertyTex[propertyID] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, height, 0, gl.ALPHA, gl.FLOAT,
-                    this.properties[k]);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-        }
-    }
-    _createStyleTileTexture(numFeatures) {
-        // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
-        // since RGB components are discarded
-        const gl = this.renderer.gl;
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(numFeatures / width);
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        return texture;
-    }
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteTexture(this.texFilter);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texWidth = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.texFilter = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Dataframe;
-
-
-
-function getLineNormal(a, b) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    return normalize([-dy, dx]);
-}
-
-function normalize(v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-    return [v[0] / s, v[1] / s];
-}
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
@@ -8913,108 +9288,123 @@ function normalize(v) {
 // The geom will be an array of coordinates in this case
 function decodeGeom(geomType, geom) {
     if (geomType == 'point') {
-        return {
-            geometry: geom,
-            breakpointList: []
-        };
-    } else if (geomType == 'polygon') {
-        let vertexArray = []; //Array of triangle vertices
-        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(feature => {
-            feature.map(polygon => {
-                const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
-                triangles.map(index => {
-                    vertexArray.push(polygon.flat[2 * index]);
-                    vertexArray.push(polygon.flat[2 * index + 1]);
-                });
-            });
-            breakpointList.push(vertexArray.length);
-        });
-        return {
-            geometry: new Float32Array(vertexArray),
-            breakpointList
-        };
-    } else if (geomType == 'line') {
-        let geometry = [];
-        let normals = [];
-        let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
-        geom.map(feature => {
-            feature.map(line => {
-                // Create triangulation
-                for (let i = 0; i < line.length - 2; i += 2) {
-                    const a = [line[i + 0], line[i + 1]];
-                    const b = [line[i + 2], line[i + 3]];
-                    if (i > 0) {
-                        var prev = [line[i + -2], line[i + -1]];
-                        var nprev = getLineNormal(a, prev);
-                    }
-                    if (i < line.length - 4) {
-                        var next = [line[i + 4], line[i + 5]];
-                        var nnext = getLineNormal(next, b);
-                    }
-                    let normal = getLineNormal(b, a);
-                    let na = normal;
-                    let nb = normal;
-                    //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
-                    if (prev) {
-                        na = normalize([
-                            normal[0] * 0.5 + nprev[0] * 0.5,
-                            normal[1] * 0.5 + nprev[1] * 0.5,
-                        ]);
-                    }
-                    if (next) {
-                        nb = normalize([
-                            normal[0] * 0.5 + nnext[0] * 0.5,
-                            normal[1] * 0.5 + nnext[1] * 0.5,
-                        ]);
-                    }
-                    normals.push(-na[0], -na[1]);
-                    normals.push(na[0], na[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    normals.push(na[0], na[1]);
-                    normals.push(nb[0], nb[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    normal = [0, 0];
-
-
-                    //First triangle
-                    geometry.push(a[0] - 0.01 * normal[0]);
-                    geometry.push(a[1] - 0.01 * normal[1]);
-
-                    geometry.push(a[0] + 0.01 * normal[0]);
-                    geometry.push(a[1] + 0.01 * normal[1]);
-
-                    geometry.push(b[0] - 0.01 * normal[0]);
-                    geometry.push(b[1] - 0.01 * normal[1]);
-
-                    //Second triangle
-                    geometry.push(a[0] + 0.01 * normal[0]);
-                    geometry.push(a[1] + 0.01 * normal[1]);
-
-                    geometry.push(b[0] + 0.01 * normal[0]);
-                    geometry.push(b[1] + 0.01 * normal[1]);
-
-                    geometry.push(b[0] - 0.01 * normal[0]);
-                    geometry.push(b[1] - 0.01 * normal[1]);
-                }
-            });
-            breakpointList.push(geometry.length);
-        });
-        return {
-            geometry: new Float32Array(geometry),
-            breakpointList,
-            normals: new Float32Array(normals)
-        };
-    } else {
-        throw new Error(`Unimplemented geometry type: '${geomType}'`);
+        return decodePoint(geom);
     }
+    if (geomType == 'polygon') {
+        return decodePolygon(geom);
+    }
+    if (geomType == 'line') {
+        return decodeLine(geom);
+    }
+    throw new Error(`Unimplemented geometry type: '${geomType}'`);
+}
+
+function decodePoint(geometry) {
+    return {
+        geometry: geometry,
+        breakpointList: []
+    };
 }
 
 
+function decodePolygon(geometry) {
+    let vertexArray = []; //Array of triangle vertices
+    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    geometry.map(feature => {
+        feature.map(polygon => {
+            const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
+            triangles.map(index => {
+                vertexArray.push(polygon.flat[2 * index]);
+                vertexArray.push(polygon.flat[2 * index + 1]);
+            });
+        });
+        breakpointList.push(vertexArray.length);
+    });
+    return {
+        geometry: new Float32Array(vertexArray),
+        breakpointList
+    };
+}
+
+function decodeLine(geom) {
+    let normals = [];
+    let geometry = [];
+    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    geom.map(feature => {
+        feature.map(lineString => {
+            // Create triangulation
+            
+            for (let i = 0; i < lineString.length - 2; i += 2) {
+                const a = [lineString[i + 0], lineString[i + 1]];
+                const b = [lineString[i + 2], lineString[i + 3]];
+                const normal = getLineNormal(b, a);
+                let na = normal;
+                let nb = normal;
+                
+                if (i > 0) {
+                    const prev = [lineString[i - 2], lineString[i - 1]];
+                    na = getJointNormal(prev, a, b) || na;
+                }
+                if (i < lineString.length - 4) {
+                    const next = [lineString[i + 4], lineString[i + 5]];
+                    nb = getJointNormal(a, b, next) || nb;
+                }
+
+                // First triangle
+    
+                normals.push(-na[0], -na[1]);
+                normals.push(na[0], na[1]);
+                normals.push(-nb[0], -nb[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
+
+                // Second triangle
+    
+                normals.push(na[0], na[1]);
+                normals.push(nb[0], nb[1]);
+                normals.push(-nb[0], -nb[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
+                geometry.push(b[0], b[1]);
+            }
+        });
+        breakpointList.push(geometry.length);
+    });
+    return {
+        geometry: new Float32Array(geometry),
+        breakpointList,
+        normals: new Float32Array(normals)
+    };
+}
+
+function getLineNormal(a, b) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    return normalize([-dy, dx]);
+}
+
+function getJointNormal(a, b, c) {
+    const u = normalize([a[0] - b[0], a[1] - b[1]]);
+    const v = normalize([c[0] - b[0], c[1] - b[1]]);
+    const sin = - u[1] * v[0] + u[0] * v[1];
+    if (sin !== 0) {
+        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
+    }
+}
+
+function normalize(v) {
+    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    return [v[0] / s, v[1] / s];
+}
+
+/* harmony default export */ __webpack_exports__["a"] = ({ decodeGeom });
+
+
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9671,12 +10061,12 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(66);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -9758,7 +10148,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9911,12 +10301,12 @@ const validation = {
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -9984,19 +10374,22 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__ = __webpack_require__(77);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__ = __webpack_require__(78);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(23);
+
 
 
 
@@ -10006,7 +10399,7 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 const SAMPLE_ROWS = 1000;
-const MIN_FILTERING = 500000;
+const MIN_FILTERING = 2000000;
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -10039,7 +10432,7 @@ class Windshaft {
             }
             , maxAge: 1000 * 60 * 60
         };
-        this.cache = __WEBPACK_IMPORTED_MODULE_3_lru_cache__(lruOptions);
+        this.cache = __WEBPACK_IMPORTED_MODULE_4_lru_cache__(lruOptions);
         this.inProgressInstantiations = {};
     }
 
@@ -10058,24 +10451,31 @@ class Windshaft {
     }
 
     /**
-     * Should be called whenever the viewport or the style changes
-     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * Should be called whenever the style changes (even if metadata is not going to be used)
+     * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
+     * Returns  a promise to a Metadata
      * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    async getData(viewport, style) {
+    async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
-        const filtering = __WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["a" /* getFiltering */](style);
-        const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
+        const filtering = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getFiltering */](style);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
-        this._getTiles(tiles);
         return this.metadata;
     }
+
+    getData(viewport) {
+        if (this._isInstantiated()) {
+            const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
+            this._getTiles(tiles);
+        }
+    }
+
 
     _getTiles(tiles) {
         this._requestGroupID++;
@@ -10111,6 +10511,10 @@ class Windshaft {
         return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
     }
 
+    _isInstantiated() {
+        return !!this.metadata;
+    }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
@@ -10128,12 +10532,12 @@ class Windshaft {
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, MNS, conf);
+        const metadata = await this._getMetadata(query, MNS, conf);
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
-            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_4__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
+            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
         } else {
             aggSQL = this._buildQuery(select);
         }
@@ -10210,15 +10614,15 @@ class Windshaft {
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
-        // TODO: Should the dataframe constructor have type and size parameters?
-        const dataframe = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["a" /* Dataframe */](
-            rs.center,
-            rs.scale,
-            geometry,
-            properties,
-        );
-        dataframe.type = type;
-        dataframe.size = size;
+        const dataframe = new __WEBPACK_IMPORTED_MODULE_2__core_dataframe__["a" /* default */]({
+            active: false,
+            center: rs.center,
+            geom: geometry,
+            properties: properties,
+            scale: rs.scale,
+            size: size,
+            type: type,
+        });
 
         return dataframe;
     }
@@ -10283,7 +10687,7 @@ class Windshaft {
                 if (response.byteLength == 0 || response == 'null') {
                     return { empty: true };
                 }
-                var tile = new __WEBPACK_IMPORTED_MODULE_5__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_2_pbf__(response));
+                var tile = new __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__["VectorTile"](new __WEBPACK_IMPORTED_MODULE_3_pbf__(response));
                 const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
                 var fieldMap = {};
 
@@ -10424,15 +10828,45 @@ class Windshaft {
 
         return { properties, points, featureGeometries };
     }
-    async getMetadata(query, proto, conf) {
+
+    async _getMetadata(query, proto, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type
         //Get category names and counts by grouping by
         //Assign ids
-        const metadata = {
-            columns: [],
-        };
+
+        const [{ numerics, categories, dates }, featureCount] = await Promise.all([
+            this._getColumnTypes(query, conf),
+            this.getFeatureCount(query, conf)]);
+
+        const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
+
+        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
+            this.getSample(conf, sampling),
+            this.getNumericTypes(numerics, query, conf),
+            this.getDatesTypes(dates, query, conf),
+            this.getCategoryTypes(categories, query, conf)]);
+
+        const columns = [];
+        numerics.forEach((name, index) => columns.push(numericsTypes[index]));
+        dates.forEach((name, index) => columns.push(datesTypes[index]));
+
+        const categoryIDs = {};
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            columns.push(t);
+        });
+        const metadata = new __WEBPACK_IMPORTED_MODULE_7__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, sample);
+        console.log(metadata);
+        return metadata;
+    }
+
+    /**
+     * Return an object with the names of the columns clasified by type.
+     */
+    async _getColumnTypes(query, conf) {
         const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
         let categories = [];
@@ -10450,30 +10884,7 @@ class Windshaft {
             }
         });
 
-        metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const datesTypes = await this.getDatesTypes(dates, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
-        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);
-
-        numerics.map((name, index) => {
-            const t = numericsTypes[index];
-            metadata.columns.push(t);
-        });
-        dates.map((name, index) => {
-            const t = datesTypes[index];
-            metadata.columns.push(t);
-        });
-        metadata.categoryIDs = {};
-        metadata.sample = sample;
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
-            metadata.columns.push(t);
-        });
-        console.log(metadata);
-        return metadata;
+        return { numerics, categories, dates };
     }
 
     async getSample(conf, sampling) {
@@ -10654,7 +11065,7 @@ function authURL(url, conf) {
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10662,7 +11073,7 @@ function authURL(url, conf) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(68);
+var ieee754 = __webpack_require__(70);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -11279,7 +11690,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -11369,7 +11780,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11379,11 +11790,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(70)
-var util = __webpack_require__(72)
+var Map = __webpack_require__(72)
+var util = __webpack_require__(74)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(76)
+var Yallist = __webpack_require__(78)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -11843,7 +12254,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -11853,13 +12264,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(71)
+  module.exports = __webpack_require__(73)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -11978,7 +12389,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -12506,7 +12917,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(74);
+exports.isBuffer = __webpack_require__(76);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -12550,7 +12961,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(75);
+exports.inherits = __webpack_require__(77);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -12568,10 +12979,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(73), __webpack_require__(23)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(75), __webpack_require__(25)))
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports) {
 
 var g;
@@ -12598,7 +13009,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -12609,7 +13020,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -12638,7 +13049,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -13014,7 +13425,7 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13025,9 +13436,9 @@ function Node (value, prev, next, list) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(15);
 
 
@@ -13042,7 +13453,7 @@ function Node (value, prev, next, list) {
 
 /**
  * Returns supported windshaft filters for the style
- * @param {*} style 
+ * @param {*} style
  * @returns {Filtering}
  */
 function getFiltering(style) {
@@ -13100,20 +13511,20 @@ function getBlendFilter(f) {
 }
 
 function getInFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["a" /* In */] && f.property instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */])) {
+    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["a" /* In */] && f.value instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) && f.categories.length > 0) {
         return [{
             type: 'in',
-            property: f.property.name,
+            property: f.value.name,
             whitelist: f.categories.map(cat => cat.expr)
         }];
     }
 }
 
 function getNinFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["b" /* Nin */] && f.property instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */])) {
+    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["b" /* Nin */] && f.value instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) && f.categories.length > 0) {
         return [{
             type: 'nin',
-            property: f.property.name,
+            property: f.value.name,
             blacklist: f.categories.map(cat => cat.expr)
         }];
     }
@@ -13139,22 +13550,22 @@ function isBetweenFilter(f) {
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(79);
-module.exports.VectorTileFeature = __webpack_require__(25);
-module.exports.VectorTileLayer = __webpack_require__(24);
+module.exports.VectorTile = __webpack_require__(81);
+module.exports.VectorTileFeature = __webpack_require__(27);
+module.exports.VectorTileLayer = __webpack_require__(26);
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(24);
+var VectorTileLayer = __webpack_require__(26);
 
 module.exports = VectorTile;
 
@@ -13172,7 +13583,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13491,12 +13902,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -13575,18 +13986,18 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_functions__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_functions__ = __webpack_require__(2);
 
 
 
@@ -13616,7 +14027,7 @@ class Layer {
     * new carto.Layer('layer0', source, style);
     *
     * @fires CartoError
-    * 
+    *
     * @constructor Layer
     * @memberof carto
     * @api
@@ -13681,6 +14092,36 @@ class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source && this._source !== source) {
+            this._source.free();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(() => {
+            this._styleChanged(style);
+        });
+        this._compileShaders(style, metadata);
+    }
     /**
      * Set a new source for this layer.
      *
@@ -13689,13 +14130,24 @@ class Layer {
      * @instance
      * @api
      */
-    setSource(source) {
+    async setSource(source) {
         this._checkSource(source);
+        const style = this._style;
+        if (style) {
+            var metadata = await source.requestMetadata(style);
+        }
+        if (this._style !== style) {
+            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+        if (style) {
+            this._styleChanged(style);
+        }
     }
 
     /**
@@ -13727,7 +14179,7 @@ class Layer {
 
     /**
      * Set a new style for this layer.
-     * 
+     *
      * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
      * @param {carto.Style} style - New style
@@ -13751,9 +14203,9 @@ class Layer {
 
     /**
      * Blend the current style with another style.
-     * 
+     *
      * This allows smooth transforms between two different styles.
-     * 
+     *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different styles varying the width
      * const style0 = new carto.style({ width: 10 });
@@ -13765,7 +14217,7 @@ class Layer {
      * // The points will be animated from 10px to 20px for 500ms.
      * layer.blendToStyle(style1, 500);
      *
-     * @param {carto.Style} style - The final style 
+     * @param {carto.Style} style - The final style
      * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
@@ -13844,7 +14296,7 @@ class Layer {
 
     initCallback() {
         this._contextInitCallback();
-        this.requestData();
+        this.requestMetadata();
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -13871,18 +14323,14 @@ class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        const originalPromise = this.requestData(style);
-        if (!originalPromise) {
-            // The previous stored metadata is still valid
-            this._compileShaders(style, this.metadata);
-            return Promise.resolve();
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
-        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
-        return originalPromise.then(metadata => {
-            this.metadata = metadata;
-            this._compileShaders(style, metadata);
-            this.requestData(style);
-        });
+        this.metadata = metadata;
+        this._compileShaders(style, this.metadata);
+        return this.requestData();
     }
 
     _checkId(id) {
@@ -13922,13 +14370,20 @@ class Layer {
         throw new Error('?');
     }
 
-    async requestData(style) {
+    async requestMetadata(style) {
         style = style || this._style;
         if (!style) {
             return;
         }
         await this._context;
-        return this._source.requestData(this._getViewport(), style);
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
     }
 
     getNumFeatures() {
@@ -13942,7 +14397,7 @@ class Layer {
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13967,16 +14422,16 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(87);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
 
 
 
@@ -14015,7 +14470,7 @@ function parseStyleNamedExpr(styleSpec, node) {
     }
     const value = parseNode(node.right);
     // Don't cast resolution properties implicitly since they must be of type Number
-    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["d" /* implicitCast */])(value);
+    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(value);
 }
 
 function parseStyleDefinition(str) {
@@ -14131,7 +14586,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -14818,12 +15273,12 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
 
 
 let integrator = null;
@@ -14849,12 +15304,12 @@ class CartoMapIntegrator {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
 
 
