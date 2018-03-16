@@ -8,10 +8,10 @@ It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
 ![](./docs/images/carto-gl-capture.png)
 
+
 ## Documentation and examples
 
 You **need to generate the documentation to have an up to date version**.
-
 
 ### Public documentation
 
@@ -44,13 +44,16 @@ To generate the docs for the private API, you need to execute:
 yarn docs:all
 ```
 
+
 ## License
 
 This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
 
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
+
 
 ## Development
 
