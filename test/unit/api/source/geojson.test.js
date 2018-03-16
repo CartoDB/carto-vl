@@ -131,7 +131,10 @@ describe('api/source/geojson', () => {
                     }
                 ]
             };
-            expect(source._metadata).toEqual(expected);
+            expect(source._metadata.columns).toEqual(expected.columns);
+            expect(source._metadata.categoryIDs).toEqual(expected.categoryIDs);
+            expect(source._metadata.featureCount).toEqual(expected.featureCount);
+            expect(source._metadata.sample).toEqual(expected.sample);
         });
 
         it('should throw an error if data is not valid', function () {
