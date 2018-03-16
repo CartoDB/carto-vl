@@ -44,19 +44,37 @@ To watch the files
 yarn build:watch
 ```
 
-### Generate the docs
+### Documentation and examples
+
+You **need to generate the documentation to have an up to date version**.
+
+
+#### Public documentation
+
+This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
+ - Getting started introduction with a basic example.
+ - Detailed information about how styling expressions.
+ - Full reference for the public API.
+
+For generating the public documentation, you should run:
 
 ```
 yarn docs
 ```
 
-To generate all the docs
+#### Internal documentation
+
+It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
+
+To generate the docs for the private API, you need to execute:
 
 ```
 yarn docs:all
 ```
 
-### Serve docs and examples
+#### Serve docs and examples
+
+The recommended way to navigate the documentation and check the examples is running the following command:
 
 ```
 yarn serve
