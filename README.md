@@ -1,4 +1,4 @@
-## CARTO GL
+# CARTO GL
 
 [![CircleCI](https://circleci.com/gh/CartoDB/renderer-prototype.svg?style=svg)](https://circleci.com/gh/CartoDB/renderer-prototype)
 
