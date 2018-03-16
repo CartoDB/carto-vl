@@ -8,10 +8,6 @@ It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
 ![](./docs/images/carto-gl-capture.png)
 
-## Getting Started
-
-[TBD]
-
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
