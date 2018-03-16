@@ -8,38 +8,6 @@ It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
 ![](./docs/images/carto-gl-capture.png)
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
-
-## Submitting Contributions
-
-You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
-
-## License
-
-This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
-
-## Development
-
-### Install the dependencies
-
-```
-yarn
-```
-
-### Build the library
-
-```
-yarn build
-```
-
-To watch the files
-
-```
-yarn build:watch
-```
-
 ### Documentation and examples
 
 You **need to generate the documentation to have an up to date version**.
@@ -74,6 +42,39 @@ The recommended way to navigate the documentation and check the examples is runn
 
 ```
 yarn serve
+```
+
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
+
+
+## Submitting Contributions
+
+You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
+
+## License
+
+This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Development
+
+### Install the dependencies
+
+```
+yarn
+```
+
+### Build the library
+
+```
+yarn build
+```
+
+To watch the files
+
+```
+yarn build:watch
 ```
 
 ### Run the tests
