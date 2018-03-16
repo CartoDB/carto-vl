@@ -464,7 +464,7 @@ export default class Windshaft {
         const categoryIDs = {};
         categories.map((name, index) => {
             const t = categoriesTypes[index];
-            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
             columns.push(t);
         });
         const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
