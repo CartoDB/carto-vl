@@ -123,10 +123,7 @@ function getCornerVector(a, b, c) {
     const v = normalize([c[0] - b[0], c[1] - b[1]]);
     const sin = - u[1] * v[0] + u[0] * v[1];
     if (sin !== 0) {
-        return [
-            (u[0] + v[0]) / sin,
-            (u[1] + v[1]) / sin
-        ];
+        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
     }
     
 }
