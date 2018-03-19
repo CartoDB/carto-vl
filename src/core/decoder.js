@@ -73,11 +73,16 @@ function decodeLine(geom) {
             // Normal vectors for the corners zab and abc. We use z to define
             // the point before a.
             let nzab, nabc;
-            // Flags that indicate if the corners zab and abc should be flat.
-            // The critera for this flag to be true is that the angle of the
-            // corner ia less than 30 degrees.
-            let fzab = false;
-            let fabc = false;
+            // Flat numbers fzab and fabc are used to indicate if the corners
+            // zab and abc should be flat and in which direction.
+            // * fabc = 0: no flat corner.
+            // * fabc = -1: flat corner in the oposite direction of nabc.
+            // * fabc = 1: flat corner in the same direction of nabc.
+            // The critera to obtain this number is that the absolute value of
+            // the sinus of the angle between BA and BC is less than 0.5. The sign
+            // of the number is just the opposite of the sign of the sinus.
+            let fzab = 0;
+            let fabc = 0;
             
             // We need at least two points
             if (lineString.length >= 4) {
@@ -98,7 +103,7 @@ function decodeLine(geom) {
                         nabc = normal;
                     } else {
                         // If there is no next point c, reset its properties
-                        fabc = false;
+                        fabc = 0;
                         nabc = null;
                     }
 
@@ -106,17 +111,77 @@ function decodeLine(geom) {
                     geometry.push(a[0], a[1]);
                     geometry.push(a[0], a[1]);
                     geometry.push(b[0], b[1]);
-                    nzab ? normals.push(nzab[0], nzab[1]) : normals.push(nab[0], nab[1]);
-                    (nzab && !fzab) ? normals.push(-nzab[0], -nzab[1]) : normals.push(-nab[0], -nab[1]);
-                    (nabc && !fabc) ? normals.push(-nabc[0], -nabc[1]) : normals.push(-nab[0], -nab[1]);
+                    if (nzab) {
+                        if (fzab == 0) {
+                            normals.push(nzab[0], nzab[1]);
+                        } else if (fzab == -1) {
+                            normals.push(nzab[0], nzab[1]);
+                        } else {
+                            normals.push(nab[0], nab[1]);
+                        }
+                    } else {
+                        normals.push(nab[0], nab[1]);
+                    }
+                    if (nzab) {
+                        if (fzab == 0) {
+                            normals.push(-nzab[0], -nzab[1]);
+                        } else if (fzab == -1) {
+                            normals.push(-nab[0], -nab[1]);
+                        } else {
+                            normals.push(-nzab[0], -nzab[1]);
+                        }
+                    } else {
+                        normals.push(-nab[0], -nab[1]);
+                    }
+                    if (nabc) {
+                        if (fabc == 0) {
+                            normals.push(-nabc[0], -nabc[1]);
+                        } else if (fabc == -1) {
+                            normals.push(-nab[0], -nab[1]);
+                        } else {
+                            normals.push(-nabc[0], -nabc[1]);
+                        }
+                    } else {
+                        normals.push(-nab[0], -nab[1]);
+                    }
                     
                     // Second triangle
                     geometry.push(a[0], a[1]);
                     geometry.push(b[0], b[1]);
                     geometry.push(b[0], b[1]);
-                    nzab ? normals.push(nzab[0], nzab[1]) : normals.push(nab[0], nab[1]);
-                    (nabc && !fabc) ? normals.push(-nabc[0], -nabc[1]) : normals.push(-nab[0], -nab[1]);
-                    nabc ? normals.push(nabc[0], nabc[1]) : normals.push(nab[0], nab[1]);
+                    if (nzab) {
+                        if (fzab == 0) {
+                            normals.push(nzab[0], nzab[1]);
+                        } else if (fzab == -1) {
+                            normals.push(nzab[0], nzab[1]);
+                        } else {
+                            normals.push(nab[0], nab[1]);
+                        }
+                    } else {
+                        normals.push(nab[0], nab[1]);
+                    }
+                    if (nabc) {
+                        if (fabc == 0) {
+                            normals.push(-nabc[0], -nabc[1]);
+                        } else if (fabc == -1) {
+                            normals.push(-nab[0], -nab[1]);
+                        } else {
+                            normals.push(-nabc[0], -nabc[1]);
+                        }
+                    } else {
+                        normals.push(-nab[0], -nab[1]);
+                    }
+                    if (nabc) {
+                        if (fabc == 0) {
+                            normals.push(nabc[0], nabc[1]);
+                        } else if (fabc == -1) {
+                            normals.push(nabc[0], nabc[1]);
+                        } else {
+                            normals.push(nab[0], nab[1]);
+                        }
+                    } else {
+                        normals.push(nab[0], nab[1]);
+                    }
                     
                     if (fabc && nabc) {
                         // Third triangle
@@ -124,9 +189,15 @@ function decodeLine(geom) {
                         geometry.push(b[0], b[1]);
                         geometry.push(b[0], b[1]);
                         geometry.push(b[0], b[1]);
-                        normals.push(nabc[0], nabc[1]);
-                        normals.push(-nab[0], -nab[1]);
-                        normals.push(-nbc[0], -nbc[1]);
+                        if (fabc == -1) {
+                            normals.push(nabc[0], nabc[1]);
+                            normals.push(-nab[0], -nab[1]);
+                            normals.push(-nbc[0], -nbc[1]);
+                        } else {
+                            normals.push(-nabc[0], -nabc[1]);
+                            normals.push(nbc[0], nbc[1]);
+                            normals.push(nab[0], nab[1]);
+                        }
                     }
                     
                     // Update the variables for the next iteration.
@@ -170,7 +241,7 @@ function getJointNormal(a, b, c) {
     const v = uvector(b, c);
     const sin = v[0] * u[1] - v[1] * u[0];
     return {
-        flat: Math.abs(sin) < 0.5,
+        flat: Math.abs(sin) < 0.5 ? - Math.sign(sin) : 0,
         normal: (sin !== 0) && [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin]
     };
 }
