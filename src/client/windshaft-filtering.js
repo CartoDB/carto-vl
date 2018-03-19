@@ -15,7 +15,7 @@ import FloatConstant from '../core/style/expressions/floatConstant';
  * @returns {Filtering}
  */
 export function getFiltering(style) {
-    return getFilter(style.filter);
+    return getFilter(style.getFilter());
 }
 
 /**

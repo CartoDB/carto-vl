@@ -154,7 +154,7 @@ export default class Style {
         return this._styleSpec.order;
     }
 
-    get filter() {
+    getFilter() {
         return this._styleSpec.filter;
     }
 
@@ -163,7 +163,7 @@ export default class Style {
             this.getWidth().isAnimated() ||
             this.getStrokeColor().isAnimated() ||
             this.getStrokeWidth().isAnimated() ||
-            this.filter.isAnimated();
+            this.getFilter.isAnimated();
     }
 
     onChange(callback) {

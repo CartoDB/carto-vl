@@ -230,7 +230,7 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.filter.blendFrom(this._style.filter, ms, interpolator);
+            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
         }
 
         return this._styleChanged(style).then(r => {
@@ -317,7 +317,7 @@ export default class Layer {
     _compileShaders(style, metadata) {
         style.compileShaders(this._integrator.renderer.gl, metadata);
     }
-    
+
     async _styleChanged(style) {
         await this._context;
         const source = this._source;
