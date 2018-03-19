@@ -172,7 +172,7 @@ export default class Style {
 
     _changed() {
         if (this._changeCallback) {
-            this._changeCallback();
+            this._changeCallback(this);
         }
     }
 
