@@ -230,7 +230,7 @@ export default class Style {
         this.filterShader = r.shader;
     }
 
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;
