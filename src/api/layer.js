@@ -258,7 +258,7 @@ export default class Layer {
     }
 
     hasDataframes() {
-        return this._renderLayer.dataframes.length > 0;
+        return this._renderLayer.hasDataframes();
     }
 
     getId() {
@@ -381,7 +381,7 @@ export default class Layer {
     }
 
     getNumFeatures() {
-        return this._renderLayer.dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+        return this._renderLayer.getNumFeatures();
     }
 
     //TODO free layer resources
