@@ -163,7 +163,7 @@ export default class Style {
             this.getWidth().isAnimated() ||
             this.getStrokeColor().isAnimated() ||
             this.getStrokeWidth().isAnimated() ||
-            this.getFilter.isAnimated();
+            this.getFilter().isAnimated();
     }
 
     onChange(callback) {
