@@ -5,6 +5,7 @@ import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
+import Metadata from '../core/metadata';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -455,15 +456,45 @@ export default class Windshaft {
 
         return { properties, points, featureGeometries };
     }
+
     async _getMetadata(query, proto, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type
         //Get category names and counts by grouping by
         //Assign ids
-        const metadata = {
-            columns: [],
-        };
+
+        const [{ numerics, categories, dates }, featureCount] = await Promise.all([
+            this._getColumnTypes(query, conf),
+            this.getFeatureCount(query, conf)]);
+
+        const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
+
+        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
+            this.getSample(conf, sampling),
+            this.getNumericTypes(numerics, query, conf),
+            this.getDatesTypes(dates, query, conf),
+            this.getCategoryTypes(categories, query, conf)]);
+
+        const columns = [];
+        numerics.forEach((name, index) => columns.push(numericsTypes[index]));
+        dates.forEach((name, index) => columns.push(datesTypes[index]));
+
+        const categoryIDs = {};
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            columns.push(t);
+        });
+        const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
+        console.log(metadata);
+        return metadata;
+    }
+
+    /**
+     * Return an object with the names of the columns clasified by type.
+     */
+    async _getColumnTypes(query, conf) {
         const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
         let categories = [];
@@ -481,30 +512,7 @@ export default class Windshaft {
             }
         });
 
-        metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const datesTypes = await this.getDatesTypes(dates, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
-        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);
-
-        numerics.map((name, index) => {
-            const t = numericsTypes[index];
-            metadata.columns.push(t);
-        });
-        dates.map((name, index) => {
-            const t = datesTypes[index];
-            metadata.columns.push(t);
-        });
-        metadata.categoryIDs = {};
-        metadata.sample = sample;
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
-            metadata.columns.push(t);
-        });
-        console.log(metadata);
-        return metadata;
+        return { numerics, categories, dates };
     }
 
     async getSample(conf, sampling) {

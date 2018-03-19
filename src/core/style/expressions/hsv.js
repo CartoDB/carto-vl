@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast } from './utils';
+import { implicitCast, checkExpression } from './utils';
 
 export default class HSV extends Expression {
     /**
@@ -12,17 +12,19 @@ export default class HSV extends Expression {
         h = implicitCast(h);
         s = implicitCast(s);
         v = implicitCast(v);
+
+        checkType('h', 0, h);
+        checkType('s', 1, s);
+        checkType('v', 2, v);
+
         super({ h: h, s: s, v: v });
+        this.type = 'color';
     }
     _compile(metadata) {
         super._compile(metadata);
-        function typeCheck(v) {
-            return !(v.type == 'float' || v.type == 'category');
-        }
-        if (typeCheck(this.h) || typeCheck(this.s) || typeCheck(this.v)) {
-            throw new Error('CIELab() invalid parameters');
-        }
-        this.type = 'color';
+        checkType('h', 0, this.h);
+        checkType('s', 1, this.s);
+        checkType('v', 2, this.v);
         const normalize = (v, hue = false) => {
             if (v.type == 'category') {
                 return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
@@ -43,4 +45,11 @@ export default class HSV extends Expression {
     `);
     }
     // TODO eval
+}
+
+function checkType(parameterName, parameterIndex, parameter) {
+    checkExpression('hsv', parameterName, parameterIndex, parameter);
+    if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+        throw new Error(`hsv(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+    }
 }

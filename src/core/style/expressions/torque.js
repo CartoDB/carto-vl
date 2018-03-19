@@ -40,6 +40,7 @@ export class Fade extends Expression {
         }
         fadeIn = implicitCast(fadeIn);
         fadeOut = implicitCast(fadeOut);
+        // TODO improve type check
         super({ fadeIn, fadeOut });
         this.type = 'fade';
         this.inlineMaker = (inline) => ({
@@ -78,6 +79,7 @@ export class Torque extends Expression {
         }
         const _cycle = floatDiv(floatMod(now(), duration), duration);
         super({ input, _cycle, fade });
+        // TODO improve type check
         this.duration = duration;
     }
     _compile(meta) {

@@ -1,6 +1,7 @@
 import { implicitCast } from './utils';
 import Expression from './expression';
 
+// TODO type checking
 
 export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
 export class BounceEaseIn extends genInterpolator(

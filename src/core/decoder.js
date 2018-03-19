@@ -59,69 +59,48 @@ function decodePolygon(geometry) {
 }
 
 function decodeLine(geom) {
-    let geometry = [];
     let normals = [];
+    let geometry = [];
     let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
-        feature.map(line => {
+        feature.map(lineString => {
             // Create triangulation
-            for (let i = 0; i < line.length - 2; i += 2) {
-                const a = [line[i + 0], line[i + 1]];
-                const b = [line[i + 2], line[i + 3]];
-                if (i > 0) {
-                    var prev = [line[i + -2], line[i + -1]];
-                    var nprev = getLineNormal(a, prev);
-                }
-                if (i < line.length - 4) {
-                    var next = [line[i + 4], line[i + 5]];
-                    var nnext = getLineNormal(next, b);
-                }
-                let normal = getLineNormal(b, a);
+            
+            for (let i = 0; i < lineString.length - 2; i += 2) {
+                const a = [lineString[i + 0], lineString[i + 1]];
+                const b = [lineString[i + 2], lineString[i + 3]];
+                const normal = getLineNormal(b, a);
                 let na = normal;
                 let nb = normal;
-                //TODO bug, cartesian interpolation is not correct, should use polar coordinates for the interpolation
-                if (prev) {
-                    na = normalize([
-                        normal[0] * 0.5 + nprev[0] * 0.5,
-                        normal[1] * 0.5 + nprev[1] * 0.5,
-                    ]);
+                
+                if (i > 0) {
+                    const prev = [lineString[i - 2], lineString[i - 1]];
+                    na = getJointNormal(prev, a, b) || na;
                 }
-                if (next) {
-                    nb = normalize([
-                        normal[0] * 0.5 + nnext[0] * 0.5,
-                        normal[1] * 0.5 + nnext[1] * 0.5,
-                    ]);
+                if (i < lineString.length - 4) {
+                    const next = [lineString[i + 4], lineString[i + 5]];
+                    nb = getJointNormal(a, b, next) || nb;
                 }
+
+                // First triangle
+    
                 normals.push(-na[0], -na[1]);
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
 
+                // Second triangle
+    
                 normals.push(na[0], na[1]);
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
-
-                normal = [0, 0];
-
-
-                //First triangle
-                geometry.push(a[0] - 0.01 * normal[0]);
-                geometry.push(a[1] - 0.01 * normal[1]);
-
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
-
-                //Second triangle
-                geometry.push(a[0] + 0.01 * normal[0]);
-                geometry.push(a[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] + 0.01 * normal[0]);
-                geometry.push(b[1] + 0.01 * normal[1]);
-
-                geometry.push(b[0] - 0.01 * normal[0]);
-                geometry.push(b[1] - 0.01 * normal[1]);
+    
+                geometry.push(a[0], a[1]);
+                geometry.push(b[0], b[1]);
+                geometry.push(b[0], b[1]);
             }
         });
         breakpointList.push(geometry.length);
@@ -139,10 +118,18 @@ function getLineNormal(a, b) {
     return normalize([-dy, dx]);
 }
 
+function getJointNormal(a, b, c) {
+    const u = normalize([a[0] - b[0], a[1] - b[1]]);
+    const v = normalize([c[0] - b[0], c[1] - b[1]]);
+    const sin = - u[1] * v[0] + u[0] * v[1];
+    if (sin !== 0) {
+        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
+    }
+}
+
 function normalize(v) {
     const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
     return [v[0] / s, v[1] / s];
 }
-
 
 export default { decodeGeom };

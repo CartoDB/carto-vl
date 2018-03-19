@@ -23,7 +23,6 @@ const INITIAL_TIMESTAMP = Date.now();
  */
 const RTT_WIDTH = 1024;
 
-
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
  * Initialization will be done synchronously.
@@ -141,28 +140,6 @@ class Renderer {
         this._zoom = zoom;
     }
 
-
-    /**
-     * Removes a dataframe for the renderer. Freeing its resources.
-     * @param {*} tile
-     */
-    removeDataframe(dataframe) {
-        this.dataframes = this.dataframes.filter(t => t !== dataframe);
-    }
-
-    /**
-     * @description Adds a new dataframe to the renderer.
-     *
-     * Performance-intensive. The required allocation and copy of resources will happen synchronously.
-     * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
-     * @param {Dataframe} dataframe
-     * @returns {BoundDataframe}
-     */
-    addDataframe(dataframe) {
-        dataframe.bind(this);
-        this.dataframes.push(dataframe);
-    }
-
     getAspect() {
         if (this.gl) {
             return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
@@ -170,29 +147,22 @@ class Renderer {
         return 1;
     }
 
-
-    getStyledTiles() {
-        return this.dataframes.filter(tile => tile.style && tile.visible && tile.style.colorShader);
-    }
-
-
-    _computeDrawMetadata() {
+    _computeDrawMetadata(renderLayer) {
+        const tiles = renderLayer.dataframes;
+        const style = renderLayer.style;
         const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-        const tiles = this.getStyledTiles();
         let drawMetadata = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
-        let requiredColumns = tiles.map(d => {
-            const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
-            const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
-            const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
-            const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
-            const filterRequirements = d.style.filter._getDrawMetadataRequirements();
-            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].
-                reduce(schema.union, schema.IDENTITY);
-        }).reduce(schema.union, schema.IDENTITY).columns;
+        const colorRequirements = style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
+        const filterRequirements = style.filter._getDrawMetadataRequirements();
+        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
+            .reduce(schema.union, schema.IDENTITY).columns;
 
         if (requiredColumns.length == 0) {
             return drawMetadata;
@@ -224,18 +194,18 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = d.style.filter._getMinimumNeededSchema().columns;
+            const columnNames = style.filter._getMinimumNeededSchema().columns;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (d.style.filter) {
+                    if (style.filter) {
                         columnNames.forEach(name => {
                             f[name] = d.properties[name][i];
                         });
-                        if (d.style.filter.eval(f) < 0.5) {
+                        if (style.filter.eval(f) < 0.5) {
                             continue;
                         }
                     }
@@ -290,21 +260,25 @@ class Renderer {
         return drawMetadata;
     }
 
-    refresh(timestamp) {
+    renderLayer(renderLayer) {
         const gl = this.gl;
-        // Don't re-render more than once per animation frame
-        if (this.lastFrame === timestamp) {
-            return;
-        }
 
-        var width = gl.canvas.clientWidth;
-        var height = gl.canvas.clientHeight;
+        const width = gl.canvas.clientWidth;
+        const height = gl.canvas.clientHeight;
         if (gl.canvas.width != width ||
             gl.canvas.height != height) {
             gl.canvas.width = width;
             gl.canvas.height = height;
         }
-        var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+
+
+        const tiles = renderLayer.dataframes;
+        const style = renderLayer.style;
+
+        if (!tiles.length) {
+            return;
+        }
 
         gl.enable(gl.CULL_FACE);
 
@@ -314,9 +288,8 @@ class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const tiles = this.getStyledTiles();
 
-        const drawMetadata = this._computeDrawMetadata();
+        const drawMetadata = this._computeDrawMetadata(renderLayer);
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -347,11 +320,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
-        tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texFilter, tile.style.filterShader, tile.style.filter, tile.style.propertyFilterTID));
+        tiles.map(tile => styleTile(tile, tile.texColor, style.colorShader, style.getColor(), style.propertyColorTID));
+        tiles.map(tile => styleTile(tile, tile.texWidth, style.widthShader, style.getWidth(), style.propertyWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeColor, style.strokeColorShader, style.getStrokeColor(), style.propertyStrokeColorTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, style.strokeWidthShader, style.getStrokeWidth(), style.propertyStrokeWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.filter, style.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -359,7 +332,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
@@ -381,7 +354,7 @@ class Renderer {
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -405,6 +378,9 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
+            if (tile.type == 'line') {
+                gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
 
@@ -461,7 +437,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -494,11 +470,8 @@ class Renderer {
     }
 }
 
-function getOrderingRenderBuckets(tiles) {
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer = tiles[0].style.getOrder();
-    }
+function getOrderingRenderBuckets(renderLayer) {
+    const orderer = renderLayer.style.getOrder();
     let orderingMins = [0];
     let orderingMaxs = [1000];
     if (orderer instanceof Asc) {

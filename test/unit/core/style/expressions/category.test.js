@@ -1,6 +1,19 @@
 import * as s from '../../../../../src/core/style/functions';
+import { validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/style/expressions/category', () => {
+    describe('error control', () => {
+        validateStaticTypeErrors('category', []);
+        validateStaticTypeErrors('category', [undefined]);
+        validateStaticTypeErrors('category', [123]);
+        validateStaticTypeErrors('category', ['float']);
+    });
+
+    describe('type', () => {
+        validateStaticType('category', ['red'], 'category');
+        validateStaticType('category', ['123'], 'category');
+    });
+
     describe('.eval()', () => {
         const fakeMetadata = {
             columns: [{

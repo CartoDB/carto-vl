@@ -6,6 +6,7 @@ import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/style/functions';
+import RenderLayer from '../core/renderLayer';
 
 
 export default class Layer {
@@ -40,7 +41,6 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
-        this._dataframes = [];
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
@@ -51,21 +51,16 @@ export default class Layer {
         this.setStyle(style);
 
         this._listeners = {};
+        this._renderLayer = new RenderLayer();
 
         this.state = 'init';
         console.log('L', this);
 
         this.paintCallback = () => {
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.setStyle(this._style);
-                    dataframe.visible = dataframe.active;
-                });
-            this._integrator.renderer.refresh(Number.NaN);
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.visible = false;
-                });
+            if (this._style && this._style.colorShader) {
+                this._renderLayer.style = this._style;
+                this._integrator.renderer.renderLayer(this._renderLayer);
+            }
             if (this.state == 'dataLoaded') {
                 this.state = 'dataPainted';
                 this._fire('loaded');
@@ -92,6 +87,36 @@ export default class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source && this._source !== source) {
+            this._source.free();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(() => {
+            this._styleChanged(style);
+        });
+        this._compileShaders(style, metadata);
+    }
     /**
      * Set a new source for this layer.
      *
@@ -100,13 +125,24 @@ export default class Layer {
      * @instance
      * @api
      */
-    setSource(source) {
+    async setSource(source) {
         this._checkSource(source);
+        const style = this._style;
+        if (style) {
+            var metadata = await source.requestMetadata(style);
+        }
+        if (this._style !== style) {
+            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source && this._source !== source) {
             this._source.free();
         }
         this._source = source;
+        if (style) {
+            this._styleChanged(style);
+        }
     }
 
     /**
@@ -114,8 +150,7 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
-        this._dataframes.push(dataframe);
-        this._integrator.renderer.addDataframe(dataframe);
+        this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
     }
 
@@ -124,8 +159,7 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
-        this._dataframes = this._dataframes.filter(d => d !== dataframe);
-        this._integrator.renderer.removeDataframe(dataframe);
+        this._renderLayer.removeDataframe(dataframe);
         this._integrator.invalidateWebGLState();
     }
 
@@ -224,7 +258,7 @@ export default class Layer {
     }
 
     hasDataframes() {
-        return this._dataframes.length > 0;
+        return this._renderLayer.hasDataframes();
     }
 
     getId() {
@@ -254,6 +288,7 @@ export default class Layer {
     }
 
     initCallback() {
+        this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
         this.requestMetadata();
     }
@@ -282,7 +317,12 @@ export default class Layer {
     }
     async _styleChanged(style) {
         await this._context;
-        this.metadata = await this.requestMetadata(style);
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
         this._compileShaders(style, this.metadata);
         return this.requestData();
     }
@@ -341,7 +381,7 @@ export default class Layer {
     }
 
     getNumFeatures() {
-        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+        return this._renderLayer.getNumFeatures();
     }
 
     //TODO free layer resources

@@ -1,4 +1,5 @@
 import Expression from './expression';
+import { checkInstance } from './utils';
 
 export class Width extends Expression {
     constructor() {
@@ -10,9 +11,7 @@ export class Width extends Expression {
 export class Asc extends Expression {
     constructor(by) {
         super({});
-        if (!(by instanceof Width)) {
-            throw new Error('Asc() only accepts \'width()\' for now');
-        }
+        checkInstance('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -20,9 +19,7 @@ export class Asc extends Expression {
 export class Desc extends Expression {
     constructor(by) {
         super({});
-        if (!(by instanceof Width)) {
-            throw new Error('Desc() only accepts \'width()\' for now');
-        }
+        checkInstance('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
