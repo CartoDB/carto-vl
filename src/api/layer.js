@@ -258,7 +258,7 @@ export default class Layer {
     }
 
     hasDataframes() {
-        return this._renderLayer.dataframes.length > 0;
+        return this._renderLayer.hasDataframes();
     }
 
     getId() {

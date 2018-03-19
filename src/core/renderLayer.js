@@ -22,6 +22,10 @@ export default class RenderLayer {
         this.dataframes = this.dataframes.filter(df => df !== dataframe);
     }
 
+    hasDataframes() {
+        return this.dataframes.length > 0;
+    }
+
     _checkDataframeType(dataframe) {
         if (this.type != dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
