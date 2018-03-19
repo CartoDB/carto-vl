@@ -147,9 +147,9 @@ class Renderer {
         return 1;
     }
 
-    _computeDrawMetadata(layer) {
-        const tiles = layer.dataframes;
-        const style = layer.style;
+    _computeDrawMetadata(renderLayer) {
+        const tiles = renderLayer.dataframes;
+        const style = renderLayer.style;
         const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
         let drawMetadata = {
             freeTexUnit: 4,
@@ -260,7 +260,7 @@ class Renderer {
         return drawMetadata;
     }
 
-    renderLayer(layer) {
+    renderLayer(renderLayer) {
         const gl = this.gl;
 
         const width = gl.canvas.clientWidth;
@@ -273,8 +273,8 @@ class Renderer {
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
 
-        const tiles = layer.dataframes;
-        const style = layer.style;
+        const tiles = renderLayer.dataframes;
+        const style = renderLayer.style;
 
         if (!tiles.length) {
             return;
@@ -289,7 +289,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
 
-        const drawMetadata = this._computeDrawMetadata(layer);
+        const drawMetadata = this._computeDrawMetadata(renderLayer);
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -332,7 +332,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
@@ -354,7 +354,7 @@ class Renderer {
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -437,7 +437,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -470,8 +470,8 @@ class Renderer {
     }
 }
 
-function getOrderingRenderBuckets(layer) {
-    const orderer = layer.style.getOrder();
+function getOrderingRenderBuckets(renderLayer) {
+    const orderer = renderLayer.style.getOrder();
     let orderingMins = [0];
     let orderingMaxs = [1000];
     if (orderer instanceof Asc) {
