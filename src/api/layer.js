@@ -315,11 +315,11 @@ export default class Layer {
     }
 
     _compileShaders(style, metadata) {
-        style._compileColorShader(this._integrator.renderer.gl, metadata);
-        style._compileWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+        style.compileColorShader(this._integrator.renderer.gl, metadata);
+        style.compileWidthShader(this._integrator.renderer.gl, metadata);
+        style.compileStrokeColorShader(this._integrator.renderer.gl, metadata);
+        style.compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
+        style.compileFilterShader(this._integrator.renderer.gl, metadata);
     }
     async _styleChanged(style) {
         await this._context;

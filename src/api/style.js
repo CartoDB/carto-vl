@@ -187,35 +187,35 @@ export default class Style {
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
-    _compileColorShader(gl, metadata) {
+    compileColorShader(gl, metadata) {
         this._styleSpec.color._bind(metadata);
         const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;
     }
 
-    _compileWidthShader(gl, metadata) {
+    compileWidthShader(gl, metadata) {
         this._styleSpec.width._bind(metadata);
         const r = compileShader(gl, this._styleSpec.width, shaders.styler.createWidthShader);
         this.propertyWidthTID = r.tid;
         this.widthShader = r.shader;
     }
 
-    _compileStrokeColorShader(gl, metadata) {
+    compileStrokeColorShader(gl, metadata) {
         this._styleSpec.strokeColor._bind(metadata);
         const r = compileShader(gl, this._styleSpec.strokeColor, shaders.styler.createColorShader);
         this.propertyStrokeColorTID = r.tid;
         this.strokeColorShader = r.shader;
     }
 
-    _compileStrokeWidthShader(gl, metadata) {
+    compileStrokeWidthShader(gl, metadata) {
         this._styleSpec.strokeWidth._bind(metadata);
         const r = compileShader(gl, this._styleSpec.strokeWidth, shaders.styler.createWidthShader);
         this.propertyStrokeWidthTID = r.tid;
         this.strokeWidthShader = r.shader;
     }
 
-    _compileFilterShader(gl, metadata) {
+    compileFilterShader(gl, metadata) {
         this._styleSpec.filter._bind(metadata);
         const r = compileShader(gl, this._styleSpec.filter, shaders.styler.createFilterShader);
         this.propertyFilterTID = r.tid;
