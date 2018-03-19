@@ -6,6 +6,7 @@ import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/style/functions';
+import RenderLayer from '../core/renderLayer';
 
 
 export default class Layer {
@@ -40,7 +41,6 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
-        this._dataframes = [];
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
@@ -51,21 +51,16 @@ export default class Layer {
         this.setStyle(style);
 
         this._listeners = {};
+        this._renderLayer = new RenderLayer();
 
         this.state = 'init';
         console.log('L', this);
 
         this.paintCallback = () => {
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.setStyle(this._style);
-                    dataframe.visible = dataframe.active;
-                });
-            this._integrator.renderer.refresh(Number.NaN);
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.visible = false;
-                });
+            if (this._style && this._style.colorShader) {
+                this._renderLayer.style = this._style;
+                this._integrator.renderer.renderLayer(this._renderLayer);
+            }
             if (this.state == 'dataLoaded') {
                 this.state = 'dataPainted';
                 this._fire('loaded');
@@ -155,8 +150,7 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
-        this._dataframes.push(dataframe);
-        this._integrator.renderer.addDataframe(dataframe);
+        this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
     }
 
@@ -165,8 +159,7 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataFrameRemoved(dataframe) {
-        this._dataframes = this._dataframes.filter(d => d !== dataframe);
-        this._integrator.renderer.removeDataframe(dataframe);
+        this._renderLayer.removeDataframe(dataframe);
         this._integrator.invalidateWebGLState();
     }
 
@@ -265,7 +258,7 @@ export default class Layer {
     }
 
     hasDataframes() {
-        return this._dataframes.length > 0;
+        return this._renderLayer.dataframes.length > 0;
     }
 
     getId() {
@@ -295,6 +288,7 @@ export default class Layer {
     }
 
     initCallback() {
+        this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
         this.requestMetadata();
     }
@@ -387,7 +381,7 @@ export default class Layer {
     }
 
     getNumFeatures() {
-        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+        return this._renderLayer.dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
     //TODO free layer resources
