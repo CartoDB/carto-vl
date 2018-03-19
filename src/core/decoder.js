@@ -112,20 +112,16 @@ function decodeLine(geom) {
                     geometry.push(a[0], a[1]);
                     geometry.push(b[0], b[1]);
                     if (nzab) {
-                        if (fzab == 0) {
-                            normals.push(nzab[0], nzab[1]);
-                        } else if (fzab == -1) {
-                            normals.push(nzab[0], nzab[1]);
-                        } else {
+                        if (fzab == 1) {
                             normals.push(nab[0], nab[1]);
+                        } else {
+                            normals.push(nzab[0], nzab[1]);
                         }
                     } else {
                         normals.push(nab[0], nab[1]);
                     }
                     if (nzab) {
-                        if (fzab == 0) {
-                            normals.push(-nzab[0], -nzab[1]);
-                        } else if (fzab == -1) {
+                        if (fzab == -1) {
                             normals.push(-nab[0], -nab[1]);
                         } else {
                             normals.push(-nzab[0], -nzab[1]);
@@ -134,9 +130,7 @@ function decodeLine(geom) {
                         normals.push(-nab[0], -nab[1]);
                     }
                     if (nabc) {
-                        if (fabc == 0) {
-                            normals.push(-nabc[0], -nabc[1]);
-                        } else if (fabc == -1) {
+                        if (fabc == -1) {
                             normals.push(-nab[0], -nab[1]);
                         } else {
                             normals.push(-nabc[0], -nabc[1]);
@@ -150,20 +144,16 @@ function decodeLine(geom) {
                     geometry.push(b[0], b[1]);
                     geometry.push(b[0], b[1]);
                     if (nzab) {
-                        if (fzab == 0) {
-                            normals.push(nzab[0], nzab[1]);
-                        } else if (fzab == -1) {
-                            normals.push(nzab[0], nzab[1]);
-                        } else {
+                        if (fzab == 1) {
                             normals.push(nab[0], nab[1]);
+                        } else {
+                            normals.push(nzab[0], nzab[1]);
                         }
                     } else {
                         normals.push(nab[0], nab[1]);
                     }
                     if (nabc) {
-                        if (fabc == 0) {
-                            normals.push(-nabc[0], -nabc[1]);
-                        } else if (fabc == -1) {
+                        if (fabc == -1) {
                             normals.push(-nab[0], -nab[1]);
                         } else {
                             normals.push(-nabc[0], -nabc[1]);
@@ -172,12 +162,10 @@ function decodeLine(geom) {
                         normals.push(-nab[0], -nab[1]);
                     }
                     if (nabc) {
-                        if (fabc == 0) {
-                            normals.push(nabc[0], nabc[1]);
-                        } else if (fabc == -1) {
-                            normals.push(nabc[0], nabc[1]);
-                        } else {
+                        if (fabc == 1) {
                             normals.push(nab[0], nab[1]);
+                        } else {
+                            normals.push(nabc[0], nabc[1]);
                         }
                     } else {
                         normals.push(nab[0], nab[1]);
