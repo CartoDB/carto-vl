@@ -187,35 +187,43 @@ export default class Style {
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
-    compileColorShader(gl, metadata) {
+    compileShaders(gl, metadata) {
+        this._compileColorShader(gl, metadata);
+        this._compileWidthShader(gl, metadata);
+        this._compileStrokeColorShader(gl, metadata);
+        this._compileStrokeWidthShader(gl, metadata);
+        this._compileFilterShader(gl, metadata);
+    }
+
+    _compileColorShader(gl, metadata) {
         this._styleSpec.color._bind(metadata);
         const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;
     }
 
-    compileWidthShader(gl, metadata) {
+    _compileWidthShader(gl, metadata) {
         this._styleSpec.width._bind(metadata);
         const r = compileShader(gl, this._styleSpec.width, shaders.styler.createWidthShader);
         this.propertyWidthTID = r.tid;
         this.widthShader = r.shader;
     }
 
-    compileStrokeColorShader(gl, metadata) {
+    _compileStrokeColorShader(gl, metadata) {
         this._styleSpec.strokeColor._bind(metadata);
         const r = compileShader(gl, this._styleSpec.strokeColor, shaders.styler.createColorShader);
         this.propertyStrokeColorTID = r.tid;
         this.strokeColorShader = r.shader;
     }
 
-    compileStrokeWidthShader(gl, metadata) {
+    _compileStrokeWidthShader(gl, metadata) {
         this._styleSpec.strokeWidth._bind(metadata);
         const r = compileShader(gl, this._styleSpec.strokeWidth, shaders.styler.createWidthShader);
         this.propertyStrokeWidthTID = r.tid;
         this.strokeWidthShader = r.shader;
     }
 
-    compileFilterShader(gl, metadata) {
+    _compileFilterShader(gl, metadata) {
         this._styleSpec.filter._bind(metadata);
         const r = compileShader(gl, this._styleSpec.filter, shaders.styler.createFilterShader);
         this.propertyFilterTID = r.tid;
