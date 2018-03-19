@@ -49,7 +49,13 @@ export default class Map {
         window.requestAnimationFrame(this.update.bind(this));
     }
 
-    update() {
+    update(timestamp) {
+        // Don't re-render more than once per animation frame
+        if (this.lastFrame === timestamp) {
+            return;
+        }
+        this.lastFrame = timestamp;
+
         this._drawBackground(this._background);
 
         let loaded = true;
