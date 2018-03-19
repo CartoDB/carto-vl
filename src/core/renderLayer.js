@@ -26,6 +26,10 @@ export default class RenderLayer {
         return this.dataframes.length > 0;
     }
 
+    getNumFeatures() {
+        return this.dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+    }
+
     _checkDataframeType(dataframe) {
         if (this.type != dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
