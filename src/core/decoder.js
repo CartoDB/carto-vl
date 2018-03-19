@@ -16,7 +16,7 @@ import * as earcut from 'earcut';
                 }
             ]
 */
-// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
+// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
 export function decodeGeom(geomType, geom) {
     if (geomType == 'point') {
@@ -98,7 +98,7 @@ function decodeLine(geom) {
                         // If there is a next point c, compute its properties
                         c = [lineString[i], lineString[i + 1]];
                         nbc = getLineNormal(b, c);
-                        const { flat, normal } = getJointNormal(a, b, c);
+                        const { flat, normal } = getJoinNormal(a, b, c);
                         fabc = flat;
                         nabc = normal;
                     } else {
@@ -218,13 +218,13 @@ function getLineNormal(a, b) {
 }
 
 /**
- * Compute the normal of the joint of lines BA and BC.
+ * Compute the normal of the join of lines BA and BC.
  * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
  * multiplied by a factor of `1/sin(theta)` to reach the intersecction of the wide lines.
  * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
  * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
  */
-function getJointNormal(a, b, c) {
+function getJoinNormal(a, b, c) {
     const u = uvector(b, a);
     const v = uvector(b, c);
     const sin = v[0] * u[1] - v[1] * u[0];
