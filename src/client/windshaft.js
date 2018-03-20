@@ -151,7 +151,19 @@ export default class Windshaft {
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
-        const backendFilters = metadata.featureCount > 1 ? filters : null;
+        let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
+
+        // Alternative A. apply separate filters in SQL and Aggr. API
+        // if (this._requiresAggregation(MNS)) {
+        //     agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
+        // }
+
+        // Alternative B. apply eigher SQL or Aggr. API filters but not both
+        if (this._requiresAggregation(MNS)) {
+            agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
+            backendFilters = null;
+        }
+
         aggSQL = this._buildQuery(select, backendFilters);
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
@@ -179,7 +191,7 @@ export default class Windshaft {
 
     _checkLayerMeta(MNS) {
         if (!this._isAggregated()) {
-            if (MNS.columns.some(column => R.schema.column.isAggregated(column))) {
+            if (this._requiresAggregation(MNS)) {
                 throw new Error('Aggregation not supported for this dataset');
             }
         }
@@ -187,6 +199,10 @@ export default class Windshaft {
 
     _isAggregated() {
         return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
+    }
+
+    _requiresAggregation(MNS) {
+        return MNS.columns.some(column => R.schema.column.isAggregated(column));
     }
 
     _generateAggregation(MRS, resolution) {

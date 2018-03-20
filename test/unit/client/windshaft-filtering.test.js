@@ -12,32 +12,32 @@ describe('src/client/windshaft-filtering', () => {
 
         describe('when the filter does exists', () => {
             it('should return a BETWEEN clause with a between() filter', () => {
-                expect(f.getSQLWhere([{
+                expect(f.getSQLWhere({preaggregation: [{
                     type: 'between',
                     property: 'numericProperty',
                     lowerLimit: 10,
                     upperLimit: 20,
-                }])).toEqual('WHERE (numericProperty BETWEEN 10 AND 20)');
+                }]})).toEqual('WHERE (numericProperty BETWEEN 10 AND 20)');
             });
 
             it('should return a IN clause with an in() filter', () => {
-                expect(f.getSQLWhere([{
+                expect(f.getSQLWhere({preaggregation: [{
                     type: 'in',
                     property: 'categoricalProperty',
                     whitelist: ['red', 'blue']
-                }])).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\'))');
+                }]})).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\'))');
             });
 
             it('should return a NOT IN clause with an nin() filter', () => {
-                expect(f.getSQLWhere([{
+                expect(f.getSQLWhere({preaggregation: [{
                     type: 'nin',
                     property: 'categoricalProperty',
                     blacklist: ['red', 'blue']
-                }])).toEqual('WHERE (categoricalProperty NOT IN (\'red\',\'blue\'))');
+                }]})).toEqual('WHERE (categoricalProperty NOT IN (\'red\',\'blue\'))');
             });
 
             it('should compose sub-filter with non-unary filters', () => {
-                expect(f.getSQLWhere([
+                expect(f.getSQLWhere({preaggregation: [
                     {
                         type: 'in',
                         property: 'categoricalProperty',
@@ -49,7 +49,7 @@ describe('src/client/windshaft-filtering', () => {
                         lowerLimit: 10,
                         upperLimit: 20,
                     }
-                ])).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\')) AND (numericProperty BETWEEN 10 AND 20)');
+                ]})).toEqual('WHERE (categoricalProperty IN (\'red\',\'blue\')) AND (numericProperty BETWEEN 10 AND 20)');
             });
         });
     });
@@ -68,7 +68,7 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.between(s.property('numericProperty'), 10, 20)
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
 
             it('`between($numericProperty, 10,20) with constantFloats`', () => {
@@ -83,9 +83,9 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.between(s.property('numericProperty'), s.floatConstant(10), 20)
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
-            
+
             it('`in($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -97,9 +97,9 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.in(s.property('categoricalProperty'), 'red', 'blue')
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
-            
+
             it('`nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -111,7 +111,7 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.nin(s.property('categoricalProperty'), 'red', 'blue')
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
         });
 
@@ -131,9 +131,9 @@ describe('src/client/windshaft-filtering', () => {
                         s.lt(s.property('numericProperty'), s.now())
                     )
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
-            
+
             it('`$numericProperty<now() and between($numericProperty, 10,20)`', () => {
                 const expected = [
                     {
@@ -149,7 +149,7 @@ describe('src/client/windshaft-filtering', () => {
                         s.between(s.property('numericProperty'), 10, 20),
                     )
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
         });
 
@@ -170,9 +170,9 @@ describe('src/client/windshaft-filtering', () => {
                         s.animate(100)
                     )
                 }));
-                expect(actual).toEqual(expected);
+                expect(actual.preaggregation).toEqual(expected);
             });
-            
+
             it('should return null when the mix factor is not an Animation', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.blend(
@@ -207,7 +207,7 @@ describe('src/client/windshaft-filtering', () => {
                     filter: s.between(s.property('property'), 0, s.now())
                 }))).toBeNull();
             });
-            
+
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.or(
