@@ -1,17 +1,16 @@
 const puppeteer = require('puppeteer');
 
-
 puppeteer.launch({
     headless: false,
     args: ['--disable-gpu-vsync'],
 }).then(browser => {
     browser.newPage().then(page => {
-        page.goto('file:///home/dmanzanares/github/renderer-prototype/examples/expressions/animation.html', { waitUntil: 'networkidle0' }).then(() => {
-            console.log('Profiling started');
+        page.goto(`file://${__dirname}/benchmark.html`, { waitUntil: 'networkidle0' }).then(() => {
+            console.log('Benchmark started');
             page.evaluate(() => {
                 window.times = [];
-                profileLayer(window.times);
-                function profileLayer(times) {
+                benchmarkLayer(window.times);
+                function benchmarkLayer(times) {
                     let lastTime;
                     function metrics(t) {
                         if (lastTime) {
