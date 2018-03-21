@@ -112,7 +112,7 @@ export default class Layer {
             this._style.onChange(null);
         }
         this._style = style;
-        style.onChange(this._styleChanged);
+        style.onChange(this._styleChanged.bind(this));
         this._compileShaders(style, metadata);
     }
     /**
