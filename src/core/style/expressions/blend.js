@@ -54,7 +54,7 @@ export default class Blend extends Expression {
     _preDraw(...args) {
         super._preDraw(...args);
         if (this.originalMix instanceof Animate && !this.originalMix.isAnimated()) {
-            this.parent._replaceChild(this, this.b);
+            this.parent.replaceChild(this, this.b);
             this.notify();
         }
     }

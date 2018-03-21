@@ -160,7 +160,7 @@ class Renderer {
         const widthRequirements = style.getWidth()._getDrawMetadataRequirements();
         const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
         const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
-        const filterRequirements = style.filter._getDrawMetadataRequirements();
+        const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
         let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
             .reduce(schema.union, schema.IDENTITY).columns;
 
@@ -194,18 +194,18 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = style.filter._getMinimumNeededSchema().columns;
+            const columnNames = style.getFilter()._getMinimumNeededSchema().columns;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (style.filter) {
+                    if (style.getFilter()) {
                         columnNames.forEach(name => {
                             f[name] = d.properties[name][i];
                         });
-                        if (style.filter.eval(f) < 0.5) {
+                        if (style.getFilter().eval(f) < 0.5) {
                             continue;
                         }
                     }
@@ -324,7 +324,7 @@ class Renderer {
         tiles.map(tile => styleTile(tile, tile.texWidth, style.widthShader, style.getWidth(), style.propertyWidthTID));
         tiles.map(tile => styleTile(tile, tile.texStrokeColor, style.strokeColorShader, style.getStrokeColor(), style.propertyStrokeColorTID));
         tiles.map(tile => styleTile(tile, tile.texStrokeWidth, style.strokeWidthShader, style.getStrokeWidth(), style.propertyStrokeWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.filter, style.propertyFilterTID));
+        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.getFilter(), style.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
