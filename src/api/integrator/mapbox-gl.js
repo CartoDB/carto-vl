@@ -4,12 +4,12 @@ import * as util from '../util';
 let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
-let integrator = null;
+const integrators = new WeakMap();
 export default function getMGLIntegrator(map) {
-    if (!integrator) {
-        integrator = new MGLIntegrator(map);
+    if (!integrators.get(map)) {
+        integrators.set(map, new MGLIntegrator(map));
     }
-    return integrator;
+    return integrators.get(map);
 }
 
 

@@ -24,4 +24,7 @@ function checkLayerList(layerList){
             throw new Error('Invalid layer, layer must be an instance of carto.Layer');
         }
     });
+    if (!layerList.every(layer=> layer._integrator==layerList[0]._integrator)){
+        throw new Error('Invalid argument, all layers must belong to the same map');
+    }
 }
