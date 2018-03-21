@@ -345,4 +345,7 @@ export default class GeoJSON extends Base {
         }
         return total >= 0;
     }
+
+    free(){
+    }
 }

@@ -35,4 +35,10 @@ export default class RenderLayer {
             throw new Error('Layer dataframes must always be of the same type');
         }
     }
+
+    freeDataframes() {
+        this.dataframes.map(df => df.free());
+        this.dataframes = [];
+        this.type = null;        
+    }
 }

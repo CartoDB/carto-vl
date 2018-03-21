@@ -47,14 +47,13 @@ export default class Layer {
 
         this._id = id;
         this.metadata = null;
-        this.setSource(source);
-        this.setStyle(style);
-
         this._listeners = {};
         this._renderLayer = new RenderLayer();
-
         this.state = 'init';
         console.log('L', this);
+        
+        this.setSource(source);
+        this.setStyle(style);
 
         this.paintCallback = () => {
             if (this._style && this._style.colorShader) {
@@ -102,8 +101,8 @@ export default class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
+        if (this._source !== source) {
+            this._freeSource();
         }
         this._source = source;
         this.requestData();
@@ -136,8 +135,8 @@ export default class Layer {
         }
         this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
+        if (this._source !== source) {
+            this._freeSource();
         }
         this._source = source;
         if (style) {
@@ -384,5 +383,10 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    //TODO free layer resources
+    _freeSource() {
+        if (this._source) {
+            this._source.free();
+        }
+        this._renderLayer.freeDataframes();
+    }
 }

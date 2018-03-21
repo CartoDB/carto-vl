@@ -220,6 +220,7 @@ export default class Windshaft {
 
     free() {
         this.cache.reset();
+        this._oldDataframes = [];        
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
