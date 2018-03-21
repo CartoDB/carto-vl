@@ -46,7 +46,8 @@
     "mocha": "^5.0.0",
     "sloc": "^0.2.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.8.1"
+    "webpack": "^3.8.1",
+    "puppeteer": "^1.1.0"
   },
   "main": "src/index.js",
   "scripts": {
@@ -68,6 +69,7 @@
     "test:e2e": "yarn build:dev && mocha test/acceptance/e2e.test.js",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
+    "test:benchmark": "node test/benchmark/benchmark.js",
     "serve": "yarn build:dev && yarn docs && http-server",
     "loc": "sloc src/ examples/",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master"
