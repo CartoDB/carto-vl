@@ -32,11 +32,11 @@ class MGLIntegrator {
     }
 
     on(name, cb) {
-        return this._emitter(name, cb);
+        return this._emitter.on(name, cb);
     }
 
     off(name, cb) {
-        return this._emitter(name, cb);
+        return this._emitter.off(name, cb);
     }
 
     _suscribeToMapEvents(map) {
@@ -99,7 +99,7 @@ class MGLIntegrator {
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
-    
+
     getZoom() {
         var b = this.map.getBounds();
         var c = this.map.getCenter();
