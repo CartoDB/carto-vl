@@ -45,12 +45,8 @@ class MGLIntegrator {
         map.on('moveend', this.move.bind(this));
         map.on('resize', this.move.bind(this));
 
-        map.on('mousemove', data => {
-            this._emitter.emit('mousemove', data);
-        });
-        map.on('click', data => {
-            this._emitter.emit('click', data);
-        });
+        map.on('mousemove', data => this._emitter.emit('mousemove', data));
+        map.on('click', data => this._emitter.emit('click', data));
     }
 
     _registerMoveObserver(observerName, observerCallback) {
