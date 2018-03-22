@@ -24,11 +24,8 @@ class MGLIntegrator {
         this.invalidateWebGLState = null;
         this._emitter = mitt();
 
-        map.on('movestart', this.move.bind(this));
-        map.on('move', this.move.bind(this));
-        map.on('moveend', this.move.bind(this));
-        map.on('resize', this.move.bind(this));
 
+        this._suscribeToMapEvents(map);
         this.moveObservers = {};
 
         this._layers = [];
@@ -41,13 +38,29 @@ class MGLIntegrator {
     off(name, cb) {
         return this._emitter(name, cb);
     }
-    
+
+    _suscribeToMapEvents(map) {
+        map.on('movestart', this.move.bind(this));
+        map.on('move', this.move.bind(this));
+        map.on('moveend', this.move.bind(this));
+        map.on('resize', this.move.bind(this));
+
+        map.on('mousemove', data => {
+            this._emitter.emit('mousemove', data);
+        });
+        map.on('click', data => {
+            this._emitter.emit('click', data);
+        });
+    }
+
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
+
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
+
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
         const layerId = layer.getId();
@@ -70,9 +83,11 @@ class MGLIntegrator {
         this._layers.push(layer);
         this.move();
     }
+
     needRefresh() {
         this.map.repaint = true; // FIXME: add logic to manage repaint flag
     }
+
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
@@ -80,9 +95,11 @@ class MGLIntegrator {
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
+
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
+    
     getZoom() {
         var b = this.map.getBounds();
         var c = this.map.getCenter();
