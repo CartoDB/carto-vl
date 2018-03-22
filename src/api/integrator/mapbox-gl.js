@@ -1,3 +1,4 @@
+import mitt from 'mitt';
 import * as R from '../../core/renderer';
 import * as util from '../util';
 
@@ -21,6 +22,7 @@ class MGLIntegrator {
         this.renderer = new R.Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
+        this._emitter = mitt();
 
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
@@ -31,6 +33,15 @@ class MGLIntegrator {
 
         this._layers = [];
     }
+
+    on(name, cb) {
+        return this._emitter(name, cb);
+    }
+
+    off(name, cb) {
+        return this._emitter(name, cb);
+    }
+    
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
