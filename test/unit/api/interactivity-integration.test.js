@@ -47,7 +47,7 @@ describe('Interactivity', () => {
         });
     });
 
-    fdescribe('.on', () => {
+    describe('.on', () => {
         let interactivity;
         it('should throw an error when suscribing to an invalid event', done => {
             layer.on('loaded', () => {
@@ -57,8 +57,17 @@ describe('Interactivity', () => {
             });
             layer.addTo(map);
         });
-        it('should suscribe to a new event', () => {
+    });
 
+    describe('.off', () => {
+        let interactivity;
+        it('should throw an error when suscribing to an invalid event', done => {
+            layer.on('loaded', () => {
+                interactivity = new carto.Interactivity([layer]);
+                expect(() => { interactivity.off('invalidEventName'); }).toThrowError(/Unrecognized event/);
+                done();
+            });
+            layer.addTo(map);
         });
     });
 
