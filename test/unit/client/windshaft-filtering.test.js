@@ -181,19 +181,19 @@ describe('src/client/windshaft-filtering', () => {
                         0.5
                     )
                 }));
-                expect(actual).toBeNull();
+                expect(actual.preaggregation).toBeNull();
             });
         });
 
         describe('when the filter should return null', () => {
             it('with the default filter', () => {
-                expect(f.getFiltering(new Style())).toBeNull();
+                expect(f.getFiltering(new Style()).preaggregation).toBeNull();
             });
 
             it('with the `filter: true`', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.TRUE
-                }))).toBeNull();
+                })).preaggregation).toBeNull();
             });
 
             it('with the `filter: $property==5 and $property==5`', () => {
@@ -202,19 +202,19 @@ describe('src/client/windshaft-filtering', () => {
                         s.eq(s.property('property'), 5),
                         s.eq(s.property('property'), 5)
                     )
-                }))).toBeNull();
+                })).preaggregation).toBeNull();
             });
 
             it('with the `filter: $property<10`', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.lt(s.property('property'), 10)
-                }))).toBeNull();
+                })).preaggregation).toBeNull();
             });
 
             it('with the `filter: between($property, 0, now())`', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.between(s.property('property'), 0, s.now())
-                }))).toBeNull();
+                })).preaggregation).toBeNull();
             });
 
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
@@ -223,7 +223,7 @@ describe('src/client/windshaft-filtering', () => {
                         s.between(s.property('numericProperty'), 10, 20),
                         s.nin(s.property('categoricalProperty', 'red', 'blue'))
                     )
-                }))).toBeNull();
+                })).preaggregation).toBeNull();
             });
         });
     });
