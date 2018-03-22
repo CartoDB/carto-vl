@@ -11,8 +11,10 @@ const EVENTS = [
 export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
-        this._layerList = layerList;
         this._emitter = mitt();
+        this._layerList = layerList;
+
+        this._subscribeToIntegratorEvents(this._layerList[0].getIntegrator());
     }
 
     on(eventName, callback) {
@@ -23,6 +25,10 @@ export default class Interactivity {
     off(eventName, callback) {
         checkEvent(eventName);
         return this._emitter.off(eventName, callback);
+    }
+
+    _subscribeToIntegratorEvents(integrator) {
+        
     }
 }
 
@@ -36,10 +42,10 @@ function checkLayerList(layerList) {
     if (!layerList.every(layer => layer instanceof Layer)) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
-    if (layerList.some(layer => !layer._integrator)) {
+    if (layerList.some(layer => !layer.getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to some map');
     }
-    if (!layerList.every(layer => layer._integrator == layerList[0]._integrator)) {
+    if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }
