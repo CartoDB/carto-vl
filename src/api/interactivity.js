@@ -19,11 +19,9 @@ function checkLayerList(layerList) {
     if (!layerList.length) {
         throw new Error('Invalid argument, layer list must not be empty');
     }
-    layerList.forEach(layer => {
-        if (!(layer instanceof Layer)) {
-            throw new Error('Invalid layer, layer must be an instance of carto.Layer');
-        }
-    });
+    if (!layerList.every(layer => layer instanceof Layer)) {
+        throw new Error('Invalid layer, layer must be an instance of carto.Layer');
+    }
     if (layerList.some(layer => !layer._integrator)) {
         throw new Error('Invalid argument, all layers must belong to some map');
     }
