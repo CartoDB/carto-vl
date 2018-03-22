@@ -2,17 +2,18 @@ import * as carto from '../../../src/';
 import mapboxgl from '../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
-    describe('When the user creates a new Interactivity object', () => {
-        let div, source, style, layer, map;
-        beforeEach(() => {
-            const setup = _setup('map');
-            div = setup.div;
-            map = setup.map;
+    let div, source, style, layer, map;
+    beforeEach(() => {
+        const setup = _setup('map');
+        div = setup.div;
+        map = setup.map;
 
-            source = new carto.source.GeoJSON(geojson);
-            style = new carto.Style('color: rgba(1, 0, 0, 1)');
-            layer = new carto.Layer('layer', source, style);
-        });
+        source = new carto.source.GeoJSON(geojson);
+        style = new carto.Style('color: rgba(1, 0, 0, 1)');
+        layer = new carto.Layer('layer', source, style);
+    });
+    describe('When the user creates a new Interactivity object', () => {
+
 
         fit('should throw an error when some layer is not attached to a map', () => {
             expect(() => new carto.Interactivity([layer])).toThrowError(/.*map.*/);
@@ -44,10 +45,25 @@ describe('Interactivity', () => {
                 }
             }
         });
+    });
 
-        afterEach(() => {
-            document.body.removeChild(div);
+    fdescribe('.on', () => {
+        let interactivity;
+        it('should throw an error when suscribing to an invalid event', done => {
+            layer.on('loaded', () => {
+                interactivity = new carto.Interactivity([layer]);
+                expect(() => { interactivity.on('invalidEventName'); }).toThrow();
+                done();
+            });
+            layer.addTo(map);
         });
+        it('should suscribe to a new event', () => {
+
+        });
+    });
+
+    afterEach(() => {
+        document.body.removeChild(div);
     });
 });
 

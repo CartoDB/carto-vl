@@ -1,6 +1,13 @@
 import mitt from 'mitt';
 import Layer from './layer';
 
+const EVENTS = [
+    'featureClick',
+    'featureClickOut',
+    'featureEnter',
+    'featureHover',
+    'featureLeave',
+];
 export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
@@ -32,5 +39,11 @@ function checkLayerList(layerList) {
     }
     if (!layerList.every(layer => layer._integrator == layerList[0]._integrator)) {
         throw new Error('Invalid argument, all layers must belong to the same map');
+    }
+}
+
+function checkEvent(eventName) {
+    if (!EVENTS.includes(eventName)) {
+        throw new Error(`Unrecognized event: ${eventName}. Availiable events: ${EVENTS.join(', ')}`);
     }
 }
