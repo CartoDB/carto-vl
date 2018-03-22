@@ -8,9 +8,13 @@ export default class Interactivity {
         this._emitter = mitt();
     }
 
-    on(eventName, callback) { }
+    on(eventName, callback) {
+        return this._emitter.on(eventName, callback);
+    }
 
-    off(eventName, callback) { }
+    off(eventName, callback) {
+        return this._emitter.off(eventName, callback);
+    }
 }
 
 function checkLayerList(layerList) {
