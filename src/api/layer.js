@@ -270,6 +270,10 @@ export default class Layer {
         return this._style;
     }
 
+    getIntegrator() {
+        return this._integrator;
+    }
+
     _isCartoMap(map) {
         return map instanceof CartoMap;
     }
