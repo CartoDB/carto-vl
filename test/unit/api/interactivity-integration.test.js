@@ -35,8 +35,8 @@ describe('foo', () => {
         expect(() => { new carto.Interactivity([layer1]); }).toThrowError(/.*map.*/);
     });
 
-    xit('should throw an error when layers belong to different maps', done => {
-        /*const div2 = document.createElement('div');
+    fit('should throw an error when layers belong to different maps', done => {
+        const div2 = document.createElement('div');
         div2.id = 'map2';
         document.body.appendChild(div2);
         const map2 = new mapboxgl.Map({
@@ -45,14 +45,22 @@ describe('foo', () => {
             center: [0, 30],
             zoom: 2
         });
-        const layer2 = new carto.Layer('layer', source, style);*/
-        //layer2.addTo(map2);
+        const layer2 = new carto.Layer('layer2',  new carto.source.GeoJSON({
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [0, 0]
+            },
+            'properties': {
+                'cartodb_id': 1
+            }
+        }), style);
+        // layer2.addTo(map2);
 
         layer1.on('loaded', () => {
-            expect(layer1._integrator === null).toBeTruthy();
             done();
         });
-        layer1.addTo(map);        
+        layer1.addTo(map);
         // expect(() => { new carto.Interactivity([layer1, layer2]); }).toThrowError(/.*map.*/);
     });
 
