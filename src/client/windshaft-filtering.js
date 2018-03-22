@@ -18,8 +18,8 @@ import * as schema from '../core/schema';
  */
 export function getFiltering(style) {
     const filtering = {
-        preaggregation: getFilter(style.filter),
-        aggregation: getAPIFilter(style.filter)
+        preaggregation: getFilter(style.getFilter()),
+        aggregation: getAPIFilter(style.getFilter())
     };
     if (!filtering.preaggregation && !filtering.preaggregation) {
         return null;
@@ -84,7 +84,8 @@ function getAndFilter(f) {
     if (f instanceof And) {
         // we can ignore nonsupported (null) subexpressions and yet support partial filtering
         // note that expression lists are combined with AND
-        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y));
+        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+        return l.length ? l : null;
     }
 }
 

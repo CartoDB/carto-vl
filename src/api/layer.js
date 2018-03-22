@@ -47,14 +47,13 @@ export default class Layer {
 
         this._id = id;
         this.metadata = null;
-        this.setSource(source);
-        this.setStyle(style);
-
         this._listeners = {};
         this._renderLayer = new RenderLayer();
-
         this.state = 'init';
         console.log('L', this);
+
+        this.setSource(source);
+        this.setStyle(style);
 
         this.paintCallback = () => {
             if (this._style && this._style.colorShader) {
@@ -102,8 +101,8 @@ export default class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
+        if (this._source !== source) {
+            this._freeSource();
         }
         this._source = source;
         this.requestData();
@@ -112,9 +111,7 @@ export default class Layer {
             this._style.onChange(null);
         }
         this._style = style;
-        style.onChange(() => {
-            this._styleChanged(style);
-        });
+        style.onChange(this._styleChanged.bind(this));
         this._compileShaders(style, metadata);
     }
     /**
@@ -136,8 +133,8 @@ export default class Layer {
         }
         this.metadata = metadata;
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
+        if (this._source !== source) {
+            this._freeSource();
         }
         this._source = source;
         if (style) {
@@ -223,7 +220,7 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.filter.blendFrom(this._style.filter, ms, interpolator);
+            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
         }
 
         return this._styleChanged(style).then(r => {
@@ -309,12 +306,9 @@ export default class Layer {
     }
 
     _compileShaders(style, metadata) {
-        style._compileColorShader(this._integrator.renderer.gl, metadata);
-        style._compileWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileFilterShader(this._integrator.renderer.gl, metadata);
+        style.compileShaders(this._integrator.renderer.gl, metadata);
     }
+
     async _styleChanged(style) {
         await this._context;
         const source = this._source;
@@ -384,5 +378,10 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    //TODO free layer resources
+    _freeSource() {
+        if (this._source) {
+            this._source.free();
+        }
+        this._renderLayer.freeDataframes();
+    }
 }

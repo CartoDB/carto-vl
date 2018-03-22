@@ -31,37 +31,37 @@ export function decodeGeom(geomType, geom) {
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(geometry) {
+function decodePoint(vertices) {
     return {
-        geometry: geometry,
-        breakpointList: []
+        vertices: vertices,
+        breakpoints: []
     };
 }
 
 
 function decodePolygon(geometry) {
-    let vertexArray = []; //Array of triangle vertices
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let vertices = []; //Array of triangle vertices
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertexArray.push(polygon.flat[2 * index]);
-                vertexArray.push(polygon.flat[2 * index + 1]);
+                vertices.push(polygon.flat[2 * index]);
+                vertices.push(polygon.flat[2 * index + 1]);
             });
         });
-        breakpointList.push(vertexArray.length);
+        breakpoints.push(vertices.length);
     });
     return {
-        geometry: new Float32Array(vertexArray),
-        breakpointList
+        vertices: new Float32Array(vertices),
+        breakpoints
     };
 }
 
 function decodeLine(geom) {
+    let vertices = [];
     let normals = [];
-    let geometry = [];
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
@@ -88,9 +88,9 @@ function decodeLine(geom) {
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
     
-                geometry.push(a[0], a[1]);
-                geometry.push(a[0], a[1]);
-                geometry.push(b[0], b[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
 
                 // Second triangle
     
@@ -98,16 +98,16 @@ function decodeLine(geom) {
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
     
-                geometry.push(a[0], a[1]);
-                geometry.push(b[0], b[1]);
-                geometry.push(b[0], b[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+                vertices.push(b[0], b[1]);
             }
         });
-        breakpointList.push(geometry.length);
+        breakpoints.push(vertices.length);
     });
     return {
-        geometry: new Float32Array(geometry),
-        breakpointList,
+        vertices: new Float32Array(vertices),
+        breakpoints,
         normals: new Float32Array(normals)
     };
 }

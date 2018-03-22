@@ -154,7 +154,7 @@ export default class Style {
         return this._styleSpec.order;
     }
 
-    get filter() {
+    getFilter() {
         return this._styleSpec.filter;
     }
 
@@ -163,7 +163,7 @@ export default class Style {
             this.getWidth().isAnimated() ||
             this.getStrokeColor().isAnimated() ||
             this.getStrokeWidth().isAnimated() ||
-            this.filter.isAnimated();
+            this.getFilter().isAnimated();
     }
 
     onChange(callback) {
@@ -172,7 +172,7 @@ export default class Style {
 
     _changed() {
         if (this._changeCallback) {
-            this._changeCallback();
+            this._changeCallback(this);
         }
     }
 
@@ -185,6 +185,14 @@ export default class Style {
             this._styleSpec.filter,
         ].filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+    }
+
+    compileShaders(gl, metadata) {
+        this._compileColorShader(gl, metadata);
+        this._compileWidthShader(gl, metadata);
+        this._compileStrokeColorShader(gl, metadata);
+        this._compileStrokeWidthShader(gl, metadata);
+        this._compileFilterShader(gl, metadata);
     }
 
     _compileColorShader(gl, metadata) {
@@ -222,7 +230,7 @@ export default class Style {
         this.filterShader = r.shader;
     }
 
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;

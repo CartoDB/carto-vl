@@ -1,39 +1,57 @@
 import Expression from './expression';
-import { implicitCast, checkExpression } from './utils';
+import { implicitCast, checkExpression, checkLooseType, checkType } from './utils';
 
-export default class HSV extends Expression {
-    /**
-     * @description Color constructor for Hue Saturation Value (HSV) color space
-     * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
-     * @param {*} saturation saturation of the color in the [0,1] range
-     * @param {*} value value (brightness) of the color in the [0,1] range
-     */
-    constructor(h, s, v) {
-        h = implicitCast(h);
-        s = implicitCast(s);
-        v = implicitCast(v);
+// TODO docs
+/**
+* @description Color constructor for Hue Saturation Value (HSV) color space
+* @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
+* @param {*} saturation saturation of the color in the [0,1] range
+* @param {*} value value (brightness) of the color in the [0,1] range
+*/
+export const HSV = genHSV('hsv', false);
+export const HSVA = genHSV('hsva', true);
 
-        checkType('h', 0, h);
-        checkType('s', 1, s);
-        checkType('v', 2, v);
-
-        super({ h: h, s: s, v: v });
-        this.type = 'color';
-    }
-    _compile(metadata) {
-        super._compile(metadata);
-        checkType('h', 0, this.h);
-        checkType('s', 1, this.s);
-        checkType('v', 2, this.v);
-        const normalize = (v, hue = false) => {
-            if (v.type == 'category') {
-                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+function genHSV(name, alpha) {
+    return class extends Expression {
+        constructor(h, s, v, a) {
+            h = implicitCast(h);
+            s = implicitCast(s);
+            v = implicitCast(v);
+            const children = { h, s, v };
+            if (alpha) {
+                a = implicitCast(a);
+                checkLooseType(name, 'a', 3, 'float', a);
+                children.a = a;
             }
-            return '';
-        };
-        super._setGenericGLSL(inline =>
-            `vec4(hsv2rgb(vec3(${inline.h}${normalize(this.h, true)}, clamp(${inline.s}${normalize(this.s)}, 0.,1.), clamp(${inline.v}${normalize(this.v)}, 0.,1.))), 1)`
-            , `
+
+            hsvCheckType('h', 0, h);
+            hsvCheckType('s', 1, s);
+            hsvCheckType('v', 2, v);
+
+            super(children);
+            this.type = 'color';
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            hsvCheckType('h', 0, this.h);
+            hsvCheckType('s', 1, this.s);
+            hsvCheckType('v', 2, this.v);
+            if (alpha) {
+                checkType('hsva', 'a', 3, 'float', this.a);
+            }
+            const normalize = (v, hue = false) => {
+                if (v.type == 'category') {
+                    return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+                }
+                return '';
+            };
+            super._setGenericGLSL(inline =>
+                `vec4(hsv2rgb(vec3(
+                    ${inline.h}${normalize(this.h, true)},
+                    clamp(${inline.s}${normalize(this.s)}, 0.,1.),
+                    clamp(${inline.v}${normalize(this.v)}, 0.,1.)
+                )), ${alpha ? `clamp(${inline.a}, 0.,1.)` : '1.'})`
+                , `
     #ifndef HSV2RGB
     #define HSV2RGB
     vec3 hsv2rgb(vec3 c) {
@@ -43,13 +61,15 @@ export default class HSV extends Expression {
     }
     #endif
     `);
+        }
+        // TODO eval
+    };
+
+    function hsvCheckType(parameterName, parameterIndex, parameter) {
+        checkExpression(name, parameterName, parameterIndex, parameter);
+        if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+        }
     }
-    // TODO eval
 }
 
-function checkType(parameterName, parameterIndex, parameter) {
-    checkExpression('hsv', parameterName, parameterIndex, parameter);
-    if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
-        throw new Error(`hsv(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
-    }
-}

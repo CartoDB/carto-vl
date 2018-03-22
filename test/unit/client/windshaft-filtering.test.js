@@ -196,6 +196,15 @@ describe('src/client/windshaft-filtering', () => {
                 }))).toBeNull();
             });
 
+            it('with the `filter: $property==5 and $property==5`', () => {
+                expect(f.getFiltering(new Style({
+                    filter: s.and(
+                        s.eq(s.property('property'), 5),
+                        s.eq(s.property('property'), 5)
+                    )
+                }))).toBeNull();
+            });
+
             it('with the `filter: $property<10`', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.lt(s.property('property'), 10)

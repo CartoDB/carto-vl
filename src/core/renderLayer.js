@@ -22,6 +22,10 @@ export default class RenderLayer {
         this.dataframes = this.dataframes.filter(df => df !== dataframe);
     }
 
+    getActiveDataframes() {
+        return this.dataframes.filter(df => df.active);
+    }
+
     hasDataframes() {
         return this.dataframes.length > 0;
     }
@@ -34,5 +38,11 @@ export default class RenderLayer {
         if (this.type != dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
         }
+    }
+
+    freeDataframes() {
+        this.dataframes.map(df => df.free());
+        this.dataframes = [];
+        this.type = null;
     }
 }
