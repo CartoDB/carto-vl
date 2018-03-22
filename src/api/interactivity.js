@@ -16,6 +16,7 @@ export default class Interactivity {
     }
 
     on(eventName, callback) {
+        checkEvent(eventName);
         return this._emitter.on(eventName, callback);
     }
 
