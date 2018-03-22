@@ -39,7 +39,7 @@ describe('Interactivity', () => {
             function _testHelper() {
                 loadedLayers++;
                 if (loadedLayers === 2) {
-                    expect(() => new carto.Interactivity([layer, layer2])).toThrowError(/.*all layers must belong to the same map.*/);
+                    expect(() => new carto.Interactivity([layer, layer2])).toThrowError(/all layers must belong to the same map/);
                     document.body.removeChild(div2);
                     done();
                 }
