@@ -15,7 +15,7 @@ describe('Interactivity', () => {
     describe('When the user creates a new Interactivity object', () => {
 
 
-        fit('should throw an error when some layer is not attached to a map', () => {
+        it('should throw an error when some layer is not attached to a map', () => {
             expect(() => new carto.Interactivity([layer])).toThrowError(/.*map.*/);
         });
 
