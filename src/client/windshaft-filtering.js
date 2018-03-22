@@ -21,7 +21,7 @@ export function getFiltering(style) {
         preaggregation: getFilter(style.getFilter()),
         aggregation: getAPIFilter(style.getFilter())
     };
-    if (!filtering.preaggregation && !filtering.preaggregation) {
+    if (!filtering.preaggregation && !filtering.aggregation) {
         return null;
     }
     return filtering;
