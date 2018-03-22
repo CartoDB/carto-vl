@@ -4,50 +4,50 @@ This guide walks through making a variety of common thematic map types for point
 
 ## Basic Styling Properties
 
-+ [Point Size](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#point-size)
-+ [Point Color](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#point-color)
-+ [Point Stroke Width](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#point-stroke-width)
-+ [Point Stroke Color](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#point-stroke-color)
-+ [Cluster Resolution](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#cluster-resolution)
-+ [Point Draw Order](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#point-draw-order)
++ Point Size
++ Point Color
++ Point Stroke Widthe-width
++ Point Stroke Colore-color
++ Cluster Resolutionolution
++ Point Draw Orderorder
 
 ### Point Size
 
 To adjust the point size, use the `width` property.
 
 ```
-width: 3
+width: 5
 ```
 
-![screen shot 2018-02-14 at 2 56 20 pm](https://user-images.githubusercontent.com/1566273/36230312-42eb9d06-1197-11e8-9989-27276334aa13.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1IiwiZiI6eyJsbmciOi04Ni45ODUxNDA3MDY2NjM3NCwibGF0IjotMS4xMzY4NjgzNzcyMTYxNjAzZS0xM30sImciOjAuMzUzMTQ2NzEyMTMwODk3MX0=)
 
 ### Point Color
 Use the `color` property to color features with one of CARTO GL's [supported color spaces](LINK).
 
 ```
-width: 3
-color: hsv(0.1,1,1)
+width: 5
+color: hsv(0.6,1,1)
 ```
-![screen shot 2018-02-14 at 3 12 01 pm](https://user-images.githubusercontent.com/1566273/36230948-75b88882-1199-11e8-9d60-713c1e3905e3.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogaHN2KDAuNiwxLDEpIiwiZiI6eyJsbmciOi05My40ODYxMjU0MzYyNzk3OSwibGF0IjozNi42OTk4MTAyNTcwODQxOH0sImciOjIuNTg3ODYwNDM1NjA4ODE5M30=)
 
 ### Point Stroke Width
 
 ```
 width: 5
-color: hsv(0.1,1,1)
+color: hsv(0.6,1,1)
 strokeWidth: 1
 ```
-![screen shot 2018-02-26 at 1 25 01 pm](https://user-images.githubusercontent.com/1566273/36693430-80841cf0-1af8-11e8-969d-9effd3bd4537.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogaHN2KDAuNiwxLDEpXG5zdHJva2VXaWR0aDogMSIsImYiOnsibG5nIjotOTMuNDg2MTI1NDM2Mjc5NzksImxhdCI6MzYuNjk5ODEwMjU3MDg0MTh9LCJnIjoyLjU4Nzg2MDQzNTYwODgxOTN9)
 
 ### Point Stroke Color
 
 ```
 width: 5
-color: hsv(0.1,1,1)
+color: hsv(0.6,1,1)
 strokeWidth: 1
-strokeColor: hsv(1,1,1)
+strokeColor: hsv(1,0,1)
 ```
-![screen shot 2018-02-26 at 1 26 24 pm](https://user-images.githubusercontent.com/1566273/36693502-b2e1d0f2-1af8-11e8-907d-ce5a31e5ddfa.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogaHN2KDAuNiwxLDEpXG5zdHJva2VXaWR0aDogMVxuc3Ryb2tlQ29sb3I6IGhzdigxLDAsMSkiLCJmIjp7ImxuZyI6LTk1LjMxMzkxNjE5MTI2NzgyLCJsYXQiOjM3LjQ5NDk5NjQ4Mjc0NTc1fSwiZyI6Mi45Nzc3MTkwMjk3ODU2NzN9)
 
 ### Cluster Resolution
 Points are clustered within the defined resolution and the placement of the point is based on the properties of all points in the defined cluster resolution.
@@ -56,7 +56,7 @@ Points are clustered within the defined resolution and the placement of the poin
 width: 5
 resolution: 5
 ```
-![screen shot 2018-02-26 at 1 52 36 pm](https://user-images.githubusercontent.com/1566273/36694680-618d0d76-1afc-11e8-8d32-b46cd8337e7f.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5yZXNvbHV0aW9uOiA1IiwiZiI6eyJsbmciOi05NS4zMTM5MTYxOTEyNjc4MiwibGF0IjozNy40OTQ5OTY0ODI3NDU3NX0sImciOjIuOTc3NzE5MDI5Nzg1NjczfQ==)
 
 ### Point Draw Order
 
@@ -65,76 +65,62 @@ order: desc(width())
 ```
 
 ## Color by Value: String
-+ [Basic Syntax](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#basic-syntax)
-+ [Unique Values](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#unique-values)
-+ [Most Common Category](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#by-most-common-category)
-+ [Attribute values](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#by-attribute-value)
-
-### Basic Syntax
-
-#### Acess Attributes
-Whether an attribute is a string or number, append it with a `$` to access:
-```
-$category (string)
-$amount (number)
-```
-#### Color by Attribute
-To color features by a string, use a `ramp()` including the attribute name appended with a `$` and a [CARTOColor Qualitative Scheme](https://github.com/CartoDB/CartoColor/wiki/CARTOColor-Scheme-Names).
-
-`color: ramp($attribute,colorscheme)`
++ Unique Values
++ Most Common
++ Attribute
 
 ### Unique Values  
 The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together. 
 
 ```
-width: 3
-color: ramp($cause_descrip,Prism)
+width: 5
+color: ramp($commodity_name,Prism)
 ```
-![screen shot 2018-02-14 at 3 39 06 pm](https://user-images.githubusercontent.com/1566273/36232131-cc1e110c-119d-11e8-81b4-8a70cd066e5a.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCgkY29tbW9kaXR5X25hbWUsUHJpc20pIiwiZiI6eyJsbmciOi05Ni42NTI3OTQzMzU0NTkyNSwibGF0Ijo0OC4wMDcyNDM5MjcyNjEzNn0sImciOjIuOTc3NzE5MDI5Nzg1NjczfQ==)
 
 ### Most common category
 
-To color features by the most common category, you can use a [metadata operator](https://github.com/CartoDB/renderer-prototype/wiki/Operator-Tables#metadata-operators) or an [aggregation operator](LINK).
+To color features by the most common category, you can use a metadata operatoror an aggregation operator.
 
 #### Metadata Operator
-The map below uses the metadata operator `top` to retrieve the top 4 values in the `cause_descrip` field. Each category is colored with a unique color and all other features are colored as other.
+The map below uses the metadata operator `top` to retrieve the top 4 values in the `commodity_name` field. Each category is colored with a unique color and all other features are colored as other.
 
 ```
-width: 3
-color: ramp(top($cause_descrip,4),Prism)
+width: 5
+color: ramp(top($commodity_name,5),Prism)
 ```
-![screen shot 2018-02-15 at 2 04 07 pm](https://user-images.githubusercontent.com/1566273/36280954-32d5a660-1259-11e8-9ed7-39bd970ef7cc.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCh0b3AoJGNvbW1vZGl0eV9uYW1lLDUpLFByaXNtKVxuIiwiZiI6eyJsbmciOi05Ni4xMTY5MjM2NzkzNDc3OSwibGF0Ijo0Ny41NTIxNjA5MDU5OTIxMX0sImciOjMuMDY4NDU0MTIwMzM3NjI4OH0=)
 
 #### Aggregation Operator
-The map below uses the aggregation operator `MODE` coloring features by the mode of the `cause_descrip` field.
+The map below uses the aggregation operator `MODE` coloring features by the mode of the `commodity_name` field.
 
 ```
-width: 3
-color: ramp(MODE($cause_descrip),Prism)
+width: 5
+color: ramp(MODE($commodity_name),Prism)
 ```
-![screen shot 2018-02-15 at 2 09 54 pm](https://user-images.githubusercontent.com/1566273/36281190-fd346770-1259-11e8-9353-ef35fff451d3.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcChNT0RFKCRjb21tb2RpdHlfbmFtZSksUHJpc20pXG4iLCJmIjp7ImxuZyI6LTk2LjExNjkyMzY3OTM0Nzc5LCJsYXQiOjQ3LjU1MjE2MDkwNTk5MjExfSwiZyI6My4wNjg0NTQxMjAzMzc2Mjg4fQ==)
 
 ### Attribute Values
 
-To map colors to particular categories, use the [classification operator](https://github.com/CartoDB/renderer-prototype/wiki/Operator-Tables#classification-operators) `buckets`.
+To map colors to particular categories, use the classification operator `buckets`.
 
 The map below colors fires that were caused by `Lightning` or `Arson` and all other categories are colored as other.
 
 ```
-width: 3
-color: ramp(buckets($cause_descrip,"Lightning","Arson"),Prism)
+width: 5
+color: ramp(buckets($commodity_name,"SOYBEANS","RICE","WHEAT"),Prism)
 ```
-![screen shot 2018-02-15 at 2 29 01 pm](https://user-images.githubusercontent.com/1566273/36281906-9bc451c8-125c-11e8-872c-791b7e47a514.png)
+[Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcChidWNrZXRzKCRjb21tb2RpdHlfbmFtZSxcIlNPWUJFQU5TXCIsXCJSSUNFXCIsXCJXSEVBVFwiKSxQcmlzbSlcbiIsImYiOnsibG5nIjotOTYuMTE2OTIzNjc5MzQ3NzksImxhdCI6NDcuNTUyMTYwOTA1OTkyMTF9LCJnIjozLjA2ODQ1NDEyMDMzNzYyODh9)
 
 ## Color and Size by Value: Numbers
 There are a variety of ways to symbolize points using numeric attributes.
 
-+ [Classed color](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#classed-color)
-+ [Classed size](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#classed-size)
-+ [Unclassed color](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#unclassed-color)
-+ [Unlcassed size](https://github.com/CartoDB/renderer-prototype/wiki/Map-Examples#unlcassed-size)
-+ [Manual Classed Color](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#manually-classed-color)
-+ [Manual Classed Size](https://github.com/CartoDB/renderer-prototype/wiki/Styling-Points#manually-classed-size)
++ Classed color
++ Classed size
++ Unclassed color
++ Unlcassed size
++ Manual Classed Color
++ Manual Classed Size
 
 
 ### Classed Color
