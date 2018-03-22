@@ -44,7 +44,7 @@ describe('Interactivity', () => {
                     done();
                 }
             }
-        });
+        }, 10000);
     });
 
     describe('.on', () => {
