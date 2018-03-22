@@ -148,7 +148,7 @@ class Renderer {
     }
 
     _computeDrawMetadata(renderLayer) {
-        const tiles = renderLayer.dataframes;
+        const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
         const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
         let drawMetadata = {
@@ -273,7 +273,7 @@ class Renderer {
         const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
 
-        const tiles = renderLayer.dataframes;
+        const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
 
         if (!tiles.length) {
