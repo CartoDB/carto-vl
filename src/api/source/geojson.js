@@ -48,9 +48,10 @@ export default class GeoJSON extends Base {
         this._loaded = false;
     }
 
-    bindLayer(addDataframe, removeDataframe) {
+    bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestMetadata() {
@@ -72,6 +73,7 @@ export default class GeoJSON extends Base {
             type: this._getDataframeType(this._type)
         });
         this._addDataframe(dataframe);
+        this._dataLoadedCallback();
     }
 
     _checkData(data) {

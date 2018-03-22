@@ -67,7 +67,7 @@ describe('api/source/geojson', () => {
             };
             const source = new GeoJSON(data);
 
-            source.bindLayer(_ => _);
+            source.bindLayer(_ => _, _ => _, _ => _);
             spyOn(source, '_addDataframe');
 
             expect(source._addDataframe).toHaveBeenCalledTimes(0);
@@ -193,5 +193,25 @@ describe('api/source/geojson', () => {
                 source.requestData();
             }).toThrowError('first polygon ring must be external.');
         });
+    });
+    it('should call the dataLoaded callback when the dataframe is added', () => {
+        const source = new GeoJSON({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
+            },
+            properties: {
+                cartodb_id: 1
+            }
+        });
+
+        const fakeAddDataframe = jasmine.createSpy('addDataframe');
+        const fakeRemoveDataframe = jasmine.createSpy('removeDataframe');
+        const fakeDataLoaded = jasmine.createSpy('dataLoaded');
+        source.bindLayer(fakeAddDataframe, fakeRemoveDataframe, fakeDataLoaded);
+        expect(fakeDataLoaded).not.toHaveBeenCalled();
+        source.requestData();
+        expect(fakeDataLoaded).toHaveBeenCalled();
     });
 });
