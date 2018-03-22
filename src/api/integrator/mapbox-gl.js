@@ -30,7 +30,6 @@ class MGLIntegrator {
         this.moveObservers = {};
         this._layers = [];
         this._paintedLayers = 0;
-        this.map.repaint = true;
     }
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
