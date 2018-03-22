@@ -52,7 +52,7 @@ describe('Interactivity', () => {
         it('should throw an error when suscribing to an invalid event', done => {
             layer.on('loaded', () => {
                 interactivity = new carto.Interactivity([layer]);
-                expect(() => { interactivity.on('invalidEventName'); }).toThrow();
+                expect(() => { interactivity.on('invalidEventName'); }).toThrowError(/Unrecognized event/);
                 done();
             });
             layer.addTo(map);
