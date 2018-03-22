@@ -28,8 +28,8 @@ class MGLIntegrator {
         map.on('resize', this.move.bind(this));
 
         this.moveObservers = {};
-
         this._layers = [];
+        this._paintedLayers = 0;
     }
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
@@ -41,7 +41,6 @@ class MGLIntegrator {
         const callbackID = `_cartoGL_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
@@ -50,6 +49,17 @@ class MGLIntegrator {
                 this._layers.map(layer => layer.initCallback());
             }
             layer.paintCallback();
+            this._paintedLayers++;
+
+            if (this._paintedLayers % this._layers.length == 0) {
+                // Last layer has been painted
+                const isAnimated = this._layers.some(layer =>
+                    layer.getStyle() && layer.getStyle().isAnimated());
+                if (!isAnimated && this.map.repaint) {
+                    this.map.repaint = false;
+                }
+            }
+
             invalidate();
         });
         this.map.addLayer({
@@ -60,7 +70,7 @@ class MGLIntegrator {
         this.move();
     }
     needRefresh() {
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
+        this.map.repaint = true;
     }
     move() {
         var c = this.map.getCenter();
