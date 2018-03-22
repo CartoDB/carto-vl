@@ -1,15 +1,16 @@
+import mitt from 'mitt';
 import Layer from './layer';
 
 export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
         this._layerList = layerList;
+        this._emitter = mitt();
     }
-    on(eventName, callback) {
-    }
-    off(eventName, callback) {
 
-    }
+    on(eventName, callback) { }
+
+    off(eventName, callback) { }
 }
 
 function checkLayerList(layerList) {
