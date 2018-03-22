@@ -1,4 +1,4 @@
-import { And, Or } from '../core/style/expressions/binary';
+import { And, Or, Equals } from '../core/style/expressions/binary';
 import { In, Nin } from '../core/style/expressions/belongs';
 import Between from '../core/style/expressions/between';
 import Category from '../core/style/expressions/category';
@@ -10,6 +10,8 @@ import FloatConstant from '../core/style/expressions/floatConstant';
 import { Avg, Mode, Sum } from '../core/style/expressions/aggregation';
 import * as schema from '../core/schema';
 
+
+// TODO: Add options for filter separation mode (A/B); implement API filtering as class to handle parameter
 
 /**
  * Returns supported windshaft filters for the style
@@ -156,6 +158,12 @@ function isBetweenFilter2(f) {
         && (f.upperLimit instanceof Float || f.upperLimit instanceof FloatConstant);
 }
 
+function isEqualFilter(f) {
+    // support only property == value
+    return f instanceof Equals
+        && (f.a instanceof Property || f.a instanceof Avg || f.a instanceof Mode || f.a instanceof Sum)  // better use getAggregatedAPIFilter(f.a)
+        && (f.b instanceof Float || f.b instanceof FloatConstant || f.b instanceof Category);
+}
 
 function getAPIFilter(f) {
     let filters = {};
@@ -212,10 +220,19 @@ function getBasicAPIFilter(f) {
             return p;
         }
     }
+    if (isEqualFilter(f)) {
+        let p = getAggregatedAPIFilter(f.a);
+        if (p) {
+            p.filters.push({
+                equal: f.b.expr
+            })
+        }
+        return p;
+    }
 }
 
 function getAggregatedAPIFilter(f) {
-    if (f instanceof Avg || f instanceof Sum) { // if f._aggName
+    if (f instanceof Avg || f instanceof Sum || f instanceof Mode) { // if f._aggName
         let p = getPropertyAPIFilter(f.property);
         if (p) {
             p.property = schema.column.aggColumn(p.property, f._aggName);
