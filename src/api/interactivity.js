@@ -1,30 +1,33 @@
 import Layer from './layer';
 
 export default class Interactivity {
-    constructor (layerList){
+    constructor(layerList) {
         checkLayerList(layerList);
         this._layerList = layerList;
     }
-    on(eventName, callback){
+    on(eventName, callback) {
     }
-    off(eventName, callback){
-        
+    off(eventName, callback) {
+
     }
 }
 
-function checkLayerList(layerList){
-    if (!Array.isArray(layerList)){
-        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');        
+function checkLayerList(layerList) {
+    if (!Array.isArray(layerList)) {
+        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
-    if (!layerList.length){
+    if (!layerList.length) {
         throw new Error('Invalid argument, layer list must not be empty');
     }
     layerList.forEach(layer => {
-        if (!(layer instanceof Layer)){
+        if (!(layer instanceof Layer)) {
             throw new Error('Invalid layer, layer must be an instance of carto.Layer');
         }
     });
-    if (!layerList.every(layer=> layer._integrator==layerList[0]._integrator)){
+    if (layerList.some(layer => !layer._integrator)) {
+        throw new Error('Invalid argument, all layers must belong to some map');
+    }
+    if (!layerList.every(layer => layer._integrator == layerList[0]._integrator)) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }

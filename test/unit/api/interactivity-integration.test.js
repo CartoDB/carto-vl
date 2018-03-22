@@ -14,7 +14,7 @@ describe('Interactivity', () => {
             layer = new carto.Layer('layer', source, style);
         });
 
-        xit('should throw an error when some layer is not attached to a map', () => {
+        fit('should throw an error when some layer is not attached to a map', () => {
             expect(() => new carto.Interactivity([layer])).toThrowError(/.*map.*/);
         });
 
