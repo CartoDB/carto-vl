@@ -28,7 +28,43 @@ export default class Interactivity {
     }
 
     _subscribeToIntegratorEvents(integrator) {
-        
+        integrator.on('mousemove', this._onMouseMove);
+        integrator.on('click', this._onClick);
+    }
+
+    _onMouseMove(event) {
+        const data = this._createFeatureEvent(event);
+        this._fireEvent(data);
+    }
+
+    _onClick(event) {
+        const data = this._createFeatureEvent(event);
+        this._fireEvent(data);
+    }
+
+    _createFeatureEvent(eventData) {
+        const features = this._getFeaturesAtPosition();
+        return {
+            features,
+            coordinates: eventData.lngLat,
+            position: eventData.point,
+        };
+    }
+
+    _fireEvent(featureEvent) {
+        const type = this._getEventType();
+        this._emitter.emit(type, featureEvent);
+    }
+
+    _getFeaturesAtPosition() {
+        // TODO: getFeatures at event location.
+        return [];
+    }
+
+    _getEventType() {
+        // TODO: get type based on internal state
+        const type = 'featureClick';
+        return type;
     }
 }
 
