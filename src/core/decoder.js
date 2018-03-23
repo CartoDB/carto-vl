@@ -63,149 +63,90 @@ function decodeLine(geom) {
     let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
         feature.map(lineString => {
-            // Create triangulation
-
-            // Points a and b are the current points for the line segment
-            // to draw. Point c is the next point in the lineString
-            let a, b, c;
-            // Normal vectors for the lines ab and bc
-            let nab, nbc;
-            // Normal vectors for the corners zab and abc. We use z to define
-            // the point before a.
-            let nzab, nabc;
-            // Flat numbers fzab and fabc are used to indicate if the corners
-            // zab and abc should be flat and in which direction.
-            // * fabc = 0: no flat corner.
-            // * fabc = -1: flat corner in the oposite direction of nabc.
-            // * fabc = 1: flat corner in the same direction of nabc.
-            // The critera to obtain this number is that the absolute value of
-            // the sinus of the angle between BA and BC is less than 0.5. The sign
-            // of the number is just the opposite of the sign of the sinus.
-            let fzab = 0;
-            let fabc = 0;
-            
-            // We need at least two points
-            if (lineString.length >= 4) {
-                
-                // Initialize the first two points
-                a = [lineString[0], lineString[1]];
-                b = [lineString[2], lineString[3]];
-                nab = getLineNormal(a, b);
-                
-                for (let i = 4; i <= lineString.length; i += 2) {
-                    
-                    if (i <= lineString.length - 2) {
-                        // If there is a next point c, compute its properties
-                        c = [lineString[i], lineString[i + 1]];
-                        nbc = getLineNormal(b, c);
-                        const { flat, normal } = getJoinNormal(a, b, c);
-                        fabc = flat;
-                        nabc = normal;
-                    } else {
-                        // If there is no next point c, reset its properties
-                        fabc = 0;
-                        nabc = null;
-                    }
-
-                    // First triangle
-                    geometry.push(a[0], a[1]);
-                    geometry.push(a[0], a[1]);
-                    geometry.push(b[0], b[1]);
-                    if (nzab) {
-                        if (fzab == 1) {
-                            normals.push(nab[0], nab[1]);
-                        } else {
-                            normals.push(nzab[0], nzab[1]);
-                        }
-                    } else {
-                        normals.push(nab[0], nab[1]);
-                    }
-                    if (nzab) {
-                        if (fzab == -1) {
-                            normals.push(-nab[0], -nab[1]);
-                        } else {
-                            normals.push(-nzab[0], -nzab[1]);
-                        }
-                    } else {
-                        normals.push(-nab[0], -nab[1]);
-                    }
-                    if (nabc) {
-                        if (fabc == -1) {
-                            normals.push(-nab[0], -nab[1]);
-                        } else {
-                            normals.push(-nabc[0], -nabc[1]);
-                        }
-                    } else {
-                        normals.push(-nab[0], -nab[1]);
-                    }
-                    
-                    // Second triangle
-                    geometry.push(a[0], a[1]);
-                    geometry.push(b[0], b[1]);
-                    geometry.push(b[0], b[1]);
-                    if (nzab) {
-                        if (fzab == 1) {
-                            normals.push(nab[0], nab[1]);
-                        } else {
-                            normals.push(nzab[0], nzab[1]);
-                        }
-                    } else {
-                        normals.push(nab[0], nab[1]);
-                    }
-                    if (nabc) {
-                        if (fabc == -1) {
-                            normals.push(-nab[0], -nab[1]);
-                        } else {
-                            normals.push(-nabc[0], -nabc[1]);
-                        }
-                    } else {
-                        normals.push(-nab[0], -nab[1]);
-                    }
-                    if (nabc) {
-                        if (fabc == 1) {
-                            normals.push(nab[0], nab[1]);
-                        } else {
-                            normals.push(nabc[0], nabc[1]);
-                        }
-                    } else {
-                        normals.push(nab[0], nab[1]);
-                    }
-                    
-                    if (fabc && nabc) {
-                        // Third triangle
-                        // It only appears in the flat corners
-                        geometry.push(b[0], b[1]);
-                        geometry.push(b[0], b[1]);
-                        geometry.push(b[0], b[1]);
-                        if (fabc == -1) {
-                            normals.push(nabc[0], nabc[1]);
-                            normals.push(-nab[0], -nab[1]);
-                            normals.push(-nbc[0], -nbc[1]);
-                        } else {
-                            normals.push(-nabc[0], -nabc[1]);
-                            normals.push(nbc[0], nbc[1]);
-                            normals.push(nab[0], nab[1]);
-                        }
-                    }
-                    
-                    // Update the variables for the next iteration.
-                    // This is an algorithm optimization to reduce
-                    // the number of operations by half
-                    a = b;
-                    b = c;
-                    nab = nbc;
-                    fzab = fabc;
-                    nzab = nabc;
-                }
-            }
+            addLine(lineString, geometry, normals);
         });
-        breakpointList.push(geometry.length);
+        breakpointList.push(geometry.length);    
     });
     return {
         normals: new Float32Array(normals),
         geometry: new Float32Array(geometry),
         breakpointList
     };
+}
+
+/**
+ * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
+ * with `miter` joins. For angle < 60 joins are automatically asjusted to `bevel`.
+ */
+function addLine(lineString, geometry, normals) {
+    let prevPoint, currentPoint, nextPoint;
+    let prevNormal, nextNormal;
+    
+    // We need at least two points
+    if (lineString.length >= 4) {
+        
+        // Initialize the first two points
+        prevPoint = [lineString[0], lineString[1]];
+        currentPoint = [lineString[2], lineString[3]];
+        prevNormal = getLineNormal(prevPoint, currentPoint);
+        
+        for (let i = 4; i <= lineString.length; i += 2) {
+            
+            // First triangle
+            addTriangle(
+                [prevPoint, prevPoint, currentPoint],
+                [prevNormal, neg(prevNormal), neg(prevNormal)]
+            );
+            
+            // Second triangle
+            addTriangle(
+                [prevPoint, currentPoint, currentPoint],
+                [prevNormal, neg(prevNormal), prevNormal]
+            );
+            
+            if (i <= lineString.length - 2) {
+                // If there is a next point, compute its properties
+                nextPoint = [lineString[i], lineString[i + 1]];
+                nextNormal = getLineNormal(currentPoint, nextPoint);
+                // `turnLeft` indicates that the nextLine turns to the left
+                // `miterJoin` is true when join must be `miter`. Otherwise it will be `bevel`
+                // `joinNormal` vector contains the direction and size for the `miter` vertex
+                let {turnLeft, miterJoin, joinNormal} = getJoinNormal(prevPoint, currentPoint, nextPoint);
+                
+                // Third triangle
+                addTriangle(
+                    [currentPoint, currentPoint, currentPoint],
+                    [[0, 0],
+                        turnLeft ? neg(prevNormal) : nextNormal,
+                        turnLeft ? neg(nextNormal) : prevNormal]
+                );
+                
+                if (miterJoin) {
+                    // Forth triangle
+                    addTriangle(
+                        [currentPoint, currentPoint, currentPoint],
+                        [turnLeft ? neg(joinNormal) : joinNormal,
+                            turnLeft ? neg(nextNormal) : prevNormal,
+                            turnLeft ? neg(prevNormal) : nextNormal]
+                    );   
+                }
+            }
+            
+            // Update the variables for the next iteration
+            prevPoint = currentPoint;
+            currentPoint = nextPoint;
+            prevNormal = nextNormal;
+        }
+    }
+
+    function addTriangle(p, n) {
+        geometry.push(p[0][0], p[0][1]);
+        geometry.push(p[1][0], p[1][1]);
+        geometry.push(p[2][0], p[2][1]);
+        normals.push(n[0][0], n[0][1]);
+        normals.push(n[1][0], n[1][1]);
+        normals.push(n[2][0], n[2][1]);
+    }
 }
 
 /**
@@ -229,9 +170,17 @@ function getJoinNormal(a, b, c) {
     const v = uvector(b, c);
     const sin = v[0] * u[1] - v[1] * u[0];
     return {
-        flat: Math.abs(sin) < 0.5 ? - Math.sign(sin) : 0,
-        normal: (sin !== 0) && [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin]
+        turnLeft: sin > 0,
+        miterJoin: Math.abs(sin) > 0.866, // 60 deg
+        joinNormal: (sin !== 0) && [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin]
     };
+}
+
+/**
+ * Return the negative of the provided vector
+ */
+function neg(v) {
+    return [-v[0], -v[1]];
 }
 
 /**
