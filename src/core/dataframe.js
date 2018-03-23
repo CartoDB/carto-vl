@@ -1,5 +1,7 @@
 import decoder from './decoder';
+
 export default class Dataframe {
+    // `type` is one of 'point' or 'line' or 'polygon'
     constructor({ center, scale, geom, properties, type, active, size }) {
         this.active = active;
         this.center = center;
@@ -8,25 +10,24 @@ export default class Dataframe {
         this.scale = scale;
         this.size = size;
         this.type = type;
+        this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
+        this.numVertex = this.decodedGeom.vertices.length / 2;
+        this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
+        this.propertyTex = [];
+
     }
 
     bind(renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
 
-        this.propertyTex = [];
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
 
-        const decodedGeom = decoder.decodeGeom(this.type, this.geom);
-        var points = decodedGeom.geometry;
-        this.numVertex = points.length / 2;
-        this.breakpointList = decodedGeom.breakpointList;
-        this.numFeatures = this.breakpointList.length || this.numVertex;
         this._genDataframePropertyTextures(gl);
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
-
-        this.style = null;
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
@@ -37,22 +38,22 @@ export default class Dataframe {
         this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
         this.texFilter = this._createStyleTileTexture(this.numFeatures);
 
-        var ids = new Float32Array(points.length);
+        const ids = new Float32Array(vertices.length);
         let index = 0;
-        for (var i = 0; i < points.length; i += 2) {
-            if ((!this.breakpointList.length && i > 0) || i == this.breakpointList[index]) {
+        for (let i = 0; i < vertices.length; i += 2) {
+            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
                 index++;
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-        if (decodedGeom.normals) {
+        if (this.decodedGeom.normals) {
             this.normalBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.normals, gl.STATIC_DRAW);
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
@@ -63,6 +64,35 @@ export default class Dataframe {
         this.style = style;
     }
 
+    getFeaturesAtPosition(pos) {
+        switch (this.type) {
+            case 'point':
+                return this._getPointsAtPosition(pos);
+            case 'line':
+                return this._getLinesAtPosition(pos);
+            case 'polygon':
+                return this._getPolygonAtPosition(pos);
+            default:
+                return [];
+        }
+    }
+
+    _getPointsAtPosition(pos) {
+        console.log(pos);
+        return [];
+    }
+
+    _getLinesAtPosition(pos) {
+        console.log(pos);
+        return [];
+
+    }
+
+    _getPolygonAtPosition(pos) {
+        console.log(pos);
+        return [];
+    }
+
     _genDataframePropertyTextures() {
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
@@ -71,9 +101,9 @@ export default class Dataframe {
         this.height = height;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
-        for (var k in this.properties) {
+        for (const k in this.properties) {
             if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                var propertyID = this.propertyID[k];
+                let propertyID = this.propertyID[k];
                 if (propertyID === undefined) {
                     propertyID = this.propertyCount;
                     this.propertyCount++;

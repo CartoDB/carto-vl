@@ -61,13 +61,11 @@ import CIELab from './expressions/CIELab';
 import Float from './expressions/float';
 import FloatConstant from './expressions/floatConstant';
 import Category from './expressions/category';
-import HSV from './expressions/hsv';
 import Linear from './expressions/linear';
 import Near from './expressions/near';
 import Now from './expressions/now';
 import Property from './expressions/property';
 import Ramp from './expressions/ramp';
-import RGBA from './expressions/rgba';
 import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
@@ -118,6 +116,9 @@ import { Cubic } from './expressions/interpolators';
 
 import {Torque, Fade} from './expressions/torque';
 
+// Colors
+import {RGB, RGBA} from './expressions/rgb';
+import {HSV, HSVA} from './expressions/hsv';
 
 export { Cubic };
 
@@ -150,9 +151,11 @@ export const sign = (...args) => new Sign(...args);
 export const near = (...args) => new Near(...args);
 export const blend = (...args) => new Blend(...args);
 export const rgba = (...args) => new RGBA(...args);
+export const rgb = (...args) => new RGB(...args);
 export const property = (...args) => new Property(...args);
 export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
+export const hsva = (...args) => new HSVA(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
 export const float = (...args) => new Float(...args);

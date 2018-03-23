@@ -31,46 +31,46 @@ export function decodeGeom(geomType, geom) {
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(geometry) {
+function decodePoint(vertices) {
     return {
-        geometry: geometry,
-        breakpointList: []
+        vertices: vertices,
+        breakpoints: []
     };
 }
 
 function decodePolygon(geometry) {
-    let vertexArray = []; //Array of triangle vertices
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let vertices = []; //Array of triangle vertices
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertexArray.push(polygon.flat[2 * index]);
-                vertexArray.push(polygon.flat[2 * index + 1]);
+                vertices.push(polygon.flat[2 * index]);
+                vertices.push(polygon.flat[2 * index + 1]);
             });
         });
-        breakpointList.push(vertexArray.length);
+        breakpoints.push(vertices.length);
     });
     return {
-        geometry: new Float32Array(vertexArray),
-        breakpointList
+        vertices: new Float32Array(vertices),
+        breakpoints
     };
 }
 
 function decodeLine(geom) {
+    let vertices = [];
     let normals = [];
-    let geometry = [];
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
         feature.map(lineString => {
-            addLine(lineString, geometry, normals);
+            addLine(lineString, vertices, normals);
         });
-        breakpointList.push(geometry.length);    
+        breakpoints.push(vertices.length);    
     });
     return {
         normals: new Float32Array(normals),
-        geometry: new Float32Array(geometry),
-        breakpointList
+        vertices: new Float32Array(vertices),
+        breakpoints
     };
 }
 
@@ -78,7 +78,7 @@ function decodeLine(geom) {
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-function addLine(lineString, geometry, normals) {
+function addLine(lineString, vertices, normals) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     
@@ -140,9 +140,9 @@ function addLine(lineString, geometry, normals) {
     }
 
     function addTriangle(p, n) {
-        geometry.push(p[0][0], p[0][1]);
-        geometry.push(p[1][0], p[1][1]);
-        geometry.push(p[2][0], p[2][1]);
+        vertices.push(p[0][0], p[0][1]);
+        vertices.push(p[1][0], p[1][1]);
+        vertices.push(p[2][0], p[2][1]);
         normals.push(n[0][0], n[0][1]);
         normals.push(n[1][0], n[1][1]);
         normals.push(n[2][0], n[2][1]);

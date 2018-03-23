@@ -101,7 +101,7 @@ export default class Expression {
      * @param {*} toReplace
      * @param {*} replacer
      */
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] == toReplace);
         this[name] = replacer;
         replacer.parent = this;
@@ -125,7 +125,7 @@ export default class Expression {
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
         return final;
     }
@@ -135,7 +135,7 @@ export default class Expression {
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
     }
 
