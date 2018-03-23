@@ -76,7 +76,7 @@ function decodeLine(geom) {
 
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
- * with `miter` joins. For angle < 60 joins are automatically asjusted to `bevel`.
+ * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
 function addLine(lineString, geometry, normals) {
     let prevPoint, currentPoint, nextPoint;
@@ -95,13 +95,13 @@ function addLine(lineString, geometry, normals) {
             // First triangle
             addTriangle(
                 [prevPoint, prevPoint, currentPoint],
-                [prevNormal, neg(prevNormal), neg(prevNormal)]
+                [neg(prevNormal), prevNormal, prevNormal]
             );
             
             // Second triangle
             addTriangle(
                 [prevPoint, currentPoint, currentPoint],
-                [prevNormal, neg(prevNormal), prevNormal]
+                [neg(prevNormal), prevNormal, neg(prevNormal)]
             );
             
             if (i <= lineString.length - 2) {
@@ -109,25 +109,25 @@ function addLine(lineString, geometry, normals) {
                 nextPoint = [lineString[i], lineString[i + 1]];
                 nextNormal = getLineNormal(currentPoint, nextPoint);
                 // `turnLeft` indicates that the nextLine turns to the left
-                // `miterJoin` is true when join must be `miter`. Otherwise it will be `bevel`
-                // `joinNormal` vector contains the direction and size for the `miter` vertex
-                let {turnLeft, miterJoin, joinNormal} = getJoinNormal(prevPoint, currentPoint, nextPoint);
+                // `joinNormal` contains the direction and size for the `miter` vertex
+                //  If this is not defined means that the join must be `bevel`.
+                let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
                 
                 // Third triangle
                 addTriangle(
                     [currentPoint, currentPoint, currentPoint],
                     [[0, 0],
-                        turnLeft ? neg(prevNormal) : nextNormal,
-                        turnLeft ? neg(nextNormal) : prevNormal]
+                        turnLeft ? prevNormal : neg(nextNormal),
+                        turnLeft ? nextNormal : neg(prevNormal)]
                 );
                 
-                if (miterJoin) {
+                if (joinNormal) {
                     // Forth triangle
                     addTriangle(
                         [currentPoint, currentPoint, currentPoint],
-                        [turnLeft ? neg(joinNormal) : joinNormal,
-                            turnLeft ? neg(nextNormal) : prevNormal,
-                            turnLeft ? neg(prevNormal) : nextNormal]
+                        [joinNormal,
+                            turnLeft ? nextNormal : neg(prevNormal),
+                            turnLeft ? prevNormal : neg(nextNormal)]
                     );   
                 }
             }
@@ -151,28 +151,32 @@ function addLine(lineString, geometry, normals) {
 
 /**
  * Compute the normal of a line AB.
- * By definition it is the unitary vector from A to B, rotated 90 degrees
+ * By definition it is the unitary vector from B to A, rotated +90 degrees
  */
 function getLineNormal(a, b) {
-    const u = uvector(a, b);
+    const u = normalize(vector(b, a));
     return [-u[1], u[0]];
 }
 
 /**
- * Compute the normal of the join of lines BA and BC.
+ * Compute the normal of the join from the lines' normals.
  * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
  * multiplied by a factor of `1/sin(theta)` to reach the intersecction of the wide lines.
  * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
  * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
  */
-function getJoinNormal(a, b, c) {
-    const u = uvector(b, a);
-    const v = uvector(b, c);
+function getJoinNormal(prevNormal, nextNormal) {
+    const u = [prevNormal[1], -prevNormal[0]];
+    const v = [-nextNormal[1], nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
+    const factor = Math.abs(sin);
+    const miterJoin = factor > 0.866; // 60 deg
     return {
         turnLeft: sin > 0,
-        miterJoin: Math.abs(sin) > 0.866, // 60 deg
-        joinNormal: (sin !== 0) && [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin]
+        joinNormal: miterJoin && neg([
+            (u[0] + v[0]) / factor ,
+            (u[1] + v[1]) / factor
+        ])
     };
 }
 
@@ -184,10 +188,10 @@ function neg(v) {
 }
 
 /**
- * Create a unitary vector wich goes from p1 to p2
+ * Create a vector which goes from p1 to p2
  */
-function uvector(p1, p2) {
-    return normalize([p2[0] - p1[0], p2[1] - p1[1]]);
+function vector(p1, p2) {
+    return [p2[0] - p1[0], p2[1] - p1[1]];
 }
 
 /**
