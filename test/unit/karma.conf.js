@@ -1,7 +1,7 @@
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
-        files: ['test/unit/index.test.js'],
+        files: ['index.test.js'],
         reporters: ['mocha'],
         port: 9876,  // karma web server port
         colors: true,
@@ -11,7 +11,7 @@ module.exports = function (config) {
         singleRun: false,
         concurrency: Infinity,
         preprocessors: {
-            'test/unit/index.test.js': ['webpack', 'sourcemap'],
+            'index.test.js': ['webpack', 'sourcemap'],
         },
         webpack: {
             devtool: 'inline-source-map'
