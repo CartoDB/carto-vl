@@ -271,6 +271,14 @@ export default class Layer {
         return this._style;
     }
 
+    getIntegrator() {
+        return this._integrator;
+    }
+
+    getFeaturesAtPosition(pos) {
+        return this._renderLayer.getFeaturesAtPosition(pos);
+    }
+
     _isCartoMap(map) {
         return map instanceof CartoMap;
     }

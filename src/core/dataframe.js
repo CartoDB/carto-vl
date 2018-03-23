@@ -1,5 +1,7 @@
 import decoder from './decoder';
+
 export default class Dataframe {
+    // `type` is one of 'point' or 'line' or 'polygon'
     constructor({ center, scale, geom, properties, type, active, size }) {
         this.active = active;
         this.center = center;
@@ -12,7 +14,7 @@ export default class Dataframe {
         this.numVertex = this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
-        
+
     }
 
     bind(renderer) {
@@ -60,6 +62,35 @@ export default class Dataframe {
 
     setStyle(style) {
         this.style = style;
+    }
+
+    getFeaturesAtPosition(pos) {
+        switch (this.type) {
+            case 'point':
+                return this._getPointsAtPosition(pos);
+            case 'line':
+                return this._getLinesAtPosition(pos);
+            case 'polygon':
+                return this._getPolygonAtPosition(pos);
+            default:
+                return [];
+        }
+    }
+
+    _getPointsAtPosition(pos) {
+        console.log(pos);
+        return [];
+    }
+
+    _getLinesAtPosition(pos) {
+        console.log(pos);
+        return [];
+
+    }
+
+    _getPolygonAtPosition(pos) {
+        console.log(pos);
+        return [];
     }
 
     _genDataframePropertyTextures() {
