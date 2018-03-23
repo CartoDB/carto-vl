@@ -53,6 +53,12 @@ class Renderer {
 
     _initGL(gl) {
         this.gl = gl;
+        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+        if (supportedRTT < RTT_WIDTH) {
+            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+        }
+
+        // TODO these two extensions should be optional
         const OES_texture_float = gl.getExtension('OES_texture_float');
         if (!OES_texture_float) {
             throw new Error('WebGL extension OES_texture_float is unsupported');
@@ -61,10 +67,7 @@ class Renderer {
         if (!OES_texture_float_linear) {
             throw new Error('WebGL extension OES_texture_float_linear is unsupported');
         }
-        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-        if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-        }
+
         this._initShaders();
 
         this.auxFB = gl.createFramebuffer();
