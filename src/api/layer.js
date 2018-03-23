@@ -276,7 +276,12 @@ export default class Layer {
     }
 
     getFeaturesAtPosition(pos) {
-        return this._renderLayer.getFeaturesAtPosition(pos);
+        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+    }
+
+    _addLayerIdToFeature(feature) {
+        feature.layerId = this._id;
+        return feature;
     }
 
     _isCartoMap(map) {
