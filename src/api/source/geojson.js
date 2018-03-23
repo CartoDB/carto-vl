@@ -70,7 +70,8 @@ export default class GeoJSON extends Base {
             properties: this._decodeProperties(),
             scale: 1,
             size: this._features.length,
-            type: this._getDataframeType(this._type)
+            type: this._getDataframeType(this._type),
+            metadata: this._metadata,
         });
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
