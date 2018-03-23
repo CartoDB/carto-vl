@@ -64,7 +64,7 @@ export default class Interactivity {
     _getFeaturesAtPosition(lngLat) {
         const wm = projectToWebMercator({ lng: lngLat[0], lat: lngLat[1] });
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
-        return this._layerList.map(layer => layer._renderLayer._getFeaturesAtPosition(nwmc)).reduce(Array.concat);
+        return this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)).reduce(Array.concat);
     }
 
     _getEventType() {
