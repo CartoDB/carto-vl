@@ -45,9 +45,7 @@ export default class Interactivity {
     }
 
     _createFeatureEvent(eventData) {
-        const wm = projectToWebMercator({ lng: eventData.lngLat[0], lat: eventData.lngLat[1] });
-        const nwmcCoords = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
-        const features = this._getFeaturesAtPosition(nwmcCoords);
+        const features = this._getFeaturesAtPosition(eventData.lngLat);
         return {
             features,
             coordinates: eventData.lngLat,
@@ -60,8 +58,10 @@ export default class Interactivity {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition(nwmcCoords) {
-        return this._layerList.map(layer => layer._renderLayer._getFeaturesAtPosition(nwmcCoords)).reduce(Array.concat);
+    _getFeaturesAtPosition(lngLat) {
+        const wm = projectToWebMercator({ lng: lngLat[0], lat: lngLat[1] });
+        const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
+        return this._layerList.map(layer => layer._renderLayer._getFeaturesAtPosition(nwmc)).reduce(Array.concat);
     }
 
     _getEventType() {
