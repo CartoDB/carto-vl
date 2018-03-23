@@ -129,7 +129,7 @@ describe('api/layer', () => {
         });
     });
 
-    fdescribe('.getFeaturesAtPosition', () => {
+    describe('.getFeaturesAtPosition', () => {
         it('should add a layerId to every feature in the list', () => {
             const layer = new Layer('layer0', source, style);
             const fakeFeature0 = {
