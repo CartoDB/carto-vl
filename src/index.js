@@ -26,13 +26,12 @@ import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
-import JSONArray from './api/source/jsonArray';
 import Interactivity from './api/interactivity';
 
 // Namespaces
 
 const style = { expressions };
-const source = { Dataset, SQL, GeoJSON, JSONArray };
+const source = { Dataset, SQL, GeoJSON };
 
 export {
     source,
