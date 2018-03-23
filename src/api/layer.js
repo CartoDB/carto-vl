@@ -58,15 +58,17 @@ export default class Layer {
         this.setStyle(style);
     }
 
-    _fire(eventType, eventData) {
-        return this._emitter.emit(eventType, eventData);
-    }
 
     on(eventType, callback) {
         return this._emitter.on(eventType, callback);
     }
+
     off(eventType, callback) {
         return this._emitter.off(eventType, callback);
+    }
+
+    _fire(eventType, eventData) {
+        return this._emitter.emit(eventType, eventData);
     }
 
     $paintCallback() {
