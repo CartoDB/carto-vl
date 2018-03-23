@@ -54,17 +54,6 @@ export default class Layer {
 
         this.setSource(source);
         this.setStyle(style);
-
-        this.paintCallback = () => {
-            if (this._style && this._style.colorShader) {
-                this._renderLayer.style = this._style;
-                this._integrator.renderer.renderLayer(this._renderLayer);
-            }
-            if (this.state == 'dataLoaded') {
-                this.state = 'dataPainted';
-                this._fire('loaded');
-            }
-        };
     }
 
     _fire(eventType, eventData) {
@@ -84,6 +73,17 @@ export default class Layer {
     off(eventType, callback) {
         const index = this._listeners[eventType].indexOf(callback);
         this._listeners[eventType].splice(index, 1);
+    }
+
+    $paintCallback() {
+        if (this._style && this._style.colorShader) {
+            this._renderLayer.style = this._style;
+            this._integrator.renderer.renderLayer(this._renderLayer);
+        }
+        if (this.state == 'dataLoaded') {
+            this.state = 'dataPainted';
+            this._fire('loaded');
+        }
     }
 
     async update(source, style) {

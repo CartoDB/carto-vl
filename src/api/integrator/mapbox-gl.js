@@ -72,7 +72,7 @@ class MGLIntegrator {
                 this.renderer._initGL(gl);
                 this._layers.map(layer => layer.initCallback());
             }
-            layer.paintCallback();
+            layer.$paintCallback();
             this._paintedLayers++;
 
             if (this._paintedLayers % this._layers.length == 0) {
