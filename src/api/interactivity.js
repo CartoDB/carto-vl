@@ -13,9 +13,12 @@ const EVENTS = [
 export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
+        this._init(layerList);
+    }
+
+    _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-
         this._subscribeToIntegratorEvents(this._layerList[0].getIntegrator());
     }
 
