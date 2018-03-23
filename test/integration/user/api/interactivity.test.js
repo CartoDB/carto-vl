@@ -1,5 +1,5 @@
-import * as carto from '../../../src/';
-import mapboxgl from '../../../vendor/mapbox-gl-dev';
+import * as carto from '../../../../src/';
+import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
     let div, source, style, layer, map;
