@@ -33,6 +33,12 @@ describe('src/core/dataframe', () => {
                 type: 'polygon',
                 size: 1,
                 active: true,
+                metadata: {
+                    columns: [{
+                        name: 'id',
+                        type: 'float'
+                    }]
+                }
             });
             const feature1 = {
                 properties: {
