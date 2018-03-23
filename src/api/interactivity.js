@@ -1,5 +1,7 @@
 import mitt from 'mitt';
 import Layer from './layer';
+import { WM_R, projectToWebMercator } from './util';
+import { wToR } from '../client/rsys';
 
 const EVENTS = [
     'featureClick',
@@ -43,7 +45,9 @@ export default class Interactivity {
     }
 
     _createFeatureEvent(eventData) {
-        const features = this._getFeaturesAtPosition();
+        const wm = projectToWebMercator({ lng: eventData.lngLat[0], lat: eventData.lngLat[1] });
+        const nwmcCoords = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
+        const features = this._getFeaturesAtPosition(nwmcCoords);
         return {
             features,
             coordinates: eventData.lngLat,
@@ -56,9 +60,8 @@ export default class Interactivity {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition() {
-        // TODO: getFeatures at event location.
-        return [];
+    _getFeaturesAtPosition(nwmcCoords) {
+        return this._layerList.map(layer => layer._renderLayer._getFeaturesAtPosition(nwmcCoords)).reduce(Array.concat);
     }
 
     _getEventType() {

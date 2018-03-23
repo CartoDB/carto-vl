@@ -40,6 +40,10 @@ export default class RenderLayer {
         }
     }
 
+    getFeaturesAtPosition(pos) {
+        return this.dataframes.map(df => df.getFeaturesAtPosition(pos)).reduce(Array.concat);
+    }
+
     freeDataframes() {
         this.dataframes.map(df => df.free());
         this.dataframes = [];
