@@ -1,3 +1,4 @@
+import mitt from 'mitt';
 import * as util from './util';
 import SourceBase from './source/base';
 import Style from './style';
@@ -38,6 +39,7 @@ export default class Layer {
         this._checkSource(source);
         this._checkStyle(style);
 
+        this._emitter = mitt();
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
@@ -57,22 +59,14 @@ export default class Layer {
     }
 
     _fire(eventType, eventData) {
-        if (!this._listeners[eventType]) {
-            return;
-        }
-        this._listeners[eventType].map(listener => listener(eventData));
+        return this._emitter.emit(eventType, eventData);
     }
 
     on(eventType, callback) {
-        if (!this._listeners[eventType]) {
-            this._listeners[eventType] = [callback];
-        } else {
-            this._listeners[eventType].push(callback);
-        }
+        return this._emitter.on(eventType, callback);
     }
     off(eventType, callback) {
-        const index = this._listeners[eventType].indexOf(callback);
-        this._listeners[eventType].splice(index, 1);
+        return this._emitter.off(eventType, callback);
     }
 
     $paintCallback() {
