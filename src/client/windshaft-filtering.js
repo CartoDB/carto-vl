@@ -63,7 +63,15 @@ class AggregationFiltering {
         return this._basicCondition(f);
     }
 
+    _removeBlend(f) {
+        if (f instanceof Blend && f.originalMix instanceof Animate) {
+            return f.b;
+        }
+        return f;
+    }
+
     _basicCondition(f) {
+        f = this._removeBlend(f);
         return this._between(f)
             || this._equals(f) || this._notEquals(f)
             || this._lessThan(f) || this._lessThanOrEqualTo(f)
@@ -72,6 +80,7 @@ class AggregationFiltering {
     }
 
     _value(f) {
+        f = this._removeBlend(f);
         if (f instanceof Float || f instanceof FloatConstant || f instanceof Category) {
             return f.expr;
         }
@@ -143,6 +152,7 @@ class AggregationFiltering {
     }
 
     _aggregation(f) {
+        f = this._removeBlend(f);
         if (f instanceof Max || f instanceof Min || f instanceof Avg || f instanceof Sum || f instanceof Mode) {
             let p = this._property(f.property);
             if (p) {
@@ -159,6 +169,7 @@ class AggregationFiltering {
     }
 
     _property(f) {
+        f = this._removeBlend(f);
         if (f instanceof Property) {
             return {
                 property: f.name,
