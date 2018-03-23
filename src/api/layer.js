@@ -39,6 +39,13 @@ export default class Layer {
         this._checkSource(source);
         this._checkStyle(style);
 
+        this._init(id, source, style);
+    }
+
+    _init(id, source, style) {
+        this.state = 'init';
+        this._id = id;
+
         this._emitter = mitt();
         this._lastViewport = null;
         this._lastMNS = null;
@@ -47,11 +54,9 @@ export default class Layer {
             this._contextInitCallback = resolve;
         });
 
-        this._id = id;
         this.metadata = null;
         this._listeners = {};
         this._renderLayer = new RenderLayer();
-        this.state = 'init';
 
         this.update(source, style);
     }
