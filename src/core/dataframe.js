@@ -95,6 +95,9 @@ export default class Dataframe {
         const breakpoints = this.decodedGeom.breakpoints;
         let featureID = 0;
         const features = [];
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
         for (let i = 0; i < vertices.length; i += 6) {
             if (i >= breakpoints[featureID]) {
                 featureID++;
@@ -207,14 +210,28 @@ export default class Dataframe {
     }
 }
 
-function sign(p1, p2, p3) {
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+function pointInTriangle(p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneTest(p, v1, v2) < 0;
+    const b2 = halfPlaneTest(p, v2, v3) < 0;
+    const b3 = halfPlaneTest(p, v3, v1) < 0;
+
+    return (b1 == b2) && (b2 == b3);
 }
 
-function pointInTriangle(pt, v1, v2, v3) {
-    const b1 = sign(pt, v1, v2) < 0;
-    const b2 = sign(pt, v2, v3) < 0;
-    const b3 = sign(pt, v3, v1) < 0;
-
-    return ((b1 == b2) && (b2 == b3));
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+function halfPlaneTest(p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
