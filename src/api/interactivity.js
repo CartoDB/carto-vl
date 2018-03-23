@@ -33,8 +33,8 @@ export default class Interactivity {
     }
 
     _subscribeToIntegratorEvents(integrator) {
-        integrator.on('mousemove', this._onMouseMove);
-        integrator.on('click', this._onClick);
+        integrator.on('mousemove', this._onMouseMove.bind(this));
+        integrator.on('click', this._onClick.bind(this));
     }
 
     _onMouseMove(event) {
@@ -62,9 +62,9 @@ export default class Interactivity {
     }
 
     _getFeaturesAtPosition(lngLat) {
-        const wm = projectToWebMercator({ lng: lngLat[0], lat: lngLat[1] });
+        const wm = projectToWebMercator({ lng: lngLat.lng, lat: lngLat.lat });
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
-        return this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)).reduce(Array.concat);
+        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
     }
 
     _getEventType() {
