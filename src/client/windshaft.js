@@ -23,6 +23,8 @@ export default class Windshaft {
     constructor(source) {
         this._source = source;
 
+        this._exclusive = true;
+
         this._requestGroupID = 0;
         this._oldDataframes = [];
         this._MNS = null;
@@ -70,7 +72,7 @@ export default class Windshaft {
     async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
-        const filtering = windshaftFiltering.getFiltering(style);
+        const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
@@ -153,18 +155,15 @@ export default class Windshaft {
         // If the number of features is higher than the minimun, enable server filtering.
         let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
 
-        // Alternative A. apply separate filters in SQL and Aggr. API
-        // if (this._requiresAggregation(MNS)) {
-        //     agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
-        // }
-
-        // Alternative B. apply eigher SQL or Aggr. API filters but not both
-        if (this._requiresAggregation(MNS)) {
+        if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
-            backendFilters = null;
+            if (!this._exclusive) {
+                backendFilters = null;
+            }
         }
-
-        aggSQL = this._buildQuery(select, backendFilters);
+        if (backendFilters) {
+            aggSQL = this._buildQuery(select, backendFilters);
+        }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
         this._checkLayerMeta(MNS);

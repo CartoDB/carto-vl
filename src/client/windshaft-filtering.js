@@ -12,9 +12,13 @@ import * as schema from '../core/schema';
 
 class AggregationFiltering {
     constructor(options) {
-        this._onlyAggregateFilters = options.onlyAggregateFilters;
+        // exclusive mode: aggregate filters don't include pre-aggregate conditions (dimensions)
+        // in that case pre-aggregate filters should always be applied, even with aggregation
+        // (which can be more efficient)
+        this._onlyAggregateFilters = options.exclusive;
     }
 
+    // return (partial) filters as an object (JSON) in the format of the Maps API aggregation interface
     getFilters(styleFilter) {
         let filters = {};
         let filterList = this._and(styleFilter).filter(Boolean);
@@ -211,6 +215,206 @@ class AggregationFiltering {
     }
 }
 
+class PreaggregationFiltering {
+    constructor() {
+    }
+
+    // return (partial) filters as an object (JSON) representing the SQL syntax tree
+    getFilter(styleFilter) {
+        return this._filter(styleFilter);
+    }
+
+    _filter(f) {
+        return this._and(f) || this._or(f)
+            || this._in(f) || this._notIn(f)
+            || this._between(f)
+            || this._equals(f) || this._notEquals(f)
+            || this._lessThan(f) || this._lessThanOrEqualTo(f)
+            || this._greaterThan(f) || this._greaterThanOrEqualTo(f)
+            || this._blend(f) || null;
+    }
+
+    _and(f) {
+        if (f instanceof And) {
+            // we can ignore nonsupported (null) subexpressions and yet support partial filtering
+            // note that expression lists are combined with AND
+            const l = [this._filter(f.a), this._filter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+            if (l.length) {
+                if (l.length == 1) {
+                    return l[0];
+                }
+                return {
+                    type: 'and',
+                    left: l[0],
+                    right: l[1]
+                };
+            }
+        }
+    }
+
+    _or(f) {
+        if (f instanceof Or) {
+            // if any subexpression is not supported the OR combination isn't supported either
+            let a = this._filter(f.a);
+            let b = this._filter(f.b);
+            if (a && b) {
+                return {
+                    type: 'or',
+                    left: a,
+                    right: b
+                };
+            }
+        }
+    }
+
+    _lessThan(f) {
+        return this._cmpOp(f, LessThan, 'lessThan');
+    }
+
+    _lessThanOrEqualTo(f) {
+        return this._cmpOp(f, LessThanOrEqualTo, 'lessThanOrEqualTo');
+    }
+
+    _greaterThan(f) {
+        return this._cmpOp(f, GreaterThan, 'greaterThan');
+    }
+
+    _greaterThanOrEqualTo(f) {
+        return this._cmpOp(f, GreaterThanOrEqualTo, 'greaterThanOrEqualTo');
+    }
+
+    _equals(f) {
+        return this._cmpOp(f, Equals, 'equals');
+    }
+
+    _notEquals(f) {
+        return this._cmpOp(f, NotEquals, 'notEquals');
+    }
+
+    _cmpOp(f, opClass, type) {
+        if (f instanceof opClass) {
+            let a = this._property(f.a) || this._value(f.a);
+            let b = this._property(f.b) || this._value(f.b);
+            if (a && b) {
+                return {
+                    type: type,
+                    left: a,
+                    right: b
+                };
+            }
+        }
+    }
+
+    _blend(f) {
+        if (f instanceof Blend && f.originalMix instanceof Animate) {
+            return this._filter(f.b);
+        }
+    }
+
+    _property(f) {
+        if (f instanceof Property) {
+            return {
+                type: 'property',
+                property: f.name
+            };
+        }
+    }
+
+    _value(f) {
+        if (f instanceof Float || f instanceof FloatConstant || f instanceof Category) {
+            return {
+                type: 'value',
+                value: f.expr
+            };
+        }
+    }
+
+    _in(f) {
+        if (f instanceof In) {
+            let p = this._property(f.value);
+            let values = f.categories.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                return {
+                    type: 'in',
+                    property: p.property,
+                    values: values.map(v => v.value)
+                };
+            }
+        }
+    }
+
+    _notIn(f) {
+        if (f instanceof Nin) {
+            let p = this._property(f.value);
+            let values = f.categories.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                return {
+                    type: 'notIn',
+                    property: p.property,
+                    values: values.map(v => v.value)
+                };
+            }
+        }
+    }
+
+    _between(f) {
+        if (f instanceof Between) {
+            let p = this._property(f.value);
+            let lo = this._value(f.lowerLimit);
+            let hi = this._value(f.upperLimit);
+            if (p && lo != null && hi != null) {
+                return {
+                    type: 'between',
+                    property: p.property,
+                    lower: lo.value,
+                    upper: hi.value
+                };
+            }
+        }
+    }
+}
+
+function getSQL(node) {
+    if (node.type) {
+        return `(${SQLGenerators[node.type](node)})`;
+    }
+    return sqlQ(node);
+}
+
+function sqlQ(value) {
+    if (isFinite(value)) {
+        return String(value);
+    }
+    return `'${value}'`; // TODO: escape single quotes! (by doubling them)
+}
+
+function sqlId(id) {
+    if (!id.match(/^[a-z\d_]+$/)) {
+        id = `"${id}"`; // TODO: escape double quotes!
+    }
+    return id;
+}
+
+function sqlSep(args, sep) {
+    return args.map(arg => getSQL(arg)).join(sep);
+}
+
+const SQLGenerators = {
+    'and':         (f) => sqlSep([f.left, f.right], ' AND '),
+    'or':          (f) => sqlSep([f.left, f.right], ' OR '),
+    'between':     (f) => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
+    'in':          (f) => `${sqlId(f.property)} IN (${sqlSep(f.values, ',')})`,
+    'notIn':       (f) => `${sqlId(f.property)} NOT IN (${sqlSep(f.values, ',')})`,
+    'equals':      (f) => sqlSep([f.left, f.right], ' = '),
+    'notEquals':   (f) => sqlSep([f.left, f.right], ' <> '),
+    'lessThan':    (f) => sqlSep([f.left, f.right], ' < '),
+    'lessThanOrEqualTo': (f) => sqlSep([f.left, f.right], ' <= '),
+    'greaterThan': (f) => sqlSep([f.left, f.right], ' > '),
+    'greaterThanOrEqualTo': (f) => sqlSep([f.left, f.right], ' >= '),
+    'property':    (f) => sqlId(f.property),
+    'value':       (f) => sqlQ(f.value)
+};
+
 /**
  * Returns supported windshaft filters for the style
  * @param {*} style
@@ -218,8 +422,9 @@ class AggregationFiltering {
  */
 export function getFiltering(style, options = {}) {
     const aggrFiltering = new AggregationFiltering(options);
+    const preFiltering = new PreaggregationFiltering(options);
     const filtering = {
-        preaggregation: getFilter(style.getFilter()),
+        preaggregation: preFiltering.getFilter(style.getFilter()),
         aggregation: aggrFiltering.getFilters(style.getFilter())
     };
     if (!filtering.preaggregation && !filtering.aggregation) {
@@ -234,117 +439,13 @@ export function getFiltering(style, options = {}) {
  */
 export function getSQLWhere(filtering) {
     filtering = filtering && filtering.preaggregation;
-    if (!filtering || filtering.length == 0) {
-        return '';
+    let sql;
+    if (filtering && Object.keys(filtering).length > 0) {
+        sql = getSQL(filtering);
     }
-    return 'WHERE ' + getAndSQL(filtering);
+    return sql ? 'WHERE ' + sql : '';
 }
 
 export function getAggregationFilters(filtering) {
     return filtering && filtering.aggregation;
-}
-
-
-function getAndSQL(filters) {
-    return filters.map(filter => getSQL(filter)).join(' AND ');
-}
-
-function getSQL(f) {
-    return getOrSQL(f) || getBetweenSQL(f) || getInSQL(f) || getNinSQL(f) || '';
-}
-
-function getBetweenSQL(f) {
-    if (f.type == 'between') {
-        return `(${f.property} BETWEEN ${f.lowerLimit} AND ${f.upperLimit})`;
-    }
-}
-
-function getInSQL(f) {
-    if (f.type == 'in') {
-        return `(${f.property} IN (${f.whitelist.map(cat => `'${cat}'`).join()}))`;
-    }
-}
-
-function getNinSQL(f) {
-    if (f.type == 'nin') {
-        return `(${f.property} NOT IN (${f.blacklist.map(cat => `'${cat}'`).join()}))`;
-    }
-}
-
-function getOrSQL(f) {
-    if (f.type == 'or') {
-        return `(${getAndSQL(f.first)} OR ${getAndSQL(f.second)})`;
-    }
-}
-
-function getFilter(f) {
-    return getAndFilter(f) || getOrFilter(f) ||getInFilter(f) || getNinFilter(f) || getBetweenFilter(f) || getBlendFilter(f) || null;
-}
-
-function getAndFilter(f) {
-    if (f instanceof And) {
-        // we can ignore nonsupported (null) subexpressions and yet support partial filtering
-        // note that expression lists are combined with AND
-        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
-        return l.length ? l : null;
-    }
-}
-
-function getOrFilter(f) {
-    if (f instanceof Or) {
-        // if any subexpression is not supported the OR combination isn't supported either
-        let a = getFilter(f.a);
-        let b = getFilter(f.b);
-        if (a && b) {
-            return [{
-                type: 'or',
-                first: a,
-                second: b
-            }];
-        }
-    }
-}
-
-function getBlendFilter(f) {
-    if (f instanceof Blend && f.originalMix instanceof Animate) {
-        return getFilter(f.b);
-    }
-}
-
-function getInFilter(f) {
-    if (f instanceof In && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
-        return [{
-            type: 'in',
-            property: f.value.name,
-            whitelist: f.categories.map(cat => cat.expr)
-        }];
-    }
-}
-
-function getNinFilter(f) {
-    if (f instanceof Nin && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
-        return [{
-            type: 'nin',
-            property: f.value.name,
-            blacklist: f.categories.map(cat => cat.expr)
-        }];
-    }
-}
-
-function getBetweenFilter(f) {
-    if (isBetweenFilter(f)) {
-        return [{
-            type: 'between',
-            property: f.value instanceof Property ? f.value.name : f.value.property.name,
-            lowerLimit: f.lowerLimit.expr,
-            upperLimit: f.upperLimit.expr,
-        }];
-    }
-}
-
-function isBetweenFilter(f) {
-    return f instanceof Between
-        && (f.value instanceof Property)
-        && (f.lowerLimit instanceof Float || f.lowerLimit instanceof FloatConstant)
-        && (f.upperLimit instanceof Float || f.upperLimit instanceof FloatConstant);
 }
