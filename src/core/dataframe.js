@@ -88,9 +88,43 @@ export default class Dataframe {
 
     }
 
-    _getPolygonAtPosition(pos) {
-        console.log(pos);
-        return [];
+    _getPolygonAtPosition(p) {
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureID = 0;
+        const features = [];
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureID]) {
+                featureID++;
+            }
+            const v1 = {
+                x: vertices[2 * i + 0],
+                y: vertices[2 * i + 1]
+            };
+            const v2 = {
+                x: vertices[2 * i + 2],
+                y: vertices[2 * i + 3]
+            };
+            const v3 = {
+                x: vertices[2 * i + 4],
+                y: vertices[2 * i + 5]
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                features.push({
+                    properties: this._getPropertiesOf(featureID)
+                });
+            }
+        }
+        return features;
+    }
+
+    _getPropertiesOf(featureID) {
+        const properties = {};
+        Object.keys(this.properties).map(propertyName => {
+            properties[propertyName] = this.properties[propertyName][featureID];
+        });
+        return properties;
     }
 
     _genDataframePropertyTextures() {
@@ -161,4 +195,16 @@ export default class Dataframe {
             this.propertyTex = null;
         }
     }
+}
+
+function sign(p1, p2, p3) {
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+}
+
+function pointInTriangle(pt, v1, v2, v3) {
+    const b1 = sign(pt, v1, v2) < 0;
+    const b2 = sign(pt, v2, v3) < 0;
+    const b3 = sign(pt, v3, v1) < 0;
+
+    return ((b1 == b2) && (b2 == b3));
 }
