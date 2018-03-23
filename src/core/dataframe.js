@@ -76,20 +76,22 @@ export default class Dataframe {
                 return [];
         }
     }
-    _getPointsAtPosition(pos){
+
+    _getPointsAtPosition(pos) {
         console.log(pos);
         return [];
     }
-    _getLinesAtPosition(pos){
-        console.log(pos);        
+
+    _getLinesAtPosition(pos) {
+        console.log(pos);
         return [];
 
     }
-    _getPolygonAtPosition(pos){
-        console.log(pos);        
+
+    _getPolygonAtPosition(pos) {
+        console.log(pos);
         return [];
     }
-
 
     _genDataframePropertyTextures() {
         const gl = this.renderer.gl;
