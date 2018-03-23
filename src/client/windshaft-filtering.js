@@ -395,24 +395,24 @@ function sqlId(id) {
     return id;
 }
 
-function sqlSep(args, sep) {
+function sqlSep(sep, ...args) {
     return args.map(arg => getSQL(arg)).join(sep);
 }
 
 const SQLGenerators = {
-    'and':         (f) => sqlSep([f.left, f.right], ' AND '),
-    'or':          (f) => sqlSep([f.left, f.right], ' OR '),
-    'between':     (f) => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
-    'in':          (f) => `${sqlId(f.property)} IN (${sqlSep(f.values, ',')})`,
-    'notIn':       (f) => `${sqlId(f.property)} NOT IN (${sqlSep(f.values, ',')})`,
-    'equals':      (f) => sqlSep([f.left, f.right], ' = '),
-    'notEquals':   (f) => sqlSep([f.left, f.right], ' <> '),
-    'lessThan':    (f) => sqlSep([f.left, f.right], ' < '),
-    'lessThanOrEqualTo': (f) => sqlSep([f.left, f.right], ' <= '),
-    'greaterThan': (f) => sqlSep([f.left, f.right], ' > '),
-    'greaterThanOrEqualTo': (f) => sqlSep([f.left, f.right], ' >= '),
-    'property':    (f) => sqlId(f.property),
-    'value':       (f) => sqlQ(f.value)
+    'and':                  f => sqlSep(' AND ', f.left, f.right),
+    'or':                   f => sqlSep(' OR ', f.left, f.right),
+    'between':              f => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
+    'in':                   f => `${sqlId(f.property)} IN (${sqlSep(',', ...f.values)})`,
+    'notIn':                f => `${sqlId(f.property)} NOT IN (${sqlSep(',', ...f.values)})`,
+    'equals':               f => sqlSep( ' = ', f.left, f.right),
+    'notEquals':            f => sqlSep(' <> ', f.left, f.right),
+    'lessThan':             f => sqlSep(' < ', f.left, f.right),
+    'lessThanOrEqualTo':    f => sqlSep(' <= ', f.left, f.right),
+    'greaterThan':          f => sqlSep( ' > ', f.left, f.right),
+    'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
+    'property':             f => sqlId(f.property),
+    'value':                f => sqlQ(f.value)
 };
 
 /**
