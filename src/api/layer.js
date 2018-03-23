@@ -149,6 +149,7 @@ export default class Layer {
     _onDataframeAdded(dataframe) {
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
     }
 
     /**
@@ -322,6 +323,7 @@ export default class Layer {
         }
         this.metadata = metadata;
         this._compileShaders(style, this.metadata);
+        this._integrator.needRefresh();
         return this.requestData();
     }
 

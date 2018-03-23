@@ -239,11 +239,7 @@ map.on('load', () => {
             layer = new carto.Layer('myCartoLayer', source, style);
             layer.addTo(map, 'watername_ocean');
         } else {
-            layer.update(source, style).then(() => {
-                localStorage.setItem('serverURL', $('#serverURL').val());
-                localStorage.setItem('user', $('#user').val());
-                localStorage.setItem('dataset', $('#dataset').val());
-            });
+            layer.update(source, style);
         }
     };
 
@@ -280,11 +276,6 @@ map.on('load', () => {
     addButton('Gecat', 'eyJhIjoic2VsZWN0ICosIDEgYXMgY28gZnJvbSBnZWNhdF9nZW9kYXRhX2NvcHkiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIobG9nKGF2Zygkc3BlZWQpKSwgMCwgNCksIEdleXNlciksICBzdW0oJGNvKSp6b29tKCkvMTAwMDAwKjEuOCo0KVxud2lkdGg6IDJcbnJlc29sdXRpb246IDAuMjUgIiwiZiI6eyJsbmciOjEuMjYxNjc5MjY2OTU0ODQzMSwibGF0Ijo0MS43MDQxMDQ5NzQ5MjA0NTV9LCJnIjo3LjM0NjUzOTQ5NzYwMzA0fQ==');
     addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KFNVTSgkYW1vdW50KS81MDAwMCkqMjAqKHpvb20oKS80MDAwKzAuMDEpKjEuNVxuY29sb3I6IHJhbXAoTU9ERSgkY2F0ZWdvcnkpLCBQcmlzbSlcbmZpbHRlcjogTU9ERSgkY2F0ZWdvcnkpID09IFwiVHJhbnNwb3J0ZXNcIiAgICBvciAgIE1PREUoJGNhdGVnb3J5KSA9PSBcIlNhbHVkXCIiLCJmIjp7ImxuZyI6Mi4xNjU4NTg4OTcwMDI3NDk1LCJsYXQiOjQxLjM3MDU1MjA4MDk0Mzg3fSwiZyI6MTEuNjg4MjUzMTg3MjM4MTk4fQ==');
 
-    if (localStorage.getItem('dataset')) {
-        $('#dataset').val(localStorage.getItem('dataset'));
-        $('#user').val(localStorage.getItem('user'));
-        $('#serverURL').val(localStorage.getItem('serverURL'));
-    }
     if (location.hash.length > 1) {
         setConfig(location.hash.substring(1));
     } else {
