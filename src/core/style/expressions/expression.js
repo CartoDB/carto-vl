@@ -2,7 +2,18 @@ import { implicitCast } from './utils';
 import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
-
+/**
+ * Abstract expression class
+ *
+ * All expressions listed in  {@link carto.style.expressions} inherit from this class so any of them
+ * they can be used where an Expression is required as long as the types match.
+ *
+ * This means that you can't a numeric expression where a color expression is expected.
+ *
+ * @memberof carto.style.expressions
+ * @name Expression
+ * @api
+ */
 export default class Expression {
     /**
      * @hideconstructor
@@ -62,6 +73,14 @@ export default class Expression {
     }
 
     /**
+     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+     * @param {number} timestamp
+     */
+    _setTimestamp(timestamp) {
+        this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
+    }
+
+    /**
      * Pre-rendering routine. Should establish related WebGL state as needed.
      * @param {*} l
      */
@@ -82,11 +101,15 @@ export default class Expression {
      * @param {*} toReplace
      * @param {*} replacer
      */
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] == toReplace);
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
+    }
+
+    notify() {
+        this.parent.notify();
     }
 
     /**
@@ -102,8 +125,9 @@ export default class Expression {
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
+        return final;
     }
 
     blendFrom(final, duration = 500, interpolator = null) {
@@ -111,7 +135,7 @@ export default class Expression {
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
     }
 
@@ -125,5 +149,9 @@ export default class Expression {
     _getMinimumNeededSchema() {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+    }
+    // eslint-disable-next-line no-unused-vars
+    eval(feature) {
+        throw new Error('Unimplemented');
     }
 }

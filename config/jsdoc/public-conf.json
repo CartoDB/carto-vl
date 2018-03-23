@@ -1,21 +1,23 @@
 {
-  "source": {
-    "include": [
-      "src"
-    ]
-  },
-  "templates": {
-    "default": {
-      "outputSourceFiles": false,
-      "useLongnameInNav": true
+    "source": {
+        "include": [
+            "src",
+            "docs/README.md"
+        ]
+    },
+    "templates": {
+        "default": {
+            "outputSourceFiles": false,
+            "useLongnameInNav": true
+        },
+        "referenceTitle": "CARTO GL"
+    },
+    "plugins": [
+        "plugins/api",
+        "plugins/markdown"
+    ],
+    "opts": {
+        "recurse": true,
+        "destination": "./docs/public"
     }
-  },
-  "plugins": [
-    "plugins/api",
-    "plugins/markdown"
-  ],
-  "opts": {
-    "recurse": true,
-    "destination": "./docs/public"
-  }
 }

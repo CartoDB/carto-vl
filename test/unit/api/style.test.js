@@ -5,33 +5,33 @@ describe('api/style', () => {
 
     describe('constructor', () => {
         describe('when parameter is a styleSpec object', () => {
-            xit('should set default style values when no parameters are given', () => {
+            it('should set default style values when no parameters are given', () => {
                 const actual = new Style();
 
                 // Check returned object inherits from Style
                 expect(actual).toEqual(jasmine.any(Style));
                 // Check returned object properties
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor()).toEqual(s.rgba(0, 1, 0, 0.5));
-                expect(actual.getWidth()).toEqual(s.float(5));
-                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
-                expect(actual.getStrokeWidth()).toEqual(s.float(0));
-                expect(actual.getOrder()).toEqual(s.noOrder());
+                expect(actual.getColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
+                expect(actual.getWidth().expr).toEqual(s.float(5).expr);
+                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
+                expect(actual.getStrokeWidth().expr).toEqual(s.float(0).expr);
+                expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
-            xit('should set default style values when an empty object is given', () => {
+            it('should set default style values when an empty object is given', () => {
                 const actual = new Style({});
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor()).toEqual(s.rgba(0, 1, 0, 0.5));
-                expect(actual.getWidth()).toEqual(s.float(5));
-                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 1, 0, 0.5));
-                expect(actual.getStrokeWidth()).toEqual(s.float(0));
-                expect(actual.getOrder()).toEqual(s.noOrder());
+                expect(actual.getColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
+                expect(actual.getWidth().expr).toEqual(s.float(5).expr);
+                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
+                expect(actual.getStrokeWidth().expr).toEqual(s.float(0).expr);
+                expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
-            xit('should set the style properties defined in the styleSpec object', () => {
+            it('should set the style properties defined in the styleSpec object', () => {
                 const styleSpec = {
                     resolution: 2,
                     color: s.rgba(1, 0, 0, 1),
@@ -44,11 +44,22 @@ describe('api/style', () => {
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(2);
-                expect(actual.getColor()).toEqual(s.rgba(1, 0, 0, 1));
-                expect(actual.getWidth()).toEqual(s.float(10));
-                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
-                expect(actual.getStrokeWidth()).toEqual(s.float(15));
-                expect(actual.getOrder()).toEqual(s.asc(s.width()));
+                expect(actual.getColor().expr).toEqual(s.rgba(1, 0, 0, 1).expr);
+                expect(actual.getWidth().expr).toEqual(s.float(10).expr);
+                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 0, 1, 1).expr);
+                expect(actual.getStrokeWidth().expr).toEqual(s.float(15).expr);
+                expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
+            });
+
+            it('should allow the style properties `width` and `strokeWidth` to be numbers', () => {
+                const actual = new Style({
+                    width: 1,
+                    strokeWidth: 10
+                });
+
+                expect(actual).toEqual(jasmine.any(Style));
+                expect(actual.getWidth().expr).toEqual(s.float(1).expr);
+                expect(actual.getStrokeWidth().expr).toEqual(s.float(10).expr);
             });
         });
 
@@ -79,7 +90,7 @@ describe('api/style', () => {
 
             it('should throw an error when width is not a valid expression', () => {
                 const styleSpec = {
-                    width: 10 // wrong type!
+                    width: true // wrong type!
                 };
                 expect(function () {
                     new Style(styleSpec);
@@ -97,7 +108,7 @@ describe('api/style', () => {
 
             it('should throw an error when strokeWidth is not a valid expression', () => {
                 const styleSpec = {
-                    strokeWidth: 5 // wrong type!
+                    strokeWidth: true // wrong type!
                 };
                 expect(function () {
                     new Style(styleSpec);
@@ -145,14 +156,55 @@ describe('api/style', () => {
         });
     });
 
-    describe('.filter', () => {
+    describe('expression.blendTo()', () => {
+        const dateNow = Date.now;
+        afterEach(function () {
+            Date.now = dateNow;
+        });
+        it('should return the new/final expression', () => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(s.property('fake_property'), float);
+            new Style({
+                filter: expected,
+            });
+
+            const final = float.blendTo(floatB, 10);
+            expect(final).toBe(floatB);
+        });
+        it('should notify the style on change', done => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(s.property('fake_property'), float);
+            const style = new Style({
+                filter: expected,
+            });
+            style.onChange(done);
+            float.blendTo(floatB, 10);
+        }, 10);
+        it('should notify the style after the final blending', done => {
+            const float = s.float(1);
+            const floatB = s.float(2);
+            const expected = s.gt(7, float);
+            const style = new Style({
+                filter: expected,
+            });
+            float.blendTo(floatB, 999);
+            style.onChange(done);
+            const t = Date.now() + 1000;
+            Date.now = () => t;
+            style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
+        }, 10);
+    });
+
+    describe('.getFilter()', () => {
         it('should return the current filter', () => {
             const expected = s.gt(s.property('fake_property'), 1000);
             const style = new Style({
                 filter: expected,
             });
 
-            const actual = style.filter;
+            const actual = style.getFilter();
 
             expect(actual).toEqual(expected);
         });

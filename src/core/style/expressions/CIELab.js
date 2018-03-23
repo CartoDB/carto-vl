@@ -1,19 +1,29 @@
 import Expression from './expression';
-import {implicitCast} from './utils';
+import { implicitCast, checkLooseType, checkType, checkExpression } from './utils';
 
 export default class CIELab extends Expression {
     constructor(l, a, b) {
         l = implicitCast(l);
         a = implicitCast(a);
         b = implicitCast(b);
+
+        checkExpression('cielab', 'l', 0, l);
+        checkExpression('cielab', 'a', 1, a);
+        checkExpression('blend', 'b', 2, b);
+        checkLooseType('cielab', 'l', 0, 'float', l);
+        checkLooseType('cielab', 'a', 1, 'float', a);
+        checkLooseType('cielab', 'b', 2, 'float', b);
+
         super({ l: l, a: a, b: b });
+        this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.l.type != 'float' || this.a.type != 'float' || this.b.type != 'float') {
-            throw new Error('CIELab() invalid parameters');
-        }
-        this.type = 'color';
+
+        checkType('cielab', 'l', 0, 'float', this.l);
+        checkType('cielab', 'a', 1, 'float', this.a);
+        checkType('cielab', 'b', 2, 'float', this.b);
+
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
                 vec3(
@@ -63,4 +73,5 @@ export default class CIELab extends Expression {
         #endif
         `);
     }
+    // TODO EVAL
 }

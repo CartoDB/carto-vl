@@ -83,9 +83,9 @@ void main(void) {
     float size = 64.*texture2D(widthTex, featureID).a;
     float fillSize = size;
     float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
-    size+=strokeSize*0.5;
+    size+=strokeSize;
     fillScale=size/fillSize;
-    strokeScale=size/max(0.001, (fillSize-strokeSize*0.5));
+    strokeScale=size/max(0.001, (fillSize-strokeSize));
     if (fillScale==strokeScale){
         stroke.a=0.;
     }

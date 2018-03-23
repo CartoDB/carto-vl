@@ -6,31 +6,33 @@ import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/style/functions';
+import RenderLayer from '../core/renderLayer';
 
-/**
- * Responsabilities: rely style changes into MNS source notifications, notify renderer about style changes, notify source about viewport changes,
- * rely dataframes to renderer, configure visibility for all source dataframes, set up MGL integration (opionally)
- */
 
 export default class Layer {
 
     /**
-     * Create a carto.Layer.
-     *
-     *
-     * @param {string} id
-     * @param {carto.source.Base} source
-     * @param {carto.Style} style
-     *
-     * @example
-     * new carto.Layer('layer0', source, style);
-     *
-     * @fires CartoError
-     *
-     * @constructor Layer
-     * @memberof carto
-     * @api
-     */
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    *
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -39,29 +41,25 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
-        this._dataframes = [];
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
 
         this._id = id;
         this.metadata = null;
-        this.setSource(source);
-        this.setStyle(style);
-
         this._listeners = {};
-
+        this._renderLayer = new RenderLayer();
         this.state = 'init';
         console.log('L', this);
 
+        this.setSource(source);
+        this.setStyle(style);
+
         this.paintCallback = () => {
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.setStyle(this._style);
-                    dataframe.visible = dataframe.active;
-                });
-            this._integrator.renderer.refresh(Number.NaN);
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.visible = false;
-                });
+            if (this._style && this._style.colorShader) {
+                this._renderLayer.style = this._style;
+                this._integrator.renderer.renderLayer(this._renderLayer);
+            }
             if (this.state == 'dataLoaded') {
                 this.state = 'dataPainted';
                 this._fire('loaded');
@@ -88,43 +86,96 @@ export default class Layer {
         this._listeners[eventType].splice(index, 1);
     }
 
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source !== source) {
+            this._freeSource();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(this._styleChanged.bind(this));
+        this._compileShaders(style, metadata);
+    }
     /**
      * Set a new source for this layer.
      *
      * @param {carto.source.Base} source - New source
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
-    setSource(source) {
+    async setSource(source) {
         this._checkSource(source);
-        source.bindLayer(
-            dataframe => {
-                this._dataframes.push(dataframe);
-                this._integrator.renderer.addDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            dataframe => {
-                this._dataframes = this._dataframes.filter(d => d !== dataframe);
-                this._integrator.renderer.removeDataframe(dataframe);
-                this._integrator.invalidateWebGLState();
-            },
-            () => {
-                this.state = 'dataLoaded';
-            }
-        );
-        if (this._source && this._source !== source) {
-            this._source.free();
+        const style = this._style;
+        if (style) {
+            var metadata = await source.requestMetadata(style);
+        }
+        if (this._style !== style) {
+            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source !== source) {
+            this._freeSource();
         }
         this._source = source;
+        if (style) {
+            this._styleChanged(style);
+        }
+    }
+
+    /**
+     * Callback executed when the client adds a new dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataframeAdded(dataframe) {
+        this._renderLayer.addDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
+    }
+
+    /**
+     * Callback executed when the client removes dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataFrameRemoved(dataframe) {
+        this._renderLayer.removeDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+    * Callback executed when the client finishes loading data
+    */
+    _onDataLoaded() {
+        this.state = 'dataLoaded';
     }
 
     /**
      * Set a new style for this layer.
      *
-     * @param {carto.Style} style - New style
+     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
      *
+     * @param {carto.Style} style - New style
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     setStyle(style) {
@@ -142,11 +193,25 @@ export default class Layer {
     }
 
     /**
-     * Blend the current style with another style
+     * Blend the current style with another style.
      *
-     * @param {carto.Style} style - style to blend to
+     * This allows smooth transforms between two different styles.
      *
+     * @example <caption> Smooth transition variating point size </caption>
+     * // We create two different styles varying the width
+     * const style0 = new carto.style({ width: 10 });
+     * const style1 = new carto.style({ width: 20 });
+     * // Create a layer with the first style
+     * const layer = new carto.Layer(source, style);
+     * // We add the layer to the map, the points in this layer will have widh 10
+     * layer.addTo(map, 'layer0');
+     * // The points will be animated from 10px to 20px for 500ms.
+     * layer.blendToStyle(style1, 500);
+     *
+     * @param {carto.Style} style - The final style
+     * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     blendToStyle(style, ms = 400, interpolator = cubic) {
@@ -156,7 +221,7 @@ export default class Layer {
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
             style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.filter.blendFrom(this._style.filter, ms, interpolator);
+            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
         }
 
         return this._styleChanged(style).then(r => {
@@ -176,8 +241,8 @@ export default class Layer {
      *
      * @param {mapboxgl.Map} map
      * @param {string} beforeLayerID
-     *
      * @memberof carto.Layer
+     * @instance
      * @api
      */
     addTo(map, beforeLayerID) {
@@ -191,7 +256,7 @@ export default class Layer {
     }
 
     hasDataframes() {
-        return this._dataframes.length > 0;
+        return this._renderLayer.hasDataframes();
     }
 
     getId() {
@@ -204,6 +269,19 @@ export default class Layer {
 
     getStyle() {
         return this._style;
+    }
+
+    getIntegrator() {
+        return this._integrator;
+    }
+
+    getFeaturesAtPosition(pos) {
+        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+    }
+
+    _addLayerIdToFeature(feature) {
+        feature.layerId = this._id;
+        return feature;
     }
 
     _isCartoMap(map) {
@@ -221,9 +299,11 @@ export default class Layer {
     }
 
     initCallback() {
-        this._styleChanged(this._style);
-        this.requestData();
+        this._renderLayer.renderer = this._integrator.renderer;
+        this._contextInitCallback();
+        this.requestMetadata();
     }
+
     _addToMGLMap(map, beforeLayerID) {
         if (map.isStyleLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
@@ -239,28 +319,21 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _styleChanged(style) {
-        const recompile = (metadata) => {
-            style._compileColorShader(this._integrator.renderer.gl, metadata);
-            style._compileWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-            style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-            style._compileFilterShader(this._integrator.renderer.gl, metadata);
-        };
-        if (!(this._integrator && this._integrator.invalidateWebGLState)) {
-            return Promise.resolve();
+    _compileShaders(style, metadata) {
+        style.compileShaders(this._integrator.renderer.gl, metadata);
+    }
+
+    async _styleChanged(style) {
+        await this._context;
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
-        const originalPromise = this.requestData(style);
-        if (!originalPromise) {
-            // The previous stored metadata is still valid
-            recompile(this.metadata);
-            return Promise.resolve();
-        }
-        // this.metadata needs to be updated, try to get new metadata and update this.metadata and proceed if everything works well
-        return originalPromise.then(metadata => {
-            this.metadata = metadata;
-            recompile(metadata);
-        });
+        this.metadata = metadata;
+        this._compileShaders(style, this.metadata);
+        this._integrator.needRefresh();
+        return this.requestData();
     }
 
     _checkId(id) {
@@ -301,17 +374,30 @@ export default class Layer {
         throw new Error('?');
     }
 
-    requestData(style) {
+    async requestMetadata(style) {
         style = style || this._style;
-        if (!this._integrator.invalidateWebGLState) {
+        if (!style) {
             return;
         }
-        return this._source.requestData(this._getViewport(), style);
+        await this._context;
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
     }
 
     getNumFeatures() {
-        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+        return this._renderLayer.getNumFeatures();
     }
 
-    //TODO free layer resources
+    _freeSource() {
+        if (this._source) {
+            this._source.free();
+        }
+        this._renderLayer.freeDataframes();
+    }
 }

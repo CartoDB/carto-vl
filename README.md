@@ -1,26 +1,59 @@
-## CARTO GL
+# CARTO GL
+
+[![CircleCI](https://circleci.com/gh/CartoDB/renderer-prototype.svg?style=svg)](https://circleci.com/gh/CartoDB/renderer-prototype)
 
 CARTO GL is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/).
 
 It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
 
-![](./doc/carto-gl-capture.png)
+![](./docs/images/carto-gl-capture.png)
 
-## Getting Started
 
-[TBD]
+## Documentation and examples
+
+You **need to generate the documentation to have an up to date version**.
+
+### Public documentation
+
+This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
+ - Getting started introduction with a basic example.
+ - Detailed information about how styling expressions.
+ - Full reference for the public API.
+
+For generating the public documentation, you should run:
+
+```
+yarn docs
+```
+
+### Serve docs and examples
+
+The recommended way to navigate the documentation and check the examples is running the following command:
+
+```
+yarn serve
+```
+
+### Internal documentation
+
+It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
+
+To generate the docs for the private API, you need to execute:
+
+```
+yarn docs:all
+```
+
+
+## License
+
+This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
 
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
 
-## Submitting Contributions
-
-You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
-
-## License
-
-This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
 
 ## Development
 
@@ -28,44 +61,6 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 
 ```
 yarn
-```
-
-### Run the tests
-
-#### Unit tests
-
-```
-yarn test
-```
-
-To watch the unit tests
-
-```
-yarn test:watch
-```
-
-To launch the unit tests in the browser
-
-```
-yarn test:browser
-```
-
-#### Acceptance tests
-
-```
-yarn test:acceptance
-```
-
-To add more acceptance tests
-
-```
-yarn test:acceptance:prepare
-```
-
-**Note**: you need to configure the CHROME_BIN variable before running the tests, for example:
-
-```
-export CHROME_BIN=/usr/bin/chromium-browser
 ```
 
 ### Build the library
@@ -80,14 +75,12 @@ To watch the files
 yarn build:watch
 ```
 
-### Generate the docs
+### Run the tests
 
-```
-yarn docs
-```
+- [Unit tests](./test/unit/README.md)
+- [Integration tests](./test/integration/README.md)
+- [Acceptance tests](./test/acceptance/README.md)
 
-To generate all the docs
+### Submitting Contributions
 
-```
-yarn docs:all
-```
+You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)

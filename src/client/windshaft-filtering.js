@@ -15,7 +15,7 @@ import FloatConstant from '../core/style/expressions/floatConstant';
  * @returns {Filtering}
  */
 export function getFiltering(style) {
-    return getFilter(style.filter);
+    return getFilter(style.getFilter());
 }
 
 /**
@@ -58,7 +58,8 @@ function getFilter(f) {
 
 function getAndFilter(f) {
     if (f instanceof And) {
-        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), null);
+        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+        return l.length ? l : null;
     }
 }
 
@@ -69,20 +70,20 @@ function getBlendFilter(f) {
 }
 
 function getInFilter(f) {
-    if (f instanceof In && f.property instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof In && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
         return [{
             type: 'in',
-            property: f.property.name,
+            property: f.value.name,
             whitelist: f.categories.map(cat => cat.expr)
         }];
     }
 }
 
 function getNinFilter(f) {
-    if (f instanceof Nin && f.property instanceof Property && f.categories.every(cat => cat instanceof Category)) {
+    if (f instanceof Nin && f.value instanceof Property && f.categories.every(cat => cat instanceof Category) && f.categories.length > 0) {
         return [{
             type: 'nin',
-            property: f.property.name,
+            property: f.value.name,
             blacklist: f.categories.map(cat => cat.expr)
         }];
     }

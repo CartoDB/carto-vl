@@ -3,11 +3,13 @@
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
 version: 2
+
 jobs:
+
   lint:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
     working_directory: ~/repo
     steps:
       - checkout
@@ -18,10 +20,12 @@ jobs:
           - v1-dependencies-
       - run: yarn install
       - run: yarn lint
+      - run: yarn docs
+
   test-unit:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
     working_directory: ~/repo
     steps:
       - checkout
@@ -36,26 +40,65 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-  test-acceptance:
+  
+  test-user:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
     working_directory: ~/repo
     steps:
       - checkout
-      - run: Xvfb :98 & 
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
-      - run: yarn build
+      - run: yarn test:user
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: xvfb-run -a yarn test:acceptance
+
+  test-integration:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: Xvfb :98 &
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: xvfb-run -a yarn test:render
+
+  test-acceptance:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: Xvfb :98 &
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: xvfb-run -a yarn test:e2e
 
 workflows:
   version: 2
@@ -63,4 +106,5 @@ workflows:
     jobs:
       - lint
       - test-unit
-      - test-acceptance
+      - test-integration
+      - test-user

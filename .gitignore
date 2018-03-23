@@ -2,5 +2,10 @@
 *_out.png
 .DS_Store
 .vscode/
+
 dist/
+docs/all
+docs/public
 node_modules/
+test/acceptance/e2e/**/*.html
+test/integration/render/**/*.html

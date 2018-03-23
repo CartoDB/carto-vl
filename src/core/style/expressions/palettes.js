@@ -1,8 +1,36 @@
-import * as cartocolor from 'cartocolor';
 
-class PaletteGenerator {
+import * as cartocolor from 'cartocolor';
+import Expression from './expression';
+
+/**
+ * ### Color palettes
+ *
+ * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
+ * Use them with a {@link carto.style.expressions.ramp|ramp}
+ *
+ * The following palettes are availiable:
+ *  - Categorical:
+ *      - PRISM
+ *      - EARTH
+ *  - Numeric
+ *      - ...
+ *
+ * @api
+ * @name carto.style.expressions.palettes
+ * @memberof carto.style.expressions
+ *
+ * @example <caption> Using a color scheme </caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  filter: s.ramp(s.property('type'), s.palettes.PRISM);
+ * });
+ */
+const palettes = {};
+
+class PaletteGenerator extends Expression {
     constructor(name, subPalettes) {
-        this.type = 'paletteGenerator';
+        super({});
+        this.type = 'palette';
         this.name = name;
         this.subPalettes = subPalettes;
         this.tags = subPalettes.tags;
@@ -17,15 +45,13 @@ class PaletteGenerator {
     }
 }
 
-const palettes = {};
-
 Object.keys(cartocolor).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, cartocolor[name]);
 });
 
 class Inverse {
     constructor(palette) {
-        this.type = 'paletteGenerator';
+        this.type = 'palette';
         this._originalPalette = palette;
         this.tags = palette.tags;
         this.subPalettes = new Proxy(palette.subPalettes, {

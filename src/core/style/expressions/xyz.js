@@ -2,12 +2,14 @@ import Expression from './expression';
 import { implicitCast } from './utils';
 
 
+// TODO should this expression be removed?
 export default class XYZ extends Expression {
     constructor(x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);
         z = implicitCast(z);
         super({ x: x, y: y, z: z });
+        // TODO improve type check
     }
     _compile(meta) {
         super._compile(meta);

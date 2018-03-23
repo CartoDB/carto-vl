@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Populated places | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO GL JS -->
+  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #controls {
+      position: absolute;
+      padding: 20px;
+      background: white;
+      top: 12px;
+      right: 12px;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      width: 200px;
+      color: #2E3C43;
+    }
+    #controls li {
+      list-style-type: none;
+      margin: 0 0 8px 0;
+      display: flex;
+      vertical-align: middle;
+    }
+    #controls li input {
+      margin: 0 8px 0 0;
+    }
+    #controls li label {
+      font: 12px/16px 'Open Sans';
+      cursor: pointer;
+    }
+    #controls li:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <ul>
+      <li>
+        <input type="radio" name="pop" onclick="setAll()" id="all" checked>
+        <label for="all">All places<label>
+      </li>
+      <li>
+        <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
+        <label for="most">Very populated places</label>
+      </li>
+      <li>
+        <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
+        <label for="less">Less populated places</label>
+      </li>
+    </ul>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 2
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'YOUR_API_KEY'
+    });
+
+    const populatedPlacesSource = new carto.source.Dataset(`
+      ne_10m_populated_places_simple
+    `);
+    const allPlacesStyle = new carto.Style(`
+      width: 6
+      color: rgba(0.93, 0.30, 0.35, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+      filter: $pop_max >= 0
+    `);
+    const veryPopulatedStyle = new carto.Style(`
+      width: 11
+      color: rgba(0.41, 0.71, 0.62, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+      filter: $pop_max > 5000000
+    `);
+    const lessPopulatedStyle = new carto.Style(`
+      width: 11
+      color: rgba(0.95, 0.34, 0.26, 1.0)
+      strokeWidth: 1
+      strokeColor: rgba(1, 1, 1, 1)
+      filter: $pop_max < 100
+    `);
+
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesStyle);
+
+    populatedPlacesLayer.addTo(map, 'watername_ocean');
+
+    function setAll() {
+      populatedPlacesLayer.blendToStyle(allPlacesStyle);
+    }
+
+    function setVeryPopulated() {
+      populatedPlacesLayer.blendToStyle(veryPopulatedStyle);
+    }
+
+    function setLessPopulated() {
+      populatedPlacesLayer.blendToStyle(lessPopulatedStyle);
+    }
+  </script>
+</body>
+</html>

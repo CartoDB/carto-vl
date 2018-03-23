@@ -5,16 +5,17 @@ import * as shaders from '../core/shaders';
 import { compileShader } from '../core/style/shader-compiler';
 import { parseStyleDefinition } from '../core/style/parser';
 import Expression from '../core/style/expressions/expression';
+import { implicitCast } from '../core/style/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 
-const DEFAULT_RESOLUTION = 1;
-const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = s.float(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 1, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = s.float(0);
-const DEFAULT_ORDER_EXPRESSION = s.noOrder();
-const DEFAULT_FILTER_EXPRESSION = s.floatConstant(1);
+const DEFAULT_RESOLUTION = () => 1;
+const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_WIDTH_EXPRESSION = () => s.float(5);
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.float(0);
+const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
+const DEFAULT_FILTER_EXPRESSION = () => s.floatConstant(1);
 const SUPPORTED_PROPERTIES = [
     'resolution',
     'color',
@@ -25,35 +26,35 @@ const SUPPORTED_PROPERTIES = [
     'filter'
 ];
 
-/**
- * @description A Style defines how associated dataframes of a particular renderer should be renderer.
- *
- * Styles are only compatible with dataframes that comply with the same schema.
- * The schema is the interface that a dataframe must comply with.
- */
 
 export default class Style {
 
     /**
-     * Create a carto.Style.
-     *
-     * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
-     *
-     * @example
-     * new carto.Style(`
-     *   color: rgb(0,0,0)
-     * `);
-     *
-     * new carto.Style({
-     *   color: carto.style.expression.rgb(0,0,0)
-     * });
-     *
-     * @fires CartoError
-     *
-     * @constructor Style
-     * @memberof carto
-     * @api
-     */
+    * A Style defines how the data will be displayed: the color of the elements and size are basic things that can be
+    * managed through styles. Styles also control the element visibility, ordering or aggregation level.
+    *
+    * A Style is created from an {@link StyleSpec|styleSpec} object or from a string.
+    * Each attribute in the {@link StyleSpec|styleSpec} must be a valid {@link carto.style.expressions|expression}.
+    * Those expressions will be evaluated dynamically for every element in the dataset.
+    *
+    * @param {string|StyleSpec} definition - The definition of a style. This parameter could be a `string` or a `StyleSpec` object
+    *
+    * @example <caption> Create a style with black dots using the string constructor </caption>
+    * new carto.Style(`
+    *   color: rgb(0,0,0)
+    * `);
+    *
+    * @example <caption> Create a style with black dots using the styleSpec constructor </caption>
+    * new carto.Style({
+    *   color: carto.style.expression.rgb(0,0,0)
+    * });
+    *
+    * @fires CartoError
+    *
+    * @constructor Style
+    * @memberof carto
+    * @api
+    */
     constructor(definition) {
         const styleSpec = this._getStyleDefinition(definition);
         this._checkStyleSpec(styleSpec);
@@ -81,6 +82,7 @@ export default class Style {
      * @return {number}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getResolution() {
@@ -93,6 +95,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getColor() {
@@ -105,6 +108,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getWidth() {
@@ -117,6 +121,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeColor() {
@@ -129,6 +134,7 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getStrokeWidth() {
@@ -141,22 +147,23 @@ export default class Style {
      * @return {carto.style.expression}
      *
      * @memberof carto.Style
+     * @instance
      * @api
      */
     getOrder() {
         return this._styleSpec.order;
     }
 
-    get filter(){
+    getFilter() {
         return this._styleSpec.filter;
     }
 
     isAnimated() {
         return this.getColor().isAnimated() ||
-               this.getWidth().isAnimated() ||
-               this.getStrokeColor().isAnimated() ||
-               this.getStrokeWidth().isAnimated() ||
-               this.filter.isAnimated();
+            this.getWidth().isAnimated() ||
+            this.getStrokeColor().isAnimated() ||
+            this.getStrokeWidth().isAnimated() ||
+            this.getFilter().isAnimated();
     }
 
     onChange(callback) {
@@ -165,7 +172,7 @@ export default class Style {
 
     _changed() {
         if (this._changeCallback) {
-            this._changeCallback();
+            this._changeCallback(this);
         }
     }
 
@@ -178,6 +185,14 @@ export default class Style {
             this._styleSpec.filter,
         ].filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+    }
+
+    compileShaders(gl, metadata) {
+        this._compileColorShader(gl, metadata);
+        this._compileWidthShader(gl, metadata);
+        this._compileStrokeColorShader(gl, metadata);
+        this._compileStrokeWidthShader(gl, metadata);
+        this._compileFilterShader(gl, metadata);
     }
 
     _compileColorShader(gl, metadata) {
@@ -215,7 +230,7 @@ export default class Style {
         this.filterShader = r.shader;
     }
 
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;
@@ -272,13 +287,13 @@ export default class Style {
      * @return {StyleSpec}
      */
     _setDefaults(styleSpec) {
-        styleSpec.resolution = util.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION : styleSpec.resolution;
-        styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION;
-        styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION;
-        styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION;
-        styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION;
-        styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION;
-        styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION;
+        styleSpec.resolution = util.isUndefined(styleSpec.resolution) ? DEFAULT_RESOLUTION() : styleSpec.resolution;
+        styleSpec.color = styleSpec.color || DEFAULT_COLOR_EXPRESSION();
+        styleSpec.width = styleSpec.width || DEFAULT_WIDTH_EXPRESSION();
+        styleSpec.strokeColor = styleSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
+        styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
+        styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION();
+        styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION();
         return styleSpec;
     }
 
@@ -286,15 +301,18 @@ export default class Style {
         /**
          * @typedef {object} StyleSpec
          * @property {number} resolution
-         * @property {carto.style.expression.Base} color
-         * @property {carto.style.expression.Base} width
-         * @property {carto.style.expression.Base} strokeColor
-         * @property {carto.style.expression.Base} strokeWidth
-         * @property {carto.style.expression.Base} order
+         * @property {carto.style.expressions.Expression} color
+         * @property {carto.style.expressions.Expression} width
+         * @property {carto.style.expressions.Expression} strokeColor
+         * @property {carto.style.expressions.Expression} strokeWidth
+         * @property {carto.style.expressions.Expression} order
          * @api
          */
 
         // TODO: Check expression types ie: color is not a number expression!
+
+        styleSpec.width = implicitCast(styleSpec.width);
+        styleSpec.strokeWidth = implicitCast(styleSpec.strokeWidth);
 
         if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
@@ -302,11 +320,11 @@ export default class Style {
         if (!(styleSpec.color instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[color]');
         }
-        if (!(styleSpec.width instanceof Expression)) {
-            throw new CartoValidationError('style', 'nonValidExpression[width]');
-        }
         if (!(styleSpec.strokeColor instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[strokeColor]');
+        }
+        if (!(styleSpec.width instanceof Expression)) {
+            throw new CartoValidationError('style', 'nonValidExpression[width]');
         }
         if (!(styleSpec.strokeWidth instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[strokeWidth]');

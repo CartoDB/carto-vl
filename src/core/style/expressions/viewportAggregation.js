@@ -29,6 +29,7 @@ function generateAggregattion(metadataPropertyName, global) {
         _compile(metadata) {
             console.log(metadata);
             super._compile(metadata);
+            // TODO improve type check
             this.property._compile(metadata);
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
@@ -40,7 +41,11 @@ function generateAggregattion(metadataPropertyName, global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
@@ -52,7 +57,7 @@ function generateAggregattion(metadataPropertyName, global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };
@@ -69,6 +74,7 @@ function generatePercentile(global) {
                 throw new Error('Percentile must be a fixed literal number');
             }
             super({ value: float(0) });
+            // TODO improve type check
             this.property = property;
             this.percentile = percentile;
         }
@@ -88,12 +94,16 @@ function generatePercentile(global) {
             return this.property._getMinimumNeededSchema();
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.property.name] };
+            if (!global) {
+                return { columns: [this.property.name] };
+            } else {
+                return { columns: [] };
+            }
         }
         _preDraw(drawMetadata, gl) {
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name == this.property.name);
-                const total = column.accumHistogram[999];
+                const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
                     if (column.accumHistogram[i] >= this.percentile / 100 * total) {
@@ -109,7 +119,7 @@ function generatePercentile(global) {
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        getValue() {
+        eval() {
             return this.value.expr;
         }
     };

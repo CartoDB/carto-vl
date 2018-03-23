@@ -1,19 +1,16 @@
+import mitt from 'mitt';
 import * as R from '../../core/renderer';
-
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+import * as util from '../util';
 
 let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
-let integrator = null;
+const integrators = new WeakMap();
 export default function getMGLIntegrator(map) {
-    if (!integrator) {
-        integrator = new MGLIntegrator(map);
+    if (!integrators.get(map)) {
+        integrators.set(map, new MGLIntegrator(map));
     }
-    return integrator;
+    return integrators.get(map);
 }
 
 
@@ -25,73 +22,101 @@ class MGLIntegrator {
         this.renderer = new R.Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
+        this._emitter = mitt();
 
+
+        this._suscribeToMapEvents(map);
+        this.moveObservers = {};
+        this._layers = [];
+        this._paintedLayers = 0;
+    }
+
+    on(name, cb) {
+        return this._emitter.on(name, cb);
+    }
+
+    off(name, cb) {
+        return this._emitter.off(name, cb);
+    }
+
+    _suscribeToMapEvents(map) {
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
         map.on('moveend', this.move.bind(this));
         map.on('resize', this.move.bind(this));
 
-        this.moveObservers = {};
-
-        this._layers = [];
+        map.on('mousemove', data => {
+            this._emitter.emit('mousemove', data);
+        });
+        map.on('click', data => {
+            this._emitter.emit('click', data);
+        });
     }
+
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
+
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
+
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-                layer.initCallback();
+                this._layers.map(layer => layer.initCallback());
             }
             layer.paintCallback();
+            this._paintedLayers++;
+
+            if (this._paintedLayers % this._layers.length == 0) {
+                // Last layer has been painted
+                const isAnimated = this._layers.some(layer =>
+                    layer.getStyle() && layer.getStyle().isAnimated());
+                if (!isAnimated && this.map.repaint) {
+                    this.map.repaint = false;
+                }
+            }
+
             invalidate();
         });
         this.map.addLayer({
             id: layerId,
             type: 'custom-webgl'
         }, beforeLayerID);
-        this._layers.push(layerId);
+        this._layers.push(layer);
         this.move();
     }
+
     needRefresh() {
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
+        this.map.repaint = true;
     }
+
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
+
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
+
     getZoom() {
         var b = this.map.getBounds();
         var c = this.map.getCenter();
         var nw = b.getNorthWest();
         var sw = b.getSouthWest();
-        var z = (Wmxy(nw).y - Wmxy(sw).y) / WM_2R;
-        this.renderer.setCenter(c.lng / 180., Wmxy(c).y / WM_R);
+        var z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         return z;
     }
-}
-
-// Webmercator projection
-function Wmxy(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x: x, y: y };
 }

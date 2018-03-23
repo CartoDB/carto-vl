@@ -1,19 +1,24 @@
 import Expression from './expression';
+import { checkString } from './utils';
 
+/**
+ * @description Wrapper around category names
+ * @param {string} categoryName
+ * @returns {carto.style.expressions.Expression} category expression with the category name provided
+ *
+ * @memberof carto.style.expressions
+ * @name category
+ * @function
+ * @api
+ */
 export default class Category extends Expression {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        if (typeof x !== 'string') {
-            throw new Error(`Invalid arguments to Category(): ${x}`);
-        }
+    constructor(categoryName) {
+        checkString('category', 'categoryName', 0, categoryName);
         super({});
-        this.expr = x;
+        this.expr = categoryName;
+        this.type = 'category';
     }
     _compile(metadata) {
-        this.type = 'category';
         this._metadata = metadata;
     }
     _applyToShaderSource(uniformIDMaker) {
@@ -29,6 +34,9 @@ export default class Category extends Expression {
     _preDraw(drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._uniformLocation, id);
+    }
+    eval() {
+        return this._metadata.categoryIDs[this.expr];
     }
     isAnimated() {
         return false;

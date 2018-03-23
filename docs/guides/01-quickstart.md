@@ -1,8 +1,7 @@
 ## Quickstart Guide
 
-Welcome to the CARTO GL internal release documentation. CARTO GL is a
+Welcome to the CARTO GL internal release documentation.
 
 ### About this Guide
 
-Hello my name is mamata
 

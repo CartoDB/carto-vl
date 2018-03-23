@@ -1,13 +1,14 @@
 import * as R from '../core/renderer';
 import * as rsys from './rsys';
-
+import Dataframe from '../core/dataframe';
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
+import Metadata from '../core/metadata';
 
 const SAMPLE_ROWS = 1000;
-const MIN_FILTERING = 500000;
+const MIN_FILTERING = 2000000;
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -42,7 +43,6 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
-        this._subdomainCounter = 0;
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -60,24 +60,31 @@ export default class Windshaft {
     }
 
     /**
-     * Should be called whenever the viewport or the style changes
-     * Returns falseable if the metadata didn't changed, or a promise to a Metadata if it did change
+     * Should be called whenever the style changes (even if metadata is not going to be used)
+     * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
+     * Returns  a promise to a Metadata
      * @param {*} viewport
      * @param {*} MNS
      * @param {*} addDataframe
      * @param {*} styleDataframe
      */
-    async getData(viewport, style) {
+    async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
-        const tiles = rsys.rTiles(viewport);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
-        this._getTiles(tiles);
         return this.metadata;
     }
+
+    getData(viewport) {
+        if (this._isInstantiated()) {
+            const tiles = rsys.rTiles(viewport);
+            this._getTiles(tiles);
+        }
+    }
+
 
     _getTiles(tiles) {
         this._requestGroupID++;
@@ -113,6 +120,10 @@ export default class Windshaft {
         return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
     }
 
+    _isInstantiated() {
+        return !!this.metadata;
+    }
+
     _getCategoryIDFromString(category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
@@ -126,15 +137,18 @@ export default class Windshaft {
     async _instantiateUncached(MNS, resolution, filters) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        const select = this._buildSelectClause(MNS);
+        let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this.getMetadata(query, MNS, conf);
+        const metadata = await this._getMetadata(query, MNS, conf);
 
+        select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
         if (metadata.featureCount > MIN_FILTERING) {
             aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
+        } else {
+            aggSQL = this._buildQuery(select);
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
@@ -183,8 +197,11 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).concat(['the_geom', 'the_geom_webmercator']);
+    _buildSelectClause(MRS, dateFields = []) {
+        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+            name => dateFields.includes(name) ? name + '::text' : name
+        )
+            .concat(['the_geom', 'the_geom_webmercator']);
     }
 
     _buildQuery(select) {
@@ -192,27 +209,30 @@ export default class Windshaft {
     }
 
     _getConfig() {
+        // for local environments, which require direct access to Maps and SQL API ports, end the configured URL with "{local}"
         return {
             apiKey: this._source._apiKey,
             username: this._source._username,
-            serverURL: this._source._serverURL
+            mapsServerURL: this._source._serverURL.maps,
+            sqlServerURL: this._source._serverURL.sql
         };
     }
 
     free() {
         this.cache.reset();
+        this._oldDataframes = [];
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
-        // TODO: Should the dataframe constructor have type and size parameters?
-        const dataframe = new R.Dataframe(
-            rs.center,
-            rs.scale,
-            geometry,
-            properties,
-        );
-        dataframe.type = type;
-        dataframe.size = size;
+        const dataframe = new Dataframe({
+            active: false,
+            center: rs.center,
+            geom: geometry,
+            properties: properties,
+            scale: rs.scale,
+            size: size,
+            type: type,
+        });
 
         return dataframe;
     }
@@ -243,7 +263,7 @@ export default class Windshaft {
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
-        this._subdomains = layergroup.cdn_url.templates.https.subdomains;
+        this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return getLayerUrl(layergroup, LAYER_INDEX, conf);
     }
 
@@ -285,24 +305,26 @@ export default class Windshaft {
 
                 const numFields = [];
                 const catFields = [];
-                const catFieldsReal = [];
-                const numFieldsReal = [];
+                const dateFields = [];
                 this._MNS.columns.map(name => {
                     const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
-                    if (this.metadata.columns.find(c => c.name == basename).type == 'category') {
+                    const type = this.metadata.columns.find(c => c.name == basename).type;
+                    if (type == 'category') {
                         catFields.push(name);
-                        catFieldsReal.push(name);
-                    } else {
+                    } else if (type == 'float') {
                         numFields.push(name);
-                        numFieldsReal.push(name);
+                    } else if (type == 'date') {
+                        dateFields.push(name);
+                    } else {
+                        throw new Error(`Column type '${type}' not supported`);
                     }
 
-                }
-                );
-                catFieldsReal.map((name, i) => fieldMap[name] = i);
-                numFieldsReal.map((name, i) => fieldMap[name] = i + catFields.length);
+                });
+                catFields.map((name, i) => fieldMap[name] = i);
+                numFields.map((name, i) => fieldMap[name] = i + catFields.length);
+                dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
 
-                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, catFieldsReal, numFields);
+                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
                 var rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
@@ -317,8 +339,13 @@ export default class Windshaft {
     }
 
     _getTileUrl(x, y, z) {
-        //const s = this._subdomains[this._subdomainCounter++ % this._subdomains.length];
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z);//.replace('{s}', s);
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z);
+        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
+    }
+
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
     _decodePolygons(geom, featureGeometries, mvt_extent) {
@@ -373,7 +400,7 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, catFieldsReal, numFields) {
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
         var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
         if (this.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
@@ -400,20 +427,24 @@ export default class Windshaft {
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = count;
             });
+            datesField.map((name, index) => {
+                const d = Date.parse(f.properties[name]);
+                if (Number.isNaN(d)) {
+                    throw new Error('invalid MVT date');
+                }
+                const metadataColumn = metadata.columns.find(c => c.name == name);
+                const min = metadataColumn.min;
+                const max = metadataColumn.max;
+                const n = (d - min) / (max.getTime() - min.getTime());
+                properties[index + catFields.length + numFields.length][i] = n;
+            });
         }
         console.log('max', mx);
 
         return { properties, points, featureGeometries };
     }
-    async getMetadata(query, proto, conf) {
-        //Get column names and types with a limit 0
-        //Get min,max,sum and count of numerics
-        //for each category type
-        //Get category names and counts by grouping by
-        //Assign ids
-        const metadata = {
-            columns: [],
-        };
+
+    async _getMetadata(query, proto, conf) {
         return {
             columns: [
                 {
@@ -422,36 +453,62 @@ export default class Windshaft {
                 }
             ]
         };
+        
+        //Get column names and types with a limit 0
+        //Get min,max,sum and count of numerics
+        //for each category type
+        //Get category names and counts by grouping by
+        //Assign ids
+
+        const [{ numerics, categories, dates }, featureCount] = await Promise.all([
+            this._getColumnTypes(query, conf),
+            this.getFeatureCount(query, conf)]);
+
+        const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
+
+        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
+            this.getSample(conf, sampling),
+            this.getNumericTypes(numerics, query, conf),
+            this.getDatesTypes(dates, query, conf),
+            this.getCategoryTypes(categories, query, conf)]);
+
+        const columns = [];
+        numerics.forEach((name, index) => columns.push(numericsTypes[index]));
+        dates.forEach((name, index) => columns.push(datesTypes[index]));
+
+        const categoryIDs = {};
+        categories.map((name, index) => {
+            const t = categoriesTypes[index];
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            columns.push(t);
+        });
+        const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
+        console.log(metadata);
+        return metadata;
+    }
+
+    /**
+     * Return an object with the names of the columns clasified by type.
+     */
+    async _getColumnTypes(query, conf) {
         const fields = await this.getColumnTypes(query, conf);
         let numerics = [];
         let categories = [];
+        let dates = [];
         Object.keys(fields).map(name => {
             const type = fields[name].type;
             if (type == 'number') {
                 numerics.push(name);
             } else if (type == 'string') {
                 categories.push(name);
+            } else if (type == 'date') {
+                dates.push(name);
+            } else if (type != 'geometry') {
+                throw new Error(`Unsuportted type ${type}`);
             }
         });
 
-        metadata.featureCount = await this.getFeatureCount(query, conf);
-        const numericsTypes = await this.getNumericTypes(numerics, query, conf);
-        const categoriesTypes = await this.getCategoryTypes(categories, query, conf);
-        const sampling = Math.min(SAMPLE_ROWS / metadata.featureCount, 1);
-        const sample = await this.getSample(conf, sampling);
-
-        numerics.map((name, index) => {
-            const t = numericsTypes[index];
-            metadata.columns.push(t);
-        });
-        metadata.categoryIDs = {};
-        metadata.sample = sample;
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => metadata.categoryIDs[name] = this._getCategoryIDFromString(name));
-            metadata.columns.push(t);
-        });
-        return metadata;
+        return { numerics, categories, dates };
     }
 
     async getSample(conf, sampling) {
@@ -464,40 +521,41 @@ export default class Windshaft {
                     SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
         }
 
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await getSQL(q, conf);
         const json = await response.json();
         console.log(json);
         return json.rows;
     }
 
+    // Returns the total feature count, including possibly filtered features
     async getFeatureCount(query, conf) {
         const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(q));
+        const response = await getSQL(q, conf);
         const json = await response.json();
         return json.rows[0].count;
     }
 
     async getColumnTypes(query, conf) {
         const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await getSQL(columnListQuery, conf);
         const json = await response.json();
         return json.fields;
     }
 
     async getGeometryType(query, conf) {
         const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(columnListQuery));
+        const response = await getSQL(columnListQuery, conf);
         const json = await response.json();
         const type = json.rows[0].type;
         switch (type) {
-        case 'ST_MultiPolygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            case 'ST_MultiPolygon':
+                return 'polygon';
+            case 'ST_Point':
+                return 'point';
+            case 'ST_MultiLineString':
+                return 'line';
+            default:
+                throw new Error(`Unimplemented geometry type ''${type}'`);
         }
     }
 
@@ -507,7 +565,7 @@ export default class Windshaft {
             aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
         ).concat(['COUNT(*)']).join();
         const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(numericsQuery));
+        const response = await getSQL(numericsQuery, conf);
         const json = await response.json();
         return names.map(name => {
             return {
@@ -522,10 +580,39 @@ export default class Windshaft {
         );
     }
 
+    _getDateFromStr(str) {
+        if (Number.isNaN(Date.parse(str))) {
+            throw new Error(`Invalid date: '${str}'`);
+        }
+        return new Date(str);
+    }
+
+    async getDatesTypes(names, query, conf) {
+        if (names.length == 0) {
+            return [];
+        }
+        const aggFns = ['min', 'max'];
+        const datesSelect = names.map(name =>
+            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
+        ).join();
+        const numericsQuery = `SELECT ${datesSelect} FROM ${query};`;
+        const response = await getSQL(numericsQuery, conf);
+        const json = await response.json();
+        return names.map(name => {
+            return {
+                name,
+                type: 'date',
+                min: this._getDateFromStr(json.rows[0][`${name}_min`]),
+                max: this._getDateFromStr(json.rows[0][`${name}_max`]),
+            };
+        }
+        );
+    }
+
     async getCategoryTypes(names, query, conf) {
         return Promise.all(names.map(async name => {
             const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await fetch(`${conf.serverURL}/api/v2/sql?q=` + encodeURIComponent(catQuery));
+            const response = await getSQL(catQuery, conf);
             const json = await response.json();
             let counts = [];
             let names = [];
@@ -563,16 +650,35 @@ function getAggFN(name) {
     return s.substr(0, s.indexOf('_'));
 }
 
-const endpoint = (conf) => {
-    return `${conf.serverURL}/api/v1/map?api_key=${conf.apiKey}`;
+const endpoint = (conf, path = '') => {
+    let url = `${conf.mapsServerURL}/api/v1/map`;
+    if (path) {
+        url += '/' + path;
+    }
+    url = authURL(url, conf);
+    return url;
 };
 
 function getLayerUrl(layergroup, layerIndex, conf) {
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
-        return `${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt?api_key=${conf.apiKey}`;
+        return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
     }
-    return `${endpoint(conf)}/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`;
+    return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
+}
+
+function getSQL(query, conf) {
+    let url = `${conf.sqlServerURL}/api/v2/sql?q=` + encodeURIComponent(query);
+    url = authURL(url, conf);
+    return fetch(url);
+}
+
+function authURL(url, conf) {
+    if (conf.apiKey) {
+        const sep = url.includes('?') ? '&' : '?';
+        url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
+    }
+    return url;
 }
 
 /**

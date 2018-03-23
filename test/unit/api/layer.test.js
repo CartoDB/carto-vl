@@ -85,7 +85,7 @@ describe('api/layer', () => {
         describe('._addToMGLMap', () => {
             beforeEach(() => {
                 this.layer = new Layer('layer0', source, style);
-                this.layer._onMapLoaded = () => {};
+                this.layer._onMapLoaded = () => { };
                 spyOn(this.layer, '_onMapLoaded');
             });
 
@@ -96,7 +96,7 @@ describe('api/layer', () => {
             });
 
             it('should not call onMapLoaded when the map is not loaded', () => {
-                const mapMock = { isStyleLoaded: () => false, on: () => {} };
+                const mapMock = { isStyleLoaded: () => false, on: () => { } };
                 this.layer._addToMGLMap(mapMock);
                 expect(this.layer._onMapLoaded).not.toHaveBeenCalled();
             });
@@ -126,6 +126,25 @@ describe('api/layer', () => {
                 this.layer._addToMGLMap(mapMock);
                 expect(this.layer._onMapLoaded).not.toHaveBeenCalled();
             });
+        });
+    });
+
+    describe('.getFeaturesAtPosition', () => {
+        it('should add a layerId to every feature in the list', () => {
+            const layer = new Layer('layer0', source, style);
+            const fakeFeature0 = {
+                properties: {},
+                id: 'fakeId0'
+            };
+
+            const fakeFeature1 = {
+                properties: {},
+                id: 'fakeId0'
+            };
+            spyOn(layer._renderLayer, 'getFeaturesAtPosition').and.returnValue([{ fakeFeature0, fakeFeature1 }]);
+
+            expect(layer.getFeaturesAtPosition()[0].layerId).toEqual('layer0');
+            expect(layer.getFeaturesAtPosition()[0].layerId).toEqual('layer0');
         });
     });
 });
