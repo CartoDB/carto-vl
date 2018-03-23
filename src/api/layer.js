@@ -13,27 +13,27 @@ import RenderLayer from '../core/renderLayer';
 export default class Layer {
 
     /**
-    *
-    * A Layer is the primary way to visualize geospatial data.
-    *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
-    *
-    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
-    *
-    * @param {string} id
-    * @param {carto.source.Base} source
-    * @param {carto.Style} style
-    *
-    * @example
-    * new carto.Layer('layer0', source, style);
-    *
-    * @fires CartoError
-    *
-    * @constructor Layer
-    * @memberof carto
-    * @api
-    */
+     *
+     * A Layer is the primary way to visualize geospatial data.
+     *
+     * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+     *
+     * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+     * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+     *
+     * @param {string} id
+     * @param {carto.source.Base} source
+     * @param {carto.Style} style
+     *
+     * @example
+     * new carto.Layer('layer0', source, style);
+     *
+     * @fires CartoError
+     *
+     * @constructor Layer
+     * @memberof carto
+     * @api
+     */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -61,7 +61,6 @@ export default class Layer {
         this.update(source, style);
     }
 
-
     on(eventType, callback) {
         return this._emitter.on(eventType, callback);
     }
@@ -70,18 +69,22 @@ export default class Layer {
         return this._emitter.off(eventType, callback);
     }
 
-    _fire(eventType, eventData) {
-        return this._emitter.emit(eventType, eventData);
-    }
-
-    $paintCallback() {
-        if (this._style && this._style.colorShader) {
-            this._renderLayer.style = this._style;
-            this._integrator.renderer.renderLayer(this._renderLayer);
-        }
-        if (this.state == 'dataLoaded') {
-            this.state = 'dataPainted';
-            this._fire('loaded');
+    /**
+     * Add this layer to a map.
+     *
+     * @param {mapboxgl.Map} map
+     * @param {string} beforeLayerID
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    addTo(map, beforeLayerID) {
+        if (this._isCartoMap(map)) {
+            this._addToCartoMap(map, beforeLayerID);
+        } else if (this._isMGLMap(map)) {
+            this._addToMGLMap(map, beforeLayerID);
+        } else {
+            throw new CartoValidationError('layer', 'nonValidMap');
         }
     }
 
@@ -113,6 +116,7 @@ export default class Layer {
         style.onChange(this._styleChanged.bind(this));
         this._compileShaders(style, metadata);
     }
+
     /**
      * Set a new source for this layer.
      *
@@ -139,32 +143,6 @@ export default class Layer {
         if (style) {
             this._styleChanged(style);
         }
-    }
-
-    /**
-     * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataframeAdded(dataframe) {
-        this._renderLayer.addDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-        this._integrator.needRefresh();
-    }
-
-    /**
-     * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataFrameRemoved(dataframe) {
-        this._renderLayer.removeDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-    }
-
-    /**
-    * Callback executed when the client finishes loading data
-    */
-    _onDataLoaded() {
-        this.state = 'dataLoaded';
     }
 
     /**
@@ -235,23 +213,26 @@ export default class Layer {
         });
     }
 
-    /**
-     * Add this layer to a map.
-     *
-     * @param {mapboxgl.Map} map
-     * @param {string} beforeLayerID
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    addTo(map, beforeLayerID) {
-        if (this._isCartoMap(map)) {
-            this._addToCartoMap(map, beforeLayerID);
-        } else if (this._isMGLMap(map)) {
-            this._addToMGLMap(map, beforeLayerID);
-        } else {
-            throw new CartoValidationError('layer', 'nonValidMap');
+    initCallback() {
+        this._renderLayer.renderer = this._integrator.renderer;
+        this._contextInitCallback();
+        this.requestMetadata();
+    }
+
+    async requestMetadata(style) {
+        style = style || this._style;
+        if (!style) {
+            return;
         }
+        await this._context;
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
     }
 
     hasDataframes() {
@@ -270,12 +251,57 @@ export default class Layer {
         return this._style;
     }
 
+    getNumFeatures() {
+        return this._renderLayer.getNumFeatures();
+    }
+
     getIntegrator() {
         return this._integrator;
     }
 
     getFeaturesAtPosition(pos) {
         return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+    }
+
+    $paintCallback() {
+        if (this._style && this._style.colorShader) {
+            this._renderLayer.style = this._style;
+            this._integrator.renderer.renderLayer(this._renderLayer);
+        }
+        if (this.state == 'dataLoaded') {
+            this.state = 'dataPainted';
+            this._fire('loaded');
+        }
+    }
+
+    _fire(eventType, eventData) {
+        return this._emitter.emit(eventType, eventData);
+    }
+
+    /**
+     * Callback executed when the client adds a new dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataframeAdded(dataframe) {
+        this._renderLayer.addDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
+    }
+
+    /**
+     * Callback executed when the client removes dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataFrameRemoved(dataframe) {
+        this._renderLayer.removeDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+     * Callback executed when the client finishes loading data
+     */
+    _onDataLoaded() {
+        this.state = 'dataLoaded';
     }
 
     _addLayerIdToFeature(feature) {
@@ -295,12 +321,6 @@ export default class Layer {
     _addToCartoMap(map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
-    }
-
-    initCallback() {
-        this._renderLayer.renderer = this._integrator.renderer;
-        this._contextInitCallback();
-        this.requestMetadata();
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -370,26 +390,6 @@ export default class Layer {
             return this._integrator.renderer.getBounds();
         }
         throw new Error('?');
-    }
-
-    async requestMetadata(style) {
-        style = style || this._style;
-        if (!style) {
-            return;
-        }
-        await this._context;
-        return this._source.requestMetadata(style);
-    }
-
-    async requestData() {
-        if (!this.metadata) {
-            return;
-        }
-        this._source.requestData(this._getViewport());
-    }
-
-    getNumFeatures() {
-        return this._renderLayer.getNumFeatures();
     }
 
     _freeSource() {
