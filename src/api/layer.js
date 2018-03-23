@@ -52,7 +52,6 @@ export default class Layer {
         this._listeners = {};
         this._renderLayer = new RenderLayer();
         this.state = 'init';
-        console.log('L', this);
 
         this.update(source, style);
     }
