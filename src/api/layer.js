@@ -54,8 +54,7 @@ export default class Layer {
         this.state = 'init';
         console.log('L', this);
 
-        this.setSource(source);
-        this.setStyle(style);
+        this.update(source, style);
     }
 
 
