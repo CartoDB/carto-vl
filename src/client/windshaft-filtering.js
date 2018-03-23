@@ -24,34 +24,27 @@ class AggregationFiltering {
         let filterList = this._and(styleFilter).filter(Boolean);
         for (let p of filterList) {
             let name = p.property;
-            if (filters[name]) {
-                // can't AND-combine filters for the same property
-                return [];
+            let existingFilter = filters[name];
+            if (existingFilter) {
+                if (this._compatibleAndFilters(existingFilter, p.filters)) {
+                    // combine inequalities into a range
+                    Object.assign(existingFilter[0], p.filters[0]);
+                }
+                else {
+                    // can't AND-combine filters for the same property
+                    return {};
+                }
             }
-            filters[name] = p.filters;
+            else {
+                filters[name] = p.filters;
+            }
         }
         return filters;
     }
 
     _and(f) {
         if (f instanceof And) {
-            let a = this._or(f.a);
-            let b = this._or(f.b);
-            if (!a) {
-                return [b];
-            }
-            if (!b) {
-                return [a];
-            }
-            if (a.property != b.property) {
-                return [a, b];
-            }
-            if (this._compatibleAndFilters(a, b)) {
-                // adjacent AND inequalities on the same property/aggregation
-                // are combined, when possible, into a range filter
-                Object.assign(a.filters[0], b.filters[0]);
-                return [a];
-            }
+            return this._and(f.a).concat(this._and(f.b)).filter(Boolean);
         }
         return [this._or(f)].filter(Boolean);
     }
@@ -87,8 +80,8 @@ class AggregationFiltering {
     _between(f) {
         if (f instanceof Between) {
             let p = this._aggregation(f.value);
-            let lo = p && this._value(f.lowerlimit);
-            let hi = p && lo && this._value(f.lowerLimit);
+            let lo = p && this._value(f.lowerLimit);
+            let hi = p && lo && this._value(f.upperLimit);
             if (hi) {
                 p.filters.push({
                     greater_than_or_equal_to: lo,
@@ -107,6 +100,7 @@ class AggregationFiltering {
                 p.filters.push({
                     in: values
                 });
+                return p;
             }
         }
     }
@@ -119,6 +113,7 @@ class AggregationFiltering {
                 p.filters.push({
                     not_in: values
                 });
+                return p;
             }
         }
     }
@@ -194,21 +189,19 @@ class AggregationFiltering {
 
     _compatibleAndFilters(a, b) {
         // check if a and b can be combined into a range filter
-        if (a.property == b.property) {
-            if (a.filters.length === 0 || b.filters.length === 0) {
-                return true;
-            }
-            if (a.filters.length === 1 && b.filters.length === 1) {
-                const af = a.filters[0];
-                const bf = b.filters[0];
-                if (Object.keys(af).length === 1 && Object.keys(bf).length === 1) {
-                    const ka = Object.keys(af)[0];
-                    const kb = Object.keys(bf)[0];
-                    const less_ops = ['less_than', 'less_than_or_equal_to'];
-                    const greater_ops = ['greater_than', 'greater_than_or_equal_to'];
-                    return (less_ops.includes(ka) && greater_ops.includes(kb))
-                        || (less_ops.includes(kb) && greater_ops.includes(ka));
-                }
+        if (a.length === 0 || b.length === 0) {
+            return true;
+        }
+        if (a.length === 1 && b.length === 1) {
+            const af = a[0];
+            const bf = b[0];
+            if (Object.keys(af).length === 1 && Object.keys(bf).length === 1) {
+                const ka = Object.keys(af)[0];
+                const kb = Object.keys(bf)[0];
+                const less_ops = ['less_than', 'less_than_or_equal_to'];
+                const greater_ops = ['greater_than', 'greater_than_or_equal_to'];
+                return (less_ops.includes(ka) && greater_ops.includes(kb))
+                    || (less_ops.includes(kb) && greater_ops.includes(ka));
             }
         }
         return false;
