@@ -232,6 +232,7 @@ export default class Windshaft {
             scale: rs.scale,
             size: size,
             type: type,
+            metadata: this.metadata,
         });
 
         return dataframe;

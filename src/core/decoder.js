@@ -31,9 +31,9 @@ export function decodeGeom(geomType, geom) {
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(vertices) {
+function decodePoint(geometry) {
     return {
-        vertices: vertices,
+        vertices: geometry,
         breakpoints: []
     };
 }
@@ -57,11 +57,11 @@ function decodePolygon(geometry) {
     };
 }
 
-function decodeLine(geom) {
+function decodeLine(geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geom.map(feature => {
+    geometry.map(feature => {
         feature.map(lineString => {
             addLine(lineString, vertices, normals);
         });
