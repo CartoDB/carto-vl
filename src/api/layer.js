@@ -145,13 +145,14 @@ export default class Layer {
      * @instance
      * @api
      */
-    setStyle(style) {
+    async setStyle(style) {
         this._checkStyle(style);
+
+        await this._styleChanged(style);
+
         this._style.onChange(null);
         this._style = style;
         this._style.onChange(this._styleChanged.bind(this));
-
-        return this._styleChanged(style);
     }
 
     /**
@@ -176,21 +177,20 @@ export default class Layer {
      * @instance
      * @api
      */
-    blendToStyle(style, ms = 400, interpolator = cubic) {
+    async blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
-        if (this._style) {
-            this._style.onChange(null);
-            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
-            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
-            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
-            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
-        }
+        
+        style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
+        style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
+        style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
+        style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+        style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
 
+        await this._styleChanged(style);
+
+        this._style.onChange(null);
         this._style = style;
         this._style.onChange(this._styleChanged.bind(this));
-
-        return this._styleChanged(style);
     }
 
     // The integrator will call this method once the webgl context is ready.
