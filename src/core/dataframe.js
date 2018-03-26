@@ -117,6 +117,7 @@ export default class Dataframe {
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
                 features.push({
+                    id: featureID,
                     properties: this._getPropertiesOf(featureID)
                 });
                 // Don't repeat a feature if we the point is on an shared (by two triangles) edge
