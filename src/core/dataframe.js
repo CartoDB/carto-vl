@@ -65,12 +65,12 @@ export default class Dataframe {
         this.style = style;
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition(pos, style) {
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos);
             case 'line':
-                return this._getLinesAtPosition(pos);
+                return this._getLinesAtPosition(pos, style);
             case 'polygon':
                 return this._getPolygonAtPosition(pos);
             default:
@@ -83,13 +83,16 @@ export default class Dataframe {
         return [];
     }
 
-    _getLinesAtPosition(pos) {
+    _getLinesAtPosition(pos, style) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
         let featureID = 0;
         const features = [];
+        const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -97,8 +100,11 @@ export default class Dataframe {
             if (i >= breakpoints[featureID]) {
                 featureID++;
             }
-            // TODO get size by evaluating the width of the line and applying the window scale
-            const size = 0.01;
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureID];
+            });
+            const size = styleWidth.eval(f) * widthScale;
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * size,
                 y: vertices[i + 1] + normals[i + 1] * size

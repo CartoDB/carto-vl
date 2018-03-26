@@ -43,6 +43,7 @@
         const source = new carto.source.Dataset('ne_50m_rivers_lake_centerlines');
         const style = new carto.Style(`
             color: ramp($name, bold)
+            width: 20
     `);
         const layer = new carto.Layer('layer', source, style);
 
