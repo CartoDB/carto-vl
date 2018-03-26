@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Single layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO GL JS -->
+    <script src="../../dist/carto-gl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="../../vendor/mapbox-gl-dev.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            center: [0, 30],
+            zoom: 2
+        });
+
+        carto.setDefaultAuth({
+            user: 'cartogl',
+            apiKey: 'YOUR_API_KEY'
+        });
+
+        const source = new carto.source.Dataset('ne_50m_rivers_lake_centerlines');
+        const style = new carto.Style(`
+            color: ramp($name, bold)
+    `);
+        const layer = new carto.Layer('layer', source, style);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            const interactivity = new carto.Interactivity([layer]);
+            interactivity.on('featureClick', event => {
+                console.log(JSON.stringify(event));
+            });
+        });
+    </script>
+</body>
+
+</html>
