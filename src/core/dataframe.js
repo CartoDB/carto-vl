@@ -61,10 +61,6 @@ export default class Dataframe {
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    setStyle(style) {
-        this.style = style;
-    }
-
     getFeaturesAtPosition(pos, style) {
         switch (this.type) {
             case 'point':
