@@ -65,34 +65,41 @@ export default class Dataframe {
         this.style = style;
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition(pos, style) {
         switch (this.type) {
             case 'point':
-                return this._getPointsAtPosition(pos);
+                return this._getPointsAtPosition(pos, style);
             case 'line':
-                return this._getLinesAtPosition(pos);
+                return this._getLinesAtPosition(pos, style);
             case 'polygon':
-                return this._getPolygonAtPosition(pos);
+                return this._getPolygonAtPosition(pos, style);
             default:
                 return [];
         }
     }
 
-    _getPointsAtPosition(p) {
+    _getPointsAtPosition(p, style) {
         p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
         const points = this.decodedGeom.vertices;
         const features = [];
+        const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
         for (let i = 0; i < points.length; i += 2) {
+            const featureID = i / 2;
             const center = {
                 x: points[i],
                 y: points[i + 1],
             };
-            // TODO scale must be based on width
-            const scale = 0.01;
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureID];
+            });
+            const scale = styleWidth.eval(f) * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
                 features.push({
-                    properties: this._getPropertiesOf(i / 2)
+                    properties: this._getPropertiesOf(featureID)
                 });
             }
         }
