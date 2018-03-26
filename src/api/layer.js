@@ -11,29 +11,28 @@ import RenderLayer from '../core/renderLayer';
 
 
 export default class Layer {
-
     /**
-     *
-     * A Layer is the primary way to visualize geospatial data.
-     *
-     * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
-     *
-     * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-     * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
-     *
-     * @param {string} id
-     * @param {carto.source.Base} source
-     * @param {carto.Style} style
-     *
-     * @example
-     * new carto.Layer('layer0', source, style);
-     *
-     * @fires CartoError
-     *
-     * @constructor Layer
-     * @memberof carto
-     * @api
-     */
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    *
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
@@ -179,7 +178,7 @@ export default class Layer {
      */
     async blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
-        
+
         style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
         style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
         style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
