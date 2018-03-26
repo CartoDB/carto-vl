@@ -65,14 +65,14 @@ function decodeLine(geom) {
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
-            
+
             for (let i = 0; i < lineString.length - 2; i += 2) {
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
                 const normal = getLineNormal(b, a);
                 let na = normal;
                 let nb = normal;
-                
+
                 if (i > 0) {
                     const prev = [lineString[i - 2], lineString[i - 1]];
                     na = getJointNormal(prev, a, b) || na;
@@ -83,21 +83,21 @@ function decodeLine(geom) {
                 }
 
                 // First triangle
-    
+
                 normals.push(-na[0], -na[1]);
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
-    
+
                 vertices.push(a[0], a[1]);
                 vertices.push(a[0], a[1]);
                 vertices.push(b[0], b[1]);
 
                 // Second triangle
-    
+
                 normals.push(na[0], na[1]);
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
-    
+
                 vertices.push(a[0], a[1]);
                 vertices.push(b[0], b[1]);
                 vertices.push(b[0], b[1]);

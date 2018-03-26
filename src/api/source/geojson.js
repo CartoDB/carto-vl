@@ -70,7 +70,8 @@ export default class GeoJSON extends Base {
             properties: this._decodeProperties(),
             scale: 1,
             size: this._features.length,
-            type: this._getDataframeType(this._type)
+            type: this._getDataframeType(this._type),
+            metadata: this._metadata,
         });
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
@@ -181,7 +182,7 @@ export default class GeoJSON extends Base {
     _decodeProperties() {
         const properties = {};
         this._numFields.concat(this._catFields).map(name => {
-            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met            
+            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
         for (var i = 0; i < this._features.length; i++) {
