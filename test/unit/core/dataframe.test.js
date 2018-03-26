@@ -41,6 +41,7 @@ describe('src/core/dataframe', () => {
                 }
             });
             const feature1 = {
+                id: 0,
                 properties: {
                     id: 0
                 }
