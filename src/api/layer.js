@@ -55,7 +55,6 @@ export default class Layer {
         });
 
         this.metadata = null;
-        this._listeners = {};
         this._renderLayer = new RenderLayer();
 
         this.update(source, style);
