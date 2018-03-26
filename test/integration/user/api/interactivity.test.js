@@ -71,6 +71,38 @@ describe('Interactivity', () => {
             layer.addTo(map);
         });
     });
+    
+    describe('when the user clicks on the map', () => {
+        let interactivity;
+        
+        describe('and the click is not in a feature', () => {
+            it('should fire a featureClick event with an empty features list', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    interactivity.on('featureClick', event => {
+                        expect(event.features.length).toEqual(0);
+                        done();
+                    });
+                    map.fire('click', { lngLat: { lng: 0, lat: 0 } });
+                });
+                layer.addTo(map);
+            });
+        });
+        
+        describe('and the click is in a feature', () => {
+            it('should fire a featureClick event with a features list containing the clicked feature', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    interactivity.on('featureClick', event => {
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        done();
+                    });
+                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                });
+                layer.addTo(map);
+            });
+        });
+    });
 
     afterEach(() => {
         document.body.removeChild(div);
@@ -97,8 +129,16 @@ function _setup(name) {
 const geojson = {
     'type': 'Feature',
     'geometry': {
-        'type': 'Point',
-        'coordinates': [0, 0]
+        'type': 'Polygon',
+        'coordinates': [
+            [
+                [0, 0],
+                [50, 0],
+                [50, 50],
+                [0, 50],
+                [0, 0]
+            ]
+        ]
     },
     'properties': {
         'cartodb_id': 1
