@@ -174,6 +174,40 @@ describe('Interactivity', () => {
                 layer.addTo(map);
             });
         });
+        
+        describe('and the mouse leaves a feature', () => {
+            it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    // Move mouse inside a feature
+                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    interactivity.on('featureLeave', event => {
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        done();
+                    });
+                    // Move mouse outside the same feature
+                    map.fire('mousemove', { lngLat: { lng: 0, lat: 0 } });
+                });
+                layer.addTo(map);
+            });
+            
+            it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                    // Move mouse outside any feature
+                    map.fire('mousemove', { lngLat: { lng: 0, lat: 0 } });
+                    interactivity.on('featureLeave', featureClickOutSpy);
+                    interactivity.on('featureHover', () => {
+                        expect(featureClickOutSpy).not.toHaveBeenCalled();
+                        done();
+                    });
+                    // Move mouse outside any feature
+                    map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                });
+                layer.addTo(map);
+            });
+        });
     });
 
     afterEach(() => {
