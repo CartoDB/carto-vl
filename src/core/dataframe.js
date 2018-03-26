@@ -78,9 +78,25 @@ export default class Dataframe {
         }
     }
 
-    _getPointsAtPosition(pos) {
-        console.log(pos);
-        return [];
+    _getPointsAtPosition(p) {
+        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+        const points = this.decodedGeom.vertices;
+        const features = [];
+        for (let i = 0; i < points.length; i += 2) {
+            const center = {
+                x: points[i],
+                y: points[i + 1],
+            };
+            // TODO scale must be based on width
+            const scale = 0.01;
+            const inside = pointInCircle(p, center, scale);
+            if (inside) {
+                features.push({
+                    properties: this._getPropertiesOf(i / 2)
+                });
+            }
+        }
+        return features;
     }
 
     _getLinesAtPosition(pos) {
@@ -234,4 +250,13 @@ function halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function pointInCircle(p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
 }
