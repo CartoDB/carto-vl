@@ -87,6 +87,10 @@
       const interactivity = new carto.Interactivity([layer]);
       interactivity.on('featureClick', event => {
         updateCountry(event);
+        console.log('CLICK', event.features);
+      });
+      interactivity.on('featureClickOut', event => {
+        console.log('CLICK OUT', event.feature);
       });
     });
     

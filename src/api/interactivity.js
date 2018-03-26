@@ -14,6 +14,8 @@ export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
         this._init(layerList);
+        
+        this._prevFeatures = [];
     }
 
     _init(layerList) {
@@ -43,8 +45,23 @@ export default class Interactivity {
     }
 
     _onClick(event) {
-        const data = this._createFeatureEvent(event);
-        this._fireEvent('featureClick', data);
+        const featureEvent = this._createFeatureEvent(event);
+        
+        // Manage clickOut events
+        const currentFeatureIDs = this._getFeatureIDs(featureEvent.features);
+        for (let feature of this._prevFeatures) {
+            if (!currentFeatureIDs.includes(feature.id)) {
+                this._fireEvent('featureClickOut', {
+                    coordinates: featureEvent.coordinates,
+                    position: featureEvent.position,
+                    feature: feature
+                });
+            }
+        }
+        this._prevFeatures = featureEvent.features;
+
+        // Launch click event
+        this._fireEvent('featureClick', featureEvent);
     }
 
     _createFeatureEvent(eventData) {
@@ -64,6 +81,10 @@ export default class Interactivity {
         const wm = projectToWebMercator(lngLat);
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
         return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
+    }
+    
+    _getFeatureIDs(features) {
+        return features.map(feature => feature.id);
     }
 }
 
