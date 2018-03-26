@@ -118,25 +118,6 @@ export default class Layer {
     }
 
     /**
-     * Set a new source for this layer.
-     *
-     * @param {carto.source.Base} source - New source
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    setSource(source) {
-        if (this._source === source) {
-            return;
-        }
-        this._checkSource(source);
-        this._freeSource();
-        this._source = source;
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        return this._styleChanged(this._style);
-    }
-
-    /**
      * Set a new style for this layer.
      *
      * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}

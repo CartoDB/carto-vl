@@ -55,10 +55,6 @@ describe('api/layer', () => {
         });
     });
 
-    describe('.setSource', () => {
-
-    });
-
     describe('.setStyle', () => {
 
     });

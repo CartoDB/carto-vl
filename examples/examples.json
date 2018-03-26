@@ -17,11 +17,6 @@
                     "file": "basics/multi-layer.html"
                 },
                 {  
-                    "title": "Change the source",
-                    "desc": "Update the source of your layers",
-                    "file": "basics/change-source.html"
-                },
-                {  
                     "title": "Change the style",
                     "desc": "Update the style of your layers",
                     "file": "basics/change-style.html"
@@ -115,11 +110,6 @@
                     "title": "Most/less populated places",
                     "desc": "Filter the 20 most/less populated places in the world",
                     "file": "misc/populated-places.html"
-                },
-                {  
-                    "title": "Edit SQL & Expressions",
-                    "desc": "Edit manually the SQL query and the Expressions style",
-                    "file": "misc/edit-sql-expressions.html"
                 },
                 {  
                     "title": "GeoJSON viewer",
