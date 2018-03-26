@@ -3,6 +3,7 @@ import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
     let div, source, style, layer, map;
+
     beforeEach(() => {
         const setup = _setup('map');
         div = setup.div;
@@ -12,8 +13,8 @@ describe('Interactivity', () => {
         style = new carto.Style('color: rgba(1, 0, 0, 1)');
         layer = new carto.Layer('layer', source, style);
     });
-    describe('When the user creates a new Interactivity object', () => {
 
+    describe('When the user creates a new Interactivity object', () => {
 
         it('should throw an error when some layer is not attached to a map', () => {
             expect(() => new carto.Interactivity([layer])).toThrowError(/.*map.*/);
@@ -44,7 +45,7 @@ describe('Interactivity', () => {
                     done();
                 }
             }
-        }, 10000);
+        });
     });
 
     describe('.on', () => {
@@ -85,7 +86,7 @@ function _setup(name) {
 
     const map = new mapboxgl.Map({
         container: name,
-        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        style: { version: 8, sources: {}, layers: [] },
         center: [0, 30],
         zoom: 2
     });
