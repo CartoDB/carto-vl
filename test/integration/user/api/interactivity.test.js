@@ -139,6 +139,42 @@ describe('Interactivity', () => {
             });
         });
     });
+    
+    describe('when the user move the mouse on the map', () => {
+        let interactivity;
+        
+        describe('and the mouse enters in a feature', () => {
+            it('should fire a featureEnter event with a features list containing the entered feature', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    interactivity.on('featureEnter', event => {
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        done();
+                    });
+                    // Move mouse inside a feature
+                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                });
+                layer.addTo(map);
+            });
+            
+            it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                    // Move mouse inside a feature
+                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    interactivity.on('featureEnter', featureClickOutSpy);
+                    interactivity.on('featureHover', () => {
+                        expect(featureClickOutSpy).not.toHaveBeenCalled();
+                        done();
+                    });
+                    // Move mouse inside the same feature
+                    map.fire('mousemove', { lngLat: { lng: 20, lat: 20 } });
+                });
+                layer.addTo(map);
+            });
+        });
+    });
 
     afterEach(() => {
         document.body.removeChild(div);
