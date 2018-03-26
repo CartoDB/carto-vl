@@ -114,14 +114,8 @@ export default class Interactivity {
      * The output value is also an array of features.
      */
     _getDiffFeatures(featuresA, featuresB) {
-        let featuresDiff = [];
         const IDs = this._getFeatureIDs(featuresB);
-        for (let feature of featuresA) {
-            if (!IDs.includes(feature.id)) {
-                featuresDiff.push(feature);
-            }
-        }
-        return featuresDiff;
+        return featuresA.filter(feature => !IDs.includes(feature.id));
     }
     
     _getFeatureIDs(features) {
