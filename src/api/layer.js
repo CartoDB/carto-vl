@@ -125,24 +125,15 @@ export default class Layer {
      * @instance
      * @api
      */
-    async setSource(source) {
+    setSource(source) {
+        if (this._source === source) {
+            return;
+        }
         this._checkSource(source);
-        const style = this._style;
-        if (style) {
-            var metadata = await source.requestMetadata(style);
-        }
-        if (this._style !== style) {
-            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
-        }
-        this.metadata = metadata;
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source !== source) {
-            this._freeSource();
-        }
+        this._freeSource();
         this._source = source;
-        if (style) {
-            this._styleChanged(style);
-        }
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        return this._styleChanged(this._style);
     }
 
     /**
@@ -157,16 +148,11 @@ export default class Layer {
      */
     setStyle(style) {
         this._checkStyle(style);
-        return this._styleChanged(style).then(r => {
-            if (this._style) {
-                this._style.onChange(null);
-            }
-            this._style = style;
-            this._style.onChange(() => {
-                this._styleChanged(style);
-            });
-            return r;
-        });
+        this._style.onChange(null);
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+
+        return this._styleChanged(style);
     }
 
     /**
@@ -194,6 +180,7 @@ export default class Layer {
     blendToStyle(style, ms = 400, interpolator = cubic) {
         this._checkStyle(style);
         if (this._style) {
+            this._style.onChange(null);
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
             style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
@@ -201,18 +188,13 @@ export default class Layer {
             style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
         }
 
-        return this._styleChanged(style).then(r => {
-            if (this._style) {
-                this._style.onChange(null);
-            }
-            this._style = style;
-            this._style.onChange(() => {
-                this._styleChanged(style);
-            });
-            return r;
-        });
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+
+        return this._styleChanged(style);
     }
 
+    // The integrator will call this method once the webgl context is ready.
     initCallback() {
         this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
