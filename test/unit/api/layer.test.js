@@ -66,11 +66,14 @@ describe('api/layer', () => {
                 layer.blendToStyle(style2);
             }).not.toThrow();
         });
-        it('should throw an error if style is not valid', () => {
+        it('should throw an error if style is undefined', () => {
             const layer = new Layer('layer0', source, style);
             expect(function () {
                 layer.blendToStyle();
             }).toThrowError('`style` property required.');
+        });
+        it('should throw an error when style is not a valid style', () => {
+            const layer = new Layer('layer0', source, style);
             expect(function () {
                 layer.blendToStyle(2);
             }).toThrowError('The given object is not a valid style. See "carto.Style".');
