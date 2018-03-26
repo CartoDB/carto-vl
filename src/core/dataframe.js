@@ -1,8 +1,9 @@
 import decoder from './decoder';
+import { wToR } from '../client/rsys';
 
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
-    constructor({ center, scale, geom, properties, type, active, size }) {
+    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -14,7 +15,7 @@ export default class Dataframe {
         this.numVertex = this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
-
+        this.metadata = metadata;
     }
 
     bind(renderer) {
@@ -88,9 +89,55 @@ export default class Dataframe {
 
     }
 
-    _getPolygonAtPosition(pos) {
-        console.log(pos);
-        return [];
+    _getPolygonAtPosition(p) {
+        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureID = 0;
+        const features = [];
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureID]) {
+                featureID++;
+            }
+            const v1 = {
+                x: vertices[i + 0],
+                y: vertices[i + 1]
+            };
+            const v2 = {
+                x: vertices[i + 2],
+                y: vertices[i + 3]
+            };
+            const v3 = {
+                x: vertices[i + 4],
+                y: vertices[i + 5]
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                features.push({
+                    properties: this._getPropertiesOf(featureID)
+                });
+                // Don't repeat a feature if we the point is on an shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureID];
+            }
+        }
+        return features;
+    }
+
+    _getPropertiesOf(featureID) {
+        const properties = {};
+        Object.keys(this.properties).map(propertyName => {
+            let prop = this.properties[propertyName][featureID];
+            const column = this.metadata.columns.find(c => c.name == propertyName);
+            if (column.type == 'category') {
+                prop = column.categoryNames[prop];
+            }
+            properties[propertyName] = prop;
+        });
+        return properties;
     }
 
     _genDataframePropertyTextures() {
@@ -161,4 +208,30 @@ export default class Dataframe {
             this.propertyTex = null;
         }
     }
+}
+
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+function pointInTriangle(p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneTest(p, v1, v2) < 0;
+    const b2 = halfPlaneTest(p, v2, v3) < 0;
+    const b3 = halfPlaneTest(p, v3, v1) < 0;
+
+    return (b1 == b2) && (b2 == b3);
+}
+
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+function halfPlaneTest(p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
