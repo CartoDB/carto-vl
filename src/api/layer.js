@@ -55,6 +55,8 @@ export default class Layer {
 
         this.metadata = null;
         this._renderLayer = new RenderLayer();
+        this.state = 'init';
+        this.isLoaded = false;
 
         this.update(source, style);
     }
@@ -248,9 +250,9 @@ export default class Layer {
             this._renderLayer.style = this._style;
             this._integrator.renderer.renderLayer(this._renderLayer);
         }
-        if (this.state == 'dataLoaded') {
-            this.state = 'dataPainted';
+        if (!this.isLoaded && this.state == 'dataLoaded') {
             this._fire('loaded');
+            this.isLoaded = true;
         }
     }
 
