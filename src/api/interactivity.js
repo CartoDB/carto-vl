@@ -19,7 +19,7 @@ export default class Interactivity {
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(this._layerList[0].getIntegrator());
+        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
     }
 
     on(eventName, callback) {
@@ -39,12 +39,12 @@ export default class Interactivity {
 
     _onMouseMove(event) {
         const data = this._createFeatureEvent(event);
-        this._fireEvent(data);
+        this._fireEvent('', data);
     }
 
     _onClick(event) {
         const data = this._createFeatureEvent(event);
-        this._fireEvent(data);
+        this._fireEvent('featureClick', data);
     }
 
     _createFeatureEvent(eventData) {
@@ -56,8 +56,7 @@ export default class Interactivity {
         };
     }
 
-    _fireEvent(featureEvent) {
-        const type = this._getEventType();
+    _fireEvent(type, featureEvent) {
         this._emitter.emit(type, featureEvent);
     }
 
@@ -65,12 +64,6 @@ export default class Interactivity {
         const wm = projectToWebMercator(lngLat);
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
         return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
-    }
-
-    _getEventType() {
-        // TODO: get type based on internal state
-        const type = 'featureClick';
-        return type;
     }
 }
 
