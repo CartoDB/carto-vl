@@ -47,7 +47,7 @@ class Renderer {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
         this.RTT_WIDTH = RTT_WIDTH;
-        console.log('R', this);
+        // console.log('R', this);
         this.dataframes = [];
     }
 

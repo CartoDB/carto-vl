@@ -83,12 +83,30 @@ describe('Interactivity', () => {
                         expect(event.features.length).toEqual(0);
                         done();
                     });
+                    // Click outside the feature
                     map.fire('click', { lngLat: { lng: 0, lat: 0 } });
                 });
                 layer.addTo(map);
             });
+            
+            describe('and a feature was previously clicked', () => {
+                it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
+                    layer.on('loaded', () => {
+                        interactivity = new carto.Interactivity([layer]);
+                        interactivity.on('featureClickOut', event => {
+                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                            done();
+                        });
+                        // Click inside the feature
+                        map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                        // Click outside the feature
+                        map.fire('click', { lngLat: { lng: 0, lat: 0 } });
+                    });
+                    layer.addTo(map);
+                });
+            });
         });
-        
+
         describe('and the click is in a feature', () => {
             it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 layer.on('loaded', () => {
@@ -97,7 +115,25 @@ describe('Interactivity', () => {
                         expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
                         done();
                     });
+                    // Click inside the feature
                     map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                });
+                layer.addTo(map);
+            });
+
+            it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                    interactivity.on('featureClickOut', featureClickOutSpy);
+                    // Click inside the feature
+                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                    interactivity.on('featureClick', () => {
+                        expect(featureClickOutSpy).not.toHaveBeenCalled();
+                        done();
+                    });
+                    // Click inside the same feature
+                    map.fire('click', { lngLat: { lng: 20, lat: 20 } });
                 });
                 layer.addTo(map);
             });

@@ -51,7 +51,7 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this.isLoaded = false;
-        console.log('L', this);
+        // console.log('L', this);
 
         this.setSource(source);
         this.setStyle(style);
