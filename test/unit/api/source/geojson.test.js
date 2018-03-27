@@ -239,7 +239,17 @@ describe('api/source/geojson', () => {
                 new GeoJSON(data);
                 expect(data.properties.cartodb_id).toBeUndefined();
             });
-            it('should throw an error when feature already has a cartodb_id property ', () => { });
+
+            it('should throw an error when feature already has a cartodb_id property ', () => {
+                const data = {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [0, 0] },
+                    properties: {
+                        cartodb_id: 'invalid'
+                    }
+                };
+                expect(() => new GeoJSON(data)).toThrowError('`cartodb_id` is a reserved property so it can not be used');
+            });
         });
     });
 

@@ -99,7 +99,17 @@ export default class GeoJSON extends Base {
     }
 
     _addCartodbId(features) {
-        return features.map((feature, i) => { feature.properties.cartodb_id = i; return feature; }) || [];
+        return features.map((feature, i) => {
+            this._checkFeature(feature);
+            feature.properties.cartodb_id = i;
+            return feature;
+        }) || [];
+    }
+
+    _checkFeature(feature) {
+        if (feature.properties && feature.properties.cartodb_id) {
+            throw new CartoValidationError('source', 'featureHasCartodbId');
+        }
     }
 
     _computeMetadata() {
