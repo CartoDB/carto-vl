@@ -1,3 +1,4 @@
+import { blend, equals, property, animate } from './style/functions';
 
 export default class RenderLayer {
     constructor() {
@@ -41,7 +42,29 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style)));
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
+            feature.blendColor = (newColor, duration = 500) => {
+                if (!feature._originalStyle) {
+                    feature._originalStyle = this.style.getColor();
+                }
+                const newExpr = blend(
+                    this.style.getColor(),
+                    newColor,
+                    // This hack can be removed once cartodb_id gets into master
+                    blend(0, equals(property('admin'), feature.properties.admin), animate(duration))
+                );
+                feature._newStyle = newExpr;
+                this.style.replaceChild(
+                    this.style.getColor(),
+                    newExpr
+                );
+                this.style.getColor().notify();
+            };
+            feature.normalize = () => {
+                feature._newStyle.parent.replaceChild(feature._newStyle, feature._originalStyle);
+            };
+            return feature;
+        });
     }
 
     freeDataframes() {
