@@ -80,7 +80,7 @@ describe('Interactivity', () => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureClick', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, featureID: 0 });
                         done();
                     });
                     // Click inside the feature
@@ -126,7 +126,7 @@ describe('Interactivity', () => {
                     layer.on('loaded', () => {
                         interactivity = new carto.Interactivity([layer]);
                         interactivity.on('featureClickOut', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, featureID: 0 });
                             done();
                         });
                         // Click inside the feature
@@ -148,7 +148,7 @@ describe('Interactivity', () => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureHover', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, featureID: 0 });
                         done();
                     });
                     // Move mouse inside a feature
@@ -161,7 +161,7 @@ describe('Interactivity', () => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureEnter', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, featureID: 0 });
                         done();
                     });
                     // Move mouse inside a feature
@@ -210,7 +210,7 @@ describe('Interactivity', () => {
                     // Move mouse inside a feature
                     map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureLeave', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, featureID: 0 });
                         done();
                     });
                     // Move mouse outside the feature
@@ -274,7 +274,5 @@ const geojson = {
             ]
         ]
     },
-    'properties': {
-        'cartodb_id': 1
-    }
+    'properties': {}
 };
