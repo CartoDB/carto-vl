@@ -197,7 +197,16 @@ describe('api/source/geojson', () => {
         });
 
         fdescribe('cartodb_id', () => {
-            it('should be auto generated and unique for every feature in the geojson', () => {
+            it('should be auto generated and unique for a single feature', () => {
+                const data = {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [0, 0] },
+                    properties: {}
+                };
+                const source = new GeoJSON(data);
+                expect(source._features[0].properties.cartodb_id).toEqual(0);
+            });
+            it('should be auto generated and unique for every feature in a featureCollection', () => {
                 const data = {
                     type: 'FeatureCollection',
                     features: [{
