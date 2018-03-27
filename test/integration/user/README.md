@@ -1,6 +1,6 @@
 # User tests
 
-The idea of these tests is to automatically test the **user** using local data sources (GeoJSON) and a real map.
+The idea of these tests is to automatically test the **user activity** using local data sources (GeoJSON) and a real map.
 
 ## Running the tests
 

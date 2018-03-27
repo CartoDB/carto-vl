@@ -1,4 +1,4 @@
-# Integration tests
+# Render tests
 
 The idea of these tests is to automatically test the **renderer** using local data sources (GeoJSON) and a static map. The local GeoJSON files are located in the `common/sources` directory.
 
