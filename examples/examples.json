@@ -1,57 +1,62 @@
-{  
-    "main": {  
+{
+    "main": {
         "file": "misc/guide.html"
     },
-    "categories": [  
-        {  
+    "categories": [
+        {
             "title": "Basics",
-            "samples": [  
-                {  
+            "samples": [
+                {
                     "title": "Add a layer",
                     "desc": "Add one CARTO layer to your map",
                     "file": "basics/single-layer.html"
                 },
-                {  
+                {
                     "title": "Add multiple layers",
                     "desc": "Add multiple CARTO layers to your map",
                     "file": "basics/multi-layer.html"
                 },
-                {  
+                {
                     "title": "Change the style",
                     "desc": "Update the style of your layers",
                     "file": "basics/change-style.html"
+                },
+                {
+                    "title": "Change the source",
+                    "desc": "Update the source of your layers",
+                    "file": "basics/change-source.html"
                 }
             ]
         },
-        {  
+        {
             "title": "Expressions",
             "samples": [
-                {  
+                {
                     "title": "Default style",
                     "desc": "",
                     "file": "expressions/default.html"
                 },
-                {  
+                {
                     "title": "Use color expressions",
                     "desc": "",
                     "file": "expressions/color.html"
                 },
-                {  
+                {
                     "title": "Use category ramp",
                     "desc": "",
                     "file": "expressions/ramp-category.html"
                 },
-                {  
+                {
                     "title": "Use numeric ramp",
                     "desc": "",
                     "file": "expressions/ramp-numeric.html"
                 },
-                {  
+                {
                     "title": "Setup ordering",
                     "desc": "",
                     "file": "expressions/order.html"
                 },
-                {  
+                {
                     "title": "Filter metadata",
                     "desc": "",
                     "file": "expressions/filter.html"
@@ -61,62 +66,62 @@
                     "desc": "",
                     "file": "expressions/viewport.html"
                 },
-                {  
+                {
                     "title": "Animated dataset",
                     "desc": "",
                     "file": "expressions/animation.html"
                 },
-                {  
+                {
                     "title": "Torque",
                     "desc": "",
                     "file": "expressions/torque.html"
                 }
             ]
         },
-        {  
+        {
             "title": "Interactivity",
-            "samples": [  
-                {  
+            "samples": [
+                {
                     "title": "Detect feature click",
                     "desc": "Interact with the features on the click event",
                     "xfile": "interactivity/feature-click.html"
                 },
-                {  
+                {
                     "title": "Detect feature over/out",
                     "desc": "Interact with the features on the over/out events",
                     "xfile": "interactivity/feature-over-out.html"
                 }
             ]
         },
-        {  
+        {
             "title": "Misc",
-            "samples": [  
-                {  
+            "samples": [
+                {
                     "title": "Guide",
                     "desc": "Full reference guide example",
                     "xfile": "misc/guide.html"
                 },
-                {  
+                {
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
                     "xfile": "misc/popups.html"
                 },
-                {  
+                {
                     "title": "Legends",
                     "desc": "Create dynamic legends",
                     "xfile": "misc/legends.html"
                 },
-                {  
+                {
                     "title": "Most/less populated places",
                     "desc": "Filter the 20 most/less populated places in the world",
                     "file": "misc/populated-places.html"
                 },
-                {  
+                {
                     "title": "GeoJSON viewer",
                     "desc": "Load and view GeoJSON files",
                     "file": "misc/geojson-viewer.html"
                 },
-                {  
+                {
                     "title": "Error handling",
                     "desc": "Handle common errors in maps",
                     "xfile": "misc/error-handling.html"
