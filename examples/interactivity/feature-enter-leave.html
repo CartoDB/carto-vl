@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Feature click | CARTO</title>
+  <title>Feature enter/leave | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
@@ -48,9 +48,6 @@
       font: 400 16px/22px 'Open Sans';
       margin-bottom: 4px;
     }
-    #content p {
-      font: 400 12px/16px 'Open Sans';
-    }
   </style>
 </head>
 <body>
@@ -85,12 +82,13 @@
       updateTitle('Click on the countries');
   
       const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureClick', event => {
+      interactivity.on('featureEnter', event => {
         updateCountry(event);
-        console.log('CLICK', event.features);
+        console.log('ENTER', event.features);
       });
-      interactivity.on('featureClickOut', event => {
-        console.log('CLICK OUT', event.features);
+      interactivity.on('featureLeave', event => {
+        clearContent();
+        console.log('LEAVE', event.features);
       });
     });
     
@@ -104,15 +102,15 @@
       let content = '';
       if (event.features.length > 0) {
         const topCountryName = event.features[0].properties.admin || '';
-        const lng = event.coordinates.lng;
-        const lat = event.coordinates.lat;
         content += `<div class="container">`;
         content += `<h3>${topCountryName.toUpperCase()}</h3>`;
-        content += `<p>LNG: ${lng}</p>`;
-        content += `<p>LAT: ${lat}</p>`;
         content += `</div>`;
       }
       document.getElementById('content').innerHTML = content;
+    }
+    
+    function clearContent(event) {
+      document.getElementById('content').innerHTML = '';
     }
   </script>
 </body>
