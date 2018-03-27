@@ -50,7 +50,8 @@ export default class Layer {
         this._listeners = {};
         this._renderLayer = new RenderLayer();
         this.state = 'init';
-        console.log('L', this);
+        this.isLoaded = false;
+        // console.log('L', this);
 
         this.setSource(source);
         this.setStyle(style);
@@ -60,9 +61,9 @@ export default class Layer {
                 this._renderLayer.style = this._style;
                 this._integrator.renderer.renderLayer(this._renderLayer);
             }
-            if (this.state == 'dataLoaded') {
-                this.state = 'dataPainted';
+            if (!this.isLoaded && this.state == 'dataLoaded') {
                 this._fire('loaded');
+                this.isLoaded = true;
             }
         };
     }

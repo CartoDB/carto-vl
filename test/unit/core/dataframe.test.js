@@ -59,8 +59,49 @@ describe('src/core/dataframe', () => {
         });
 
         describe('when dataframe is line type', () => {
-            it('should return an empty list when there are no lines at the given position', () => { });
-            it('should return a list containing the features at the given position', () => { });
+            const segment = [
+                0, 0,
+                9, 0
+            ];
+            const dataframe = new Dataframe({
+                center: { x: 0, y: 0 },
+                scale: 1,
+                geom: [[segment]],
+                properties: {
+                    id: [1]
+                },
+                type: 'line',
+                size: 1,
+                active: true,
+                metadata: {
+                    columns: [{
+                        name: 'id',
+                        type: 'float'
+                    }]
+                }
+            });
+            const feature1 = {
+                properties: {
+                    id: 1
+                }
+            };
+            const style = {
+                getWidth: () => ({
+                    eval: () => {
+                        return 1;
+                    }
+                })
+            };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
+            it('should return an empty list when there are no lines at the given position', () => {
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001/1024 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001/1024 }, style)).toEqual([]);
+
+            });
+            it('should return a list containing the features at the given position', () => {
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999/1024 }, style)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999/1024 }, style)).toEqual([feature1]);
+            });
         });
 
         describe('when dataframe is polygon type', () => {
@@ -90,6 +131,7 @@ describe('src/core/dataframe', () => {
                 }
             });
             const feature1 = {
+                id: 0,
                 properties: {
                     id: 0
                 }

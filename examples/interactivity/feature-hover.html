@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Feature click | CARTO</title>
+  <title>Feature hover | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
@@ -82,15 +82,12 @@
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the countries');
+      updateTitle('Move the mouse over the countries');
   
       const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureClick', event => {
+      interactivity.on('featureHover', event => {
         updateCountry(event);
-        console.log('CLICK', event.features);
-      });
-      interactivity.on('featureClickOut', event => {
-        console.log('CLICK OUT', event.features);
+        console.log('HOVER', event.features);
       });
     });
     

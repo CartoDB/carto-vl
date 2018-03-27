@@ -14,12 +14,14 @@ export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
         this._init(layerList);
+        
+        this._prevFeatures = [];
     }
 
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(this._layerList[0].getIntegrator());
+        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
     }
 
     on(eventName, callback) {
@@ -38,26 +40,66 @@ export default class Interactivity {
     }
 
     _onMouseMove(event) {
-        const data = this._createFeatureEvent(event);
-        this._fireEvent(data);
+        const featureEvent = this._createFeatureEvent(event);
+        const currentFeatures = featureEvent.features;
+
+        // Manage enter/leave events
+        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+        
+        if (featuresLeft.length > 0) {
+            this._fireEvent('featureLeave', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresLeft
+            });
+        }
+        
+        if (featuresEntered.length > 0) {
+            this._fireEvent('featureEnter', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresEntered
+            });
+        }
+
+        this._prevFeatures = featureEvent.features;
+        
+        // Launch hover event
+        this._fireEvent('featureHover', featureEvent);
     }
 
     _onClick(event) {
-        const data = this._createFeatureEvent(event);
-        this._fireEvent(data);
+        const featureEvent = this._createFeatureEvent(event);
+        const currentFeatures = featureEvent.features;
+        
+        // Manage clickOut event
+        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        
+        if (featuresClickedOut.length > 0) {
+            this._fireEvent('featureClickOut', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresClickedOut
+            });
+        }
+
+        this._prevFeatures = featureEvent.features;
+
+        // Launch click event
+        this._fireEvent('featureClick', featureEvent);
     }
 
     _createFeatureEvent(eventData) {
         const features = this._getFeaturesAtPosition(eventData.lngLat);
         return {
-            features,
             coordinates: eventData.lngLat,
             position: eventData.point,
+            features
         };
     }
 
-    _fireEvent(featureEvent) {
-        const type = this._getEventType();
+    _fireEvent(type, featureEvent) {
         this._emitter.emit(type, featureEvent);
     }
 
@@ -66,11 +108,18 @@ export default class Interactivity {
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
         return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
     }
-
-    _getEventType() {
-        // TODO: get type based on internal state
-        const type = 'featureClick';
-        return type;
+    
+    /**
+     * Return the difference between the feature arrays A and B.
+     * The output value is also an array of features.
+     */
+    _getDiffFeatures(featuresA, featuresB) {
+        const IDs = this._getFeatureIDs(featuresB);
+        return featuresA.filter(feature => !IDs.includes(feature.id));
+    }
+    
+    _getFeatureIDs(features) {
+        return features.map(feature => feature.id);
     }
 }
 
