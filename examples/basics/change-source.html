@@ -106,15 +106,15 @@
     citiesLayer.addTo(map, 'watername_ocean');
 
     function setAllCities() {
-      citiesLayer.setSource(allCitiesSource);
+      citiesLayer.update(allCitiesSource, citiesLayer.getStyle());
     }
 
     function setEuropeanCities() {
-      citiesLayer.setSource(europeanCitiesSource);
+      citiesLayer.update(europeanCitiesSource, citiesLayer.getStyle());
     }
 
     function setSpanishCities() {
-      citiesLayer.setSource(spanishCitiesSource);
+      citiesLayer.update(spanishCitiesSource, citiesLayer.getStyle());
     }
   </script>
 </body>

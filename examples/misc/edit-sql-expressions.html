@@ -148,7 +148,7 @@ filter: $pop_max > 10000
 
     function updateSource() {
       reset('#sql');
-      populatedPlacesLayer.setSource(new carto.source.SQL(getValue('#sql')))
+      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')), populatedPlacesLayer.getStyle())
         // .catch(cartoError => {
         //   error('#sql', cartoError);
         // });

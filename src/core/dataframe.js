@@ -65,12 +65,12 @@ export default class Dataframe {
         this.style = style;
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition(pos, style) {
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos);
             case 'line':
-                return this._getLinesAtPosition(pos);
+                return this._getLinesAtPosition(pos, style);
             case 'polygon':
                 return this._getPolygonAtPosition(pos);
             default:
@@ -83,9 +83,51 @@ export default class Dataframe {
         return [];
     }
 
-    _getLinesAtPosition(pos) {
-        console.log(pos);
-        return [];
+    _getLinesAtPosition(pos, style) {
+        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureID = 0;
+        const features = [];
+        const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureID]) {
+                featureID++;
+            }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureID];
+            });
+            const size = styleWidth.eval(f) * widthScale;
+            const v1 = {
+                x: vertices[i + 0] + normals[i + 0] * size,
+                y: vertices[i + 1] + normals[i + 1] * size
+            };
+            const v2 = {
+                x: vertices[i + 2] + normals[i + 2] * size,
+                y: vertices[i + 3] + normals[i + 3] * size
+            };
+            const v3 = {
+                x: vertices[i + 4] + normals[i + 4] * size,
+                y: vertices[i + 5] + normals[i + 5] * size
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                features.push({
+                    properties: this._getPropertiesOf(featureID)
+                });
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureID];
+            }
+        }
+        return features;
 
     }
 
@@ -121,7 +163,7 @@ export default class Dataframe {
                     id: properties.cartodb_id,
                     properties
                 });
-                // Don't repeat a feature if we the point is on an shared (by two triangles) edge
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
             }
