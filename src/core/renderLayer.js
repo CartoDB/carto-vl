@@ -41,7 +41,7 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos)));
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style)));
     }
 
     freeDataframes() {
