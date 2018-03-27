@@ -31,16 +31,8 @@ describe('src/core/dataframe', () => {
             const feature1 = { id: 0, properties: { cartodb_id: 0, id: 1 } };
             const feature2 = { id: 1, properties: { cartodb_id: 1, id: 2 } };
             const style = {
-                getWidth: () => ({
-                    eval: () => {
-                        return 0.5;
-                    }
-                }),
-                getStrokeWidth: () => ({
-                    eval: () => {
-                        return 0.5;
-                    }
-                })
+                getWidth: () => ({ eval: () => 0.5 }),
+                getStrokeWidth: () => ({ eval: () => 0.5 })
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
 
