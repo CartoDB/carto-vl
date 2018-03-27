@@ -9,7 +9,7 @@ describe('Interactivity', () => {
         div = setup.div;
         map = setup.map;
 
-        source = new carto.source.GeoJSON(geojson);
+        source = new carto.source.GeoJSON(featureJson);
         style = new carto.Style('color: rgba(1, 0, 0, 1)');
         layer = new carto.Layer('layer', source, style);
     });
@@ -25,7 +25,7 @@ describe('Interactivity', () => {
             const setup = _setup('map1');
             const div2 = setup.div;
             const map2 = setup.map;
-            const source2 = new carto.source.GeoJSON(geojson);
+            const source2 = new carto.source.GeoJSON(featureJson);
             const style2 = new carto.Style('color: rgba(1, 0, 0, 1)');
             const layer2 = new carto.Layer('layer2', source2, style2);
 
@@ -71,16 +71,16 @@ describe('Interactivity', () => {
             layer.addTo(map);
         });
     });
-    
+
     describe('when the user clicks on the map', () => {
         let interactivity;
-        
+
         describe('and the click is in a feature', () => {
             it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureClick', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
                     // Click inside the feature
@@ -106,7 +106,26 @@ describe('Interactivity', () => {
                 layer.addTo(map);
             });
         });
-        
+
+        describe('and multiple features are clicked', () => {
+            it('should return the right feature.id', done => {
+                source = new carto.source.GeoJSON(featureCollectionJson);
+                layer = new carto.Layer('layer', source, style);
+
+                layer.on('loaded', () => {
+                    interactivity = new carto.Interactivity([layer]);
+                    interactivity.on('featureClick', event => {
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
+                        expect(event.features[1]).toEqual({ id: 1, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        done();
+                    });
+                    // Click inside the features
+                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                });
+                layer.addTo(map);
+            });
+        });
+
         describe('and the click is not in a feature', () => {
             it('should fire a featureClick event with an empty features list', done => {
                 layer.on('loaded', () => {
@@ -120,13 +139,13 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-            
+
             describe('and a feature was previously clicked', () => {
                 it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
                     layer.on('loaded', () => {
                         interactivity = new carto.Interactivity([layer]);
                         interactivity.on('featureClickOut', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                             done();
                         });
                         // Click inside the feature
@@ -139,16 +158,16 @@ describe('Interactivity', () => {
             });
         });
     });
-    
+
     describe('when the user move the mouse on the map', () => {
         let interactivity;
-        
+
         describe('and the mouse enters in a feature', () => {
             it('should fire a featureHover event with a features list containing the entered feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureHover', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
                     // Move mouse inside a feature
@@ -156,12 +175,12 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-            
+
             it('should fire a featureEnter event with a features list containing the entered feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureEnter', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
                     // Move mouse inside a feature
@@ -169,7 +188,7 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-            
+
             it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
@@ -187,7 +206,7 @@ describe('Interactivity', () => {
                 layer.addTo(map);
             });
         });
-        
+
         describe('and the mouse leaves a feature', () => {
             it('should fire a featureHover event with an empty features list', done => {
                 layer.on('loaded', () => {
@@ -203,14 +222,14 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-            
+
             it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
                     // Move mouse inside a feature
                     map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureLeave', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 1 } });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
                     // Move mouse outside the feature
@@ -218,7 +237,7 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-            
+
             it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
                 layer.on('loaded', () => {
                     interactivity = new carto.Interactivity([layer]);
@@ -260,7 +279,7 @@ function _setup(name) {
     return { div, map };
 }
 
-const geojson = {
+const featureJson = {
     'type': 'Feature',
     'geometry': {
         'type': 'Polygon',
@@ -274,7 +293,43 @@ const geojson = {
             ]
         ]
     },
-    'properties': {
-        'cartodb_id': 1
-    }
+    'properties': {}
+};
+
+const featureCollectionJson = {
+    type: 'FeatureCollection',
+    features: [
+        {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                'coordinates': [
+                    [
+                        [0, 0],
+                        [50, 0],
+                        [50, 50],
+                        [0, 50],
+                        [0, 0]
+                    ]
+                ]
+            },
+            properties: {}
+        },
+        {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                'coordinates': [
+                    [
+                        [0, 0],
+                        [55, 0],
+                        [55, 55],
+                        [0, 55],
+                        [0, 0]
+                    ]
+                ]
+            },
+            properties: {}
+        }
+    ]
 };

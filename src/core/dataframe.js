@@ -84,22 +84,20 @@ export default class Dataframe {
         const styleWidth = style.getWidth();
         const styleStrokeWidth = style.getStrokeWidth();
         for (let i = 0; i < points.length; i += 2) {
-            const featureID = i / 2;
+            const featureIndex = i / 2;
             const center = {
                 x: points[i],
                 y: points[i + 1],
             };
             const f = {};
             columnNames.forEach(name => {
-                f[name] = this.properties[name][featureID];
+                f[name] = this.properties[name][featureIndex];
             });
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
             const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
-                features.push({
-                    properties: this._getPropertiesOf(featureID)
-                });
+                this._addFeatureToArray(featureIndex, features);
             }
         }
         return features;
@@ -110,9 +108,9 @@ export default class Dataframe {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
-        let featureID = 0;
+        let featureIndex = 0;
         const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels        
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
@@ -120,12 +118,12 @@ export default class Dataframe {
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureID]) {
-                featureID++;
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
             }
             const f = {};
             columnNames.forEach(name => {
-                f[name] = this.properties[name][featureID];
+                f[name] = this.properties[name][featureIndex];
             });
             // width is a diameter and scale is radius-like, we need to divide by 2
             const scale = styleWidth.eval(f) / 2 * widthScale;
@@ -143,30 +141,28 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                features.push({
-                    properties: this._getPropertiesOf(featureID)
-                });
+                this._addFeatureToArray(featureIndex, features);
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID] - 6;
+                i = breakpoints[featureIndex] - 6;
             }
         }
         return features;
 
     }
 
-    _getPolygonAtPosition(p) {
-        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+    _getPolygonAtPosition(pos) {
+        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
-        let featureID = 0;
+        let featureIndex = 0;
         const features = [];
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureID]) {
-                featureID++;
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
             }
             const v1 = {
                 x: vertices[i + 0],
@@ -182,16 +178,21 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                features.push({
-                    id: featureID,
-                    properties: this._getPropertiesOf(featureID)
-                });
+                this._addFeatureToArray(featureIndex, features);
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID] - 6;
+                i = breakpoints[featureIndex] - 6;
             }
         }
         return features;
+    }
+
+    _addFeatureToArray(featureIndex, features) {
+        const properties = this._getPropertiesOf(featureIndex);
+        features.push({
+            id: properties.cartodb_id,
+            properties
+        });
     }
 
     _getPropertiesOf(featureID) {

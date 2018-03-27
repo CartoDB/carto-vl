@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Feature enter/leave | CARTO</title>
+  <title>Feature click | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <script src="../../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -48,6 +48,9 @@
       font: 400 16px/22px 'Open Sans';
       margin-bottom: 4px;
     }
+    #content p {
+      font: 400 12px/16px 'Open Sans';
+    }
   </style>
 </head>
 <body>
@@ -71,46 +74,50 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_adm0_europe
+      ne_10m_populated_places_simple
     `);
     const style = new carto.Style(`
-      color: ramp($admin, bold)
+      width: sqrt($pop_max)/150,
+      strokeWidth: sqrt($pop_max)/150-8,
+      color: ramp($name, bold)
+      strokeColor: opacity(ramp($name, bold), 0.3)
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the countries');
-  
+      updateTitle('Click on the cities');
+
       const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureEnter', event => {
-        updateCountry(event);
-        console.log('ENTER', event.features);
+      interactivity.on('featureClick', event => {
+        updateCity(event);
+        console.log('CLICK', event.features);
       });
-      interactivity.on('featureLeave', event => {
-        clearContent();
-        console.log('LEAVE', event.features);
+      interactivity.on('featureClickOut', event => {
+        console.log('CLICK OUT', event.features);
       });
     });
-    
+
     layer.addTo(map, 'watername_ocean');
-    
+
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
-    
-    function updateCountry(event) {
+
+    function updateCity(event) {
       let content = '';
       if (event.features.length > 0) {
-        const topCountryName = event.features[0].properties.admin || '';
-        content += `<div class="container">`;
-        content += `<h3>${topCountryName.toUpperCase()}</h3>`;
-        content += `</div>`;
+        for (let feature of event.features) {
+          content += `
+            <div class="container">
+              <h3>${feature.properties.name}</h3>
+              <p>POP: ${feature.properties.pop_max}</p>
+              <p>LNG: ${event.coordinates.lng}</p>
+              <p>LAT: ${event.coordinates.lat}</p>
+            </div>
+          `;
+        }
       }
       document.getElementById('content').innerHTML = content;
-    }
-    
-    function clearContent(event) {
-      document.getElementById('content').innerHTML = '';
     }
   </script>
 </body>

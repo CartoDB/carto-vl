@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <script src="../../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -74,40 +74,43 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_adm0_europe
+      ne_50m_rivers_lake_centerlines
     `);
     const style = new carto.Style(`
-      color: ramp($admin, bold)
+      width: 10
+      color: ramp($name, bold)
+      filter: in($featurecla, 'River')
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the countries');
-  
+      updateTitle('Move the mouse over the rivers');
+
       const interactivity = new carto.Interactivity([layer]);
       interactivity.on('featureHover', event => {
-        updateCountry(event);
+        updateRiver(event);
         console.log('HOVER', event.features);
       });
     });
-    
+
     layer.addTo(map, 'watername_ocean');
-    
+
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
-    
-    function updateCountry(event) {
+
+    function updateRiver(event) {
       let content = '';
       if (event.features.length > 0) {
-        const topCountryName = event.features[0].properties.admin || '';
-        const lng = event.coordinates.lng;
-        const lat = event.coordinates.lat;
-        content += `<div class="container">`;
-        content += `<h3>${topCountryName.toUpperCase()}</h3>`;
-        content += `<p>LNG: ${lng}</p>`;
-        content += `<p>LAT: ${lat}</p>`;
-        content += `</div>`;
+        for (let feature of event.features) {
+          content += `
+            <div class="container">
+              <h3>${feature.properties.name}</h3>
+              <p>LNG: ${event.coordinates.lng}</p>
+              <p>LAT: ${event.coordinates.lat}</p>
+            </div>
+          `;
+        }
       }
       document.getElementById('content').innerHTML = content;
     }
