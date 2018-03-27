@@ -87,11 +87,13 @@ export default class GeoJSON extends Base {
     }
 
     _getFeatures(data) {
-        if (data.type === 'FeatureCollection') {
-            return this._addCartodbId(data.features);
+        // Create a copy to avoid modifications to the original data
+        let dataCopy = JSON.parse(JSON.stringify(data));
+        if (dataCopy.type === 'FeatureCollection') {
+            return this._addCartodbId(dataCopy.features);
         }
-        if (data.type === 'Feature') {
-            return this._addCartodbId([data]);
+        if (dataCopy.type === 'Feature') {
+            return this._addCartodbId([dataCopy]);
         }
         throw new CartoValidationError('source', 'nonValidGeoJSONData');
     }

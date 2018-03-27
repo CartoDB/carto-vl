@@ -206,6 +206,7 @@ describe('api/source/geojson', () => {
                 const source = new GeoJSON(data);
                 expect(source._features[0].properties.cartodb_id).toEqual(0);
             });
+
             it('should be auto generated and unique for every feature in a featureCollection', () => {
                 const data = {
                     type: 'FeatureCollection',
@@ -227,6 +228,16 @@ describe('api/source/geojson', () => {
                 };
                 const source = new GeoJSON(data);
                 expect(source._features.map(feature => feature.properties.cartodb_id)).toEqual([0, 1, 2]);
+            });
+
+            it('should not mutate the original data', () => {
+                const data = {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [0, 0] },
+                    properties: {}
+                };
+                new GeoJSON(data);
+                expect(data.properties.cartodb_id).toBeUndefined();
             });
             it('should throw an error when feature already has a cartodb_id property ', () => { });
         });
