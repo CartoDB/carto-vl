@@ -184,13 +184,15 @@ export default class Windshaft {
 
         MRS.columns
             .forEach(name => {
-                if (name.startsWith('_cdb_agg_')) {
-                    aggregation.columns[name] = {
-                        aggregate_function: getAggFN(name),
-                        aggregated_column: getBase(name)
-                    };
-                } else {
-                    aggregation.dimensions[name] = name;
+                if (name !== 'cartodb_id') {
+                    if (name.startsWith('_cdb_agg_')) {
+                        aggregation.columns[name] = {
+                            aggregate_function: getAggFN(name),
+                            aggregated_column: getBase(name)
+                        };
+                    } else {
+                        aggregation.dimensions[name] = name;
+                    }
                 }
             });
 
@@ -201,7 +203,7 @@ export default class Windshaft {
         return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
             name => dateFields.includes(name) ? name + '::text' : name
         )
-            .concat(['the_geom', 'the_geom_webmercator']);
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
     _buildQuery(select) {
