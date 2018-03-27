@@ -19,21 +19,27 @@ describe('src/core/dataframe', () => {
                 scale: 1,
                 geom: [[segment]],
                 properties: {
-                    id: [1]
+                    numeric_prop: [1],
+                    cartodb_id: [0]
                 },
                 type: 'line',
                 size: 1,
                 active: true,
                 metadata: {
                     columns: [{
-                        name: 'id',
+                        name: 'numeric_prop',
+                        type: 'float'
+                    },{
+                        name: 'cartodb_id',
                         type: 'float'
                     }]
                 }
             });
             const feature1 = {
+                id: 0,
                 properties: {
-                    id: 1
+                    numeric_prop: 1,
+                    cartodb_id: 0
                 }
             };
             const style = {
