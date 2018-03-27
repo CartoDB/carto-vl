@@ -28,22 +28,29 @@ describe('src/core/dataframe', () => {
                 scale: 1,
                 geom: [[polygon1]],
                 properties: {
-                    id: [0]
+                    numeric_property: [0],
+                    cartodb_id: [0],
                 },
                 type: 'polygon',
                 size: 1,
                 active: true,
                 metadata: {
-                    columns: [{
-                        name: 'id',
-                        type: 'float'
-                    }]
+                    columns: [
+                        {
+                            name: 'cartodb_id',
+                            type: 'float'
+                        },
+                        {
+                            name: 'numeric_property',
+                            type: 'float'
+                        }]
                 }
             });
             const feature1 = {
                 id: 0,
                 properties: {
-                    id: 0
+                    numeric_property: 0,
+                    cartodb_id: 0
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {

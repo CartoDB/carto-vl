@@ -93,14 +93,14 @@ export default class Dataframe {
         p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
-        let featureID = 0;
+        let featureIndex = 0;
         const features = [];
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureID]) {
-                featureID++;
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
             }
             const v1 = {
                 x: vertices[i + 0],
@@ -117,12 +117,12 @@ export default class Dataframe {
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
                 features.push({
-                    id: featureID,
-                    properties: this._getPropertiesOf(featureID)
+                    id: this._getPropertiesOf(featureIndex).cartodb_id,
+                    properties: this._getPropertiesOf(featureIndex)
                 });
                 // Don't repeat a feature if we the point is on an shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID];
+                i = breakpoints[featureIndex] - 6;
             }
         }
         return features;

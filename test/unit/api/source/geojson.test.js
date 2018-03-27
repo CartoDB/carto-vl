@@ -32,11 +32,14 @@ describe('api/source/geojson', () => {
         const expected = {
             numeric: new Float32Array(2 + 1024),
             category: new Float32Array(2 + 1024),
+            cartodb_id: new Float32Array(2 + 1024),
         };
         expected.numeric[0] = 1;
         expected.numeric[1] = 2;
         expected.category[0] = 0;
         expected.category[1] = 1;
+        expected.cartodb_id[0] = 0;
+        expected.cartodb_id[1] = 1;
         expect(properties).toEqual(expected);
     });
 
@@ -59,7 +62,7 @@ describe('api/source/geojson', () => {
                 },
                 properties: {
                     cartodb_id: 0
-                }
+                },
             }]);
         });
 
@@ -127,6 +130,15 @@ describe('api/source/geojson', () => {
                         type: 'category',
                         categoryNames: ['red', 'blue'],
                         categoryCounts: [1, 1],
+                    },
+                    {
+                        name: 'cartodb_id',
+                        type: 'float',
+                        min: 0,
+                        max: 1,
+                        avg: 0.5,
+                        sum: 1,
+                        count: 2
                     }
                 ],
                 categoryIDs: {
@@ -137,11 +149,13 @@ describe('api/source/geojson', () => {
                 sample: [
                     {
                         numeric: 1,
-                        category: 'red'
+                        category: 'red',
+                        cartodb_id: 0,
                     },
                     {
                         numeric: 2,
-                        category: 'blue'
+                        category: 'blue',
+                        cartodb_id: 1,
                     }
                 ]
             };

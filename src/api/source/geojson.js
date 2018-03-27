@@ -121,12 +121,10 @@ export default class GeoJSON extends Base {
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             Object.keys(properties).map(name => {
-                if (name !== 'cartodb_id') {
-                    const value = properties[name];
-                    Number.isFinite(value) ?
-                        this._addNumericPropertyToMetadata(name, value, columns) :
-                        this._addCategoryPropertyToMetadata(name, value, columns);
-                }
+                const value = properties[name];
+                Number.isFinite(value) ?
+                    this._addNumericPropertyToMetadata(name, value, columns) :
+                    this._addCategoryPropertyToMetadata(name, value, columns);
             });
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
@@ -150,10 +148,7 @@ export default class GeoJSON extends Base {
                 return;
             }
         }
-        // Create a copy to avoid modifications to the original data
-        let propertiesCopy = JSON.parse(JSON.stringify(properties));
-        delete propertiesCopy.cartodb_id;
-        sample.push(propertiesCopy);
+        sample.push(properties);
     }
 
     _addNumericPropertyToMetadata(propertyName, value, columns) {
