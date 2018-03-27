@@ -25,6 +25,7 @@ describe('api/source/geojson', () => {
             }
         }]
     };
+
     it('_decodeProperties() should return a valid Dataframe properties object', () => {
         const source = new GeoJSON(data);
         const properties = source._decodeProperties();
@@ -38,6 +39,7 @@ describe('api/source/geojson', () => {
         expected.category[1] = 1;
         expect(properties).toEqual(expected);
     });
+
     describe('constructor', () => {
         it('should build a new Source with (data) as a Feature', () => {
             const data = {
@@ -194,6 +196,7 @@ describe('api/source/geojson', () => {
             }).toThrowError('first polygon ring must be external.');
         });
     });
+    
     it('should call the dataLoaded callback when the dataframe is added', () => {
         const source = new GeoJSON({
             type: 'Feature',
