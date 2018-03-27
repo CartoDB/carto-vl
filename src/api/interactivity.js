@@ -102,8 +102,6 @@ export default class Interactivity {
     constructor(layerList) {
         checkLayerList(layerList);
         this._init(layerList);
-
-        this._prevFeatures = [];
     }
 
     /**
@@ -138,6 +136,7 @@ export default class Interactivity {
         this._emitter = mitt();
         this._layerList = layerList;
         this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        this._prevFeatures = [];
     }
 
     _subscribeToIntegratorEvents(integrator) {
