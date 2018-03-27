@@ -71,17 +71,18 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_50m_rivers_lake_centerlines
+      ne_10m_populated_places_simple
     `);
     const style = new carto.Style(`
-      width: 10
+      width: sqrt($pop_max)/150,
+      strokeWidth: sqrt($pop_max)/150-8,
       color: ramp($name, bold)
-      filter: in($featurecla, 'River')
+      strokeColor: opacity(ramp($name, bold), 0.3)
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the rivers');
+      updateTitle('Move the mouse over the cities');
 
       const interactivity = new carto.Interactivity([layer]);
       interactivity.on('featureEnter', event => {
@@ -107,6 +108,7 @@
           content += `
             <div class="container">
               <h3>${feature.properties.name}</h3>
+              <p>POP: ${feature.properties.pop_max}</p>
             </div>
           `;
         }

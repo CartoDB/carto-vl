@@ -79,7 +79,7 @@
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the countries');
+      updateTitle('Move the mouse over the countries');
 
       const interactivity = new carto.Interactivity([layer]);
       interactivity.on('featureEnter', event => {
