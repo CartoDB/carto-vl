@@ -195,8 +195,13 @@ describe('api/source/geojson', () => {
                 source.requestData();
             }).toThrowError('first polygon ring must be external.');
         });
+
+        describe('cartodb_id', () => {
+            it('should be auto generated and unique for every feature in the geojson', () => { });
+            it('should throw an error when feature already has a cartodb_id property ', () => { });
+        });
     });
-    
+
     it('should call the dataLoaded callback when the dataframe is added', () => {
         const source = new GeoJSON({
             type: 'Feature',
