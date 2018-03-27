@@ -89,12 +89,11 @@ export default class GeoJSON extends Base {
     _getFeatures(data) {
         if (data.type === 'FeatureCollection') {
             return data.features || [];
-        } else if (data.type === 'Feature') {
+        }
+        if (data.type === 'Feature') {
             return [data];
         }
-        else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
-        }
+        throw new CartoValidationError('source', 'nonValidGeoJSONData');
     }
 
     _computeMetadata() {
@@ -349,6 +348,6 @@ export default class GeoJSON extends Base {
         return total >= 0;
     }
 
-    free(){
+    free() {
     }
 }
