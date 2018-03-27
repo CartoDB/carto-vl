@@ -81,6 +81,7 @@ export default class Dataframe {
         const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
+        const styleStrokeWidth = style.getStrokeWidth();
         for (let i = 0; i < points.length; i += 2) {
             const featureID = i / 2;
             const center = {
@@ -91,7 +92,7 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureID];
             });
-            const scale = styleWidth.eval(f) * widthScale;
+            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
                 features.push({

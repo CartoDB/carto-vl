@@ -1,7 +1,5 @@
 import Dataframe from '../../../src/core/dataframe';
 
-// import dataframe from '../../../src/core/dataframe';
-
 describe('src/core/dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
         describe('when dataframe is point type', () => {
@@ -38,7 +36,12 @@ describe('src/core/dataframe', () => {
             const style = {
                 getWidth: () => ({
                     eval: () => {
-                        return 1;
+                        return 0.5;
+                    }
+                }),
+                getStrokeWidth: () => ({
+                    eval: () => {
+                        return 0.5;
                     }
                 })
             };
