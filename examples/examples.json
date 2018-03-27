@@ -125,6 +125,11 @@
                     "title": "Error handling",
                     "desc": "Handle common errors in maps",
                     "xfile": "misc/error-handling.html"
+                },
+                {
+                    "title": "Edit SQL & Expressions",
+                    "desc": "Manually edit the SQL query and the Expressions style",
+                    "file": "misc/edit-sql-expressions.html"
                 }
             ]
         }
