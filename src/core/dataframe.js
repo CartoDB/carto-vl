@@ -61,26 +61,48 @@ export default class Dataframe {
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    setStyle(style) {
-        this.style = style;
-    }
-
     getFeaturesAtPosition(pos, style) {
         switch (this.type) {
             case 'point':
-                return this._getPointsAtPosition(pos);
+                return this._getPointsAtPosition(pos, style);
             case 'line':
                 return this._getLinesAtPosition(pos, style);
             case 'polygon':
-                return this._getPolygonAtPosition(pos);
+                return this._getPolygonAtPosition(pos, style);
             default:
                 return [];
         }
     }
 
-    _getPointsAtPosition(pos) {
-        console.log(pos);
-        return [];
+    _getPointsAtPosition(p, style) {
+        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+        const points = this.decodedGeom.vertices;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        const styleStrokeWidth = style.getStrokeWidth();
+        for (let i = 0; i < points.length; i += 2) {
+            const featureID = i / 2;
+            const center = {
+                x: points[i],
+                y: points[i + 1],
+            };
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureID];
+            });
+            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
+            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
+            const inside = pointInCircle(p, center, scale);
+            if (inside) {
+                features.push({
+                    properties: this._getPropertiesOf(featureID)
+                });
+            }
+        }
+        return features;
     }
 
     _getLinesAtPosition(pos, style) {
@@ -90,7 +112,8 @@ export default class Dataframe {
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
         const features = [];
-        const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels        
+        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         // Linear search for all features
@@ -104,18 +127,19 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
-            const size = styleWidth.eval(f) * widthScale;
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = styleWidth.eval(f) / 2 * widthScale;
             const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * size,
-                y: vertices[i + 1] + normals[i + 1] * size
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
             };
             const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * size,
-                y: vertices[i + 3] + normals[i + 3] * size
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
             };
             const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * size,
-                y: vertices[i + 5] + normals[i + 5] * size
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
@@ -280,4 +304,13 @@ function halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function pointInCircle(p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
 }
