@@ -31,6 +31,7 @@ import { wToR } from '../client/rsys';
  * @type {FeatureEvent}
  * @api
  */
+
 /**
  * featureClickOut events are fired when the user clicks outside a feature that was clicked in the last featureClick event.
  * The list of features that were clicked before and that are no longer behind this new click is provided.
@@ -39,6 +40,7 @@ import { wToR } from '../client/rsys';
  * @type {FeatureEvent}
  * @api
  */
+
 /**
  * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature is now under the cursor.
  * The list of features that are now behind the cursor and that weren't before is provided.
@@ -47,6 +49,7 @@ import { wToR } from '../client/rsys';
  * @type {FeatureEvent}
  * @api
  */
+
 /**
  * featureHover events are fired when the user moves the cursor.
  * The list of features behind the cursor is provided.
@@ -55,6 +58,7 @@ import { wToR } from '../client/rsys';
  * @type {FeatureEvent}
  * @api
  */
+
 /**
  * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature is no longer behind the cursor.
  * The list of features that are no longer behind the cursor and that were before is provided.
@@ -63,6 +67,7 @@ import { wToR } from '../client/rsys';
  * @type {FeatureEvent}
  * @api
  */
+
 const EVENTS = [
     'featureClick',
     'featureClickOut',
@@ -83,8 +88,10 @@ export default class Interactivity {
     * @example
     * const myLayer = new carto.Layer('layer0', mySource, myStyle);
     * myLayer.addTo(myMap);
-    * const myInteractivity = new carto.Interactivity([myLayer]);
-    * myInteractivity.on('click', event => console.log(event));
+    * myLayer.on('loaded', () => {
+    *     const myInteractivity = new carto.Interactivity([myLayer]);
+    *     myInteractivity.on('click', event => console.log(event));
+    * })
     *
     * @fires CartoError
     *
