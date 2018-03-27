@@ -48,12 +48,19 @@ describe('api/source/geojson', () => {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
-                properties: {
-                    cartodb_id: 1
-                }
+                properties: {}
             };
             const source = new GeoJSON(data);
-            expect(source._features).toEqual([data]);
+            expect(source._features).toEqual([{
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    cartodb_id: 0
+                }
+            }]);
         });
 
         it('should requestData just once', () => {
@@ -63,9 +70,7 @@ describe('api/source/geojson', () => {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
-                properties: {
-                    cartodb_id: 1
-                }
+                properties: {}
             };
             const source = new GeoJSON(data);
 
@@ -88,13 +93,20 @@ describe('api/source/geojson', () => {
                         type: 'Point',
                         coordinates: [0, 0]
                     },
-                    properties: {
-                        cartodb_id: 1
-                    }
+                    properties: {}
                 }]
             };
             const source = new GeoJSON(data);
-            expect(source._features).toEqual(data.features);
+            expect(source._features).toEqual([{
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    cartodb_id: 0
+                }
+            }]);
         });
 
         it('should compute metadata for numeric and category properties', () => {
@@ -160,9 +172,7 @@ describe('api/source/geojson', () => {
                         type: 'Point',
                         coordinates: [0, 0]
                     },
-                    properties: {
-                        cartodb_id: 1
-                    }
+                    properties: {}
                 },
                 {
                     type: 'Feature',
@@ -170,9 +180,7 @@ describe('api/source/geojson', () => {
                         type: 'LineString',
                         coordinates: [[0, 0], [1, 1]]
                     },
-                    properties: {
-                        cartodb_id: 2
-                    }
+                    properties: {}
                 }]
             });
             expect(function () {
@@ -187,16 +195,14 @@ describe('api/source/geojson', () => {
                     type: 'Polygon',
                     coordinates: [[0, 0], [0, 1], [1, 1], [0, 0]]
                 },
-                properties: {
-                    cartodb_id: 1
-                }
+                properties: {}
             });
             expect(function () {
                 source.requestData();
             }).toThrowError('first polygon ring must be external.');
         });
 
-        fdescribe('cartodb_id', () => {
+        describe('cartodb_id', () => {
             it('should be auto generated and unique for a single feature', () => {
                 const data = {
                     type: 'Feature',
@@ -260,9 +266,7 @@ describe('api/source/geojson', () => {
                 type: 'Point',
                 coordinates: [0, 0]
             },
-            properties: {
-                cartodb_id: 1
-            }
+            properties: {}
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
