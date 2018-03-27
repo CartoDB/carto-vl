@@ -144,7 +144,7 @@ export default class Dataframe {
                 });
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID];
+                i = breakpoints[featureID] - 6;
             }
         }
         return features;
@@ -184,7 +184,7 @@ export default class Dataframe {
                 });
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID];
+                i = breakpoints[featureID] - 6;
             }
         }
         return features;
