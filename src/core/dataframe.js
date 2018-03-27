@@ -116,9 +116,10 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
+                const properties = this._getPropertiesOf(featureIndex);
                 features.push({
-                    id: this._getPropertiesOf(featureIndex).cartodb_id,
-                    properties: this._getPropertiesOf(featureIndex)
+                    id: properties.cartodb_id,
+                    properties
                 });
                 // Don't repeat a feature if we the point is on an shared (by two triangles) edge
                 // Also, don't waste CPU cycles

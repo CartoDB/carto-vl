@@ -72,6 +72,10 @@ export default class Windshaft {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
+        // FIXME: force to include `cartodb_id` in the MNS columns
+        if (!MNS.columns.includes('cartodb_id')) {
+            MNS.columns.push('cartodb_id');
+        }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
@@ -461,7 +465,7 @@ export default class Windshaft {
             this.getDatesTypes(dates, query, conf),
             this.getCategoryTypes(categories, query, conf)]);
 
-        const columns = [];
+        let columns = [];
         numerics.forEach((name, index) => columns.push(numericsTypes[index]));
         dates.forEach((name, index) => columns.push(datesTypes[index]));
 
@@ -471,6 +475,9 @@ export default class Windshaft {
             t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
             columns.push(t);
         });
+        // FIXME: force columns to include `cartodb_id` in the Metadata
+        columns = columns.filter(column => column.name !== 'cartodb_id');
+        columns.push({ name: 'cartodb_id', type: 'float' });
         const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
         console.log(metadata);
         return metadata;
