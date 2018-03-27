@@ -475,9 +475,6 @@ export default class Windshaft {
             t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
             columns.push(t);
         });
-        // FIXME: force columns to include `cartodb_id` in the Metadata
-        columns = columns.filter(column => column.name !== 'cartodb_id');
-        columns.push({ name: 'cartodb_id', type: 'float' });
         const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
         console.log(metadata);
         return metadata;
