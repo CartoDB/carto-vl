@@ -84,21 +84,23 @@ export default class Dataframe {
         const styleWidth = style.getWidth();
         const styleStrokeWidth = style.getStrokeWidth();
         for (let i = 0; i < points.length; i += 2) {
-            const featureID = i / 2;
+            const featureIndex = i / 2;
             const center = {
                 x: points[i],
                 y: points[i + 1],
             };
             const f = {};
             columnNames.forEach(name => {
-                f[name] = this.properties[name][featureID];
+                f[name] = this.properties[name][featureIndex];
             });
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
             const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
+                const properties = this._getPropertiesOf(featureIndex);
                 features.push({
-                    properties: this._getPropertiesOf(featureID)
+                    id: properties.cartodb_id,
+                    properties
                 });
             }
         }
@@ -112,7 +114,7 @@ export default class Dataframe {
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
         const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels        
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
