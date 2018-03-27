@@ -88,7 +88,10 @@ export default class GeoJSON extends Base {
 
     _getFeatures(data) {
         if (data.type === 'FeatureCollection') {
-            return data.features || [];
+            return data.features.map((feature, i) => {
+                feature.properties.cartodb_id = i;
+                return feature;
+            }) || [];
         }
         if (data.type === 'Feature') {
             return [data];

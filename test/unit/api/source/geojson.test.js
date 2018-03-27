@@ -217,7 +217,7 @@ describe('api/source/geojson', () => {
                     }]
                 };
                 const source = new GeoJSON(data);
-                expect(source.features.map(feature => feature.properties.cartodb_id)).toEqual([1, 2, 3]);
+                expect(source._features.map(feature => feature.properties.cartodb_id)).toEqual([0, 1, 2]);
             });
             it('should throw an error when feature already has a cartodb_id property ', () => { });
         });
