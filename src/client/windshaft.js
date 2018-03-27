@@ -72,7 +72,8 @@ export default class Windshaft {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
-        // FIXME: force to include `cartodb_id` in the MNS columns
+        // Force to include `cartodb_id` in the MNS columns.
+        // TODO: revisit this request to Maps API
         if (!MNS.columns.includes('cartodb_id')) {
             MNS.columns.push('cartodb_id');
         }
