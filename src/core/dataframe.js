@@ -97,11 +97,7 @@ export default class Dataframe {
             const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
-                const properties = this._getPropertiesOf(featureIndex);
-                features.push({
-                    id: properties.cartodb_id,
-                    properties
-                });
+                this._addFeatureToArray(featureIndex, features);
             }
         }
         return features;
@@ -145,11 +141,7 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                const properties = this._getPropertiesOf(featureIndex);
-                features.push({
-                    id: properties.cartodb_id,
-                    properties
-                });
+                this._addFeatureToArray(featureIndex, features);
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -186,17 +178,21 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                const properties = this._getPropertiesOf(featureIndex);
-                features.push({
-                    id: properties.cartodb_id,
-                    properties
-                });
+                this._addFeatureToArray(featureIndex, features);
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
             }
         }
         return features;
+    }
+
+    _addFeatureToArray(featureIndex, features) {
+        const properties = this._getPropertiesOf(featureIndex);
+        features.push({
+            id: properties.cartodb_id,
+            properties
+        });
     }
 
     _getPropertiesOf(featureID) {
