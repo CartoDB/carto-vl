@@ -88,7 +88,7 @@ export default class Dataframe {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
-        let featureID = 0;
+        let featureIndex = 0;
         const features = [];
         const widthScale = 1 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
@@ -97,12 +97,12 @@ export default class Dataframe {
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureID]) {
-                featureID++;
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
             }
             const f = {};
             columnNames.forEach(name => {
-                f[name] = this.properties[name][featureID];
+                f[name] = this.properties[name][featureIndex];
             });
             const size = styleWidth.eval(f) * widthScale;
             const v1 = {
@@ -119,20 +119,22 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
+                const properties = this._getPropertiesOf(featureIndex);
                 features.push({
-                    properties: this._getPropertiesOf(featureID)
+                    id: properties.cartodb_id,
+                    properties
                 });
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
-                i = breakpoints[featureID];
+                i = breakpoints[featureIndex] - 6;
             }
         }
         return features;
 
     }
 
-    _getPolygonAtPosition(p) {
-        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+    _getPolygonAtPosition(pos) {
+        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
