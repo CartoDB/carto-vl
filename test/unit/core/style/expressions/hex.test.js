@@ -10,11 +10,10 @@ describe('src/core/style/expressions/hex', () => {
 
     describe('type', () => {
         validateStaticType('hex', ['#808080'], 'color');
+        validateStaticType('hex', ['#AAA'], 'color');
     });
 
     describe('eval', () => {
         // TODO
     });
 });
-
-

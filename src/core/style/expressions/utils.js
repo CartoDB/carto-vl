@@ -15,18 +15,25 @@ export function implicitCast(value) {
 }
 
 export function hexToRgb(hex) {
-    // TODO allow for #F00 and #F004 notations
-    // TODO error control
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) {
-        throw new Error('Invalid hexadecimal color');
+    // Evaluate #ABC
+    let result = /^#?([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})$/i.exec(hex);
+    if (result) {
+        return {
+            r: parseInt(result[1] + result[1], 16),
+            g: parseInt(result[2] + result[2], 16),
+            b: parseInt(result[3] + result[3], 16)
+        };
     }
-    return {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-        a: 255,
-    };
+    // Evaluate #ABCDEF
+    result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+    }
+    throw new Error('Invalid hexadecimal color');
 }
 
 export function getOrdinalFromIndex(index) {

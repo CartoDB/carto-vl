@@ -3,16 +3,15 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
 
 /**
  *
- * Create a color from their hexadecimal description
+ * Create a color from its hexadecimal description
  *
- * @param {string} hexadecimalColor - color in the form #AA88AA
+ * @param {string} hexadecimalColor - color in the form #ABC or #ABCDEF
  * @return {carto.style.expressions.hex}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.style.expressions;
- * const $type = s.property('type');
  * const style = new carto.Style({
- *  color: s.hex('#2233AA');
+ *   color: s.hex('#00F');
  * });
  *
  * @memberof carto.style.expressions
@@ -37,4 +36,3 @@ export default class Hex extends Expression {
     }
     // TODO eval
 }
-
