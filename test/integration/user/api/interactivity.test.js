@@ -10,7 +10,7 @@ describe('Interactivity', () => {
         map = setup.map;
 
         source = new carto.source.GeoJSON(featureJson);
-        style = new carto.Style('color: rgba(1, 0, 0, 1)');
+        style = new carto.Style('color: rgb(255, 0, 0)');
         layer = new carto.Layer('layer', source, style);
     });
 
@@ -26,7 +26,7 @@ describe('Interactivity', () => {
             const div2 = setup.div;
             const map2 = setup.map;
             const source2 = new carto.source.GeoJSON(featureJson);
-            const style2 = new carto.Style('color: rgba(1, 0, 0, 1)');
+            const style2 = new carto.Style('color: rgb(255, 0, 0)');
             const layer2 = new carto.Layer('layer2', source2, style2);
 
             layer.on('loaded', _testHelper);

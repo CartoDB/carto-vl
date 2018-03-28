@@ -17,7 +17,7 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * const s = carto.style.expressions;
  * const $type = s.property('type');
  * const style = new carto.Style({
- *  color: s.rgba(0, 1, 0, 1);
+ *  color: s.rgba(0, 255, 0, 1);
  * });
  *
  * @memberof carto.style.expressions
@@ -52,7 +52,7 @@ function genRGB(name, alpha) {
             if (alpha) {
                 checkType('rgba', 'a', 3, 'float', this.a);
             }
-            this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${alpha ? inline.a : '1.'})`;
+            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
         // TODO eval
     };

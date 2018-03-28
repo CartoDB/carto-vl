@@ -89,7 +89,7 @@
       ne_10m_populated_places_simple
     `);
     const styleRed = new carto.Style(`
-      color: rgba(1.0, 0.0, 0.0, 1.0)
+      color: rgb(255, 0, 0)
     `);
     const styleYellow = new carto.Style(`
       color: cielab(90,10,60)
@@ -98,7 +98,7 @@
       color: hsv(0.59, 0.89, 1.0)
     `);
     const styleGreen = new carto.Style(`
-      color: opacity(hsv(0.3, 1.0, 1.0), 0.2)
+      color: hsva(0.3, 1.0, 1.0, 0.2)
     `);
     const layer = new carto.Layer('layer', source, styleRed);
 
@@ -115,7 +115,7 @@
     function setHSVBlue() {
       layer.blendToStyle(styleBlue);
     }
-    
+
     function setOpacityGreen() {
       layer.blendToStyle(styleGreen);
     }
