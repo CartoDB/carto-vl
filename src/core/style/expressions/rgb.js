@@ -15,9 +15,8 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.style.expressions;
- * const $type = s.property('type');
  * const style = new carto.Style({
- *  color: s.rgba(0, 1, 0, 1);
+ *   color: s.rgba(0, 0, 1, 1)
  * });
  *
  * @memberof carto.style.expressions

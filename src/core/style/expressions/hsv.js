@@ -1,13 +1,27 @@
 import Expression from './expression';
 import { implicitCast, checkExpression, checkLooseType, checkType } from './utils';
 
-// TODO docs
 /**
-* @description Color constructor for Hue Saturation Value (HSV) color space
-* @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
-* @param {*} saturation saturation of the color in the [0,1] range
-* @param {*} value value (brightness) of the color in the [0,1] range
-*/
+ *
+ * Evaluates to a hsva color.
+ *
+ * @param {carto.style.expressions.number|number} h - The hue of the color
+ * @param {carto.style.expressions.number|number} s - The saturation of the color
+ * @param {carto.style.expressions.number|number} v - The value (brightness) of the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.hsva}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name hsva
+ * @function
+ * @api
+ */
 export const HSV = genHSV('hsv', false);
 export const HSVA = genHSV('hsva', true);
 

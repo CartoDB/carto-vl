@@ -13,9 +13,8 @@ import { implicitCast, checkExpression, checkLooseType, checkType } from './util
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.style.expressions;
- * const $type = s.property('type');
  * const style = new carto.Style({
- *  color: s.hsla(0, 1, 0, 1);
+ *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
  * });
  *
  * @memberof carto.style.expressions
@@ -23,8 +22,8 @@ import { implicitCast, checkExpression, checkLooseType, checkType } from './util
  * @function
  * @api
  */
-export const HSLA = genHSL('hsla', true);
 export const HSL = genHSL('hsl', false);
+export const HSLA = genHSL('hsla', true);
 
 function genHSL(name, alpha) {
     return class HSLA extends Expression {
