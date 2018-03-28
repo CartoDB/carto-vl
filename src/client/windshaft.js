@@ -72,6 +72,11 @@ export default class Windshaft {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style);
+        // Force to include `cartodb_id` in the MNS columns.
+        // TODO: revisit this request to Maps API
+        if (!MNS.columns.includes('cartodb_id')) {
+            MNS.columns.push('cartodb_id');
+        }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
@@ -184,13 +189,15 @@ export default class Windshaft {
 
         MRS.columns
             .forEach(name => {
-                if (name.startsWith('_cdb_agg_')) {
-                    aggregation.columns[name] = {
-                        aggregate_function: getAggFN(name),
-                        aggregated_column: getBase(name)
-                    };
-                } else {
-                    aggregation.dimensions[name] = name;
+                if (name !== 'cartodb_id') {
+                    if (name.startsWith('_cdb_agg_')) {
+                        aggregation.columns[name] = {
+                            aggregate_function: getAggFN(name),
+                            aggregated_column: getBase(name)
+                        };
+                    } else {
+                        aggregation.dimensions[name] = name;
+                    }
                 }
             });
 
@@ -201,7 +208,7 @@ export default class Windshaft {
         return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
             name => dateFields.includes(name) ? name + '::text' : name
         )
-            .concat(['the_geom', 'the_geom_webmercator']);
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
     _buildQuery(select) {
@@ -459,7 +466,7 @@ export default class Windshaft {
             this.getDatesTypes(dates, query, conf),
             this.getCategoryTypes(categories, query, conf)]);
 
-        const columns = [];
+        let columns = [];
         numerics.forEach((name, index) => columns.push(numericsTypes[index]));
         dates.forEach((name, index) => columns.push(datesTypes[index]));
 

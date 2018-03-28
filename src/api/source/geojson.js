@@ -87,13 +87,28 @@ export default class GeoJSON extends Base {
     }
 
     _getFeatures(data) {
-        if (data.type === 'FeatureCollection') {
-            return data.features || [];
-        } else if (data.type === 'Feature') {
-            return [data];
+        // Create a copy to avoid modifications to the original data
+        let dataCopy = JSON.parse(JSON.stringify(data));
+        if (dataCopy.type === 'FeatureCollection') {
+            return this._addCartodbId(dataCopy.features);
         }
-        else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
+        if (dataCopy.type === 'Feature') {
+            return this._addCartodbId([dataCopy]);
+        }
+        throw new CartoValidationError('source', 'nonValidGeoJSONData');
+    }
+
+    _addCartodbId(features) {
+        return features.map((feature, i) => {
+            this._checkFeature(feature);
+            feature.properties.cartodb_id = i;
+            return feature;
+        }) || [];
+    }
+
+    _checkFeature(feature) {
+        if (feature.properties && feature.properties.cartodb_id) {
+            throw new CartoValidationError('source', 'featureHasCartodbId');
         }
     }
 
@@ -126,14 +141,14 @@ export default class GeoJSON extends Base {
         return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(feature, sample, featureCount) {
+    _sampleFeatureOnMetadata(properties, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
                 return;
             }
         }
-        sample.push(feature);
+        sample.push(properties);
     }
 
     _addNumericPropertyToMetadata(propertyName, value, columns) {
@@ -349,6 +364,6 @@ export default class GeoJSON extends Base {
         return total >= 0;
     }
 
-    free(){
+    free() {
     }
 }
