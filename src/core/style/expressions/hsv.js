@@ -39,14 +39,14 @@ function genHSV(name, alpha) {
             if (alpha) {
                 checkType('hsva', 'a', 3, 'float', this.a);
             }
-            const normalize = (v, hue = false) => {
-                if (v.type == 'category') {
-                    return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
                 }
                 return '';
             };
             super._setGenericGLSL(inline =>
-                `vec4(hsv2rgb(vec3(
+                `vec4(HSVtoRGB(vec3(
                     ${inline.h}${normalize(this.h, true)},
                     clamp(${inline.s}${normalize(this.s)}, 0.,1.),
                     clamp(${inline.v}${normalize(this.v)}, 0.,1.)
@@ -54,10 +54,11 @@ function genHSV(name, alpha) {
                 , `
     #ifndef HSV2RGB
     #define HSV2RGB
-    vec3 hsv2rgb(vec3 c) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    vec3 HSVtoRGB(vec3 HSV) {
+      float R = clamp(abs(HSV.x * 6. - 3.) - 1., 0., 1.);
+      float G = clamp(2. - abs(HSV.x * 6. - 2.), 0., 1.);
+      float B = clamp(2. - abs(HSV.x * 6. - 4.), 0., 1.);
+      return ((vec3(R,G,B) - 1.) * HSV.y + 1.) * HSV.z;
     }
     #endif
     `);
@@ -72,4 +73,3 @@ function genHSV(name, alpha) {
         }
     }
 }
-
