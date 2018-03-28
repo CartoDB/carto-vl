@@ -67,11 +67,12 @@ function genHSL(name, alpha) {
     #ifndef HSL2RGB
     #define HSL2RGB
     vec3 HSLtoRGB(vec3 HSL) {
-      float R = clamp(abs(HSL.x * 6. - 3.) - 1., 0., 1.);
-      float G = clamp(2. - abs(HSL.x * 6. - 2.), 0., 1.);
-      float B = clamp(2. - abs(HSL.x * 6. - 4.), 0., 1.);
+      float R = abs(HSL.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSL.x * 6. - 2.);
+      float B = 2. - abs(HSL.x * 6. - 4.);
       float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
-      return (vec3(R,G,B) - 0.5) * C + HSL.z;
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return (RGB - 0.5) * C + HSL.z;
     }
     #endif
     `);

@@ -69,10 +69,11 @@ function genHSV(name, alpha) {
     #ifndef HSV2RGB
     #define HSV2RGB
     vec3 HSVtoRGB(vec3 HSV) {
-      float R = clamp(abs(HSV.x * 6. - 3.) - 1., 0., 1.);
-      float G = clamp(2. - abs(HSV.x * 6. - 2.), 0., 1.);
-      float B = clamp(2. - abs(HSV.x * 6. - 4.), 0., 1.);
-      return ((vec3(R,G,B) - 1.) * HSV.y + 1.) * HSV.z;
+      float R = abs(HSV.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSV.x * 6. - 2.);
+      float B = 2. - abs(HSV.x * 6. - 4.);
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
     }
     #endif
     `);
