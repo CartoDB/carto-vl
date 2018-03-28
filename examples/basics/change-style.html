@@ -73,7 +73,8 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2
+      zoom: 2,
+      dragRotate: false,
     });
 
     carto.setDefaultAuth({
@@ -86,21 +87,21 @@
     `);
     const styleRed = new carto.Style(`
       width: 6
-      color: rgba(0.93, 0.30, 0.35, 1.0)
+      color: rgb(237, 76, 89)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255, 255)
     `);
     const styleGreen = new carto.Style(`
       width: 8
-      color: rgba(0.61, 0.78, 0.23, 1.0)
+      color: rgb(156, 199, 59)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255, 255)
     `);
     const styleBlue = new carto.Style(`
       width: 10
-      color: rgba(0.09, 0.52, 0.98, 1.0)
+      color: rgb(23, 133, 250)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255, 255)
     `);
     const layer = new carto.Layer('layer', source, styleRed);
 

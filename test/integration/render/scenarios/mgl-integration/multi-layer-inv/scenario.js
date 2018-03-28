@@ -7,14 +7,14 @@ const map = new mapboxgl.Map({
 
 const source0 = new carto.source.GeoJSON(sources['point']);
 const style0 = new carto.Style(`
-    color: rgba(1,0,0,1)
+    color: rgb(255,0,0)
     width: 40
 `);
 const layer0 = new carto.Layer('layer0', source0, style0);
 
 const source1 = new carto.source.GeoJSON(sources['line-string']);
 const style1 = new carto.Style(`
-    color: rgba(0,1,0,1)
+    color: rgb(0,255,0)
     width: 40
 `);
 const layer1 = new carto.Layer('layer1', source1, style1);

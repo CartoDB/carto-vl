@@ -73,7 +73,8 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [2.1734, 41.3851],
-      zoom: 14
+      zoom: 14,
+      dragRotate: false,
     });
 
     carto.setDefaultAuth({
@@ -88,7 +89,7 @@
     const style = new carto.Style({
         width: s.sqrt(s.prop('amount')),
         color: s.ramp(s.prop('category'), s.palettes.prism),
-        strokeColor: s.rgba(1, 1, 1, 0.5),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
         strokeWidth: 1,
     });
     const layer = new carto.Layer('layer', source, style);
@@ -99,7 +100,7 @@
       layer.blendToStyle(new carto.Style({
           width: s.sqrt(s.prop('amount')),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(1, 1, 1, 0.5),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
       }));
     }
@@ -108,7 +109,7 @@
       layer.blendToStyle(new carto.Style({
           width: s.sqrt(s.prop('amount')),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(1, 1, 1, 0.5),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
           order: s.asc(s.width())
       }));
@@ -118,7 +119,7 @@
       layer.blendToStyle(new carto.Style({
           width: s.sqrt(s.prop('amount')),
           color: s.ramp(s.prop('category'), s.palettes.prism),
-          strokeColor: s.rgba(1, 1, 1, 0.5),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
           order: s.desc(s.width())
       }));

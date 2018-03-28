@@ -14,7 +14,7 @@ const source = new carto.source.SQL('SELECT ST_Multi(the_geom_webmercator) as th
 const s = carto.style.expressions;
 const style = new carto.Style({
     width: s.float(100),
-    color: s.rgba(0, .5, .5, .9)
+    color: s.rgba(0, 127, 127, .9)
 });
 const layer = new carto.Layer('myCartoLayer', source, style);
 
