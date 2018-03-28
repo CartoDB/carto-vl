@@ -263,13 +263,12 @@ class Renderer {
     renderLayer(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
+        const gl = this.gl;
+        const aspect = this.getAspect();
 
         if (!tiles.length) {
             return;
         }
-
-        const gl = this.gl;
-        const aspect = this.getAspect();
 
         gl.enable(gl.CULL_FACE);
 
@@ -324,13 +323,14 @@ class Renderer {
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         if (renderLayer.type != 'point') {
+            const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             if (w != this._width || h != this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                    w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -339,7 +339,7 @@ class Renderer {
 
                 [this._width, this._height] = [w, h];
             }
-            gl.viewport(0, 0, w * 2, h * 2);
+            gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
