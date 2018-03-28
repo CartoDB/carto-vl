@@ -261,24 +261,15 @@ class Renderer {
     }
 
     renderLayer(renderLayer) {
-        const gl = this.gl;
-
-        const width = gl.canvas.clientWidth;
-        const height = gl.canvas.clientHeight;
-        if (gl.canvas.width != width ||
-            gl.canvas.height != height) {
-            gl.canvas.width = width;
-            gl.canvas.height = height;
-        }
-        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-
-
         const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
 
         if (!tiles.length) {
             return;
         }
+
+        const gl = this.gl;
+        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
         gl.enable(gl.CULL_FACE);
 
