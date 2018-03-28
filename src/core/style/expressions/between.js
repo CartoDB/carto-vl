@@ -18,7 +18,7 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * });
  *
  * @memberof carto.style.expressions
- * @name in
+ * @name between
  * @function
  * @api
  */
