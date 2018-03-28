@@ -3,55 +3,53 @@ import { implicitCast, checkExpression, checkLooseType, checkType } from './util
 
 /**
  *
- * Evaluates to a hsva color.
+ * Evaluates to a hsla color.
  *
  * @param {carto.style.expressions.number|number} h - The hue of the color
  * @param {carto.style.expressions.number|number} s - The saturation of the color
- * @param {carto.style.expressions.number|number} v - The value (brightness) of the color
+ * @param {carto.style.expressions.number|number} l - The lightness of the color
  * @param {carto.style.expressions.number|number} a - The alpha value of the color
- * @return {carto.style.expressions.hsva}
+ * @return {carto.style.expressions.hsla}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.style.expressions;
  * const style = new carto.Style({
- *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
+ *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
  * });
  *
  * @memberof carto.style.expressions
- * @name hsva
+ * @name hsla
  * @function
  * @api
  */
-export const HSV = genHSV('hsv', false);
-export const HSVA = genHSV('hsva', true);
+export const HSL = genHSL('hsl', false);
+export const HSLA = genHSL('hsla', true);
 
-function genHSV(name, alpha) {
-    return class extends Expression {
-        constructor(h, s, v, a) {
-            h = implicitCast(h);
-            s = implicitCast(s);
-            v = implicitCast(v);
-            const children = { h, s, v };
+function genHSL(name, alpha) {
+    return class HSLA extends Expression {
+        constructor(h, s, l, a) {
+            [h, s, l, a] = [h, s, l, a].map(implicitCast);
+
+            const children = { h, s, l };
             if (alpha) {
-                a = implicitCast(a);
                 checkLooseType(name, 'a', 3, 'float', a);
                 children.a = a;
             }
 
-            hsvCheckType('h', 0, h);
-            hsvCheckType('s', 1, s);
-            hsvCheckType('v', 2, v);
+            hslCheckType('h', 0, h);
+            hslCheckType('s', 1, s);
+            hslCheckType('l', 2, l);
 
             super(children);
             this.type = 'color';
         }
-        _compile(metadata) {
-            super._compile(metadata);
-            hsvCheckType('h', 0, this.h);
-            hsvCheckType('s', 1, this.s);
-            hsvCheckType('v', 2, this.v);
+        _compile(meta) {
+            super._compile(meta);
+            hslCheckType('h', 0, this.h);
+            hslCheckType('s', 1, this.s);
+            hslCheckType('l', 2, this.l);
             if (alpha) {
-                checkType('hsva', 'a', 3, 'float', this.a);
+                checkType('hsla', 'a', 3, 'float', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -60,20 +58,21 @@ function genHSV(name, alpha) {
                 return '';
             };
             super._setGenericGLSL(inline =>
-                `vec4(HSVtoRGB(vec3(
+                `vec4(HSLtoRGB(vec3(
                     ${inline.h}${normalize(this.h, true)},
-                    clamp(${inline.s}${normalize(this.s)}, 0.,1.),
-                    clamp(${inline.v}${normalize(this.v)}, 0.,1.)
-                )), ${alpha ? `clamp(${inline.a}, 0.,1.)` : '1.'})`
+                    clamp(${inline.s}${normalize(this.s)}, 0., 1.),
+                    clamp(${inline.l}${normalize(this.l)}, 0., 1.)
+                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
                 , `
-    #ifndef HSV2RGB
-    #define HSV2RGB
-    vec3 HSVtoRGB(vec3 HSV) {
-      float R = abs(HSV.x * 6. - 3.) - 1.;
-      float G = 2. - abs(HSV.x * 6. - 2.);
-      float B = 2. - abs(HSV.x * 6. - 4.);
+    #ifndef HSL2RGB
+    #define HSL2RGB
+    vec3 HSLtoRGB(vec3 HSL) {
+      float R = abs(HSL.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSL.x * 6. - 2.);
+      float B = 2. - abs(HSL.x * 6. - 4.);
+      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
       vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
-      return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
+      return (RGB - 0.5) * C + HSL.z;
     }
     #endif
     `);
@@ -81,7 +80,7 @@ function genHSV(name, alpha) {
         // TODO eval
     };
 
-    function hsvCheckType(parameterName, parameterIndex, parameter) {
+    function hslCheckType(parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
         if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);

@@ -8,16 +8,15 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * Evaluates to a rgba color.
  *
  * @param {carto.style.expressions.number|number} r - The amount of red in the color
- * @param {carto.style.expressions.number|number} g - The amount of red in the color
- * @param {carto.style.expressions.number|number} b - The amount of red in the color
+ * @param {carto.style.expressions.number|number} g - The amount of green in the color
+ * @param {carto.style.expressions.number|number} b - The amount of blue in the color
  * @param {carto.style.expressions.number|number} a - The alpha value of the color
  * @return {carto.style.expressions.rgba}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.style.expressions;
- * const $type = s.property('type');
  * const style = new carto.Style({
- *  color: s.rgba(0, 255, 0, 1);
+ *   color: s.rgba(0, 0, 255, 1)
  * });
  *
  * @memberof carto.style.expressions

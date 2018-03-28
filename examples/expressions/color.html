@@ -67,6 +67,10 @@
         <label for="blue">HSV - Blue</label>
       </li>
       <li>
+        <input type="radio" name="style" onclick="setHSLPurple()" id="purple">
+        <label for="purple">HSL - Purple</label>
+      </li>
+      <li>
         <input type="radio" name="style" onclick="setOpacityGreen()" id="green">
         <label for="green">Opacity - Green</label>
       </li>
@@ -93,13 +97,16 @@
       color: rgb(255, 0, 0)
     `);
     const styleYellow = new carto.Style(`
-      color: cielab(90,10,60)
+      color: cielab(90, 10, 60)
     `);
     const styleBlue = new carto.Style(`
-      color: hsv(0.59, 0.89, 1.0)
+      color: hsva(0.59, 0.89, 1.0, 1.0)
+    `);
+    const stylePurple = new carto.Style(`
+      color: hsla(0.7, 0.7, 0.5, 1.0)
     `);
     const styleGreen = new carto.Style(`
-      color: hsva(0.3, 1.0, 1.0, 0.2)
+      color: opacity(cielab(87.73, -86.18, 83.18), 0.2)
     `);
     const layer = new carto.Layer('layer', source, styleRed);
 
@@ -115,6 +122,10 @@
 
     function setHSVBlue() {
       layer.blendToStyle(styleBlue);
+    }
+
+    function setHSLPurple() {
+      layer.blendToStyle(stylePurple);
     }
 
     function setOpacityGreen() {
