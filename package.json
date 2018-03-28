@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "carto-gl",
   "version": "0.1.0",
   "description": "CARTO Vector library",
