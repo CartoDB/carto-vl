@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "carto-gl",
+  "name": "renderer-prototype",
   "version": "0.1.0",
   "description": "CARTO Vector library",
   "repository": {
