@@ -142,7 +142,7 @@ class Renderer {
 
     getAspect() {
         if (this.gl) {
-            return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+            return this.gl.canvas.width / this.gl.canvas.height;
         }
         return 1;
     }
@@ -150,7 +150,7 @@ class Renderer {
     _computeDrawMetadata(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
-        const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+        const aspect = this.getAspect();
         let drawMetadata = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom,
@@ -269,7 +269,7 @@ class Renderer {
         }
 
         const gl = this.gl;
-        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+        const aspect = this.getAspect();
 
         gl.enable(gl.CULL_FACE);
 
