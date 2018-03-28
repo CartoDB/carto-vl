@@ -311,6 +311,9 @@ export default class Layer {
 
     async _styleChanged(style) {
         await this._context;
+        if (!this._source) {
+            throw new Error('A source is required before changing the style');
+        }
         const source = this._source;
         const metadata = await source.requestMetadata(style);
         if (this._source !== source) {
