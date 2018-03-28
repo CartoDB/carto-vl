@@ -4,7 +4,5 @@
     "type": "Point",
     "coordinates": [ 0, 0 ]
   },
-  "properties": {
-    "cartodb_id": 1
-  }
+  "properties": {}
 }

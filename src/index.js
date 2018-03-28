@@ -13,6 +13,7 @@
  *  -   {@link carto.style.expressions|carto.style.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Style|carto.Style}
+ * - {@link carto.Interactivity|carto.Interactivity}
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */

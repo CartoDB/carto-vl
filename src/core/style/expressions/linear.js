@@ -16,7 +16,7 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * });
 *
 * @memberof carto.style.expressions
-* @name ramp
+* @name linear
 * @function
 * @api
 */
