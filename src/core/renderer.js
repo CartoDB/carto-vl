@@ -371,6 +371,8 @@ class Renderer {
                 s * (this._center.y - tile.center.y));
             if (tile.type == 'line') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            } else if (tile.type == 'point') {
+                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
