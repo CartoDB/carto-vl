@@ -61,6 +61,7 @@ class Point {
         this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
         this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
     }
 }
 class Tri {

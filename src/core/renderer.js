@@ -23,7 +23,6 @@ const INITIAL_TIMESTAMP = Date.now();
  */
 const RTT_WIDTH = 1024;
 
-
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
  * Initialization will be done synchronously.
@@ -48,7 +47,7 @@ class Renderer {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
         this.RTT_WIDTH = RTT_WIDTH;
-        console.log('R', this);
+        // console.log('R', this);
         this.dataframes = [];
     }
 
@@ -141,58 +140,29 @@ class Renderer {
         this._zoom = zoom;
     }
 
-
-    /**
-     * Removes a dataframe for the renderer. Freeing its resources.
-     * @param {*} tile
-     */
-    removeDataframe(dataframe) {
-        this.dataframes = this.dataframes.filter(t => t !== dataframe);
-    }
-
-    /**
-     * @description Adds a new dataframe to the renderer.
-     *
-     * Performance-intensive. The required allocation and copy of resources will happen synchronously.
-     * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
-     * @param {Dataframe} dataframe
-     * @returns {BoundDataframe}
-     */
-    addDataframe(dataframe) {
-        dataframe.bind(this);
-        this.dataframes.push(dataframe);
-    }
-
     getAspect() {
         if (this.gl) {
-            return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+            return this.gl.canvas.width / this.gl.canvas.height;
         }
         return 1;
     }
 
-
-    getStyledTiles() {
-        return this.dataframes.filter(tile => tile.style && tile.visible && tile.style.colorShader);
-    }
-
-
-    _computeDrawMetadata() {
-        const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-        const tiles = this.getStyledTiles();
+    _computeDrawMetadata(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const style = renderLayer.style;
+        const aspect = this.getAspect();
         let drawMetadata = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
-        let requiredColumns = tiles.map(d => {
-            const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
-            const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
-            const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
-            const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
-            const filterRequirements = d.style.filter._getDrawMetadataRequirements();
-            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].
-                reduce(schema.union, schema.IDENTITY);
-        }).reduce(schema.union, schema.IDENTITY).columns;
+        const colorRequirements = style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
+        const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
+        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
+            .reduce(schema.union, schema.IDENTITY).columns;
 
         if (requiredColumns.length == 0) {
             return drawMetadata;
@@ -224,18 +194,18 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = d.style.filter._getMinimumNeededSchema().columns;
+            const columnNames = style.getFilter()._getMinimumNeededSchema().columns;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (d.style.filter) {
+                    if (style.getFilter()) {
                         columnNames.forEach(name => {
                             f[name] = d.properties[name][i];
                         });
-                        if (d.style.filter.eval(f) < 0.5) {
+                        if (style.getFilter().eval(f) < 0.5) {
                             continue;
                         }
                     }
@@ -290,21 +260,15 @@ class Renderer {
         return drawMetadata;
     }
 
-    refresh(timestamp) {
+    renderLayer(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const style = renderLayer.style;
         const gl = this.gl;
-        // Don't re-render more than once per animation frame
-        if (this.lastFrame === timestamp) {
+        const aspect = this.getAspect();
+
+        if (!tiles.length) {
             return;
         }
-
-        var width = gl.canvas.clientWidth;
-        var height = gl.canvas.clientHeight;
-        if (gl.canvas.width != width ||
-            gl.canvas.height != height) {
-            gl.canvas.width = width;
-            gl.canvas.height = height;
-        }
-        var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
         gl.enable(gl.CULL_FACE);
 
@@ -314,9 +278,8 @@ class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const tiles = this.getStyledTiles();
 
-        const drawMetadata = this._computeDrawMetadata();
+        const drawMetadata = this._computeDrawMetadata(renderLayer);
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -347,11 +310,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
-        tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texFilter, tile.style.filterShader, tile.style.filter, tile.style.propertyFilterTID));
+        tiles.map(tile => styleTile(tile, tile.texColor, style.colorShader, style.getColor(), style.propertyColorTID));
+        tiles.map(tile => styleTile(tile, tile.texWidth, style.widthShader, style.getWidth(), style.propertyWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeColor, style.strokeColorShader, style.getStrokeColor(), style.propertyStrokeColorTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, style.strokeWidthShader, style.getStrokeWidth(), style.propertyStrokeWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.getFilter(), style.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -359,14 +322,15 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
+            const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             if (w != this._width || h != this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                    w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -375,13 +339,13 @@ class Renderer {
 
                 [this._width, this._height] = [w, h];
             }
-            gl.viewport(0, 0, w * 2, h * 2);
+            gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -407,6 +371,8 @@ class Renderer {
                 s * (this._center.y - tile.center.y));
             if (tile.type == 'line') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            } else if (tile.type == 'point') {
+                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
@@ -464,7 +430,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -497,11 +463,8 @@ class Renderer {
     }
 }
 
-function getOrderingRenderBuckets(tiles) {
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer = tiles[0].style.getOrder();
-    }
+function getOrderingRenderBuckets(renderLayer) {
+    const orderer = renderLayer.style.getOrder();
     let orderingMins = [0];
     let orderingMaxs = [1000];
     if (orderer instanceof Asc) {

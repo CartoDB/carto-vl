@@ -110,9 +110,9 @@ SELECT * FROM ne_10m_populated_places_simple
         <h3>Expressions</h3>
         <textarea id="expressions" rows="3">
 width: 6
-color: rgba(0.93, 0.30, 0.35, 1.0)
+color: rgb(237, 76, 89)
 strokeWidth: 0.5
-strokeColor: rgba(1, 1, 1, 1)
+strokeColor: rgb(255, 255, 255)
 filter: $pop_max > 10000
           </textarea>
           <div class="action-container">
@@ -132,7 +132,8 @@ filter: $pop_max > 10000
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2
+      zoom: 2,
+      dragRotate: false,
     });
 
     carto.setDefaultAuth({
@@ -148,7 +149,7 @@ filter: $pop_max > 10000
 
     function updateSource() {
       reset('#sql');
-      populatedPlacesLayer.setSource(new carto.source.SQL(getValue('#sql')))
+      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')), populatedPlacesLayer.getStyle())
         // .catch(cartoError => {
         //   error('#sql', cartoError);
         // });

@@ -1,6 +1,9 @@
 import decoder from './decoder';
+import { wToR } from '../client/rsys';
+
 export default class Dataframe {
-    constructor({ center, scale, geom, properties, type, active, size }) {
+    // `type` is one of 'point' or 'line' or 'polygon'
+    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -8,25 +11,24 @@ export default class Dataframe {
         this.scale = scale;
         this.size = size;
         this.type = type;
+        this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
+        this.numVertex = this.decodedGeom.vertices.length / 2;
+        this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
+        this.propertyTex = [];
+        this.metadata = metadata;
     }
 
     bind(renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
 
-        this.propertyTex = [];
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
 
-        const decodedGeom = decoder.decodeGeom(this.type, this.geom);
-        var points = decodedGeom.geometry;
-        this.numVertex = points.length / 2;
-        this.breakpointList = decodedGeom.breakpointList;
-        this.numFeatures = this.breakpointList.length || this.numVertex;
         this._genDataframePropertyTextures(gl);
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
-
-        this.style = null;
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
@@ -37,30 +39,173 @@ export default class Dataframe {
         this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
         this.texFilter = this._createStyleTileTexture(this.numFeatures);
 
-        var ids = new Float32Array(points.length);
+        const ids = new Float32Array(vertices.length);
         let index = 0;
-        for (var i = 0; i < points.length; i += 2) {
-            if ((!this.breakpointList.length && i > 0) || i == this.breakpointList[index]) {
+        for (let i = 0; i < vertices.length; i += 2) {
+            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
                 index++;
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-        if (decodedGeom.normals) {
+        if (this.decodedGeom.normals) {
             this.normalBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.normals, gl.STATIC_DRAW);
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    setStyle(style) {
-        this.style = style;
+    getFeaturesAtPosition(pos, style) {
+        switch (this.type) {
+            case 'point':
+                return this._getPointsAtPosition(pos, style);
+            case 'line':
+                return this._getLinesAtPosition(pos, style);
+            case 'polygon':
+                return this._getPolygonAtPosition(pos, style);
+            default:
+                return [];
+        }
+    }
+
+    _getPointsAtPosition(p, style) {
+        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+        const points = this.decodedGeom.vertices;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        const styleStrokeWidth = style.getStrokeWidth();
+        for (let i = 0; i < points.length; i += 2) {
+            const featureIndex = i / 2;
+            const center = {
+                x: points[i],
+                y: points[i + 1],
+            };
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
+            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
+            const inside = pointInCircle(p, center, scale);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+            }
+        }
+        return features;
+    }
+
+    _getLinesAtPosition(pos, style) {
+        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureIndex = 0;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+            }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = styleWidth.eval(f) / 2 * widthScale;
+            const v1 = {
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
+            };
+            const v2 = {
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
+            };
+            const v3 = {
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+        return features;
+
+    }
+
+    _getPolygonAtPosition(pos) {
+        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureIndex = 0;
+        const features = [];
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+            }
+            const v1 = {
+                x: vertices[i + 0],
+                y: vertices[i + 1]
+            };
+            const v2 = {
+                x: vertices[i + 2],
+                y: vertices[i + 3]
+            };
+            const v3 = {
+                x: vertices[i + 4],
+                y: vertices[i + 5]
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+        return features;
+    }
+
+    _addFeatureToArray(featureIndex, features) {
+        const properties = this._getPropertiesOf(featureIndex);
+        features.push({
+            id: properties.cartodb_id,
+            properties
+        });
+    }
+
+    _getPropertiesOf(featureID) {
+        const properties = {};
+        Object.keys(this.properties).map(propertyName => {
+            let prop = this.properties[propertyName][featureID];
+            const column = this.metadata.columns.find(c => c.name == propertyName);
+            if (column.type == 'category') {
+                prop = column.categoryNames[prop];
+            }
+            properties[propertyName] = prop;
+        });
+        return properties;
     }
 
     _genDataframePropertyTextures() {
@@ -71,9 +216,9 @@ export default class Dataframe {
         this.height = height;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
-        for (var k in this.properties) {
+        for (const k in this.properties) {
             if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                var propertyID = this.propertyID[k];
+                let propertyID = this.propertyID[k];
                 if (propertyID === undefined) {
                     propertyID = this.propertyCount;
                     this.propertyCount++;
@@ -131,4 +276,39 @@ export default class Dataframe {
             this.propertyTex = null;
         }
     }
+}
+
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+function pointInTriangle(p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneTest(p, v1, v2) < 0;
+    const b2 = halfPlaneTest(p, v2, v3) < 0;
+    const b3 = halfPlaneTest(p, v3, v1) < 0;
+
+    return (b1 == b2) && (b2 == b3);
+}
+
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+function halfPlaneTest(p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function pointInCircle(p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
 }

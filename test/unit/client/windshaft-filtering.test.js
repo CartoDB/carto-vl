@@ -85,7 +85,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
-            
+
             it('`in($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -99,7 +99,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
-            
+
             it('`nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 const expected = [
                     {
@@ -133,7 +133,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
-            
+
             it('`$numericProperty<now() and between($numericProperty, 10,20)`', () => {
                 const expected = [
                     {
@@ -172,7 +172,7 @@ describe('src/client/windshaft-filtering', () => {
                 }));
                 expect(actual).toEqual(expected);
             });
-            
+
             it('should return null when the mix factor is not an Animation', () => {
                 const actual = f.getFiltering(new Style({
                     filter: s.blend(
@@ -196,6 +196,15 @@ describe('src/client/windshaft-filtering', () => {
                 }))).toBeNull();
             });
 
+            it('with the `filter: $property==5 and $property==5`', () => {
+                expect(f.getFiltering(new Style({
+                    filter: s.and(
+                        s.eq(s.property('property'), 5),
+                        s.eq(s.property('property'), 5)
+                    )
+                }))).toBeNull();
+            });
+
             it('with the `filter: $property<10`', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.lt(s.property('property'), 10)
@@ -207,7 +216,7 @@ describe('src/client/windshaft-filtering', () => {
                     filter: s.between(s.property('property'), 0, s.now())
                 }))).toBeNull();
             });
-            
+
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
                 expect(f.getFiltering(new Style({
                     filter: s.or(

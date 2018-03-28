@@ -15,7 +15,7 @@ import FloatConstant from '../core/style/expressions/floatConstant';
  * @returns {Filtering}
  */
 export function getFiltering(style) {
-    return getFilter(style.filter);
+    return getFilter(style.getFilter());
 }
 
 /**
@@ -58,7 +58,8 @@ function getFilter(f) {
 
 function getAndFilter(f) {
     if (f instanceof And) {
-        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y));
+        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+        return l.length ? l : null;
     }
 }
 

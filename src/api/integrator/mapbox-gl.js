@@ -1,15 +1,16 @@
+import mitt from 'mitt';
 import * as R from '../../core/renderer';
 import * as util from '../util';
 
 let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
-let integrator = null;
+const integrators = new WeakMap();
 export default function getMGLIntegrator(map) {
-    if (!integrator) {
-        integrator = new MGLIntegrator(map);
+    if (!integrators.get(map)) {
+        integrators.set(map, new MGLIntegrator(map));
     }
-    return integrator;
+    return integrators.get(map);
 }
 
 
@@ -21,27 +22,49 @@ class MGLIntegrator {
         this.renderer = new R.Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
+        this._emitter = mitt();
 
+
+        this._suscribeToMapEvents(map);
+        this.moveObservers = {};
+        this._layers = [];
+        this._paintedLayers = 0;
+    }
+
+    on(name, cb) {
+        return this._emitter.on(name, cb);
+    }
+
+    off(name, cb) {
+        return this._emitter.off(name, cb);
+    }
+
+    _suscribeToMapEvents(map) {
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
         map.on('moveend', this.move.bind(this));
         map.on('resize', this.move.bind(this));
 
-        this.moveObservers = {};
-
-        this._layers = [];
+        map.on('mousemove', data => {
+            this._emitter.emit('mousemove', data);
+        });
+        map.on('click', data => {
+            this._emitter.emit('click', data);
+        });
     }
+
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
+
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
+
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
@@ -49,7 +72,18 @@ class MGLIntegrator {
                 this.renderer._initGL(gl);
                 this._layers.map(layer => layer.initCallback());
             }
-            layer.paintCallback();
+            layer.$paintCallback();
+            this._paintedLayers++;
+
+            if (this._paintedLayers % this._layers.length == 0) {
+                // Last layer has been painted
+                const isAnimated = this._layers.some(layer =>
+                    layer.getStyle() && layer.getStyle().isAnimated());
+                if (!isAnimated && this.map.repaint) {
+                    this.map.repaint = false;
+                }
+            }
+
             invalidate();
         });
         this.map.addLayer({
@@ -59,9 +93,11 @@ class MGLIntegrator {
         this._layers.push(layer);
         this.move();
     }
+
     needRefresh() {
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
+        this.map.repaint = true;
     }
+
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
@@ -69,9 +105,11 @@ class MGLIntegrator {
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
+
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
+
     getZoom() {
         var b = this.map.getBounds();
         var c = this.map.getCenter();

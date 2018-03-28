@@ -197,14 +197,14 @@ describe('api/style', () => {
         }, 10);
     });
 
-    describe('.filter', () => {
+    describe('.getFilter()', () => {
         it('should return the current filter', () => {
             const expected = s.gt(s.property('fake_property'), 1000);
             const style = new Style({
                 filter: expected,
             });
 
-            const actual = style.filter;
+            const actual = style.getFilter();
 
             expect(actual).toEqual(expected);
         });

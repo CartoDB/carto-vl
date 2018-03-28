@@ -123,6 +123,10 @@ const validation = {
         'first-polygon-external': {
             messageRegex: /firstPolygonExternal$/,
             friendlyMessage: 'first polygon ring must be external.'
+        },
+        'feature-has-cartodb_id': {
+            messageRegex: /featureHasCartodbId$/,
+            friendlyMessage: '`cartodb_id` is a reserved property so it can not be used'
         }
     },
     style: {

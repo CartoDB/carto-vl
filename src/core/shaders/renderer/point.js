@@ -54,6 +54,7 @@ uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
+uniform float devicePixelRatio;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -79,13 +80,13 @@ void main(void) {
     float size = 64.*texture2D(widthTex, featureID).a;
     float fillSize = size;
     float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
-    size+=strokeSize*0.5;
+    size+=strokeSize;
     fillScale=size/fillSize;
-    strokeScale=size/max(0.001, (fillSize-strokeSize*0.5));
+    strokeScale=size/max(0.001, (fillSize-strokeSize));
     if (fillScale==strokeScale){
         stroke.a=0.;
     }
-    gl_PointSize = size+2.;
+    gl_PointSize = size * devicePixelRatio + 2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
 

@@ -7,14 +7,17 @@ export default class Zoom extends Expression {
      */
     constructor() {
         super({ zoom: float(0) });
+        this.type = 'float';
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.type = 'float';
         super.inlineMaker = inline => inline.zoom;
     }
     _preDraw(drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;
         this.zoom._preDraw(drawMetadata, gl);
+    }
+    eval() {
+        return this.zoom.expr;
     }
 }
