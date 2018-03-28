@@ -5,7 +5,7 @@ const map = new carto.Map({
 
 const source = new carto.source.GeoJSON(sources['point']);
 const style = new carto.Style(`
-    color: rgba(1, 0, 0, 1)
+    color: rgb(255, 0, 0)
     width: 50
     strokeWidth: 20
 `);

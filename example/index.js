@@ -4,10 +4,10 @@
 
 const styles = [
     `width: 3
-color: rgba(0.8,0,0,1)`,
+color: rgb(204,0,0)`,
 
     `width: 3
-color: rgba(0.8,0,0,0.2)`,
+color: rgba(204,0,0,0.2)`,
 
     `width: 3
 color: hsv(0, 0, 1)`,

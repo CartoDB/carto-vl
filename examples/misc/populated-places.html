@@ -86,23 +86,23 @@
     `);
     const allPlacesStyle = new carto.Style(`
       width: 6
-      color: rgba(0.93, 0.30, 0.35, 1.0)
+      color: rgb(237, 76, 89)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255,255)
       filter: $pop_max >= 0
     `);
     const veryPopulatedStyle = new carto.Style(`
       width: 11
-      color: rgba(0.41, 0.71, 0.62, 1.0)
+      color: rgb(105, 181, 158)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255, 255)
       filter: $pop_max > 5000000
     `);
     const lessPopulatedStyle = new carto.Style(`
       width: 11
-      color: rgba(0.95, 0.34, 0.26, 1.0)
+      color: rgb(242, 87, 66)
       strokeWidth: 1
-      strokeColor: rgba(1, 1, 1, 1)
+      strokeColor: rgb(255, 255, 255)
       filter: $pop_max < 100
     `);
 

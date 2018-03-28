@@ -10,9 +10,9 @@ import CartoValidationError from './error-handling/carto-validation-error';
 
 
 const DEFAULT_RESOLUTION = () => 1;
-const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
 const DEFAULT_WIDTH_EXPRESSION = () => s.float(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 1, 0, 0.5);
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.float(0);
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.floatConstant(1);
