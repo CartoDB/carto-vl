@@ -834,6 +834,224 @@ const style = new carto.Style({
     
 
     
+    <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Check if a given value is contained within an inclusive range (including the limits).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric expression that is going to be tested against the [lowerLimit, upperLimit] range</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lowerLimit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric expression with the lower limit of the range</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>upperLimit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric expression with the upper limit of the range</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>numeric expression with the result of the check</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Display only cities where the population density is within the [50,100] range.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.style.expressions;
+const $dn = s.property('populationDensity');
+const style = new carto.Style({
+ filter: s.between($dn, 50, 100);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".blend"><span class="type-signature">(static) </span>blend<span class="signature">(a, b, mix)</span><span class="type-signature"> &rarr; {<a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a>}</span></h4>
     
 
@@ -2341,6 +2559,484 @@ const style = new carto.Style({
     
 
     
+    <h4 class="name" id=".hsla"><span class="type-signature">(static) </span>hsla<span class="signature">(h, s, l, a)</span><span class="type-signature"> &rarr; {<a href="carto.style.expressions.html#.hsla">carto.style.expressions.hsla</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Evaluates to a hsla color.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>h</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The hue of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>s</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The saturation of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>l</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The lightness of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>a</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The alpha value of the color</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.style.expressions.html#.hsla">carto.style.expressions.hsla</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Display blue points.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.style.expressions;
+const style = new carto.Style({
+  color: s.hsla(0.67, 1.0, 0.5, 1.0)
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".hsva"><span class="type-signature">(static) </span>hsva<span class="signature">(h, s, v, a)</span><span class="type-signature"> &rarr; {<a href="carto.style.expressions.html#.hsva">carto.style.expressions.hsva</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Evaluates to a hsva color.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>h</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The hue of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>s</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The saturation of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>v</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The value (brightness) of the color</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>a</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.style.expressions.html#.number">carto.style.expressions.number</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The alpha value of the color</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.style.expressions.html#.hsva">carto.style.expressions.hsva</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Display blue points.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.style.expressions;
+const style = new carto.Style({
+  color: s.hsva(0.67, 1.0, 1.0, 1.0)
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, categories)</span><span class="type-signature"> &rarr; {carto.style.expressions.expression}</span></h4>
     
 
@@ -2533,7 +3229,7 @@ const style = new carto.Style({
     
 
     
-    <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a>}</span></h4>
+    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(property, min, max)</span><span class="type-signature"> &rarr; {carto.style.expressions.expression}</span></h4>
     
 
     
@@ -2541,7 +3237,7 @@ const style = new carto.Style({
 
 
 <div class="description">
-    <p>Check if a given value is contained within an inclusive range (including the limits).</p>
+    <p>Linearly interpolates the value of a given property between min and max.</p>
 </div>
 
 
@@ -2577,16 +3273,13 @@ const style = new carto.Style({
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>property</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type">carto.style.expressions.property</span>
 
 
             
@@ -2596,23 +3289,20 @@ const style = new carto.Style({
 
             
 
-            <td class="description last"><p>numeric expression that is going to be tested against the [lowerLimit, upperLimit] range</p></td>
+            <td class="description last"><p>The property to be evaluated and interpolated</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>lowerLimit</code></td>
+                <td class="name"><code>min</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type">carto.style.expressions.expression</span>
 
 
             
@@ -2622,23 +3312,20 @@ const style = new carto.Style({
 
             
 
-            <td class="description last"><p>numeric expression with the lower limit of the range</p></td>
+            <td class="description last"><p>Numeric or date expression pointing to the lower limit</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>upperLimit</code></td>
+                <td class="name"><code>max</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type">carto.style.expressions.expression</span>
 
 
             
@@ -2648,7 +3335,7 @@ const style = new carto.Style({
 
             
 
-            <td class="description last"><p>numeric expression with the upper limit of the range</p></td>
+            <td class="description last"><p>Numeric or date expression pointing to the higher limit</p></td>
         </tr>
 
     
@@ -2710,10 +3397,6 @@ const style = new carto.Style({
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    <p>numeric expression with the result of the check</p>
-</div>
-
 
 
 <dl>
@@ -2722,7 +3405,7 @@ const style = new carto.Style({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.style.expressions.html#.Expression">carto.style.expressions.Expression</a></span>
+<span class="param-type">carto.style.expressions.expression</span>
 
 
     </dd>
@@ -2735,12 +3418,11 @@ const style = new carto.Style({
 
     <h5>Example</h5>
     
-        <p class="code-caption">Display only cities where the population density is within the [50,100] range.</p>
+        <p class="code-caption"> Display points with a different color depending on the `category` property. </p>
     
     <pre class="prettyprint"><code>const s = carto.style.expressions;
-const $dn = s.property('populationDensity');
 const style = new carto.Style({
- filter: s.between($dn, 50, 100);
+ color: s.ramp(s.linear(s.prop('speed', 10, 100), PRISM),
 });</code></pre>
 
 
@@ -5101,210 +5783,6 @@ const style = new carto.Style({
     
 
     
-    <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(property, min, max)</span><span class="type-signature"> &rarr; {carto.style.expressions.expression}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Linearly interpolates the value of a given property between min and max.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">carto.style.expressions.property</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The property to be evaluated and interpolated</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>min</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">carto.style.expressions.expression</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Numeric or date expression pointing to the lower limit</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>max</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">carto.style.expressions.expression</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Numeric or date expression pointing to the higher limit</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">carto.style.expressions.expression</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-        <p class="code-caption"> Display points with a different color depending on the `category` property. </p>
-    
-    <pre class="prettyprint"><code>const s = carto.style.expressions;
-const style = new carto.Style({
- color: s.ramp(s.linear(s.prop('speed', 10, 100), PRISM),
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(input, palette)</span><span class="type-signature"> &rarr; {carto.style.expressions.expression}</span></h4>
     
 
@@ -5584,7 +6062,7 @@ const style = new carto.Style({
 
             
 
-            <td class="description last"><p>The amount of red in the color</p></td>
+            <td class="description last"><p>The amount of green in the color</p></td>
         </tr>
 
     
@@ -5610,7 +6088,7 @@ const style = new carto.Style({
 
             
 
-            <td class="description last"><p>The amount of red in the color</p></td>
+            <td class="description last"><p>The amount of blue in the color</p></td>
         </tr>
 
     
@@ -5722,9 +6200,8 @@ const style = new carto.Style({
         <p class="code-caption">Display blue points.</p>
     
     <pre class="prettyprint"><code>const s = carto.style.expressions;
-const $type = s.property('type');
 const style = new carto.Style({
- color: s.rgba(0, 1, 0, 1);
+  color: s.rgba(0, 0, 255, 1)
 });</code></pre>
 
 
@@ -6582,13 +7059,13 @@ const style = new carto.Style({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">carto.style.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Style.html">carto.Style</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.style.expressions.html">carto.style.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Mar 16 2018 18:08:35 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 28 2018 18:31:49 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

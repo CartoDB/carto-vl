@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 34);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(11);
 
 
 
@@ -189,7 +189,7 @@ class Expression {
      * @param {*} toReplace
      * @param {*} replacer
      */
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] == toReplace);
         this[name] = replacer;
         replacer.parent = this;
@@ -213,7 +213,7 @@ class Expression {
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
         return final;
     }
@@ -223,7 +223,7 @@ class Expression {
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
-        parent._replaceChild(this, blender);
+        parent.replaceChild(this, blender);
         blender.notify();
     }
 
@@ -399,40 +399,41 @@ function mix(x, y, a) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return _in; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_linear__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_near__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_now__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_property__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_top__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_time__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_unary__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_quantiles__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_torque__ = __webpack_require__(52);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_belongs_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_between__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_time__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_unary__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_binary__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_torque__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_rgb__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_hsv__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__ = __webpack_require__(55);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__ = __webpack_require__(57);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["b"]; });
 /**
  *  @api
  *  @namespace carto.style.expressions
@@ -509,8 +510,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
-
 // Unary ops
 
 
@@ -553,6 +552,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+// Colors
+
+
+
 
 
 
@@ -562,76 +565,88 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 // Expose classes as constructor functions
-const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["a" /* Asc */](...args);
+const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["a" /* Asc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["asc"] = asc;
 
-const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["b" /* Desc */](...args);
+const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["b" /* Desc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["desc"] = desc;
 
-const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["c" /* NoOrder */](...args);
+const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["c" /* NoOrder */](...args);
 /* harmony export (immutable) */ __webpack_exports__["noOrder"] = noOrder;
 
-const width = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_ordering__["d" /* Width */](...args);
+const width = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_ordering__["d" /* Width */](...args);
 /* harmony export (immutable) */ __webpack_exports__["width"] = width;
 
-const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["f" /* FloatMul */](...args);
+const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["f" /* FloatMul */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatMul"] = floatMul;
 
-const floatDiv = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["d" /* FloatDiv */](...args);
+const floatDiv = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["d" /* FloatDiv */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatDiv"] = floatDiv;
 
-const floatAdd = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["c" /* FloatAdd */](...args);
+const floatAdd = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["c" /* FloatAdd */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatAdd"] = floatAdd;
 
-const floatSub = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["h" /* FloatSub */](...args);
+const floatSub = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["h" /* FloatSub */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatSub"] = floatSub;
 
-const floatPow = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["g" /* FloatPow */](...args);
+const floatPow = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["g" /* FloatPow */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatPow"] = floatPow;
 
-const floatMod = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["e" /* FloatMod */](...args);
+const floatMod = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["e" /* FloatMod */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatMod"] = floatMod;
 
-const log = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["c" /* Log */](...args);
+const log = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["c" /* Log */](...args);
 /* harmony export (immutable) */ __webpack_exports__["log"] = log;
 
-const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["g" /* Sqrt */](...args);
+const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["g" /* Sqrt */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sqrt"] = sqrt;
 
-const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["f" /* Sin */](...args);
+const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["f" /* Sin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sin"] = sin;
 
-const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["b" /* Cos */](...args);
+const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["b" /* Cos */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cos"] = cos;
 
-const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["h" /* Tan */](...args);
+const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["h" /* Tan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["tan"] = tan;
 
-const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["e" /* Sign */](...args);
+const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["e" /* Sign */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sign"] = sign;
 
-const near = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_near__["a" /* default */](...args);
+const near = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_near__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["near"] = near;
 
 const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_blend__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["blend"] = blend;
 
-const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_rgba__["a" /* default */](...args);
+const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_rgb__["b" /* RGBA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["rgba"] = rgba;
 
-const property = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_property__["a" /* default */](...args);
+const rgb = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_rgb__["a" /* RGB */](...args);
+/* harmony export (immutable) */ __webpack_exports__["rgb"] = rgb;
+
+const property = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_property__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["property"] = property;
 
 const animate = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_animate__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["animate"] = animate;
 
-const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_hsv__["a" /* default */](...args);
+const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_hsv__["a" /* HSV */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
 
-const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_opacity__["a" /* default */](...args);
+const hsva = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_hsv__["b" /* HSVA */](...args);
+/* harmony export (immutable) */ __webpack_exports__["hsva"] = hsva;
+
+const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__["a" /* HSL */](...args);
+/* harmony export (immutable) */ __webpack_exports__["hsl"] = hsl;
+
+const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__["b" /* HSLA */](...args);
+/* harmony export (immutable) */ __webpack_exports__["hsla"] = hsla;
+
+const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
 
-const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_ramp__["a" /* default */](...args);
+const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ramp"] = ramp;
 
 const float = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_float__["a" /* default */](...args);
@@ -640,109 +655,109 @@ const float = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_float__[
 const category = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_category__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["category"] = category;
 
-const max = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__["b" /* Max */](...args);
+const max = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__["b" /* Max */](...args);
 /* harmony export (immutable) */ __webpack_exports__["max"] = max;
 
-const min = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__["c" /* Min */](...args);
+const min = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__["c" /* Min */](...args);
 /* harmony export (immutable) */ __webpack_exports__["min"] = min;
 
-const sum = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__["e" /* Sum */](...args);
+const sum = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__["e" /* Sum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sum"] = sum;
 
-const avg = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__["a" /* Avg */](...args);
+const avg = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__["a" /* Avg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["avg"] = avg;
 
-const mode = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_aggregation__["d" /* Mode */](...args);
+const mode = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__["d" /* Mode */](...args);
 /* harmony export (immutable) */ __webpack_exports__["mode"] = mode;
 
-const top = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_top__["a" /* default */](...args);
+const top = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_top__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["top"] = top;
 
-const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_linear__["a" /* default */](...args);
+const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_linear__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
 
-const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__["a" /* Cubic */](...args);
+const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__["a" /* Cubic */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
 
-const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_interpolators__["b" /* ILinear */](...args);
+const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__["b" /* ILinear */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
 
-const now = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_now__["a" /* default */](...args);
+const now = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_now__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["now"] = now;
 
-const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_zoom__["a" /* default */](...args);
+const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
 
 const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
 
-const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_xyz__["a" /* default */](...args);
+const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
 
-const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["a" /* Abs */](...args);
+const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["a" /* Abs */](...args);
 /* harmony export (immutable) */ __webpack_exports__["abs"] = abs;
 
-const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["i" /* GreaterThan */](...args);
+const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["i" /* GreaterThan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["greaterThan"] = greaterThan;
 
-const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["j" /* GreaterThanOrEqualTo */](...args);
+const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["j" /* GreaterThanOrEqualTo */](...args);
 /* harmony export (immutable) */ __webpack_exports__["greaterThanOrEqualTo"] = greaterThanOrEqualTo;
 
-const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["k" /* LessThan */](...args);
+const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["k" /* LessThan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["lessThan"] = lessThan;
 
-const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["l" /* LessThanOrEqualTo */](...args);
+const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["l" /* LessThanOrEqualTo */](...args);
 /* harmony export (immutable) */ __webpack_exports__["lessThanOrEqualTo"] = lessThanOrEqualTo;
 
-const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["b" /* Equals */](...args);
+const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["b" /* Equals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
 
-const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["m" /* NotEquals */](...args);
+const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["m" /* NotEquals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["notEquals"] = notEquals;
 
 const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["buckets"] = buckets;
 
-const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_quantiles__["b" /* Quantiles */](...args);
+const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["b" /* Quantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["quantiles"] = quantiles;
 
-const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_quantiles__["a" /* GlobalQuantiles */](...args);
+const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["a" /* GlobalQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalQuantiles"] = globalQuantiles;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
+const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
-const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
+const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
 
-const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
+const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalPercentile"] = globalPercentile;
 
-const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
+const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMax"] = globalMax;
 
-const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
+const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMin"] = globalMin;
 
-const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
+const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
 
-const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
+const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalSum"] = globalSum;
 
-const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
+const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalCount"] = globalCount;
 
 const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a" /* Inverse */](...args);
@@ -751,13 +766,13 @@ const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palett
 const floatConstant = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floatConstant"] = floatConstant;
 
-const torque = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_torque__["b" /* Torque */](...args);
+const torque = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_torque__["b" /* Torque */](...args);
 /* harmony export (immutable) */ __webpack_exports__["torque"] = torque;
 
-const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_torque__["a" /* Fade */](...args);
+const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_torque__["a" /* Fade */](...args);
 /* harmony export (immutable) */ __webpack_exports__["fade"] = fade;
 
-const time = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_time__["a" /* default */](...args);
+const time = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_time__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["time"] = time;
 
 
@@ -767,13 +782,13 @@ const TRUE = new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /*
 const FALSE = new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](0);
 /* harmony export (immutable) */ __webpack_exports__["FALSE"] = FALSE;
 
-const and = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["a" /* And */](...args);
+const and = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["a" /* And */](...args);
 /* harmony export (immutable) */ __webpack_exports__["and"] = and;
 
-const or = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_binary__["n" /* Or */](...args);
+const or = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["n" /* Or */](...args);
 /* harmony export (immutable) */ __webpack_exports__["or"] = or;
 
-const not = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_unary__["d" /* Not */](...args);
+const not = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_unary__["d" /* Not */](...args);
 /* harmony export (immutable) */ __webpack_exports__["not"] = not;
 
 
@@ -789,7 +804,7 @@ const lt = lessThan;
 const lte = lessThanOrEqualTo;
 /* harmony export (immutable) */ __webpack_exports__["lte"] = lte;
 
-const _in = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__["a" /* In */](...args);
+const _in = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_belongs_js__["a" /* In */](...args);
 
 const number = float;
 /* harmony export (immutable) */ __webpack_exports__["number"] = number;
@@ -822,10 +837,10 @@ const eq = equals;
 const neq = notEquals;
 /* harmony export (immutable) */ __webpack_exports__["neq"] = neq;
 
-const nin = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_belongs_js__["b" /* Nin */](...args);
+const nin = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_belongs_js__["b" /* Nin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["nin"] = nin;
 
-const between = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_between__["a" /* default */](...args);
+const between = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_between__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["between"] = between;
 
 
@@ -1346,6 +1361,55 @@ function getReturnTypeFromSignature(signature) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return WM_R; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WM_2R; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return projectToWebMercator; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isUndefined; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isObject; });
+/**
+ * Export util functions
+ */
+
+const DEG2RAD = Math.PI / 180;
+const EARTH_RADIUS = 6378137;
+const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
+const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
+
+function projectToWebMercator(latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    let x = lng * EARTH_RADIUS;
+    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
+    return { x, y };
+}
+
+function isUndefined(value) {
+    return value === undefined;
+}
+
+function isString(value) {
+    return typeof value == 'string';
+}
+
+function isNumber(value) {
+    return typeof value == 'number';
+}
+
+function isObject(value) {
+    const type = typeof value;
+    return value != null && (type == 'object' || type == 'function');
+}
+
+
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
@@ -1558,60 +1622,11 @@ function genUnaryOp(name, jsFn, glsl) {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return WM_R; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return WM_2R; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return projectToWebMercator; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isUndefined; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isNumber; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isObject; });
-/**
- * Export util functions
- */
-
-const DEG2RAD = Math.PI / 180;
-const EARTH_RADIUS = 6378137;
-const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
-const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-
-function projectToWebMercator(latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x, y };
-}
-
-function isUndefined(value) {
-    return value === undefined;
-}
-
-function isString(value) {
-    return typeof value == 'string';
-}
-
-function isNumber(value) {
-    return typeof value == 'number';
-}
-
-function isObject(value) {
-    const type = typeof value;
-    return value != null && (type == 'object' || type == 'function');
-}
-
-
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(68);
 
 
 /**
@@ -1776,9 +1791,9 @@ function genAggregationOp(aggName, aggType) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -1807,7 +1822,6 @@ const INITIAL_TIMESTAMP = Date.now();
  */
 const RTT_WIDTH = 1024;
 
-
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
  * Initialization will be done synchronously.
@@ -1832,7 +1846,7 @@ class Renderer {
         this._center = { x: 0, y: 0 };
         this._zoom = 1;
         this.RTT_WIDTH = RTT_WIDTH;
-        console.log('R', this);
+        // console.log('R', this);
         this.dataframes = [];
     }
 
@@ -1925,58 +1939,29 @@ class Renderer {
         this._zoom = zoom;
     }
 
-
-    /**
-     * Removes a dataframe for the renderer. Freeing its resources.
-     * @param {*} tile
-     */
-    removeDataframe(dataframe) {
-        this.dataframes = this.dataframes.filter(t => t !== dataframe);
-    }
-
-    /**
-     * @description Adds a new dataframe to the renderer.
-     *
-     * Performance-intensive. The required allocation and copy of resources will happen synchronously.
-     * To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
-     * @param {Dataframe} dataframe
-     * @returns {BoundDataframe}
-     */
-    addDataframe(dataframe) {
-        dataframe.bind(this);
-        this.dataframes.push(dataframe);
-    }
-
     getAspect() {
         if (this.gl) {
-            return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+            return this.gl.canvas.width / this.gl.canvas.height;
         }
         return 1;
     }
 
-
-    getStyledTiles() {
-        return this.dataframes.filter(tile => tile.style && tile.visible && tile.style.colorShader);
-    }
-
-
-    _computeDrawMetadata() {
-        const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
-        const tiles = this.getStyledTiles();
+    _computeDrawMetadata(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const style = renderLayer.style;
+        const aspect = this.getAspect();
         let drawMetadata = {
             freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
-        let requiredColumns = tiles.map(d => {
-            const colorRequirements = d.style.getColor()._getDrawMetadataRequirements();
-            const widthRequirements = d.style.getWidth()._getDrawMetadataRequirements();
-            const strokeColorRequirements = d.style.getStrokeColor()._getDrawMetadataRequirements();
-            const strokeWidthRequirements = d.style.getStrokeWidth()._getDrawMetadataRequirements();
-            const filterRequirements = d.style.filter._getDrawMetadataRequirements();
-            return [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].
-                reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]);
-        }).reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
+        const colorRequirements = style.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = style.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
+        const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
+        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
+            .reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
 
         if (requiredColumns.length == 0) {
             return drawMetadata;
@@ -2008,18 +1993,18 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = d.style.filter._getMinimumNeededSchema().columns;
+            const columnNames = style.getFilter()._getMinimumNeededSchema().columns;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (d.style.filter) {
+                    if (style.getFilter()) {
                         columnNames.forEach(name => {
                             f[name] = d.properties[name][i];
                         });
-                        if (d.style.filter.eval(f) < 0.5) {
+                        if (style.getFilter().eval(f) < 0.5) {
                             continue;
                         }
                     }
@@ -2074,21 +2059,15 @@ class Renderer {
         return drawMetadata;
     }
 
-    refresh(timestamp) {
+    renderLayer(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const style = renderLayer.style;
         const gl = this.gl;
-        // Don't re-render more than once per animation frame
-        if (this.lastFrame === timestamp) {
+        const aspect = this.getAspect();
+
+        if (!tiles.length) {
             return;
         }
-
-        var width = gl.canvas.clientWidth;
-        var height = gl.canvas.clientHeight;
-        if (gl.canvas.width != width ||
-            gl.canvas.height != height) {
-            gl.canvas.width = width;
-            gl.canvas.height = height;
-        }
-        var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
         gl.enable(gl.CULL_FACE);
 
@@ -2098,9 +2077,8 @@ class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const tiles = this.getStyledTiles();
 
-        const drawMetadata = this._computeDrawMetadata();
+        const drawMetadata = this._computeDrawMetadata(renderLayer);
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -2131,11 +2109,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleTile(tile, tile.texColor, tile.style.colorShader, tile.style.getColor(), tile.style.propertyColorTID));
-        tiles.map(tile => styleTile(tile, tile.texWidth, tile.style.widthShader, tile.style.getWidth(), tile.style.propertyWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeColor, tile.style.strokeColorShader, tile.style.getStrokeColor(), tile.style.propertyStrokeColorTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, tile.style.strokeWidthShader, tile.style.getStrokeWidth(), tile.style.propertyStrokeWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texFilter, tile.style.filterShader, tile.style.filter, tile.style.propertyFilterTID));
+        tiles.map(tile => styleTile(tile, tile.texColor, style.colorShader, style.getColor(), style.propertyColorTID));
+        tiles.map(tile => styleTile(tile, tile.texWidth, style.widthShader, style.getWidth(), style.propertyWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeColor, style.strokeColorShader, style.getStrokeColor(), style.propertyStrokeColorTID));
+        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, style.strokeWidthShader, style.getStrokeWidth(), style.propertyStrokeWidthTID));
+        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.getFilter(), style.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -2143,14 +2121,15 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
+            const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             if (w != this._width || h != this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                    w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -2159,13 +2138,13 @@ class Renderer {
 
                 [this._width, this._height] = [w, h];
             }
-            gl.viewport(0, 0, w * 2, h * 2);
+            gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(tiles);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -2191,6 +2170,8 @@ class Renderer {
                 s * (this._center.y - tile.center.y));
             if (tile.type == 'line') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            } else if (tile.type == 'point') {
+                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
@@ -2248,7 +2229,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (tiles.length && tiles[0].type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -2281,11 +2262,8 @@ class Renderer {
     }
 }
 
-function getOrderingRenderBuckets(tiles) {
-    let orderer = null;
-    if (tiles.length > 0) {
-        orderer = tiles[0].style.getOrder();
-    }
+function getOrderingRenderBuckets(renderLayer) {
+    const orderer = renderLayer.style.getOrder();
     let orderingMins = [0];
     let orderingMaxs = [1000];
     if (orderer instanceof __WEBPACK_IMPORTED_MODULE_3__style_functions__["Asc"]) {
@@ -2306,962 +2284,6 @@ function getOrderingRenderBuckets(tiles) {
 
 /***/ }),
 /* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["union"] = union;
-/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
-// The IDENTITY schema contains zero columns, and it has two interesting properties:
-//      union(a,IDENTITY)=union(IDENTITY, a)=a
-//      contains(x, IDENTITY)=true  (for x = valid schema)
-const IDENTITY = {
-    columns: []
-};
-/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
-
-
-/*
-const schema = {
-    columns: ['temp', 'cat']
-};*/
-
-//TODO
-// Returns true if subsetSchema is a contained by supersetSchema
-// A schema A is contained by the schema B when all columns of A are present in B and
-// all aggregations in A are present in B, if a column is not aggregated in A, it must
-// be not aggregated in B
-//export function contains(supersetSchema, subsetSchema) {
-//}
-
-// Returns the union of a and b schemas
-// The union of two schemas is a schema with all the properties in both schemas and with their
-// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
-// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
-// to null. In this case the function will throw an exception.
-function union(a, b) {
-    const t = a.columns.concat(b.columns);
-    return {
-        columns: t.filter((item, pos) => t.indexOf(item) == pos)
-    };
-}
-
-function equals(a,b){
-    if (!a || !b){
-        return false;
-    }
-    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
-}
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-
-//TODO refactor to use uniformfloat class
-class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
-    constructor(duration) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('animate', 'duration', 0, duration);
-        if (duration < 0) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
-        }
-        super({});
-        this.aTime = Date.now();
-        this.bTime = this.aTime + Number(duration);
-        this.type = 'float';
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
-    }
-    _preDraw(drawMetadata, gl) {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
-        } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
-        }
-    }
-    eval() {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        return Math.min(this.mix, 1.);
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
-
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-class Base {
-
-    /**
-     * Base data source object.
-     *
-     * The methods listed in the {@link carto.source.Base|source.Base} object are availiable in all source objects.
-     *
-     * Use a source to reference the data used in a {@link carto.layer.Base|layer}.
-     *
-     * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset}, {@link carto.source.SQL} of {@link carto.source.GeoJSON} instead.
-     *
-     *
-     * @constructor Base
-     * @abstract
-     * @memberof carto.source
-     * @api
-     */
-    constructor() {
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Base;
-
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
-
-
-
-
-/**
- * @description Linearly interpolate from *a* to *b* based on *mix*
- * @param {carto.style.expressions.Expression | number} a numeric or color expression
- * @param {carto.style.expressions.Expression | number} b numeric or color expression
- * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.style.expressions.Expression} numeric expression
- *
- * @memberof carto.style.expressions
- * @name blend
- * @function
- * @api
- */
-class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
-    constructor(a, b, mix, interpolator) {
-        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(b);
-        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(mix);
-
-
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'a', 0, a);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'b', 1, b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'mix', 2, mix);
-        if (a.type && b.type) {
-            abTypeCheck(a, b);
-        }
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])('blend', 'mix', 2, 'float', mix);
-
-        // TODO check interpolator type
-        const originalMix = mix;
-        if (interpolator) {
-            mix = interpolator(mix);
-        }
-        super({ a: a, b: b, mix: mix });
-        this.originalMix = originalMix;
-
-        if (a.type && b.type) {
-            this.type = a.type;
-        }
-    }
-    _compile(meta) {
-        super._compile(meta);
-
-        abTypeCheck(this.a, this.b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])('blend', 'mix', 1, 'float', this.mix);
-
-        this.type = this.a.type;
-
-        this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
-    }
-    _preDraw(...args) {
-        super._preDraw(...args);
-        if (this.originalMix instanceof __WEBPACK_IMPORTED_MODULE_1__animate__["a" /* default */] && !this.originalMix.isAnimated()) {
-            this.parent._replaceChild(this, this.b);
-            this.notify();
-        }
-    }
-    eval(feature) {
-        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
-        const x = this.a.eval(feature);
-        const y = this.b.eval(feature);
-        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* mix */])(x, y, a);
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
-
-
-function abTypeCheck(a, b) {
-    if (!((a.type == 'float' && b.type == 'float') || (a.type == 'color' && b.type == 'color'))) {
-        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
-    }
-}
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-
-/**
- *
- * Wraps a number.
- *
- * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.style.expressions.Expression} numeric expression
- *
- * @example <caption>Creating a number expression.</caption>
- * const s = carto.style.expressions;
- * const style = new carto.Style({
- *  width: s.number(15);  // Elements will have width 15
- * });
- *
- * @memberof carto.style.expressions
- * @name number
- * @function
- * @api
- */
-class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
-        super({});
-        this.expr = x;
-        this.type = 'float';
-    }
-
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float float${this._uniformID};\n`,
-            inline: `float${this._uniformID}`
-        };
-    }
-
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
-    }
-
-    _preDraw(drawMetadata, gl) {
-        gl.uniform1f(this._uniformLocation, this.expr);
-    }
-
-    isAnimated() {
-        return false;
-    }
-
-    eval() {
-        return this.expr;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Float;
-
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-
-class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @jsapi
-     * @param {*} x
-     */
-    constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
-        super({});
-        this.expr = x;
-        this.type = 'float';
-        this.inlineMaker = () => `(${x.toFixed(20)})`;
-    }
-
-    eval() {
-        return this.expr;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = FloatConstant;
-
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-/**
- * @description Wrapper around category names
- * @param {string} categoryName
- * @returns {carto.style.expressions.Expression} category expression with the category name provided
- *
- * @memberof carto.style.expressions
- * @name category
- * @function
- * @api
- */
-class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    constructor(categoryName) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('category', 'categoryName', 0, categoryName);
-        super({});
-        this.expr = categoryName;
-        this.type = 'category';
-    }
-    _compile(metadata) {
-        this._metadata = metadata;
-    }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
-        return {
-            preface: `uniform float cat${this._uniformID};\n`,
-            inline: `cat${this._uniformID}`
-        };
-    }
-    _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
-    }
-    _preDraw(drawMetadata, gl) {
-        const id = this._metadata.categoryIDs[this.expr];
-        gl.uniform1f(this._uniformLocation, id);
-    }
-    eval() {
-        return this._metadata.categoryIDs[this.expr];
-    }
-    isAnimated() {
-        return false;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Category;
-
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
-
-
-
-
-function IN_INLINE_MAKER(categories) {
-    if (categories.length == 0) {
-        return () => '0.';
-    }
-    return inline => `(${categories.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
-}
-
-function NIN_INLINE_MAKER(categories) {
-    if (categories.length == 0) {
-        return () => '1.';
-    }
-    return inline => `(${categories.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
-}
-
-/**
- *
- * Check if a categorical value belongs to a list of categories.
- *
- * @param {carto.style.expressions.expression | string} value - Categorical expression to be tested against the categorical whitelist
- * @param {...carto.style.expressions.expression | ...string} categories - Multiple categorical expression parameters that will form the whitelist
- * @return {carto.style.expressions.expression} numeric expression with the result of the check
- *
- * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
- * const s = carto.style.expressions;
- * const $type = s.property('type');
- * const style = new carto.Style({
- *  filter: s.in($type, 'metropolis', 'capital');
- * });
- *
- * @memberof carto.style.expressions
- * @name in
- * @function
- * @api
- */
-const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
-/* harmony export (immutable) */ __webpack_exports__["a"] = In;
-
-
-
-/**
- *
- * Check if value does not belong to the categories list given by the categories parameters.
- *
- * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
- * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
- * @return {carto.style.expressions.Expression} numeric expression with the result of the check
- *
- * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
- * const s = carto.style.expressions;
- * const $type = s.property('type');
- * const style = new carto.Style({
- *  filter: s.nin($type, 'metropolis', 'capital');
- * });
- *
- * @memberof carto.style.expressions
- * @name nin
- * @function
- * @api
- */
-const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
-/* harmony export (immutable) */ __webpack_exports__["b"] = Nin;
-
-
-function generateBelongsExpression(name, inlineMaker, jsEval) {
-
-    return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
-        constructor(value, ...categories) {
-            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(value);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'value', 0, value);
-
-            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */]);
-
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'value', 0, 'category', value);
-            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, '', index + 1, 'category', cat));
-
-            let children = {
-                value
-            };
-            categories.map((arg, index) => children[`arg${index}`] = arg);
-            super(children);
-            this.categories = categories;
-            this.inlineMaker = inlineMaker(this.categories);
-            this.type = 'float';
-        }
-
-        _compile(meta) {
-            super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'value', 0, 'category', this.value);
-            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, '', index + 1, 'category', cat));
-        }
-
-        eval(feature) {
-            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
-        }
-    };
-
-}
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-/**
- *
- * Check if a given value is contained within an inclusive range (including the limits).
- *
- * @param {carto.style.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {carto.style.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
- * @param {carto.style.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
- * @return {carto.style.expressions.Expression} numeric expression with the result of the check
- *
- * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
- * const s = carto.style.expressions;
- * const $dn = s.property('populationDensity');
- * const style = new carto.Style({
- *  filter: s.between($dn, 50, 100);
- * });
- *
- * @memberof carto.style.expressions
- * @name in
- * @function
- * @api
- */
-class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    constructor(value, lowerLimit, upperLimit) {
-        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(value);
-        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(lowerLimit);
-        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(upperLimit);
-
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'value', 0, 'float', value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'lowerLimit', 1, 'float', lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'upperLimit', 2, 'float', upperLimit);
-
-        super({ value, lowerLimit, upperLimit });
-        this.type = 'float';
-    }
-
-    _compile(meta) {
-        super._compile(meta);
-
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'value', 0, 'float', this.value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'lowerLimit', 1, 'float', this.lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'upperLimit', 2, 'float', this.upperLimit);
-
-        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
-    }
-
-    eval(feature) {
-        const value = this.value.eval(feature);
-        const lower = this.lowerLimit.eval(feature);
-        const upper = this.upperLimit.eval(feature);
-        return (value >= lower && value <= upper) ? 1 : 0;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Between;
-
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
-
-
-
-// TODO type checking
-
-class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
-/* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
-
-class BounceEaseIn extends genInterpolator(
-    inner => `BounceEaseIn(${inner})`,
-    `
-    #ifndef BOUNCE_EASE_IN
-    #define BOUNCE_EASE_IN
-    float BounceEaseIn_BounceEaseOut(float p)
-    {
-        if(p < 4./11.0)
-        {
-            return (121. * p * p)/16.0;
-        }
-        else if(p < 8./11.0)
-        {
-            return (363./40.0 * p * p) - (99./10.0 * p) + 17./5.0;
-        }
-        else if(p < 9./10.0)
-        {
-            return (4356./361.0 * p * p) - (35442./1805.0 * p) + 16061./1805.0;
-        }
-        else
-        {
-            return (54./5.0 * p * p) - (513./25.0 * p) + 268./25.0;
-        }
-    }
-    float BounceEaseIn(float p)
-    {
-        return 1. - BounceEaseOut(1. - p);
-    }
-    #endif
-
-`,
-    inner => inner // TODO FIXME
-) { }
-/* unused harmony export BounceEaseIn */
-
-class Cubic extends genInterpolator(
-    inner => `cubicEaseInOut(${inner})`,
-    `
-    #ifndef CUBIC
-    #define CUBIC
-    float cubicEaseInOut(float p){
-        if (p < 0.5) {
-            return 4. * p * p * p;
-        }else {
-            float f = ((2. * p) - 2.);
-            return 0.5 * f * f * f + 1.;
-        }
-    }
-    #endif
-`,
-    inner => inner // TODO FIXME
-) { }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
-
-
-
-// Interpolators
-function genInterpolator(inlineMaker, preface, jsEval) {
-    const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
-        constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(m);
-            super({ m: m });
-        }
-        _compile(meta) {
-            super._compile(meta);
-            if (this.m.type != 'float') {
-                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
-            }
-            this.type = 'float';
-            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
-        }
-        eval(feature) {
-            return jsEval(this.m.eval(feature));
-        }
-    };
-    fn.type = 'interpolator';
-    return fn;
-
-}
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(62);
-
-
-
-
-
-const NUM_TEXTURE_LOCATIONS = 4;
-const shaderCache = new __WEBPACK_IMPORTED_MODULE_3__shader_cache__["a" /* default */]();
-
-let programID = 1;
-
-function compileShader(gl, sourceCode, type) {
-    if (shaderCache.has(gl, sourceCode)) {
-        return shaderCache.get(gl, sourceCode);
-    }
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    shaderCache.set(gl, sourceCode, shader);
-    return shader;
-}
-
-function compileProgram(gl, glslVS, glslFS) {
-    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
-    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-    this.programID = programID++;
-}
-
-class AABlender {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_2__aaBlender__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_2__aaBlender__["a" /* FS */]);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
-    }
-}
-
-class Point {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
-        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-    }
-}
-class Tri {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-    }
-}
-class Line {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
-class GenericStyler {
-    constructor(gl, glsl, preface, inline) {
-        const VS = glsl.VS;
-        let FS = glsl.FS;
-        FS = FS.replace('$PREFACE', preface);
-        FS = FS.replace('$INLINE', inline);
-        compileProgram.call(this, gl, VS, FS);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.textureLocations = [];
-        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
-        }
-    }
-}
-class Color extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Color*/' + preface, inline);
-    }
-}
-class Width extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Width*/' + preface, `vec4((${inline})/64.)`);
-    }
-}
-
-class Filter extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Filter*/' + preface, `vec4(${inline})`);
-    }
-}
-
-const renderer = {
-    createPointShader: function (gl) {
-        return new Point(gl);
-    },
-    createTriShader: function (gl) {
-        return new Tri(gl);
-    },
-    createLineShader: function (gl) {
-        return new Line(gl);
-    }
-};
-
-const styler = {
-    createColorShader: function (gl, preface, inline) {
-        return new Color(gl, preface, inline);
-    },
-    createWidthShader: function (gl, preface, inline) {
-        return new Width(gl, preface, inline);
-    },
-    createFilterShader: function (gl, preface, inline) {
-        return new Filter(gl, preface, inline);
-    }
-};
-
-
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(63);
-
-class Dataframe {
-    constructor({ center, scale, geom, properties, type, active, size }) {
-        this.active = active;
-        this.center = center;
-        this.geom = geom;
-        this.properties = properties;
-        this.scale = scale;
-        this.size = size;
-        this.type = type;
-    }
-
-    bind(renderer) {
-        const gl = renderer.gl;
-        this.renderer = renderer;
-
-        this.propertyTex = [];
-
-        const decodedGeom = __WEBPACK_IMPORTED_MODULE_0__decoder__["a" /* default */].decodeGeom(this.type, this.geom);
-        var points = decodedGeom.geometry;
-        this.numVertex = points.length / 2;
-        this.breakpointList = decodedGeom.breakpointList;
-        this.numFeatures = this.breakpointList.length || this.numVertex;
-        this._genDataframePropertyTextures(gl);
-
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.style = null;
-
-        this.vertexBuffer = gl.createBuffer();
-        this.featureIDBuffer = gl.createBuffer();
-
-        this.texColor = this._createStyleTileTexture(this.numFeatures);
-        this.texWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texFilter = this._createStyleTileTexture(this.numFeatures);
-
-        var ids = new Float32Array(points.length);
-        let index = 0;
-        for (var i = 0; i < points.length; i += 2) {
-            if ((!this.breakpointList.length && i > 0) || i == this.breakpointList[index]) {
-                index++;
-            }
-            ids[i + 0] = ((index) % width) / (width - 1);
-            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-        if (decodedGeom.normals) {
-            this.normalBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, decodedGeom.normals, gl.STATIC_DRAW);
-        }
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-    }
-
-    setStyle(style) {
-        this.style = style;
-    }
-
-    _genDataframePropertyTextures() {
-        const gl = this.renderer.gl;
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.height = height;
-        this.propertyID = {}; //Name => PID
-        this.propertyCount = 0;
-        for (var k in this.properties) {
-            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                var propertyID = this.propertyID[k];
-                if (propertyID === undefined) {
-                    propertyID = this.propertyCount;
-                    this.propertyCount++;
-                    this.propertyID[k] = propertyID;
-                }
-                this.propertyTex[propertyID] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, height, 0, gl.ALPHA, gl.FLOAT,
-                    this.properties[k]);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-        }
-    }
-
-    _createStyleTileTexture(numFeatures) {
-        // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
-        // since RGB components are discarded
-        const gl = this.renderer.gl;
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(numFeatures / width);
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        return texture;
-    }
-
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteTexture(this.texFilter);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texWidth = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.texFilter = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Dataframe;
-
-
-
-/***/ }),
-/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3411,7 +2433,1216 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["union"] = union;
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+const IDENTITY = {
+    columns: []
+};
+/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
+
+
+/*
+const schema = {
+    columns: ['temp', 'cat']
+};*/
+
+//TODO
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+//export function contains(supersetSchema, subsetSchema) {
+//}
+
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+function union(a, b) {
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+    };
+}
+
+function equals(a,b){
+    if (!a || !b){
+        return false;
+    }
+    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
+}
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+
+//TODO refactor to use uniformfloat class
+class Animate extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+     * @param {*} duration animation duration in milliseconds
+     */
+    constructor(duration) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('animate', 'duration', 0, duration);
+        if (duration < 0) {
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
+        }
+        super({});
+        this.aTime = Date.now();
+        this.bTime = this.aTime + Number(duration);
+        this.type = 'float';
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float anim${this._uniformID};\n`,
+            inline: `anim${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+    }
+    _preDraw(drawMetadata, gl) {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        if (this.mix > 1.) {
+            gl.uniform1f(this._uniformLocation, 1);
+        } else {
+            gl.uniform1f(this._uniformLocation, this.mix);
+        }
+    }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
+    }
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Animate;
+
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+class Base {
+
+    /**
+     * Base data source object.
+     *
+     * The methods listed in the {@link carto.source.Base|source.Base} object are availiable in all source objects.
+     *
+     * Use a source to reference the data used in a {@link carto.layer.Base|layer}.
+     *
+     * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset}, {@link carto.source.SQL} of {@link carto.source.GeoJSON} instead.
+     *
+     *
+     * @constructor Base
+     * @abstract
+     * @memberof carto.source
+     * @api
+     */
+    constructor() {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Base;
+
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+//      
+// An event handler can take an optional event argument
+// and should not return a value
+                                          
+                                                               
+
+// An array of all currently registered event handlers for a type
+                                            
+                                                            
+// A map of event types and their corresponding event handlers.
+                        
+                                 
+                                   
+  
+
+/** Mitt: Tiny (~200b) functional event emitter / pubsub.
+ *  @name mitt
+ *  @returns {Mitt}
+ */
+function mitt(all                 ) {
+	all = all || Object.create(null);
+
+	return {
+		/**
+		 * Register an event handler for the given type.
+		 *
+		 * @param  {String} type	Type of event to listen for, or `"*"` for all events
+		 * @param  {Function} handler Function to call in response to given event
+		 * @memberOf mitt
+		 */
+		on: function on(type        , handler              ) {
+			(all[type] || (all[type] = [])).push(handler);
+		},
+
+		/**
+		 * Remove an event handler for the given type.
+		 *
+		 * @param  {String} type	Type of event to unregister `handler` from, or `"*"`
+		 * @param  {Function} handler Handler function to remove
+		 * @memberOf mitt
+		 */
+		off: function off(type        , handler              ) {
+			if (all[type]) {
+				all[type].splice(all[type].indexOf(handler) >>> 0, 1);
+			}
+		},
+
+		/**
+		 * Invoke all handlers for the given type.
+		 * If present, `"*"` handlers are invoked after type-matched handlers.
+		 *
+		 * @param {String} type  The event type to invoke
+		 * @param {Any} [evt]  Any value (object is recommended and powerful), passed to each handler
+		 * @memberOf mitt
+		 */
+		emit: function emit(type        , evt     ) {
+			(all[type] || []).slice().map(function (handler) { handler(evt); });
+			(all['*'] || []).slice().map(function (handler) { handler(type, evt); });
+		}
+	};
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (mitt);
+//# sourceMappingURL=mitt.es.js.map
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expression__ = __webpack_require__(0);
+
+
+
+
+/**
+ * @description Linearly interpolate from *a* to *b* based on *mix*
+ * @param {carto.style.expressions.Expression | number} a numeric or color expression
+ * @param {carto.style.expressions.Expression | number} b numeric or color expression
+ * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.style.expressions.Expression} numeric expression
+ *
+ * @memberof carto.style.expressions
+ * @name blend
+ * @function
+ * @api
+ */
+class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */] {
+    constructor(a, b, mix, interpolator) {
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(mix);
+
+
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'a', 0, a);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'b', 1, b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'mix', 2, mix);
+        if (a.type && b.type) {
+            abTypeCheck(a, b);
+        }
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])('blend', 'mix', 2, 'float', mix);
+
+        // TODO check interpolator type
+        const originalMix = mix;
+        if (interpolator) {
+            mix = interpolator(mix);
+        }
+        super({ a: a, b: b, mix: mix });
+        this.originalMix = originalMix;
+
+        if (a.type && b.type) {
+            this.type = a.type;
+        }
+    }
+    _compile(meta) {
+        super._compile(meta);
+
+        abTypeCheck(this.a, this.b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])('blend', 'mix', 1, 'float', this.mix);
+
+        this.type = this.a.type;
+
+        this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
+    }
+    _preDraw(...args) {
+        super._preDraw(...args);
+        if (this.originalMix instanceof __WEBPACK_IMPORTED_MODULE_1__animate__["a" /* default */] && !this.originalMix.isAnimated()) {
+            this.parent.replaceChild(this, this.b);
+            this.notify();
+        }
+    }
+    eval(feature) {
+        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
+        const x = this.a.eval(feature);
+        const y = this.b.eval(feature);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* mix */])(x, y, a);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Blend;
+
+
+function abTypeCheck(a, b) {
+    if (!((a.type == 'float' && b.type == 'float') || (a.type == 'color' && b.type == 'color'))) {
+        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
+    }
+}
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+
+/**
+ *
+ * Wraps a number.
+ *
+ * @param {number} x - A number to be warped in a numeric expression
+ * @return {carto.style.expressions.Expression} numeric expression
+ *
+ * @example <caption>Creating a number expression.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *  width: s.number(15);  // Elements will have width 15
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name number
+ * @function
+ * @api
+ */
+class Float extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} x
+     */
+    constructor(x) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
+        super({});
+        this.expr = x;
+        this.type = 'float';
+    }
+
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float float${this._uniformID};\n`,
+            inline: `float${this._uniformID}`
+        };
+    }
+
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
+    }
+
+    _preDraw(drawMetadata, gl) {
+        gl.uniform1f(this._uniformLocation, this.expr);
+    }
+
+    isAnimated() {
+        return false;
+    }
+
+    eval() {
+        return this.expr;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Float;
+
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+
+class FloatConstant extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    /**
+     * @jsapi
+     * @param {*} x
+     */
+    constructor(x) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('float', 'x', 0, x);
+        super({});
+        this.expr = x;
+        this.type = 'float';
+        this.inlineMaker = () => `(${x.toFixed(20)})`;
+    }
+
+    eval() {
+        return this.expr;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = FloatConstant;
+
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ * @description Wrapper around category names
+ * @param {string} categoryName
+ * @returns {carto.style.expressions.Expression} category expression with the category name provided
+ *
+ * @memberof carto.style.expressions
+ * @name category
+ * @function
+ * @api
+ */
+class Category extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(categoryName) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('category', 'categoryName', 0, categoryName);
+        super({});
+        this.expr = categoryName;
+        this.type = 'category';
+    }
+    _compile(metadata) {
+        this._metadata = metadata;
+    }
+    _applyToShaderSource(uniformIDMaker) {
+        this._uniformID = uniformIDMaker();
+        return {
+            preface: `uniform float cat${this._uniformID};\n`,
+            inline: `cat${this._uniformID}`
+        };
+    }
+    _postShaderCompile(program, gl) {
+        this._uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
+    }
+    _preDraw(drawMetadata, gl) {
+        const id = this._metadata.categoryIDs[this.expr];
+        gl.uniform1f(this._uniformLocation, id);
+    }
+    eval() {
+        return this._metadata.categoryIDs[this.expr];
+    }
+    isAnimated() {
+        return false;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Category;
+
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+
+function IN_INLINE_MAKER(categories) {
+    if (categories.length == 0) {
+        return () => '0.';
+    }
+    return inline => `(${categories.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+}
+
+function NIN_INLINE_MAKER(categories) {
+    if (categories.length == 0) {
+        return () => '1.';
+    }
+    return inline => `(${categories.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+}
+
+/**
+ *
+ * Check if a categorical value belongs to a list of categories.
+ *
+ * @param {carto.style.expressions.expression | string} value - Categorical expression to be tested against the categorical whitelist
+ * @param {...carto.style.expressions.expression | ...string} categories - Multiple categorical expression parameters that will form the whitelist
+ * @return {carto.style.expressions.expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.in($type, 'metropolis', 'capital');
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name in
+ * @function
+ * @api
+ */
+const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
+/* harmony export (immutable) */ __webpack_exports__["a"] = In;
+
+
+
+/**
+ *
+ * Check if value does not belong to the categories list given by the categories parameters.
+ *
+ * @param {carto.style.expressions.Expression | string} value - Categorical expression to be tested against the categorical blacklist
+ * @param {...carto.style.expressions.Expression | ...string} categories - Multiple categorical expression parameters that will form the blacklist
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
+ * const s = carto.style.expressions;
+ * const $type = s.property('type');
+ * const style = new carto.Style({
+ *  filter: s.nin($type, 'metropolis', 'capital');
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name nin
+ * @function
+ * @api
+ */
+const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
+/* harmony export (immutable) */ __webpack_exports__["b"] = Nin;
+
+
+function generateBelongsExpression(name, inlineMaker, jsEval) {
+
+    return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+        constructor(value, ...categories) {
+            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'value', 0, value);
+
+            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */]);
+
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'value', 0, 'category', value);
+            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, '', index + 1, 'category', cat));
+
+            let children = {
+                value
+            };
+            categories.map((arg, index) => children[`arg${index}`] = arg);
+            super(children);
+            this.categories = categories;
+            this.inlineMaker = inlineMaker(this.categories);
+            this.type = 'float';
+        }
+
+        _compile(meta) {
+            super._compile(meta);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'value', 0, 'category', this.value);
+            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, '', index + 1, 'category', cat));
+        }
+
+        eval(feature) {
+            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
+        }
+    };
+
+}
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ *
+ * Check if a given value is contained within an inclusive range (including the limits).
+ *
+ * @param {carto.style.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {carto.style.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
+ * @param {carto.style.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
+ * @return {carto.style.expressions.Expression} numeric expression with the result of the check
+ *
+ * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
+ * const s = carto.style.expressions;
+ * const $dn = s.property('populationDensity');
+ * const style = new carto.Style({
+ *  filter: s.between($dn, 50, 100);
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name between
+ * @function
+ * @api
+ */
+class Between extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(value, lowerLimit, upperLimit) {
+        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(value);
+        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(lowerLimit);
+        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(upperLimit);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'value', 0, 'float', value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'lowerLimit', 1, 'float', lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'upperLimit', 2, 'float', upperLimit);
+
+        super({ value, lowerLimit, upperLimit });
+        this.type = 'float';
+    }
+
+    _compile(meta) {
+        super._compile(meta);
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'value', 0, 'float', this.value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'lowerLimit', 1, 'float', this.lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'upperLimit', 2, 'float', this.upperLimit);
+
+        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
+    }
+
+    eval(feature) {
+        const value = this.value.eval(feature);
+        const lower = this.lowerLimit.eval(feature);
+        const upper = this.upperLimit.eval(feature);
+        return (value >= lower && value <= upper) ? 1 : 0;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Between;
+
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+
+
+
+// TODO type checking
+
+class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+/* harmony export (immutable) */ __webpack_exports__["b"] = ILinear;
+
+class BounceEaseIn extends genInterpolator(
+    inner => `BounceEaseIn(${inner})`,
+    `
+    #ifndef BOUNCE_EASE_IN
+    #define BOUNCE_EASE_IN
+    float BounceEaseIn_BounceEaseOut(float p)
+    {
+        if(p < 4./11.0)
+        {
+            return (121. * p * p)/16.0;
+        }
+        else if(p < 8./11.0)
+        {
+            return (363./40.0 * p * p) - (99./10.0 * p) + 17./5.0;
+        }
+        else if(p < 9./10.0)
+        {
+            return (4356./361.0 * p * p) - (35442./1805.0 * p) + 16061./1805.0;
+        }
+        else
+        {
+            return (54./5.0 * p * p) - (513./25.0 * p) + 268./25.0;
+        }
+    }
+    float BounceEaseIn(float p)
+    {
+        return 1. - BounceEaseOut(1. - p);
+    }
+    #endif
+
+`,
+    inner => inner // TODO FIXME
+) { }
+/* unused harmony export BounceEaseIn */
+
+class Cubic extends genInterpolator(
+    inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`,
+    inner => inner // TODO FIXME
+) { }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Cubic;
+
+
+
+// Interpolators
+function genInterpolator(inlineMaker, preface, jsEval) {
+    const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+        constructor(m) {
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(m);
+            super({ m: m });
+        }
+        _compile(meta) {
+            super._compile(meta);
+            if (this.m.type != 'float') {
+                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+            }
+            this.type = 'float';
+            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+        }
+        eval(feature) {
+            return jsEval(this.m.eval(feature));
+        }
+    };
+    fn.type = 'interpolator';
+    return fn;
+
+}
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(65);
+
+
+
+
+
+const NUM_TEXTURE_LOCATIONS = 4;
+const shaderCache = new __WEBPACK_IMPORTED_MODULE_3__shader_cache__["a" /* default */]();
+
+let programID = 1;
+
+function compileShader(gl, sourceCode, type) {
+    if (shaderCache.has(gl, sourceCode)) {
+        return shaderCache.get(gl, sourceCode);
+    }
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+    }
+    shaderCache.set(gl, sourceCode, shader);
+    return shader;
+}
+
+function compileProgram(gl, glslVS, glslFS) {
+    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, VS);
+    gl.attachShader(this.program, FS);
+    gl.linkProgram(this.program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
+    }
+    this.programID = programID++;
+}
+
+class AABlender {
+    constructor(gl) {
+        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_2__aaBlender__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_2__aaBlender__["a" /* FS */]);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
+    }
+}
+
+class Point {
+    constructor(gl) {
+        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
+        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
+    }
+}
+class Tri {
+    constructor(gl) {
+        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+    }
+}
+class Line {
+    constructor(gl) {
+        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].FS);
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
+    }
+}
+class GenericStyler {
+    constructor(gl, glsl, preface, inline) {
+        const VS = glsl.VS;
+        let FS = glsl.FS;
+        FS = FS.replace('$PREFACE', preface);
+        FS = FS.replace('$INLINE', inline);
+        compileProgram.call(this, gl, VS, FS);
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.textureLocations = [];
+        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
+            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
+        }
+    }
+}
+class Color extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Color*/' + preface, inline);
+    }
+}
+class Width extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Width*/' + preface, `vec4((${inline})/64.)`);
+    }
+}
+
+class Filter extends GenericStyler {
+    constructor(gl, preface, inline) {
+        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Filter*/' + preface, `vec4(${inline})`);
+    }
+}
+
+const renderer = {
+    createPointShader: function (gl) {
+        return new Point(gl);
+    },
+    createTriShader: function (gl) {
+        return new Tri(gl);
+    },
+    createLineShader: function (gl) {
+        return new Line(gl);
+    }
+};
+
+const styler = {
+    createColorShader: function (gl, preface, inline) {
+        return new Color(gl, preface, inline);
+    },
+    createWidthShader: function (gl, preface, inline) {
+        return new Width(gl, preface, inline);
+    },
+    createFilterShader: function (gl, preface, inline) {
+        return new Filter(gl, preface, inline);
+    }
+};
+
+
+
+
+/***/ }),
 /* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(10);
+
+
+
+class Dataframe {
+    // `type` is one of 'point' or 'line' or 'polygon'
+    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
+        this.active = active;
+        this.center = center;
+        this.geom = geom;
+        this.properties = properties;
+        this.scale = scale;
+        this.size = size;
+        this.type = type;
+        this.decodedGeom = __WEBPACK_IMPORTED_MODULE_0__decoder__["a" /* default */].decodeGeom(this.type, this.geom);
+        this.numVertex = this.decodedGeom.vertices.length / 2;
+        this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
+        this.propertyTex = [];
+        this.metadata = metadata;
+    }
+
+    bind(renderer) {
+        const gl = renderer.gl;
+        this.renderer = renderer;
+
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
+
+        this._genDataframePropertyTextures(gl);
+
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.vertexBuffer = gl.createBuffer();
+        this.featureIDBuffer = gl.createBuffer();
+
+        this.texColor = this._createStyleTileTexture(this.numFeatures);
+        this.texWidth = this._createStyleTileTexture(this.numFeatures);
+        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
+        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
+        this.texFilter = this._createStyleTileTexture(this.numFeatures);
+
+        const ids = new Float32Array(vertices.length);
+        let index = 0;
+        for (let i = 0; i < vertices.length; i += 2) {
+            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
+                index++;
+            }
+            ids[i + 0] = ((index) % width) / (width - 1);
+            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        if (this.decodedGeom.normals) {
+            this.normalBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.normals, gl.STATIC_DRAW);
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
+    }
+
+    getFeaturesAtPosition(pos, style) {
+        switch (this.type) {
+            case 'point':
+                return this._getPointsAtPosition(pos, style);
+            case 'line':
+                return this._getLinesAtPosition(pos, style);
+            case 'polygon':
+                return this._getPolygonAtPosition(pos, style);
+            default:
+                return [];
+        }
+    }
+
+    _getPointsAtPosition(p, style) {
+        p = Object(__WEBPACK_IMPORTED_MODULE_1__client_rsys__["c" /* wToR */])(p.x, p.y, { center: this.center, scale: this.scale });
+        const points = this.decodedGeom.vertices;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        const styleStrokeWidth = style.getStrokeWidth();
+        for (let i = 0; i < points.length; i += 2) {
+            const featureIndex = i / 2;
+            const center = {
+                x: points[i],
+                y: points[i + 1],
+            };
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
+            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
+            const inside = pointInCircle(p, center, scale);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+            }
+        }
+        return features;
+    }
+
+    _getLinesAtPosition(pos, style) {
+        const p = Object(__WEBPACK_IMPORTED_MODULE_1__client_rsys__["c" /* wToR */])(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureIndex = 0;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const styleWidth = style.getWidth();
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+            }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = styleWidth.eval(f) / 2 * widthScale;
+            const v1 = {
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
+            };
+            const v2 = {
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
+            };
+            const v3 = {
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+        return features;
+
+    }
+
+    _getPolygonAtPosition(pos) {
+        const p = Object(__WEBPACK_IMPORTED_MODULE_1__client_rsys__["c" /* wToR */])(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const vertices = this.decodedGeom.vertices;
+        const breakpoints = this.decodedGeom.breakpoints;
+        let featureIndex = 0;
+        const features = [];
+        // Linear search for all features
+        // Tests triangles instead of polygons since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+            }
+            const v1 = {
+                x: vertices[i + 0],
+                y: vertices[i + 1]
+            };
+            const v2 = {
+                x: vertices[i + 2],
+                y: vertices[i + 3]
+            };
+            const v3 = {
+                x: vertices[i + 4],
+                y: vertices[i + 5]
+            };
+            const inside = pointInTriangle(p, v1, v2, v3);
+            if (inside) {
+                this._addFeatureToArray(featureIndex, features);
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+        return features;
+    }
+
+    _addFeatureToArray(featureIndex, features) {
+        const properties = this._getPropertiesOf(featureIndex);
+        features.push({
+            id: properties.cartodb_id,
+            properties
+        });
+    }
+
+    _getPropertiesOf(featureID) {
+        const properties = {};
+        Object.keys(this.properties).map(propertyName => {
+            let prop = this.properties[propertyName][featureID];
+            const column = this.metadata.columns.find(c => c.name == propertyName);
+            if (column.type == 'category') {
+                prop = column.categoryNames[prop];
+            }
+            properties[propertyName] = prop;
+        });
+        return properties;
+    }
+
+    _genDataframePropertyTextures() {
+        const gl = this.renderer.gl;
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.height = height;
+        this.propertyID = {}; //Name => PID
+        this.propertyCount = 0;
+        for (const k in this.properties) {
+            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
+                let propertyID = this.propertyID[k];
+                if (propertyID === undefined) {
+                    propertyID = this.propertyCount;
+                    this.propertyCount++;
+                    this.propertyID[k] = propertyID;
+                }
+                this.propertyTex[propertyID] = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, height, 0, gl.ALPHA, gl.FLOAT,
+                    this.properties[k]);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            }
+        }
+    }
+
+    _createStyleTileTexture(numFeatures) {
+        // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
+        // since RGB components are discarded
+        const gl = this.renderer.gl;
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(numFeatures / width);
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        return texture;
+    }
+
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteTexture(this.texFilter);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+            this.texColor = 'freed';
+            this.texWidth = 'freed';
+            this.texStrokeColor = 'freed';
+            this.texStrokeWidth = 'freed';
+            this.texFilter = 'freed';
+            this.vertexBuffer = 'freed';
+            this.featureIDBuffer = 'freed';
+            this.propertyTex = null;
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Dataframe;
+
+
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+function pointInTriangle(p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneTest(p, v1, v2) < 0;
+    const b2 = halfPlaneTest(p, v2, v3) < 0;
+    const b3 = halfPlaneTest(p, v3, v1) < 0;
+
+    return (b1 == b2) && (b2 == b3);
+}
+
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+function halfPlaneTest(p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function pointInCircle(p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
+}
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3464,15 +3695,15 @@ class Metadata {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(71);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(30);
 
 
 
@@ -3537,7 +3768,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -3727,13 +3958,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(27);
+var VectorTileFeature = __webpack_require__(28);
 
 module.exports = VectorTileLayer;
 
@@ -3795,13 +4026,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(82);
+var Point = __webpack_require__(85);
 
 module.exports = VectorTileFeature;
 
@@ -4035,7 +4266,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4043,7 +4274,7 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultAuth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkAuth; });
 /* unused harmony export cleanDefaultAuth */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -4126,7 +4357,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4134,7 +4365,7 @@ function checkUsername(username) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultConfig; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkConfig; });
 /* unused harmony export cleanDefaultConfig */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -4195,16 +4426,406 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(92);
+
+
+
+
+
+
+
+
+
+
+
+
+class Layer {
+    /**
+    *
+    * A Layer is the primary way to visualize geospatial data.
+    *
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    *
+    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    *
+    * @param {string} id
+    * @param {carto.source.Base} source
+    * @param {carto.Style} style
+    *
+    * @example
+    * new carto.Layer('layer0', source, style);
+    *
+    * @fires CartoError
+    *
+    * @constructor Layer
+    * @memberof carto
+    * @api
+    */
+    constructor(id, source, style) {
+        this._checkId(id);
+        this._checkSource(source);
+        this._checkStyle(style);
+
+        this._init(id, source, style);
+    }
+
+    _init(id, source, style) {
+        this.state = 'init';
+        this._id = id;
+
+        this._emitter = Object(__WEBPACK_IMPORTED_MODULE_0_mitt__["a" /* default */])();
+        this._lastViewport = null;
+        this._lastMNS = null;
+        this._integrator = null;
+        this._context = new Promise((resolve) => {
+            this._contextInitCallback = resolve;
+        });
+
+        this.metadata = null;
+        this._renderLayer = new __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__["a" /* default */]();
+        this.state = 'init';
+        this.isLoaded = false;
+
+        this.update(source, style);
+    }
+
+    on(eventType, callback) {
+        return this._emitter.on(eventType, callback);
+    }
+
+    off(eventType, callback) {
+        return this._emitter.off(eventType, callback);
+    }
+
+    /**
+     * Add this layer to a map.
+     *
+     * @param {mapboxgl.Map} map
+     * @param {string} beforeLayerID
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    addTo(map, beforeLayerID) {
+        if (this._isCartoMap(map)) {
+            this._addToCartoMap(map, beforeLayerID);
+        } else if (this._isMGLMap(map)) {
+            this._addToMGLMap(map, beforeLayerID);
+        } else {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidMap');
+        }
+    }
+
+    async update(source, style) {
+        this._checkSource(source);
+        this._checkStyle(style);
+        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        const uid = this._atomicChangeUID;
+        await this._context;
+        const metadata = await source.requestMetadata(style);
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
+
+        // Everything was ok => commit changes
+        this.metadata = metadata;
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        if (this._source !== source) {
+            this._freeSource();
+        }
+        this._source = source;
+        this.requestData();
+
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        style.onChange(this._styleChanged.bind(this));
+        this._compileShaders(style, metadata);
+    }
+
+    /**
+     * Set a new style for this layer.
+     *
+     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
+     *
+     * @param {carto.Style} style - New style
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    async setStyle(style) {
+        this._checkStyle(style);
+
+        await this._styleChanged(style);
+        if (this._style) {
+            this._style.onChange(null);
+        }
+        this._style = style;
+        this._style.onChange(this._styleChanged.bind(this));
+    }
+
+    /**
+     * Blend the current style with another style.
+     *
+     * This allows smooth transforms between two different styles.
+     *
+     * @example <caption> Smooth transition variating point size </caption>
+     * // We create two different styles varying the width
+     * const style0 = new carto.style({ width: 10 });
+     * const style1 = new carto.style({ width: 20 });
+     * // Create a layer with the first style
+     * const layer = new carto.Layer(source, style);
+     * // We add the layer to the map, the points in this layer will have widh 10
+     * layer.addTo(map, 'layer0');
+     * // The points will be animated from 10px to 20px for 500ms.
+     * layer.blendToStyle(style1, 500);
+     *
+     * @param {carto.Style} style - The final style
+     * @param {number} duration - The animation duration in milliseconds [default:400]
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_8__core_style_functions__["cubic"]) {
+        this._checkStyle(style);
+        if (this._style) {
+            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
+            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
+            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
+            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
+            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
+        }
+
+        this._styleChanged(style).then(() => {
+            if (this._style) {
+                this._style.onChange(null);
+            }
+            this._style = style;
+            this._style.onChange(this._styleChanged.bind(this));
+        });
+    }
+
+    // The integrator will call this method once the webgl context is ready.
+    initCallback() {
+        this._renderLayer.renderer = this._integrator.renderer;
+        this._contextInitCallback();
+        this.requestMetadata();
+    }
+
+    async requestMetadata(style) {
+        style = style || this._style;
+        if (!style) {
+            return;
+        }
+        await this._context;
+        return this._source.requestMetadata(style);
+    }
+
+    async requestData() {
+        if (!this.metadata) {
+            return;
+        }
+        this._source.requestData(this._getViewport());
+    }
+
+    hasDataframes() {
+        return this._renderLayer.hasDataframes();
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getSource() {
+        return this._source;
+    }
+
+    getStyle() {
+        return this._style;
+    }
+
+    getNumFeatures() {
+        return this._renderLayer.getNumFeatures();
+    }
+
+    getIntegrator() {
+        return this._integrator;
+    }
+
+    getFeaturesAtPosition(pos) {
+        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+    }
+
+    $paintCallback() {
+        if (this._style && this._style.colorShader) {
+            this._renderLayer.style = this._style;
+            this._integrator.renderer.renderLayer(this._renderLayer);
+        }
+        if (!this.isLoaded && this.state == 'dataLoaded') {
+            this._fire('loaded');
+            this.isLoaded = true;
+        }
+    }
+
+    _fire(eventType, eventData) {
+        return this._emitter.emit(eventType, eventData);
+    }
+
+    /**
+     * Callback executed when the client adds a new dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataframeAdded(dataframe) {
+        this._renderLayer.addDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
+    }
+
+    /**
+     * Callback executed when the client removes dataframe
+     * @param {Dataframe} dataframe
+     */
+    _onDataFrameRemoved(dataframe) {
+        this._renderLayer.removeDataframe(dataframe);
+        this._integrator.invalidateWebGLState();
+    }
+
+    /**
+     * Callback executed when the client finishes loading data
+     */
+    _onDataLoaded() {
+        this.state = 'dataLoaded';
+    }
+
+    _addLayerIdToFeature(feature) {
+        feature.layerId = this._id;
+        return feature;
+    }
+
+    _isCartoMap(map) {
+        return map instanceof __WEBPACK_IMPORTED_MODULE_4__map__["a" /* default */];
+    }
+
+    _isMGLMap() {
+        // TODO: implement this
+        return true;
+    }
+
+    _addToCartoMap(map, beforeLayerID) {
+        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_5__integrator_carto__["a" /* default */])(map);
+        this._integrator.addLayer(this, beforeLayerID);
+    }
+
+    _addToMGLMap(map, beforeLayerID) {
+        if (map.isStyleLoaded()) {
+            this._onMapLoaded(map, beforeLayerID);
+        } else {
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
+        }
+    }
+
+    _onMapLoaded(map, beforeLayerID) {
+        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__["a" /* default */])(map);
+        this._integrator.addLayer(this, beforeLayerID);
+    }
+
+    _compileShaders(style, metadata) {
+        style.compileShaders(this._integrator.renderer.gl, metadata);
+    }
+
+    async _styleChanged(style) {
+        await this._context;
+        if (!this._source) {
+            throw new Error('A source is required before changing the style');
+        }
+        const source = this._source;
+        const metadata = await source.requestMetadata(style);
+        if (this._source !== source) {
+            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+        }
+        this.metadata = metadata;
+        this._compileShaders(style, this.metadata);
+        this._integrator.needRefresh();
+        return this.requestData();
+    }
+
+    _checkId(id) {
+        if (__WEBPACK_IMPORTED_MODULE_1__util__["f" /* isUndefined */](id)) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'idRequired');
+        }
+        if (!__WEBPACK_IMPORTED_MODULE_1__util__["e" /* isString */](id)) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'idStringRequired');
+        }
+        if (id === '') {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidId');
+        }
+    }
+
+    _checkSource(source) {
+        if (__WEBPACK_IMPORTED_MODULE_1__util__["f" /* isUndefined */](source)) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'sourceRequired');
+        }
+        if (!(source instanceof __WEBPACK_IMPORTED_MODULE_2__source_base__["a" /* default */])) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidSource');
+        }
+    }
+
+    _checkStyle(style) {
+        if (__WEBPACK_IMPORTED_MODULE_1__util__["f" /* isUndefined */](style)) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'styleRequired');
+        }
+        if (!(style instanceof __WEBPACK_IMPORTED_MODULE_3__style__["a" /* default */])) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidStyle');
+        }
+    }
+
+    _getViewport() {
+        if (this._integrator) {
+            return this._integrator.renderer.getBounds();
+        }
+        throw new Error('?');
+    }
+
+    _freeSource() {
+        if (this._source) {
+            this._source.free();
+        }
+        this._renderLayer.freeDataframes();
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Layer;
+
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
@@ -4220,9 +4841,9 @@ function _checkServerURL(serverURL) {
 
 
 const DEFAULT_RESOLUTION = () => 1;
-const DEFAULT_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["rgba"](0, 1, 0, 0.5);
+const DEFAULT_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["rgba"](0, 255, 0, 0.5);
 const DEFAULT_WIDTH_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["float"](5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["rgba"](0, 1, 0, 0.5);
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["rgba"](0, 255, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["float"](0);
 const DEFAULT_ORDER_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["noOrder"]();
 const DEFAULT_FILTER_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_style_functions__["floatConstant"](1);
@@ -4364,7 +4985,7 @@ class Style {
         return this._styleSpec.order;
     }
 
-    get filter() {
+    getFilter() {
         return this._styleSpec.filter;
     }
 
@@ -4373,7 +4994,7 @@ class Style {
             this.getWidth().isAnimated() ||
             this.getStrokeColor().isAnimated() ||
             this.getStrokeWidth().isAnimated() ||
-            this.filter.isAnimated();
+            this.getFilter().isAnimated();
     }
 
     onChange(callback) {
@@ -4382,7 +5003,7 @@ class Style {
 
     _changed() {
         if (this._changeCallback) {
-            this._changeCallback();
+            this._changeCallback(this);
         }
     }
 
@@ -4395,6 +5016,14 @@ class Style {
             this._styleSpec.filter,
         ].filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(__WEBPACK_IMPORTED_MODULE_2__core_schema__["union"], __WEBPACK_IMPORTED_MODULE_2__core_schema__["IDENTITY"]);
+    }
+
+    compileShaders(gl, metadata) {
+        this._compileColorShader(gl, metadata);
+        this._compileWidthShader(gl, metadata);
+        this._compileStrokeColorShader(gl, metadata);
+        this._compileStrokeWidthShader(gl, metadata);
+        this._compileFilterShader(gl, metadata);
     }
 
     _compileColorShader(gl, metadata) {
@@ -4432,7 +5061,7 @@ class Style {
         this.filterShader = r.shader;
     }
 
-    _replaceChild(toReplace, replacer) {
+    replaceChild(toReplace, replacer) {
         if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;
@@ -4549,7 +5178,7 @@ class Style {
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4604,7 +5233,13 @@ class Map {
         window.requestAnimationFrame(this.update.bind(this));
     }
 
-    update() {
+    update(timestamp) {
+        // Don't re-render more than once per animation frame
+        if (this.lastFrame === timestamp) {
+            return;
+        }
+        this.lastFrame = timestamp;
+
         this._drawBackground(this._background);
 
         let loaded = true;
@@ -4613,7 +5248,7 @@ class Map {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getStyle() && layer.getStyle().isAnimated();
             if (hasData || hasAnimation) {
-                layer.paintCallback();
+                layer.$paintCallback();
             }
             loaded = loaded && hasData;
             animated = animated || hasAnimation;
@@ -4684,7 +5319,7 @@ class Map {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4692,19 +5327,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(84);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(93);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_4__api_layer__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Style", function() { return __WEBPACK_IMPORTED_MODULE_5__api_style__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return __WEBPACK_IMPORTED_MODULE_8__api_map__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Interactivity", function() { return __WEBPACK_IMPORTED_MODULE_9__api_interactivity__["a"]; });
 /**
  *  @api
  *  @namespace carto
@@ -4720,9 +5357,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  *  -   {@link carto.style.expressions|carto.style.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Style|carto.Style}
+ * - {@link carto.Interactivity|carto.Interactivity}
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
+
 
 
 
@@ -4743,13 +5382,13 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return palettes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
 
@@ -4836,14 +5475,14 @@ class Inverse {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(37);
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -6696,7 +7335,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(36);
+var colorbrewer = __webpack_require__(38);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -6729,14 +7368,14 @@ if (true) {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(37);
+module.exports = __webpack_require__(39);
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -7061,7 +7700,7 @@ if (true) {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7214,7 +7853,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7302,73 +7941,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 40 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-class HSV extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @description Color constructor for Hue Saturation Value (HSV) color space
-     * @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
-     * @param {*} saturation saturation of the color in the [0,1] range
-     * @param {*} value value (brightness) of the color in the [0,1] range
-     */
-    constructor(h, s, v) {
-        h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(h);
-        s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(s);
-        v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(v);
-
-        checkType('h', 0, h);
-        checkType('s', 1, s);
-        checkType('v', 2, v);
-
-        super({ h: h, s: s, v: v });
-        this.type = 'color';
-    }
-    _compile(metadata) {
-        super._compile(metadata);
-        checkType('h', 0, this.h);
-        checkType('s', 1, this.s);
-        checkType('v', 2, this.v);
-        const normalize = (v, hue = false) => {
-            if (v.type == 'category') {
-                return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
-            }
-            return '';
-        };
-        super._setGenericGLSL(inline =>
-            `vec4(hsv2rgb(vec3(${inline.h}${normalize(this.h, true)}, clamp(${inline.s}${normalize(this.s)}, 0.,1.), clamp(${inline.v}${normalize(this.v)}, 0.,1.))), 1)`
-            , `
-    #ifndef HSV2RGB
-    #define HSV2RGB
-    vec3 hsv2rgb(vec3 c) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-    }
-    #endif
-    `);
-    }
-    // TODO eval
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = HSV;
-
-
-function checkType(parameterName, parameterIndex, parameter) {
-    Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('hsv', parameterName, parameterIndex, parameter);
-    if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
-        throw new Error(`hsv(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
-    }
-}
-
-
-/***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7392,7 +7965,7 @@ function checkType(parameterName, parameterIndex, parameter) {
 * });
 *
 * @memberof carto.style.expressions
-* @name ramp
+* @name linear
 * @function
 * @api
 */
@@ -7450,7 +8023,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7503,7 +8076,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7542,7 +8115,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7694,71 +8267,6 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
     // TODO eval
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Ramp;
-
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-
-
-
-//TODO refactor to uniformcolor, write color (plain, literal)
-
-/**
- *
- * Evaluates to a rgba color.
- *
- * @param {carto.style.expressions.number|number} r - The amount of red in the color
- * @param {carto.style.expressions.number|number} g - The amount of red in the color
- * @param {carto.style.expressions.number|number} b - The amount of red in the color
- * @param {carto.style.expressions.number|number} a - The alpha value of the color
- * @return {carto.style.expressions.rgba}
- *
- * @example <caption>Display blue points.</caption>
- * const s = carto.style.expressions;
- * const $type = s.property('type');
- * const style = new carto.Style({
- *  color: s.rgba(0, 1, 0, 1);
- * });
- *
- * @memberof carto.style.expressions
- * @name rgba
- * @function
- * @api
- */
-class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-    /**
-     * @description RGBA color constructor
-     * @param {*} r red component in the [0,1] range
-     * @param {*} g green component in the [0,1] range
-     * @param {*} b blue component in the [0,1] range
-     * @param {*} a alpha/opacity component in the [0,1] range
-     */
-    constructor(r, g, b, a) {
-        [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'r', 0, 'float', r);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'g', 1, 'float', g);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'b', 2, 'float', b);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('rgba', 'a', 3, 'float', a);
-        super({ r, g, b, a });
-        this.type = 'color';
-    }
-    _compile(meta) {
-        super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'r', 0, 'float', this.r);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'g', 1, 'float', this.g);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'b', 2, 'float', this.b);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'a', 3, 'float', this.a);
-        this.inlineMaker = inline => `vec4(${inline.r}, ${inline.g}, ${inline.b}, ${inline.a})`;
-    }
-    // TODO eval
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = RGBA;
 
 
 
@@ -8001,15 +8509,18 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
      */
     constructor() {
         super({ zoom: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(0) });
+        this.type = 'float';
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.type = 'float';
         super.inlineMaker = inline => inline.zoom;
     }
     _preDraw(drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;
         this.zoom._preDraw(drawMetadata, gl);
+    }
+    eval() {
+        return this.zoom.expr;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Zoom;
@@ -8307,6 +8818,282 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+//TODO refactor to uniformcolor, write color (plain, literal)
+
+/**
+ *
+ * Evaluates to a rgba color.
+ *
+ * @param {carto.style.expressions.number|number} r - The amount of red in the color
+ * @param {carto.style.expressions.number|number} g - The amount of green in the color
+ * @param {carto.style.expressions.number|number} b - The amount of blue in the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.rgba}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.rgba(0, 0, 255, 1)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name rgba
+ * @function
+ * @api
+ */
+const RGBA = genRGB('rgba', true);
+/* harmony export (immutable) */ __webpack_exports__["b"] = RGBA;
+
+const RGB = genRGB('rgb', false);
+/* harmony export (immutable) */ __webpack_exports__["a"] = RGB;
+
+
+function genRGB(name, alpha) {
+    return class RGBA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(r, g, b, a) {
+            [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'r', 0, 'float', r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'g', 1, 'float', g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'b', 2, 'float', b);
+
+            const children = { r, g, b };
+            if (alpha) {
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'float', a);
+                children.a = a;
+            }
+            super(children);
+            this.type = 'color';
+        }
+        _compile(meta) {
+            super._compile(meta);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'r', 0, 'float', this.r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'g', 1, 'float', this.g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'b', 2, 'float', this.b);
+            if (alpha) {
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'a', 3, 'float', this.a);
+            }
+            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
+        }
+        // TODO eval
+    };
+}
+
+
+/***/ }),
+/* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ *
+ * Evaluates to a hsva color.
+ *
+ * @param {carto.style.expressions.number|number} h - The hue of the color
+ * @param {carto.style.expressions.number|number} s - The saturation of the color
+ * @param {carto.style.expressions.number|number} v - The value (brightness) of the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.hsva}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name hsva
+ * @function
+ * @api
+ */
+const HSV = genHSV('hsv', false);
+/* harmony export (immutable) */ __webpack_exports__["a"] = HSV;
+
+const HSVA = genHSV('hsva', true);
+/* harmony export (immutable) */ __webpack_exports__["b"] = HSVA;
+
+
+function genHSV(name, alpha) {
+    return class extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(h, s, v, a) {
+            h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(h);
+            s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(s);
+            v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(v);
+            const children = { h, s, v };
+            if (alpha) {
+                a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'float', a);
+                children.a = a;
+            }
+
+            hsvCheckType('h', 0, h);
+            hsvCheckType('s', 1, s);
+            hsvCheckType('v', 2, v);
+
+            super(children);
+            this.type = 'color';
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            hsvCheckType('h', 0, this.h);
+            hsvCheckType('s', 1, this.s);
+            hsvCheckType('v', 2, this.v);
+            if (alpha) {
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsva', 'a', 3, 'float', this.a);
+            }
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
+                }
+                return '';
+            };
+            super._setGenericGLSL(inline =>
+                `vec4(HSVtoRGB(vec3(
+                    ${inline.h}${normalize(this.h, true)},
+                    clamp(${inline.s}${normalize(this.s)}, 0.,1.),
+                    clamp(${inline.v}${normalize(this.v)}, 0.,1.)
+                )), ${alpha ? `clamp(${inline.a}, 0.,1.)` : '1.'})`
+                , `
+    #ifndef HSV2RGB
+    #define HSV2RGB
+    vec3 HSVtoRGB(vec3 HSV) {
+      float R = abs(HSV.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSV.x * 6. - 2.);
+      float B = 2. - abs(HSV.x * 6. - 4.);
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
+    }
+    #endif
+    `);
+        }
+        // TODO eval
+    };
+
+    function hsvCheckType(parameterName, parameterIndex, parameter) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+        }
+    }
+}
+
+
+/***/ }),
+/* 55 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ *
+ * Evaluates to a hsla color.
+ *
+ * @param {carto.style.expressions.number|number} h - The hue of the color
+ * @param {carto.style.expressions.number|number} s - The saturation of the color
+ * @param {carto.style.expressions.number|number} l - The lightness of the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.hsla}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name hsla
+ * @function
+ * @api
+ */
+const HSL = genHSL('hsl', false);
+/* harmony export (immutable) */ __webpack_exports__["a"] = HSL;
+
+const HSLA = genHSL('hsla', true);
+/* harmony export (immutable) */ __webpack_exports__["b"] = HSLA;
+
+
+function genHSL(name, alpha) {
+    return class HSLA extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(h, s, l, a) {
+            [h, s, l, a] = [h, s, l, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+
+            const children = { h, s, l };
+            if (alpha) {
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'float', a);
+                children.a = a;
+            }
+
+            hslCheckType('h', 0, h);
+            hslCheckType('s', 1, s);
+            hslCheckType('l', 2, l);
+
+            super(children);
+            this.type = 'color';
+        }
+        _compile(meta) {
+            super._compile(meta);
+            hslCheckType('h', 0, this.h);
+            hslCheckType('s', 1, this.s);
+            hslCheckType('l', 2, this.l);
+            if (alpha) {
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsla', 'a', 3, 'float', this.a);
+            }
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
+                }
+                return '';
+            };
+            super._setGenericGLSL(inline =>
+                `vec4(HSLtoRGB(vec3(
+                    ${inline.h}${normalize(this.h, true)},
+                    clamp(${inline.s}${normalize(this.s)}, 0., 1.),
+                    clamp(${inline.l}${normalize(this.l)}, 0., 1.)
+                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
+                , `
+    #ifndef HSL2RGB
+    #define HSL2RGB
+    vec3 HSLtoRGB(vec3 HSL) {
+      float R = abs(HSL.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSL.x * 6. - 2.);
+      float B = 2. - abs(HSL.x * 6. - 4.);
+      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return (RGB - 0.5) * C + HSL.z;
+    }
+    #endif
+    `);
+        }
+        // TODO eval
+    };
+
+    function hslCheckType(parameterName, parameterIndex, parameter) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+        }
+    }
+}
+
+
+/***/ }),
+/* 56 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 
 
@@ -8461,7 +9248,7 @@ function generatePercentile(global) {
 
 
 /***/ }),
-/* 54 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8510,16 +9297,16 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 55 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(24);
 
 
 
@@ -8570,9 +9357,10 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._loaded = false;
     }
 
-    bindLayer(addDataframe, removeDataframe) {
+    bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestMetadata() {
@@ -8591,9 +9379,11 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             properties: this._decodeProperties(),
             scale: 1,
             size: this._features.length,
-            type: this._getDataframeType(this._type)
+            type: this._getDataframeType(this._type),
+            metadata: this._metadata,
         });
         this._addDataframe(dataframe);
+        this._dataLoadedCallback();
     }
 
     _checkData(data) {
@@ -8606,13 +9396,28 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     }
 
     _getFeatures(data) {
-        if (data.type === 'FeatureCollection') {
-            return data.features || [];
-        } else if (data.type === 'Feature') {
-            return [data];
+        // Create a copy to avoid modifications to the original data
+        let dataCopy = JSON.parse(JSON.stringify(data));
+        if (dataCopy.type === 'FeatureCollection') {
+            return this._addCartodbId(dataCopy.features);
         }
-        else {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidGeoJSONData');
+        if (dataCopy.type === 'Feature') {
+            return this._addCartodbId([dataCopy]);
+        }
+        throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidGeoJSONData');
+    }
+
+    _addCartodbId(features) {
+        return features.map((feature, i) => {
+            this._checkFeature(feature);
+            feature.properties.cartodb_id = i;
+            return feature;
+        }) || [];
+    }
+
+    _checkFeature(feature) {
+        if (feature.properties && feature.properties.cartodb_id) {
+            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'featureHasCartodbId');
         }
     }
 
@@ -8645,14 +9450,14 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(feature, sample, featureCount) {
+    _sampleFeatureOnMetadata(properties, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
                 return;
             }
         }
-        sample.push(feature);
+        sample.push(properties);
     }
 
     _addNumericPropertyToMetadata(propertyName, value, columns) {
@@ -8701,7 +9506,7 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _decodeProperties() {
         const properties = {};
         this._numFields.concat(this._catFields).map(name => {
-            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met            
+            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
         for (var i = 0; i < this._features.length; i++) {
@@ -8867,19 +9672,22 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
         return total >= 0;
     }
+
+    free() {
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = GeoJSON;
 
 
 
 /***/ }),
-/* 56 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(57);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(62);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -8889,7 +9697,7 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 57 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8950,6 +9758,7 @@ uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
+uniform float devicePixelRatio;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -8975,13 +9784,13 @@ void main(void) {
     float size = 64.*texture2D(widthTex, featureID).a;
     float fillSize = size;
     float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
-    size+=strokeSize*0.5;
+    size+=strokeSize;
     fillScale=size/fillSize;
-    strokeScale=size/max(0.001, (fillSize-strokeSize*0.5));
+    strokeScale=size/max(0.001, (fillSize-strokeSize));
     if (fillScale==strokeScale){
         stroke.a=0.;
     }
-    gl_PointSize = size+2.;
+    gl_PointSize = size * devicePixelRatio + 2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);
 
@@ -9029,8 +9838,9 @@ void main(void) {
 /* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
 
 
+
 /***/ }),
-/* 58 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9077,7 +9887,7 @@ void main(void) {
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9129,7 +9939,7 @@ void main(void) {
 
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9178,7 +9988,7 @@ void main(void) {
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9216,7 +10026,7 @@ void main(void) {
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9259,12 +10069,12 @@ class ShaderCache {
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export decodeGeom */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(67);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
@@ -9299,48 +10109,48 @@ function decodeGeom(geomType, geom) {
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(geometry) {
+function decodePoint(vertices) {
     return {
-        geometry: geometry,
-        breakpointList: []
+        vertices: vertices,
+        breakpoints: []
     };
 }
 
 
 function decodePolygon(geometry) {
-    let vertexArray = []; //Array of triangle vertices
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let vertices = []; //Array of triangle vertices
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertexArray.push(polygon.flat[2 * index]);
-                vertexArray.push(polygon.flat[2 * index + 1]);
+                vertices.push(polygon.flat[2 * index]);
+                vertices.push(polygon.flat[2 * index + 1]);
             });
         });
-        breakpointList.push(vertexArray.length);
+        breakpoints.push(vertices.length);
     });
     return {
-        geometry: new Float32Array(vertexArray),
-        breakpointList
+        vertices: new Float32Array(vertices),
+        breakpoints
     };
 }
 
 function decodeLine(geom) {
+    let vertices = [];
     let normals = [];
-    let geometry = [];
-    let breakpointList = []; // Array of indices (to vertexArray) that separate each feature
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
-            
+
             for (let i = 0; i < lineString.length - 2; i += 2) {
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
                 const normal = getLineNormal(b, a);
                 let na = normal;
                 let nb = normal;
-                
+
                 if (i > 0) {
                     const prev = [lineString[i - 2], lineString[i - 1]];
                     na = getJointNormal(prev, a, b) || na;
@@ -9351,31 +10161,31 @@ function decodeLine(geom) {
                 }
 
                 // First triangle
-    
+
                 normals.push(-na[0], -na[1]);
                 normals.push(na[0], na[1]);
                 normals.push(-nb[0], -nb[1]);
-    
-                geometry.push(a[0], a[1]);
-                geometry.push(a[0], a[1]);
-                geometry.push(b[0], b[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
 
                 // Second triangle
-    
+
                 normals.push(na[0], na[1]);
                 normals.push(nb[0], nb[1]);
                 normals.push(-nb[0], -nb[1]);
-    
-                geometry.push(a[0], a[1]);
-                geometry.push(b[0], b[1]);
-                geometry.push(b[0], b[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+                vertices.push(b[0], b[1]);
             }
         });
-        breakpointList.push(geometry.length);
+        breakpoints.push(vertices.length);
     });
     return {
-        geometry: new Float32Array(geometry),
-        breakpointList,
+        vertices: new Float32Array(vertices),
+        breakpoints,
         normals: new Float32Array(normals)
     };
 }
@@ -9404,7 +10214,7 @@ function normalize(v) {
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10061,12 +10871,12 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(69);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -10148,7 +10958,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10279,6 +11089,10 @@ const validation = {
         'first-polygon-external': {
             messageRegex: /firstPolygonExternal$/,
             friendlyMessage: 'first polygon ring must be external.'
+        },
+        'feature-has-cartodb_id': {
+            messageRegex: /featureHasCartodbId$/,
+            friendlyMessage: '`cartodb_id` is a reserved property so it can not be used'
         }
     },
     style: {
@@ -10301,12 +11115,12 @@ const validation = {
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -10374,21 +11188,21 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(79);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(83);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(24);
 
 
 
@@ -10463,6 +11277,11 @@ class Windshaft {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
         const filtering = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getFiltering */](style);
+        // Force to include `cartodb_id` in the MNS columns.
+        // TODO: revisit this request to Maps API
+        if (!MNS.columns.includes('cartodb_id')) {
+            MNS.columns.push('cartodb_id');
+        }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             await this._instantiate(MNS, resolution, filtering);
         }
@@ -10575,13 +11394,15 @@ class Windshaft {
 
         MRS.columns
             .forEach(name => {
-                if (name.startsWith('_cdb_agg_')) {
-                    aggregation.columns[name] = {
-                        aggregate_function: getAggFN(name),
-                        aggregated_column: getBase(name)
-                    };
-                } else {
-                    aggregation.dimensions[name] = name;
+                if (name !== 'cartodb_id') {
+                    if (name.startsWith('_cdb_agg_')) {
+                        aggregation.columns[name] = {
+                            aggregate_function: getAggFN(name),
+                            aggregated_column: getBase(name)
+                        };
+                    } else {
+                        aggregation.dimensions[name] = name;
+                    }
                 }
             });
 
@@ -10592,7 +11413,7 @@ class Windshaft {
         return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
             name => dateFields.includes(name) ? name + '::text' : name
         )
-            .concat(['the_geom', 'the_geom_webmercator']);
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
     _buildQuery(select) {
@@ -10611,6 +11432,7 @@ class Windshaft {
 
     free() {
         this.cache.reset();
+        this._oldDataframes = [];
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
@@ -10622,6 +11444,7 @@ class Windshaft {
             scale: rs.scale,
             size: size,
             type: type,
+            metadata: this.metadata,
         });
 
         return dataframe;
@@ -10848,7 +11671,7 @@ class Windshaft {
             this.getDatesTypes(dates, query, conf),
             this.getCategoryTypes(categories, query, conf)]);
 
-        const columns = [];
+        let columns = [];
         numerics.forEach((name, index) => columns.push(numericsTypes[index]));
         dates.forEach((name, index) => columns.push(datesTypes[index]));
 
@@ -11065,7 +11888,7 @@ function authURL(url, conf) {
 
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11073,7 +11896,7 @@ function authURL(url, conf) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(70);
+var ieee754 = __webpack_require__(73);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -11690,12 +12513,12 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 70 */
+/* 73 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var nBits = -7
@@ -11708,12 +12531,12 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   e = s & ((1 << (-nBits)) - 1)
   s >>= (-nBits)
   nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   m = e & ((1 << (-nBits)) - 1)
   e >>= (-nBits)
   nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   if (e === 0) {
     e = 1 - eBias
@@ -11728,7 +12551,7 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
 
 exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
@@ -11761,7 +12584,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
       m = 0
       e = eMax
     } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
+      m = ((value * c) - 1) * Math.pow(2, mLen)
       e = e + eBias
     } else {
       m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
@@ -11780,7 +12603,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 71 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11790,11 +12613,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(72)
-var util = __webpack_require__(74)
+var Map = __webpack_require__(75)
+var util = __webpack_require__(77)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(78)
+var Yallist = __webpack_require__(81)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -12254,7 +13077,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 72 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -12264,13 +13087,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(73)
+  module.exports = __webpack_require__(76)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
 
 /***/ }),
-/* 73 */
+/* 76 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -12389,7 +13212,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 74 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -12917,7 +13740,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(76);
+exports.isBuffer = __webpack_require__(79);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -12961,7 +13784,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(77);
+exports.inherits = __webpack_require__(80);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -12979,10 +13802,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(75), __webpack_require__(25)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(78), __webpack_require__(26)))
 
 /***/ }),
-/* 75 */
+/* 78 */
 /***/ (function(module, exports) {
 
 var g;
@@ -13009,7 +13832,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 76 */
+/* 79 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -13020,7 +13843,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 77 */
+/* 80 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -13049,7 +13872,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 78 */
+/* 81 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -13425,21 +14248,21 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 79 */
+/* 82 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getFiltering;
 /* harmony export (immutable) */ __webpack_exports__["b"] = getSQLWhere;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(17);
 
 
 
@@ -13457,7 +14280,7 @@ function Node (value, prev, next, list) {
  * @returns {Filtering}
  */
 function getFiltering(style) {
-    return getFilter(style.filter);
+    return getFilter(style.getFilter());
 }
 
 /**
@@ -13500,7 +14323,8 @@ function getFilter(f) {
 
 function getAndFilter(f) {
     if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["a" /* And */]) {
-        return [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y));
+        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+        return l.length ? l : null;
     }
 }
 
@@ -13550,22 +14374,22 @@ function isBetweenFilter(f) {
 
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(81);
-module.exports.VectorTileFeature = __webpack_require__(27);
-module.exports.VectorTileLayer = __webpack_require__(26);
+module.exports.VectorTile = __webpack_require__(84);
+module.exports.VectorTileFeature = __webpack_require__(28);
+module.exports.VectorTileLayer = __webpack_require__(27);
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(26);
+var VectorTileLayer = __webpack_require__(27);
 
 module.exports = VectorTile;
 
@@ -13583,7 +14407,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13902,12 +14726,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -13986,418 +14810,7 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 
 /***/ }),
-/* 84 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__source_base__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__style__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__map__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__integrator_carto__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_functions__ = __webpack_require__(2);
-
-
-
-
-
-
-
-
-
-
-class Layer {
-
-    /**
-    *
-    * A Layer is the primary way to visualize geospatial data.
-    *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
-    *
-    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
-    *
-    * @param {string} id
-    * @param {carto.source.Base} source
-    * @param {carto.Style} style
-    *
-    * @example
-    * new carto.Layer('layer0', source, style);
-    *
-    * @fires CartoError
-    *
-    * @constructor Layer
-    * @memberof carto
-    * @api
-    */
-    constructor(id, source, style) {
-        this._checkId(id);
-        this._checkSource(source);
-        this._checkStyle(style);
-
-        this._lastViewport = null;
-        this._lastMNS = null;
-        this._integrator = null;
-        this._dataframes = [];
-        this._context = new Promise((resolve) => {
-            this._contextInitCallback = resolve;
-        });
-
-        this._id = id;
-        this.metadata = null;
-        this.setSource(source);
-        this.setStyle(style);
-
-        this._listeners = {};
-
-        this.state = 'init';
-        console.log('L', this);
-
-        this.paintCallback = () => {
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.setStyle(this._style);
-                    dataframe.visible = dataframe.active;
-                });
-            this._integrator.renderer.refresh(Number.NaN);
-            this._dataframes.map(
-                dataframe => {
-                    dataframe.visible = false;
-                });
-            if (this.state == 'dataLoaded') {
-                this.state = 'dataPainted';
-                this._fire('loaded');
-            }
-        };
-    }
-
-    _fire(eventType, eventData) {
-        if (!this._listeners[eventType]) {
-            return;
-        }
-        this._listeners[eventType].map(listener => listener(eventData));
-    }
-
-    on(eventType, callback) {
-        if (!this._listeners[eventType]) {
-            this._listeners[eventType] = [callback];
-        } else {
-            this._listeners[eventType].push(callback);
-        }
-    }
-    off(eventType, callback) {
-        const index = this._listeners[eventType].indexOf(callback);
-        this._listeners[eventType].splice(index, 1);
-    }
-
-    async update(source, style) {
-        this._checkSource(source);
-        this._checkStyle(style);
-        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
-        const uid = this._atomicChangeUID;
-        await this._context;
-        const metadata = await source.requestMetadata(style);
-        if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
-        }
-
-        // Everything was ok => commit changes
-        this.metadata = metadata;
-
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
-        }
-        this._source = source;
-        this.requestData();
-
-        if (this._style) {
-            this._style.onChange(null);
-        }
-        this._style = style;
-        style.onChange(() => {
-            this._styleChanged(style);
-        });
-        this._compileShaders(style, metadata);
-    }
-    /**
-     * Set a new source for this layer.
-     *
-     * @param {carto.source.Base} source - New source
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    async setSource(source) {
-        this._checkSource(source);
-        const style = this._style;
-        if (style) {
-            var metadata = await source.requestMetadata(style);
-        }
-        if (this._style !== style) {
-            throw new Error('A style change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
-        }
-        this.metadata = metadata;
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
-        if (this._source && this._source !== source) {
-            this._source.free();
-        }
-        this._source = source;
-        if (style) {
-            this._styleChanged(style);
-        }
-    }
-
-    /**
-     * Callback executed when the client adds a new dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataframeAdded(dataframe) {
-        this._dataframes.push(dataframe);
-        this._integrator.renderer.addDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-    }
-
-    /**
-     * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataFrameRemoved(dataframe) {
-        this._dataframes = this._dataframes.filter(d => d !== dataframe);
-        this._integrator.renderer.removeDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-    }
-
-    /**
-    * Callback executed when the client finishes loading data
-    */
-    _onDataLoaded() {
-        this.state = 'dataLoaded';
-    }
-
-    /**
-     * Set a new style for this layer.
-     *
-     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
-     *
-     * @param {carto.Style} style - New style
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    setStyle(style) {
-        this._checkStyle(style);
-        return this._styleChanged(style).then(r => {
-            if (this._style) {
-                this._style.onChange(null);
-            }
-            this._style = style;
-            this._style.onChange(() => {
-                this._styleChanged(style);
-            });
-            return r;
-        });
-    }
-
-    /**
-     * Blend the current style with another style.
-     *
-     * This allows smooth transforms between two different styles.
-     *
-     * @example <caption> Smooth transition variating point size </caption>
-     * // We create two different styles varying the width
-     * const style0 = new carto.style({ width: 10 });
-     * const style1 = new carto.style({ width: 20 });
-     * // Create a layer with the first style
-     * const layer = new carto.Layer(source, style);
-     * // We add the layer to the map, the points in this layer will have widh 10
-     * layer.addTo(map, 'layer0');
-     * // The points will be animated from 10px to 20px for 500ms.
-     * layer.blendToStyle(style1, 500);
-     *
-     * @param {carto.Style} style - The final style
-     * @param {number} duration - The animation duration in milliseconds [default:400]
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    blendToStyle(style, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_7__core_style_functions__["cubic"]) {
-        this._checkStyle(style);
-        if (this._style) {
-            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
-            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
-            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
-            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.filter.blendFrom(this._style.filter, ms, interpolator);
-        }
-
-        return this._styleChanged(style).then(r => {
-            if (this._style) {
-                this._style.onChange(null);
-            }
-            this._style = style;
-            this._style.onChange(() => {
-                this._styleChanged(style);
-            });
-            return r;
-        });
-    }
-
-    /**
-     * Add this layer to a map.
-     *
-     * @param {mapboxgl.Map} map
-     * @param {string} beforeLayerID
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    addTo(map, beforeLayerID) {
-        if (this._isCartoMap(map)) {
-            this._addToCartoMap(map, beforeLayerID);
-        } else if (this._isMGLMap(map)) {
-            this._addToMGLMap(map, beforeLayerID);
-        } else {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidMap');
-        }
-    }
-
-    hasDataframes() {
-        return this._dataframes.length > 0;
-    }
-
-    getId() {
-        return this._id;
-    }
-
-    getSource() {
-        return this._source;
-    }
-
-    getStyle() {
-        return this._style;
-    }
-
-    _isCartoMap(map) {
-        return map instanceof __WEBPACK_IMPORTED_MODULE_3__map__["a" /* default */];
-    }
-
-    _isMGLMap() {
-        // TODO: implement this
-        return true;
-    }
-
-    _addToCartoMap(map, beforeLayerID) {
-        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_4__integrator_carto__["a" /* default */])(map);
-        this._integrator.addLayer(this, beforeLayerID);
-    }
-
-    initCallback() {
-        this._contextInitCallback();
-        this.requestMetadata();
-    }
-
-    _addToMGLMap(map, beforeLayerID) {
-        if (map.isStyleLoaded()) {
-            this._onMapLoaded(map, beforeLayerID);
-        } else {
-            map.on('load', () => {
-                this._onMapLoaded(map, beforeLayerID);
-            });
-        }
-    }
-
-    _onMapLoaded(map, beforeLayerID) {
-        this._integrator = Object(__WEBPACK_IMPORTED_MODULE_5__integrator_mapbox_gl__["a" /* default */])(map);
-        this._integrator.addLayer(this, beforeLayerID);
-    }
-
-    _compileShaders(style, metadata) {
-        style._compileColorShader(this._integrator.renderer.gl, metadata);
-        style._compileWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeColorShader(this._integrator.renderer.gl, metadata);
-        style._compileStrokeWidthShader(this._integrator.renderer.gl, metadata);
-        style._compileFilterShader(this._integrator.renderer.gl, metadata);
-    }
-    async _styleChanged(style) {
-        await this._context;
-        const source = this._source;
-        const metadata = await source.requestMetadata(style);
-        if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
-        }
-        this.metadata = metadata;
-        this._compileShaders(style, this.metadata);
-        return this.requestData();
-    }
-
-    _checkId(id) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](id)) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idRequired');
-        }
-        if (!__WEBPACK_IMPORTED_MODULE_0__util__["e" /* isString */](id)) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'idStringRequired');
-        }
-        if (id === '') {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidId');
-        }
-    }
-
-    _checkSource(source) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](source)) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'sourceRequired');
-        }
-        if (!(source instanceof __WEBPACK_IMPORTED_MODULE_1__source_base__["a" /* default */])) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidSource');
-        }
-    }
-
-    _checkStyle(style) {
-        if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](style)) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'styleRequired');
-        }
-        if (!(style instanceof __WEBPACK_IMPORTED_MODULE_2__style__["a" /* default */])) {
-            throw new __WEBPACK_IMPORTED_MODULE_6__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidStyle');
-        }
-    }
-
-    _getViewport() {
-        if (this._integrator) {
-            return this._integrator.renderer.getBounds();
-        }
-        throw new Error('?');
-    }
-
-    async requestMetadata(style) {
-        style = style || this._style;
-        if (!style) {
-            return;
-        }
-        await this._context;
-        return this._source.requestMetadata(style);
-    }
-
-    async requestData() {
-        if (!this.metadata) {
-            return;
-        }
-        this._source.requestData(this._getViewport());
-    }
-
-    getNumFeatures() {
-        return this._dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
-    }
-
-    //TODO free layer resources
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Layer;
-
-
-
-/***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14422,13 +14835,13 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export parseStyleExpression */
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
@@ -14586,7 +14999,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -14769,7 +15182,13 @@ function parseNode(node) {
 					gobbleSpaces();
 					var biop, to_check = expr.substr(index, max_binop_len), tc_len = to_check.length;
 					while(tc_len > 0) {
-						if(binary_ops.hasOwnProperty(to_check)) {
+						// Don't accept a binary op when it is an identifier.
+						// Binary ops that start with a identifier-valid character must be followed
+						// by a non identifier-part valid character
+						if(binary_ops.hasOwnProperty(to_check) && (
+							!isIdentifierStart(exprICode(index)) ||
+							(index+to_check.length< expr.length && !isIdentifierPart(exprICode(index+to_check.length)))
+						)) {
 							index += tc_len;
 							return to_check;
 						}
@@ -14857,7 +15276,13 @@ function parseNode(node) {
 						to_check = expr.substr(index, max_unop_len);
 						tc_len = to_check.length;
 						while(tc_len > 0) {
-							if(unary_ops.hasOwnProperty(to_check)) {
+						// Don't accept an unary op when it is an identifier.
+						// Unary ops that start with a identifier-valid character must be followed
+						// by a non identifier-part valid character
+							if(unary_ops.hasOwnProperty(to_check) && (
+								!isIdentifierStart(exprICode(index)) ||
+								(index+to_check.length < expr.length && !isIdentifierPart(exprICode(index+to_check.length)))
+							)) {
 								index += tc_len;
 								return {
 									type: UNARY_EXP,
@@ -14874,7 +15299,7 @@ function parseNode(node) {
 							return gobbleVariable();
 						}
 					}
-					
+
 					return false;
 				},
 				// Parse simple numeric literals: `12`, `3.4`, `.5`. Do this by using a string to
@@ -15273,7 +15698,7 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -15300,29 +15725,33 @@ class CartoMapIntegrator {
     addLayer(layerId, layer) {
         this.map.addLayer(layerId, layer);
     }
+    needRefresh(){
+    }
 }
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+
 
 
 
 let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
-let integrator = null;
+const integrators = new WeakMap();
 function getMGLIntegrator(map) {
-    if (!integrator) {
-        integrator = new MGLIntegrator(map);
+    if (!integrators.get(map)) {
+        integrators.set(map, new MGLIntegrator(map));
     }
-    return integrator;
+    return integrators.get(map);
 }
 
 
@@ -15331,30 +15760,52 @@ function getMGLIntegrator(map) {
  */
 class MGLIntegrator {
     constructor(map) {
-        this.renderer = new __WEBPACK_IMPORTED_MODULE_0__core_renderer__["b" /* Renderer */]();
+        this.renderer = new __WEBPACK_IMPORTED_MODULE_1__core_renderer__["b" /* Renderer */]();
         this.map = map;
         this.invalidateWebGLState = null;
+        this._emitter = Object(__WEBPACK_IMPORTED_MODULE_0_mitt__["a" /* default */])();
 
+
+        this._suscribeToMapEvents(map);
+        this.moveObservers = {};
+        this._layers = [];
+        this._paintedLayers = 0;
+    }
+
+    on(name, cb) {
+        return this._emitter.on(name, cb);
+    }
+
+    off(name, cb) {
+        return this._emitter.off(name, cb);
+    }
+
+    _suscribeToMapEvents(map) {
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
         map.on('moveend', this.move.bind(this));
         map.on('resize', this.move.bind(this));
 
-        this.moveObservers = {};
-
-        this._layers = [];
+        map.on('mousemove', data => {
+            this._emitter.emit('mousemove', data);
+        });
+        map.on('click', data => {
+            this._emitter.emit('click', data);
+        });
     }
+
     _registerMoveObserver(observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
+
     _unregisterMoveObserver(observerName) {
         delete this.moveObservers[observerName];
     }
+
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartoGL_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
             if (!this.invalidateWebGLState) {
                 this.invalidateWebGLState = invalidate;
@@ -15362,7 +15813,18 @@ class MGLIntegrator {
                 this.renderer._initGL(gl);
                 this._layers.map(layer => layer.initCallback());
             }
-            layer.paintCallback();
+            layer.$paintCallback();
+            this._paintedLayers++;
+
+            if (this._paintedLayers % this._layers.length == 0) {
+                // Last layer has been painted
+                const isAnimated = this._layers.some(layer =>
+                    layer.getStyle() && layer.getStyle().isAnimated());
+                if (!isAnimated && this.map.repaint) {
+                    this.map.repaint = false;
+                }
+            }
+
             invalidate();
         });
         this.map.addLayer({
@@ -15372,27 +15834,358 @@ class MGLIntegrator {
         this._layers.push(layer);
         this.move();
     }
+
     needRefresh() {
-        this.map.repaint = true; // FIXME: add logic to manage repaint flag
+        this.map.repaint = true;
     }
+
     move() {
         var c = this.map.getCenter();
         // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_1__util__["b" /* WM_R */]);
+        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_2__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_2__util__["b" /* WM_R */]);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
+
     notifyObservers() {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
+
     getZoom() {
         var b = this.map.getBounds();
         var c = this.map.getCenter();
         var nw = b.getNorthWest();
         var sw = b.getSouthWest();
-        var z = (__WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](nw).y - __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](sw).y) / __WEBPACK_IMPORTED_MODULE_1__util__["a" /* WM_2R */];
-        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_1__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_1__util__["b" /* WM_R */]);
+        var z = (__WEBPACK_IMPORTED_MODULE_2__util__["g" /* projectToWebMercator */](nw).y - __WEBPACK_IMPORTED_MODULE_2__util__["g" /* projectToWebMercator */](sw).y) / __WEBPACK_IMPORTED_MODULE_2__util__["a" /* WM_2R */];
+        this.renderer.setCenter(c.lng / 180., __WEBPACK_IMPORTED_MODULE_2__util__["g" /* projectToWebMercator */](c).y / __WEBPACK_IMPORTED_MODULE_2__util__["b" /* WM_R */]);
         return z;
+    }
+}
+
+
+/***/ }),
+/* 92 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+class RenderLayer {
+    constructor() {
+        this.dataframes = [];
+        this.renderer = null;
+        this.style = null;
+        this.type = null;
+    }
+    // Performance-intensive. The required allocation and copy of resources will happen synchronously.
+    // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
+    addDataframe(dataframe) {
+        if (this.type) {
+            this._checkDataframeType(dataframe);
+        }
+        this.type = dataframe.type;
+        dataframe.bind(this.renderer);
+        this.dataframes.push(dataframe);
+    }
+
+    // Removes a dataframe for the renderer. Freeing its resources.
+    removeDataframe(dataframe) {
+        this.dataframes = this.dataframes.filter(df => df !== dataframe);
+    }
+
+    getActiveDataframes() {
+        return this.dataframes.filter(df => df.active);
+    }
+
+    hasDataframes() {
+        return this.dataframes.length > 0;
+    }
+
+    getNumFeatures() {
+        return this.dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+    }
+
+    _checkDataframeType(dataframe) {
+        if (this.type != dataframe.type) {
+            throw new Error('Layer dataframes must always be of the same type');
+        }
+    }
+
+    getFeaturesAtPosition(pos) {
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style)));
+    }
+
+    freeDataframes() {
+        this.dataframes.map(df => df.free());
+        this.dataframes = [];
+        this.type = null;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = RenderLayer;
+
+
+
+/***/ }),
+/* 93 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(10);
+
+
+
+
+
+
+/**
+ * 
+ * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
+ * @typedef {Object} FeatureEvent
+ * @property {object} coordinates LongLat coordinates in {lng: 0, lat:0} form
+ * @property {object} position pixel coordinates in {x: 0, y: 0} form
+ * @property {Array<carto.Feature>} features array of {@link carto.Feature}
+ * @api
+ */
+
+/**
+ * 
+ * Feature objects are provided by {@link carto.FeatureEvent} events.
+ * @typedef {Object} Feature
+ * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
+ * @api
+ */
+
+
+
+/**
+ * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
+ *
+ * @event featureClick
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureClickOut events are fired when the user clicks outside a feature that was clicked in the last featureClick event.
+ * The list of features that were clicked before and that are no longer behind this new click is provided.
+ *
+ * @event featureClickOut
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature is now under the cursor.
+ * The list of features that are now behind the cursor and that weren't before is provided.
+ *
+ * @event featureEnter
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureHover events are fired when the user moves the cursor.
+ * The list of features behind the cursor is provided.
+ *
+ * @event featureHover
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature is no longer behind the cursor.
+ * The list of features that are no longer behind the cursor and that were before is provided.
+ *
+ * @event featureLeave
+ * @type {FeatureEvent}
+ * @api
+ */
+
+const EVENTS = [
+    'featureClick',
+    'featureClickOut',
+    'featureEnter',
+    'featureHover',
+    'featureLeave',
+];
+class Interactivity {
+    /**
+    *
+    * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
+    *
+    * To create a Interactivity object an array of {@link carto.Layer} is required.
+    * Events fired from interactivity objects will refer to the features of these layers and only these layers.
+    *
+    * @param {Array<carto.Layer>} layerList - Array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
+    *
+    * @example
+    * const myLayer = new carto.Layer('layer0', mySource, myStyle);
+    * myLayer.addTo(myMap);
+    * myLayer.on('loaded', () => {
+    *     const myInteractivity = new carto.Interactivity([myLayer]);
+    *     myInteractivity.on('click', event => console.log(event));
+    * })
+    *
+    * @fires CartoError
+    *
+    * @constructor Interactivity
+    * @memberof carto
+    * @api
+    */
+    constructor(layerList) {
+        checkLayerList(layerList);
+        this._init(layerList);
+    }
+
+    /**
+     * Register an event handler for the given type.
+     *
+     * @param {string} eventName - type of event to listen for
+     * @param {function} callback - function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    on(eventName, callback) {
+        checkEvent(eventName);
+        return this._emitter.on(eventName, callback);
+    }
+
+    /**
+     * Remove an event handler for the given type.
+     *
+     * @param {string} eventName - type of event to unregister
+     * @param {function} callback - handler function to unregister
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    off(eventName, callback) {
+        checkEvent(eventName);
+        return this._emitter.off(eventName, callback);
+    }
+
+    _init(layerList) {
+        this._emitter = Object(__WEBPACK_IMPORTED_MODULE_0_mitt__["a" /* default */])();
+        this._layerList = layerList;
+        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        this._prevFeatures = [];
+    }
+
+    _subscribeToIntegratorEvents(integrator) {
+        integrator.on('mousemove', this._onMouseMove.bind(this));
+        integrator.on('click', this._onClick.bind(this));
+    }
+
+    _onMouseMove(event) {
+        const featureEvent = this._createFeatureEvent(event);
+        const currentFeatures = featureEvent.features;
+
+        // Manage enter/leave events
+        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+
+        if (featuresLeft.length > 0) {
+            this._fireEvent('featureLeave', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresLeft
+            });
+        }
+
+        if (featuresEntered.length > 0) {
+            this._fireEvent('featureEnter', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresEntered
+            });
+        }
+
+        this._prevFeatures = featureEvent.features;
+
+        // Launch hover event
+        this._fireEvent('featureHover', featureEvent);
+    }
+
+    _onClick(event) {
+        const featureEvent = this._createFeatureEvent(event);
+        const currentFeatures = featureEvent.features;
+
+        // Manage clickOut event
+        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+
+        if (featuresClickedOut.length > 0) {
+            this._fireEvent('featureClickOut', {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: featuresClickedOut
+            });
+        }
+
+        this._prevFeatures = featureEvent.features;
+
+        // Launch click event
+        this._fireEvent('featureClick', featureEvent);
+    }
+
+    _createFeatureEvent(eventData) {
+        const features = this._getFeaturesAtPosition(eventData.lngLat);
+        return {
+            coordinates: eventData.lngLat,
+            position: eventData.point,
+            features
+        };
+    }
+
+    _fireEvent(type, featureEvent) {
+        this._emitter.emit(type, featureEvent);
+    }
+
+    _getFeaturesAtPosition(lngLat) {
+        const wm = Object(__WEBPACK_IMPORTED_MODULE_2__util__["g" /* projectToWebMercator */])(lngLat);
+        const nwmc = Object(__WEBPACK_IMPORTED_MODULE_3__client_rsys__["c" /* wToR */])(wm.x, wm.y, { scale: __WEBPACK_IMPORTED_MODULE_2__util__["b" /* WM_R */], center: { x: 0, y: 0 } });
+        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
+    }
+
+    /**
+     * Return the difference between the feature arrays A and B.
+     * The output value is also an array of features.
+     */
+    _getDiffFeatures(featuresA, featuresB) {
+        const IDs = this._getFeatureIDs(featuresB);
+        return featuresA.filter(feature => !IDs.includes(feature.id));
+    }
+
+    _getFeatureIDs(features) {
+        return features.map(feature => feature.id);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Interactivity;
+
+
+function checkLayerList(layerList) {
+    if (!Array.isArray(layerList)) {
+        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
+    }
+    if (!layerList.length) {
+        throw new Error('Invalid argument, layer list must not be empty');
+    }
+    if (!layerList.every(layer => layer instanceof __WEBPACK_IMPORTED_MODULE_1__layer__["a" /* default */])) {
+        throw new Error('Invalid layer, layer must be an instance of carto.Layer');
+    }
+    if (layerList.some(layer => !layer.getIntegrator())) {
+        throw new Error('Invalid argument, all layers must belong to some map');
+    }
+    if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
+        throw new Error('Invalid argument, all layers must belong to the same map');
+    }
+}
+
+function checkEvent(eventName) {
+    if (!EVENTS.includes(eventName)) {
+        throw new Error(`Unrecognized event: ${eventName}. Availiable events: ${EVENTS.join(', ')}`);
     }
 }
 
