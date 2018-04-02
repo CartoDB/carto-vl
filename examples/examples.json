@@ -82,25 +82,25 @@
             "title": "Interactivity",
             "samples": [
                 {
-                    "title": "Detect feature click",
-                    "desc": "",
+                    "title": "Feature click",
+                    "desc": "Detect a feature click event",
                     "file": "interactivity/feature-click.html"
                 },
                 {
-                    "title": "Detect feature click out",
-                    "desc": "",
-                    "file": "interactivity/feature-click-out.html"
-                },
-                {
-                    "title": "Detect feature hover",
-                    "desc": "",
+                    "title": "Feature hover",
+                    "desc": "Detect a feature hover events ",
                     "file": "interactivity/feature-hover.html"
                 },
                 {
-                    "title": "Detect feature enter/leave",
-                    "desc": "",
+                    "title": "Feature enter/leave",
+                    "desc": "Detect feature enter/leave events",
                     "file": "interactivity/feature-enter-leave.html"
-                }
+                },
+                {
+                    "title": "Style a feature",
+                    "desc": "Style a detected feature",
+                    "file": "interactivity/style-feature.html"
+                },
             ]
         },
         {
