@@ -9,7 +9,6 @@ describe('src/core/style/expressions/float', () => {
         validateStaticType('color', ['blue'], 'color');
         validateStaticType('color', ['AliceBlue'], 'color');
         validateStaticType('color', ['BLACK'], 'color');
-
     });
 });
 
