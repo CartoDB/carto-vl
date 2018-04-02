@@ -7,9 +7,7 @@
         "type": "Point",
         "coordinates": [ 0, 0 ]
       },
-      "properties": {
-        "cartodb_id": 1
-      }
+      "properties": {}
     },
     {
       "type": "Feature",
@@ -17,9 +15,7 @@
         "type": "Point",
         "coordinates": [ 10, 10 ]
       },
-      "properties": {
-        "cartodb_id": 2
-      }
+      "properties": {}
     }
   ]
 }

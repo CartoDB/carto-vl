@@ -70,7 +70,8 @@ export default class GeoJSON extends Base {
             properties: this._decodeProperties(),
             scale: 1,
             size: this._features.length,
-            type: this._getDataframeType(this._type)
+            type: this._getDataframeType(this._type),
+            metadata: this._metadata,
         });
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
@@ -86,13 +87,28 @@ export default class GeoJSON extends Base {
     }
 
     _getFeatures(data) {
-        if (data.type === 'FeatureCollection') {
-            return data.features || [];
-        } else if (data.type === 'Feature') {
-            return [data];
+        // Create a copy to avoid modifications to the original data
+        let dataCopy = JSON.parse(JSON.stringify(data));
+        if (dataCopy.type === 'FeatureCollection') {
+            return this._addCartodbId(dataCopy.features);
         }
-        else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
+        if (dataCopy.type === 'Feature') {
+            return this._addCartodbId([dataCopy]);
+        }
+        throw new CartoValidationError('source', 'nonValidGeoJSONData');
+    }
+
+    _addCartodbId(features) {
+        return features.map((feature, i) => {
+            this._checkFeature(feature);
+            feature.properties.cartodb_id = i;
+            return feature;
+        }) || [];
+    }
+
+    _checkFeature(feature) {
+        if (feature.properties && feature.properties.cartodb_id) {
+            throw new CartoValidationError('source', 'featureHasCartodbId');
         }
     }
 
@@ -125,14 +141,14 @@ export default class GeoJSON extends Base {
         return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(feature, sample, featureCount) {
+    _sampleFeatureOnMetadata(properties, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
                 return;
             }
         }
-        sample.push(feature);
+        sample.push(properties);
     }
 
     _addNumericPropertyToMetadata(propertyName, value, columns) {
@@ -181,7 +197,7 @@ export default class GeoJSON extends Base {
     _decodeProperties() {
         const properties = {};
         this._numFields.concat(this._catFields).map(name => {
-            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met            
+            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
         for (var i = 0; i < this._features.length; i++) {
@@ -348,6 +364,6 @@ export default class GeoJSON extends Base {
         return total >= 0;
     }
 
-    free(){
+    free() {
     }
 }

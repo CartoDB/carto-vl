@@ -13,6 +13,7 @@
  *  -   {@link carto.style.expressions|carto.style.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Style|carto.Style}
+ * - {@link carto.Interactivity|carto.Interactivity}
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
@@ -26,6 +27,7 @@ import Style from './api/style';
 import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
+import Interactivity from './api/interactivity';
 
 // Namespaces
 
@@ -39,5 +41,6 @@ export {
     setDefaultConfig,
     style,
     Style,
-    Map
+    Map,
+    Interactivity
 };

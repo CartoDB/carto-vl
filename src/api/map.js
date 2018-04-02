@@ -64,7 +64,7 @@ export default class Map {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getStyle() && layer.getStyle().isAnimated();
             if (hasData || hasAnimation) {
-                layer.paintCallback();
+                layer.$paintCallback();
             }
             loaded = loaded && hasData;
             animated = animated || hasAnimation;

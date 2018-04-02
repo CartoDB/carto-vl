@@ -40,6 +40,25 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+  
+  test-user:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+      - run: yarn install
+      - run: yarn test:user
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
 
   test-integration:
     docker:
@@ -88,3 +107,4 @@ workflows:
       - lint
       - test-unit
       - test-integration
+      - test-user
