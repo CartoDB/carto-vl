@@ -85,10 +85,9 @@
     layer.on('loaded', () => {
       updateTitle('Move the mouse over the countries');
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureHover', event => {
-        updateCountry(event);
-      });
+      const interactivity = new carto.Interactivity(layer);
+
+      interactivity.on('featureHover', updateCountry);
     });
 
     layer.addTo(map, 'watername_ocean');

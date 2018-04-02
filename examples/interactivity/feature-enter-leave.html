@@ -84,13 +84,10 @@
     layer.on('loaded', () => {
       updateTitle('Move the mouse over the rivers');
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureEnter', event => {
-        updateRiver(event);
-      });
-      interactivity.on('featureLeave', event => {
-        clearContent();
-      });
+      const interactivity = new carto.Interactivity(layer);
+
+      interactivity.on('featureEnter', updateRiver);
+      interactivity.on('featureLeave', clearContent);
     });
 
     layer.addTo(map, 'watername_ocean');

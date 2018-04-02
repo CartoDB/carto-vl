@@ -86,11 +86,9 @@
     layer.on('loaded', () => {
       updateTitle('Click on the cities');
 
-      const interactivity = new carto.Interactivity([layer]);
+      const interactivity = new carto.Interactivity(layer);
 
-      interactivity.on('featureClick', event => {
-        updateCity(event);
-      });
+      interactivity.on('featureClick', updateCity);
     });
 
     layer.addTo(map, 'watername_ocean');
