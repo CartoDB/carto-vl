@@ -114,13 +114,14 @@ import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
 import { ILinear } from './expressions/interpolators';
 import { Cubic } from './expressions/interpolators';
 
-import {Torque, Fade} from './expressions/torque';
+import { Torque, Fade } from './expressions/torque';
 
 // Colors
 import {RGB, RGBA} from './expressions/rgb';
 import {HSV, HSVA} from './expressions/hsv';
 import {HSL, HSLA} from './expressions/hsl';
 import Hex from './expressions/hex';
+import NamedColor from './expressions/named-color';
 
 export { Cubic };
 
@@ -161,6 +162,7 @@ export const hsv = (...args) => new HSV(...args);
 export const hsva = (...args) => new HSVA(...args);
 export const hsl = (...args) => new HSL(...args);
 export const hsla = (...args) => new HSLA(...args);
+export const namedColor = (...args) => new NamedColor(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
 export const float = (...args) => new Float(...args);
