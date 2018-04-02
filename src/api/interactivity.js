@@ -86,12 +86,12 @@ export default class Interactivity {
     * @param {carto.Layer|Array<carto.Layer>} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
     * @example
-    * const myLayer = new carto.Layer('layer0', mySource, myStyle);
-    * myLayer.on('loaded', () => {
-    *   const myInteractivity = new carto.Interactivity(myLayer);
-    *   myInteractivity.on('click', event => console.log(event));
+    * const layer = new carto.Layer('layer', source, style);
+    * layer.on('loaded', () => {
+    *   const interactivity = new carto.Interactivity(layer);
+    *   interactivity.on('click', event => console.log(event));
     * });
-    * myLayer.addTo(myMap);
+    * layer.addTo(myMap);
     *
     * @fires CartoError
     *
