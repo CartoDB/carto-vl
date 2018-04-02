@@ -399,7 +399,6 @@ class Renderer {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
-                gl.disable(gl.BLEND); // Disable overlapping in lines
             }
 
             gl.activeTexture(gl.TEXTURE0);
@@ -432,7 +431,6 @@ class Renderer {
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (tile.type == 'line') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
-                gl.enable(gl.BLEND); // Restore BLEND
             }
         });
         orderingMins.map((_, orderingIndex) => {
