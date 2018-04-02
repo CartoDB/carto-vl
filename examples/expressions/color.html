@@ -59,6 +59,10 @@
         <label for="red">RGBA - Red</label>
       </li>
       <li>
+        <input type="radio" name="style" onclick="setHEXGray()" id="gray">
+        <label for="gray">HEX - Gray</label>
+      </li>
+      <li>
         <input type="radio" name="style" onclick="setCIELABYellow()" id="yellow">
         <label for="yellow">CIELAB - Yellow</label>
       </li>
@@ -100,6 +104,9 @@
     const styleRed = new carto.Style(`
       color: rgb(255, 0, 0)
     `);
+    const styleGray = new carto.Style(`
+      color: hex('#AAA')
+    `);
     const styleYellow = new carto.Style(`
       color: cielab(90, 10, 60)
     `);
@@ -121,6 +128,10 @@
 
     function setRGBARed() {
       layer.blendToStyle(styleRed);
+    }
+
+    function setHEXGray() {
+      layer.blendToStyle(styleGray);
     }
 
     function setCIELABYellow() {

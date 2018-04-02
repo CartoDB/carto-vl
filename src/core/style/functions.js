@@ -117,11 +117,11 @@ import { Cubic } from './expressions/interpolators';
 import { Torque, Fade } from './expressions/torque';
 
 // Colors
-import { RGB, RGBA } from './expressions/rgb';
-import { HSV, HSVA } from './expressions/hsv';
-import { HSL, HSLA } from './expressions/hsl';
+import {RGB, RGBA} from './expressions/rgb';
+import {HSV, HSVA} from './expressions/hsv';
+import {HSL, HSLA} from './expressions/hsl';
+import Hex from './expressions/hex';
 import NamedColor from './expressions/named-color';
-
 
 export { Cubic };
 
@@ -155,6 +155,7 @@ export const near = (...args) => new Near(...args);
 export const blend = (...args) => new Blend(...args);
 export const rgba = (...args) => new RGBA(...args);
 export const rgb = (...args) => new RGB(...args);
+export const hex = (...args) => new Hex(...args);
 export const property = (...args) => new Property(...args);
 export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
