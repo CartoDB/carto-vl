@@ -114,7 +114,7 @@
                 {
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
-                    "xfile": "misc/popups.html"
+                    "file": "misc/popups.html"
                 },
                 {
                     "title": "Legends",
