@@ -83,13 +83,23 @@
             "samples": [
                 {
                     "title": "Detect feature click",
-                    "desc": "Interact with the features on the click event",
-                    "xfile": "interactivity/feature-click.html"
+                    "desc": "",
+                    "file": "interactivity/feature-click.html"
                 },
                 {
-                    "title": "Detect feature over/out",
-                    "desc": "Interact with the features on the over/out events",
-                    "xfile": "interactivity/feature-over-out.html"
+                    "title": "Detect feature click out",
+                    "desc": "",
+                    "file": "interactivity/feature-click-out.html"
+                },
+                {
+                    "title": "Detect feature hover",
+                    "desc": "",
+                    "file": "interactivity/feature-hover.html"
+                },
+                {
+                    "title": "Detect feature enter/leave",
+                    "desc": "",
+                    "file": "interactivity/feature-enter-leave.html"
                 }
             ]
         },
