@@ -406,7 +406,10 @@ export default class Windshaft {
     }
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
-        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+        const properties = [];
+        for (let i=0; i<catFields.length+numFields.length; i++){
+            properties.push(new Float32Array(mvtLayer.length + 1024));
+        }
         if (this.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
