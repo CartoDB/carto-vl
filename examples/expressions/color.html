@@ -120,8 +120,9 @@
       color: opacity(cielab(87.73, -86.18, 83.18), 0.2)
     `);
     const styleOrange = new carto.Style(`
-      color: namedColor('orange')
+      color: orange
     `);
+
     const layer = new carto.Layer('layer', source, styleRed);
 
     layer.addTo(map, 'watername_ocean');
