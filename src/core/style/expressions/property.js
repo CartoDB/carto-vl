@@ -44,7 +44,8 @@ export default class Property extends Expression {
         if (this.type == 'category') {
             this.numCategories = metaColumn.categoryNames.length;
         }
-        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        // TODO rename propertytidmaker
+        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => propertyTIDMaker(this.name));
     }
     _getMinimumNeededSchema() {
         return {

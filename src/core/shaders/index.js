@@ -3,7 +3,6 @@ import * as stylerGLSL from './styler';
 import * as aaBlenderGLSL from './aaBlender';
 import ShaderCache from './shader-cache';
 
-const NUM_TEXTURE_LOCATIONS = 4;
 const shaderCache = new ShaderCache();
 
 let programID = 1;
@@ -97,10 +96,6 @@ class GenericStyler {
         FS = FS.replace('$INLINE', inline);
         compileProgram.call(this, gl, VS, FS);
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.textureLocations = [];
-        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
-        }
     }
 }
 class Color extends GenericStyler {

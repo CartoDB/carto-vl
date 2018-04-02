@@ -30,7 +30,7 @@ function genAggregationOp(aggName, aggType) {
         _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
             return {
                 preface: '',
-                inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
+                inline: `${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
             };
         }
         eval(feature) {

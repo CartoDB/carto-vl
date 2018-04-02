@@ -152,7 +152,6 @@ class Renderer {
         const style = renderLayer.style;
         const aspect = this.getAspect();
         let drawMetadata = {
-            freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
@@ -287,20 +286,15 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
-            for (let i = 0; i < 16; i++) {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-                gl.uniform1i(shader.textureLocations[i], 0);
-            }
-
-            drawMetadata.freeTexUnit = 4;
+            // Enforce that property texture TextureUnit don't clash with auxiliar ones
+            drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
                 gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(shader.textureLocations[i], i);
+                gl.uniform1i(TID[name], i);
             });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
