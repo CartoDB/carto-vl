@@ -74,6 +74,10 @@
         <input type="radio" name="style" onclick="setOpacityGreen()" id="green">
         <label for="green">Opacity - Green</label>
       </li>
+      <li>
+        <input type="radio" name="style" onclick="setNamedColor()" id="named">
+        <label for="green">Named Color - Orange</label>
+      </li>
     </ul>
   </div>
   <script>
@@ -108,6 +112,9 @@
     const styleGreen = new carto.Style(`
       color: opacity(cielab(87.73, -86.18, 83.18), 0.2)
     `);
+    const styleOrange = new carto.Style(`
+      color: color('orange')
+    `);
     const layer = new carto.Layer('layer', source, styleRed);
 
     layer.addTo(map, 'watername_ocean');
@@ -130,6 +137,10 @@
 
     function setOpacityGreen() {
       layer.blendToStyle(styleGreen);
+    }
+
+    function setNamedColor(){
+      layer.blendToStyle(styleOrange);
     }
   </script>
 </body>
