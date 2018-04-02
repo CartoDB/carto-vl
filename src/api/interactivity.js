@@ -5,7 +5,7 @@ import { wToR } from '../client/rsys';
 
 
 /**
- * 
+ *
  * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
  * @typedef {Object} FeatureEvent
  * @property {object} coordinates LongLat coordinates in {lng: 0, lat:0} form
@@ -15,7 +15,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * 
+ *
  * Feature objects are provided by {@link carto.FeatureEvent} events.
  * @typedef {Object} Feature
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
@@ -83,7 +83,7 @@ export default class Interactivity {
     * To create a Interactivity object an array of {@link carto.Layer} is required.
     * Events fired from interactivity objects will refer to the features of these layers and only these layers.
     *
-    * @param {Array<carto.Layer>} layerList - Array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
+    * @param {carto.Layer|Array<carto.Layer>} layers - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
     * @example
     * const myLayer = new carto.Layer('layer0', mySource, myStyle);
@@ -100,6 +100,10 @@ export default class Interactivity {
     * @api
     */
     constructor(layerList) {
+        if (layerList instanceof Layer) {
+            // Allow one layer as input
+            layerList = [layerList];
+        }
         checkLayerList(layerList);
         this._init(layerList);
     }
