@@ -97,7 +97,7 @@ var map = new mapboxgl.Map({
     style: BASEMAPS[basemap], // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
-    dragRotate: false, // disable drag to rotate handling
+    dragRotate: false // disable drag to rotate handling
 });
 
 const auth = {

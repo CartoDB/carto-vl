@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../../dist/carto-gl.js"></script>
+  <script src="../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -64,9 +64,9 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
-      dragRotate: false,
+      center: [20, 50],
+      zoom: 3,
+      dragRotate: false
     });
 
     carto.setDefaultAuth({
@@ -75,24 +75,19 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      ne_adm0_europe
     `);
     const style = new carto.Style(`
-      width: sqrt($pop_max)/150,
-      strokeWidth: sqrt($pop_max)/150-8,
-      color: ramp($name, bold)
-      strokeColor: opacity(ramp($name, bold), 0.3)
+      color: ramp($admin, bold)
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the cities');
+      updateTitle('Move the mouse over the countries');
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureHover', event => {
-        updateRiver(event);
-        console.log('HOVER', event.features);
-      });
+      const interactivity = new carto.Interactivity(layer);
+
+      interactivity.on('featureHover', updateCountry);
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -101,19 +96,16 @@
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateRiver(event) {
+    function updateCountry(event) {
       let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.name}</h3>
-              <p>POP: ${feature.properties.pop_max}</p>
-              <p>LNG: ${event.coordinates.lng}</p>
-              <p>LAT: ${event.coordinates.lat}</p>
-            </div>
-          `;
-        }
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.properties.admin}</h3>
+            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+          </div>
+        `;
       }
       document.getElementById('content').innerHTML = content;
     }

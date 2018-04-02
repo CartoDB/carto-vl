@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../../dist/carto-gl.js"></script>
+  <script src="../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -63,7 +63,7 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
-      dragRotate: false,
+      dragRotate: false
     });
 
     carto.setDefaultAuth({
@@ -75,7 +75,7 @@
       ne_50m_rivers_lake_centerlines
     `);
     const style = new carto.Style(`
-      width: 10
+      width: 6
       color: ramp($name, bold)
       filter: in($featurecla, 'River')
     `);
@@ -84,15 +84,10 @@
     layer.on('loaded', () => {
       updateTitle('Move the mouse over the rivers');
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureEnter', event => {
-        updateRiver(event);
-        console.log('ENTER', event.features);
-      });
-      interactivity.on('featureLeave', event => {
-        clearContent();
-        console.log('LEAVE', event.features);
-      });
+      const interactivity = new carto.Interactivity(layer);
+
+      interactivity.on('featureEnter', updateRiver);
+      interactivity.on('featureLeave', clearContent);
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -103,19 +98,17 @@
 
     function updateRiver(event) {
       let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.name}</h3>
-            </div>
-          `;
-        }
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.properties.name}</h3>
+          </div>
+        `;
       }
       document.getElementById('content').innerHTML = content;
     }
 
-    function clearContent(event) {
+    function clearContent() {
       document.getElementById('content').innerHTML = '';
     }
   </script>

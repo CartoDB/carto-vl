@@ -148,7 +148,7 @@ export default class Layer {
      * const style0 = new carto.style({ width: 10 });
      * const style1 = new carto.style({ width: 20 });
      * // Create a layer with the first style
-     * const layer = new carto.Layer(source, style);
+     * const layer = new carto.Layer('layer', source, style0);
      * // We add the layer to the map, the points in this layer will have widh 10
      * layer.addTo(map, 'layer0');
      * // The points will be animated from 10px to 20px for 500ms.
