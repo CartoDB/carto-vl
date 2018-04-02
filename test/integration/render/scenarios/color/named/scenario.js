@@ -3,8 +3,8 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['point']);
-const style = new carto.Style('color: blue');
+const source = new carto.source.GeoJSON(sources['line-string']);
+const style = new carto.Style('color: white');
 const layer = new carto.Layer('layer', source, style);
 
 layer.addTo(map);
