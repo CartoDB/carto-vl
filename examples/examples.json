@@ -97,6 +97,11 @@
                     "file": "interactivity/feature-enter-leave.html"
                 },
                 {
+                    "title": "Muliple features",
+                    "desc": "Detect multiple features from different layers",
+                    "file": "interactivity/multi-feature.html"
+                },
+                {
                     "title": "Style a feature",
                     "desc": "Style a detected feature",
                     "xfile": "interactivity/style-feature.html"

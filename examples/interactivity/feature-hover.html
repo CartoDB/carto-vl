@@ -98,16 +98,14 @@
 
     function updateCountry(event) {
       let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.admin}</h3>
-              <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
-              <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
-            </div>
-          `;
-        }
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.properties.admin}</h3>
+            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+          </div>
+        `;
       }
       document.getElementById('content').innerHTML = content;
     }

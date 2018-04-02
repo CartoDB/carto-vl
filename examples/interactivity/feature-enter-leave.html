@@ -60,7 +60,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
       dragRotate: false
@@ -98,14 +98,12 @@
 
     function updateRiver(event) {
       let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.name}</h3>
-            </div>
-          `;
-        }
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.properties.name}</h3>
+          </div>
+        `;
       }
       document.getElementById('content').innerHTML = content;
     }

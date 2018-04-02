@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Feature click | CARTO</title>
+  <title>Multi feature | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
@@ -64,8 +64,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 3,
+      center: [0, 40],
+      zoom: 4,
       dragRotate: false
     });
 
@@ -74,41 +74,64 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+    const spainCitiesSource = new carto.source.SQL(`
+      SELECT *
+      FROM ne_10m_populated_places_simple
+      WHERE adm0name = \'Spain\'
     `);
-    const style = new carto.Style(`
+    const spainCitiesStyle = new carto.Style(`
       width: log($pop_max + 10),
       color: opacity(ramp($name, bold), 0.7)
+      strokeWidth: 1
+      strokeColor: rgb(255, 255, 255)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesStyle);
 
-    layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+    const europeCountriesSource = new carto.source.Dataset(`
+      ne_adm0_europe
+    `);
+    const europeCountriesStyle = new carto.Style(`
+      color: ramp($admin, bold)
+    `);
+    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesStyle);
 
-      const interactivity = new carto.Interactivity(layer);
+    europeCountriesLayer.on('loaded', () => {
+      updateTitle('Click on the cities / countries');
 
-      interactivity.on('featureClick', updateCity);
+      // Detect first `europeCountriesLayer` features, then `spainCitiesLayer` features
+      const interactivity = new carto.Interactivity([europeCountriesLayer, spainCitiesLayer]);
+
+      interactivity.on('featureClick', updateInfo);
     });
 
-    layer.addTo(map, 'watername_ocean');
+    spainCitiesLayer.addTo(map, 'watername_ocean');
+    europeCountriesLayer.addTo(map, 'spainCitiesLayer');
 
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateCity(event) {
-      let content = '';
+    function updateInfo(event) {
+      let content = '<div class="container">';
       for (let feature of event.features) {
-        content += `
-          <div class="container">
+        if (feature.layerId === 'europeCountriesLayer') {
+          content += `
+            <h3><b>${feature.properties.admin}</b></h3>
+
+          `;
+        }
+        if (feature.layerId === 'spainCitiesLayer') {
+          content += `
             <h3>${feature.properties.name}</h3>
-            <p>Population <b>${feature.properties.pop_max}</b></p>
-            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
-            <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
-          </div>
-        `;
+            <p>Population <b>${feature.properties.pop_max}</b></p><br>
+          `;
+        }
       }
+      content += `
+        <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+        <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+      `
+      content += '</div>';
       document.getElementById('content').innerHTML = content;
     }
   </script>
