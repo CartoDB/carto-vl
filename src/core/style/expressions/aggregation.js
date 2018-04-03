@@ -1,4 +1,5 @@
 import Expression from './expression';
+import * as schema from '../../schema';
 import Property from './property';
 import { checkInstance, checkType } from './utils';
 
@@ -14,6 +15,7 @@ function genAggregationOp(aggName, aggType) {
         constructor(property) {
             checkInstance(aggName, 'property', 0, Property, property);
             super({ property: property });
+            this._aggName = aggName;
             this.type = aggType;
         }
         get name() {
@@ -30,17 +32,17 @@ function genAggregationOp(aggName, aggType) {
         _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
             return {
                 preface: '',
-                inline: `${getGLSLforProperty(`_cdb_agg_${aggName}_${this.property.name}`)}`
+                inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, aggName))}`
             };
         }
         eval(feature) {
-            return feature[`_cdb_agg_${aggName}_${this.property.name}`];
+            return feature[schema.column.aggColumn(this.property.name, aggName)];
         }
         _postShaderCompile() { }
         _getMinimumNeededSchema() {
             return {
                 columns: [
-                    `_cdb_agg_${aggName}_${this.property.name}`
+                    schema.column.aggColumn(this.property.name, aggName)
                 ]
             };
         }
