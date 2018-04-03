@@ -139,7 +139,8 @@ export default class Interactivity {
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._prevFeatures = [];
+        this._prevHoverFeatures = [];
+        this._prevClickFeatures = [];
         Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
@@ -156,8 +157,8 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage enter/leave events
-        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
-        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevHoverFeatures);
 
         if (featuresLeft.length > 0) {
             this._fireEvent('featureLeave', {
@@ -175,7 +176,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevHoverFeatures = featureEvent.features;
 
         // Launch hover event
         this._fireEvent('featureHover', featureEvent);
@@ -186,7 +187,7 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage clickOut event
-        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, currentFeatures);
 
         if (featuresClickedOut.length > 0) {
             this._fireEvent('featureClickOut', {
@@ -196,7 +197,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevClickFeatures = featureEvent.features;
 
         // Launch click event
         this._fireEvent('featureClick', featureEvent);
