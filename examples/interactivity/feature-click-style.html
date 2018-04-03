@@ -81,9 +81,9 @@
             apiKey: 'YOUR_API_KEY'
         });
 
-        const source = new carto.source.Dataset('ne_adm0_europe');
+        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
         const style = new carto.Style(`
-      color: ramp($admin, bold)
+      width: 20
     `);
         const layer = new carto.Layer('layer', source, style);
 
@@ -111,8 +111,8 @@
             let content = '';
             if (event.features.length > 0) {
                 const s = carto.style.expressions;
-                event.features[0].style.color.blendTo('rgba(1, 1, 0, 0.3)');
-                // event.features[0].style.color.blendTo(s.rgba(1, 1, 0, 0.3));
+                event.features[0].style.color.blendTo('rgba(1, 1, 0, 0.93)');
+                event.features[0].style.width.blendTo(50);
                 const topCountryName = event.features[0].properties.admin || '';
                 const lng = event.coordinates.lng;
                 const lat = event.coordinates.lat;

@@ -48,7 +48,7 @@ export default class RenderLayer {
 
             const genReset = styleProperty =>
                 (duration = 500) => {
-                    if (this.styledFeatures[feature.id][styleProperty]) {
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
                         this.styledFeatures[feature.id][styleProperty].replaceChild(
                             this.styledFeatures[feature.id][styleProperty].mix,
                             // animate(0) is used to ensure that blend._predraw() "GC" collects it
