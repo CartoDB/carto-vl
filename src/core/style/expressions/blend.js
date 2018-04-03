@@ -58,6 +58,12 @@ export default class Blend extends Expression {
             this.notify();
         }
     }
+    replaceChild(toReplace, replacer) {
+        if (toReplace == this.mix) {
+            this.originalMix = replacer;
+        }
+        super.replaceChild(toReplace, replacer);
+    }
     eval(feature) {
         const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
