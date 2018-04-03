@@ -70,6 +70,18 @@ varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
 
+// From [0.,1.] in exponential-like form to pixels in [0.,255.]
+float decodeWidth(float x){
+    x*=255.;
+    if (x < 64.){
+        return x*0.25;
+    }else if (x<128.){
+        return (x-64.)+16.;
+    }else{
+        return (x-127.)*2.+80.;
+    }
+}
+
 void main(void) {
     color = texture2D(colorTex, featureID);
     stroke = texture2D(colorStrokeTex, featureID);
@@ -77,9 +89,9 @@ void main(void) {
     color.a *= filtering;
     stroke.a *= filtering;
 
-    float size = 64.*texture2D(widthTex, featureID).a;
+    float size = decodeWidth(texture2D(widthTex, featureID).a);
     float fillSize = size;
-    float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
+    float strokeSize = decodeWidth(texture2D(strokeWidthTex, featureID).a);
     size+=strokeSize;
     fillScale=size/fillSize;
     strokeScale=size/max(0.001, (fillSize-strokeSize));

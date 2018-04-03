@@ -112,7 +112,10 @@ setInterval(() => {
     }
 }, 500);
 
+map.on('zoom', event => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
+
 map.on('load', () => {
+    document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0;//styles.length - 1;
 
     function handleError(error) {

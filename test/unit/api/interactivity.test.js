@@ -53,15 +53,7 @@ describe('api/interactivity', () => {
             expect(() => new Interactivity(['wadus'])).toThrowError('Invalid layer, layer must be an instance of carto.Layer');
         });
 
-        it('should throw an error when the layers have no integrator', () => {
-            layer.getIntegrator = () => undefined;
-
-            expect(() => new Interactivity([layer])).toThrowError('Invalid argument, all layers must belong to some map');
-
-            layer.getIntegrator = () => mockIntegrator;
-        });
-
-        it('should throw an error when the layers have different integrator', () => {
+        xit('should throw an error when the layers have different integrator', () => {
             const layer2 = new Layer('layer2', source, style);
             const mockIntegrator2 = { on: () => {} };
             layer2.getIntegrator = () => mockIntegrator2;

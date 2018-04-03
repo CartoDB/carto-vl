@@ -1,3 +1,5 @@
+import { blend, property, animate, notEquals } from './style/functions';
+import { parseStyleExpression } from './style/parser';
 
 export default class RenderLayer {
     constructor() {
@@ -5,6 +7,7 @@ export default class RenderLayer {
         this.renderer = null;
         this.style = null;
         this.type = null;
+        this.styledFeatures = {};
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
@@ -41,7 +44,66 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style)));
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
+
+            const genReset = styleProperty =>
+                (duration = 500) => {
+                    if (this.styledFeatures[feature.id][styleProperty]) {
+                        this.styledFeatures[feature.id][styleProperty].replaceChild(
+                            this.styledFeatures[feature.id][styleProperty].mix,
+                            // animate(0) is used to ensure that blend._predraw() "GC" collects it
+                            blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
+                        );
+                        this.styledFeatures[feature.id][styleProperty] = undefined;
+                    }
+                };
+
+            const genStyleProperty = styleProperty => {
+                const blender = (newExpression, duration = 500) => {
+                    if (typeof newExpression == 'string') {
+                        newExpression = parseStyleExpression(newExpression);
+                    }
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]){
+                        this.styledFeatures[feature.id][styleProperty].a.blendTo(newExpression, duration);
+                        return;
+                    }
+                    const blendExpr = blend(
+                        newExpression,
+                        this.style._styleSpec[styleProperty],
+                        blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
+                    );
+                    this.trackFeatureStyle(feature.id, styleProperty, blendExpr);
+                    this.style.replaceChild(
+                        this.style._styleSpec[styleProperty],
+                        blendExpr,
+                    );
+                    this.style._styleSpec[styleProperty].notify();
+                };
+                return {
+                    blendTo: blender,
+                    reset: genReset(styleProperty)
+                };
+            };
+
+            feature.style = {
+                color: genStyleProperty('color'),
+                width: genStyleProperty('width'),
+                strokeColor: genStyleProperty('strokeColor'),
+                strokeWidth: genStyleProperty('strokeWidth'),
+                reset: (duration = 500) => {
+                    genReset('color')(duration);
+                    genReset('width')(duration);
+                    genReset('strokeColor')(duration);
+                    genReset('strokeWidth')(duration);
+                }
+            };
+            return feature;
+        });
+    }
+
+    trackFeatureStyle(featureID, styleProperty, newStyle) {
+        this.styledFeatures[featureID] = this.styledFeatures[featureID] || {};
+        this.styledFeatures[featureID][styleProperty] = newStyle;
     }
 
     freeDataframes() {
