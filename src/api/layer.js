@@ -102,7 +102,7 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        source.bindLayer(this);
+        source._bindLayer(this);
         if (this._source !== source) {
             this._freeSource();
         }
