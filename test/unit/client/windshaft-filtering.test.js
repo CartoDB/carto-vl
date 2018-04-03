@@ -100,12 +100,12 @@ describe('src/client/windshaft-filtering', () => {
                 )).toEqual('WHERE (("categoricalProperty" IN (\'red\',\'blue\')) OR ("numericProperty" BETWEEN 10 AND 20))');
             });
 
-            fit('should handle single quotes in text literals', () => {
+            it('should handle single quotes in text literals', () => {
                 expect(preSQL(f, {
                     type: 'in',
                     property: 'airport',
                     values: ['O\'Hare']
-                })).toEqual('WHERE ("categoricalProperty" IN (\'O\'\'Hare\'))');
+                })).toEqual('WHERE (airport IN (\'O\'\'Hare\'))');
             });
         });
     });
