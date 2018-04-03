@@ -93,7 +93,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2,
+      zoom: 1,
       dragRotate: false
     });
 
@@ -108,13 +108,14 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      world_population_2015
     `);
     const style = new carto.Style(`
-      width: log($pop_max + 10) / 1.5
-      color: opacity(ramp($name, bold), 0.7)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+      width: 100*sqrt($pop_2015)/sqrt(globalMax($pop_2015))
+      color: opacity(ramp($country_name,bold),0.8)
+      strokeColor: ramp($country_name,bold)
+      strokeWidth: 1.5
+      order: asc(width())
     `);
     const layer = new carto.Layer('layer', source, style);
 
@@ -146,10 +147,10 @@
         const properties = event.features[0].properties;
         popup.setHTML(`
         <div class="popup-container">
-          <h2>${properties.name}</h2>
+          <h2>${properties.country_name}</h2>
           <ul>
             <h3>Population:</h3>
-            <h4>${properties.pop_max}</h4>
+            <h4>${properties.pop_2015}</h4>
           </ul>
         </div>
         `);
