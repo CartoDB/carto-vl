@@ -86,6 +86,13 @@ describe('api/layer', () => {
                 layer.blendToStyle(2);
             }).toThrowError('The given object is not a valid style. See "carto.Style".');
         });
+        it('should throw an error if a style is already added to another layer', () => {
+            const layer = new Layer('layer0', source, style);
+            new Layer('layer1', source, style2);
+            expect(() => {
+                layer.blendToStyle(style2);
+            }).toThrowError(/[\s\S]*shared[\s\S]*/g);
+        });
     });
 
     describe('.addTo', () => {
