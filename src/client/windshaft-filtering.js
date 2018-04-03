@@ -415,7 +415,7 @@ function sqlQ(value) {
 
 function sqlId(id) {
     if (!id.match(/^[a-z\d_]+$/)) {
-        id = `"${id}"`; // TODO: escape double quotes!
+        id = `"${id.replace(/\"/g,'""')}"`;
     }
     return id;
 }
