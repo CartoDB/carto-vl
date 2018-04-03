@@ -15,17 +15,24 @@ Object.keys(functions)
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 
-/**
- * @jsapi
- * @param {*} str
- * @param {*} schema
- */
-export function parseStyleExpression(str, schema) {
-    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp('^', 10);
-    const r = parseNode(jsep(str), schema);
-    jsep.removeBinaryOp('^');
+export function parseStyleExpression(str) {
+    prepareJsep();
+    const r = implicitCast(parseNode(jsep(str)));
+    cleanJsep();
     return r;
+}
+
+export function parseStyleDefinition(str) {
+    prepareJsep();
+    const ast = jsep(str);
+    let styleSpec = {};
+    if (ast.type == 'Compound') {
+        ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
+    } else {
+        parseStyleNamedExpr(styleSpec, ast);
+    }
+    cleanJsep();
+    return styleSpec;
 }
 
 function parseStyleNamedExpr(styleSpec, node) {
@@ -39,30 +46,6 @@ function parseStyleNamedExpr(styleSpec, node) {
     const value = parseNode(node.right);
     // Don't cast resolution properties implicitly since they must be of type Number
     styleSpec[name] = name == 'resolution' ? value : implicitCast(value);
-}
-
-export function parseStyleDefinition(str) {
-    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    jsep.addBinaryOp(':', 0);
-    jsep.addBinaryOp('^', 11);
-    jsep.addBinaryOp('or', 1);
-    jsep.addBinaryOp('and', 2);
-    jsep.removeLiteral('true');
-    jsep.removeLiteral('false');
-    const ast = jsep(str);
-    let styleSpec = {};
-    if (ast.type == 'Compound') {
-        ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
-    } else {
-        parseStyleNamedExpr(styleSpec, ast);
-    }
-    jsep.removeBinaryOp('and');
-    jsep.removeBinaryOp('or');
-    jsep.removeBinaryOp('^');
-    jsep.removeBinaryOp(':');
-    jsep.addLiteral('true');
-    jsep.addLiteral('false');
-    return styleSpec;
 }
 
 function parseFunctionCall(node) {
@@ -152,4 +135,23 @@ function parseNode(node) {
         return parseIdentifier(node);
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function prepareJsep(){
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    jsep.addBinaryOp(':', 0);
+    jsep.addBinaryOp('^', 11);
+    jsep.addBinaryOp('or', 1);
+    jsep.addBinaryOp('and', 2);
+    jsep.removeLiteral('true');
+    jsep.removeLiteral('false');
+}
+
+function cleanJsep(){
+    jsep.removeBinaryOp('and');
+    jsep.removeBinaryOp('or');
+    jsep.removeBinaryOp('^');
+    jsep.removeBinaryOp(':');
+    jsep.addLiteral('true');
+    jsep.addLiteral('false');
 }
