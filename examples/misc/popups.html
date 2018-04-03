@@ -111,7 +111,7 @@
       world_population_2015
     `);
     const style = new carto.Style(`
-      width: 100*sqrt($pop_2015)/sqrt(globalMax($pop_2015))
+      width: 50*sqrt($pop_2015)/sqrt(globalMax($pop_2015))*zoom()
       color: opacity(ramp($country_name,bold),0.8)
       strokeColor: ramp($country_name,bold)
       strokeWidth: 1.5
