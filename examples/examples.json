@@ -104,7 +104,7 @@
                 {
                     "title": "Style a feature",
                     "desc": "Style a detected feature",
-                    "xfile": "interactivity/style-feature.html"
+                    "file": "interactivity/style-feature.html"
                 }
             ]
         },
