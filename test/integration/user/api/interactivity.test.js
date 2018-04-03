@@ -99,7 +99,6 @@ describe('Interactivity', () => {
                 });
                 layer.addTo(map);
             });
-        });
 
         describe('and multiple features are clicked', () => {
             it('should return the right feature.id', done => {

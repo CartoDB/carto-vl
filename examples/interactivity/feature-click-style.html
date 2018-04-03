@@ -87,18 +87,18 @@
     `);
         const layer = new carto.Layer('layer', source, style);
 
+        const interactivity = new carto.Interactivity([layer]);
+        interactivity.on('featureClick', event => {
+            updateCountry(event);
+            console.log('CLICK', event.features);
+        });
+        interactivity.on('featureClickOut', event => {
+            console.log('CLICK OUT', event.features);
+            event.features.map(f => f.style.reset());
+        });
+
         layer.on('loaded', () => {
             updateTitle('Click on the countries');
-
-            const interactivity = new carto.Interactivity([layer]);
-            interactivity.on('featureClick', event => {
-                updateCountry(event);
-                console.log('CLICK', event.features);
-            });
-            interactivity.on('featureClickOut', event => {
-                console.log('CLICK OUT', event.features);
-                event.features.map(f => f.style.reset());
-            });
         });
 
         layer.addTo(map, 'watername_ocean');
