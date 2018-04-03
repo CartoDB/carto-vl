@@ -41,8 +41,8 @@ function genQuantiles(global) {
         _getDrawMetadataRequirements() {
             return { columns: [this.input.name] };
         }
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
             let childInlines = {};
             childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
             const funcName = `quantiles${this.quantilesUID}`;

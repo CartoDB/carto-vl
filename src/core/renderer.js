@@ -142,7 +142,7 @@ class Renderer {
 
     getAspect() {
         if (this.gl) {
-            return this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+            return this.gl.canvas.width / this.gl.canvas.height;
         }
         return 1;
     }
@@ -150,9 +150,8 @@ class Renderer {
     _computeDrawMetadata(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
-        const aspect = this.gl.canvas.clientWidth / this.gl.canvas.clientHeight;
+        const aspect = this.getAspect();
         let drawMetadata = {
-            freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
@@ -261,20 +260,10 @@ class Renderer {
     }
 
     renderLayer(renderLayer) {
-        const gl = this.gl;
-
-        const width = gl.canvas.clientWidth;
-        const height = gl.canvas.clientHeight;
-        if (gl.canvas.width != width ||
-            gl.canvas.height != height) {
-            gl.canvas.width = width;
-            gl.canvas.height = height;
-        }
-        const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-
-
         const tiles = renderLayer.getActiveDataframes();
         const style = renderLayer.style;
+        const gl = this.gl;
+        const aspect = this.getAspect();
 
         if (!tiles.length) {
             return;
@@ -297,20 +286,15 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
-            for (let i = 0; i < 16; i++) {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-                gl.uniform1i(shader.textureLocations[i], 0);
-            }
-
-            drawMetadata.freeTexUnit = 4;
+            // Enforce that property texture TextureUnit don't clash with auxiliar ones
+            drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
                 gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(shader.textureLocations[i], i);
+                gl.uniform1i(TID[name], i);
             });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
@@ -333,13 +317,14 @@ class Renderer {
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
         if (renderLayer.type != 'point') {
+            const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
             if (w != this._width || h != this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    w * 2, h * 2, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+                    w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -348,7 +333,7 @@ class Renderer {
 
                 [this._width, this._height] = [w, h];
             }
-            gl.viewport(0, 0, w * 2, h * 2);
+            gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
@@ -380,6 +365,8 @@ class Renderer {
                 s * (this._center.y - tile.center.y));
             if (tile.type == 'line') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
+            } else if (tile.type == 'point') {
+                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
             tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];

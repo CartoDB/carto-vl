@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Feature hover | CARTO</title>
+  <title>Style a feature | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../../dist/carto-gl.js"></script>
+  <script src="../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -36,36 +36,20 @@
       padding: 8px 12px;
       color: #fff;
     }
-    .container {
-      padding: 8px 12px;
-      background: white;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-      border-radius: 4px;
-      color: #2E3C43;
-      margin-top: 12px;
-    }
-    #content h3 {
-      font: 400 16px/22px 'Open Sans';
-      margin-bottom: 4px;
-    }
-    #content p {
-      font: 400 12px/16px 'Open Sans';
-    }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div id="controls">
     <h2></h2>
-    <div id="content">
-    </div>
   </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2
+      zoom: 3,
+      dragRotate: false
     });
 
     carto.setDefaultAuth({
@@ -74,20 +58,25 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_adm0_europe
+      ne_10m_populated_places_simple
     `);
     const style = new carto.Style(`
-      color: ramp($admin, bold)
+      width: log($pop_max + 10),
+      color: opacity(ramp($name, bold), 0.7)
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the countries');
+      updateTitle('Click on the cities');
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureHover', event => {
-        updateCountry(event);
-        console.log('HOVER', event.features);
+      const interactivity = new carto.Interactivity(layer);
+
+      interactivity.on('featureClick', event => {
+        // TODO: Change the features style
+      });
+
+      interactivity.on('featureClickOut', event => {
+        // TODO: Restore initial features style
       });
     });
 
@@ -95,22 +84,6 @@
 
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
-    }
-
-    function updateCountry(event) {
-      let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.admin}</h3>
-              <p>LNG: ${event.coordinates.lng}</p>
-              <p>LAT: ${event.coordinates.lat}</p>
-            </div>
-          `;
-        }
-      }
-      document.getElementById('content').innerHTML = content;
     }
   </script>
 </body>

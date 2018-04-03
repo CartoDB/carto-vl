@@ -4,10 +4,10 @@
 
 const styles = [
     `width: 3
-color: rgba(0.8,0,0,1)`,
+color: rgb(204,0,0)`,
 
     `width: 3
-color: rgba(0.8,0,0,0.2)`,
+color: rgba(204,0,0,0.2)`,
 
     `width: 3
 color: hsv(0, 0, 1)`,
@@ -97,6 +97,7 @@ var map = new mapboxgl.Map({
     style: BASEMAPS[basemap], // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
+    dragRotate: false // disable drag to rotate handling
 });
 
 const auth = {

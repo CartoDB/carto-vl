@@ -1,12 +1,14 @@
-# CARTO GL
+# CARTO VL
 
 [![CircleCI](https://circleci.com/gh/CartoDB/renderer-prototype.svg?style=svg)](https://circleci.com/gh/CartoDB/renderer-prototype)
 
-CARTO GL is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/).
+CARTO VL is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/).
 
-It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful Vector maps.
+It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful **Vector maps**.
 
-![](./docs/images/carto-gl-capture.png)
+| ![](./docs/images/points.png) | ![](./docs/images/lines.png) |
+|---|---|
+| ![](./docs/images/aggregation.png) | ![](./docs/images/polygons.png) |
 
 
 ## Documentation and examples

@@ -82,14 +82,29 @@
             "title": "Interactivity",
             "samples": [
                 {
-                    "title": "Detect feature click",
-                    "desc": "Interact with the features on the click event",
-                    "xfile": "interactivity/feature-click.html"
+                    "title": "Feature click",
+                    "desc": "Detect a feature click event",
+                    "file": "interactivity/feature-click.html"
                 },
                 {
-                    "title": "Detect feature over/out",
-                    "desc": "Interact with the features on the over/out events",
-                    "xfile": "interactivity/feature-over-out.html"
+                    "title": "Feature hover",
+                    "desc": "Detect a feature hover events ",
+                    "file": "interactivity/feature-hover.html"
+                },
+                {
+                    "title": "Feature enter/leave",
+                    "desc": "Detect feature enter/leave events",
+                    "file": "interactivity/feature-enter-leave.html"
+                },
+                {
+                    "title": "Muliple features",
+                    "desc": "Detect multiple features from different layers",
+                    "file": "interactivity/multi-feature.html"
+                },
+                {
+                    "title": "Style a feature",
+                    "desc": "Style a detected feature",
+                    "xfile": "interactivity/style-feature.html"
                 }
             ]
         },
@@ -104,7 +119,7 @@
                 {
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
-                    "xfile": "misc/popups.html"
+                    "file": "misc/popups.html"
                 },
                 {
                     "title": "Legends",

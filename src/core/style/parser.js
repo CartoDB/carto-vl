@@ -2,6 +2,8 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 import { implicitCast } from './expressions/utils';
+import { CSS_COLOR_NAMES, NamedColor } from './expressions/named-color';
+
 // TODO use Schema classes
 
 const aggFns = [];
@@ -130,6 +132,8 @@ function parseIdentifier(node) {
         return functions.palettes[node.name.toLowerCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
+    } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
+        return new NamedColor(node.name.toLowerCase());
     }
 }
 

@@ -1,13 +1,27 @@
 import Expression from './expression';
 import { implicitCast, checkExpression, checkLooseType, checkType } from './utils';
 
-// TODO docs
 /**
-* @description Color constructor for Hue Saturation Value (HSV) color space
-* @param {*} hue   hue is the color hue, the coordinates goes from 0 to 1 and is cyclic, i.e.: 0.5=1.5=2.5=-0.5
-* @param {*} saturation saturation of the color in the [0,1] range
-* @param {*} value value (brightness) of the color in the [0,1] range
-*/
+ *
+ * Evaluates to a hsva color.
+ *
+ * @param {carto.style.expressions.number|number} h - The hue of the color
+ * @param {carto.style.expressions.number|number} s - The saturation of the color
+ * @param {carto.style.expressions.number|number} v - The value (brightness) of the color
+ * @param {carto.style.expressions.number|number} a - The alpha value of the color
+ * @return {carto.style.expressions.hsva}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name hsva
+ * @function
+ * @api
+ */
 export const HSV = genHSV('hsv', false);
 export const HSVA = genHSV('hsva', true);
 
@@ -39,14 +53,14 @@ function genHSV(name, alpha) {
             if (alpha) {
                 checkType('hsva', 'a', 3, 'float', this.a);
             }
-            const normalize = (v, hue = false) => {
-                if (v.type == 'category') {
-                    return `/${hue ? v.numCategories + 1 : v.numCategories}.`;
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
                 }
                 return '';
             };
             super._setGenericGLSL(inline =>
-                `vec4(hsv2rgb(vec3(
+                `vec4(HSVtoRGB(vec3(
                     ${inline.h}${normalize(this.h, true)},
                     clamp(${inline.s}${normalize(this.s)}, 0.,1.),
                     clamp(${inline.v}${normalize(this.v)}, 0.,1.)
@@ -54,10 +68,12 @@ function genHSV(name, alpha) {
                 , `
     #ifndef HSV2RGB
     #define HSV2RGB
-    vec3 hsv2rgb(vec3 c) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    vec3 HSVtoRGB(vec3 HSV) {
+      float R = abs(HSV.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSV.x * 6. - 2.);
+      float B = 2. - abs(HSV.x * 6. - 4.);
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
     }
     #endif
     `);
@@ -72,4 +88,3 @@ function genHSV(name, alpha) {
         }
     }
 }
-
