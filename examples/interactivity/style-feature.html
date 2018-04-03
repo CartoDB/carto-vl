@@ -48,7 +48,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 3,
+      zoom: 1.5,
       dragRotate: false
     });
 
@@ -58,13 +58,14 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      world_population_2015
     `);
     const style = new carto.Style(`
-      width: sqrt($pop_max/2000)
-      color: opacity(ramp($name, bold), 0.8)
+      width: 50*sqrt($pop_2015)/sqrt(globalMax($pop_2015))*zoom()
+      color: hsva(0.73,0.69,0.89,0.4)
+      strokeColor: hsva(0.73,0.69,0.89,0.5)
       strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+      order: asc(width())
     `);
     const layer = new carto.Layer('layer', source, style);
 
@@ -72,7 +73,7 @@
 
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
-        event.features[0].style.color.blendTo('rgba(1, 1, 0, 0.3)', 100)
+        event.features[0].style.color.blendTo('rgba(255,20,255,0.7)', 100)
       }
     });
 
@@ -85,8 +86,8 @@
     interactivity.on('featureClick', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.style.strokeWidth.blendTo('5', 100);
-        feature.style.strokeColor.blendTo('rgb(0,0,0)', 100);
+        feature.style.strokeWidth.blendTo('4', 100);
+        feature.style.strokeColor.blendTo('rgb(255,20,138)', 100);
       }
     });
 
@@ -99,7 +100,7 @@
     });
 
     layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+      updateTitle('Hover or Click on a country');
     });
 
     layer.addTo(map, 'watername_ocean');
