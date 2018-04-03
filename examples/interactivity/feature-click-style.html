@@ -114,10 +114,10 @@
             if (event.features.length > 0) {
                 const s = carto.style.expressions;
                 if (focusedFeature) {
-                    focusedFeature.normalize();
+                    focusedFeature.style.normalize();
                 }
                 focusedFeature = event.features[0];
-                event.features[0].blendColor(s.rgba(1, 1, 0, 0.3));
+                event.features[0].style.color.blendTo(s.rgba(1, 1, 0, 0.3));
                 const topCountryName = event.features[0].properties.admin || '';
                 const lng = event.coordinates.lng;
                 const lat = event.coordinates.lat;
