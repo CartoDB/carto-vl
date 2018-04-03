@@ -64,8 +64,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 3,
+      center: [-105.048,39.749],
+      zoom: 15,
       dragRotate: false
     });
 
@@ -75,16 +75,18 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      tree_inventory_sloans
     `);
     const style = new carto.Style(`
-      width: log($pop_max + 10),
-      color: opacity(ramp($name, bold), 0.7)
+      width: $diameter_number*4
+      color: opacity(ramp($type,bold),0.7)
+      strokeColor: ramp($type,bold)
+      strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, style);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+      updateTitle('Click on each tree');
 
       const interactivity = new carto.Interactivity(layer);
 
@@ -102,8 +104,8 @@
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.properties.name}</h3>
-            <p>Population <b>${feature.properties.pop_max}</b></p>
+            <h3>${feature.properties.type}</h3>
+            <p>Diameter <b>${feature.properties.diameter_number}</b></p>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>
