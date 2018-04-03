@@ -54,6 +54,7 @@ export default class RenderLayer {
                             // animate(0) is used to ensure that blend._predraw() "GC" collects it
                             blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
                         );
+                        this.styledFeatures[feature.id][styleProperty] = undefined;
                     }
                 };
 
@@ -61,6 +62,10 @@ export default class RenderLayer {
                 const blender = (newExpression, duration = 500) => {
                     if (typeof newExpression == 'string') {
                         newExpression = parseStyleExpression(newExpression);
+                    }
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]){
+                        this.styledFeatures[feature.id][styleProperty].a.blendTo(newExpression, duration);
+                        return;
                     }
                     const blendExpr = blend(
                         newExpression,
