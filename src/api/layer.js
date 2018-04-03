@@ -354,7 +354,7 @@ export default class Layer {
         if (!(style instanceof Style)) {
             throw new CartoValidationError('layer', 'nonValidStyle');
         }
-        if (style._boundLayer){
+        if (style._boundLayer && style._boundLayer !== this) {
             throw new CartoValidationError('layer', 'sharedStyle');
         }
     }

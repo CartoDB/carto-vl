@@ -100,7 +100,7 @@ describe('Interactivity', () => {
         describe('and multiple features are clicked', () => {
             it('should return the right feature.id', done => {
                 source = new carto.source.GeoJSON(featureCollectionJson);
-                layer = new carto.Layer('layer', source, style);
+                layer = new carto.Layer('layer', source, new carto.Style());
                 interactivity = new carto.Interactivity(layer);
                 interactivity.on('featureClick', event => {
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
