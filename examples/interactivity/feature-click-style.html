@@ -81,9 +81,7 @@
             apiKey: 'YOUR_API_KEY'
         });
 
-        const source = new carto.source.Dataset(`
-      ne_adm0_europe
-    `);
+        const source = new carto.source.Dataset('ne_adm0_europe');
         const style = new carto.Style(`
       color: ramp($admin, bold)
     `);
@@ -99,6 +97,7 @@
             });
             interactivity.on('featureClickOut', event => {
                 console.log('CLICK OUT', event.features);
+                event.features.map(f => f.style.reset());
             });
         });
 
@@ -114,7 +113,7 @@
             if (event.features.length > 0) {
                 const s = carto.style.expressions;
                 if (focusedFeature) {
-                    focusedFeature.style.normalize();
+                    focusedFeature.style.reset();
                 }
                 focusedFeature = event.features[0];
                 event.features[0].style.color.blendTo(s.rgba(1, 1, 0, 0.3));

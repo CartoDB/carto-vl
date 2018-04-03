@@ -1,4 +1,4 @@
-import { blend, equals, property, animate } from './style/functions';
+import { blend, property, animate, notEquals } from './style/functions';
 
 export default class RenderLayer {
     constructor() {
@@ -6,6 +6,7 @@ export default class RenderLayer {
         this.renderer = null;
         this.style = null;
         this.type = null;
+        this.styledFeatures = {};
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
@@ -43,38 +44,56 @@ export default class RenderLayer {
 
     getFeaturesAtPosition(pos) {
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
+
+            const genReset = styleProperty =>
+                (duration = 500) => {
+                    if (this.styledFeatures[feature.id][styleProperty]) {
+                        this.styledFeatures[feature.id][styleProperty].replaceChild(
+                            this.styledFeatures[feature.id][styleProperty].mix,
+                            blend(notEquals(property('cartodb_id'), feature.id), 1, animate(duration))
+                        );
+                    }
+                };
+
             const genStyleProperty = styleProperty => {
                 const blender = (newExpression, duration = 500) => {
-                    if (!feature._originalStyle) {
-                        feature._originalStyle = this.style.getColor();
-                    }
                     const blendExpr = blend(
-                        this.style._styleSpec[styleProperty],
                         newExpression,
-                        blend(0, equals(property('cartodb_id'), feature.id), animate(duration))
+                        this.style._styleSpec[styleProperty],
+                        blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
                     );
-                    feature._newStyle = blendExpr;
+                    this.trackFeatureStyle(feature.id, styleProperty, blendExpr);
                     this.style.replaceChild(
                         this.style.getColor(),
-                        blendExpr
+                        blendExpr,
                     );
                     this.style.getColor().notify();
                 };
                 return {
-                    blendTo: blender
+                    blendTo: blender,
+                    reset: genReset(styleProperty)
                 };
             };
+
             feature.style = {
                 color: genStyleProperty('color'),
                 width: genStyleProperty('width'),
                 strokeColor: genStyleProperty('strokeColor'),
                 strokeWidth: genStyleProperty('strokeWidth'),
-                normalize: () => {
-                    feature._newStyle.parent.replaceChild(feature._newStyle, feature._originalStyle);
+                reset: (duration = 500) => {
+                    genReset('color')(duration);
+                    genReset('width')(duration);
+                    genReset('strokeColor')(duration);
+                    genReset('strokeWidth')(duration);
                 }
             };
             return feature;
         });
+    }
+
+    trackFeatureStyle(featureID, styleProperty, newStyle) {
+        this.styledFeatures[featureID] = this.styledFeatures[featureID] || {};
+        this.styledFeatures[featureID][styleProperty] = newStyle;
     }
 
     freeDataframes() {
