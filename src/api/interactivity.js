@@ -104,7 +104,7 @@ export default class Interactivity {
             // Allow one layer as input
             layerList = [layerList];
         }
-        checkLayerList(layerList);
+        preCheckLayerList(layerList);
         this._init(layerList);
     }
 
@@ -139,8 +139,11 @@ export default class Interactivity {
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         this._prevFeatures = [];
+        Promise.all(layerList.map(layer => layer._context)).then(() => {
+            postCheckLayerList(layerList);
+            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        });
     }
 
     _subscribeToIntegratorEvents(integrator) {
@@ -232,7 +235,7 @@ export default class Interactivity {
     }
 }
 
-function checkLayerList(layerList) {
+function preCheckLayerList(layerList) {
     if (!Array.isArray(layerList)) {
         throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
@@ -242,9 +245,8 @@ function checkLayerList(layerList) {
     if (!layerList.every(layer => layer instanceof Layer)) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
-    if (layerList.some(layer => !layer.getIntegrator())) {
-        throw new Error('Invalid argument, all layers must belong to some map');
-    }
+}
+function postCheckLayerList(layerList) {
     if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
