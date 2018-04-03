@@ -88,6 +88,8 @@ describe('Interactivity', () => {
                 layer.on('loaded', () => {
                     // Click inside the feature
                     map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                    // Move the mouse
+                    map.fire('mousemove', { lngLat: { lng: 15, lat: 15 } });
                     // Click inside the same feature
                     map.fire('click', { lngLat: { lng: 20, lat: 20 } });
                 });
@@ -137,6 +139,8 @@ describe('Interactivity', () => {
                     layer.on('loaded', () => {
                         // Click inside the feature
                         map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                        // Move the mouse
+                        map.fire('mousemove', { lngLat: { lng: 0, lat: 0 } });
                         // Click outside the feature
                         map.fire('click', { lngLat: { lng: -10, lat: -10 } });
                     });
