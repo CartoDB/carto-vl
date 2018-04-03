@@ -1,4 +1,5 @@
 import { blend, property, animate, notEquals } from './style/functions';
+import { parseStyleExpression } from './style/parser';
 
 export default class RenderLayer {
     constructor() {
@@ -50,13 +51,17 @@ export default class RenderLayer {
                     if (this.styledFeatures[feature.id][styleProperty]) {
                         this.styledFeatures[feature.id][styleProperty].replaceChild(
                             this.styledFeatures[feature.id][styleProperty].mix,
-                            blend(notEquals(property('cartodb_id'), feature.id), 1, animate(duration))
+                            // animate(0) is used to ensure that blend._predraw() "GC" collects it
+                            blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
                         );
                     }
                 };
 
             const genStyleProperty = styleProperty => {
                 const blender = (newExpression, duration = 500) => {
+                    if (typeof newExpression == 'string') {
+                        newExpression = parseStyleExpression(newExpression);
+                    }
                     const blendExpr = blend(
                         newExpression,
                         this.style._styleSpec[styleProperty],
