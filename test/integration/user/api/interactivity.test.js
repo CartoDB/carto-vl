@@ -67,6 +67,10 @@ describe('Interactivity', () => {
             it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 interactivity = new carto.Interactivity([layer]);
                 interactivity.on('featureClick', event => {
+                    expect(event.features[0].style.color.blendTo).toBeDefined();
+                    expect(event.features[0].style.color.reset).toBeDefined();
+                    expect(event.features[0].style.reset).toBeDefined();
+                    delete event.features[0].style;
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                     done();
                 });
@@ -101,6 +105,8 @@ describe('Interactivity', () => {
                 layer = new carto.Layer('layer', source, style);
                 interactivity = new carto.Interactivity([layer]);
                 interactivity.on('featureClick', event => {
+                    delete event.features[0].style;
+                    delete event.features[1].style;
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                     expect(event.features[1]).toEqual({ id: 1, layerId: 'layer', properties: { cartodb_id: 1 } });
                     done();
@@ -131,6 +137,7 @@ describe('Interactivity', () => {
                 it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
                     interactivity = new carto.Interactivity([layer]);
                     interactivity.on('featureClickOut', event => {
+                        delete event.features[0].style;
                         expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
@@ -153,6 +160,7 @@ describe('Interactivity', () => {
             it('should fire a featureHover event with a features list containing the entered feature', done => {
                 interactivity = new carto.Interactivity([layer]);
                 interactivity.on('featureHover', event => {
+                    delete event.features[0].style;
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                     done();
                 });
@@ -166,6 +174,7 @@ describe('Interactivity', () => {
             it('should fire a featureEnter event with a features list containing the entered feature', done => {
                 interactivity = new carto.Interactivity([layer]);
                 interactivity.on('featureEnter', event => {
+                    delete event.features[0].style;
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                     done();
                 });
@@ -216,6 +225,7 @@ describe('Interactivity', () => {
                     // Move mouse inside a feature
                     map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureLeave', event => {
+                        delete event.features[0].style;
                         expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 } });
                         done();
                     });
