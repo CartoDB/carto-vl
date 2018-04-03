@@ -18,10 +18,32 @@ import { wToR } from '../client/rsys';
  *
  * Feature objects are provided by {@link carto.FeatureEvent} events.
  * @typedef {Object} Feature
+ * @property {Number} id cartodb_id
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
+ * @property {carto.FeatureStyle} style
  * @api
  */
 
+/**
+ *
+ * FeatureStyle objects can be accessed through {@link carto.Feature} objects.
+ * @typedef {Object} FeatureStyle
+ * @property {FeatureStyleProperty} color
+ * @property {FeatureStyleProperty} width
+ * @property {FeatureStyleProperty} colorStroke
+ * @property {FeatureStyleProperty} widthStroke
+ * @property {Function} reset reset custom feature styles by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
+
+/**
+ *
+ * FeatureStyleProperty objects can be accessed through {@link carto.FeatureStyle} objects.
+ * @typedef {Object} FeatureStyleProperty
+ * @property {Function} blendTo change the feature style by blending to a destination style expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
+ * @property {Function} reset reset custom feature style property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
 
 
 /**
