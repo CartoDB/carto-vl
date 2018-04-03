@@ -106,16 +106,11 @@
         function updateTitle(text) {
             document.getElementsByTagName('h2')[0].innerHTML = text;
         }
-        let focusedFeature = null;
 
         function updateCountry(event) {
             let content = '';
             if (event.features.length > 0) {
                 const s = carto.style.expressions;
-                if (focusedFeature) {
-                    focusedFeature.style.reset();
-                }
-                focusedFeature = event.features[0];
                 event.features[0].style.color.blendTo('rgba(1, 1, 0, 0.3)');
                 // event.features[0].style.color.blendTo(s.rgba(1, 1, 0, 0.3));
                 const topCountryName = event.features[0].properties.admin || '';
