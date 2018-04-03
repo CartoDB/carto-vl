@@ -48,6 +48,15 @@ describe('src/client/windshaft-filtering', () => {
                 })).toEqual('WHERE ("numericProperty" BETWEEN 10 AND 20)');
             });
 
+            it('quotes in identifiers should be handled properly', () => {
+                expect(preSQL(f, {
+                    type: 'between',
+                    property: 'weird"property',
+                    lower: 10,
+                    upper: 20
+                })).toEqual('WHERE ("weird""property" BETWEEN 10 AND 20)');
+            });
+
             it('should return a IN clause with an in() filter', () => {
                 expect(preSQL(f, {
                     type: 'in',
