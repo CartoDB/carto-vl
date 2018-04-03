@@ -180,7 +180,7 @@ function genUnaryOp(name, jsFn, glsl) {
             super._compile(meta);
             checkType(name, 'x', 0, 'float', this.a);
             if (this.a.type != 'float') {
-                throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
+                throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
             this.inlineMaker = inlines => glsl(inlines.a);
         }
