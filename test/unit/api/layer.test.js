@@ -53,6 +53,14 @@ describe('api/layer', () => {
                 new Layer('layer0', source, {});
             }).toThrowError('The given object is not a valid style. See "carto.Style".');
         });
+
+
+        it('should throw an error if a style is already added to another layer', () => {
+            new Layer('layer1', source, style);
+            expect(() => {
+                new Layer('layer2', source, style);
+            }).toThrowError(/[\s\S]*shared[\s\S]*/g);
+        });
     });
 
     describe('.setStyle', () => {

@@ -42,6 +42,7 @@ export default class Layer {
     }
 
     _init(id, source, style) {
+        style._boundLayer = this;
         this.state = 'init';
         this._id = id;
 
@@ -352,6 +353,9 @@ export default class Layer {
         }
         if (!(style instanceof Style)) {
             throw new CartoValidationError('layer', 'nonValidStyle');
+        }
+        if (style._boundLayer){
+            throw new CartoValidationError('layer', 'sharedStyle');
         }
     }
 

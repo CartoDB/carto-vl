@@ -27,6 +27,10 @@ const validation = {
         'non-valid-style': {
             messageRegex: /nonValidStyle/,
             friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
+        },
+        'shared-style': {
+            messageRegex: /sharedStyle/,
+            friendlyMessage: 'The given Style object is already bound to another layer. Styles cannot be shared between different layers'
         }
     },
     setup: {
