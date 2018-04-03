@@ -74,10 +74,10 @@ export default class RenderLayer {
                     );
                     this.trackFeatureStyle(feature.id, styleProperty, blendExpr);
                     this.style.replaceChild(
-                        this.style.getColor(),
+                        this.style._styleSpec[styleProperty],
                         blendExpr,
                     );
-                    this.style.getColor().notify();
+                    this.style._styleSpec[styleProperty].notify();
                 };
                 return {
                     blendTo: blender,
