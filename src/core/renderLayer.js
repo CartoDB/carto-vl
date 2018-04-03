@@ -54,6 +54,7 @@ export default class RenderLayer {
                             // animate(0) is used to ensure that blend._predraw() "GC" collects it
                             blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
                         );
+                        this.style._styleSpec[styleProperty].notify();
                         this.styledFeatures[feature.id][styleProperty] = undefined;
                     }
                 };
@@ -63,7 +64,7 @@ export default class RenderLayer {
                     if (typeof newExpression == 'string') {
                         newExpression = parseStyleExpression(newExpression);
                     }
-                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]){
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
                         this.styledFeatures[feature.id][styleProperty].a.blendTo(newExpression, duration);
                         return;
                     }
