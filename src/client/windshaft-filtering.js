@@ -410,7 +410,7 @@ function sqlQ(value) {
     if (isFinite(value)) {
         return String(value);
     }
-    return `'${value}'`; // TODO: escape single quotes! (by doubling them)
+    return `'${value.replace(/\'/g,'\'\'')}'`;
 }
 
 function sqlId(id) {
