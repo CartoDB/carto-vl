@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Feature click | CARTO</title>
+  <title>Feature enter/leave | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../../dist/carto-gl.js"></script>
+  <script src="../../dist/carto-gl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../../vendor/mapbox-gl-dev.js"></script>
+  <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
       z-index: 0;
     }
+
     #controls {
       position: absolute;
       top: 12px;
@@ -29,6 +32,7 @@
       width: 200px;
       z-index: 2;
     }
+
     #controls h2 {
       font: 300 12px/16px 'Open Sans';
       background: rgba(0, 0, 0, 0.64);
@@ -36,6 +40,7 @@
       padding: 8px 12px;
       color: #fff;
     }
+
     .container {
       padding: 8px 12px;
       background: white;
@@ -44,15 +49,14 @@
       color: #2E3C43;
       margin-top: 12px;
     }
+
     #content h3 {
       font: 400 16px/22px 'Open Sans';
       margin-bottom: 4px;
     }
-    #content p {
-      font: 400 12px/16px 'Open Sans';
-    }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="controls">
@@ -66,7 +70,7 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
-      dragRotate: false,
+      dragRotate: false
     });
 
     carto.setDefaultAuth({
@@ -75,27 +79,21 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      ne_50m_rivers_lake_centerlines
     `);
     const style = new carto.Style(`
-      width: sqrt($pop_max)/150,
-      strokeWidth: sqrt($pop_max)/150-8,
+      width: 6
       color: ramp($name, bold)
-      strokeColor: opacity(ramp($name, bold), 0.3)
+      filter: in($featurecla, 'River')
     `);
     const layer = new carto.Layer('layer', source, style);
 
-    layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureEnter', updateRiver);
+    interactivity.on('featureLeave', clearContent);
 
-      const interactivity = new carto.Interactivity([layer]);
-      interactivity.on('featureClick', event => {
-        updateCity(event);
-        console.log('CLICK', event.features);
-      });
-      interactivity.on('featureClickOut', event => {
-        console.log('CLICK OUT', event.features);
-      });
+    layer.on('loaded', () => {
+      updateTitle('Move the mouse over the rivers');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -104,22 +102,22 @@
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateCity(event) {
+    function updateRiver(event) {
       let content = '';
-      if (event.features.length > 0) {
-        for (let feature of event.features) {
-          content += `
-            <div class="container">
-              <h3>${feature.properties.name}</h3>
-              <p>POP: ${feature.properties.pop_max}</p>
-              <p>LNG: ${event.coordinates.lng}</p>
-              <p>LAT: ${event.coordinates.lat}</p>
-            </div>
-          `;
-        }
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.properties.name}</h3>
+          </div>
+        `;
       }
       document.getElementById('content').innerHTML = content;
     }
+
+    function clearContent() {
+      document.getElementById('content').innerHTML = '';
+    }
   </script>
 </body>
+
 </html>

@@ -56,9 +56,9 @@ export default class Ramp extends Expression {
     _free(gl) {
         gl.deleteTexture(this.texture);
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
         this._UID = uniformIDMaker();
-        const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const input = this.input._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
         return {
             preface: input.preface + `
         uniform sampler2D texRamp${this._UID};

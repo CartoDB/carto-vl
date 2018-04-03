@@ -17,9 +17,9 @@ export default class Top extends Expression {
         this.othersBucket = true;
         this._meta = metadata;
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
         this._UID = uniformIDMaker();
-        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const property = this.property._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
         return {
             preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
             inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`

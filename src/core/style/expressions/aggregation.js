@@ -29,10 +29,10 @@ function genAggregationOp(aggName, aggType) {
             super._compile(metadata);
             checkType(aggName, 'property', 0, aggType, this.property);
         }
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
             return {
                 preface: '',
-                inline: `p${propertyTIDMaker(schema.column.aggColumn(this.property.name, aggName))}`
+                inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, aggName))}`
             };
         }
         eval(feature) {

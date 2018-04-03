@@ -97,7 +97,7 @@ var map = new mapboxgl.Map({
     style: BASEMAPS[basemap], // stylesheet location
     center: [2.17, 41.38], // starting position [lng, lat]
     zoom: 13, // starting zoom,
-    dragRotate: false, // disable drag to rotate handling
+    dragRotate: false // disable drag to rotate handling
 });
 
 const auth = {
@@ -112,7 +112,10 @@ setInterval(() => {
     }
 }, 500);
 
+map.on('zoom', event => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
+
 map.on('load', () => {
+    document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0;//styles.length - 1;
 
     function handleError(error) {

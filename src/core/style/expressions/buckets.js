@@ -106,8 +106,8 @@ export default class Buckets extends Expression {
             }
         });
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         const funcName = `buckets${this.bucketUID}`;

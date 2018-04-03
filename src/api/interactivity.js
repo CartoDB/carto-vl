@@ -5,7 +5,7 @@ import { wToR } from '../client/rsys';
 
 
 /**
- * 
+ *
  * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
  * @typedef {Object} FeatureEvent
  * @property {object} coordinates LongLat coordinates in {lng: 0, lat:0} form
@@ -15,7 +15,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * 
+ *
  * Feature objects are provided by {@link carto.FeatureEvent} events.
  * @typedef {Object} Feature
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
@@ -83,15 +83,15 @@ export default class Interactivity {
     * To create a Interactivity object an array of {@link carto.Layer} is required.
     * Events fired from interactivity objects will refer to the features of these layers and only these layers.
     *
-    * @param {Array<carto.Layer>} layerList - Array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
+    * @param {carto.Layer|Array<carto.Layer>} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
     * @example
-    * const myLayer = new carto.Layer('layer0', mySource, myStyle);
-    * myLayer.addTo(myMap);
-    * myLayer.on('loaded', () => {
-    *     const myInteractivity = new carto.Interactivity([myLayer]);
-    *     myInteractivity.on('click', event => console.log(event));
-    * })
+    * const layer = new carto.Layer('layer', source, style);
+    * layer.on('loaded', () => {
+    *   const interactivity = new carto.Interactivity(layer);
+    *   interactivity.on('click', event => console.log(event));
+    * });
+    * layer.addTo(myMap);
     *
     * @fires CartoError
     *
@@ -100,7 +100,11 @@ export default class Interactivity {
     * @api
     */
     constructor(layerList) {
-        checkLayerList(layerList);
+        if (layerList instanceof Layer) {
+            // Allow one layer as input
+            layerList = [layerList];
+        }
+        preCheckLayerList(layerList);
         this._init(layerList);
     }
 
@@ -135,8 +139,12 @@ export default class Interactivity {
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
-        this._prevFeatures = [];
+        this._prevHoverFeatures = [];
+        this._prevClickFeatures = [];
+        Promise.all(layerList.map(layer => layer._context)).then(() => {
+            postCheckLayerList(layerList);
+            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        });
     }
 
     _subscribeToIntegratorEvents(integrator) {
@@ -149,8 +157,8 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage enter/leave events
-        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
-        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevHoverFeatures);
 
         if (featuresLeft.length > 0) {
             this._fireEvent('featureLeave', {
@@ -168,7 +176,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevHoverFeatures = featureEvent.features;
 
         // Launch hover event
         this._fireEvent('featureHover', featureEvent);
@@ -179,7 +187,7 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage clickOut event
-        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, currentFeatures);
 
         if (featuresClickedOut.length > 0) {
             this._fireEvent('featureClickOut', {
@@ -189,7 +197,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevClickFeatures = featureEvent.features;
 
         // Launch click event
         this._fireEvent('featureClick', featureEvent);
@@ -228,7 +236,7 @@ export default class Interactivity {
     }
 }
 
-function checkLayerList(layerList) {
+function preCheckLayerList(layerList) {
     if (!Array.isArray(layerList)) {
         throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
@@ -238,9 +246,8 @@ function checkLayerList(layerList) {
     if (!layerList.every(layer => layer instanceof Layer)) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
-    if (layerList.some(layer => !layer.getIntegrator())) {
-        throw new Error('Invalid argument, all layers must belong to some map');
-    }
+}
+function postCheckLayerList(layerList) {
     if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }

@@ -17,21 +17,12 @@ export const FS = `
 
 precision highp float;
 
-varying  vec2 uv;
+varying vec2 uv;
 
 $PREFACE
 
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
 void main(void) {
-    // TODO texture reads should be dynamic to improve Texture Unit utilization
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    float p2=texture2D(property2, uv).a;
-    float p3=texture2D(property3, uv).a;
+    vec2 featureID = uv;
     gl_FragColor = $INLINE;
 }
 `;
