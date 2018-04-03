@@ -47,12 +47,23 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+        this._boundLayers = [];
     }
 
-    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
+    _bindLayer(layer) {
+        this._boundLayers.push(layer);
+    }
+    _unbindLayer(layer) {
+        this._boundLayers = this._boundLayers.filter(l => l == layer);
+    }
+    _addDataframe(dataframe) {
+        this._boundLayers.map(l=>l._addDataframe(dataframe));
+    }
+    _removeDataframe(dataframe) {
+        this._boundLayers.map(l=>l._removeDataframe(dataframe));
+    }
+    _dataLoadedCallback() {
+        this._boundLayers.map(l=>l._dataLoadedCallback());
     }
 
     _getInstantiationID(MNS, resolution, filtering) {

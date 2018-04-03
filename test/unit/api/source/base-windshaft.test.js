@@ -90,11 +90,11 @@ describe('api/source/base-windshaft', () => {
         });
     });
 
-    describe('.bindLayer', () => {
+    describe('._bindLayer', () => {
 
     });
 
-    describe('.requrestData', () => {
+    describe('.requestData', () => {
 
     });
 });
