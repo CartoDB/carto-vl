@@ -77,7 +77,7 @@ describe('api/source/geojson', () => {
             };
             const source = new GeoJSON(data);
 
-            source.bindLayer(_ => _, _ => _, _ => _);
+            source._bindLayer({ _addDataframe: _ => _, _dataLoadedCallback: _ => _ });
             spyOn(source, '_addDataframe');
 
             expect(source._addDataframe).toHaveBeenCalledTimes(0);
@@ -283,10 +283,8 @@ describe('api/source/geojson', () => {
             properties: {}
         });
 
-        const fakeAddDataframe = jasmine.createSpy('addDataframe');
-        const fakeRemoveDataframe = jasmine.createSpy('removeDataframe');
         const fakeDataLoaded = jasmine.createSpy('dataLoaded');
-        source.bindLayer(fakeAddDataframe, fakeRemoveDataframe, fakeDataLoaded);
+        source._bindLayer({ _addDataframe: _ => _, _dataLoadedCallback: fakeDataLoaded});
         expect(fakeDataLoaded).not.toHaveBeenCalled();
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();
