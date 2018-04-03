@@ -102,7 +102,7 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        source.bindLayer(this);
         if (this._source !== source) {
             this._freeSource();
         }
@@ -249,7 +249,7 @@ export default class Layer {
      * Callback executed when the client adds a new dataframe
      * @param {Dataframe} dataframe
      */
-    _onDataframeAdded(dataframe) {
+    _addDataframe(dataframe) {
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         this._integrator.needRefresh();
@@ -259,7 +259,7 @@ export default class Layer {
      * Callback executed when the client removes dataframe
      * @param {Dataframe} dataframe
      */
-    _onDataFrameRemoved(dataframe) {
+    _removeDataframe(dataframe) {
         this._renderLayer.removeDataframe(dataframe);
         this._integrator.invalidateWebGLState();
     }
@@ -267,7 +267,7 @@ export default class Layer {
     /**
      * Callback executed when the client finishes loading data
      */
-    _onDataLoaded() {
+    _dataLoadedCallback() {
         this.state = 'dataLoaded';
     }
 

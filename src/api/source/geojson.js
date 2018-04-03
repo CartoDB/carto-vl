@@ -44,14 +44,21 @@ export default class GeoJSON extends Base {
         this._catFields = [];
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
-
+        this._boundLayers = [];
         this._loaded = false;
     }
 
-    bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
+    _bindLayer(layer) {
+        this._boundLayers.push(layer);
+    }
+    _unbindLayer(layer) {
+        this._boundLayers = this._boundLayers.filter(l => l == layer);
+    }
+    _addDataframe(dataframe) {
+        this._boundLayers.map(l=>l._addDataframe(dataframe));
+    }
+    _dataLoadedCallback() {
+        this._boundLayers.map(l=>l._dataLoadedCallback());
     }
 
     requestMetadata() {
