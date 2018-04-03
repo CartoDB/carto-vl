@@ -71,33 +71,35 @@
     const interactivity = new carto.Interactivity(layer);
 
     interactivity.on('featureEnter', event => {
-      // Change the features style
-      event.features.map(feature => feature.style.color.blendTo('rgba(1, 1, 0, 0.3)', 100));
+      if (event.features.length > 0) {
+        event.features[0].style.color.blendTo('rgba(1, 1, 0, 0.3)', 100)
+      }
     });
 
     interactivity.on('featureLeave', event => {
-      // Restore initial features style
-      event.features.map(feature => feature.style.color.reset(100));
+      if (event.features.length > 0) {
+        event.features[0].style.color.reset(100);
+      }
     });
 
     interactivity.on('featureClick', event => {
-      // Change the features style
-      event.features.map(feature => {
+      if (event.features.length > 0) {
+        const feature = event.features[0];
         feature.style.strokeWidth.blendTo('5', 100);
         feature.style.strokeColor.blendTo('rgb(0,0,0)', 100);
-      });
+      }
     });
 
     interactivity.on('featureClickOut', event => {
-      // Restore initial features style
-      event.features.map(feature => {
-        feature.style.strokeWidth.reset(100)
-        feature.style.strokeColor.reset(100)
-      });
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        feature.style.strokeWidth.reset(100);
+        feature.style.strokeColor.reset(100);
+      }
     });
 
     layer.on('loaded', () => {
-      updateTitle('Click on the countries');
+      updateTitle('Click on the cities');
     });
 
     layer.addTo(map, 'watername_ocean');
