@@ -229,6 +229,7 @@ map.on('load', () => {
         const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
         const source = new SourceClass(
             $('#dataset').val(),
+            {},
             {
                 user: $('#user').val(),
                 apiKey: 'YOUR_API_KEY'
