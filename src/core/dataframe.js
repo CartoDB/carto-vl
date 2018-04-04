@@ -188,24 +188,21 @@ export default class Dataframe {
     }
 
     _addFeatureToArray(featureIndex, features) {
-        const properties = this._getPropertiesOf(featureIndex);
-        features.push({
-            id: properties.cartodb_id,
-            properties
-        });
-    }
-
-    _getPropertiesOf(featureID) {
+        let id = '';
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
-            let prop = this.properties[propertyName][featureID];
-            const column = this.metadata.columns.find(c => c.name == propertyName);
-            if (column.type == 'category') {
-                prop = column.categoryNames[prop];
+            let prop = this.properties[propertyName][featureIndex];
+            if (propertyName === 'cartodb_id') {
+                id = prop;
+            } else {
+                const column = this.metadata.columns.find(c => c.name == propertyName);
+                if (column && column.type == 'category') {
+                    prop = column.categoryNames[prop];
+                }
+                properties[propertyName] = prop;
             }
-            properties[propertyName] = prop;
         });
-        return properties;
+        features.push({ id, properties });
     }
 
     _genDataframePropertyTextures() {
