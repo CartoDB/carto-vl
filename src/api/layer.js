@@ -42,7 +42,6 @@ export default class Layer {
     }
 
     _init(id, source, style) {
-        source = source._clone();        
         this.state = 'init';
         this._id = id;
 
