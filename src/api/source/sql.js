@@ -54,6 +54,10 @@ export default class SQL extends BaseWindshaft {
         this.initialize(auth, config);
     }
 
+    _clone(){
+        return new SQL(this._query, this._auth, this._config);
+    }
+
     _checkQuery(query) {
         if (util.isUndefined(query)) {
             throw new CartoValidationError('source', 'queryRequired');

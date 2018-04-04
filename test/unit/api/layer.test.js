@@ -1,4 +1,6 @@
 import Dataset from '../../../src/api/source/dataset';
+import SQL from '../../../src/api/source/sql';
+import GeoJSON from '../../../src/api/source/geojson';
 import Style from '../../../src/api/style';
 import Layer from '../../../src/api/layer';
 
@@ -60,6 +62,37 @@ describe('api/layer', () => {
             expect(() => {
                 new Layer('layer2', source, style);
             }).toThrowError(/[\s\S]*shared[\s\S]*/g);
+        });
+    });
+
+    describe('cloning the source', () => {
+        it('should be done with Dataset sources', () => {
+            const source = new Dataset('ne_10m_populated_places_simple', {
+                user: 'test',
+                apiKey: '1234567890'
+            });
+            const layer = new Layer('layer0', source, new Style());
+            expect(layer.getSource()).not.toBe(source);
+        });
+        it('should be done with SQL sources', () => {
+            const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
+                user: 'test',
+                apiKey: '1234567890'
+            });
+            const layer = new Layer('layer0', source, new Style());
+            expect(layer.getSource()).not.toBe(source);
+        });
+        it('should be done with GeoJSON sources', () => {
+            const source = new GeoJSON({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {}
+            });
+            const layer = new Layer('layer0', source, new Style());
+            expect(layer.getSource()).not.toBe(source);
         });
     });
 
