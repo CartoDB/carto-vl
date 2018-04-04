@@ -85,7 +85,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError(/[\s\S]*must.*greater[\s\S]*/g);
+                }).toThrowError('`resolution` must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -94,7 +94,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError(/[\s\S]*must.*less[\s\S]*/g);
+                }).toThrowError('`resolution` must be less than 255.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
