@@ -58,7 +58,7 @@ function genRGB(name, alpha) {
                 r: this.r.eval(f),
                 g: this.g.eval(f),
                 b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 255,
+                a: alpha ? this.a.eval(f) : 1,
             };
         }
     };
