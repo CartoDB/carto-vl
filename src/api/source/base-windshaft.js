@@ -6,6 +6,10 @@ import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
 
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
+const DEFAULT_COLUMNS = {
+    columns: [],
+    aggregated_columns: {}
+};
 
 export default class BaseWindshaft extends Base {
 
@@ -14,11 +18,14 @@ export default class BaseWindshaft extends Base {
         this._client = new Windshaft(this);
     }
 
-    initialize(auth, config) {
+    initialize(columns, auth, config) {
+        columns = columns || DEFAULT_COLUMNS;
         auth = auth || getDefaultAuth();
         config = config || getDefaultConfig();
+        this._checkColumns(columns);
         checkAuth(auth);
         checkConfig(config);
+        this._columns = columns;
         this._apiKey = auth.apiKey;
         this._username = auth.username;
         this._serverURL = this._generateURL(auth, config);
@@ -38,6 +45,10 @@ export default class BaseWindshaft extends Base {
 
     free() {
         this._client.free();
+    }
+
+    _checkColumns() {
+        // TODO
     }
 
     _generateURL(auth, config) {
