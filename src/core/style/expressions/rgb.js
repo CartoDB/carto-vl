@@ -53,6 +53,13 @@ function genRGB(name, alpha) {
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
-        // TODO eval
+        eval(f) {
+            return {
+                r: this.r.eval(f),
+                g: this.g.eval(f),
+                b: this.b.eval(f),
+                a: alpha ? this.a.eval(f) : 255,
+            };
+        }
     };
 }
