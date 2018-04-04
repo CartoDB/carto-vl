@@ -27,7 +27,7 @@ const SUPPORTED_PROPERTIES = [
 ];
 
 const MIN_RESOLUTION = 0;
-const MAX_RESOLUTION = 255;
+const MAX_RESOLUTION = 256;
 
 export default class Style {
 

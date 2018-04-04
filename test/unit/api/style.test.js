@@ -94,7 +94,7 @@ describe('api/style', () => {
                 };
                 expect(function () {
                     new Style(styleSpec);
-                }).toThrowError('`resolution` must be less than 255.');
+                }).toThrowError('`resolution` must be less than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
