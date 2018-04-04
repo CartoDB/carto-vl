@@ -57,6 +57,12 @@ export default class BaseWindshaft extends Base {
         return { columns };
     }
 
+    getColumnsList() {
+        const columns = this._columns.columns;
+        const aggregatedColumns = Object.keys(this._columns.aggregated_columns);
+        return columns.concat(aggregatedColumns);
+    }
+
     _checkColumns() {
         // TODO
     }

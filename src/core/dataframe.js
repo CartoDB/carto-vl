@@ -3,7 +3,7 @@ import { wToR } from '../client/rsys';
 
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
-    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
+    constructor({ center, scale, geom, properties, type, active, size, metadata, featureProperties }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -16,6 +16,7 @@ export default class Dataframe {
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
+        this.featureProperties = featureProperties;
     }
 
     bind(renderer) {
@@ -100,7 +101,7 @@ export default class Dataframe {
             const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._createFeature(featureIndex));
             }
         }
         return features;
@@ -144,7 +145,7 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._createFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -181,7 +182,7 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._createFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -190,7 +191,7 @@ export default class Dataframe {
         return features;
     }
 
-    _addFeatureToArray(featureIndex, features) {
+    _createFeature(featureIndex) {
         let id = '';
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
@@ -198,14 +199,18 @@ export default class Dataframe {
             if (propertyName === 'cartodb_id') {
                 id = prop;
             } else {
-                const column = this.metadata.columns.find(c => c.name == propertyName);
-                if (column && column.type == 'category') {
-                    prop = column.categoryNames[prop];
+                // Add only the properties defined in the source
+                if (this.featureProperties.includes(propertyName)) {
+                    const column = this.metadata.columns.find(c => c.name == propertyName);
+                    if (column && column.type == 'category') {
+                        prop = column.categoryNames[prop];
+                    }
+                    properties[propertyName] = prop;
                 }
-                properties[propertyName] = prop;
+                // Ignore the properties defined in the style
             }
         });
-        features.push({ id, properties });
+        return { id, properties };
     }
 
     _genDataframePropertyTextures() {

@@ -280,6 +280,7 @@ export default class Windshaft {
             size: size,
             type: type,
             metadata: this.metadata,
+            featureProperties: this._source.getColumnsList()
         });
 
         return dataframe;
