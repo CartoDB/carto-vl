@@ -52,7 +52,7 @@ export default class BaseWindshaft extends Base {
         let columns = this._columns.columns;
         for (let key in this._columns.aggregated_columns) {
             const item = this._columns.aggregated_columns[key];
-            columns.push(schema.column.aggColumn(item.aggregate_function, item.aggregated_column));
+            columns.push(schema.column.aggregatedName(item.aggregate_function, item.aggregated_column, key));
         }
         return { columns };
     }

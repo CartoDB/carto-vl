@@ -72,7 +72,7 @@ export default class Windshaft {
     async getMetadata(style) {
         const styleMNS = style.getMinimumNeededSchema();
         const sourceMNS = this._source.getMinimumNeededSchema();
-        const MNS = this._mergeMNS(styleMNS, sourceMNS);
+        const MNS = R.schema.union(styleMNS, sourceMNS);
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
@@ -98,13 +98,6 @@ export default class Windshaft {
             const tiles = rsys.rTiles(viewport);
             this._getTiles(tiles);
         }
-    }
-
-    _mergeMNS(a, b) {
-        a = a || {};
-        b = b || {};
-        const columns = (a.columns || []).concat(b.columns || []);
-        return { columns };
     }
 
     _getTiles(tiles) {
@@ -158,6 +151,7 @@ export default class Windshaft {
     async _instantiateUncached(MNS, resolution, filters) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
+
         let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
@@ -230,9 +224,9 @@ export default class Windshaft {
             .forEach(name => {
                 if (name !== 'cartodb_id') {
                     if (R.schema.column.isAggregated(name)) {
-                        aggregation.columns[name] = {
-                            aggregate_function: R.schema.column.getAggFN(name),
-                            aggregated_column: R.schema.column.getBase(name)
+                        aggregation.columns[R.schema.column.getAlias(name)] = {
+                            aggregate_function: R.schema.column.getAggregateFunction(name),
+                            aggregated_column: R.schema.column.getAggregatedColumn(name)
                         };
                     } else {
                         aggregation.dimensions[name] = name;
@@ -243,11 +237,15 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => R.schema.column.getBase(name)).map(
-            name => dateFields.includes(name) ? name + '::text' : name
-        )
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+    _buildSelectClause(MNS, dateFields = []) {
+        const aggColumns = MNS.columns.map(name => {
+            name = R.schema.column.getAggregatedColumn(name);
+            if (dateFields.includes(name)) {
+                name += '::text';
+            }
+            return name;
+        });
+        return aggColumns.concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
     _buildQuery(select, filters) {
@@ -356,18 +354,18 @@ export default class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
-                    const basename = R.schema.column.getBase(name);
+                    const alias = R.schema.column.getAlias(name);
+                    const basename = R.schema.column.getAggregatedColumn(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
-                        catFields.push(name);
+                        catFields.push(alias);
                     } else if (type == 'float') {
-                        numFields.push(name);
+                        numFields.push(alias);
                     } else if (type == 'date') {
-                        dateFields.push(name);
+                        dateFields.push(alias);
                     } else {
                         throw new Error(`Column type '${type}' not supported`);
                     }
-
                 });
                 catFields.map((name, i) => fieldMap[name] = i);
                 numFields.map((name, i) => fieldMap[name] = i + catFields.length);
@@ -377,6 +375,7 @@ export default class Windshaft {
 
                 var rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
+
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
                 });

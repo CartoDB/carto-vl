@@ -62,6 +62,9 @@ export default class Dataframe {
     }
 
     getFeaturesAtPosition(pos, style) {
+        if (!style) {
+            return [];
+        }
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos, style);
@@ -200,7 +203,7 @@ export default class Dataframe {
         Object.keys(this.properties).map(propertyName => {
             let prop = this.properties[propertyName][featureID];
             const column = this.metadata.columns.find(c => c.name == propertyName);
-            if (column.type == 'category') {
+            if (column && column.type == 'category') {
                 prop = column.categoryNames[prop];
             }
             properties[propertyName] = prop;
