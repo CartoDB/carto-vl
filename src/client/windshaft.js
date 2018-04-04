@@ -16,10 +16,14 @@ const MIN_FILTERING = 2000000;
 // Requrest SQL API (temp)
 // Cache dataframe
 
+
+
 export default class Windshaft {
 
     constructor(source) {
         this._source = source;
+
+        this._exclusive = true;
 
         this._requestGroupID = 0;
         this._oldDataframes = [];
@@ -63,15 +67,12 @@ export default class Windshaft {
      * Should be called whenever the style changes (even if metadata is not going to be used)
      * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
      * Returns  a promise to a Metadata
-     * @param {*} viewport
-     * @param {*} MNS
-     * @param {*} addDataframe
-     * @param {*} styleDataframe
+     * @param {*} style
      */
     async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
-        const filtering = windshaftFiltering.getFiltering(style);
+        const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS.columns.includes('cartodb_id')) {
@@ -83,6 +84,13 @@ export default class Windshaft {
         return this.metadata;
     }
 
+    /**
+     * After calling getMetadata(), data for a viewport can be obtained with this function.
+     * So long as the style doesn't change, getData() can be called repeatedly for different
+     * viewports. If style changes getMetadata() should be called before requesting data
+     * for the new style.
+     * @param {*} viewport
+     */
     getData(viewport) {
         if (this._isInstantiated()) {
             const tiles = rsys.rTiles(viewport);
@@ -150,13 +158,20 @@ export default class Windshaft {
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
-        if (metadata.featureCount > MIN_FILTERING) {
-            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${windshaftFiltering.getSQLWhere(filters)}`;
-        } else {
-            aggSQL = this._buildQuery(select);
+        let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
+
+        if (backendFilters && this._requiresAggregation(MNS)) {
+            agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
+            if (!this._exclusive) {
+                backendFilters = null;
+            }
+        }
+        if (backendFilters) {
+            aggSQL = this._buildQuery(select, backendFilters);
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
@@ -178,6 +193,22 @@ export default class Windshaft {
         return promise;
     }
 
+    _checkLayerMeta(MNS) {
+        if (!this._isAggregated()) {
+            if (this._requiresAggregation(MNS)) {
+                throw new Error('Aggregation not supported for this dataset');
+            }
+        }
+    }
+
+    _isAggregated() {
+        return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
+    }
+
+    _requiresAggregation(MNS) {
+        return MNS.columns.some(column => R.schema.column.isAggregated(column));
+    }
+
     _generateAggregation(MRS, resolution) {
         let aggregation = {
             columns: {},
@@ -190,10 +221,10 @@ export default class Windshaft {
         MRS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
-                    if (name.startsWith('_cdb_agg_')) {
+                    if (R.schema.column.isAggregated(name)) {
                         aggregation.columns[name] = {
-                            aggregate_function: getAggFN(name),
-                            aggregated_column: getBase(name)
+                            aggregate_function: R.schema.column.getAggFN(name),
+                            aggregated_column: R.schema.column.getBase(name)
                         };
                     } else {
                         aggregation.dimensions[name] = name;
@@ -205,14 +236,17 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+        return MRS.columns.map(name => R.schema.column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
         )
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
-    _buildQuery(select) {
-        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    _buildQuery(select, filters) {
+        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
+        const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
+        return `SELECT ${columns} FROM ${relation} ${condition}`;
     }
 
     _getConfig() {
@@ -269,6 +303,7 @@ export default class Windshaft {
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        this._layerMeta = layergroup.metadata.layers[0].meta;
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return getLayerUrl(layergroup, LAYER_INDEX, conf);
     }
@@ -313,7 +348,7 @@ export default class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
-                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(name);
@@ -636,15 +671,6 @@ function isClockWise(vertices) {
         a -= vertices[j].x * vertices[i].y;
     }
     return a > 0;
-}
-
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
 }
 
 const endpoint = (conf, path = '') => {
