@@ -8,7 +8,7 @@ describe('api/interactivity', () => {
         let source, style, layer, mockIntegrator;
 
         beforeEach(() => {
-            source = new Dataset('ne_10m_populated_places_simple', {
+            source = new Dataset('ne_10m_populated_places_simple', {}, {
                 user: 'test',
                 apiKey: '1234567890'
             });

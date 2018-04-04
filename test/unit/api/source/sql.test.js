@@ -2,6 +2,10 @@ import SQL from '../../../../src/api/source/sql';
 
 describe('api/source/sql', () => {
     const query = 'SELECT * from table0';
+    const columns = {
+        columns: [],
+        aggregated_columns: {}
+    };
     const auth = {
         user: 'test',
         apiKey: '1234567890'
@@ -12,7 +16,7 @@ describe('api/source/sql', () => {
 
     describe('constructor', () => {
         it('should build a new Source with (query, auth, options)', () => {
-            const source = new SQL(query, auth, options);
+            const source = new SQL(query, columns, auth, options);
             expect(source._query).toEqual('SELECT * from table0');
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
@@ -22,7 +26,7 @@ describe('api/source/sql', () => {
         });
 
         it('should build a new Source with (query, auth) and default options', () => {
-            const source = new SQL(query, auth);
+            const source = new SQL(query, columns, auth);
             expect(source._query).toEqual('SELECT * from table0');
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');

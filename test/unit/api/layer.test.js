@@ -7,7 +7,7 @@ describe('api/layer', () => {
     let style, style2;
 
     beforeEach(() => {
-        source = new Dataset('ne_10m_populated_places_simple', {
+        source = new Dataset('ne_10m_populated_places_simple', {}, {
             user: 'test',
             apiKey: '1234567890'
         });

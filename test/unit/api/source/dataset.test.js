@@ -2,6 +2,10 @@ import Dataset from '../../../../src/api/source/dataset';
 
 describe('api/source/dataset', () => {
     const tableName = 'table0';
+    const columns = {
+        columns: [],
+        aggregated_columns: {}
+    };
     const auth = {
         user: 'test',
         apiKey: '1234567890'
@@ -12,7 +16,7 @@ describe('api/source/dataset', () => {
 
     describe('constructor', () => {
         it('should build a new Source with (tableName, auth, options)', () => {
-            const source = new Dataset(tableName, auth, options);
+            const source = new Dataset(tableName, columns, auth, options);
             expect(source._tableName).toEqual('table0');
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
@@ -22,7 +26,7 @@ describe('api/source/dataset', () => {
         });
 
         it('should build a new Source with (tableName, auth) and default options', () => {
-            const source = new Dataset(tableName, auth);
+            const source = new Dataset(tableName, columns, auth);
             expect(source._tableName).toEqual('table0');
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');

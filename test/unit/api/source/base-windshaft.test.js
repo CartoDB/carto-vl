@@ -1,6 +1,10 @@
 import SourceBase from '../../../../src/api/source/base-windshaft';
 
 describe('api/source/base-windshaft', () => {
+    const columns = {
+        columns: [],
+        aggregated_columns: {}
+    };
     const auth = {
         user: 'test',
         apiKey: '1234567890'
@@ -21,7 +25,7 @@ describe('api/source/base-windshaft', () => {
         const source = new SourceBase();
         it('should initialize the source with (auth, config)', () => {
             const source = new SourceBase();
-            source.initialize(auth, config);
+            source.initialize(columns, auth, config);
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
@@ -32,7 +36,7 @@ describe('api/source/base-windshaft', () => {
 
         it('should build a new Source with (auth) and default config', () => {
             const source = new SourceBase();
-            source.initialize(auth);
+            source.initialize(columns, auth);
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
@@ -43,49 +47,49 @@ describe('api/source/base-windshaft', () => {
 
         it('should throw an error if auth is not valid', function () {
             expect(function () {
-                source.initialize();
+                source.initialize(columns);
             }).toThrowError('`auth` property is required.');
             expect(function () {
-                source.initialize(1234);
+                source.initialize(columns, 1234);
             }).toThrowError('`auth` property must be an object.');
         });
 
         it('should throw an error if auth.apiKey is not valid', function () {
             expect(function () {
-                source.initialize({});
+                source.initialize(columns, {});
             }).toThrowError('`apiKey` property is required.');
             expect(function () {
-                source.initialize({ apiKey: 1234 });
+                source.initialize(columns, { apiKey: 1234 });
             }).toThrowError('`apiKey` property must be a string.');
             expect(function () {
-                source.initialize({ apiKey: '' });
+                source.initialize(columns, { apiKey: '' });
             }).toThrowError('`apiKey` property must be not empty.');
         });
 
         it('should throw an error if auth.username is not valid', function () {
             expect(function () {
-                source.initialize({ apiKey: '123456789' });
+                source.initialize(columns, { apiKey: '123456789' });
             }).toThrowError('`username` property is required.');
             expect(function () {
-                source.initialize({ user: 1234, apiKey: '123456789' });
+                source.initialize(columns, { user: 1234, apiKey: '123456789' });
             }).toThrowError('`username` property must be a string.');
             expect(function () {
-                source.initialize({ user: '', apiKey: '123456789' });
+                source.initialize(columns, { user: '', apiKey: '123456789' });
             }).toThrowError('`username` property must be not empty.');
         });
 
         it('should throw an error if config are not valid', function () {
             expect(function () {
-                source.initialize(auth, 1234);
+                source.initialize(columns, auth, 1234);
             }).toThrowError('`config` property must be an object.');
         });
 
         it('should throw an error if config.serverURL is not valid', function () {
             expect(function () {
-                source.initialize(auth, { serverURL: 1234 });
+                source.initialize(columns, auth, { serverURL: 1234 });
             }).toThrowError('`serverURL` property must be a string.');
             expect(function () {
-                source.initialize(auth, { serverURL: 'invalid-url' });
+                source.initialize(columns, auth, { serverURL: 'invalid-url' });
             }).toThrowError('`serverURL` property is not a valid URL.');
         });
     });
