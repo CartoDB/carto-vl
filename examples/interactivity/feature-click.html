@@ -72,7 +72,7 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-105.048,39.749],
+      center: [-105.048, 39.749],
       zoom: 15,
       dragRotate: false
     });
@@ -94,10 +94,10 @@
     const layer = new carto.Layer('layer', source, style);
 
     const interactivity = new carto.Interactivity(layer);
-    interactivity.on('featureClick', updateCity);
+    interactivity.on('featureClick', updateTree);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+      updateTitle('Click on the trees');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -106,7 +106,7 @@
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateCity(event) {
+    function updateTree(event) {
       let content = '';
       for (let feature of event.features) {
         content += `
