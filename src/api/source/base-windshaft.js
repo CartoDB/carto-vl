@@ -1,15 +1,12 @@
 import Base from './base';
 import Windshaft from '../../client/windshaft';
+import * as schema from '../../core/schema';
 import CartoValidationError from '../error-handling/carto-validation-error';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
 
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
-const DEFAULT_COLUMNS = {
-    columns: [],
-    aggregated_columns: {}
-};
 
 export default class BaseWindshaft extends Base {
 
@@ -19,7 +16,11 @@ export default class BaseWindshaft extends Base {
     }
 
     initialize(columns, auth, config) {
-        columns = columns || DEFAULT_COLUMNS;
+        columns = columns || {};
+        columns = {
+            columns: columns.columns || [],
+            aggregated_columns: columns.aggregated_columns || {}
+        };
         auth = auth || getDefaultAuth();
         config = config || getDefaultConfig();
         this._checkColumns(columns);
@@ -45,6 +46,15 @@ export default class BaseWindshaft extends Base {
 
     free() {
         this._client.free();
+    }
+
+    getMinimumNeededSchema() {
+        let columns = this._columns.columns;
+        for (let key in this._columns.aggregated_columns) {
+            const item = this._columns.aggregated_columns[key];
+            columns.push(schema.column.aggColumn(item.aggregate_function, item.aggregated_column));
+        }
+        return { columns };
     }
 
     _checkColumns() {

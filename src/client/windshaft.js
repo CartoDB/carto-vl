@@ -70,7 +70,9 @@ export default class Windshaft {
      * @param {*} style
      */
     async getMetadata(style) {
-        const MNS = style.getMinimumNeededSchema();
+        const styleMNS = style.getMinimumNeededSchema();
+        const sourceMNS = this._source.getMinimumNeededSchema();
+        const MNS = this._mergeMNS(styleMNS, sourceMNS);
         const resolution = style.getResolution();
         const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
@@ -98,6 +100,12 @@ export default class Windshaft {
         }
     }
 
+    _mergeMNS(a, b) {
+        a = a || {};
+        b = b || {};
+        const columns = (a.columns || []).concat(b.columns || []);
+        return { columns };
+    }
 
     _getTiles(tiles) {
         this._requestGroupID++;
