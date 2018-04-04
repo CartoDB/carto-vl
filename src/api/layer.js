@@ -91,6 +91,7 @@ export default class Layer {
     async update(source, style) {
         this._checkSource(source);
         this._checkStyle(style);
+        source = source._clone();                
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         await this._context;

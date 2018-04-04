@@ -15,13 +15,13 @@ export default class BaseWindshaft extends Base {
     }
 
     initialize(auth, config) {
-        auth = auth || getDefaultAuth();
-        config = config || getDefaultConfig();
-        checkAuth(auth);
-        checkConfig(config);
-        this._apiKey = auth.apiKey;
-        this._username = auth.username;
-        this._serverURL = this._generateURL(auth, config);
+        this._auth = auth || getDefaultAuth();
+        this._config = config || getDefaultConfig();
+        checkAuth(this._auth);
+        checkConfig(this._config);
+        this._apiKey = this._auth.apiKey;
+        this._username = this._auth.username;
+        this._serverURL = this._generateURL(this._auth, this._config);
     }
 
     bindLayer(...args) {
