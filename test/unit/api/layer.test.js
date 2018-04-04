@@ -55,6 +55,14 @@ describe('api/layer', () => {
                 new Layer('layer0', source, {});
             }).toThrowError('The given object is not a valid style. See "carto.Style".');
         });
+
+
+        it('should throw an error if a style is already added to another layer', () => {
+            new Layer('layer1', source, style);
+            expect(() => {
+                new Layer('layer2', source, style);
+            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
+        });
     });
 
     describe('cloning the source', () => {
@@ -110,6 +118,13 @@ describe('api/layer', () => {
             expect(function () {
                 layer.blendToStyle(2);
             }).toThrowError('The given object is not a valid style. See "carto.Style".');
+        });
+        it('should throw an error if a style is already added to another layer', () => {
+            const layer = new Layer('layer0', source, style);
+            new Layer('layer1', source, style2);
+            expect(() => {
+                layer.blendToStyle(style2);
+            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
         });
     });
 
