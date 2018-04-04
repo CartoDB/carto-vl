@@ -34,6 +34,7 @@ export default class Layer {
     * @api
     */
     constructor(id, source, style) {
+        source = source._clone();
         this._checkId(id);
         this._checkSource(source);
         this._checkStyle(style);
@@ -89,6 +90,7 @@ export default class Layer {
     }
 
     async update(source, style) {
+        source = source._clone();        
         this._checkSource(source);
         this._checkStyle(style);
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;

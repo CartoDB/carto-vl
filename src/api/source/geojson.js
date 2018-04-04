@@ -42,10 +42,15 @@ export default class GeoJSON extends Base {
         this._numCategories = 0;
         this._numFields = [];
         this._catFields = [];
+        this._data = data;
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
 
         this._loaded = false;
+    }
+
+    _clone(){
+        return new GeoJSON(this._data);
     }
 
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
