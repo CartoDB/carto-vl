@@ -141,6 +141,14 @@ const validation = {
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
             friendlyMessage: '`resolution` must be a number.'
+        },
+        'resolution-too-small': {
+            messageRegex: /resolutionTooSmall\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be greater than $0.'
+        },
+        'resolution-too-big': {
+            messageRegex: /resolutionTooBig\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be less than $0.'
         }
     }
 };
