@@ -61,7 +61,7 @@ describe('api/layer', () => {
             new Layer('layer1', source, style);
             expect(() => {
                 new Layer('layer2', source, style);
-            }).toThrowError(/[\s\S]*shared[\s\S]*/g);
+            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
         });
     });
 
@@ -124,7 +124,7 @@ describe('api/layer', () => {
             new Layer('layer1', source, style2);
             expect(() => {
                 layer.blendToStyle(style2);
-            }).toThrowError(/[\s\S]*shared[\s\S]*/g);
+            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
         });
     });
 
