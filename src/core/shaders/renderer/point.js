@@ -103,7 +103,7 @@ void main(void) {
     sizeNormalizer = (size+1.)/(size);
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
+    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;
