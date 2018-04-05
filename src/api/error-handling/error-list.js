@@ -27,6 +27,10 @@ const validation = {
         'non-valid-style': {
             messageRegex: /nonValidStyle/,
             friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
+        },
+        'shared-style': {
+            messageRegex: /sharedStyle/,
+            friendlyMessage: 'The given Style object is already bound to another layer. Styles cannot be shared between different layers'
         }
     },
     setup: {
@@ -141,6 +145,14 @@ const validation = {
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
             friendlyMessage: '`resolution` must be a number.'
+        },
+        'resolution-too-small': {
+            messageRegex: /resolutionTooSmall\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be greater than $0.'
+        },
+        'resolution-too-big': {
+            messageRegex: /resolutionTooBig\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be less than $0.'
         }
     }
 };

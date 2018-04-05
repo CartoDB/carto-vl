@@ -27,7 +27,6 @@ function generateAggregattion(metadataPropertyName, global) {
             this.property = property;
         }
         _compile(metadata) {
-            console.log(metadata);
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
