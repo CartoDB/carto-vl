@@ -27,6 +27,9 @@ function generateAggregattion(metadataPropertyName, global) {
             super({ value: float(0) });
             this.property = property;
         }
+        eval() {
+            return this.value.expr;
+        }
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
@@ -34,7 +37,7 @@ function generateAggregattion(metadataPropertyName, global) {
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
             if (global) {
-                this.value.expr = metadata.columns.find(c => c.name == this.property.name)[metadataPropertyName];
+                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
             }
         }
         _getMinimumNeededSchema() {
@@ -57,9 +60,6 @@ function generateAggregattion(metadataPropertyName, global) {
                 console.log(metadataPropertyName, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
-        }
-        eval() {
-            return this.value.expr;
         }
         _getColumnName() {
             if (this.property._function) {
@@ -104,14 +104,15 @@ function generatePercentile(global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(drawMetadata, gl) {
             if (!global) {
-                const column = drawMetadata.columns.find(c => c.name == this.property.name);
+                const name = this._getColumnName();
+                const column = drawMetadata.columns.find(c => c.name === name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
@@ -124,12 +125,20 @@ function generatePercentile(global) {
             }
 
             if (Math.random() > 0.99) {
-                console.log(`percentile${this.percentile}`, this.property.name, this.value.expr);
+                console.log(`percentile${this.percentile}`, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }
         eval() {
             return this.value.expr;
+        }
+        _getColumnName() {
+            if (this.property._function) {
+                // Property has aggregation
+                const aggName = schema.column.aggregatedName(this.property._function, this.property.name);
+                return schema.column.getAlias(aggName);
+            }
+            return this.property.name;
         }
     };
 }
