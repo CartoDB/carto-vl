@@ -16,17 +16,15 @@ export default class BaseWindshaft extends Base {
     }
 
     initialize(columns, auth, config) {
-        columns = columns || {};
-        this._columns = {
-            columns: columns.columns || [],
-            aggregated_columns: columns.aggregated_columns || {}
-        };
-        this._auth = auth || getDefaultAuth();
-        this._config = config || getDefaultConfig();
+        columns = columns || this._getDefaultColumns();
+        auth = auth || getDefaultAuth();
+        config = config || getDefaultConfig();
         this._checkColumns(columns);
         checkAuth(auth);
         checkConfig(config);
         this._columns = columns;
+        this._auth = auth;
+        this._config = config;
         this._apiKey = auth.apiKey;
         this._username = auth.username;
         this._serverURL = this._generateURL(auth, config);
@@ -61,6 +59,13 @@ export default class BaseWindshaft extends Base {
         const columns = this._columns.columns;
         const aggregatedColumns = Object.keys(this._columns.aggregated_columns);
         return columns.concat(aggregatedColumns);
+    }
+
+    _getDefaultColumns() {
+        return {
+            columns: [],
+            aggregated_columns: {}
+        };
     }
 
     _checkColumns() {
