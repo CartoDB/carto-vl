@@ -1,6 +1,6 @@
 import Expression from './expression';
-import * as schema from '../../schema';
 import { float } from '../functions';
+import * as schema from '../../schema';
 
 export const ViewportMax = generateAggregattion('max');
 export const ViewportMin = generateAggregattion('min');
@@ -109,8 +109,8 @@ function generatePercentile(global) {
             }
         }
         _preDraw(drawMetadata, gl) {
+            const name = this._getColumnName();
             if (!global) {
-                const name = this._getColumnName();
                 const column = drawMetadata.columns.find(c => c.name === name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
@@ -122,7 +122,6 @@ function generatePercentile(global) {
                 const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
                 this.value.expr = br;
             }
-
             if (Math.random() > 0.99) {
                 console.log(`percentile${this.percentile}`, name, this.value.expr);
             }
