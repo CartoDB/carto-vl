@@ -47,7 +47,6 @@ export default class Layer {
 
         this._emitter = mitt();
         this._lastViewport = null;
-        this._lastMNS = null;
         this._integrator = null;
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;

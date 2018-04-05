@@ -156,7 +156,7 @@ export default class Windshaft {
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this._getMetadata(query, MNS, conf);
+        const metadata = await this._getMetadata(query, conf);
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
@@ -489,7 +489,7 @@ export default class Windshaft {
         return { properties, points, featureGeometries };
     }
 
-    async _getMetadata(query, proto, conf) {
+    async _getMetadata(query, conf) {
         //Get column names and types with a limit 0
         //Get min,max,sum and count of numerics
         //for each category type

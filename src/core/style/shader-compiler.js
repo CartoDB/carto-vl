@@ -1,7 +1,10 @@
+import * as schema from '../schema';
+
 export function compileShader(gl, styleRootExpr, shaderCreator) {
     let uniformIDcounter = 0;
     let tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+        name = schema.column.getAlias(name);
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }

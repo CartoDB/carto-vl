@@ -277,7 +277,6 @@ class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-
         const drawMetadata = this._computeDrawMetadata(renderLayer);
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
