@@ -70,7 +70,7 @@ describe('Interactivity', () => {
                     expect(event.features[0].style.color.blendTo).toBeDefined();
                     expect(event.features[0].style.color.reset).toBeDefined();
                     expect(event.features[0].style.reset).toBeDefined();
-                    expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                    expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                     done();
                 });
                 layer.on('loaded', () => {
@@ -105,8 +105,8 @@ describe('Interactivity', () => {
                     layer = new carto.Layer('layer', source, style);
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureClick', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
-                        expect(event.features[1]).toEqual({ id: 1, layerId: 'layer', properties: { cartodb_id: 1 }, style: jasmine.any(Object) });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
+                        expect(event.features[1]).toEqual({ id: 1, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                         done();
                     });
                     layer.on('loaded', () => {
@@ -135,7 +135,7 @@ describe('Interactivity', () => {
                     it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
                         interactivity = new carto.Interactivity(layer);
                         interactivity.on('featureClickOut', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                             done();
                         });
                         layer.on('loaded', () => {
@@ -159,7 +159,7 @@ describe('Interactivity', () => {
                 it('should fire a featureHover event with a features list containing the entered feature', done => {
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureHover', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                         done();
                     });
                     layer.on('loaded', () => {
@@ -172,7 +172,7 @@ describe('Interactivity', () => {
                 it('should fire a featureEnter event with a features list containing the entered feature', done => {
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureEnter', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                         done();
                     });
                     layer.on('loaded', () => {
@@ -222,7 +222,7 @@ describe('Interactivity', () => {
                         // Move mouse inside a feature
                         map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
                         interactivity.on('featureLeave', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { }, style: jasmine.any(Object) });
                             done();
                         });
                         // Move mouse outside the feature
