@@ -16,7 +16,7 @@ export default class BaseWindshaft extends Base {
     }
 
     initialize(columns, auth, config) {
-        columns = columns || this._getDefaultColumns();
+        columns = this._getColumns(columns);
         auth = auth || getDefaultAuth();
         config = config || getDefaultConfig();
         this._checkColumns(columns);
@@ -61,10 +61,11 @@ export default class BaseWindshaft extends Base {
         return columns.concat(aggregatedColumns);
     }
 
-    _getDefaultColumns() {
+    _getColumns(columns) {
+        columns = columns || {};
         return {
-            columns: [],
-            aggregated_columns: {}
+            columns: columns.columns || [],
+            aggregated_columns: columns.aggregated_columns || {}
         };
     }
 

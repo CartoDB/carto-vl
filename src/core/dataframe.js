@@ -203,7 +203,7 @@ export default class Dataframe {
                 if (this.featureProperties.includes(propertyName)) {
                     const column = this.metadata.columns.find(c => c.name == propertyName);
                     if (column && column.type == 'category') {
-                        prop = column.categoryNames[prop];
+                        prop = column.categories[prop].name;
                     }
                     properties[propertyName] = prop;
                 }

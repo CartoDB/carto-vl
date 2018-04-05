@@ -42,7 +42,7 @@ export default class Property extends Expression {
         }
         this.type = metaColumn.type;
         if (this.type == 'category') {
-            this.numCategories = metaColumn.categoryNames.length;
+            this.numCategories = Object.keys(metaColumn.categories).length;
         }
         super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
     }

@@ -29,11 +29,11 @@ export default class Top extends Expression {
         const p = this.property.eval(feature);
         const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
         let ret;
-        metaColumn.categoryNames.map((name, i) => {
-            if (i==p){
-                ret = i < this.buckets? i+1:0;
+        for (let i in metaColumn.categories) {
+            if (i == p) {
+                ret = i < this.buckets ? i+1 : 0;
             }
-        });
+        }
         return ret;
     }
     _postShaderCompile(program, gl) {
@@ -47,11 +47,11 @@ export default class Top extends Expression {
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
             const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
-            metaColumn.categoryNames.map((name, i) => {
+            for (let i in metaColumn.categories) {
                 if (i < this.buckets) {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
-            });
+            }
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);

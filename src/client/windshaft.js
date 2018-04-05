@@ -515,7 +515,9 @@ export default class Windshaft {
         const categoryIDs = {};
         categories.map((name, index) => {
             const t = categoriesTypes[index];
-            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            for (let id in t.categories) {
+                categoryIDs[t.categories[id].name] = id;
+            }
             columns.push(t);
         });
         const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
@@ -650,17 +652,17 @@ export default class Windshaft {
             const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
             const response = await getSQL(catQuery, conf);
             const json = await response.json();
-            let counts = [];
-            let names = [];
+            let categories = {};
             json.rows.map(row => {
-                counts.push(row.count);
-                names.push(row.name);
+                categories[this._getCategoryIDFromString(row.name)] = {
+                    count: row.count,
+                    name: row.name
+                };
             });
             return {
                 name,
                 type: 'category',
-                categoryNames: names,
-                categoryCounts: counts
+                categories
             };
         }));
     }
