@@ -202,6 +202,7 @@ class Renderer {
                 if (x > minx && x < maxx && y > miny && y < maxy) {
                     if (style.getFilter()) {
                         columnNames.forEach(name => {
+                            name = schema.column.getAlias(name);
                             f[name] = d.properties[name][i];
                         });
                         if (style.getFilter().eval(f) < 0.5) {

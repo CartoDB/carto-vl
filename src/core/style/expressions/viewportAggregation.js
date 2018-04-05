@@ -1,4 +1,5 @@
 import Expression from './expression';
+import * as schema from '../../schema';
 import { float } from '../functions';
 
 export const ViewportMax = generateAggregattion('max');
@@ -27,7 +28,6 @@ function generateAggregattion(metadataPropertyName, global) {
             this.property = property;
         }
         _compile(metadata) {
-            console.log(metadata);
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
@@ -42,23 +42,32 @@ function generateAggregattion(metadataPropertyName, global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(drawMetadata, gl) {
-            const column = drawMetadata.columns.find(c => c.name == this.property.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name === name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, this.value.expr);
+                console.log(metadataPropertyName, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }
         eval() {
             return this.value.expr;
+        }
+        _getColumnName() {
+            if (this.property._function) {
+                // Property has aggregation
+                const aggName = schema.column.aggregatedName(this.property._function, this.property.name);
+                return schema.column.getAlias(aggName);
+            }
+            return this.property.name;
         }
     };
 }
