@@ -1,4 +1,5 @@
 import Expression from './expression';
+import * as schema from '../../schema';
 import { float } from '../functions';
 
 export const ViewportMax = generateAggregattion('max');
@@ -41,23 +42,31 @@ function generateAggregattion(metadataPropertyName, global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(drawMetadata, gl) {
-            const column = drawMetadata.columns.find(c => c.name == this.property.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name === name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, this.value.expr);
+                console.log(metadataPropertyName, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }
         eval() {
             return this.value.expr;
+        }
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return schema.column.aggColumn(this.property.name, this.property.aggName());
+            }
+            return this.property.name;
         }
     };
 }

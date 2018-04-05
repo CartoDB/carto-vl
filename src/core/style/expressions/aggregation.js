@@ -21,6 +21,9 @@ function genAggregationOp(aggName, aggType) {
         get name() {
             return this.property.name;
         }
+        get aggName() {
+            return this._aggName;
+        }
         get numCategories() {
             return this.property.numCategories;
         }

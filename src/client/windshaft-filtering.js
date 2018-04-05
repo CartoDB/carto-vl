@@ -167,7 +167,7 @@ class AggregationFiltering {
         if (f instanceof Max || f instanceof Min || f instanceof Avg || f instanceof Sum || f instanceof Mode) {
             let p = this._property(f.property);
             if (p) {
-                p.property = schema.column.aggColumn(p.property, f._aggName);
+                p.property = schema.column.aggColumn(p.property, f.aggName());
                 return p;
             }
         }
