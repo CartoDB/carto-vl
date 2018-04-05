@@ -49,7 +49,7 @@ export default class BaseWindshaft extends Base {
     }
 
     getMinimumNeededSchema() {
-        let columns = this._columns.columns;
+        const columns = this._columns.columns.slice(0);
         for (let key in this._columns.aggregated_columns) {
             const item = this._columns.aggregated_columns[key];
             columns.push(schema.column.aggregatedName(item.aggregate_function, item.aggregated_column, key));
