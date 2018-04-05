@@ -38,13 +38,17 @@ export default class Ramp extends Expression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['float', 'category'], input);
-        checkType('ramp', 'palette', 1, ['palette', 'customPalette'], palette);
+        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteFloat'], palette);
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        this.type = 'color';
+        if (palette.type == 'customPaletteFloat') {
+            this.type = 'float';
+        } else {
+            this.type = 'color';
+        }
     }
     _compile(meta) {
         super._compile(meta);
@@ -65,7 +69,9 @@ export default class Ramp extends Expression {
         uniform float keyMin${this._UID};
         uniform float keyWidth${this._UID};
         `,
-            inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
+            inline: this.palette.type == 'customPaletteFloat' ?
+                `(255.*texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).a)`
+                : `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
     _getColorsFromPalette(input, palette) {
@@ -97,31 +103,39 @@ export default class Ramp extends Expression {
             this.init = true;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const level = 0;
-            const internalFormat = gl.RGBA;
             const width = 256;
-            const height = 1;
-            const border = 0;
-            const srcFormat = gl.RGBA;
-            const srcType = gl.UNSIGNED_BYTE;
-            const pixel = new Uint8Array(4 * width);
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
-            for (var i = 0; i < width; i++) {
-                const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
-                const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
-                const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vlowRaw.a];
-                const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
-                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-                pixel[4 * i + 0] = v[0];
-                pixel[4 * i + 1] = v[1];
-                pixel[4 * i + 2] = v[2];
-                pixel[4 * i + 3] = v[3];
+            if (this.type == 'color') {
+                const pixel = new Uint8Array(4 * width);
+                const colors = this._getColorsFromPalette(this.input, this.palette);
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                    const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
+                    const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
+                    const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vlowRaw.a];
+                    const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
+                    const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                    pixel[4 * i + 0] = v[0];
+                    pixel[4 * i + 1] = v[1];
+                    pixel[4 * i + 2] = v[2];
+                    pixel[4 * i + 3] = v[3];
+                }
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                    pixel);
+            } else {
+                const pixel = new Uint8Array(4 * width);
+                const floats = this.palette.floats;
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
+                    const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
+                    const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
+                    pixel[4 * i + 3] = Math.round((1. - m) * vlowRaw + m * vhighRaw);
+                }
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                    pixel);
             }
-            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);

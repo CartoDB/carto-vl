@@ -1,7 +1,7 @@
 
 import * as cartocolor from 'cartocolor';
 import Expression from './expression';
-import { hexToRgb, checkType } from './utils';
+import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
 
 /**
  * ### Color palettes
@@ -54,15 +54,30 @@ class PaletteGenerator extends Expression {
 
 export class CustomPalette extends Expression {
     // colors is a list of expression of type 'color'
-    constructor(...colors) {
-        colors.map((color, index) => checkType('CustomPalette', `color[${index}`, index, 'color', color));
+    constructor(...elems) {
+        elems = elems.map(implicitCast);
+        if (!elems.length) {
+            throw new Error('CustomPalette() must receive at least one argument');
+        }
+        checkType('customPalette', 'colors[0]', 0, ['color', 'float'], elems[0]);
+        const type = elems[0].type;
+        elems.map((color, index) => {
+            checkExpression('customPalette', `colors[${index}]`, index, color);
+            if (color.type != type) {
+                throw new Error('customPalette(): invalid argument type combination');
+            }
+        });
         super({});
-        this.type = 'customPalette';
+        this.type = type == 'color' ? 'customPalette' : 'customPaletteFloat';
         try {
-            // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]            
-            this.colors = colors.map(c => c.eval());
+            if (type == 'color') {
+                // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]
+                this.colors = elems.map(c => c.eval());
+            } else {
+                this.floats = elems.map(c => c.eval());
+            }
         } catch (error) {
-            throw new Error('Palettes must be formed by constant colors, they cannot depend on feature properties');
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
 }
