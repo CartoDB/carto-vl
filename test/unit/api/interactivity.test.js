@@ -33,7 +33,7 @@ describe('api/interactivity', () => {
         });
 
         it('should build a new Interactivity object with two layers with the same integrator', () => {
-            const layer2 = new Layer('layer2', source, style);
+            const layer2 = new Layer('layer2', source, new Style());
             layer2.getIntegrator = () => mockIntegrator;
             const interactivity = new Interactivity([layer, layer2]);
 

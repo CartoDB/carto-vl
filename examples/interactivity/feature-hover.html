@@ -29,7 +29,7 @@
       position: absolute;
       top: 12px;
       right: 12px;
-      width: 200px;
+      width: 230px;
       z-index: 2;
     }
 
@@ -72,8 +72,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [20, 50],
-      zoom: 3,
+      center: [-0.127, 51.507],
+      zoom: 9,
       dragRotate: false
     });
 
@@ -83,18 +83,18 @@
     });
 
     const source = new carto.source.Dataset(`
-      ne_adm0_europe
+      london_neighbourhoods
     `);
     const style = new carto.Style(`
-      color: ramp($admin, bold)
+      color: ramp($neighbourhood, bold)
     `);
     const layer = new carto.Layer('layer', source, style);
 
     const interactivity = new carto.Interactivity(layer);
-    interactivity.on('featureHover', updateCountry);
+    interactivity.on('featureHover', updateNeighbourhood);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the countries');
+      updateTitle('Move the mouse over each neighbourhood');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -103,12 +103,12 @@
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateCountry(event) {
+    function updateNeighbourhood(event) {
       let content = '';
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.properties.admin}</h3>
+            <h3>${feature.properties.neighbourhood}</h3>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

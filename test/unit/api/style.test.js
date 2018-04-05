@@ -79,6 +79,24 @@ describe('api/style', () => {
                 }).toThrowError('`resolution` must be a number.');
             });
 
+            it('should throw an error when resolution is too small', () => {
+                const styleSpec = {
+                    resolution: 0
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`resolution` must be greater than 0.');
+            });
+
+            it('should throw an error when resolution is too big', () => {
+                const styleSpec = {
+                    resolution: 10000
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`resolution` must be less than 256.');
+            });
+
             it('should throw an error when color is not a valid expression', () => {
                 const styleSpec = {
                     color: 'red' // wrong type!

@@ -17,12 +17,12 @@ export default class BaseWindshaft extends Base {
 
     initialize(columns, auth, config) {
         columns = columns || {};
-        columns = {
+        this._columns = {
             columns: columns.columns || [],
             aggregated_columns: columns.aggregated_columns || {}
         };
-        auth = auth || getDefaultAuth();
-        config = config || getDefaultConfig();
+        this._auth = auth || getDefaultAuth();
+        this._config = config || getDefaultConfig();
         this._checkColumns(columns);
         checkAuth(auth);
         checkConfig(config);

@@ -48,6 +48,10 @@ export default class Dataset extends BaseWindshaft {
         this.initialize(columns, auth, config);
     }
 
+    _clone() {
+        return new Dataset(this._tableName, this._columns, this._auth, this._config);
+    }
+
     _checkTableName(tableName) {
         if (util.isUndefined(tableName)) {
             throw new CartoValidationError('source', 'tableNameRequired');
