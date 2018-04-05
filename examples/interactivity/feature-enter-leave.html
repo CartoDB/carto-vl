@@ -82,7 +82,7 @@
       ne_50m_rivers_lake_centerlines
     `);
     const style = new carto.Style(`
-      width: 6
+      width: 1*zoom()
       color: ramp($name, bold)
       filter: in($featurecla, 'River')
     `);

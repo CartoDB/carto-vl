@@ -137,9 +137,16 @@ export default class Windshaft {
         return !!this.metadata;
     }
 
-    _getCategoryIDFromString(category) {
+    _getCategoryIDFromString(category, readonly = true) {
+        if (category === undefined){
+            category = 'null';
+        }
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
+        }
+        if (readonly){
+            console.warn(`category ${category} not present in metadata`);
+            return -1;
         }
         this._categoryStringToIDMap[category] = this._numCategories;
         this._numCategories++;
@@ -511,7 +518,7 @@ export default class Windshaft {
         const categoryIDs = {};
         categories.map((name, index) => {
             const t = categoriesTypes[index];
-            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
             columns.push(t);
         });
         const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
