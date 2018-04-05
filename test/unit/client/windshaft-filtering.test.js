@@ -487,7 +487,7 @@ describe('src/client/windshaft-filtering', () => {
 
             it('between(avg($numericProperty), 10, 20)', () => {
                 const expected = {
-                    '_cdb_agg avg numericProperty': [{
+                    '_cdb_agg_avg_numericProperty': [{
                         greater_than_or_equal_to:  10,
                         less_than_or_equal_to:  20
                     }]

@@ -47,7 +47,7 @@ class AggregationFiltering {
                 }
             }
             else {
-                filters[name] = p.filters;
+                filters[schema.column.getAlias(name)] = p.filters;
             }
         }
         return filters;
@@ -167,7 +167,7 @@ class AggregationFiltering {
         if (f instanceof Max || f instanceof Min || f instanceof Avg || f instanceof Sum || f instanceof Mode) {
             let p = this._property(f.property);
             if (p) {
-                p.property = schema.column.aggregatedName(p.property, f._aggColumn);
+                p.property = schema.column.aggregatedName(f.function, p.property);
                 return p;
             }
         }

@@ -58,7 +58,7 @@ export const column = {
     },
     getAlias: name => {
         const result = AGG_PATTERN_ALIAS.exec(name);
-        return result ? result[1] : name;
+        return result ? result[1] : name.replace(/ /g,'_');
     },
     aggregatedName(aggFunction, aggColumn, alias) {
         let name = `${AGG_PREFIX} ${aggFunction} ${aggColumn}`;

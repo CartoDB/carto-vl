@@ -10,13 +10,13 @@ export const Avg = genAggregationOp('avg', 'float');
 export const Sum = genAggregationOp('sum', 'float');
 export const Mode = genAggregationOp('mode', 'category');
 
-function genAggregationOp(aggColumn, aggType) {
+function genAggregationOp(aggFunction, aggType) {
     return class AggregationOperation extends Expression {
         constructor(property) {
-            checkInstance(aggColumn, 'property', 0, Property, property);
+            checkInstance(aggFunction, 'property', 0, Property, property);
             super({ property: property });
-            this._aggColumn = aggColumn;
-            this.type = aggType;
+            this._type = aggType;
+            this._function = aggFunction;
         }
         get name() {
             return this.property.name;
@@ -24,25 +24,31 @@ function genAggregationOp(aggColumn, aggType) {
         get numCategories() {
             return this.property.numCategories;
         }
+        get type() {
+            return this._type;
+        }
+        get function() {
+            return this._function;
+        }
         //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
         _compile(metadata) {
             super._compile(metadata);
-            checkType(aggColumn, 'property', 0, aggType, this.property);
+            checkType(aggFunction, 'property', 0, aggType, this.property);
         }
         _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
             return {
                 preface: '',
-                inline: `${getGLSLforProperty(schema.column.aggregatedName(this.property.name, aggColumn))}`
+                inline: `${getGLSLforProperty(schema.column.aggregatedName(aggFunction, this.property.name))}`
             };
         }
         eval(feature) {
-            return feature[schema.column.aggregatedName(this.property.name, aggColumn)];
+            return feature[schema.column.aggregatedName(aggFunction, this.property.name)];
         }
         _postShaderCompile() { }
         _getMinimumNeededSchema() {
             return {
                 columns: [
-                    schema.column.aggregatedName(this.property.name, aggColumn)
+                    schema.column.aggregatedName(aggFunction, this.property.name)
                 ]
             };
         }

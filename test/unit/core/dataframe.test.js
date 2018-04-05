@@ -140,17 +140,19 @@ describe('src/core/dataframe', () => {
                     numeric_prop: 0
                 }
             };
+            const style = {
+            };
             it('should return an empty list when there are no features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 })).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 }, style)).toEqual([]);
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 })).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, style)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, style)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 }, style)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, style)).toEqual([feature1]);
             });
         });
 

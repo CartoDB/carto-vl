@@ -211,7 +211,7 @@ export default class Windshaft {
         return MNS.columns.some(column => R.schema.column.isAggregated(column));
     }
 
-    _generateAggregation(MRS, resolution) {
+    _generateAggregation(MNS, resolution) {
         let aggregation = {
             columns: {},
             dimensions: {},
@@ -220,7 +220,7 @@ export default class Windshaft {
             threshold: 1,
         };
 
-        MRS.columns
+        MNS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
                     if (R.schema.column.isAggregated(name)) {
@@ -244,7 +244,7 @@ export default class Windshaft {
                 name += '::text';
             }
             return name;
-        });
+        }).filter(name => name !== '');
         return aggColumns.concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
