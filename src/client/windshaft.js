@@ -238,14 +238,10 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MNS, dateFields = []) {
-        const aggColumns = MNS.columns.map(name => {
-            name = R.schema.column.getAggregatedColumn(name);
-            if (dateFields.includes(name)) {
-                name += '::text';
-            }
-            return name;
-        }).filter(name => name !== '');
-        return aggColumns.concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        return MNS.columns
+            .map(name => R.schema.column.getBase(name))
+            .map(name => dateFields.includes(name) ? name + '::text' : name)
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
     _buildQuery(select, filters) {
@@ -356,7 +352,7 @@ export default class Windshaft {
                 const dateFields = [];
                 this._MNS.columns.map(name => {
                     const alias = R.schema.column.getAlias(name);
-                    const basename = R.schema.column.getAggregatedColumn(name);
+                    const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(alias);

@@ -32,7 +32,7 @@ export function union(a, b) {
     };
 }
 
-export function equals(a,b){
+export function equals(a, b) {
     if (!a || !b){
         return false;
     }
@@ -43,28 +43,43 @@ const AGG_PREFIX = '_cdb_agg';
 const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + ' ([a-zA-Z0-9_]+) ([a-zA-Z0-9_]+)');
 const AGG_PATTERN_ALIAS = new RegExp('^' + AGG_PREFIX + ' [a-zA-Z0-9_]+ [a-zA-Z0-9_]+ ([a-zA-Z0-9_]+)');
 
+function isAggregated(name) {
+    return name.startsWith(AGG_PREFIX);
+}
+
+function getAggregateFunction(name) {
+    const result = AGG_PATTERN.exec(name);
+    return result ? result[1] : '';
+}
+
+function getAggregatedColumn(name) {
+    const result = AGG_PATTERN.exec(name);
+    return result ? result[2] : '';
+}
+
+function getAlias(name) {
+    const result = AGG_PATTERN_ALIAS.exec(name);
+    return result ? result[1] : name.replace(/ /g,'_');
+}
+
+function getBase(name) {
+    return getAggregatedColumn(name) || name;
+}
+
+function aggregatedName(aggFunction, aggColumn, alias) {
+    let name = `${AGG_PREFIX} ${aggFunction} ${aggColumn}`;
+    if (alias) {
+        name += ` ${alias}`;
+    }
+    return name;
+}
+
 // column information functions
 export const column = {
-    isAggregated: name => {
-        return name.startsWith(AGG_PREFIX);
-    },
-    getAggregateFunction: name => {
-        const result = AGG_PATTERN.exec(name);
-        return result ? result[1] : '';
-    },
-    getAggregatedColumn: name => {
-        const result = AGG_PATTERN.exec(name);
-        return result ? result[2] : name;
-    },
-    getAlias: name => {
-        const result = AGG_PATTERN_ALIAS.exec(name);
-        return result ? result[1] : name.replace(/ /g,'_');
-    },
-    aggregatedName(aggFunction, aggColumn, alias) {
-        let name = `${AGG_PREFIX} ${aggFunction} ${aggColumn}`;
-        if (alias) {
-            name += ` ${alias}`;
-        }
-        return name;
-    }
+    isAggregated,
+    getAggregateFunction,
+    getAggregatedColumn,
+    getAlias,
+    getBase,
+    aggregatedName
 };
