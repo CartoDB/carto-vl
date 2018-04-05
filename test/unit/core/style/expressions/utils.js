@@ -9,7 +9,20 @@ const metadata = {
         {
             name: 'cat',
             type: 'category',
-            categoryNames: ['red', 'blue']
+            categories: {
+                10: {
+                    name: 'red',
+                    count: 10
+                },
+                11: {
+                    name: 'blue',
+                    count: 30
+                },
+                12: {
+                    name: 'green',
+                    count: 15
+                }
+            }
         }
     ],
 };

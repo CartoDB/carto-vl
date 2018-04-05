@@ -19,7 +19,20 @@ describe('src/core/style/expressions/category', () => {
             columns: [{
                 type: 'category',
                 name: 'category',
-                categoryNames: ['cat0', 'cat1', 'cat2']
+                categories: {
+                    0: {
+                        name: 'cat0',
+                        counts: 1
+                    },
+                    1: {
+                        name: 'cat1',
+                        counts: 1
+                    },
+                    2: {
+                        name: 'cat2',
+                        counts: 1
+                    }
+                }
             }],
             categoryIDs: {
                 'cat0': 0,
@@ -36,5 +49,3 @@ describe('src/core/style/expressions/category', () => {
         });
     });
 });
-
-

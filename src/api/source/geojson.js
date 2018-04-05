@@ -139,7 +139,8 @@ export default class GeoJSON extends Base {
         });
         this._catFields.map(name => {
             const column = columns.find(c => c.name == name);
-            for (let category of column.categories) {
+            for (let id in column.categories) {
+                const category = column.categories[id];
                 categoryIDs[category.name] = this._getCategoryIDFromString(category.name);
             }
         });
@@ -189,18 +190,18 @@ export default class GeoJSON extends Base {
             columns.push({
                 name: propertyName,
                 type: 'category',
-                categories: {},
-                count: 0
+                categories: {}
             });
         }
+        const id = this._getCategoryIDFromString(value);
         const column = columns.find(c => c.name === propertyName);
         if (!Object.values(column.categories).find(category => category.name === value)) {
-            column.categories[this._getCategoryIDFromString(value)] = {
+            column.categories[id] = {
                 name: value,
-                count: column.count
+                counts: 0
             };
         }
-        column.count++;
+        column.categories[id].counts++;
     }
 
     _decodeProperties() {

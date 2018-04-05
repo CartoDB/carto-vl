@@ -128,8 +128,16 @@ describe('api/source/geojson', () => {
                     {
                         name: 'category',
                         type: 'category',
-                        categoryNames: ['red', 'blue'],
-                        categoryCounts: [1, 1],
+                        categories: {
+                            0: {
+                                name: 'red',
+                                counts: 1
+                            },
+                            1: {
+                                name: 'blue',
+                                counts: 1
+                            }
+                        }
                     },
                     {
                         name: 'cartodb_id',
@@ -150,12 +158,12 @@ describe('api/source/geojson', () => {
                     {
                         numeric: 1,
                         category: 'red',
-                        cartodb_id: 0,
+                        cartodb_id: 0
                     },
                     {
                         numeric: 2,
                         category: 'blue',
-                        cartodb_id: 1,
+                        cartodb_id: 1
                     }
                 ]
             };

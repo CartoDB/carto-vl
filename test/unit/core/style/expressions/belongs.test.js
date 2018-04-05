@@ -6,7 +6,20 @@ describe('src/core/style/expressions/belongs', () => {
         columns: [{
             type: 'category',
             name: 'category',
-            categoryNames: ['cat0', 'cat1', 'cat2']
+            categories: {
+                0: {
+                    name: 'cat0',
+                    counts: 1
+                },
+                1: {
+                    name: 'cat1',
+                    counts: 1
+                },
+                2: {
+                    name: 'cat2',
+                    counts: 1
+                }
+            }
         },
         {
             name: 'price',
@@ -92,5 +105,3 @@ describe('src/core/style/expressions/belongs', () => {
         });
     });
 });
-
-
