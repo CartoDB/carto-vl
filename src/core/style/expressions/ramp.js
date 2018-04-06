@@ -70,7 +70,7 @@ export default class Ramp extends Expression {
         uniform float keyWidth${this._UID};
         `,
             inline: this.palette.type == 'customPaletteFloat' ?
-                `(255.*texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).a)`
+                `(texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).a)`
                 : `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
@@ -122,24 +122,26 @@ export default class Ramp extends Expression {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                     pixel);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                const pixel = new Uint8Array(4 * width);
+                const pixel = new Float32Array(width);
                 const floats = this.palette.floats;
                 for (let i = 0; i < width; i++) {
                     const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
                     const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
                     const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
-                    pixel[4 * i + 3] = Math.round((1. - m) * vlowRaw + m * vhighRaw);
+                    pixel[i] =((1. - m) * vlowRaw + m * vhighRaw);
                 }
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, 1, 0, gl.ALPHA, gl.FLOAT,
                     pixel);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
 
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         }
         this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
