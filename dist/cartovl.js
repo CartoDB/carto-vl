@@ -1,5 +1,5 @@
 /*!
- * CARTO GL js https://carto.com/
+ * CARTO VL js https://carto.com/
  * Version: 0.1.0
  * 
  */
