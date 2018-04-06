@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, hexToRgb, checkLooseType, checkExpression, checkType } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType } from './utils';
 
 export default class Ramp extends Expression {
     /**
@@ -38,7 +38,7 @@ export default class Ramp extends Expression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['float', 'category'], input);
-        checkType('ramp', 'palette', 1, 'palette', palette);
+        checkType('ramp', 'palette', 1, ['palette', 'customPalette'], palette);
 
         super({ input: input });
         this.minKey = 0;
@@ -89,7 +89,7 @@ export default class Ramp extends Expression {
             }
             return colors;
         } else {
-            return palette;
+            return palette.colors;
         }
     }
     _postShaderCompile(program, gl) {
@@ -110,8 +110,8 @@ export default class Ramp extends Expression {
             for (var i = 0; i < width; i++) {
                 const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                 const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                const vlow = [hexToRgb(vlowRaw).r, hexToRgb(vlowRaw).g, hexToRgb(vlowRaw).b, 255];
-                const vhigh = [hexToRgb(vhighRaw).r, hexToRgb(vhighRaw).g, hexToRgb(vhighRaw).b, 255];
+                const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
+                const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vlowRaw.a];
                 const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                 const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                 pixel[4 * i + 0] = v[0];

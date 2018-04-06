@@ -31,12 +31,12 @@ export class NamedColor extends Expression {
         super({});
         this.type = 'color';
         this.name = colorName;
+        this.color = this._nameToRGB(this.name);
     }
 
     _compile(meta) {
         super._compile(meta);
-        const color = this._nameToRGB(this.name);
-        this.inlineMaker = () => `vec4(${(color.r / 255).toFixed(4)}, ${(color.g / 255).toFixed(4)}, ${(color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
 
     _nameToRGB(name) {
@@ -48,10 +48,12 @@ export class NamedColor extends Expression {
         document.body.removeChild(fakeDiv);
 
         const match = colorRegex.exec(rgbSring);
-        return { r: match[1], g: match[2], b: match[3] };
+        return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: 1 };
 
     }
-    // TODO eval
+    eval(){
+        return this.color;
+    }
 }
 
 export default NamedColor;

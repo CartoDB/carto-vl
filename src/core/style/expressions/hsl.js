@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, checkExpression, checkLooseType, checkType } from './utils';
+import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
  *
@@ -77,7 +77,40 @@ function genHSL(name, alpha) {
     #endif
     `);
         }
-        // TODO eval
+        eval(f) {
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                }
+                return value.eval(f);
+            };
+            const h = clamp(normalize(this.h, true), 0, 1);
+            const s = clamp(normalize(this.s), 0, 1);
+            const l = clamp(normalize(this.l), 0, 1);
+
+            const hslToRgb = (h, s, l) => {
+                const c = {
+                    r: Math.abs(h * 6 - 3) - 1,
+                    g: 2 - Math.abs(h * 6 - 2),
+                    b: 2 - Math.abs(h * 6 - 4),
+                    a: alpha ? this.a.eval(f) : 1,
+                };
+
+                const C = (1 - Math.abs(2 * l - 1)) * s;
+
+                c.r = clamp(c.r, 0, 1);
+                c.g = clamp(c.g, 0, 1);
+                c.b = clamp(c.b, 0, 1);
+
+                c.r = ((c.r - 0.5) * C + l) * 255;
+                c.g = ((c.g - 0.5) * C + l) * 255;
+                c.b = ((c.b - 0.5) * C + l) * 255;
+
+                return c;
+            };
+
+            return hslToRgb(h, s, l);
+        }
     };
 
     function hslCheckType(parameterName, parameterIndex, parameter) {

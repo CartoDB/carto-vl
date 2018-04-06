@@ -25,14 +25,16 @@ export default class Hex extends Expression {
         super({});
         this.type = 'color';
         try {
-            this.hex = hexToRgb(hexadecimalColor);
+            this.color = hexToRgb(hexadecimalColor);
         } catch (error) {
             throw new Error(getStringErrorPreface('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
     }
     _compile(meta) {
         super._compile(meta);
-        this.inlineMaker = () => `vec4(${(this.hex.r / 255).toFixed(4)}, ${(this.hex.g / 255).toFixed(4)}, ${(this.hex.b / 255).toFixed(4)}, ${(this.hex.a / 255).toFixed(4)})`;
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a / 255).toFixed(4)})`;
     }
-    // TODO eval
+    eval(){
+        return this.color;
+    }
 }
