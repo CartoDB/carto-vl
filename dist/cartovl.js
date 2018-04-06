@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 34);
+/******/ 	return __webpack_require__(__webpack_require__.s = 36);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(8);
 
 
 
@@ -135,15 +135,15 @@ class Expression {
     /**
      * Generate GLSL code
      * @param {*} uniformIDMaker    fn to get unique IDs
-     * @param {*} propertyTIDMaker  fn to get property IDs and inform of used properties
+     * @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
      */
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         return {
             preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
-            inline: this.inlineMaker(childInlines, uniformIDMaker, propertyTIDMaker)
+            inline: this.inlineMaker(childInlines, uniformIDMaker, getGLSLforProperty)
         };
     }
 
@@ -259,6 +259,7 @@ class Expression {
 /* unused harmony export throwInvalidType */
 /* unused harmony export throwInvalidInstance */
 /* unused harmony export throwInvalidNumber */
+/* unused harmony export throwInvalidArray */
 /* unused harmony export throwInvalidString */
 /* harmony export (immutable) */ __webpack_exports__["d"] = checkLooseType;
 /* harmony export (immutable) */ __webpack_exports__["b"] = checkExpression;
@@ -266,6 +267,7 @@ class Expression {
 /* harmony export (immutable) */ __webpack_exports__["c"] = checkInstance;
 /* harmony export (immutable) */ __webpack_exports__["e"] = checkNumber;
 /* harmony export (immutable) */ __webpack_exports__["f"] = checkString;
+/* unused harmony export checkArray */
 /* harmony export (immutable) */ __webpack_exports__["h"] = clamp;
 /* harmony export (immutable) */ __webpack_exports__["m"] = mix;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
@@ -281,9 +283,10 @@ const DEFAULT = undefined;
 function implicitCast(value) {
     if (Number.isFinite(value)) {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["float"])(value);
-    }
-    if (typeof value == 'string') {
+    } else if (typeof value == 'string') {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
+    }else if(Array.isArray(value)){
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["customPalette"])(...value);
     }
     return value;
 }
@@ -296,7 +299,7 @@ function hexToRgb(hex) {
             r: parseInt(result[1] + result[1], 16),
             g: parseInt(result[2] + result[2], 16),
             b: parseInt(result[3] + result[3], 16),
-            a: 255
+            a: 1
         };
     }
     // Evaluate #ABCDEF
@@ -306,7 +309,7 @@ function hexToRgb(hex) {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
             b: parseInt(result[3], 16),
-            a: 255
+            a: 1
         };
     }
     throw new Error('Invalid hexadecimal color');
@@ -338,6 +341,11 @@ function throwInvalidInstance(expressionName, parameterName, parameterIndex, exp
 function throwInvalidNumber(expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     '${number}' is not a finite number`);
+}
+
+function throwInvalidArray(expressionName, parameterName, parameterIndex, array) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${array}' is not an array`);
 }
 
 function throwInvalidString(expressionName, parameterName, parameterIndex, str) {
@@ -397,6 +405,11 @@ function checkString(expressionName, parameterName, parameterIndex, str) {
     }
 }
 
+function checkArray(expressionName, parameterName, parameterIndex, number) {
+    if (!Array.isArray(number)) {
+        throwInvalidArray(expressionName, parameterName, parameterIndex, number);
+    }
+}
 
 function clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);
@@ -414,42 +427,43 @@ function mix(x, y, a) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return _in; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_animate__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_blend__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_buckets__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_CIELab__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_float__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_category__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_linear__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_near__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_now__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_ramp__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_top__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_xyz__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_zoom__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_belongs_js__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_between__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_time__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_time__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_unary__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_torque__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_rgb__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_hsv__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_hex__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_torque__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_rgb__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_hsv__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_hex__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_named_color__ = __webpack_require__(22);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Cubic", function() { return __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__ = __webpack_require__(57);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__ = __webpack_require__(58);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["b"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__ = __webpack_require__(60);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["b"]; });
 /**
  *  @api
  *  @namespace carto.style.expressions
@@ -581,17 +595,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+
 // Expose classes as constructor functions
-const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["a" /* Asc */](...args);
+const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["a" /* Asc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["asc"] = asc;
 
-const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["b" /* Desc */](...args);
+const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["b" /* Desc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["desc"] = desc;
 
-const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["c" /* NoOrder */](...args);
+const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["c" /* NoOrder */](...args);
 /* harmony export (immutable) */ __webpack_exports__["noOrder"] = noOrder;
 
-const width = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_ordering__["d" /* Width */](...args);
+const width = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_ordering__["d" /* Width */](...args);
 /* harmony export (immutable) */ __webpack_exports__["width"] = width;
 
 const floatMul = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_binary__["f" /* FloatMul */](...args);
@@ -662,6 +677,9 @@ const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__["a"
 
 const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_hsl__["b" /* HSLA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsla"] = hsla;
+
+const namedColor = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_named_color__["c" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["namedColor"] = namedColor;
 
 const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_opacity__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
@@ -744,43 +762,43 @@ const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_qua
 const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["a" /* GlobalQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalQuantiles"] = globalQuantiles;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
+const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
-const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
+const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
 
-const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
+const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalPercentile"] = globalPercentile;
 
-const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
+const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMax"] = globalMax;
 
-const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
+const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMin"] = globalMin;
 
-const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
+const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
 
-const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
+const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalSum"] = globalSum;
 
-const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
+const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalCount"] = globalCount;
 
-const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a" /* Inverse */](...args);
+const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["b" /* Inverse */](...args);
 /* harmony export (immutable) */ __webpack_exports__["inverse"] = inverse;
 
 const floatConstant = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](...args);
@@ -794,6 +812,9 @@ const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_torque__
 
 const time = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_time__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["time"] = time;
+
+const customPalette = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_palettes__["a" /* CustomPalette */](...args);
+/* harmony export (immutable) */ __webpack_exports__["customPalette"] = customPalette;
 
 
 const TRUE = new __WEBPACK_IMPORTED_MODULE_6__expressions_floatConstant__["a" /* default */](1);
@@ -1630,7 +1651,7 @@ function genUnaryOp(name, jsFn, glsl) {
             super._compile(meta);
             Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'x', 0, 'float', this.a);
             if (this.a.type != 'float') {
-                throw new Error(`Binary operation cannot be performed to '${this.a.type}'`);
+                throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
             this.inlineMaker = inlines => glsl(inlines.a);
         }
@@ -1646,7 +1667,7 @@ function genUnaryOp(name, jsFn, glsl) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(71);
 
 
 /**
@@ -1669,6 +1690,150 @@ class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a
 
 /***/ }),
 /* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
+
+
+
+
+
+// Aggregation ops
+const Max = genAggregationOp('max', 'float');
+/* harmony export (immutable) */ __webpack_exports__["b"] = Max;
+
+const Min = genAggregationOp('min', 'float');
+/* harmony export (immutable) */ __webpack_exports__["c"] = Min;
+
+const Avg = genAggregationOp('avg', 'float');
+/* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
+
+const Sum = genAggregationOp('sum', 'float');
+/* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
+
+const Mode = genAggregationOp('mode', 'category');
+/* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
+
+
+function genAggregationOp(aggName, aggType) {
+    return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(property) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
+            super({ property: property });
+            this._aggName = aggName;
+            this.type = aggType;
+        }
+        get name() {
+            return this.property.name;
+        }
+        get numCategories() {
+            return this.property.numCategories;
+        }
+        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+        _compile(metadata) {
+            super._compile(metadata);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
+        }
+        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+            return {
+                preface: '',
+                inline: `${getGLSLforProperty(__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName))}`
+            };
+        }
+        eval(feature) {
+            return feature[__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)];
+        }
+        _postShaderCompile() { }
+        _getMinimumNeededSchema() {
+            return {
+                columns: [
+                    __WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)
+                ]
+            };
+        }
+    };
+}
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (immutable) */ __webpack_exports__["union"] = union;
+/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
+// The IDENTITY schema contains zero columns, and it has two interesting properties:
+//      union(a,IDENTITY)=union(IDENTITY, a)=a
+//      contains(x, IDENTITY)=true  (for x = valid schema)
+const IDENTITY = {
+    columns: []
+};
+/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
+
+
+/*
+const schema = {
+    columns: ['temp', 'cat']
+};*/
+
+//TODO
+// Returns true if subsetSchema is a contained by supersetSchema
+// A schema A is contained by the schema B when all columns of A are present in B and
+// all aggregations in A are present in B, if a column is not aggregated in A, it must
+// be not aggregated in B
+//export function contains(supersetSchema, subsetSchema) {
+//}
+
+// Returns the union of a and b schemas
+// The union of two schemas is a schema with all the properties in both schemas and with their
+// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
+// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
+// to null. In this case the function will throw an exception.
+function union(a, b) {
+    const t = a.columns.concat(b.columns);
+    return {
+        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+    };
+}
+
+function equals(a,b){
+    if (!a || !b){
+        return false;
+    }
+    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
+}
+
+const AGG_PREFIX = '_cdb_agg_';
+const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
+
+// column information functions
+const column = {
+    isAggregated: function isAggregated(name) {
+        return name.startsWith(AGG_PREFIX);
+    },
+    getBase: function getBase(name) {
+        return name.replace(AGG_PATTERN, '');
+    },
+    getAggFN: function getAggFN(name) {
+        let s = name.substr(AGG_PREFIX.length);
+        return s.substr(0, s.indexOf('_'));
+    },
+    aggColumn(name, aggFN) {
+        return `${AGG_PREFIX}${aggFN}_${name}`;
+    }
+};
+/* harmony export (immutable) */ __webpack_exports__["column"] = column;
+
+
+
+
+/***/ }),
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1720,7 +1885,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
         if (this.type == 'category') {
             this.numCategories = metaColumn.categoryNames.length;
         }
-        super._setGenericGLSL((childInlines, uniformIDMaker, propertyTIDMaker) => `p${propertyTIDMaker(this.name)}`);
+        super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
     _getMinimumNeededSchema() {
         return {
@@ -1738,82 +1903,14 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__property__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-
-
-
-
-// Aggregation ops
-const Max = genAggregationOp('max', 'float');
-/* harmony export (immutable) */ __webpack_exports__["b"] = Max;
-
-const Min = genAggregationOp('min', 'float');
-/* harmony export (immutable) */ __webpack_exports__["c"] = Min;
-
-const Avg = genAggregationOp('avg', 'float');
-/* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
-
-const Sum = genAggregationOp('sum', 'float');
-/* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
-
-const Mode = genAggregationOp('mode', 'category');
-/* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
-
-
-function genAggregationOp(aggName, aggType) {
-    return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-        constructor(property) {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_1__property__["a" /* default */], property);
-            super({ property: property });
-            this.type = aggType;
-        }
-        get name() {
-            return this.property.name;
-        }
-        get numCategories() {
-            return this.property.numCategories;
-        }
-        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-        _compile(metadata) {
-            super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
-        }
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-            return {
-                preface: '',
-                inline: `p${propertyTIDMaker(`_cdb_agg_${aggName}_${this.property.name}`)}`
-            };
-        }
-        eval(feature) {
-            return feature[`_cdb_agg_${aggName}_${this.property.name}`];
-        }
-        _postShaderCompile() { }
-        _getMinimumNeededSchema() {
-            return {
-                columns: [
-                    `_cdb_agg_${aggName}_${this.property.name}`
-                ]
-            };
-        }
-    };
-}
-
-
-/***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -1971,7 +2068,6 @@ class Renderer {
         const style = renderLayer.style;
         const aspect = this.getAspect();
         let drawMetadata = {
-            freeTexUnit: 4,
             zoom: 1. / this._zoom,
             columns: []
         };
@@ -2106,20 +2202,15 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
-            for (let i = 0; i < 16; i++) {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-                gl.uniform1i(shader.textureLocations[i], 0);
-            }
-
-            drawMetadata.freeTexUnit = 4;
+            // Enforce that property texture TextureUnit don't clash with auxiliar ones
+            drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
                 gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                gl.uniform1i(shader.textureLocations[i], i);
+                gl.uniform1i(TID[name], i);
             });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
@@ -2303,7 +2394,7 @@ function getOrderingRenderBuckets(renderLayer) {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2451,55 +2542,6 @@ function getRsysFromTile(x, y, z) {
 
 
 
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["union"] = union;
-/* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
-// The IDENTITY schema contains zero columns, and it has two interesting properties:
-//      union(a,IDENTITY)=union(IDENTITY, a)=a
-//      contains(x, IDENTITY)=true  (for x = valid schema)
-const IDENTITY = {
-    columns: []
-};
-/* harmony export (immutable) */ __webpack_exports__["IDENTITY"] = IDENTITY;
-
-
-/*
-const schema = {
-    columns: ['temp', 'cat']
-};*/
-
-//TODO
-// Returns true if subsetSchema is a contained by supersetSchema
-// A schema A is contained by the schema B when all columns of A are present in B and
-// all aggregations in A are present in B, if a column is not aggregated in A, it must
-// be not aggregated in B
-//export function contains(supersetSchema, subsetSchema) {
-//}
-
-// Returns the union of a and b schemas
-// The union of two schemas is a schema with all the properties in both schemas and with their
-// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
-// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
-// to null. In this case the function will throw an exception.
-function union(a, b) {
-    const t = a.columns.concat(b.columns);
-    return {
-        columns: t.filter((item, pos) => t.indexOf(item) == pos)
-    };
-}
-
-function equals(a,b){
-    if (!a || !b){
-        return false;
-    }
-    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
-}
 
 /***/ }),
 /* 12 */
@@ -2730,6 +2772,12 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__expression__["a" /* default */]
             this.parent.replaceChild(this, this.b);
             this.notify();
         }
+    }
+    replaceChild(toReplace, replacer) {
+        if (toReplace == this.mix) {
+            this.originalMix = replacer;
+        }
+        super.replaceChild(toReplace, replacer);
     }
     eval(feature) {
         const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
@@ -3180,19 +3228,90 @@ function genInterpolator(inlineMaker, preface, jsEval) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+
+const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet', 'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue', 'darkcyan', 'darkgoldenrod', 'darkgray', 'darkgrey', 'darkgreen', 'darkkhaki', 'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid', 'darkred', 'darksalmon', 'darkseagreen', 'darkslateblue', 'darkslategray', 'darkslategrey', 'darkturquoise', 'darkviolet', 'deeppink', 'deepskyblue', 'dimgray', 'dimgrey', 'dodgerblue', 'firebrick', 'floralwhite', 'forestgreen', 'fuchsia', 'gainsboro', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'grey', 'green', 'greenyellow', 'honeydew', 'hotpink', 'indianred', 'indigo', 'ivory', 'khaki', 'lavender', 'lavenderblush', 'lawngreen', 'lemonchiffon', 'lightblue', 'lightcoral', 'lightcyan', 'lightgoldenrodyellow', 'lightgray', 'lightgrey', 'lightgreen', 'lightpink', 'lightsalmon', 'lightseagreen', 'lightskyblue', 'lightslategray', 'lightslategrey', 'lightsteelblue', 'lightyellow', 'lime', 'limegreen', 'linen', 'magenta', 'maroon', 'mediumaquamarine', 'mediumblue', 'mediumorchid', 'mediumpurple', 'mediumseagreen', 'mediumslateblue', 'mediumspringgreen', 'mediumturquoise', 'mediumvioletred', 'midnightblue', 'mintcream', 'mistyrose', 'moccasin', 'navajowhite', 'navy', 'oldlace', 'olive', 'olivedrab', 'orange', 'orangered', 'orchid', 'palegoldenrod', 'palegreen', 'paleturquoise', 'palevioletred', 'papayawhip', 'peachpuff', 'peru', 'pink', 'plum', 'powderblue', 'purple', 'red', 'rosybrown', 'royalblue', 'saddlebrown', 'salmon', 'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow', 'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen'];
+/* harmony export (immutable) */ __webpack_exports__["a"] = CSS_COLOR_NAMES;
+
+
+/**
+ *
+ * Create a color from its name.
+ *
+ * @param {string} name - Color's name
+ * @return {carto.style.expressions.hex}
+ *
+ * @example <caption>Display Red points.</caption>
+ * const s = carto.style.expressions;
+ * const style = new carto.Style({
+ *   color: s.namedColor('red');
+ * });
+ *
+ * @memberof carto.style.expressions
+ * @name namedColor
+ * @function
+ * @api
+ */
+class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+    constructor(colorName) {
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('namedColor', 'colorName', 0, colorName);
+        if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
+        }
+        super({});
+        this.type = 'color';
+        this.name = colorName;
+        this.color = this._nameToRGB(this.name);
+    }
+
+    _compile(meta) {
+        super._compile(meta);
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
+    }
+
+    _nameToRGB(name) {
+        const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
+        const fakeDiv = document.createElement('div');
+        fakeDiv.style.color = name;
+        document.body.appendChild(fakeDiv);
+        const rgbSring = getComputedStyle(fakeDiv).color;
+        document.body.removeChild(fakeDiv);
+
+        const match = colorRegex.exec(rgbSring);
+        return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: 1 };
+
+    }
+    eval(){
+        return this.color;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = NamedColor;
+
+
+/* harmony default export */ __webpack_exports__["c"] = (NamedColor);
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(68);
 
 
 
 
 
-const NUM_TEXTURE_LOCATIONS = 4;
 const shaderCache = new __WEBPACK_IMPORTED_MODULE_3__shader_cache__["a" /* default */]();
 
 let programID = 1;
@@ -3286,10 +3405,6 @@ class GenericStyler {
         FS = FS.replace('$INLINE', inline);
         compileProgram.call(this, gl, VS, FS);
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.textureLocations = [];
-        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
-        }
     }
 }
 class Color extends GenericStyler {
@@ -3299,7 +3414,22 @@ class Color extends GenericStyler {
 }
 class Width extends GenericStyler {
     constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Width*/' + preface, `vec4((${inline})/64.)`);
+        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__,
+            `
+        /*Width*/
+        // From pixels in [0.,255.] to [0.,1.] in exponential-like form
+        float encodeWidth(float x){
+            if (x<16.){
+                x = x*4.;
+            }else if (x<80.){
+                x = (x-16.)+64.;
+            }else{
+                x = (x-80.)*0.5 + 128.;
+            }
+            return x / 255.;
+        }
+        ` + preface,
+            `vec4(encodeWidth(${inline}))`);
     }
 }
 
@@ -3337,12 +3467,12 @@ const styler = {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(11);
 
 
 
@@ -3662,7 +3792,7 @@ function pointInCircle(p, center, scale) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3715,15 +3845,15 @@ class Metadata {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(74);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(31);
 
 
 
@@ -3741,13 +3871,13 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
     }
 
     initialize(auth, config) {
-        auth = auth || Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["b" /* getDefaultAuth */])();
-        config = config || Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["b" /* getDefaultConfig */])();
-        Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["a" /* checkAuth */])(auth);
-        Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["a" /* checkConfig */])(config);
-        this._apiKey = auth.apiKey;
-        this._username = auth.username;
-        this._serverURL = this._generateURL(auth, config);
+        this._auth = auth || Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["b" /* getDefaultAuth */])();
+        this._config = config || Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["b" /* getDefaultConfig */])();
+        Object(__WEBPACK_IMPORTED_MODULE_3__setup_auth_service__["a" /* checkAuth */])(this._auth);
+        Object(__WEBPACK_IMPORTED_MODULE_4__setup_config_service__["a" /* checkConfig */])(this._config);
+        this._apiKey = this._auth.apiKey;
+        this._username = this._auth.username;
+        this._serverURL = this._generateURL(this._auth, this._config);
     }
 
     bindLayer(...args) {
@@ -3788,7 +3918,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -3978,13 +4108,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(28);
+var VectorTileFeature = __webpack_require__(29);
 
 module.exports = VectorTileLayer;
 
@@ -4046,13 +4176,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(86);
+var Point = __webpack_require__(88);
 
 module.exports = VectorTileFeature;
 
@@ -4286,7 +4416,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4377,7 +4507,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4446,20 +4576,20 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(93);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(94);
 
 
 
@@ -4504,6 +4634,7 @@ class Layer {
     }
 
     _init(id, source, style) {
+        style._boundLayer = this;
         this.state = 'init';
         this._id = id;
 
@@ -4553,6 +4684,7 @@ class Layer {
     async update(source, style) {
         this._checkSource(source);
         this._checkStyle(style);
+        source = source._clone();                
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         await this._context;
@@ -4815,6 +4947,9 @@ class Layer {
         if (!(style instanceof __WEBPACK_IMPORTED_MODULE_3__style__["a" /* default */])) {
             throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'nonValidStyle');
         }
+        if (style._boundLayer && style._boundLayer !== this) {
+            throw new __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__["a" /* default */]('layer', 'sharedStyle');
+        }
     }
 
     _getViewport() {
@@ -4836,16 +4971,16 @@ class Layer {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
@@ -4877,6 +5012,8 @@ const SUPPORTED_PROPERTIES = [
     'filter'
 ];
 
+const MIN_RESOLUTION = 0;
+const MAX_RESOLUTION = 256;
 
 class Style {
 
@@ -5168,6 +5305,12 @@ class Style {
         if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isNumber */](styleSpec.resolution)) {
             throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('style', 'resolutionNumberRequired');
         }
+        if (styleSpec.resolution<=MIN_RESOLUTION){
+            throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('style', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+        }
+        if (styleSpec.resolution>=MAX_RESOLUTION){
+            throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('style', `resolutionTooBig[${MAX_RESOLUTION}]`);
+        }
         if (!(styleSpec.color instanceof __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_expression__["a" /* default */])) {
             throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('style', 'nonValidExpression[color]');
         }
@@ -5198,7 +5341,178 @@ class Style {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = parseStyleExpression;
+/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__ = __webpack_require__(22);
+
+
+
+
+
+
+// TODO use Schema classes
+
+const aggFns = [];
+
+var lowerCaseFunctions = {};
+Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__)
+    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
+    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name]; });
+lowerCaseFunctions.true = __WEBPACK_IMPORTED_MODULE_1__functions__["TRUE"];
+lowerCaseFunctions.false = __WEBPACK_IMPORTED_MODULE_1__functions__["FALSE"];
+
+function parseStyleExpression(str) {
+    prepareJsep();
+    const r = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str)));
+    cleanJsep();
+    return r;
+}
+
+function parseStyleDefinition(str) {
+    prepareJsep();
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    let styleSpec = {};
+    if (ast.type == 'Compound') {
+        ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
+    } else {
+        parseStyleNamedExpr(styleSpec, ast);
+    }
+    cleanJsep();
+    return styleSpec;
+}
+
+function parseStyleNamedExpr(styleSpec, node) {
+    if (node.operator != ':') {
+        throw new Error('Invalid syntax');
+    }
+    const name = node.left.name;
+    if (!name) {
+        throw new Error('Invalid syntax');
+    }
+    const value = parseNode(node.right);
+    // Don't cast resolution properties implicitly since they must be of type Number
+    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(value);
+}
+
+function parseFunctionCall(node) {
+    const name = node.callee.name.toLowerCase();
+    if (aggFns.includes(name)) {
+        //node.arguments[0].name += '_' + name;
+        const args = node.arguments.map(arg => parseNode(arg));
+        return args[0];
+    }
+    const args = node.arguments.map(arg => parseNode(arg));
+    if (lowerCaseFunctions[name]) {
+        return lowerCaseFunctions[name](...args);
+    }
+    throw new Error(`Invalid function name '${node.callee.name}'`);
+}
+
+function parseBinaryOperation(node) {
+    const left = parseNode(node.left);
+    const right = parseNode(node.right);
+    switch (node.operator) {
+        case '*':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
+        case '/':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
+        case '+':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
+        case '-':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
+        case '%':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
+        case '^':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
+        case '>':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"](left, right);
+        case '>=':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"](left, right);
+        case '<':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"](left, right);
+        case '<=':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"](left, right);
+        case '==':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"](left, right);
+        case 'and':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["and"](left, right);
+        case 'or':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["or"](left, right);
+        default:
+            throw new Error(`Invalid binary operator '${node.operator}'`);
+    }
+}
+
+function parseUnaryOperation(node) {
+    switch (node.operator) {
+        case '-':
+            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
+        case '+':
+            return parseNode(node.argument);
+        default:
+            throw new Error(`Invalid unary operator '${node.operator}'`);
+    }
+}
+
+function parseIdentifier(node) {
+    if (node.name[0] == '$') {
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
+    } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
+        return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()];
+    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+        return lowerCaseFunctions[node.name.toLowerCase()];
+    } else if (__WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["a" /* CSS_COLOR_NAMES */].includes(node.name.toLowerCase())) {
+        return new __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["b" /* NamedColor */](node.name.toLowerCase());
+    }
+}
+
+function parseNode(node) {
+    if (node.type == 'CallExpression') {
+        return parseFunctionCall(node);
+    } else if (node.type == 'Literal') {
+        return node.value;
+    } else if (node.type == 'ArrayExpression') {
+        return node.elements.map(e => parseNode(e));
+    } else if (node.type == 'BinaryExpression') {
+        return parseBinaryOperation(node);
+    } else if (node.type == 'UnaryExpression') {
+        return parseUnaryOperation(node);
+    } else if (node.type == 'Identifier') {
+        return parseIdentifier(node);
+    }
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+}
+
+function prepareJsep(){
+    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(':', 0);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('^', 11);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('or', 1);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('and', 2);
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeLiteral('true');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeLiteral('false');
+}
+
+function cleanJsep(){
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('and');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('or');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('^');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(':');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('true');
+    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('false');
+}
+
+
+/***/ }),
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5339,7 +5653,7 @@ class Map {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5347,15 +5661,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "style", function() { return style; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_style__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(95);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Layer", function() { return __WEBPACK_IMPORTED_MODULE_4__api_layer__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
@@ -5367,14 +5681,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  *  @namespace carto
  *
  *  @description
- *  The carto-gl functionality is exposed through the **carto** namespace including:
- * 
- * - carto.source
- *  - {@link carto.source.Dataset|carto.source.Dataset} 
- *  - {@link carto.source.SQL|carto.source.SQL}
- *  - {@link carto.source.GeoJSON|carto.source.GeoJSON}
- * - carto.style
- *  -   {@link carto.style.expressions|carto.style.expressions}
+ *  The CARTO VL functionality is exposed through the **carto** namespace including:
+ *
+ * - {@link carto.source.Dataset|carto.source.Dataset}
+ * - {@link carto.source.SQL|carto.source.SQL}
+ * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - {@link carto.style.expressions|carto.style.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Style|carto.Style}
  * - {@link carto.Interactivity|carto.Interactivity}
@@ -5402,15 +5714,17 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return palettes; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(36);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return palettes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Inverse; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+
 
 
 
@@ -5445,7 +5759,13 @@ class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* 
         super({});
         this.type = 'palette';
         this.name = name;
-        this.subPalettes = subPalettes;
+        this.subPalettes = new Proxy(subPalettes, {
+            get: (target, name) => {
+                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                    return target[name].map(__WEBPACK_IMPORTED_MODULE_2__utils__["k" /* hexToRgb */]);
+                }
+            }
+        });
         this.tags = subPalettes.tags;
     }
     getLongestSubPalette() {
@@ -5457,6 +5777,44 @@ class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* 
         }
     }
 }
+
+class CustomPalette extends __WEBPACK_IMPORTED_MODULE_1__expression__["a" /* default */] {
+    // colors is a list of expression of type 'color'
+    constructor(...elems) {
+        elems = elems.map(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */]);
+        if (!elems.length) {
+            throw new Error('customPalette(): invalid parameters: must receive at least one argument');
+        }
+        const type = elems[0].type;
+        if (type == undefined) {
+            throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+        }
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('customPalette', 'colors[0]', 0, ['color', 'float'], elems[0]);
+        elems.map((color, index) => {
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["b" /* checkExpression */])('customPalette', `colors[${index}]`, index, color);
+            if (color.type == undefined) {
+                throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+            }
+            if (color.type != type) {
+                throw new Error('customPalette(): invalid parameters, invalid argument type combination');
+            }
+        });
+        super({});
+        this.type = type == 'color' ? 'customPalette' : 'customPaletteFloat';
+        try {
+            if (type == 'color') {
+                // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]
+                this.colors = elems.map(c => c.eval());
+            } else {
+                this.floats = elems.map(c => c.eval());
+            }
+        } catch (error) {
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = CustomPalette;
+
 
 Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name]);
@@ -5495,14 +5853,14 @@ class Inverse {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(37);
+module.exports = __webpack_require__(39);
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -7355,7 +7713,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(38);
+var colorbrewer = __webpack_require__(40);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -7388,14 +7746,14 @@ if (true) {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(39);
+module.exports = __webpack_require__(41);
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -7720,7 +8078,7 @@ if (true) {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7834,8 +8192,8 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
             }
         });
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         const funcName = `buckets${this.bucketUID}`;
@@ -7873,7 +8231,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7961,7 +8319,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8043,7 +8401,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8096,7 +8454,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8135,7 +8493,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8181,13 +8539,17 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
         Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('ramp', 'input', 0, input);
         Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('ramp', 'input', 0, ['float', 'category'], input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'palette', 1, 'palette', palette);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteFloat'], palette);
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        this.type = 'color';
+        if (palette.type == 'customPaletteFloat') {
+            this.type = 'float';
+        } else {
+            this.type = 'color';
+        }
     }
     _compile(meta) {
         super._compile(meta);
@@ -8199,16 +8561,18 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
     _free(gl) {
         gl.deleteTexture(this.texture);
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
         this._UID = uniformIDMaker();
-        const input = this.input._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const input = this.input._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
         return {
             preface: input.preface + `
         uniform sampler2D texRamp${this._UID};
         uniform float keyMin${this._UID};
         uniform float keyWidth${this._UID};
         `,
-            inline: `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
+            inline: this.palette.type == 'customPaletteFloat' ?
+                `(texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).a)`
+                : `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
         };
     }
     _getColorsFromPalette(input, palette) {
@@ -8232,7 +8596,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             }
             return colors;
         } else {
-            return palette;
+            return palette.colors;
         }
     }
     _postShaderCompile(program, gl) {
@@ -8240,35 +8604,45 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
             this.init = true;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const level = 0;
-            const internalFormat = gl.RGBA;
             const width = 256;
-            const height = 1;
-            const border = 0;
-            const srcFormat = gl.RGBA;
-            const srcType = gl.UNSIGNED_BYTE;
-            const pixel = new Uint8Array(4 * width);
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            // console.log(this.input.numCategories, this.input.othersBucket, colors, this);
-            for (var i = 0; i < width; i++) {
-                const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
-                const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                const vlow = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vlowRaw).b, 255];
-                const vhigh = [Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).r, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).g, Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(vhighRaw).b, 255];
-                const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
-                const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-                pixel[4 * i + 0] = v[0];
-                pixel[4 * i + 1] = v[1];
-                pixel[4 * i + 2] = v[2];
-                pixel[4 * i + 3] = v[3];
+            if (this.type == 'color') {
+                const pixel = new Uint8Array(4 * width);
+                const colors = this._getColorsFromPalette(this.input, this.palette);
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
+                    const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
+                    const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
+                    const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vlowRaw.a];
+                    const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
+                    const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
+                    pixel[4 * i + 0] = v[0];
+                    pixel[4 * i + 1] = v[1];
+                    pixel[4 * i + 2] = v[2];
+                    pixel[4 * i + 3] = v[3];
+                }
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                    pixel);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            } else {
+                const pixel = new Float32Array(width);
+                const floats = this.palette.floats;
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
+                    const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
+                    const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
+                    pixel[i] =((1. - m) * vlowRaw + m * vhighRaw);
+                }
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    width, 1, 0, gl.ALPHA, gl.FLOAT,
+                    pixel);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
-            gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         }
         this.input._postShaderCompile(program, gl);
         this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
@@ -8291,7 +8665,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8324,30 +8698,35 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
     /**
      * @description Override the input color opacity
      * @param {*} color input color
-     * @param {*} opacity new opacity
+     * @param {*} alpha new opacity
      */
-    constructor(a, b) {
-        if (Number.isFinite(b)) {
-            b = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(b);
+    constructor(color, alpha) {
+        if (Number.isFinite(alpha)) {
+            alpha = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(alpha);
         }
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'color', 0, 'color', a);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'opacity', 1, 'float', b);
-        super({ a: a, b: b });
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'color', 0, 'color', color);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'alpha', 1, 'float', alpha);
+        super({ color, alpha });
         this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'opacity', 1, 'float', this.b);
-        this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'alpha', 1, 'float', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
-    // TODO eval
+    eval(f) {
+        const color = this.color.eval(f);
+        const alpha = this.alpha.eval(f);
+        color.a = alpha;
+        return color;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Opacity;
 
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8371,9 +8750,9 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         this.othersBucket = true;
         this._meta = metadata;
     }
-    _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
         this._UID = uniformIDMaker();
-        const property = this.property._applyToShaderSource(uniformIDMaker, propertyTIDMaker);
+        const property = this.property._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
         return {
             preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
             inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`
@@ -8430,7 +8809,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8514,7 +8893,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8548,7 +8927,7 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8578,14 +8957,14 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
 
 
 
@@ -8629,8 +9008,8 @@ function genQuantiles(global) {
         _getDrawMetadataRequirements() {
             return { columns: [this.input.name] };
         }
-        _applyToShaderSource(uniformIDMaker, propertyTIDMaker) {
-            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, propertyTIDMaker));
+        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
             let childInlines = {};
             childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
             const funcName = `quantiles${this.quantilesUID}`;
@@ -8693,14 +9072,14 @@ const GlobalQuantiles = genQuantiles(true);
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
 
 
 
@@ -8833,7 +9212,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8898,13 +9277,20 @@ function genRGB(name, alpha) {
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
-        // TODO eval
+        eval(f) {
+            return {
+                r: this.r.eval(f),
+                g: this.g.eval(f),
+                b: this.b.eval(f),
+                a: alpha ? this.a.eval(f) : 1,
+            };
+        }
     };
 }
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8994,7 +9380,39 @@ function genHSV(name, alpha) {
     #endif
     `);
         }
-        // TODO eval
+
+        eval(f) {
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                }
+                return value.eval(f);
+            };
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
+            const v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.v), 0, 1);
+
+            const hsvToRgb = (h, s, v) => {
+                const c = {
+                    r: Math.abs(h * 6 - 3) - 1,
+                    g: 2 - Math.abs(h * 6 - 2),
+                    b: 2 - Math.abs(h * 6 - 4),
+                    a: alpha ? this.a.eval(f) : 1,
+                };
+
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
+
+                c.r = ((c.r - 1) * s + 1) * v * 255;
+                c.g = ((c.g - 1) * s + 1) * v * 255;
+                c.b = ((c.b - 1) * s + 1) * v * 255;
+
+                return c;
+            };
+
+            return hsvToRgb(h, s, v);
+        }
     };
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {
@@ -9007,7 +9425,7 @@ function genHSV(name, alpha) {
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9096,7 +9514,40 @@ function genHSL(name, alpha) {
     #endif
     `);
         }
-        // TODO eval
+        eval(f) {
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                }
+                return value.eval(f);
+            };
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
+            const l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.l), 0, 1);
+
+            const hslToRgb = (h, s, l) => {
+                const c = {
+                    r: Math.abs(h * 6 - 3) - 1,
+                    g: 2 - Math.abs(h * 6 - 2),
+                    b: 2 - Math.abs(h * 6 - 4),
+                    a: alpha ? this.a.eval(f) : 1,
+                };
+
+                const C = (1 - Math.abs(2 * l - 1)) * s;
+
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
+
+                c.r = ((c.r - 0.5) * C + l) * 255;
+                c.g = ((c.g - 0.5) * C + l) * 255;
+                c.b = ((c.b - 0.5) * C + l) * 255;
+
+                return c;
+            };
+
+            return hslToRgb(h, s, l);
+        }
     };
 
     function hslCheckType(parameterName, parameterIndex, parameter) {
@@ -9109,7 +9560,7 @@ function genHSL(name, alpha) {
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9142,23 +9593,25 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         super({});
         this.type = 'color';
         try {
-            this.hex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(hexadecimalColor);
+            this.color = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(hexadecimalColor);
         } catch (error) {
             throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
     }
     _compile(meta) {
         super._compile(meta);
-        this.inlineMaker = () => `vec4(${(this.hex.r / 255).toFixed(4)}, ${(this.hex.g / 255).toFixed(4)}, ${(this.hex.b / 255).toFixed(4)}, ${(this.hex.a / 255).toFixed(4)})`;
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a / 255).toFixed(4)})`;
     }
-    // TODO eval
+    eval(){
+        return this.color;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Hex;
 
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9217,7 +9670,6 @@ function generateAggregattion(metadataPropertyName, global) {
             this.property = property;
         }
         _compile(metadata) {
-            console.log(metadata);
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
@@ -9317,7 +9769,7 @@ function generatePercentile(global) {
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9366,16 +9818,16 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default *
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(25);
 
 
 
@@ -9420,10 +9872,15 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._numCategories = 0;
         this._numFields = [];
         this._catFields = [];
+        this._data = data;
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
 
         this._loaded = false;
+    }
+
+    _clone(){
+        return new GeoJSON(this._data);
     }
 
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -9750,13 +10207,13 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(65);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -9766,7 +10223,7 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9843,6 +10300,18 @@ varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
 
+// From [0.,1.] in exponential-like form to pixels in [0.,255.]
+float decodeWidth(float x){
+    x*=255.;
+    if (x < 64.){
+        return x*0.25;
+    }else if (x<128.){
+        return (x-64.)+16.;
+    }else{
+        return (x-127.)*2.+80.;
+    }
+}
+
 void main(void) {
     color = texture2D(colorTex, featureID);
     stroke = texture2D(colorStrokeTex, featureID);
@@ -9850,9 +10319,9 @@ void main(void) {
     color.a *= filtering;
     stroke.a *= filtering;
 
-    float size = 64.*texture2D(widthTex, featureID).a;
+    float size = decodeWidth(texture2D(widthTex, featureID).a);
     float fillSize = size;
-    float strokeSize = 64.*texture2D(strokeWidthTex, featureID).a;
+    float strokeSize = decodeWidth(texture2D(strokeWidthTex, featureID).a);
     size+=strokeSize;
     fillScale=size/fillSize;
     strokeScale=size/max(0.001, (fillSize-strokeSize));
@@ -9864,7 +10333,7 @@ void main(void) {
     sizeNormalizer = (size+1.)/(size);
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>orderMaxWidth){
+    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;
@@ -9909,7 +10378,7 @@ void main(void) {
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9956,7 +10425,7 @@ void main(void) {
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9979,12 +10448,24 @@ uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
+// From [0.,1.] in exponential-like form to pixels in [0.,255.]
+float decodeWidth(float x){
+    x*=255.;
+    if (x < 64.){
+        return x*0.25;
+    }else if (x<128.){
+        return (x-64.)+16.;
+    }else{
+        return (x-127.)*2.+80.;
+    }
+}
+
 void main(void) {
     color = texture2D(colorTex, featureID);
     float filtering = texture2D(filterTex, featureID).a;
     color.a *= filtering;
     color.rgb *= color.a;
-    float size = 64.*texture2D(widthTex, featureID).a;
+    float size = decodeWidth(texture2D(widthTex, featureID).a);
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
     if (size==0. || color.a==0.){
@@ -10008,7 +10489,7 @@ void main(void) {
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10034,21 +10515,12 @@ const FS = `
 
 precision highp float;
 
-varying  vec2 uv;
+varying vec2 uv;
 
 $PREFACE
 
-uniform sampler2D property0;
-uniform sampler2D property1;
-uniform sampler2D property2;
-uniform sampler2D property3;
-
 void main(void) {
-    // TODO texture reads should be dynamic to improve Texture Unit utilization
-    float p0=texture2D(property0, uv).a;
-    float p1=texture2D(property1, uv).a;
-    float p2=texture2D(property2, uv).a;
-    float p3=texture2D(property3, uv).a;
+    vec2 featureID = uv;
     gl_FragColor = $INLINE;
 }
 `;
@@ -10057,7 +10529,7 @@ void main(void) {
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10095,7 +10567,7 @@ void main(void) {
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10138,12 +10610,12 @@ class ShaderCache {
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export decodeGeom */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(70);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
@@ -10283,7 +10755,7 @@ function normalize(v) {
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10940,12 +11412,12 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(72);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -11027,7 +11499,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11062,6 +11534,10 @@ const validation = {
         'non-valid-style': {
             messageRegex: /nonValidStyle/,
             friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
+        },
+        'shared-style': {
+            messageRegex: /sharedStyle/,
+            friendlyMessage: 'The given Style object is already bound to another layer. Styles cannot be shared between different layers'
         }
     },
     setup: {
@@ -11176,6 +11652,14 @@ const validation = {
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
             friendlyMessage: '`resolution` must be a number.'
+        },
+        'resolution-too-small': {
+            messageRegex: /resolutionTooSmall\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be greater than $0.'
+        },
+        'resolution-too-big': {
+            messageRegex: /resolutionTooBig\[(.+)\]$/,
+            friendlyMessage: '`resolution` must be less than $0.'
         }
     }
 };
@@ -11184,12 +11668,12 @@ const validation = {
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -11240,6 +11724,10 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
         this.initialize(auth, config);
     }
 
+    _clone(){
+        return new Dataset(this._tableName, this._auth, this._config);
+    }
+
     _checkTableName(tableName) {
         if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](tableName)) {
             throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'tableNameRequired');
@@ -11257,21 +11745,21 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(75);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(86);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(25);
 
 
 
@@ -11290,10 +11778,14 @@ const MIN_FILTERING = 2000000;
 // Requrest SQL API (temp)
 // Cache dataframe
 
+
+
 class Windshaft {
 
     constructor(source) {
         this._source = source;
+
+        this._exclusive = true;
 
         this._requestGroupID = 0;
         this._oldDataframes = [];
@@ -11337,15 +11829,12 @@ class Windshaft {
      * Should be called whenever the style changes (even if metadata is not going to be used)
      * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
      * Returns  a promise to a Metadata
-     * @param {*} viewport
-     * @param {*} MNS
-     * @param {*} addDataframe
-     * @param {*} styleDataframe
+     * @param {*} style
      */
     async getMetadata(style) {
         const MNS = style.getMinimumNeededSchema();
         const resolution = style.getResolution();
-        const filtering = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getFiltering */](style);
+        const filtering = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["b" /* getFiltering */](style, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS.columns.includes('cartodb_id')) {
@@ -11357,6 +11846,13 @@ class Windshaft {
         return this.metadata;
     }
 
+    /**
+     * After calling getMetadata(), data for a viewport can be obtained with this function.
+     * So long as the style doesn't change, getData() can be called repeatedly for different
+     * viewports. If style changes getMetadata() should be called before requesting data
+     * for the new style.
+     * @param {*} viewport
+     */
     getData(viewport) {
         if (this._isInstantiated()) {
             const tiles = __WEBPACK_IMPORTED_MODULE_1__rsys__["b" /* rTiles */](viewport);
@@ -11403,9 +11899,16 @@ class Windshaft {
         return !!this.metadata;
     }
 
-    _getCategoryIDFromString(category) {
+    _getCategoryIDFromString(category, readonly = true) {
+        if (category === undefined){
+            category = 'null';
+        }
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
+        }
+        if (readonly){
+            console.warn(`category ${category} not present in metadata`);
+            return -1;
         }
         this._categoryStringToIDMap[category] = this._numCategories;
         this._numCategories++;
@@ -11424,13 +11927,20 @@ class Windshaft {
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
         // If the number of features is higher than the minimun, enable server filtering.
-        if (metadata.featureCount > MIN_FILTERING) {
-            aggSQL = `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName} ${__WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["b" /* getSQLWhere */](filters)}`;
-        } else {
-            aggSQL = this._buildQuery(select);
+        let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
+
+        if (backendFilters && this._requiresAggregation(MNS)) {
+            agg.filters = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getAggregationFilters */](backendFilters);
+            if (!this._exclusive) {
+                backendFilters = null;
+            }
+        }
+        if (backendFilters) {
+            aggSQL = this._buildQuery(select, backendFilters);
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
@@ -11452,6 +11962,22 @@ class Windshaft {
         return promise;
     }
 
+    _checkLayerMeta(MNS) {
+        if (!this._isAggregated()) {
+            if (this._requiresAggregation(MNS)) {
+                throw new Error('Aggregation not supported for this dataset');
+            }
+        }
+    }
+
+    _isAggregated() {
+        return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
+    }
+
+    _requiresAggregation(MNS) {
+        return MNS.columns.some(column => __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.isAggregated(column));
+    }
+
     _generateAggregation(MRS, resolution) {
         let aggregation = {
             columns: {},
@@ -11464,10 +11990,10 @@ class Windshaft {
         MRS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
-                    if (name.startsWith('_cdb_agg_')) {
+                    if (__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.isAggregated(name)) {
                         aggregation.columns[name] = {
-                            aggregate_function: getAggFN(name),
-                            aggregated_column: getBase(name)
+                            aggregate_function: __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getAggFN(name),
+                            aggregated_column: __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getBase(name)
                         };
                     } else {
                         aggregation.dimensions[name] = name;
@@ -11479,14 +12005,17 @@ class Windshaft {
     }
 
     _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => name.startsWith('_cdb_agg_') ? getBase(name) : name).map(
+        return MRS.columns.map(name => __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
         )
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
     }
 
-    _buildQuery(select) {
-        return `SELECT ${select.filter((item, pos) => select.indexOf(item) == pos).join()} FROM ${this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName}`;
+    _buildQuery(select, filters) {
+        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
+        const condition = filters ? __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["c" /* getSQLWhere */](filters) : '';
+        return `SELECT ${columns} FROM ${relation} ${condition}`;
     }
 
     _getConfig() {
@@ -11543,6 +12072,7 @@ class Windshaft {
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        this._layerMeta = layergroup.metadata.layers[0].meta;
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return getLayerUrl(layergroup, LAYER_INDEX, conf);
     }
@@ -11587,7 +12117,7 @@ class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
-                    const basename = name.startsWith('_cdb_agg_') ? getBase(name) : name;
+                    const basename = __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(name);
@@ -11680,7 +12210,10 @@ class Windshaft {
     }
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
-        var properties = [new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024), new Float32Array(mvtLayer.length + 1024)];
+        const properties = [];
+        for (let i = 0; i < catFields.length + numFields.length; i++) {
+            properties.push(new Float32Array(mvtLayer.length + 1024));
+        }
         if (this.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
@@ -11747,7 +12280,7 @@ class Windshaft {
         const categoryIDs = {};
         categories.map((name, index) => {
             const t = categoriesTypes[index];
-            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
             columns.push(t);
         });
         const metadata = new __WEBPACK_IMPORTED_MODULE_7__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, sample);
@@ -11911,15 +12444,6 @@ function isClockWise(vertices) {
     return a > 0;
 }
 
-function getBase(name) {
-    return name.replace(/_cdb_agg_[a-zA-Z0-9]+_/g, '');
-}
-
-function getAggFN(name) {
-    let s = name.substr('_cdb_agg_'.length);
-    return s.substr(0, s.indexOf('_'));
-}
-
 const endpoint = (conf, path = '') => {
     let url = `${conf.mapsServerURL}/api/v1/map`;
     if (path) {
@@ -11957,7 +12481,7 @@ function authURL(url, conf) {
 
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11965,7 +12489,7 @@ function authURL(url, conf) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(74);
+var ieee754 = __webpack_require__(76);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -12582,7 +13106,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -12672,7 +13196,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12682,11 +13206,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(76)
-var util = __webpack_require__(78)
+var Map = __webpack_require__(78)
+var util = __webpack_require__(80)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(82)
+var Yallist = __webpack_require__(84)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -13146,7 +13670,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -13156,13 +13680,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(77)
+  module.exports = __webpack_require__(79)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)))
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -13281,7 +13805,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -13809,7 +14333,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(80);
+exports.isBuffer = __webpack_require__(82);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -13853,7 +14377,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(81);
+exports.inherits = __webpack_require__(83);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -13871,10 +14395,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(79), __webpack_require__(26)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(81), __webpack_require__(27)))
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports) {
 
 var g;
@@ -13901,7 +14425,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -13912,7 +14436,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -13941,7 +14465,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -14317,21 +14841,24 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = getFiltering;
-/* harmony export (immutable) */ __webpack_exports__["b"] = getSQLWhere;
+/* harmony export (immutable) */ __webpack_exports__["b"] = getFiltering;
+/* harmony export (immutable) */ __webpack_exports__["c"] = getSQLWhere;
+/* harmony export (immutable) */ __webpack_exports__["a"] = getAggregationFilters;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(8);
 
 
 
@@ -14342,123 +14869,492 @@ function Node (value, prev, next, list) {
 
 
 
+
+
+class AggregationFiltering {
+
+    /**
+     * Generate aggregation filters:
+     * This extracts, from the styles filters, those compatible to be
+     * executed through the Maps API aggregation API.
+     * The extracted filters are in the format admitted by the Maps API
+     * `filters` parameter.
+     * Filters affecting dimensions (non-aggregated columns) can optionally
+     * be extracted too, but it is more efficient to not do so and apply those
+     * filters before aggregation.
+     */
+    constructor(options) {
+        // exclusive mode: aggregate filters don't include pre-aggregate conditions (dimensions)
+        // in that case pre-aggregate filters should always be applied, even with aggregation
+        // (which can be more efficient)
+        this._onlyAggregateFilters = options.exclusive;
+    }
+
+    // return (partial) filters as an object (JSON) in the format of the Maps API aggregation interface
+    getFilters(styleFilter) {
+        let filters = {};
+        let filterList = this._and(styleFilter).filter(Boolean);
+        for (let p of filterList) {
+            let name = p.property;
+            let existingFilter = filters[name];
+            if (existingFilter) {
+                if (this._compatibleAndFilters(existingFilter, p.filters)) {
+                    // combine inequalities into a range
+                    Object.assign(existingFilter[0], p.filters[0]);
+                }
+                else {
+                    // can't AND-combine filters for the same property
+                    return {};
+                }
+            }
+            else {
+                filters[name] = p.filters;
+            }
+        }
+        return filters;
+    }
+
+    _and(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["a" /* And */]) {
+            return this._and(f.a).concat(this._and(f.b)).filter(Boolean);
+        }
+        return [this._or(f)].filter(Boolean);
+    }
+
+    _or(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["n" /* Or */]) {
+            let a = this._basicCondition(f.a);
+            let b = this._basicCondition(f.b);
+            if (a && b) {
+                if (a.property == b.property) {
+                    a.filters = a.filters.concat(b.filters);
+                    return a;
+                }
+            }
+        }
+        return this._basicCondition(f);
+    }
+
+    _removeBlend(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__["a" /* default */] && f.originalMix instanceof __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__["a" /* default */]) {
+            return f.b;
+        }
+        return f;
+    }
+
+    _basicCondition(f) {
+        f = this._removeBlend(f);
+        return this._between(f)
+            || this._equals(f) || this._notEquals(f)
+            || this._lessThan(f) || this._lessThanOrEqualTo(f)
+            || this._greaterThan(f) || this._greaterThanOrEqualTo(f)
+            || this._in(f) || this._notIn(f);
+    }
+
+    _value(f) {
+        f = this._removeBlend(f);
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) {
+            return f.expr;
+        }
+    }
+
+    _between(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__["a" /* default */]) {
+            let p = this._aggregation(f.value);
+            let lo = p && this._value(f.lowerLimit);
+            let hi = p && lo && this._value(f.upperLimit);
+            if (hi) {
+                p.filters.push({
+                    greater_than_or_equal_to: lo,
+                    less_than_or_equal_to: hi
+                });
+                return p;
+            }
+        }
+    }
+
+    _in(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["a" /* In */]) {
+            let p = this._aggregation(f.value);
+            let values = f.categories.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                p.filters.push({
+                    in: values
+                });
+                return p;
+            }
+        }
+    }
+
+    _notIn(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["b" /* Nin */]) {
+            let p = this._aggregation(f.value);
+            let values = f.categories.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                p.filters.push({
+                    not_in: values
+                });
+                return p;
+            }
+        }
+    }
+
+    _equals(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["b" /* Equals */], 'equal');
+    }
+
+    _notEquals(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["m" /* NotEquals */], 'not_equal');
+    }
+
+    _lessThan(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["k" /* LessThan */], 'less_than', 'greater_than');
+    }
+
+    _lessThanOrEqualTo(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["l" /* LessThanOrEqualTo */], 'less_than_or_equal_to', 'greater_than_or_equal_to');
+    }
+
+    _greaterThan(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["i" /* GreaterThan */], 'greater_than', 'less_than');
+    }
+
+    _greaterThanOrEqualTo(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["j" /* GreaterThanOrEqualTo */], 'greater_than_or_equal_to', 'less_than_or_equal_to');
+    }
+
+    _aggregation(f) {
+        f = this._removeBlend(f);
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["b" /* Max */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["c" /* Min */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["a" /* Avg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["e" /* Sum */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["d" /* Mode */]) {
+            let p = this._property(f.property);
+            if (p) {
+                p.property = __WEBPACK_IMPORTED_MODULE_10__core_schema__["column"].aggColumn(p.property, f._aggName);
+                return p;
+            }
+        }
+        if (this._onlyAggregateFilters) {
+            // no filters on non-aggregate columns (i.e. dimensions) are generated
+            // such filtering should be applied elsewhere
+            return;
+        }
+        return this._property(f);
+    }
+
+    _property(f) {
+        f = this._removeBlend(f);
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */]) {
+            return {
+                property: f.name,
+                filters: []
+            };
+        }
+    }
+
+    _cmpOp(f, opClass, opParam, inverseOpParam) {
+        inverseOpParam = inverseOpParam || opParam;
+        if (f instanceof opClass) {
+            let p = this._aggregation(f.a);
+            let v = p && this._value(f.b);
+            let op = opParam;
+            if (!v) {
+                p = this._aggregation(f.b);
+                v = p && this._value(f.a);
+                op = inverseOpParam;
+            }
+            if (v) {
+                let filter = {};
+                filter[op] = v;
+                p.filters.push(filter);
+                return p;
+            }
+        }
+    }
+
+    _compatibleAndFilters(a, b) {
+        // check if a and b can be combined into a range filter
+        if (a.length === 0 || b.length === 0) {
+            return true;
+        }
+        if (a.length === 1 && b.length === 1) {
+            const af = a[0];
+            const bf = b[0];
+            if (Object.keys(af).length === 1 && Object.keys(bf).length === 1) {
+                const ka = Object.keys(af)[0];
+                const kb = Object.keys(bf)[0];
+                const less_ops = ['less_than', 'less_than_or_equal_to'];
+                const greater_ops = ['greater_than', 'greater_than_or_equal_to'];
+                return (less_ops.includes(ka) && greater_ops.includes(kb))
+                    || (less_ops.includes(kb) && greater_ops.includes(ka));
+            }
+        }
+        return false;
+    }
+}
+
+class PreaggregationFiltering {
+
+    /**
+     * Generate pre-aggregation filters, i.e. filters that can be
+     * applied to the dataset before aggregation.
+     * This extracts, from the styles filters, those compatible to be
+     * executed before aggregation.
+     * The extracted filters are in an internal tree-like format;
+     * each node has a `type` property and various other parameters
+     * that depend on the type.
+     */
+    constructor() {
+    }
+
+    // return (partial) filters as an object (JSON) representing the SQL syntax tree
+    getFilter(styleFilter) {
+        return this._filter(styleFilter);
+    }
+
+    _filter(f) {
+        return this._and(f) || this._or(f)
+            || this._in(f) || this._notIn(f)
+            || this._between(f)
+            || this._equals(f) || this._notEquals(f)
+            || this._lessThan(f) || this._lessThanOrEqualTo(f)
+            || this._greaterThan(f) || this._greaterThanOrEqualTo(f)
+            || this._blend(f) || null;
+    }
+
+    _and(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["a" /* And */]) {
+            // we can ignore nonsupported (null) subexpressions that are combined with AND
+            // and keep the supported ones as a partial filter
+            const l = [this._filter(f.a), this._filter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
+            if (l.length) {
+                if (l.length == 1) {
+                    return l[0];
+                }
+                return {
+                    type: 'and',
+                    left: l[0],
+                    right: l[1]
+                };
+            }
+        }
+    }
+
+    _or(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["n" /* Or */]) {
+            // if any subexpression is not supported the OR combination isn't supported either
+            let a = this._filter(f.a);
+            let b = this._filter(f.b);
+            if (a && b) {
+                return {
+                    type: 'or',
+                    left: a,
+                    right: b
+                };
+            }
+        }
+    }
+
+    _lessThan(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["k" /* LessThan */], 'lessThan');
+    }
+
+    _lessThanOrEqualTo(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["l" /* LessThanOrEqualTo */], 'lessThanOrEqualTo');
+    }
+
+    _greaterThan(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["i" /* GreaterThan */], 'greaterThan');
+    }
+
+    _greaterThanOrEqualTo(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["j" /* GreaterThanOrEqualTo */], 'greaterThanOrEqualTo');
+    }
+
+    _equals(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["b" /* Equals */], 'equals');
+    }
+
+    _notEquals(f) {
+        return this._cmpOp(f, __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["m" /* NotEquals */], 'notEquals');
+    }
+
+    _cmpOp(f, opClass, type) {
+        if (f instanceof opClass) {
+            let a = this._property(f.a) || this._value(f.a);
+            let b = this._property(f.b) || this._value(f.b);
+            if (a && b) {
+                return {
+                    type: type,
+                    left: a,
+                    right: b
+                };
+            }
+        }
+    }
+
+    _blend(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__["a" /* default */] && f.originalMix instanceof __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__["a" /* default */]) {
+            return this._filter(f.b);
+        }
+    }
+
+    _property(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */]) {
+            return {
+                type: 'property',
+                property: f.name
+            };
+        }
+    }
+
+    _value(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) {
+            return {
+                type: 'value',
+                value: f.expr
+            };
+        }
+    }
+
+    _in(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["a" /* In */]) {
+            let p = this._property(f.value);
+            let values = f.categories.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                return {
+                    type: 'in',
+                    property: p.property,
+                    values: values.map(v => v.value)
+                };
+            }
+        }
+    }
+
+    _notIn(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["b" /* Nin */]) {
+            let p = this._property(f.value);
+            let values = f.categories.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.categories.length) {
+                return {
+                    type: 'notIn',
+                    property: p.property,
+                    values: values.map(v => v.value)
+                };
+            }
+        }
+    }
+
+    _between(f) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__["a" /* default */]) {
+            let p = this._property(f.value);
+            let lo = this._value(f.lowerLimit);
+            let hi = this._value(f.upperLimit);
+            if (p && lo != null && hi != null) {
+                return {
+                    type: 'between',
+                    property: p.property,
+                    lower: lo.value,
+                    upper: hi.value
+                };
+            }
+        }
+    }
+}
+
+function getSQL(node) {
+    if (node.type) {
+        return `(${SQLGenerators[node.type](node)})`;
+    }
+    return sqlQ(node);
+}
+
+function sqlQ(value) {
+    if (isFinite(value)) {
+        return String(value);
+    }
+    return `'${value.replace(/\'/g,'\'\'')}'`;
+}
+
+function sqlId(id) {
+    if (!id.match(/^[a-z\d_]+$/)) {
+        id = `"${id.replace(/\"/g,'""')}"`;
+    }
+    return id;
+}
+
+function sqlSep(sep, ...args) {
+    return args.map(arg => getSQL(arg)).join(sep);
+}
+
+const SQLGenerators = {
+    'and':                  f => sqlSep(' AND ', f.left, f.right),
+    'or':                   f => sqlSep(' OR ', f.left, f.right),
+    'between':              f => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
+    'in':                   f => `${sqlId(f.property)} IN (${sqlSep(',', ...f.values)})`,
+    'notIn':                f => `${sqlId(f.property)} NOT IN (${sqlSep(',', ...f.values)})`,
+    'equals':               f => sqlSep( ' = ', f.left, f.right),
+    'notEquals':            f => sqlSep(' <> ', f.left, f.right),
+    'lessThan':             f => sqlSep(' < ', f.left, f.right),
+    'lessThanOrEqualTo':    f => sqlSep(' <= ', f.left, f.right),
+    'greaterThan':          f => sqlSep( ' > ', f.left, f.right),
+    'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
+    'property':             f => sqlId(f.property),
+    'value':                f => sqlQ(f.value)
+};
 
 /**
  * Returns supported windshaft filters for the style
  * @param {*} style
  * @returns {Filtering}
  */
-function getFiltering(style) {
-    return getFilter(style.getFilter());
+function getFiltering(style, options = {}) {
+    const aggrFiltering = new AggregationFiltering(options);
+    const preFiltering = new PreaggregationFiltering(options);
+    const filtering = {
+        preaggregation: preFiltering.getFilter(style.getFilter()),
+        aggregation: aggrFiltering.getFilters(style.getFilter())
+    };
+    if (!filtering.preaggregation && !filtering.aggregation) {
+        return null;
+    }
+    return filtering;
 }
 
 /**
+ * Convert preaggregation filters (as generated by PreaggregationFiltering)
+ * into an equivalent SQL WHERE expression.
  *
  * @param {Filtering} filtering
  */
 function getSQLWhere(filtering) {
-    if (!filtering) {
-        return '';
+    filtering = filtering && filtering.preaggregation;
+    let sql;
+    if (filtering && Object.keys(filtering).length > 0) {
+        sql = getSQL(filtering);
     }
-    return 'WHERE ' + filtering.map(filter => getSQL(filter)).join(' AND ');
-
+    return sql ? 'WHERE ' + sql : '';
 }
 
-function getSQL(f) {
-    return getBetweenSQL(f) || getInSQL(f) || getNinSQL(f) || '';
+function getAggregationFilters(filtering) {
+    return filtering && filtering.aggregation;
 }
-
-function getBetweenSQL(f) {
-    if (f.type == 'between') {
-        return `(${f.property} BETWEEN ${f.lowerLimit} AND ${f.upperLimit})`;
-    }
-}
-
-function getInSQL(f) {
-    if (f.type == 'in') {
-        return `(${f.property} IN (${f.whitelist.map(cat => `'${cat}'`).join()}))`;
-    }
-}
-
-function getNinSQL(f) {
-    if (f.type == 'nin') {
-        return `(${f.property} NOT IN (${f.blacklist.map(cat => `'${cat}'`).join()}))`;
-    }
-}
-
-function getFilter(f) {
-    return getAndFilter(f) || getInFilter(f) || getNinFilter(f) || getBetweenFilter(f) || getBlendFilter(f) || null;
-}
-
-function getAndFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_0__core_style_expressions_binary__["a" /* And */]) {
-        const l = [getFilter(f.a), getFilter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
-        return l.length ? l : null;
-    }
-}
-
-function getBlendFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__["a" /* default */] && f.originalMix instanceof __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__["a" /* default */]) {
-        return getFilter(f.b);
-    }
-}
-
-function getInFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["a" /* In */] && f.value instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) && f.categories.length > 0) {
-        return [{
-            type: 'in',
-            property: f.value.name,
-            whitelist: f.categories.map(cat => cat.expr)
-        }];
-    }
-}
-
-function getNinFilter(f) {
-    if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_style_expressions_belongs__["b" /* Nin */] && f.value instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */] && f.categories.every(cat => cat instanceof __WEBPACK_IMPORTED_MODULE_3__core_style_expressions_category__["a" /* default */]) && f.categories.length > 0) {
-        return [{
-            type: 'nin',
-            property: f.value.name,
-            blacklist: f.categories.map(cat => cat.expr)
-        }];
-    }
-}
-
-function getBetweenFilter(f) {
-    if (isBetweenFilter(f)) {
-        return [{
-            type: 'between',
-            property: f.value.name,
-            lowerLimit: f.lowerLimit.expr,
-            upperLimit: f.upperLimit.expr,
-        }];
-    }
-}
-
-function isBetweenFilter(f) {
-    return f instanceof __WEBPACK_IMPORTED_MODULE_2__core_style_expressions_between__["a" /* default */]
-        && f.value instanceof __WEBPACK_IMPORTED_MODULE_5__core_style_expressions_property__["a" /* default */]
-        && (f.lowerLimit instanceof __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__["a" /* default */] || f.lowerLimit instanceof __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__["a" /* default */])
-        && (f.upperLimit instanceof __WEBPACK_IMPORTED_MODULE_4__core_style_expressions_float__["a" /* default */] || f.upperLimit instanceof __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__["a" /* default */]);
-}
-
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(85);
-module.exports.VectorTileFeature = __webpack_require__(28);
-module.exports.VectorTileLayer = __webpack_require__(27);
+module.exports.VectorTile = __webpack_require__(87);
+module.exports.VectorTileFeature = __webpack_require__(29);
+module.exports.VectorTileLayer = __webpack_require__(28);
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(27);
+var VectorTileLayer = __webpack_require__(28);
 
 module.exports = VectorTile;
 
@@ -14476,7 +15372,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14795,12 +15691,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -14858,6 +15754,10 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
         this.initialize(auth, config);
     }
 
+    _clone(){
+        return new SQL(this._query, this._auth, this._config);
+    }
+
     _checkQuery(query) {
         if (__WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](query)) {
             throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'queryRequired');
@@ -14879,7 +15779,7 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14888,13 +15788,16 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
     let uniformIDcounter = 0;
     let tid = {};
     const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
-        if (tid[name] !== undefined) {
-            return tid[name];
+        if (tid[name] === undefined) {
+            tid[name] = Object.keys(tid).length;
         }
-        tid[name] = Object.keys(tid).length;
-        return tid[name];
+        return `texture2D(propertyTex${tid[name]}, featureID).a`;
     });
+    colorModifier.preface += Object.keys(tid).map(name => `uniform sampler2D propertyTex${tid[name]};`).join('\n');
     const shader = shaderCreator(gl, colorModifier.preface, colorModifier.inline);
+    Object.keys(tid).map(name => {
+        tid[name] = gl.getUniformLocation(shader.program, `propertyTex${tid[name]}`);
+    });
     styleRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
@@ -14904,171 +15807,7 @@ function compileShader(gl, styleRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 89 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* unused harmony export parseStyleExpression */
-/* harmony export (immutable) */ __webpack_exports__["a"] = parseStyleDefinition;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
-
-
-
-
-// TODO use Schema classes
-
-const aggFns = [];
-
-var lowerCaseFunctions = {};
-Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__)
-    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
-    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name]; });
-lowerCaseFunctions.true = __WEBPACK_IMPORTED_MODULE_1__functions__["TRUE"];
-lowerCaseFunctions.false = __WEBPACK_IMPORTED_MODULE_1__functions__["FALSE"];
-
-/**
- * @jsapi
- * @param {*} str
- * @param {*} schema
- */
-function parseStyleExpression(str, schema) {
-    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('^', 10);
-    const r = parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str), schema);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('^');
-    return r;
-}
-
-function parseStyleNamedExpr(styleSpec, node) {
-    if (node.operator != ':') {
-        throw new Error('Invalid syntax');
-    }
-    const name = node.left.name;
-    if (!name) {
-        throw new Error('Invalid syntax');
-    }
-    const value = parseNode(node.right);
-    // Don't cast resolution properties implicitly since they must be of type Number
-    styleSpec[name] = name == 'resolution' ? value : Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(value);
-}
-
-function parseStyleDefinition(str) {
-    // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp(':', 0);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('^', 11);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('or', 1);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addBinaryOp('and', 2);
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeLiteral('true');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeLiteral('false');
-    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
-    let styleSpec = {};
-    if (ast.type == 'Compound') {
-        ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
-    } else {
-        parseStyleNamedExpr(styleSpec, ast);
-    }
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('and');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('or');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp('^');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeBinaryOp(':');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('true');
-    __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('false');
-    return styleSpec;
-}
-
-function parseFunctionCall(node) {
-    const name = node.callee.name.toLowerCase();
-    if (aggFns.includes(name)) {
-        //node.arguments[0].name += '_' + name;
-        const args = node.arguments.map(arg => parseNode(arg));
-        return args[0];
-    }
-    const args = node.arguments.map(arg => parseNode(arg));
-    if (lowerCaseFunctions[name]) {
-        return lowerCaseFunctions[name](...args);
-    }
-    throw new Error(`Invalid function name '${node.callee.name}'`);
-}
-
-function parseBinaryOperation(node) {
-    const left = parseNode(node.left);
-    const right = parseNode(node.right);
-    switch (node.operator) {
-        case '*':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](left, right);
-        case '/':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatDiv"](left, right);
-        case '+':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatAdd"](left, right);
-        case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatSub"](left, right);
-        case '%':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMod"](left, right);
-        case '^':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatPow"](left, right);
-        case '>':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThan"](left, right);
-        case '>=':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["greaterThanOrEqualTo"](left, right);
-        case '<':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThan"](left, right);
-        case '<=':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["lessThanOrEqualTo"](left, right);
-        case '==':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["equals"](left, right);
-        case 'and':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["and"](left, right);
-        case 'or':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["or"](left, right);
-        default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
-    }
-}
-
-function parseUnaryOperation(node) {
-    switch (node.operator) {
-        case '-':
-            return __WEBPACK_IMPORTED_MODULE_1__functions__["floatMul"](-1, parseNode(node.argument));
-        case '+':
-            return parseNode(node.argument);
-        default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
-    }
-}
-
-function parseIdentifier(node) {
-    if (node.name[0] == '$') {
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
-    } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()]) {
-        return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toLowerCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-        return lowerCaseFunctions[node.name.toLowerCase()];
-    }
-}
-
-function parseNode(node) {
-    if (node.type == 'CallExpression') {
-        return parseFunctionCall(node);
-    } else if (node.type == 'Literal') {
-        return node.value;
-    } else if (node.type == 'ArrayExpression') {
-        return node.elements.map(e => parseNode(e));
-    } else if (node.type == 'BinaryExpression') {
-        return parseBinaryOperation(node);
-    } else if (node.type == 'UnaryExpression') {
-        return parseUnaryOperation(node);
-    } else if (node.type == 'Identifier') {
-        return parseIdentifier(node);
-    }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
-}
-
-
-/***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.3
@@ -15767,12 +16506,12 @@ function parseNode(node) {
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(10);
 
 
 let integrator = null;
@@ -15800,13 +16539,13 @@ class CartoMapIntegrator {
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
 
 
@@ -15933,10 +16672,14 @@ class MGLIntegrator {
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style_parser__ = __webpack_require__(34);
+
+
 
 class RenderLayer {
     constructor() {
@@ -15944,6 +16687,7 @@ class RenderLayer {
         this.renderer = null;
         this.style = null;
         this.type = null;
+        this.styledFeatures = {};
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
@@ -15980,7 +16724,67 @@ class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style)));
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
+
+            const genReset = styleProperty =>
+                (duration = 500) => {
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
+                        this.styledFeatures[feature.id][styleProperty].replaceChild(
+                            this.styledFeatures[feature.id][styleProperty].mix,
+                            // animate(0) is used to ensure that blend._predraw() "GC" collects it
+                            Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["blend"])(Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["notEquals"])(Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["property"])('cartodb_id'), feature.id), Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["animate"])(0), Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["animate"])(duration))
+                        );
+                        this.style._styleSpec[styleProperty].notify();
+                        this.styledFeatures[feature.id][styleProperty] = undefined;
+                    }
+                };
+
+            const genStyleProperty = styleProperty => {
+                const blender = (newExpression, duration = 500) => {
+                    if (typeof newExpression == 'string') {
+                        newExpression = Object(__WEBPACK_IMPORTED_MODULE_1__style_parser__["b" /* parseStyleExpression */])(newExpression);
+                    }
+                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
+                        this.styledFeatures[feature.id][styleProperty].a.blendTo(newExpression, duration);
+                        return;
+                    }
+                    const blendExpr = Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["blend"])(
+                        newExpression,
+                        this.style._styleSpec[styleProperty],
+                        Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["blend"])(1, Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["notEquals"])(Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["property"])('cartodb_id'), feature.id), Object(__WEBPACK_IMPORTED_MODULE_0__style_functions__["animate"])(duration))
+                    );
+                    this.trackFeatureStyle(feature.id, styleProperty, blendExpr);
+                    this.style.replaceChild(
+                        this.style._styleSpec[styleProperty],
+                        blendExpr,
+                    );
+                    this.style._styleSpec[styleProperty].notify();
+                };
+                return {
+                    blendTo: blender,
+                    reset: genReset(styleProperty)
+                };
+            };
+
+            feature.style = {
+                color: genStyleProperty('color'),
+                width: genStyleProperty('width'),
+                strokeColor: genStyleProperty('strokeColor'),
+                strokeWidth: genStyleProperty('strokeWidth'),
+                reset: (duration = 500) => {
+                    genReset('color')(duration);
+                    genReset('width')(duration);
+                    genReset('strokeColor')(duration);
+                    genReset('strokeWidth')(duration);
+                }
+            };
+            return feature;
+        });
+    }
+
+    trackFeatureStyle(featureID, styleProperty, newStyle) {
+        this.styledFeatures[featureID] = this.styledFeatures[featureID] || {};
+        this.styledFeatures[featureID][styleProperty] = newStyle;
     }
 
     freeDataframes() {
@@ -15994,14 +16798,14 @@ class RenderLayer {
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(11);
 
 
 
@@ -16022,10 +16826,32 @@ class RenderLayer {
  *
  * Feature objects are provided by {@link carto.FeatureEvent} events.
  * @typedef {Object} Feature
+ * @property {Number} id cartodb_id
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
+ * @property {carto.FeatureStyle} style
  * @api
  */
 
+/**
+ *
+ * FeatureStyle objects can be accessed through {@link carto.Feature} objects.
+ * @typedef {Object} FeatureStyle
+ * @property {FeatureStyleProperty} color
+ * @property {FeatureStyleProperty} width
+ * @property {FeatureStyleProperty} colorStroke
+ * @property {FeatureStyleProperty} widthStroke
+ * @property {Function} reset reset custom feature styles by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
+
+/**
+ *
+ * FeatureStyleProperty objects can be accessed through {@link carto.FeatureStyle} objects.
+ * @typedef {Object} FeatureStyleProperty
+ * @property {Function} blendTo change the feature style by blending to a destination style expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
+ * @property {Function} reset reset custom feature style property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
 
 
 /**
@@ -16091,10 +16917,8 @@ class Interactivity {
     *
     * @example
     * const layer = new carto.Layer('layer', source, style);
-    * layer.on('loaded', () => {
-    *   const interactivity = new carto.Interactivity(layer);
-    *   interactivity.on('click', event => console.log(event));
-    * });
+    * const interactivity = new carto.Interactivity(layer);
+    * interactivity.on('click', event => console.log(event));
     * layer.addTo(myMap);
     *
     * @fires CartoError
@@ -16108,7 +16932,7 @@ class Interactivity {
             // Allow one layer as input
             layerList = [layerList];
         }
-        checkLayerList(layerList);
+        preCheckLayerList(layerList);
         this._init(layerList);
     }
 
@@ -16143,8 +16967,12 @@ class Interactivity {
     _init(layerList) {
         this._emitter = Object(__WEBPACK_IMPORTED_MODULE_0_mitt__["a" /* default */])();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
-        this._prevFeatures = [];
+        this._prevHoverFeatures = [];
+        this._prevClickFeatures = [];
+        Promise.all(layerList.map(layer => layer._context)).then(() => {
+            postCheckLayerList(layerList);
+            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        });
     }
 
     _subscribeToIntegratorEvents(integrator) {
@@ -16157,8 +16985,8 @@ class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage enter/leave events
-        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
-        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevHoverFeatures);
 
         if (featuresLeft.length > 0) {
             this._fireEvent('featureLeave', {
@@ -16176,7 +17004,7 @@ class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevHoverFeatures = featureEvent.features;
 
         // Launch hover event
         this._fireEvent('featureHover', featureEvent);
@@ -16187,7 +17015,7 @@ class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage clickOut event
-        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, currentFeatures);
 
         if (featuresClickedOut.length > 0) {
             this._fireEvent('featureClickOut', {
@@ -16197,7 +17025,7 @@ class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevClickFeatures = featureEvent.features;
 
         // Launch click event
         this._fireEvent('featureClick', featureEvent);
@@ -16238,7 +17066,7 @@ class Interactivity {
 /* harmony export (immutable) */ __webpack_exports__["a"] = Interactivity;
 
 
-function checkLayerList(layerList) {
+function preCheckLayerList(layerList) {
     if (!Array.isArray(layerList)) {
         throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
@@ -16248,9 +17076,8 @@ function checkLayerList(layerList) {
     if (!layerList.every(layer => layer instanceof __WEBPACK_IMPORTED_MODULE_1__layer__["a" /* default */])) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
-    if (layerList.some(layer => !layer.getIntegrator())) {
-        throw new Error('Invalid argument, all layers must belong to some map');
-    }
+}
+function postCheckLayerList(layerList) {
     if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
@@ -16266,4 +17093,4 @@ function checkEvent(eventName) {
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=carto-gl.js.map
+//# sourceMappingURL=cartovl.js.map
