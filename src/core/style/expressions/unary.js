@@ -168,6 +168,8 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  */
 export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
 
+export const Floor = genUnaryOp('floor', x =>Math.floor(x), x => `floor(${x})`);
+
 function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends Expression {
         constructor(a) {
