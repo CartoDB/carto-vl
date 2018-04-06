@@ -18,10 +18,32 @@ import { wToR } from '../client/rsys';
  *
  * Feature objects are provided by {@link carto.FeatureEvent} events.
  * @typedef {Object} Feature
+ * @property {Number} id cartodb_id
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
+ * @property {carto.FeatureStyle} style
  * @api
  */
 
+/**
+ *
+ * FeatureStyle objects can be accessed through {@link carto.Feature} objects.
+ * @typedef {Object} FeatureStyle
+ * @property {FeatureStyleProperty} color
+ * @property {FeatureStyleProperty} width
+ * @property {FeatureStyleProperty} colorStroke
+ * @property {FeatureStyleProperty} widthStroke
+ * @property {Function} reset reset custom feature styles by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
+
+/**
+ *
+ * FeatureStyleProperty objects can be accessed through {@link carto.FeatureStyle} objects.
+ * @typedef {Object} FeatureStyleProperty
+ * @property {Function} blendTo change the feature style by blending to a destination style expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
+ * @property {Function} reset reset custom feature style property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @api
+ */
 
 
 /**
@@ -87,10 +109,8 @@ export default class Interactivity {
     *
     * @example
     * const layer = new carto.Layer('layer', source, style);
-    * layer.on('loaded', () => {
-    *   const interactivity = new carto.Interactivity(layer);
-    *   interactivity.on('click', event => console.log(event));
-    * });
+    * const interactivity = new carto.Interactivity(layer);
+    * interactivity.on('click', event => console.log(event));
     * layer.addTo(myMap);
     *
     * @fires CartoError
@@ -104,7 +124,7 @@ export default class Interactivity {
             // Allow one layer as input
             layerList = [layerList];
         }
-        checkLayerList(layerList);
+        preCheckLayerList(layerList);
         this._init(layerList);
     }
 
@@ -139,8 +159,12 @@ export default class Interactivity {
     _init(layerList) {
         this._emitter = mitt();
         this._layerList = layerList;
-        this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
-        this._prevFeatures = [];
+        this._prevHoverFeatures = [];
+        this._prevClickFeatures = [];
+        Promise.all(layerList.map(layer => layer._context)).then(() => {
+            postCheckLayerList(layerList);
+            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        });
     }
 
     _subscribeToIntegratorEvents(integrator) {
@@ -153,8 +177,8 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage enter/leave events
-        const featuresLeft = this._getDiffFeatures(this._prevFeatures, currentFeatures);
-        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevFeatures);
+        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, currentFeatures);
+        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevHoverFeatures);
 
         if (featuresLeft.length > 0) {
             this._fireEvent('featureLeave', {
@@ -172,7 +196,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevHoverFeatures = featureEvent.features;
 
         // Launch hover event
         this._fireEvent('featureHover', featureEvent);
@@ -183,7 +207,7 @@ export default class Interactivity {
         const currentFeatures = featureEvent.features;
 
         // Manage clickOut event
-        const featuresClickedOut = this._getDiffFeatures(this._prevFeatures, currentFeatures);
+        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, currentFeatures);
 
         if (featuresClickedOut.length > 0) {
             this._fireEvent('featureClickOut', {
@@ -193,7 +217,7 @@ export default class Interactivity {
             });
         }
 
-        this._prevFeatures = featureEvent.features;
+        this._prevClickFeatures = featureEvent.features;
 
         // Launch click event
         this._fireEvent('featureClick', featureEvent);
@@ -232,7 +256,7 @@ export default class Interactivity {
     }
 }
 
-function checkLayerList(layerList) {
+function preCheckLayerList(layerList) {
     if (!Array.isArray(layerList)) {
         throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
@@ -242,9 +266,8 @@ function checkLayerList(layerList) {
     if (!layerList.every(layer => layer instanceof Layer)) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
-    if (layerList.some(layer => !layer.getIntegrator())) {
-        throw new Error('Invalid argument, all layers must belong to some map');
-    }
+}
+function postCheckLayerList(layerList) {
     if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }

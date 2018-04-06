@@ -1,5 +1,5 @@
 import Expression from './expression';
-import { implicitCast, checkExpression, checkLooseType, checkType } from './utils';
+import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
  *
@@ -78,7 +78,39 @@ function genHSV(name, alpha) {
     #endif
     `);
         }
-        // TODO eval
+
+        eval(f) {
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                }
+                return value.eval(f);
+            };
+            const h = clamp(normalize(this.h, true), 0, 1);
+            const s = clamp(normalize(this.s), 0, 1);
+            const v = clamp(normalize(this.v), 0, 1);
+
+            const hsvToRgb = (h, s, v) => {
+                const c = {
+                    r: Math.abs(h * 6 - 3) - 1,
+                    g: 2 - Math.abs(h * 6 - 2),
+                    b: 2 - Math.abs(h * 6 - 4),
+                    a: alpha ? this.a.eval(f) : 1,
+                };
+
+                c.r = clamp(c.r, 0, 1);
+                c.g = clamp(c.g, 0, 1);
+                c.b = clamp(c.b, 0, 1);
+
+                c.r = ((c.r - 1) * s + 1) * v * 255;
+                c.g = ((c.g - 1) * s + 1) * v * 255;
+                c.b = ((c.b - 1) * s + 1) * v * 255;
+
+                return c;
+            };
+
+            return hsvToRgb(h, s, v);
+        }
     };
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {

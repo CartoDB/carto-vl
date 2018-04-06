@@ -24,21 +24,26 @@ export default class Opacity extends Expression {
     /**
      * @description Override the input color opacity
      * @param {*} color input color
-     * @param {*} opacity new opacity
+     * @param {*} alpha new opacity
      */
-    constructor(a, b) {
-        if (Number.isFinite(b)) {
-            b = float(b);
+    constructor(color, alpha) {
+        if (Number.isFinite(alpha)) {
+            alpha = float(alpha);
         }
-        checkType('opacity', 'color', 0, 'color', a);
-        checkLooseType('opacity', 'opacity', 1, 'float', b);
-        super({ a: a, b: b });
+        checkType('opacity', 'color', 0, 'color', color);
+        checkLooseType('opacity', 'alpha', 1, 'float', alpha);
+        super({ color, alpha });
         this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        checkType('opacity', 'opacity', 1, 'float', this.b);
-        this.inlineMaker = inlines => `vec4((${inlines.a}).rgb, ${inlines.b})`;
+        checkType('opacity', 'alpha', 1, 'float', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
-    // TODO eval
+    eval(f) {
+        const color = this.color.eval(f);
+        const alpha = this.alpha.eval(f);
+        color.a = alpha;
+        return color;
+    }
 }

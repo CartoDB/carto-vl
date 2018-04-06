@@ -3,7 +3,6 @@ import * as stylerGLSL from './styler';
 import * as aaBlenderGLSL from './aaBlender';
 import ShaderCache from './shader-cache';
 
-const NUM_TEXTURE_LOCATIONS = 4;
 const shaderCache = new ShaderCache();
 
 let programID = 1;
@@ -97,10 +96,6 @@ class GenericStyler {
         FS = FS.replace('$INLINE', inline);
         compileProgram.call(this, gl, VS, FS);
         this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.textureLocations = [];
-        for (let i = 0; i < NUM_TEXTURE_LOCATIONS; i++) {
-            this.textureLocations[i] = gl.getUniformLocation(this.program, `property${i}`);
-        }
     }
 }
 class Color extends GenericStyler {
@@ -110,7 +105,22 @@ class Color extends GenericStyler {
 }
 class Width extends GenericStyler {
     constructor(gl, preface, inline) {
-        super(gl, stylerGLSL, '/*Width*/' + preface, `vec4((${inline})/64.)`);
+        super(gl, stylerGLSL,
+            `
+        /*Width*/
+        // From pixels in [0.,255.] to [0.,1.] in exponential-like form
+        float encodeWidth(float x){
+            if (x<16.){
+                x = x*4.;
+            }else if (x<80.){
+                x = (x-16.)+64.;
+            }else{
+                x = (x-80.)*0.5 + 128.;
+            }
+            return x / 255.;
+        }
+        ` + preface,
+            `vec4(encodeWidth(${inline}))`);
     }
 }
 

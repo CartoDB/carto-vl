@@ -1,4 +1,4 @@
-import { float, category } from '../functions';
+import { float, category, customPalette } from '../functions';
 import Expression from './expression';
 
 export const DEFAULT = undefined;
@@ -7,9 +7,10 @@ export const DEFAULT = undefined;
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
         return float(value);
-    }
-    if (typeof value == 'string') {
+    } else if (typeof value == 'string') {
         return category(value);
+    }else if(Array.isArray(value)){
+        return customPalette(...value);
     }
     return value;
 }
@@ -22,7 +23,7 @@ export function hexToRgb(hex) {
             r: parseInt(result[1] + result[1], 16),
             g: parseInt(result[2] + result[2], 16),
             b: parseInt(result[3] + result[3], 16),
-            a: 255
+            a: 1
         };
     }
     // Evaluate #ABCDEF
@@ -32,7 +33,7 @@ export function hexToRgb(hex) {
             r: parseInt(result[1], 16),
             g: parseInt(result[2], 16),
             b: parseInt(result[3], 16),
-            a: 255
+            a: 1
         };
     }
     throw new Error('Invalid hexadecimal color');
@@ -64,6 +65,11 @@ export function throwInvalidInstance(expressionName, parameterName, parameterInd
 export function throwInvalidNumber(expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     '${number}' is not a finite number`);
+}
+
+export function throwInvalidArray(expressionName, parameterName, parameterIndex, array) {
+    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    '${array}' is not an array`);
 }
 
 export function throwInvalidString(expressionName, parameterName, parameterIndex, str) {
@@ -123,6 +129,11 @@ export function checkString(expressionName, parameterName, parameterIndex, str) 
     }
 }
 
+export function checkArray(expressionName, parameterName, parameterIndex, number) {
+    if (!Array.isArray(number)) {
+        throwInvalidArray(expressionName, parameterName, parameterIndex, number);
+    }
+}
 
 export function clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);

@@ -42,6 +42,7 @@ export default class Layer {
     }
 
     _init(id, source, style) {
+        style._boundLayer = this;
         this.state = 'init';
         this._id = id;
 
@@ -91,6 +92,7 @@ export default class Layer {
     async update(source, style) {
         this._checkSource(source);
         this._checkStyle(style);
+        source = source._clone();                
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         await this._context;
@@ -352,6 +354,9 @@ export default class Layer {
         }
         if (!(style instanceof Style)) {
             throw new CartoValidationError('layer', 'nonValidStyle');
+        }
+        if (style._boundLayer && style._boundLayer !== this) {
+            throw new CartoValidationError('layer', 'sharedStyle');
         }
     }
 

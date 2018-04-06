@@ -12,7 +12,7 @@
     <link href='css/normalize.css' rel='stylesheet' />
     <link href='css/skeleton.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-    <script src="../dist/carto-gl.js"></script>
+    <script src="../dist/cartovl.js"></script>
     <script src="index.js" defer></script>
     <style>
         html,
@@ -25,6 +25,7 @@
         .mapClass {
             width: 100%;
             height: 70%;
+            position: relative;
         }
 
         #good {
@@ -84,12 +85,19 @@
             display: none;
             position: absolute;
             z-index: 1;
-            width: 300px;
             height: 120px;
             opacity: 0.75;
             color: #161616;
             font-weight: bold;
             overflow: hidden;
+        }
+
+        .map-info{
+            font-size: 13px;
+            padding: 0 5px;
+            position: absolute;
+            bottom: 0;
+            background: rgba(255, 255, 255, .5);
         }
     </style>
 </head>
@@ -99,6 +107,7 @@
     <div class='mapClass u-full-width'>
         <textarea class="u-full-width" id="feedback">¿?</textarea>
         <div id='map' class='map'></div>
+        <div class="map-info"></div>
     </div>
     <div class="container">
         <div class="row">

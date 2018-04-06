@@ -26,6 +26,8 @@ const SUPPORTED_PROPERTIES = [
     'filter'
 ];
 
+const MIN_RESOLUTION = 0;
+const MAX_RESOLUTION = 256;
 
 export default class Style {
 
@@ -316,6 +318,12 @@ export default class Style {
 
         if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
+        }
+        if (styleSpec.resolution<=MIN_RESOLUTION){
+            throw new CartoValidationError('style', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+        }
+        if (styleSpec.resolution>=MAX_RESOLUTION){
+            throw new CartoValidationError('style', `resolutionTooBig[${MAX_RESOLUTION}]`);
         }
         if (!(styleSpec.color instanceof Expression)) {
             throw new CartoValidationError('style', 'nonValidExpression[color]');

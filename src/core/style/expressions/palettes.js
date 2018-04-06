@@ -1,6 +1,7 @@
 
 import * as cartocolor from 'cartocolor';
 import Expression from './expression';
+import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
 
 /**
  * ### Color palettes
@@ -32,7 +33,13 @@ class PaletteGenerator extends Expression {
         super({});
         this.type = 'palette';
         this.name = name;
-        this.subPalettes = subPalettes;
+        this.subPalettes = new Proxy(subPalettes, {
+            get: (target, name) => {
+                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                    return target[name].map(hexToRgb);
+                }
+            }
+        });
         this.tags = subPalettes.tags;
     }
     getLongestSubPalette() {
@@ -41,6 +48,42 @@ class PaletteGenerator extends Expression {
             if (s[i]) {
                 return s[i];
             }
+        }
+    }
+}
+
+export class CustomPalette extends Expression {
+    // colors is a list of expression of type 'color'
+    constructor(...elems) {
+        elems = elems.map(implicitCast);
+        if (!elems.length) {
+            throw new Error('customPalette(): invalid parameters: must receive at least one argument');
+        }
+        const type = elems[0].type;
+        if (type == undefined) {
+            throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+        }
+        checkType('customPalette', 'colors[0]', 0, ['color', 'float'], elems[0]);
+        elems.map((color, index) => {
+            checkExpression('customPalette', `colors[${index}]`, index, color);
+            if (color.type == undefined) {
+                throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+            }
+            if (color.type != type) {
+                throw new Error('customPalette(): invalid parameters, invalid argument type combination');
+            }
+        });
+        super({});
+        this.type = type == 'color' ? 'customPalette' : 'customPaletteFloat';
+        try {
+            if (type == 'color') {
+                // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]
+                this.colors = elems.map(c => c.eval());
+            } else {
+                this.floats = elems.map(c => c.eval());
+            }
+        } catch (error) {
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
 }

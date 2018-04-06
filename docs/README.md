@@ -17,7 +17,7 @@ TBD
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <script src="../../dist/cartovl.js"></script>
   <!-- Include CARTO Mapbox GL JS fork -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->

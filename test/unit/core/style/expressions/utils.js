@@ -101,6 +101,10 @@ function getSimpleArg(type) {
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'palette':
             return [s.palettes.prism, 'Prism'];
+        case 'customPalette':
+            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
+        case 'customPaletteFloat':
+            return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
     }
@@ -117,6 +121,10 @@ function getPropertyArg(type) {
             return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
         case 'palette':
             return [s.palettes.prism, 'Prism'];
+        case 'customPalette':
+            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
+        case 'customPaletteFloat':
+            return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
     }
