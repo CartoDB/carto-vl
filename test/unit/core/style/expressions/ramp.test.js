@@ -10,6 +10,8 @@ describe('src/core/style/expressions/ramp', () => {
     describe('type', () => {
         validateStaticType('ramp', ['float', 'palette'], 'color');
         validateStaticType('ramp', ['category', 'palette'], 'color');
+        validateStaticType('ramp', ['category', 'customPalette'], 'color');
+        validateStaticType('ramp', ['category', 'customPaletteFloat'], 'float');
     });
 
     describe('eval', () => {
