@@ -57,14 +57,20 @@ export class CustomPalette extends Expression {
     constructor(...elems) {
         elems = elems.map(implicitCast);
         if (!elems.length) {
-            throw new Error('CustomPalette() must receive at least one argument');
+            throw new Error('customPalette(): invalid parameters: must receive at least one argument');
+        }
+        const type = elems[0].type;
+        if (type == undefined) {
+            throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
         }
         checkType('customPalette', 'colors[0]', 0, ['color', 'float'], elems[0]);
-        const type = elems[0].type;
         elems.map((color, index) => {
             checkExpression('customPalette', `colors[${index}]`, index, color);
+            if (color.type == undefined) {
+                throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+            }
             if (color.type != type) {
-                throw new Error('customPalette(): invalid argument type combination');
+                throw new Error('customPalette(): invalid parameters, invalid argument type combination');
             }
         });
         super({});
