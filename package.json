@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "renderer-prototype",
+  "name": "cartovl",
   "version": "0.1.0",
   "description": "CARTO Vector library",
   "repository": {

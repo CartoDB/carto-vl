@@ -22,7 +22,7 @@ width: 5
 [Example](https://cartodb.github.io/renderer-prototype/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1IiwiZiI6eyJsbmciOi04Ni45ODUxNDA3MDY2NjM3NCwibGF0IjotMS4xMzY4NjgzNzcyMTYxNjAzZS0xM30sImciOjAuMzUzMTQ2NzEyMTMwODk3MX0=)
 
 ### Point Color
-Use the `color` property to color features with one of CARTO GL's [supported color spaces](LINK).
+Use the `color` property to color features with one of CARTO VL's [supported color spaces](LINK).
 
 ```
 width: 5
@@ -70,7 +70,7 @@ order: desc(width())
 + Attribute
 
 ### Unique Values  
-The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together. 
+The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together.
 
 ```
 width: 5
@@ -173,4 +173,4 @@ color: ramp(buckets($price,50,100,500,1000),sunset)
 ![screen shot 2018-02-26 at 11 06 57 am](https://user-images.githubusercontent.com/1566273/36686931-3f42422a-1ae5-11e8-896b-39dcf045e466.png)
 
 ### Manually Classed Size
-TBD 
+TBD
