@@ -8620,6 +8620,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
                     pixel[4 * i + 2] = v[2];
                     pixel[4 * i + 3] = v[3];
                 }
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                     pixel);
@@ -9397,7 +9398,7 @@ function genHSV(name, alpha) {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? this.a.eval(f) : 1,
+                    a: alpha ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(this.a.eval(f), 0,1) : 1,
                 };
 
                 c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
