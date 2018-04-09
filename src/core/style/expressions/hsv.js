@@ -95,7 +95,7 @@ function genHSV(name, alpha) {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? this.a.eval(f) : 1,
+                    a: alpha ? clamp(this.a.eval(f), 0,1) : 1,
                 };
 
                 c.r = clamp(c.r, 0, 1);
