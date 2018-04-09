@@ -1,8 +1,8 @@
 const map = new mapboxgl.Map({
     container: 'map',
-    style: { version: 8, sources: {}, layers: [] },
-    center: [-20, 33],
-    zoom: 2
+    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    center: [-122.42, 37.77],
+    zoom: 12
 });
 
 carto.setDefaultAuth({
@@ -10,10 +10,10 @@ carto.setDefaultAuth({
     apiKey: 'YOUR_API_KEY'
 });
 
-const source = new carto.source.SQL('SELECT ST_Multi(the_geom_webmercator) as the_geom_webmercator, ST_Multi(the_geom) as the_geom FROM lines_0');
+const source = new carto.source.Dataset('sf_stclines');
 const s = carto.style.expressions;
 const style = new carto.Style({
-    width: s.float(20),
+    width: 3,
     color: s.hsv(0.2, 1, .9),
 });
 const layer = new carto.Layer('myCartoLayer', source, style);
