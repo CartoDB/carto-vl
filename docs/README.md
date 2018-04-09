@@ -19,7 +19,7 @@ TBD
   <!-- Include CARTO GL JS -->
   <script src="../../dist/cartovl.js"></script>
   <!-- Include CARTO Mapbox GL JS fork -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="https://unpkg.com/@carto/mapbox-gl@0.44.1/dist/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
   <style>
