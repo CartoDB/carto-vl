@@ -111,7 +111,7 @@ export default class Ramp extends Expression {
                     const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                     const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
                     const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
-                    const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vlowRaw.a];
+                    const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vhighRaw.a];
                     const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
                     const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
                     pixel[4 * i + 0] = v[0];
