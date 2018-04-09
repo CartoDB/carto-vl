@@ -164,6 +164,8 @@ export default class Windshaft {
         const metadata = await this._getMetadata(query, MNS, conf);
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
+        aggSQL = this._buildQuery(select);
+
         // If the number of features is higher than the minimun, enable server filtering.
         let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
 
@@ -447,9 +449,9 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
         const properties = [];
-        for (let i = 0; i < catFields.length + numFields.length; i++) {
+        for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
         if (this.geomType == 'point') {
@@ -476,7 +478,7 @@ export default class Windshaft {
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
-            datesField.map((name, index) => {
+            dateFields.map((name, index) => {
                 const d = Date.parse(f.properties[name]);
                 if (Number.isNaN(d)) {
                     throw new Error('invalid MVT date');

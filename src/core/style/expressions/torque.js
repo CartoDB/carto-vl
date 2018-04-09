@@ -92,7 +92,7 @@ export class Torque extends Expression {
         this.type = 'float';
 
         this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline.input}-${inline._cycle})*${this.duration.toFixed(20)}/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
     getSimTime() {
         if (!(this.input.min.eval() instanceof Date)){
