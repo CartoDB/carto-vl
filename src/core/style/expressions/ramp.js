@@ -119,6 +119,7 @@ export default class Ramp extends Expression {
                     pixel[4 * i + 2] = v[2];
                     pixel[4 * i + 3] = v[3];
                 }
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                     pixel);
