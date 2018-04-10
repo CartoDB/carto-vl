@@ -64,7 +64,7 @@ function generateAggregattion(metadataPropertyName, global) {
         _getColumnName() {
             if (this.property.aggName) {
                 // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName());
+                return schema.column.aggColumn(this.property.name, this.property.aggName);
             }
             return this.property.name;
         }
@@ -133,7 +133,7 @@ function generatePercentile(global) {
         _getColumnName() {
             if (this.property.aggName) {
                 // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName());
+                return schema.column.aggColumn(this.property.name, this.property.aggName);
             }
             return this.property.name;
         }

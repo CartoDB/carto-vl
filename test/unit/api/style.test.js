@@ -153,7 +153,7 @@ describe('api/style', () => {
         });
 
         describe('when parameter is a string', () => {
-            xit('should set the style properties defined in the string', () => {
+            it('should set the style properties defined in the string', () => {
                 const styleSpec = `
                     color: rgba(1, 0, 0, 1),
                     width: float(10),
@@ -165,11 +165,11 @@ describe('api/style', () => {
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor()).toEqual(s.rgba(1, 0, 0, 1));
-                expect(actual.getWidth()).toEqual(s.float(10));
-                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
-                expect(actual.getStrokeWidth()).toEqual(s.float(15));
-                expect(actual.getOrder()).toEqual(s.asc(s.width()));
+                expect(actual.getColor().expr).toEqual(s.rgba(1, 0, 0, 1).expr);
+                expect(actual.getWidth().expr).toEqual(s.float(10).expr);
+                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 0, 1, 1).expr);
+                expect(actual.getStrokeWidth().expr).toEqual(s.float(15).expr);
+                expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
         });
     });

@@ -96,9 +96,9 @@ function genQuantiles(global) {
             super._preDraw(drawMetadata, gl);
         }
         _getColumnName() {
-            if (this.property.aggName) {
+            if (this.input.aggName) {
                 // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName());
+                return schema.column.aggColumn(this.input.name, this.input.aggName);
             }
             return this.input.name;
         }
