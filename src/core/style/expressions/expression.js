@@ -35,6 +35,9 @@ export default class Expression {
         return this;
     }
 
+    _updateDrawMetadata(metadata){
+        this._getChildren().map(child => child._updateDrawMetadata(metadata));
+    }
     _compile(metadata) {
         this._getChildren().map(child => child._compile(metadata));
     }

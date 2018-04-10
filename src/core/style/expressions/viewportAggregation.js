@@ -46,7 +46,7 @@ function generateAggregattion(metadataPropertyName, global) {
                 return { columns: [] };
             }
         }
-        _preDraw(drawMetadata, gl) {
+        _updateDrawMetadata(drawMetadata){
             const column = drawMetadata.columns.find(c => c.name == this.property.name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
@@ -54,7 +54,6 @@ function generateAggregattion(metadataPropertyName, global) {
             if (Math.random() > 0.999) {
                 console.log(metadataPropertyName, this.property.name, this.value.expr);
             }
-            this.value._preDraw(drawMetadata, gl);
         }
         eval() {
             return this.value.expr;

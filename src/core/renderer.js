@@ -160,7 +160,9 @@ class Renderer {
         const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
         const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
         const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
-        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
+        const styleVariables = style._styleSpec.variables;
+        const variables = Object.values(styleVariables);
+        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
             .reduce(schema.union, schema.IDENTITY).columns;
 
         if (requiredColumns.length == 0) {
@@ -279,6 +281,10 @@ class Renderer {
 
 
         const drawMetadata = this._computeDrawMetadata(renderLayer);
+
+        Object.values(style._styleSpec.variables).map(v => {
+            v._updateDrawMetadata(drawMetadata);
+        });
 
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);

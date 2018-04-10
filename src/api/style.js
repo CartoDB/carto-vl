@@ -197,6 +197,10 @@ export default class Style {
         this._compileStrokeColorShader(gl, metadata);
         this._compileStrokeWidthShader(gl, metadata);
         this._compileFilterShader(gl, metadata);
+
+        Object.values(this._styleSpec.variables).map(v => {
+            v._bind(metadata);
+        });
     }
 
     _compileColorShader(gl, metadata) {

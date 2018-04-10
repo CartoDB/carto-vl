@@ -72,6 +72,8 @@
       strokeWidth: 1
 
       variables:[
+        view_pop_avg: viewportAvg($pop_max),
+        global_pop_avg: globalAvg($pop_max),
         watch: $name
       ]
     `);
@@ -82,6 +84,14 @@
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
+
+    map.on('move', () => {
+      const obj = {
+        global_pop_avg: style._styleSpec.variables.global_pop_avg.eval(),
+        view_pop_avg: style._styleSpec.variables.view_pop_avg.eval(),
+      }
+      console.log(obj);
+    });
 
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
@@ -100,7 +110,7 @@
         const feature = event.features[0];
         feature.style.strokeWidth.blendTo('4', 100);
         feature.style.strokeColor.blendTo('rgb(255,20,138)', 100);
-        updateTitle(feature.properties.name);
+        updateTitle(`${feature.properties.name}: ${feature.properties.pop_max}`);
       }
     });
 
