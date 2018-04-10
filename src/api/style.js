@@ -203,8 +203,46 @@ export default class Style {
         });
     }
 
+    _getDependencies() {
+        // get list of aliases
+        const aliases = Object.keys(this._styleSpec.variables);
+
+        const permanentMarkedSet = new Set();
+        const temporarilyMarkedSet = new Set();
+        const visit = node => {
+            if (permanentMarkedSet.has(node)) {
+                // Node is already a processed dependency
+                return;
+            }
+            if (temporarilyMarkedSet.has(node)) {
+                throw new Error('Viz contains a circular dependency');
+            }
+            node._getDependencies().forEach(visit);
+            temporarilyMarkedSet.add(node);
+            permanentMarkedSet.add(node);
+        };
+        const unmarked = [
+            ...this._styleSpec.color._getDependencies(),
+            ...this._styleSpec.strokeColor._getDependencies(),
+            ...this._styleSpec.width._getDependencies(),
+            ...this._styleSpec.strokeWidth._getDependencies(),
+            ...this._styleSpec.filter._getDependencies()];
+        while (unmarked.length) {
+            visit(unmarked[0]);
+        }
+        const deps = Array.from(permanentMarkedSet);
+        return deps;
+    }
+
     _compileColorShader(gl, metadata) {
         this._styleSpec.color._bind(metadata);
+        /**
+         * TODO
+         *
+         * get dependencies (without circular deps=>throw if not a DAG)
+         * compile dependencies: inlines and prefaces
+         * on reference => set inline from this compileshader
+         */
         const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;

@@ -35,6 +35,10 @@ export default class Expression {
         return this;
     }
 
+    _getDependencies(){
+
+    }
+
     _updateDrawMetadata(metadata){
         this._getChildren().map(child => child._updateDrawMetadata(metadata));
     }

@@ -46,6 +46,9 @@ export default class Property extends Expression {
         }
         super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
+    _getDependencies(aliases){
+        //if on alias => return alias
+    }
     _getMinimumNeededSchema() {
         return {
             columns: [
