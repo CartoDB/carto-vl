@@ -66,7 +66,7 @@
     ne_10m_populated_places_simple
     `);//+($name=='Madrid')
     const style = new carto.Style(`
-      width: 15
+      width: 10 * $pop_max/viewportAvg($pop_max)
       color: hsva(0.73,0.69,0.89,0.4)
       strokeColor: hsva(0.73,0.69,0.89,0.5)
       strokeWidth: 1

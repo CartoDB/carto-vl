@@ -295,6 +295,7 @@ class Renderer {
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+            styleExpr._updateDrawMetadata(drawMetadata);
             styleExpr._preDraw(drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
