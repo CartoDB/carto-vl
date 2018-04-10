@@ -43,9 +43,23 @@ function parseStyleNamedExpr(styleSpec, node) {
     if (!name) {
         throw new Error('Invalid syntax');
     }
-    const value = parseNode(node.right);
-    // Don't cast resolution properties implicitly since they must be of type Number
-    styleSpec[name] = name == 'resolution' ? value : implicitCast(value);
+    if (name == 'variables') {
+        styleSpec.variables = {};
+        node.right.elements.map(variable => {
+            if (!node.type == 'BinaryExpression' || node.operator != ':') {
+                throw new Error('Invalid syntax');
+            }
+            const [varName, varExpr] = [variable.left.name, parseNode(variable.right)];
+            styleSpec.variables[varName] = varExpr;
+        });
+    } else if (name == 'resolution') {
+        const value = parseNode(node.right);
+        styleSpec[name] = value;
+    } else {
+        const value = parseNode(node.right);
+        styleSpec[name] = implicitCast(value);
+    }
+
 }
 
 function parseFunctionCall(node) {
@@ -137,7 +151,7 @@ function parseNode(node) {
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
-function prepareJsep(){
+function prepareJsep() {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp(':', 0);
     jsep.addBinaryOp('^', 11);
@@ -147,7 +161,7 @@ function prepareJsep(){
     jsep.removeLiteral('false');
 }
 
-function cleanJsep(){
+function cleanJsep() {
     jsep.removeBinaryOp('and');
     jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');

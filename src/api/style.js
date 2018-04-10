@@ -24,7 +24,8 @@ const SUPPORTED_PROPERTIES = [
     'strokeColor',
     'strokeWidth',
     'order',
-    'filter'
+    'filter',
+    'variables'
 ];
 
 const MIN_RESOLUTION = 0;
@@ -186,7 +187,7 @@ export default class Style {
             this._styleSpec.strokeColor,
             this._styleSpec.strokeWidth,
             this._styleSpec.filter,
-        ].filter(x => x && x._getMinimumNeededSchema);
+        ].concat(Object.keys(this._styleSpec.variables).map(varname => this._styleSpec.variables[varname])).filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
@@ -320,10 +321,10 @@ export default class Style {
         if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
         }
-        if (styleSpec.resolution<=MIN_RESOLUTION){
+        if (styleSpec.resolution <= MIN_RESOLUTION) {
             throw new CartoValidationError('style', `resolutionTooSmall[${MIN_RESOLUTION}]`);
         }
-        if (styleSpec.resolution>=MAX_RESOLUTION){
+        if (styleSpec.resolution >= MAX_RESOLUTION) {
             throw new CartoValidationError('style', `resolutionTooBig[${MAX_RESOLUTION}]`);
         }
         if (!(styleSpec.color instanceof Expression)) {
