@@ -108,7 +108,7 @@ const auth = {
 let layer = null;
 setInterval(() => {
     if (layer) {
-        document.getElementById('title').innerText = `Demo dataset  ~ ${layer.getNumFeatures()} features`;
+        document.getElementById('title').innerText = `~ ${layer.getNumFeatures()} features`;
     }
 }, 500);
 
