@@ -8,6 +8,7 @@ import Expression from '../core/style/expressions/expression';
 import { implicitCast } from '../core/style/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
+// TODO rename to Viz
 
 const DEFAULT_RESOLUTION = () => 1;
 const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
