@@ -36,7 +36,11 @@ export default class Expression {
     }
 
     _getDependencies(){
+        this._getChildren().map(child => child._getDependencies());
+    }
 
+    _resolveAliases(aliases){
+        this._getChildren().map(child => child._resolveAliases(aliases));
     }
 
     _updateDrawMetadata(metadata){

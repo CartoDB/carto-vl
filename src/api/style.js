@@ -78,7 +78,10 @@ export default class Style {
         this._styleSpec.strokeWidth.notify = this._changed.bind(this);
         this._styleSpec.order.notify = this._changed.bind(this);
         this._styleSpec.filter.notify = this._changed.bind(this);
+
+        this._resolveAliases();
     }
+
 
     /**
      * Return the resolution.
@@ -187,7 +190,7 @@ export default class Style {
             this._styleSpec.strokeColor,
             this._styleSpec.strokeWidth,
             this._styleSpec.filter,
-        ].concat(Object.keys(this._styleSpec.variables).map(varname => this._styleSpec.variables[varname])).filter(x => x && x._getMinimumNeededSchema);
+        ].concat(Object.values(this._styleSpec.variables)).filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
@@ -201,6 +204,19 @@ export default class Style {
         Object.values(this._styleSpec.variables).map(v => {
             v._bind(metadata);
         });
+    }
+
+
+    _resolveAliases() {
+        [
+            this._styleSpec.color,
+            this._styleSpec.width,
+            this._styleSpec.strokeColor,
+            this._styleSpec.strokeWidth,
+            this._styleSpec.filter,
+        ].concat(Object.values(this._styleSpec.variables)).forEach(expr =>
+            expr._resolveAliases(this._styleSpec.variables)
+        );
     }
 
     _getDependencies() {

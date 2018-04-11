@@ -35,7 +35,20 @@ export default class Property extends Expression {
         super({});
         this.name = name;
     }
+    _resolveAliases(aliases) {
+        if (aliases[this.name]) {
+            this.childrenNames.push('alias');
+            this.alias = aliases[this.name];
+        } else {
+            this.alias = null;
+        }
+    }
     _compile(meta) {
+        if (this.alias) {
+            this.alias._compile(meta);
+            this.type = this.alias.type;
+            return;
+        }
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
@@ -46,10 +59,22 @@ export default class Property extends Expression {
         }
         super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
-    _getDependencies(aliases){
+    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+        if (this.alias) {
+            return this.alias._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
+        }
+        return {
+            preface: '',
+            inline: getGLSLforProperty(this.name)
+        };
+    }
+    _getDependencies(aliases) {
         //if on alias => return alias
     }
     _getMinimumNeededSchema() {
+        if (this.alias) {
+            return this.alias._getMinimumNeededSchema();
+        }
         return {
             columns: [
                 this.name
@@ -57,6 +82,9 @@ export default class Property extends Expression {
         };
     }
     eval(feature) {
+        if (this.alias) {
+            return this.alias.eval(feature);
+        }
         return feature[this.name];
     }
 }
