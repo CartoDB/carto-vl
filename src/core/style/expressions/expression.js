@@ -2,6 +2,8 @@ import { implicitCast } from './utils';
 import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
+let uid = 0;
+
 /**
  * Abstract expression class
  *
@@ -28,6 +30,7 @@ export default class Expression {
         this._metaBindings = [];
         this.preface = '';
         this._shaderBindings = new Map();
+        this._uid = uid++;
     }
 
     _bind(metadata) {
