@@ -243,7 +243,7 @@ export default class Style {
             ...this._styleSpec.strokeWidth._getDependencies(),
             ...this._styleSpec.filter._getDependencies()];
         while (unmarked.length) {
-            visit(unmarked[0]);
+            visit(unmarked.pop());
         }
     }
 
