@@ -79,7 +79,7 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         const styleStrokeWidth = style.getStrokeWidth();
@@ -93,8 +93,12 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
+            const spw = styleWidth.eval(f);
+            const ssw = styleStrokeWidth.eval(f);
+            const diameter = Math.min(spw + ssw, 126);
+
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
-            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
+            const scale = diameter / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
                 this._addFeatureToArray(featureIndex, features);
@@ -111,7 +115,7 @@ export default class Dataframe {
         let featureIndex = 0;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         // Linear search for all features
@@ -125,8 +129,10 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(styleWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = styleWidth.eval(f) / 2 * widthScale;
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
