@@ -28,8 +28,8 @@ describe('src/core/dataframe', () => {
                     }]
                 }
             });
-            const feature1 = { id: 0, properties: { cartodb_id: 0, id: 1 } };
-            const feature2 = { id: 1, properties: { cartodb_id: 1, id: 2 } };
+            const feature1 = { id: 0, properties: { id: 1 } };
+            const feature2 = { id: 1, properties: { id: 2 } };
             const style = {
                 getWidth: () => ({ eval: () => 0.5 }),
                 getStrokeWidth: () => ({ eval: () => 0.5 })
@@ -78,8 +78,7 @@ describe('src/core/dataframe', () => {
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_prop: 1,
-                    cartodb_id: 0
+                    numeric_prop: 1
                 }
             };
             const style = {
@@ -136,8 +135,7 @@ describe('src/core/dataframe', () => {
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_property: 0,
-                    cartodb_id: 0
+                    numeric_property: 0
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {

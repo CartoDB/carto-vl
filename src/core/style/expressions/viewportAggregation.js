@@ -1,5 +1,6 @@
 import Expression from './expression';
 import { float } from '../functions';
+import * as schema from '../../schema';
 
 export const ViewportMax = generateAggregattion('max');
 export const ViewportMin = generateAggregattion('min');
@@ -26,6 +27,9 @@ function generateAggregattion(metadataPropertyName, global) {
             super({ value: float(0) });
             this.property = property;
         }
+        eval() {
+            return this.value.expr;
+        }
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
@@ -33,7 +37,7 @@ function generateAggregattion(metadataPropertyName, global) {
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
             if (global) {
-                this.value.expr = metadata.columns.find(c => c.name == this.property.name)[metadataPropertyName];
+                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
             }
         }
         _getMinimumNeededSchema() {
@@ -41,22 +45,27 @@ function generateAggregattion(metadataPropertyName, global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _updateDrawMetadata(drawMetadata){
-            const column = drawMetadata.columns.find(c => c.name == this.property.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name === name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, this.value.expr);
+                console.log(metadataPropertyName, name, this.value.expr);
             }
         }
-        eval() {
-            return this.value.expr;
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return schema.column.aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
         }
     };
 }
@@ -93,15 +102,16 @@ function generatePercentile(global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(program, drawMetadata, gl) {
             // TODO use _updateDrawMetadata
+            const name = this._getColumnName();
             if (!global) {
-                const column = drawMetadata.columns.find(c => c.name == this.property.name);
+                const column = drawMetadata.columns.find(c => c.name === name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
@@ -112,14 +122,20 @@ function generatePercentile(global) {
                 const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
                 this.value.expr = br;
             }
-
             if (Math.random() > 0.99) {
-                console.log(`percentile${this.percentile}`, this.property.name, this.value.expr);
+                console.log(`percentile${this.percentile}`, name, this.value.expr);
             }
             this.value._preDraw(program, drawMetadata, gl);
         }
         eval() {
             return this.value.expr;
+        }
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return schema.column.aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
         }
     };
 }
