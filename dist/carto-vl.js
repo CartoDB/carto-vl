@@ -1,6 +1,6 @@
 /*!
  * CARTO VL js https://carto.com/
- * Version: 0.1.0
+ * Version: 0.2.0
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
 
 
 
@@ -449,7 +449,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_time__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_unary__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_aggregation__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_interpolators__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_torque__ = __webpack_require__(54);
@@ -1693,77 +1693,6 @@ class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
-
-
-
-
-
-// Aggregation ops
-const Max = genAggregationOp('max', 'float');
-/* harmony export (immutable) */ __webpack_exports__["b"] = Max;
-
-const Min = genAggregationOp('min', 'float');
-/* harmony export (immutable) */ __webpack_exports__["c"] = Min;
-
-const Avg = genAggregationOp('avg', 'float');
-/* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
-
-const Sum = genAggregationOp('sum', 'float');
-/* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
-
-const Mode = genAggregationOp('mode', 'category');
-/* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
-
-
-function genAggregationOp(aggName, aggType) {
-    return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
-        constructor(property) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
-            super({ property: property });
-            this._aggName = aggName;
-            this.type = aggType;
-        }
-        get name() {
-            return this.property.name;
-        }
-        get numCategories() {
-            return this.property.numCategories;
-        }
-        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-        _compile(metadata) {
-            super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
-        }
-        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-            return {
-                preface: '',
-                inline: `${getGLSLforProperty(__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName))}`
-            };
-        }
-        eval(feature) {
-            return feature[__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)];
-        }
-        _postShaderCompile() { }
-        _getMinimumNeededSchema() {
-            return {
-                columns: [
-                    __WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)
-                ]
-            };
-        }
-    };
-}
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (immutable) */ __webpack_exports__["union"] = union;
 /* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
@@ -1830,6 +1759,80 @@ const column = {
 /* harmony export (immutable) */ __webpack_exports__["column"] = column;
 
 
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
+
+
+
+
+
+// Aggregation ops
+const Max = genAggregationOp('max', 'float');
+/* harmony export (immutable) */ __webpack_exports__["b"] = Max;
+
+const Min = genAggregationOp('min', 'float');
+/* harmony export (immutable) */ __webpack_exports__["c"] = Min;
+
+const Avg = genAggregationOp('avg', 'float');
+/* harmony export (immutable) */ __webpack_exports__["a"] = Avg;
+
+const Sum = genAggregationOp('sum', 'float');
+/* harmony export (immutable) */ __webpack_exports__["e"] = Sum;
+
+const Mode = genAggregationOp('mode', 'category');
+/* harmony export (immutable) */ __webpack_exports__["d"] = Mode;
+
+
+function genAggregationOp(aggName, aggType) {
+    return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
+        constructor(property) {
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
+            super({ property });
+            this._aggName = aggName;
+            this.type = aggType;
+        }
+        get name() {
+            return this.property.name;
+        }
+        get aggName() {
+            return this._aggName;
+        }
+        get numCategories() {
+            return this.property.numCategories;
+        }
+        eval(feature) {
+            return feature[__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)];
+        }
+        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+        _compile(metadata) {
+            super._compile(metadata);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
+        }
+        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+            return {
+                preface: '',
+                inline: `${getGLSLforProperty(__WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName))}`
+            };
+        }
+        _postShaderCompile() { }
+        _getMinimumNeededSchema() {
+            return {
+                columns: [
+                    __WEBPACK_IMPORTED_MODULE_1__schema__["column"].aggColumn(this.property.name, aggName)
+                ]
+            };
+        }
+    };
+}
 
 
 /***/ }),
@@ -1909,7 +1912,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__style_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
@@ -3554,7 +3557,7 @@ class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         const styleStrokeWidth = style.getStrokeWidth();
@@ -3568,8 +3571,12 @@ class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
+            const spw = styleWidth.eval(f);
+            const ssw = styleStrokeWidth.eval(f);
+            const diameter = Math.min(spw + ssw, 126);
+
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
-            const scale = (styleWidth.eval(f) + styleStrokeWidth.eval(f)) / 2 * widthScale;
+            const scale = diameter / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
                 this._addFeatureToArray(featureIndex, features);
@@ -3586,7 +3593,7 @@ class Dataframe {
         let featureIndex = 0;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         // Linear search for all features
@@ -3600,8 +3607,10 @@ class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(styleWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = styleWidth.eval(f) / 2 * widthScale;
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
@@ -3663,24 +3672,21 @@ class Dataframe {
     }
 
     _addFeatureToArray(featureIndex, features) {
-        const properties = this._getPropertiesOf(featureIndex);
-        features.push({
-            id: properties.cartodb_id,
-            properties
-        });
-    }
-
-    _getPropertiesOf(featureID) {
+        let id = '';
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
-            let prop = this.properties[propertyName][featureID];
-            const column = this.metadata.columns.find(c => c.name == propertyName);
-            if (column.type == 'category') {
-                prop = column.categoryNames[prop];
+            let prop = this.properties[propertyName][featureIndex];
+            if (propertyName === 'cartodb_id') {
+                id = prop;
+            } else {
+                const column = this.metadata.columns.find(c => c.name == propertyName);
+                if (column && column.type == 'category') {
+                    prop = column.categoryNames[prop];
+                }
+                properties[propertyName] = prop;
             }
-            properties[propertyName] = prop;
         });
-        return properties;
+        features.push({ id, properties });
     }
 
     _genDataframePropertyTextures() {
@@ -4977,7 +4983,7 @@ class Layer {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_style_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_style_shader_compiler__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_style_parser__ = __webpack_require__(34);
@@ -8966,6 +8972,8 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] 
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(7);
+
 
 
 
@@ -8976,7 +8984,7 @@ let quantilesUID = 0;
 function genQuantiles(global) {
     return class Quantiles extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
         constructor(input, buckets) {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input);
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
             Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
 
             let children = {
@@ -8994,6 +9002,14 @@ function genQuantiles(global) {
             this.breakpoints = breakpoints;
             this.type = 'category';
         }
+        eval(feature) {
+            const input = this.input.eval(feature);
+            const q = this.breakpoints.findIndex(br => input <= br);
+            return q;
+        }
+        getBreakpointList() {
+            return this.breakpoints.map(br => br.expr);
+        }
         _compile(metadata) {
             super._compile(metadata);
             Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('quantiles', 'input', 0, 'float', this.input);
@@ -9007,7 +9023,7 @@ function genQuantiles(global) {
             }
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.input.name] };
+            return { columns: [this._getColumnName()] };
         }
         _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
             const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
@@ -9028,13 +9044,9 @@ function genQuantiles(global) {
                 inline: `${funcName}(${childInlines.input})`
             };
         }
-        eval(feature) {
-            const input = this.input.eval(feature);
-            const q = this.breakpoints.findIndex(br => input <= br);
-            return q;
-        }
         _preDraw(drawMetadata, gl) {
-            const column = drawMetadata.columns.find(c => c.name == this.input.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name == name);
             let i = 0;
             const total = column.accumHistogram[column.histogramBuckets - 1];
             const r = Math.random();
@@ -9058,8 +9070,12 @@ function genQuantiles(global) {
             }
             super._preDraw(drawMetadata, gl);
         }
-        getBreakpointList() {
-            return this.breakpoints.map(br => br.expr);
+        _getColumnName() {
+            if (this.input.aggName) {
+                // Property has aggregation
+                return __WEBPACK_IMPORTED_MODULE_4__schema__["column"].aggColumn(this.input.name, this.input.aggName);
+            }
+            return this.input.name;
         }
     };
 }
@@ -9618,6 +9634,8 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expression__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
+
 
 
 
@@ -9670,6 +9688,9 @@ function generateAggregattion(metadataPropertyName, global) {
             super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["float"])(0) });
             this.property = property;
         }
+        eval() {
+            return this.value.expr;
+        }
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
@@ -9677,7 +9698,7 @@ function generateAggregattion(metadataPropertyName, global) {
             this.type = 'float';
             super.inlineMaker = inline => inline.value;
             if (global) {
-                this.value.expr = metadata.columns.find(c => c.name == this.property.name)[metadataPropertyName];
+                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
             }
         }
         _getMinimumNeededSchema() {
@@ -9685,23 +9706,28 @@ function generateAggregattion(metadataPropertyName, global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(drawMetadata, gl) {
-            const column = drawMetadata.columns.find(c => c.name == this.property.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name === name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
             if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, this.property.name, this.value.expr);
+                console.log(metadataPropertyName, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }
-        eval() {
-            return this.value.expr;
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
         }
     };
 }
@@ -9738,14 +9764,15 @@ function generatePercentile(global) {
         }
         _getDrawMetadataRequirements() {
             if (!global) {
-                return { columns: [this.property.name] };
+                return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
             }
         }
         _preDraw(drawMetadata, gl) {
+            const name = this._getColumnName();
             if (!global) {
-                const column = drawMetadata.columns.find(c => c.name == this.property.name);
+                const column = drawMetadata.columns.find(c => c.name === name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];
                 // TODO OPT: this could be faster with binary search
                 for (var i = 0; i < column.histogramBuckets; i++) {
@@ -9756,14 +9783,20 @@ function generatePercentile(global) {
                 const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
                 this.value.expr = br;
             }
-
             if (Math.random() > 0.99) {
-                console.log(`percentile${this.percentile}`, this.property.name, this.value.expr);
+                console.log(`percentile${this.percentile}`, name, this.value.expr);
             }
             this.value._preDraw(drawMetadata, gl);
         }
         eval() {
             return this.value.expr;
+        }
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
         }
     };
 }
@@ -9801,7 +9834,7 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
 class Desc extends __WEBPACK_IMPORTED_MODULE_0__expression__["a" /* default */] {
     constructor(by) {
         super({});
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('asc', 'by', 0, Width, by);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('desc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -10328,6 +10361,9 @@ void main(void) {
     strokeScale=size/max(0.001, (fillSize-strokeSize));
     if (fillScale==strokeScale){
         stroke.a=0.;
+    }
+    if (size > 126.){
+        size = 126.;
     }
     gl_PointSize = size * devicePixelRatio + 2.;
     dp = 1.0/(size+1.);
@@ -11842,7 +11878,8 @@ class Windshaft {
             MNS.columns.push('cartodb_id');
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            await this._instantiate(MNS, resolution, filtering);
+            const instantiationData = await this._instantiate(MNS, resolution, filtering);
+            this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
     }
@@ -11901,13 +11938,13 @@ class Windshaft {
     }
 
     _getCategoryIDFromString(category, readonly = true) {
-        if (category === undefined){
+        if (category === undefined) {
             category = 'null';
         }
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
         }
-        if (readonly){
+        if (readonly) {
             console.warn(`category ${category} not present in metadata`);
             return -1;
         }
@@ -11941,6 +11978,11 @@ class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        
+        return { MNS, resolution, filters, metadata, urlTemplate };
+    }
+
+    _updateStateAfterInstantiating({MNS, resolution, filters, metadata, urlTemplate}) {
         this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
@@ -11949,18 +11991,15 @@ class Windshaft {
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
-
-        // Store instantiation
-        return metadata;
     }
+
     async _instantiate(MNS, resolution, filters) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
         }
-        console.log(this._getInstantiationID(MNS, resolution, filters));
-        const promise = this._instantiateUncached(MNS, resolution, filters);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
-        return promise;
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
+        return instantiationPromise;
     }
 
     _checkLayerMeta(MNS) {
@@ -14858,8 +14897,8 @@ function Node (value, prev, next, list) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_style_expressions_blend__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_style_expressions_animate__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_style_expressions_floatConstant__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(7);
 
 
 
@@ -15029,7 +15068,7 @@ class AggregationFiltering {
         if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["b" /* Max */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["c" /* Min */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["a" /* Avg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["e" /* Sum */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_style_expressions_aggregation__["d" /* Mode */]) {
             let p = this._property(f.property);
             if (p) {
-                p.property = __WEBPACK_IMPORTED_MODULE_10__core_schema__["column"].aggColumn(p.property, f._aggName);
+                p.property = __WEBPACK_IMPORTED_MODULE_10__core_schema__["column"].aggColumn(p.property, f.aggName);
                 return p;
             }
         }
@@ -15338,6 +15377,7 @@ function getSQLWhere(filtering) {
 function getAggregationFilters(filtering) {
     return filtering && filtering.aggregation;
 }
+
 
 /***/ }),
 /* 86 */
@@ -17094,4 +17134,4 @@ function checkEvent(eventName) {
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=cartovl.js.map
+//# sourceMappingURL=carto-vl.js.map
