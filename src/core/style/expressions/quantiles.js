@@ -2,13 +2,14 @@ import Expression from './expression';
 import { float } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
+import * as schema from '../../schema';
 
 let quantilesUID = 0;
 
 function genQuantiles(global) {
     return class Quantiles extends Expression {
         constructor(input, buckets) {
-            checkInstance('quantiles', 'input', 0, Property, input);
+            checkInstance('quantiles', 'input', 0, Property, input && (input.property || input));
             checkNumber('quantiles', 'buckets', 1, buckets);
 
             let children = {
@@ -26,6 +27,14 @@ function genQuantiles(global) {
             this.breakpoints = breakpoints;
             this.type = 'category';
         }
+        eval(feature) {
+            const input = this.input.eval(feature);
+            const q = this.breakpoints.findIndex(br => input <= br);
+            return q;
+        }
+        getBreakpointList() {
+            return this.breakpoints.map(br => br.expr);
+        }
         _compile(metadata) {
             super._compile(metadata);
             checkType('quantiles', 'input', 0, 'float', this.input);
@@ -39,7 +48,7 @@ function genQuantiles(global) {
             }
         }
         _getDrawMetadataRequirements() {
-            return { columns: [this.input.name] };
+            return { columns: [this._getColumnName()] };
         }
         _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
             const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
@@ -60,13 +69,9 @@ function genQuantiles(global) {
                 inline: `${funcName}(${childInlines.input})`
             };
         }
-        eval(feature) {
-            const input = this.input.eval(feature);
-            const q = this.breakpoints.findIndex(br => input <= br);
-            return q;
-        }
         _preDraw(drawMetadata, gl) {
-            const column = drawMetadata.columns.find(c => c.name == this.input.name);
+            const name = this._getColumnName();
+            const column = drawMetadata.columns.find(c => c.name == name);
             let i = 0;
             const total = column.accumHistogram[column.histogramBuckets - 1];
             const r = Math.random();
@@ -90,8 +95,12 @@ function genQuantiles(global) {
             }
             super._preDraw(drawMetadata, gl);
         }
-        getBreakpointList() {
-            return this.breakpoints.map(br => br.expr);
+        _getColumnName() {
+            if (this.input.aggName) {
+                // Property has aggregation
+                return schema.column.aggColumn(this.input.name, this.input.aggName);
+            }
+            return this.input.name;
         }
     };
 }

@@ -79,7 +79,8 @@ export default class Windshaft {
             MNS.columns.push('cartodb_id');
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            await this._instantiate(MNS, resolution, filtering);
+            const instantiationData = await this._instantiate(MNS, resolution, filtering);
+            this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
     }
@@ -138,13 +139,13 @@ export default class Windshaft {
     }
 
     _getCategoryIDFromString(category, readonly = true) {
-        if (category === undefined){
+        if (category === undefined) {
             category = 'null';
         }
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
         }
-        if (readonly){
+        if (readonly) {
             console.warn(`category ${category} not present in metadata`);
             return -1;
         }
@@ -178,6 +179,11 @@ export default class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        
+        return { MNS, resolution, filters, metadata, urlTemplate };
+    }
+
+    _updateStateAfterInstantiating({MNS, resolution, filters, metadata, urlTemplate}) {
         this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
@@ -186,18 +192,15 @@ export default class Windshaft {
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
-
-        // Store instantiation
-        return metadata;
     }
+
     async _instantiate(MNS, resolution, filters) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
         }
-        console.log(this._getInstantiationID(MNS, resolution, filters));
-        const promise = this._instantiateUncached(MNS, resolution, filters);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
-        return promise;
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
+        return instantiationPromise;
     }
 
     _checkLayerMeta(MNS) {

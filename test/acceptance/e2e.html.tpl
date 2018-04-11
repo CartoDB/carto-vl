@@ -10,7 +10,7 @@
         document.head.appendChild(styleElement);
       }
     </script>
-    <script src="<%- cartogl %>"></script>
+    <script src="<%- cartovl %>"></script>
     <script src="<%- mapboxgl %>"></script>
     <link href="<%- mapboxglcss %>" rel="stylesheet" />
     <style>
