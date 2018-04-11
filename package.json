@@ -4,7 +4,7 @@
   "description": "CARTO Vector library",
   "repository": {
     "type": "git",
-    "url": "git://github.com/CartoDB/renderer-prototype.git"
+    "url": "git://github.com/CartoDB/carto-vl.git"
   },
   "author": {
     "name": "CARTO",
