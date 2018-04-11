@@ -129,8 +129,10 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(styleWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = styleWidth.eval(f) / 2 * widthScale;
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
