@@ -61,7 +61,7 @@
       world_population_2015
     `);
     const style = new carto.Style(`
-      width: 50*sqrt($pop_2015)/sqrt(globalMax($pop_2015))*zoom()
+      width: 50 * sqrt($pop_2015) / sqrt(globalMax($pop_2015))*zoom()
       color: hsva(0.73,0.69,0.89,0.4)
       strokeColor: hsva(0.73,0.69,0.89,0.5)
       strokeWidth: 1
