@@ -66,23 +66,27 @@ export default class Style {
 
         this.updated = true;
         this._changeCallback = null;
-        this._styleSpec.color.parent = this;
-        this._styleSpec.width.parent = this;
-        this._styleSpec.strokeColor.parent = this;
-        this._styleSpec.strokeWidth.parent = this;
-        this._styleSpec.order.parent = this;
-        this._styleSpec.filter.parent = this;
-        this._styleSpec.color.notify = this._changed.bind(this);
-        this._styleSpec.width.notify = this._changed.bind(this);
-        this._styleSpec.strokeColor.notify = this._changed.bind(this);
-        this._styleSpec.strokeWidth.notify = this._changed.bind(this);
-        this._styleSpec.order.notify = this._changed.bind(this);
-        this._styleSpec.filter.notify = this._changed.bind(this);
+
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
 
         this._resolveAliases();
-        this._validateAliasDAG();        
+        this._validateAliasDAG();
     }
 
+    _getRootExpressions() {
+        return [
+            this._styleSpec.color,
+            this._styleSpec.width,
+            this._styleSpec.strokeColor,
+            this._styleSpec.strokeWidth,
+            this._styleSpec.order,
+            this._styleSpec.filter,
+            ...Object.values(this._styleSpec.variables)
+        ];
+    }
 
     /**
      * Return the resolution.
@@ -221,7 +225,6 @@ export default class Style {
     }
 
     _validateAliasDAG() {
-
         const permanentMarkedSet = new Set();
         const temporarilyMarkedSet = new Set();
         const visit = node => {
@@ -290,7 +293,14 @@ export default class Style {
     }
 
     replaceChild(toReplace, replacer) {
-        if (toReplace == this._styleSpec.color) {
+        if (Object.values(this._styleSpec.variables).includes(toReplace)) {
+            const varName = Object.keys(this._styleSpec.variables).find(varName => this._styleSpec.variables[varName] == toReplace);
+            this._styleSpec.variables[varName] = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+            this._resolveAliases();
+            this._validateAliasDAG();
+        } else if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
