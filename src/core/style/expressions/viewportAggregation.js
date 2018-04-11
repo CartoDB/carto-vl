@@ -98,7 +98,7 @@ function generatePercentile(global) {
                 return { columns: [] };
             }
         }
-        _preDraw(drawMetadata, gl) {
+        _preDraw(program, drawMetadata, gl) {
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name == this.property.name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];
@@ -115,7 +115,7 @@ function generatePercentile(global) {
             if (Math.random() > 0.99) {
                 console.log(`percentile${this.percentile}`, this.property.name, this.value.expr);
             }
-            this.value._preDraw(drawMetadata, gl);
+            this.value._preDraw(program, drawMetadata, gl);
         }
         eval() {
             return this.value.expr;

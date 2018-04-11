@@ -29,11 +29,11 @@ export default class Category extends Expression {
         };
     }
     _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
     }
-    _preDraw(drawMetadata, gl) {
+    _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];
-        gl.uniform1f(this._uniformLocation, id);
+        gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
     eval() {
         return this._metadata.categoryIDs[this.expr];

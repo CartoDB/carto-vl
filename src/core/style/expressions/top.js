@@ -61,13 +61,13 @@ export default class Top extends Expression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
         this.property._postShaderCompile(program);
-        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
+        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
     }
-    _preDraw(drawMetadata, gl) {
-        this.property._preDraw(drawMetadata);
+    _preDraw(program, drawMetadata, gl) {
+        this.property._preDraw(program, drawMetadata);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._texLoc, drawMetadata.freeTexUnit);
+        gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
         drawMetadata.freeTexUnit++;
     }
     //TODO _free

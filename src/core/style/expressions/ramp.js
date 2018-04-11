@@ -145,17 +145,17 @@ export default class Ramp extends Expression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
         this.input._postShaderCompile(program, gl);
-        this._texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
-        this._keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
-        this._keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
+        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
+        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
+        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
     }
-    _preDraw(drawMetadata, gl) {
-        this.input._preDraw(drawMetadata, gl);
+    _preDraw(program, drawMetadata, gl) {
+        this.input._preDraw(program, drawMetadata, gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._texLoc, drawMetadata.freeTexUnit);
-        gl.uniform1f(this._keyMinLoc, (this.minKey));
-        gl.uniform1f(this._keyWidthLoc, (this.maxKey) - (this.minKey));
+        gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
+        gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
+        gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
     }
     // TODO eval

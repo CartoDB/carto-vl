@@ -65,7 +65,7 @@ function genQuantiles(global) {
             const q = this.breakpoints.findIndex(br => input <= br);
             return q;
         }
-        _preDraw(drawMetadata, gl) {
+        _preDraw(program, drawMetadata, gl) {
             const column = drawMetadata.columns.find(c => c.name == this.input.name);
             let i = 0;
             const total = column.accumHistogram[column.histogramBuckets - 1];
@@ -88,7 +88,7 @@ function genQuantiles(global) {
             if (r > 0.99) {
                 console.log(this.breakpoints.map(br => br.expr));
             }
-            super._preDraw(drawMetadata, gl);
+            super._preDraw(program, drawMetadata, gl);
         }
         getBreakpointList() {
             return this.breakpoints.map(br => br.expr);

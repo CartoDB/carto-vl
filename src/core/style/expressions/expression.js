@@ -27,6 +27,7 @@ export default class Expression {
         this._getChildren().map(child => child.parent = this);
         this._metaBindings = [];
         this.preface = '';
+        this._shaderBindings = new Map();
     }
 
     _bind(metadata) {
@@ -76,6 +77,13 @@ export default class Expression {
      */
     _postShaderCompile(program, gl) {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
+    }
+
+    _getBinding(shader) {
+        if (!this._shaderBindings.has(shader)) {
+            this._shaderBindings.set(shader, {});
+        }
+        return this._shaderBindings.get(shader);
     }
 
     _getDrawMetadataRequirements() {

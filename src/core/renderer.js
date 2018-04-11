@@ -296,7 +296,7 @@ class Renderer {
             drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             styleExpr._updateDrawMetadata(drawMetadata);
-            styleExpr._preDraw(drawMetadata, gl);
+            styleExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);

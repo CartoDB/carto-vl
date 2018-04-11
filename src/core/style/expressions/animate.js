@@ -28,15 +28,15 @@ export default class Animate extends Expression {
         };
     }
     _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
     }
-    _preDraw(drawMetadata, gl) {
+    _preDraw(program, drawMetadata, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         if (this.mix > 1.) {
-            gl.uniform1f(this._uniformLocation, 1);
+            gl.uniform1f(this._getBinding(program).uniformLocation, 1);
         } else {
-            gl.uniform1f(this._uniformLocation, this.mix);
+            gl.uniform1f(this._getBinding(program).uniformLocation, this.mix);
         }
     }
     eval() {
