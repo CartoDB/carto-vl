@@ -363,6 +363,7 @@ export default class Style {
         styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
         styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION();
         styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION();
+        styleSpec.variables = styleSpec.variables || {};
         return styleSpec;
     }
 

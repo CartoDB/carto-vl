@@ -99,6 +99,7 @@ function generatePercentile(global) {
             }
         }
         _preDraw(program, drawMetadata, gl) {
+            // TODO use _updateDrawMetadata
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name == this.property.name);
                 const total = column.accumHistogram[column.histogramBuckets - 1];

@@ -211,7 +211,7 @@ describe('api/style', () => {
             style.onChange(done);
             const t = Date.now() + 1000;
             Date.now = () => t;
-            style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
+            style._styleSpec.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
     });
 
