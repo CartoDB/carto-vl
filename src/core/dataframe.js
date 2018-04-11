@@ -79,7 +79,7 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.height) / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         const styleStrokeWidth = style.getStrokeWidth();
@@ -111,7 +111,7 @@ export default class Dataframe {
         let featureIndex = 0;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = 2 / this.renderer.gl.canvas.height / this.scale * this.renderer._zoom;
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
         const styleWidth = style.getWidth();
         // Linear search for all features
