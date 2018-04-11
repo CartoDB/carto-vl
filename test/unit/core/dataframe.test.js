@@ -34,7 +34,7 @@ describe('src/core/dataframe', () => {
                 getWidth: () => ({ eval: () => 0.5 }),
                 getStrokeWidth: () => ({ eval: () => 0.5 })
             };
-            dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
             it('should return an empty list when there are no points at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, style)).toEqual([]);
@@ -88,7 +88,7 @@ describe('src/core/dataframe', () => {
                     }
                 })
             };
-            dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001 / 1024 }, style)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, style)).toEqual([]);
