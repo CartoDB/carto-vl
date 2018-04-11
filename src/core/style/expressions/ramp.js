@@ -60,18 +60,17 @@ export default class Ramp extends Expression {
     _free(gl) {
         gl.deleteTexture(this.texture);
     }
-    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-        this._UID = uniformIDMaker();
-        const input = this.input._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
+    _applyToShaderSource(getGLSLforProperty) {
+        const input = this.input._applyToShaderSource(getGLSLforProperty);
         return {
-            preface: input.preface + `
-        uniform sampler2D texRamp${this._UID};
-        uniform float keyMin${this._UID};
-        uniform float keyWidth${this._UID};
-        `,
+            preface: this._prefaceCode(input.preface + `
+        uniform sampler2D texRamp${this._uid};
+        uniform float keyMin${this._uid};
+        uniform float keyWidth${this._uid};
+        `),
             inline: this.palette.type == 'customPaletteFloat' ?
-                `(texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).a)`
-                : `texture2D(texRamp${this._UID}, vec2((${input.inline}-keyMin${this._UID})/keyWidth${this._UID}, 0.5)).rgba`
+                `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
+                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }
     _getColorsFromPalette(input, palette) {
@@ -145,9 +144,9 @@ export default class Ramp extends Expression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
         this.input._postShaderCompile(program, gl);
-        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._UID}`);
-        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._UID}`);
-        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._UID}`);
+        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
+        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);

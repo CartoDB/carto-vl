@@ -34,12 +34,7 @@ export default class Float extends Expression {
 
     _applyToShaderSource() {
         return {
-            preface: `
-            #ifndef FLOAT_${this._uid}
-            #define FLOAT_${this._uid}            
-            uniform float float${this._uid};
-            #endif
-            `,
+            preface: this._prefaceCode(`uniform float float${this._uid};`),
             inline: `float${this._uid}`
         };
     }

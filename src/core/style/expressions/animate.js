@@ -20,15 +20,14 @@ export default class Animate extends Expression {
         this.bTime = this.aTime + Number(duration);
         this.type = 'float';
     }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
+    _applyToShaderSource() {
         return {
-            preface: `uniform float anim${this._uniformID};\n`,
-            inline: `anim${this._uniformID}`
+            preface: this._prefaceCode(`uniform float anim${this._uid};\n`),
+            inline: `anim${this._uid}`
         };
     }
     _postShaderCompile(program, gl) {
-        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `anim${this._uniformID}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `anim${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
         const time = Date.now();

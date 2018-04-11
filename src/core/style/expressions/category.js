@@ -21,15 +21,14 @@ export default class Category extends Expression {
     _compile(metadata) {
         this._metadata = metadata;
     }
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
+    _applyToShaderSource() {
         return {
-            preface: `uniform float cat${this._uniformID};\n`,
-            inline: `cat${this._uniformID}`
+            preface: this._prefaceCode(`uniform float cat${this._uid};\n`),
+            inline: `cat${this._uid}`
         };
     }
     _postShaderCompile(program, gl) {
-        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uniformID}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];

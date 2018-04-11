@@ -39,6 +39,15 @@ export default class Expression {
         return this;
     }
 
+    _prefaceCode(glslCode){
+        return `
+        #ifndef DEF_${this._uid}
+        #define DEF_${this._uid}
+        ${glslCode}
+        #endif
+        `;
+    }
+
     _getDependencies() {
         return this._getChildren().map(child => child._getDependencies()).reduce((x, y) => x.concat(y), []);
     }
@@ -61,16 +70,15 @@ export default class Expression {
 
     /**
      * Generate GLSL code
-     * @param {*} uniformIDMaker    fn to get unique IDs
      * @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
      */
-    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
+    _applyToShaderSource(getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         return {
-            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface,
-            inline: this.inlineMaker(childInlines, uniformIDMaker, getGLSLforProperty)
+            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface),
+            inline: this.inlineMaker(childInlines, getGLSLforProperty)
         };
     }
 

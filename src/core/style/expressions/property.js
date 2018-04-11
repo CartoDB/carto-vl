@@ -57,11 +57,11 @@ export default class Property extends Expression {
         if (this.type == 'category') {
             this.numCategories = metaColumn.categoryNames.length;
         }
-        super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
+        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
-    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+    _applyToShaderSource(getGLSLforProperty) {
         if (this.alias) {
-            return this.alias._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
+            return this.alias._applyToShaderSource(getGLSLforProperty);
         }
         return {
             preface: '',

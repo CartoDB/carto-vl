@@ -50,8 +50,8 @@ function genQuantiles(global) {
         _getDrawMetadataRequirements() {
             return { columns: [this._getColumnName()] };
         }
-        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
+        _applyToShaderSource(getGLSLforProperty) {
+            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
             let childInlines = {};
             childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
             const funcName = `quantiles${this.quantilesUID}`;
@@ -65,7 +65,7 @@ function genQuantiles(global) {
         return ${this.breakpoints.length.toFixed(1)};
     }`;
             return {
-                preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+                preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
                 inline: `${funcName}(${childInlines.input})`
             };
         }
