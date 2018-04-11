@@ -35,15 +35,15 @@ export default class Expression {
         return this;
     }
 
-    _getDependencies(){
-        this._getChildren().map(child => child._getDependencies());
+    _getDependencies() {
+        return this._getChildren().map(child => child._getDependencies()).reduce((x, y) => x.concat(y), []);
     }
 
-    _resolveAliases(aliases){
+    _resolveAliases(aliases) {
         this._getChildren().map(child => child._resolveAliases(aliases));
     }
 
-    _updateDrawMetadata(metadata){
+    _updateDrawMetadata(metadata) {
         this._getChildren().map(child => child._updateDrawMetadata(metadata));
     }
     _compile(metadata) {

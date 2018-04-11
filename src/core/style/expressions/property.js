@@ -68,8 +68,12 @@ export default class Property extends Expression {
             inline: getGLSLforProperty(this.name)
         };
     }
-    _getDependencies(aliases) {
-        //if on alias => return alias
+    _getDependencies() {
+        if (this.alias){
+            return [this.alias];
+        }else{
+            return [];
+        }
     }
     _getMinimumNeededSchema() {
         if (this.alias) {

@@ -49,7 +49,7 @@ function parseStyleNamedExpr(styleSpec, node) {
             if (!node.type == 'BinaryExpression' || node.operator != ':') {
                 throw new Error('Invalid syntax');
             }
-            const [varName, varExpr] = [variable.left.name, parseNode(variable.right)];
+            const [varName, varExpr] = [variable.left.name, implicitCast(parseNode(variable.right))];
             styleSpec.variables[varName] = varExpr;
         });
     } else if (name == 'resolution') {

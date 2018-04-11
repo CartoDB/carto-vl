@@ -72,7 +72,8 @@
       strokeWidth: 1
 
       variables:[
-        view_pop_avg: viewportAvg($pop_max),
+        view_pop_avg: viewportAvg($pop_max)*$wadus,
+        wadus: 0.5
         global_pop_avg: globalAvg($pop_max),
         watch: $name
       ]

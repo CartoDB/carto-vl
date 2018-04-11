@@ -80,6 +80,7 @@ export default class Style {
         this._styleSpec.filter.notify = this._changed.bind(this);
 
         this._resolveAliases();
+        this._validateAliasDAG();        
     }
 
 
@@ -219,9 +220,7 @@ export default class Style {
         );
     }
 
-    _getDependencies() {
-        // get list of aliases
-        const aliases = Object.keys(this._styleSpec.variables);
+    _validateAliasDAG() {
 
         const permanentMarkedSet = new Set();
         const temporarilyMarkedSet = new Set();
@@ -233,8 +232,8 @@ export default class Style {
             if (temporarilyMarkedSet.has(node)) {
                 throw new Error('Viz contains a circular dependency');
             }
-            node._getDependencies().forEach(visit);
             temporarilyMarkedSet.add(node);
+            node._getDependencies().forEach(visit);
             permanentMarkedSet.add(node);
         };
         const unmarked = [
@@ -246,8 +245,6 @@ export default class Style {
         while (unmarked.length) {
             visit(unmarked[0]);
         }
-        const deps = Array.from(permanentMarkedSet);
-        return deps;
     }
 
     _compileColorShader(gl, metadata) {
