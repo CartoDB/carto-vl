@@ -227,4 +227,14 @@ describe('api/style', () => {
             expect(actual).toEqual(expected);
         });
     });
+
+    describe('aliases', () => {
+        it('should throw an error when the graph is not a DAG', () => {
+            expect(()=>new Style(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * $ten
+            variables: [
+                 oneHundred: $ten * $ten  
+                 ten: $oneHundred / 10
+            ]`)).toThrowError('Viz contains a circular dependency');
+        });
+    });
 });
