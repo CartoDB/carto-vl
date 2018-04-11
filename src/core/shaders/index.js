@@ -117,9 +117,6 @@ class Width extends GenericStyler {
             }else{
                 x = (x-80.)*0.5 + 128.;
             }
-            if(x>127.){
-                x = 127.;
-            }
             return x / 255.;
         }
         ` + preface,
