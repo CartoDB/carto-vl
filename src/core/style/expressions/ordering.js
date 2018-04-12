@@ -19,7 +19,7 @@ export class Asc extends Expression {
 export class Desc extends Expression {
     constructor(by) {
         super({});
-        checkInstance('asc', 'by', 0, Width, by);
+        checkInstance('desc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }

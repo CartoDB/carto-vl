@@ -5,8 +5,8 @@
   <title>Multi feature | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -88,10 +88,11 @@
       WHERE adm0name = \'Spain\'
     `);
     const spainCitiesStyle = new carto.Style(`
-      width: log($pop_max + 10),
-      color: opacity(ramp($name, bold), 0.7)
+      width: sqrt($pop_max/2000)
+      color: opacity(ramp($name, bold), 0.8)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
+      order: asc(width())
     `);
     const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesStyle);
 
@@ -99,7 +100,7 @@
       ne_adm0_europe
     `);
     const europeCountriesStyle = new carto.Style(`
-      color: ramp($admin, bold)
+      color: opacity(ramp($admin, bold),0.4)
     `);
     const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesStyle);
 

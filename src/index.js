@@ -3,14 +3,12 @@
  *  @namespace carto
  *
  *  @description
- *  The carto-gl functionality is exposed through the **carto** namespace including:
- * 
- * - carto.source
- *  - {@link carto.source.Dataset|carto.source.Dataset} 
- *  - {@link carto.source.SQL|carto.source.SQL}
- *  - {@link carto.source.GeoJSON|carto.source.GeoJSON}
- * - carto.style
- *  -   {@link carto.style.expressions|carto.style.expressions}
+ *  The CARTO VL functionality is exposed through the **carto** namespace including:
+ *
+ * - {@link carto.source.Dataset|carto.source.Dataset}
+ * - {@link carto.source.SQL|carto.source.SQL}
+ * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - {@link carto.style.expressions|carto.style.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Style|carto.Style}
  * - {@link carto.Interactivity|carto.Interactivity}

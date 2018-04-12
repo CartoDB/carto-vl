@@ -5,8 +5,8 @@
   <title>Feature enter/leave | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -82,7 +82,7 @@
       ne_50m_rivers_lake_centerlines
     `);
     const style = new carto.Style(`
-      width: 6
+      width: 1*zoom()
       color: ramp($name, bold)
       filter: in($featurecla, 'River')
     `);

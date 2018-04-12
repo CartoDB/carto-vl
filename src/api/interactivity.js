@@ -109,10 +109,8 @@ export default class Interactivity {
     *
     * @example
     * const layer = new carto.Layer('layer', source, style);
-    * layer.on('loaded', () => {
-    *   const interactivity = new carto.Interactivity(layer);
-    *   interactivity.on('click', event => console.log(event));
-    * });
+    * const interactivity = new carto.Interactivity(layer);
+    * interactivity.on('click', event => console.log(event));
     * layer.addTo(myMap);
     *
     * @fires CartoError

@@ -7,7 +7,7 @@ This guide walks through making a variety of common thematic map types with poly
 + Polygon Color
 
 ### Polygon Color
-Use the `color` property to color features with one of CARTO GL's [supported color spaces](LINK).
+Use the `color` property to color features with one of CARTO VL's [supported color spaces](LINK).
 
 ## Color by Value: String
 + Basic Syntax

@@ -17,7 +17,7 @@ width: 1.5
 ```
 
 ### Line Color
-Use the `color` property to color features with one of CARTO GL's supported color spaces.
+Use the `color` property to color features with one of CARTO VL's supported color spaces.
 
 ```
 width: 1.5

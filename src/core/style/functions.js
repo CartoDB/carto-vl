@@ -53,7 +53,7 @@
  *
  */
 
-import { palettes, Inverse } from './expressions/palettes';
+import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 import Animate from './expressions/animate';
 import Blend from './expressions/blend';
 import Buckets from './expressions/buckets';
@@ -207,6 +207,7 @@ export const floatConstant = (...args) => new FloatConstant(...args);
 export const torque = (...args) => new Torque(...args);
 export const fade = (...args) => new Fade(...args);
 export const time = (...args) => new Time(...args);
+export const customPalette = (...args) => new CustomPalette(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);

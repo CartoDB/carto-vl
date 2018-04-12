@@ -66,7 +66,7 @@ function writeTemplate(file, template) {
     fs.writeFileSync(getHTML(file), template({
         file: file,
         sources: sources,
-        cartogl: path.join(mainDir, 'dist', 'carto-gl.js'),
+        cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
         mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
         mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
     }));

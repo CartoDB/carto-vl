@@ -1,6 +1,6 @@
-# CARTO GL
+# CARTO VL
 
-CARTO GL is a javascript library to render map data in the browser using the [webgl](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) capabilities.
+CARTO VL is a javascript library to render map data in the browser using the [webgl](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) capabilities.
 
 
 ## Getting started
@@ -16,8 +16,8 @@ TBD
   <title>Single layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include CARTO Mapbox GL JS fork -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->

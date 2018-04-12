@@ -1,4 +1,5 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { hex } from '../../../../../src/core/style/functions';
 
 describe('src/core/style/expressions/hex', () => {
     describe('error control', () => {
@@ -14,6 +15,11 @@ describe('src/core/style/expressions/hex', () => {
     });
 
     describe('eval', () => {
-        // TODO
+        it('should work with #FFF forms', () => {
+            expect(hex('#FFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+        });
+        it('should work with #FFFFFF forms', () => {
+            expect(hex('#FFFFFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+        });
     });
 });

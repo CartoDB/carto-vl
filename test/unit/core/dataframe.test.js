@@ -28,13 +28,13 @@ describe('src/core/dataframe', () => {
                     }]
                 }
             });
-            const feature1 = { id: 0, properties: { cartodb_id: 0, id: 1 } };
-            const feature2 = { id: 1, properties: { cartodb_id: 1, id: 2 } };
+            const feature1 = { id: 0, properties: { id: 1 } };
+            const feature2 = { id: 1, properties: { id: 2 } };
             const style = {
                 getWidth: () => ({ eval: () => 0.5 }),
                 getStrokeWidth: () => ({ eval: () => 0.5 })
             };
-            dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
             it('should return an empty list when there are no points at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, style)).toEqual([]);
@@ -78,8 +78,7 @@ describe('src/core/dataframe', () => {
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_prop: 1,
-                    cartodb_id: 0
+                    numeric_prop: 1
                 }
             };
             const style = {
@@ -89,7 +88,7 @@ describe('src/core/dataframe', () => {
                     }
                 })
             };
-            dataframe.renderer = { _zoom: 1, gl: { canvas: { height: 1024 } } };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001 / 1024 }, style)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, style)).toEqual([]);
@@ -136,8 +135,7 @@ describe('src/core/dataframe', () => {
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_property: 0,
-                    cartodb_id: 0
+                    numeric_property: 0
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {

@@ -1,11 +1,10 @@
 {
-  "private": true,
-  "name": "renderer-prototype",
-  "version": "0.1.0",
+  "name": "@carto/carto-vl",
+  "version": "0.2.0",
   "description": "CARTO Vector library",
   "repository": {
     "type": "git",
-    "url": "git://github.com/CartoDB/renderer-prototype.git"
+    "url": "git://github.com/CartoDB/carto-vl.git"
   },
   "author": {
     "name": "CARTO",

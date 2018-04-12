@@ -12,10 +12,10 @@ describe('api/style', () => {
                 expect(actual).toEqual(jasmine.any(Style));
                 // Check returned object properties
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
-                expect(actual.getWidth().expr).toEqual(s.float(5).expr);
-                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
-                expect(actual.getStrokeWidth().expr).toEqual(s.float(0).expr);
+                expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
+                expect(actual.getWidth().eval()).toEqual(s.float(5).eval());
+                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.float(0).eval());
                 expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
@@ -24,19 +24,19 @@ describe('api/style', () => {
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
-                expect(actual.getWidth().expr).toEqual(s.float(5).expr);
-                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 1, 0, 0.5).expr);
-                expect(actual.getStrokeWidth().expr).toEqual(s.float(0).expr);
+                expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
+                expect(actual.getWidth().eval()).toEqual(s.float(5).eval());
+                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.float(0).eval());
                 expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
             it('should set the style properties defined in the styleSpec object', () => {
                 const styleSpec = {
                     resolution: 2,
-                    color: s.rgba(1, 0, 0, 1),
+                    color: s.rgba(255, 0, 0, 1),
                     width: s.float(10),
-                    strokeColor: s.rgba(0, 0, 1, 1),
+                    strokeColor: s.rgba(0, 0, 255, 1),
                     strokeWidth: s.float(15),
                     order: s.asc(s.width())
                 };
@@ -44,10 +44,10 @@ describe('api/style', () => {
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(2);
-                expect(actual.getColor().expr).toEqual(s.rgba(1, 0, 0, 1).expr);
-                expect(actual.getWidth().expr).toEqual(s.float(10).expr);
-                expect(actual.getStrokeColor().expr).toEqual(s.rgba(0, 0, 1, 1).expr);
-                expect(actual.getStrokeWidth().expr).toEqual(s.float(15).expr);
+                expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.getWidth().eval()).toEqual(s.float(10).eval());
+                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.float(15).eval());
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
 
@@ -58,8 +58,8 @@ describe('api/style', () => {
                 });
 
                 expect(actual).toEqual(jasmine.any(Style));
-                expect(actual.getWidth().expr).toEqual(s.float(1).expr);
-                expect(actual.getStrokeWidth().expr).toEqual(s.float(10).expr);
+                expect(actual.getWidth().eval()).toEqual(s.float(1).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.float(10).eval());
             });
         });
 
@@ -77,6 +77,24 @@ describe('api/style', () => {
                 expect(function () {
                     new Style(styleSpec);
                 }).toThrowError('`resolution` must be a number.');
+            });
+
+            it('should throw an error when resolution is too small', () => {
+                const styleSpec = {
+                    resolution: 0
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`resolution` must be greater than 0.');
+            });
+
+            it('should throw an error when resolution is too big', () => {
+                const styleSpec = {
+                    resolution: 10000
+                };
+                expect(function () {
+                    new Style(styleSpec);
+                }).toThrowError('`resolution` must be less than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -135,23 +153,23 @@ describe('api/style', () => {
         });
 
         describe('when parameter is a string', () => {
-            xit('should set the style properties defined in the string', () => {
+            it('should set the style properties defined in the string', () => {
                 const styleSpec = `
-                    color: rgba(1, 0, 0, 1),
-                    width: float(10),
-                    strokeColor: rgba(0, 0, 1, 1),
-                    strokeWidth: float(15),
+                    color: rgba(255, 0, 0, 1)
+                    width: float(10)
+                    strokeColor: rgba(0, 0, 255, 1)
+                    strokeWidth: float(15)
                     order: asc(width())
                 `;
                 const actual = new Style(styleSpec);
 
                 expect(actual).toEqual(jasmine.any(Style));
                 expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor()).toEqual(s.rgba(1, 0, 0, 1));
-                expect(actual.getWidth()).toEqual(s.float(10));
-                expect(actual.getStrokeColor()).toEqual(s.rgba(0, 0, 1, 1));
-                expect(actual.getStrokeWidth()).toEqual(s.float(15));
-                expect(actual.getOrder()).toEqual(s.asc(s.width()));
+                expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.getWidth().eval()).toEqual(s.float(10).eval());
+                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.float(15).eval());
+                expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
         });
     });

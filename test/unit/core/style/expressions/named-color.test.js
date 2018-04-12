@@ -1,4 +1,5 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { namedColor } from '../../../../../src/core/style/functions';
 
 describe('src/core/style/expressions/float', () => {
     describe('error control', () => {
@@ -9,6 +10,15 @@ describe('src/core/style/expressions/float', () => {
         validateStaticType('namedColor', ['blue'], 'color');
         validateStaticType('namedColor', ['AliceBlue'], 'color');
         validateStaticType('namedColor', ['BLACK'], 'color');
+    });
+
+    describe('eval', () => {
+        it('should work with blue', () => {
+            expect(namedColor('blue').eval()).toEqual({ r: 0, g: 0, b: 255, a: 1 });
+        });
+        it('should work with red', () => {
+            expect(namedColor('red').eval()).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+        });
     });
 });
 
