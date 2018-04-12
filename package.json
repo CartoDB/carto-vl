@@ -62,6 +62,7 @@
     "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "loc": "sloc src/ examples/",
+    "prepublishOnly": "yarn build:dev",
     "serve": "yarn build:dev && yarn docs && http-server",
     "test:benchmark": "node test/benchmark/benchmark.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
