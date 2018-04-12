@@ -18,6 +18,9 @@
         "Mamata Akella <makella@carto.com>",
         "Raúl Ochoa <rochoa@carto.com>"
     ],
+    "files": [
+        "dist"
+    ],
     "license": "BSD-3-Clause",
     "dependencies": {
         "@mapbox/vector-tile": "^1.3.0",
