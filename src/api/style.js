@@ -252,13 +252,6 @@ export default class Style {
 
     _compileColorShader(gl, metadata) {
         this._styleSpec.color._bind(metadata);
-        /**
-         * TODO
-         *
-         * get dependencies (without circular deps=>throw if not a DAG)
-         * compile dependencies: inlines and prefaces
-         * on reference => set inline from this compileshader
-         */
         const r = compileShader(gl, this._styleSpec.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;
