@@ -56,14 +56,21 @@ export class Fade extends Expression {
  * @param {carto.style.expression.expression} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
- * @param {Number} duration duration of the animation in seconds
- * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration
+ *
+ * It can be combined with linear and time expressions.
+ * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
+ * @param {carto.style.expression.fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {carto.style.expressions.torque}
  *
- * @example <caption> Temporal map by $day, with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
+ *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Style(`width:    2
  * color:     ramp(linear(AVG($temp), 0,30), tealrose)
  * filter:       torque($day, 40, fade(0.1, 0.3))`);
+ *
+ * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
+ * new carto.Style(`width:    2
+ * color:     ramp(linear(AVG($temp), 0,30), tealrose)
+ * filter:    torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.style.expressions
  * @name torque
