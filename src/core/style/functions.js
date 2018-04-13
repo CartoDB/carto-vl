@@ -65,6 +65,7 @@ import Linear from './expressions/linear';
 import Near from './expressions/near';
 import Now from './expressions/now';
 import Property from './expressions/property';
+import Variable from './expressions/variable';
 import Ramp from './expressions/ramp';
 import Opacity from './expressions/opacity';
 import Top from './expressions/top';
@@ -157,6 +158,7 @@ export const rgba = (...args) => new RGBA(...args);
 export const rgb = (...args) => new RGB(...args);
 export const hex = (...args) => new Hex(...args);
 export const property = (...args) => new Property(...args);
+export const variable = (...args) => new Variable(...args);
 export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
 export const hsva = (...args) => new HSVA(...args);
@@ -235,6 +237,7 @@ export const neq = notEquals;
 export const nin = (...args) => new Nin(...args);
 export const between = (...args) => new Between(...args);
 
+export { variable as var };
 
 export { _in as in };
 export { palettes, Asc, Desc };
