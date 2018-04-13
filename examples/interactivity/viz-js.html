@@ -62,9 +62,8 @@
       apiKey: 'YOUR_API_KEY'
     });
 
-    const source = new carto.source.Dataset(`
-    ne_10m_populated_places_simple
-    `);//+($name=='Madrid')
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+
     const s = carto.style.expressions;
     const style = new carto.Style({
       width: 15,
