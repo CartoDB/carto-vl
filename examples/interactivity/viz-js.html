@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
-  <script src="../../dist/cartovl.js"></script>
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -68,13 +68,13 @@
     const s = carto.style.expressions;
     const style = new carto.Style({
       width: 15,
-      color: s.hsva(0.73, 0.69, 0.89, 0.4),
+      color: s.hsva(0.73, 0.69, 0.89, s.div(s.var('view_pop_avg'), s.var('global_pop_avg'))),
       strokeColor: s.hsva(0.73, 0.69, 0.89, 0.5),
       strokeWidth: 1,
 
       variables: {
-        view_pop_avg: s.viewportAvg($pop_max),
-        global_pop_avg: s.globalAvg($pop_max),
+        view_pop_avg: s.viewportSum(s.prop('pop_max')),
+        global_pop_avg: s.globalSum(s.prop('pop_max')),
         watch: s.prop('name')
       }
     });
