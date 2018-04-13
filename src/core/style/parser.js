@@ -158,6 +158,7 @@ function prepareJsep() {
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addIdentifierChar('@');
     jsep.removeLiteral('true');
     jsep.removeLiteral('false');
 }
@@ -167,6 +168,7 @@ function cleanJsep() {
     jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
+    jsep.removeIdentifierChar('@');
     jsep.addLiteral('true');
     jsep.addLiteral('false');
 }
