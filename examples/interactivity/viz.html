@@ -74,7 +74,8 @@
         __cartovl_variable_view_pop_avg: viewportAvg($pop_max)*__cartovl_variable_wadus,
         __cartovl_variable_wadus: 0.5
         __cartovl_variable_global_pop_avg: globalAvg($pop_max),
-        __cartovl_variable_watch: $name
+        __cartovl_variable_name: $name
+        __cartovl_variable_pop_max: $pop_max
     `);
         const layer = new carto.Layer('layer', source, style);
 
@@ -109,7 +110,7 @@
                 const feature = event.features[0];
                 feature.style.strokeWidth.blendTo('4', 100);
                 feature.style.strokeColor.blendTo('rgb(255,20,138)', 100);
-                updateTitle(`${feature.properties.name}: ${feature.properties.pop_max}`);
+                updateTitle(`${feature.style.variables.name.value}: ${feature.style.variables.pop_max.value}`);
                 style._styleSpec.variables.wadus.blendTo(0.1);
             }
         });

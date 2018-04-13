@@ -75,7 +75,7 @@
       variables: {
         view_pop_avg: s.viewportSum(s.prop('pop_max')),
         global_pop_avg: s.globalSum(s.prop('pop_max')),
-        watch: s.prop('name')
+        name: s.prop('name')
       }
     });
     const layer = new carto.Layer('layer', source, style);
@@ -103,7 +103,7 @@
         const feature = event.features[0];
         feature.style.strokeWidth.blendTo('4', 100);
         feature.style.strokeColor.blendTo('rgb(255,20,138)', 100);
-        updateTitle(feature.properties.name);
+        updateTitle(feature.style.variables.name.value);
       }
     });
 
