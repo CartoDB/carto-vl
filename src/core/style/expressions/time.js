@@ -3,7 +3,7 @@ import Expression from './expression';
 export default class Time extends Expression {
     constructor(date) {
         if (!(date instanceof Date)) {
-            throw new Error('time(): invalid date parameter');
+            date = new Date(date);
         }
         super({});
         // TODO improve type check
