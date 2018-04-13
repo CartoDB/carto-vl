@@ -25,7 +25,7 @@ export function parseStyleExpression(str) {
 export function parseStyleDefinition(str) {
     prepareJsep();
     const ast = jsep(str);
-    let styleSpec = {};
+    let styleSpec = { variables: {} };
     if (ast.type == 'Compound') {
         ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
     } else {
@@ -43,15 +43,8 @@ function parseStyleNamedExpr(styleSpec, node) {
     if (!name) {
         throw new Error('Invalid syntax');
     }
-    if (name == 'variables') {
-        styleSpec.variables = {};
-        node.right.elements.map(variable => {
-            if (!node.type == 'BinaryExpression' || node.operator != ':') {
-                throw new Error('Invalid syntax');
-            }
-            const [varName, varExpr] = [variable.left.name, implicitCast(parseNode(variable.right))];
-            styleSpec.variables[varName] = varExpr;
-        });
+    if (name.startsWith('__cartovl_variable_')) {
+        styleSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
     } else if (name == 'resolution') {
         const value = parseNode(node.right);
         styleSpec[name] = value;
@@ -123,7 +116,9 @@ function parseUnaryOperation(node) {
 }
 
 function parseIdentifier(node) {
-    if (node.name[0] == '$') {
+    if (node.name.startsWith('__cartovl_variable_')) {
+        return functions.variable(node.name.substr('__cartovl_variable_'.length));
+    } else if (node.name[0] == '$') {
         return functions.property(node.name.substring(1));
     } else if (functions.palettes[node.name.toLowerCase()]) {
         return functions.palettes[node.name.toLowerCase()];
