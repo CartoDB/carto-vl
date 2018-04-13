@@ -18,7 +18,7 @@ Best part of open source, collaborate in CARTO VL code!. We like hearing from yo
 
 1. Fork the CartoDB.js repository.
 2. Create a new branch in your forked repository.
-3. Commit your changes. Add new tests if it is necessary (```grunt test```), remember to follow ["How to build"](https://github.com/CartoDB/cartodb.js/blob/master/README.md#how-to-build) steps.
+3. Commit your changes. Add new tests if it is necessary (```grunt test```).
 4. Open a pull request.
 5. Any of the CartoDB.js mantainers will take a look.
 6. If everything works, it will merged and released \o/.
@@ -28,7 +28,7 @@ If you want more detailed information, this [GitHub guide](https://guides.github
 
 ## Completing documentation
 
-CARTO VL documentation is located in ```docs/```. That folder is the content that appears in the [Developer Center](http://carto.com/developer-center/carto-js/). 
+CARTO VL documentation is located in ```docs/```. That folder is the content that appears in the [Developer Center](http://carto.com/developer-center/carto-vl/). 
 Just follow the instructions described in [contributing code](#contributing-code) and after accepting your pull request, we will make it appear online :).
 
 ## Submitting contributions

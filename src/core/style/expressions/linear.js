@@ -2,9 +2,10 @@ import Expression from './expression';
 import { checkExpression, checkLooseType, implicitCast, checkType } from './utils';
 
 /**
-* Linearly interpolates the value of a given property between min and max.
+* Linearly interpolates the value of a given input between min and max.
 *
-* @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
+*
+* @param {carto.style.expressions.expression} input - The input to be evaluated and interpolated, can be a numeric property or a date property
 * @param {carto.style.expressions.expression} min - Numeric or date expression pointing to the lower limit
 * @param {carto.style.expressions.expression} max - Numeric or date expression pointing to the higher limit
 * @return {carto.style.expressions.expression}
@@ -52,7 +53,7 @@ export default class Linear extends Expression {
 
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
-            this.inlineMaker = (inline) => `((${inline.input}-${smin.toFixed(20)})/(${(smax - smin).toFixed(20)}))`;
+            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
 
         } else {
             checkType('linear', 'input', 0, 'float', this.input);

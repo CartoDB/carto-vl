@@ -1,5 +1,6 @@
 import Expression from './expression';
 import { implicitCast, checkLooseType, checkExpression, checkType } from './utils';
+import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 
 export default class Ramp extends Expression {
     /**
@@ -109,14 +110,14 @@ export default class Ramp extends Expression {
                 for (let i = 0; i < width; i++) {
                     const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
                     const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                    const vlow = [vlowRaw.r, vlowRaw.g, vlowRaw.b, 255 * vlowRaw.a];
-                    const vhigh = [vhighRaw.r, vhighRaw.g, vhighRaw.b, 255 * vhighRaw.a];
+                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
                     const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
-                    const v = vlow.map((low, index) => low * (1. - m) + vhigh[index] * m);
-                    pixel[4 * i + 0] = v[0];
-                    pixel[4 * i + 1] = v[1];
-                    pixel[4 * i + 2] = v[2];
-                    pixel[4 * i + 3] = v[3];
+                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+                    pixel[4 * i + 0] = v.r * 255;
+                    pixel[4 * i + 1] = v.g * 255;
+                    pixel[4 * i + 2] = v.b * 255;
+                    pixel[4 * i + 3] = v.a * 255;
                 }
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
@@ -131,7 +132,7 @@ export default class Ramp extends Expression {
                     const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
                     const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
                     const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
-                    pixel[i] =((1. - m) * vlowRaw + m * vhighRaw);
+                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
                 }
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
                     width, 1, 0, gl.ALPHA, gl.FLOAT,
@@ -158,4 +159,28 @@ export default class Ramp extends Expression {
         drawMetadata.freeTexUnit++;
     }
     // TODO eval
+}
+
+function interpolate(low, high, m) {
+    const cielabLow = sRGBToCielab({
+        r: low.r,
+        g: low.g,
+        b: low.b,
+        a: low.a,
+    });
+    const cielabHigh = sRGBToCielab({
+        r: high.r,
+        g: high.g,
+        b: high.b,
+        a: high.a,
+    });
+
+    const cielabInterpolated = {
+        l: (1 - m) * cielabLow.l + m * cielabHigh.l,
+        a: (1 - m) * cielabLow.a + m * cielabHigh.a,
+        b: (1 - m) * cielabLow.b + m * cielabHigh.b,
+        alpha: (1 - m) * cielabLow.alpha + m * cielabHigh.alpha,
+    };
+
+    return cielabToSRGB(cielabInterpolated);
 }
