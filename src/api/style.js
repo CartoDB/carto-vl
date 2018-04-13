@@ -72,6 +72,10 @@ export default class Style {
             expr.notify = this._changed.bind(this);
         });
 
+        Object.keys(this._styleSpec.variables).map(varName => {
+            this._styleSpec['__cartovl_variable_' + varName] = this._styleSpec.variables[varName];
+        });
+
         this._resolveAliases();
         this._validateAliasDAG();
     }

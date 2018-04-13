@@ -44,7 +44,7 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        if (!this.style){
+        if (!this.style) {
             return [];
         }
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
@@ -83,24 +83,37 @@ export default class RenderLayer {
                     );
                     this.style._styleSpec[styleProperty].notify();
                 };
+                const self = this;
+                const properties = feature.properties;
                 return {
+                    get value(){
+                        return self.style._styleSpec[styleProperty].eval(properties);
+                    },
                     blendTo: blender,
                     reset: genReset(styleProperty)
                 };
             };
-
+            const variables = {};
+            Object.keys(this.style._styleSpec.variables).map(varName => {
+                variables[varName] = genStyleProperty('__cartovl_variable_' + varName);
+            });
             feature.style = {
                 color: genStyleProperty('color'),
                 width: genStyleProperty('width'),
                 strokeColor: genStyleProperty('strokeColor'),
                 strokeWidth: genStyleProperty('strokeWidth'),
+                variables,
                 reset: (duration = 500) => {
                     genReset('color')(duration);
                     genReset('width')(duration);
                     genReset('strokeColor')(duration);
                     genReset('strokeWidth')(duration);
+                    Object.keys(this.style._styleSpec.variables).map(varName => {
+                        variables[varName] = genReset('__cartovl_variable_' + varName)(duration);
+                    });
                 }
             };
+            feature.properties = undefined;
             return feature;
         });
     }
