@@ -66,16 +66,16 @@
     ne_10m_populated_places_simple
     `);//+($name=='Madrid')
         const style = new carto.Style(`
-      width: 1 * $pop_max/__cartovl_variable_view_pop_avg
-      color: ramp(linear($pop_max, __cartovl_variable_view_pop_avg, globalMax($pop_max)), temps)
+      width: 1 * $pop_max / @view_pop_avg
+      color: ramp(linear($pop_max, @view_pop_avg, globalMax($pop_max)), temps)
       strokeColor: hsva(0.73,0.69,0.89,0.5)
       strokeWidth: 1
 
-        __cartovl_variable_view_pop_avg: viewportAvg($pop_max)*__cartovl_variable_wadus,
-        __cartovl_variable_wadus: 0.5
-        __cartovl_variable_global_pop_avg: globalAvg($pop_max),
-        __cartovl_variable_name: $name
-        __cartovl_variable_pop_max: $pop_max
+        @view_pop_avg: viewportAvg($pop_max)* @wadus,
+        @wadus: 0.5
+        @global_pop_avg: globalAvg($pop_max),
+        @name: $name
+        @pop_max: $pop_max
     `);
         const layer = new carto.Layer('layer', source, style);
 

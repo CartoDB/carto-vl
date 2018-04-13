@@ -39,6 +39,9 @@ function parseStyleNamedExpr(styleSpec, node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
+    if (node.left.name.length && node.left.name[0] == '@') {
+        node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
+    }
     const name = node.left.name;
     if (!name) {
         throw new Error('Invalid syntax');
@@ -116,6 +119,9 @@ function parseUnaryOperation(node) {
 }
 
 function parseIdentifier(node) {
+    if (node.name.length && node.name[0] == '@') {
+        node.name = '__cartovl_variable_' + node.name.substr(1);
+    }
     if (node.name.startsWith('__cartovl_variable_')) {
         return functions.variable(node.name.substr('__cartovl_variable_'.length));
     } else if (node.name[0] == '$') {
