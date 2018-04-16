@@ -1,9 +1,9 @@
 /**
  *  @api
- *  @namespace carto.style.expressions
+ *  @namespace carto.viz.expressions
  *  @description
- *  Expressions are used to define styles, a style is composed of an expression for every configurable attribute.
- *  Remember a style has the following attributes:
+ *  Expressions are used to define vizs, a viz is composed of an expression for every configurable attribute.
+ *  Remember a viz has the following attributes:
  *
  *  - **color**: Determine the element fill color.
  *  - **strokeColor**: Determine the element border color.
@@ -11,11 +11,11 @@
  *  - **strokeWidth**: Determine the element border size.
  *  - **filter**: This is a special property used to remove elements that do not meet the expression.
  *
- * For example the point radius could be styled using the `number` expression:
+ * For example the point radius could be vizd using the `number` expression:
  *
  * ```javascript
- * const style = new carto.Viz({
- *  width: carto.style.expressions.number(10)
+ * const viz = new carto.Viz({
+ *  width: carto.viz.expressions.number(10)
  * });
  * ```
  *
@@ -23,8 +23,8 @@
  * we can set the point width depending on the population using the `property` expression.
  *
  * ```javascript
- * const style = new carto.Viz({
- *  width: carto.style.expressions.property('population')
+ * const viz = new carto.Viz({
+ *  width: carto.viz.expressions.property('population')
  * });
  * ```
  *
@@ -32,8 +32,8 @@
  * for example lets divide the population between a number using the `div` expression to make points smaller:
  *
  * ```javascript
- * const s = carto.style.expressions; // We use this alias along documentation.
- * const style = new carto.Viz({
+ * const s = carto.viz.expressions; // We use this alias along documentation.
+ * const viz = new carto.Viz({
  *  width: s.div(
  *      property('population'),
  *      s.number(10000)

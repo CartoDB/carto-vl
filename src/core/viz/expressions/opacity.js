@@ -7,15 +7,15 @@ import { checkLooseType, checkType } from './utils';
  * Override the input color opacity
  *
  * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.style.expressions.Expression} numeric expression
+ * @return {carto.viz.expressions.Expression} numeric expression
  *
  * @example <caption>Creating a number expression.</caption>
- * const s = carto.style.expressions;
- * const style = new carto.Viz({
+ * const s = carto.viz.expressions;
+ * const viz = new carto.Viz({
  *  width: s.number(15);  // Elements will have width 15
  * });
  *
- * @memberof carto.style.expressions
+ * @memberof carto.viz.expressions
  * @name number
  * @function
  * @api

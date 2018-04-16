@@ -9,15 +9,15 @@ export const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine
  * Create a color from its name.
  *
  * @param {string} name - Color's name
- * @return {carto.style.expressions.hex}
+ * @return {carto.viz.expressions.hex}
  *
  * @example <caption>Display Red points.</caption>
- * const s = carto.style.expressions;
- * const style = new carto.Viz({
+ * const s = carto.viz.expressions;
+ * const viz = new carto.Viz({
  *   color: s.namedColor('red');
  * });
  *
- * @memberof carto.style.expressions
+ * @memberof carto.viz.expressions
  * @name namedColor
  * @function
  * @api

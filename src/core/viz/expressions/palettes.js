@@ -7,7 +7,7 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
  * ### Color palettes
  *
  * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
- * Use them with a {@link carto.style.expressions.ramp|ramp}
+ * Use them with a {@link carto.viz.expressions.ramp|ramp}
  *
  * The following palettes are availiable:
  *  - Categorical:
@@ -17,12 +17,12 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
  *      - ...
  *
  * @api
- * @name carto.style.expressions.palettes
- * @memberof carto.style.expressions
+ * @name carto.viz.expressions.palettes
+ * @memberof carto.viz.expressions
  *
  * @example <caption> Using a color scheme </caption>
- * const s = carto.style.expressions;
- * const style = new carto.Viz({
+ * const s = carto.viz.expressions;
+ * const viz = new carto.Viz({
  *  filter: s.ramp(s.property('type'), s.palettes.PRISM);
  * });
  */

@@ -6,7 +6,7 @@ import { checkNumber, getStringErrorPreface } from './utils';
 export default class Animate extends Expression {
     /**
      * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the style was instantiated.
+     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
      * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
      * @param {*} duration animation duration in milliseconds
      */

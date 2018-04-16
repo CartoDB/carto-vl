@@ -4,12 +4,12 @@ import Expression from './expression';
 
 /**
  * @description Linearly interpolate from *a* to *b* based on *mix*
- * @param {carto.style.expressions.Expression | number} a numeric or color expression
- * @param {carto.style.expressions.Expression | number} b numeric or color expression
- * @param {carto.style.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.style.expressions.Expression} numeric expression
+ * @param {carto.viz.expressions.Expression | number} a numeric or color expression
+ * @param {carto.viz.expressions.Expression | number} b numeric or color expression
+ * @param {carto.viz.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.viz.expressions.Expression} numeric expression
  *
- * @memberof carto.style.expressions
+ * @memberof carto.viz.expressions
  * @name blend
  * @function
  * @api

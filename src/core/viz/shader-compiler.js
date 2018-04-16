@@ -1,6 +1,6 @@
-export function compileShader(gl, styleRootExpr, shaderCreator) {
+export function compileShader(gl, vizRootExpr, shaderCreator) {
     let tid = {};
-    const colorModifier = styleRootExpr._applyToShaderSource(name => {
+    const colorModifier = vizRootExpr._applyToShaderSource(name => {
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }
@@ -11,7 +11,7 @@ export function compileShader(gl, styleRootExpr, shaderCreator) {
     Object.keys(tid).map(name => {
         tid[name] = gl.getUniformLocation(shader.program, `propertyTex${tid[name]}`);
     });
-    styleRootExpr._postShaderCompile(shader.program, gl);
+    vizRootExpr._postShaderCompile(shader.program, gl);
     return {
         tid: tid,
         shader: shader

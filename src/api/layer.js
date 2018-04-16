@@ -15,17 +15,17 @@ export default class Layer {
     *
     * A Layer is the primary way to visualize geospatial data.
     *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|style} are required:
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
     *
     * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
     * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
     *
     * @param {string} id
     * @param {carto.source.Base} source
-    * @param {carto.Viz} style
+    * @param {carto.Viz} viz
     *
     * @example
-    * new carto.Layer('layer0', source, style);
+    * new carto.Layer('layer0', source, viz);
     *
     * @fires CartoError
     *
@@ -33,16 +33,16 @@ export default class Layer {
     * @memberof carto
     * @api
     */
-    constructor(id, source, style) {
+    constructor(id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
-        this._checkViz(style);
+        this._checkViz(viz);
 
-        this._init(id, source, style);
+        this._init(id, source, viz);
     }
 
-    _init(id, source, style) {
-        style._boundLayer = this;
+    _init(id, source, viz) {
+        viz._boundLayer = this;
         this.state = 'init';
         this._id = id;
 
@@ -59,7 +59,7 @@ export default class Layer {
         this.state = 'init';
         this.isLoaded = false;
 
-        this.update(source, style);
+        this.update(source, viz);
     }
 
     on(eventType, callback) {
@@ -89,14 +89,14 @@ export default class Layer {
         }
     }
 
-    async update(source, style) {
+    async update(source, viz) {
         this._checkSource(source);
-        this._checkViz(style);
+        this._checkViz(viz);
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         await this._context;
-        const metadata = await source.requestMetadata(style);
+        const metadata = await source.requestMetadata(viz);
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
         }
@@ -111,52 +111,52 @@ export default class Layer {
         this._source = source;
         this.requestData();
 
-        if (this._style) {
-            this._style.onChange(null);
+        if (this._viz) {
+            this._viz.onChange(null);
         }
-        this._style = style;
-        style.onChange(this._styleChanged.bind(this));
-        this._compileShaders(style, metadata);
+        this._viz = viz;
+        viz.onChange(this._vizChanged.bind(this));
+        this._compileShaders(viz, metadata);
     }
 
     /**
-     * Blend the current style with another style.
+     * Blend the current viz with another viz.
      *
-     * This allows smooth transforms between two different styles.
+     * This allows smooth transforms between two different vizs.
      *
      * @example <caption> Smooth transition variating point size </caption>
-     * // We create two different styles varying the width
-     * const style0 = new carto.style({ width: 10 });
-     * const style1 = new carto.style({ width: 20 });
-     * // Create a layer with the first style
-     * const layer = new carto.Layer('layer', source, style0);
+     * // We create two different vizs varying the width
+     * const viz0 = new carto.viz({ width: 10 });
+     * const viz1 = new carto.viz({ width: 20 });
+     * // Create a layer with the first viz
+     * const layer = new carto.Layer('layer', source, viz0);
      * // We add the layer to the map, the points in this layer will have widh 10
      * layer.addTo(map, 'layer0');
      * // The points will be animated from 10px to 20px for 500ms.
-     * layer.blendToViz(style1, 500);
+     * layer.blendToViz(viz1, 500);
      *
-     * @param {carto.Viz} style - The final style
+     * @param {carto.Viz} viz - The final viz
      * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
      * @api
      */
-    blendToViz(style, ms = 400, interpolator = cubic) {
-        this._checkViz(style);
-        if (this._style) {
-            style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
-            style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
-            style.getWidth().blendFrom(this._style.getWidth(), ms, interpolator);
-            style.getStrokeWidth().blendFrom(this._style.getStrokeWidth(), ms, interpolator);
-            style.getFilter().blendFrom(this._style.getFilter(), ms, interpolator);
+    blendToViz(viz, ms = 400, interpolator = cubic) {
+        this._checkViz(viz);
+        if (this._viz) {
+            viz.getColor().blendFrom(this._viz.getColor(), ms, interpolator);
+            viz.getStrokeColor().blendFrom(this._viz.getStrokeColor(), ms, interpolator);
+            viz.getWidth().blendFrom(this._viz.getWidth(), ms, interpolator);
+            viz.getStrokeWidth().blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
+            viz.getFilter().blendFrom(this._viz.getFilter(), ms, interpolator);
         }
 
-        this._styleChanged(style).then(() => {
-            if (this._style) {
-                this._style.onChange(null);
+        this._vizChanged(viz).then(() => {
+            if (this._viz) {
+                this._viz.onChange(null);
             }
-            this._style = style;
-            this._style.onChange(this._styleChanged.bind(this));
+            this._viz = viz;
+            this._viz.onChange(this._vizChanged.bind(this));
         });
     }
 
@@ -167,13 +167,13 @@ export default class Layer {
         this.requestMetadata();
     }
 
-    async requestMetadata(style) {
-        style = style || this._style;
-        if (!style) {
+    async requestMetadata(viz) {
+        viz = viz || this._viz;
+        if (!viz) {
             return;
         }
         await this._context;
-        return this._source.requestMetadata(style);
+        return this._source.requestMetadata(viz);
     }
 
     async requestData() {
@@ -196,7 +196,7 @@ export default class Layer {
     }
 
     getViz() {
-        return this._style;
+        return this._viz;
     }
 
     getNumFeatures() {
@@ -212,8 +212,8 @@ export default class Layer {
     }
 
     $paintCallback() {
-        if (this._style && this._style.colorShader) {
-            this._renderLayer.style = this._style;
+        if (this._viz && this._viz.colorShader) {
+            this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
         }
         if (!this.isLoaded && this.state == 'dataLoaded') {
@@ -286,22 +286,22 @@ export default class Layer {
         this._integrator.addLayer(this, beforeLayerID);
     }
 
-    _compileShaders(style, metadata) {
-        style.compileShaders(this._integrator.renderer.gl, metadata);
+    _compileShaders(viz, metadata) {
+        viz.compileShaders(this._integrator.renderer.gl, metadata);
     }
 
-    async _styleChanged(style) {
+    async _vizChanged(viz) {
         await this._context;
         if (!this._source) {
-            throw new Error('A source is required before changing the style');
+            throw new Error('A source is required before changing the viz');
         }
         const source = this._source;
-        const metadata = await source.requestMetadata(style);
+        const metadata = await source.requestMetadata(viz);
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
         this.metadata = metadata;
-        this._compileShaders(style, this.metadata);
+        this._compileShaders(viz, this.metadata);
         this._integrator.needRefresh();
         return this.requestData();
     }
@@ -327,14 +327,14 @@ export default class Layer {
         }
     }
 
-    _checkViz(style) {
-        if (util.isUndefined(style)) {
+    _checkViz(viz) {
+        if (util.isUndefined(viz)) {
             throw new CartoValidationError('layer', 'vizRequired');
         }
-        if (!(style instanceof Viz)) {
+        if (!(viz instanceof Viz)) {
             throw new CartoValidationError('layer', 'nonValidViz');
         }
-        if (style._boundLayer && style._boundLayer !== this) {
+        if (viz._boundLayer && viz._boundLayer !== this) {
             throw new CartoValidationError('layer', 'sharedViz');
         }
     }

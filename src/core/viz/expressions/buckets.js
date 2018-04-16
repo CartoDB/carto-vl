@@ -14,14 +14,14 @@ export default class Buckets extends Expression {
      *
      *
      * We´ll need:
-     *  - A {@link carto.style.expressions.ramp|ramp } to add a color for every bucket.
-     *  - A {@link carto.style.expressions.palettes|colorPalette } to define de color scheme.
+     *  - A {@link carto.viz.expressions.ramp|ramp } to add a color for every bucket.
+     *  - A {@link carto.viz.expressions.palettes|colorPalette } to define de color scheme.
      *
      *
      * ```javascript
-     *  const s = carto.style.expressions;
+     *  const s = carto.viz.expressions;
      *  const $speed = s.prop('speed');
-     *  const style = new carto.Viz({
+     *  const viz = new carto.Viz({
      *  color: s.ramp(
      *      s.buckets($speed, 30, 80, 120),
      *      s.palettes.PRISM),
@@ -39,20 +39,20 @@ export default class Buckets extends Expression {
      * procesed in a new categorical `procesedSpeed` column:
      *
      * ```javascript
-     *  const s = carto.style.expressions;
+     *  const s = carto.viz.expressions;
      *  const $procesedSpeed = s.prop('procesedSpeed');
-     *  const style = new carto.Viz({
+     *  const viz = new carto.Viz({
      *  color: s.ramp(
      *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
      *      s.palettes.PRISM),
      * });
      * ```
      *
-     * @param {carto.style.expressions.property} property - The property to be evaluated and interpolated
-     * @param {...carto.style.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
-     * @return {carto.style.expressions.expression}
+     * @param {carto.viz.expressions.property} property - The property to be evaluated and interpolated
+     * @param {...carto.viz.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
+     * @return {carto.viz.expressions.expression}
      *
-     * @memberof carto.style.expressions
+     * @memberof carto.viz.expressions
      * @name buckets
      * @function
      * @api

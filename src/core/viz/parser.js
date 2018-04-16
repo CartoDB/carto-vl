@@ -25,17 +25,17 @@ export function parseVizExpression(str) {
 export function parseVizDefinition(str) {
     prepareJsep();
     const ast = jsep(str);
-    let styleSpec = { variables: {} };
+    let vizSpec = { variables: {} };
     if (ast.type == 'Compound') {
-        ast.body.map(node => parseVizNamedExpr(styleSpec, node));
+        ast.body.map(node => parseVizNamedExpr(vizSpec, node));
     } else {
-        parseVizNamedExpr(styleSpec, ast);
+        parseVizNamedExpr(vizSpec, ast);
     }
     cleanJsep();
-    return styleSpec;
+    return vizSpec;
 }
 
-function parseVizNamedExpr(styleSpec, node) {
+function parseVizNamedExpr(vizSpec, node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
@@ -47,13 +47,13 @@ function parseVizNamedExpr(styleSpec, node) {
         throw new Error('Invalid syntax');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        styleSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
+        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
     } else if (name == 'resolution') {
         const value = parseNode(node.right);
-        styleSpec[name] = value;
+        vizSpec[name] = value;
     } else {
         const value = parseNode(node.right);
-        styleSpec[name] = implicitCast(value);
+        vizSpec[name] = implicitCast(value);
     }
 
 }
