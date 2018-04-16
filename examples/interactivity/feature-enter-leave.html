@@ -85,6 +85,7 @@
       width: 1*zoom()
       color: ramp($name, bold)
       filter: in($featurecla, 'River')
+      @name: $name
     `);
     const layer = new carto.Layer('layer', source, style);
 
@@ -107,7 +108,7 @@
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.properties.name}</h3>
+            <h3>${feature.style.variables.name.value}</h3>
           </div>
         `;
       }
