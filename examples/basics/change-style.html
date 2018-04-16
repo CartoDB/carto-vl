@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Change style | CARTO</title>
+  <title>Change viz | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -85,38 +85,38 @@
     const source = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
-    const styleRed = new carto.Style(`
+    const vizRed = new carto.Viz(`
       width: 6
       color: rgb(237, 76, 89)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
     `);
-    const styleGreen = new carto.Style(`
+    const vizGreen = new carto.Viz(`
       width: 8
       color: rgb(156, 199, 59)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
     `);
-    const styleBlue = new carto.Style(`
+    const vizBlue = new carto.Viz(`
       width: 10
       color: rgb(23, 133, 250)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
     `);
-    const layer = new carto.Layer('layer', source, styleRed);
+    const layer = new carto.Layer('layer', source, vizRed);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRed() {
-      layer.blendToStyle(styleRed);
+      layer.blendToViz(vizRed);
     }
 
     function setGreen() {
-      layer.blendToStyle(styleGreen);
+      layer.blendToViz(vizGreen);
     }
 
     function setBlue() {
-      layer.blendToStyle(styleBlue);
+      layer.blendToViz(vizBlue);
     }
   </script>
 </body>

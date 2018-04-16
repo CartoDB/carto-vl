@@ -110,7 +110,7 @@
     const source = new carto.source.Dataset(`
       world_population_2015
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       width: 50*sqrt($pop_2015)/sqrt(globalMax($pop_2015))*zoom()
       color: opacity(ramp($country_name,bold),0.8)
       strokeColor: ramp($country_name,bold)
@@ -119,7 +119,7 @@
       @country_name: $country_name
       @pop_2015: $pop_2015
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity([layer]);
     layer.on('loaded', () => {
@@ -144,7 +144,7 @@
 
     function updatePopup(event) {
       if (event.features.length > 0) {
-        const vars = event.features[0].style.variables;
+        const vars = event.features[0].viz.variables;
         popup.setHTML(`
         <div class="popup-container">
           <h2>${vars.country_name.value}</h2>

@@ -11,11 +11,11 @@ carto.setDefaultAuth({
 });
 
 const source = new carto.source.Dataset('sf_stclines');
-const s = carto.style.expressions;
-const style = new carto.Style({
+const s = carto.viz.expressions;
+const viz = new carto.Viz({
     width: 3,
     color: s.hsv(0.2, 1, .9),
 });
-const layer = new carto.Layer('myCartoLayer', source, style);
+const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);

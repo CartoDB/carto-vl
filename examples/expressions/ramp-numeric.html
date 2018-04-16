@@ -85,28 +85,28 @@
     const source = new carto.source.Dataset(`
       us_county_points
     `);
-    const s = carto.style.expressions;
-    const style = new carto.Style({
+    const s = carto.viz.expressions;
+    const viz = new carto.Viz({
       color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.sunsetdark)
     });
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRampQuantiles() {
-      layer.blendToStyle(new carto.Style({
+      layer.blendToViz(new carto.Viz({
         color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.sunsetdark)
       }));
     }
 
     function setRampBuckets() {
-      layer.blendToStyle(new carto.Style({
+      layer.blendToViz(new carto.Viz({
         color: s.ramp(s.buckets(s.prop('total_pop'), 10000, 25000, 100000, 500000, 1000000), s.palettes.sunsetdark)
       }));
     }
 
     function setRampLinear() {
-      layer.blendToStyle(new carto.Style({
+      layer.blendToViz(new carto.Viz({
         color: s.ramp(s.linear(s.prop('total_pop'), 10000, 500000), s.palettes.sunsetdark)
       }));
     }

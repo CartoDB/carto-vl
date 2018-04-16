@@ -20,28 +20,28 @@ import { wToR } from '../client/rsys';
  * @typedef {Object} Feature
  * @property {Number} id cartodb_id
  * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
- * @property {carto.FeatureStyle} style
+ * @property {carto.FeatureViz} viz
  * @api
  */
 
 /**
  *
- * FeatureStyle objects can be accessed through {@link carto.Feature} objects.
- * @typedef {Object} FeatureStyle
- * @property {FeatureStyleProperty} color
- * @property {FeatureStyleProperty} width
- * @property {FeatureStyleProperty} colorStroke
- * @property {FeatureStyleProperty} widthStroke
- * @property {Function} reset reset custom feature styles by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * FeatureViz objects can be accessed through {@link carto.Feature} objects.
+ * @typedef {Object} FeatureViz
+ * @property {FeatureVizProperty} color
+ * @property {FeatureVizProperty} width
+ * @property {FeatureVizProperty} colorStroke
+ * @property {FeatureVizProperty} widthStroke
+ * @property {Function} reset reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
  */
 
 /**
  *
- * FeatureStyleProperty objects can be accessed through {@link carto.FeatureStyle} objects.
- * @typedef {Object} FeatureStyleProperty
- * @property {Function} blendTo change the feature style by blending to a destination style expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
- * @property {Function} reset reset custom feature style property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * FeatureVizProperty objects can be accessed through {@link carto.FeatureViz} objects.
+ * @typedef {Object} FeatureVizProperty
+ * @property {Function} blendTo change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
+ * @property {Function} reset reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
  */
 
@@ -108,7 +108,7 @@ export default class Interactivity {
     * @param {carto.Layer|Array<carto.Layer>} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
     * @example
-    * const layer = new carto.Layer('layer', source, style);
+    * const layer = new carto.Layer('layer', source, viz);
     * const interactivity = new carto.Interactivity(layer);
     * interactivity.on('click', event => console.log(event));
     * layer.addTo(myMap);
