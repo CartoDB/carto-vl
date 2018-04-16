@@ -148,7 +148,7 @@ map.on('load', () => {
         $('#user').val('cartogl');
         $('#serverURL').val('https://{user}.carto.com');
 
-        document.getElementById('styleEntry').value = styles[index];
+        document.getElementById('styleEntry').value = vizs[index];
         superRefresh();
     }
     function wwi() {
@@ -237,7 +237,7 @@ map.on('load', () => {
                 serverURL: $('#serverURL').val()
             }
         );
-        const styleStr = document.getElementById('styleEntry').value;
+        const vizStr = document.getElementById('styleEntry').value;
         const viz = new carto.Viz(vizStr);
         if (!layer) {
             layer = new carto.Layer('myCartoLayer', source, viz);
@@ -297,7 +297,7 @@ Object.keys(BASEMAPS).forEach(id => {
     i.value = id;
     i.checked = id === basemap;
     i.onclick = () => {
-        map.setViz(BASEMAPS[id]);
+        map.setStyle(BASEMAPS[id]);
         let added = false;
         map.on('sourcedata', event => {
             if (map.isStyleLoaded() && !added) {
