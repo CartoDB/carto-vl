@@ -1,7 +1,7 @@
 import mitt from 'mitt';
 import * as util from './util';
 import SourceBase from './source/base';
-import Style from './style';
+import Viz from './style';
 import CartoMap from './map';
 import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
@@ -15,14 +15,14 @@ export default class Layer {
     *
     * A Layer is the primary way to visualize geospatial data.
     *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Style|style} are required:
+    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|style} are required:
     *
     * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Style|style} is used to know **how** to draw the data in the Layer.
+    * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
     *
     * @param {string} id
     * @param {carto.source.Base} source
-    * @param {carto.Style} style
+    * @param {carto.Viz} style
     *
     * @example
     * new carto.Layer('layer0', source, style);
@@ -36,7 +36,7 @@ export default class Layer {
     constructor(id, source, style) {
         this._checkId(id);
         this._checkSource(source);
-        this._checkStyle(style);
+        this._checkViz(style);
 
         this._init(id, source, style);
     }
@@ -91,7 +91,7 @@ export default class Layer {
 
     async update(source, style) {
         this._checkSource(source);
-        this._checkStyle(style);
+        this._checkViz(style);
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
@@ -133,16 +133,16 @@ export default class Layer {
      * // We add the layer to the map, the points in this layer will have widh 10
      * layer.addTo(map, 'layer0');
      * // The points will be animated from 10px to 20px for 500ms.
-     * layer.blendToStyle(style1, 500);
+     * layer.blendToViz(style1, 500);
      *
-     * @param {carto.Style} style - The final style
+     * @param {carto.Viz} style - The final style
      * @param {number} duration - The animation duration in milliseconds [default:400]
      * @memberof carto.Layer
      * @instance
      * @api
      */
-    blendToStyle(style, ms = 400, interpolator = cubic) {
-        this._checkStyle(style);
+    blendToViz(style, ms = 400, interpolator = cubic) {
+        this._checkViz(style);
         if (this._style) {
             style.getColor().blendFrom(this._style.getColor(), ms, interpolator);
             style.getStrokeColor().blendFrom(this._style.getStrokeColor(), ms, interpolator);
@@ -195,7 +195,7 @@ export default class Layer {
         return this._source;
     }
 
-    getStyle() {
+    getViz() {
         return this._style;
     }
 
@@ -272,7 +272,7 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        if (map.isStyleLoaded()) {
+        if (map.isVizLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
         } else {
             map.on('load', () => {
@@ -327,15 +327,15 @@ export default class Layer {
         }
     }
 
-    _checkStyle(style) {
+    _checkViz(style) {
         if (util.isUndefined(style)) {
             throw new CartoValidationError('layer', 'styleRequired');
         }
-        if (!(style instanceof Style)) {
-            throw new CartoValidationError('layer', 'nonValidStyle');
+        if (!(style instanceof Viz)) {
+            throw new CartoValidationError('layer', 'nonValidViz');
         }
         if (style._boundLayer && style._boundLayer !== this) {
-            throw new CartoValidationError('layer', 'sharedStyle');
+            throw new CartoValidationError('layer', 'sharedViz');
         }
     }
 

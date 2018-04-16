@@ -17,9 +17,9 @@
                     "file": "basics/multi-layer.html"
                 },
                 {
-                    "title": "Change the style",
-                    "desc": "Update the style of your layers",
-                    "file": "basics/change-style.html"
+                    "title": "Change the viz",
+                    "desc": "Update the viz of your layers",
+                    "file": "basics/change-viz.html"
                 },
                 {
                     "title": "Change the source",
@@ -32,7 +32,7 @@
             "title": "Expressions",
             "samples": [
                 {
-                    "title": "Default style",
+                    "title": "Default viz",
                     "desc": "",
                     "file": "expressions/default.html"
                 },
@@ -102,9 +102,9 @@
                     "file": "interactivity/multi-feature.html"
                 },
                 {
-                    "title": "Style a feature",
-                    "desc": "Style a detected feature",
-                    "file": "interactivity/style-feature.html"
+                    "title": "Viz a feature",
+                    "desc": "Viz a detected feature",
+                    "file": "interactivity/viz-feature.html"
                 }
             ]
         },
@@ -143,7 +143,7 @@
                 },
                 {
                     "title": "Edit SQL & Expressions",
-                    "desc": "Manually edit the SQL query and the Expressions style",
+                    "desc": "Manually edit the SQL query and the Expressions viz",
                     "file": "misc/edit-sql-expressions.html"
                 }
             ]

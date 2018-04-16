@@ -4,10 +4,10 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['points']);
-const style = new carto.Style(`
+const viz = new carto.Viz(`
     width: 20,
     color: hsv(0, linear($numeric, 0, 10), 1)
 `);
-const layer = new carto.Layer('layer', source, style);
+const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
