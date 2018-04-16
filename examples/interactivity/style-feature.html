@@ -46,9 +46,9 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [-100, 38],
-      zoom: 3,
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 1.5,
       dragRotate: false
     });
 
@@ -58,49 +58,44 @@
     });
 
     const source = new carto.source.Dataset(`
-      table_5yr_county_acs_copy_1
+      world_population_2015
     `);
-    const style = new carto.Style(`
-      width: sqrt(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))/500*zoom()
-      color: opacity(
-            rgb(236,7,111)*sum($black_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*1+
-            rgb(245,189,56)*sum($asian_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*3+
-            rgb(30,110,99)*sum($hispanic_o)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*1+
-            rgb(20,20,20)*sum($white_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*0.8, 0.9
-            )
-      strokeColor: rgba(0,0,0,0.5)
-      strokeWidth: 0.25
-      order: desc(width())
+    const viz = new carto.Viz(`
+      width: 50 * sqrt($pop_2015) / sqrt(globalMax($pop_2015))*zoom()
+      color: hsva(0.73,0.69,0.89,0.4)
+      strokeColor: hsva(0.73,0.69,0.89,0.5)
+      strokeWidth: 1
+      order: asc(width())
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
 
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
-        event.features[0].style.color.blendTo('rgba(255,255,255,0.7)', 100)
+        event.features[0].viz.color.blendTo('rgba(255,20,255,0.7)', 100)
       }
     });
 
     interactivity.on('featureLeave', event => {
       if (event.features.length > 0) {
-        event.features[0].style.color.reset(100);
+        event.features[0].viz.color.reset(100);
       }
     });
 
     interactivity.on('featureClick', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.style.strokeWidth.blendTo('3', 100);
-        feature.style.strokeColor.blendTo('rgb(255,255,255)', 100);
+        feature.viz.strokeWidth.blendTo('4', 100);
+        feature.viz.strokeColor.blendTo('rgb(255,20,138)', 100);
       }
     });
 
     interactivity.on('featureClickOut', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.style.strokeWidth.reset(100);
-        feature.style.strokeColor.reset(100);
+        feature.viz.strokeWidth.reset(100);
+        feature.viz.strokeColor.reset(100);
       }
     });
 
