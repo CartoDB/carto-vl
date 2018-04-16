@@ -71,7 +71,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
       center: [-105.048, 39.749],
       zoom: 15,
       dragRotate: false
@@ -83,15 +83,22 @@
     });
 
     const source = new carto.source.Dataset(`
-      tree_inventory_sloans
+      table_5yr_county_acs_copy_1
     `);
     const style = new carto.Style(`
-      width: $diameter_number*4
-      color: opacity(ramp($type,bold),0.7)
-      strokeColor: ramp($type,bold)
-      strokeWidth: 1
-      @type: $type
-      @diameter_number: $diameter_number
+      width: sqrt(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))/500*zoom()
+      color: opacity(
+            rgb(236,7,111)*sum($black_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*1+
+            rgb(245,189,56)*sum($asian_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*3+
+            rgb(30,110,99)*sum($hispanic_o)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*1+
+            rgb(20,20,20)*sum($white_pop)/(sum($asian_pop)+sum($black_pop)+sum($hispanic_o)+sum($white_pop))*0.8, 0.9
+            )
+      strokeColor: rgba(0,0,0,0.5)
+      strokeWidth: 0.25
+      @white_pop: $white_pop
+      @asian_pop: $asian_pop
+      @total_pop: $total_pop
+      @black_pop: $black_pop
     `);
     const layer = new carto.Layer('layer', source, style);
 
@@ -99,7 +106,7 @@
     interactivity.on('featureClick', updateTree);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the trees');
+      updateTitle('Click on a county');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -111,11 +118,12 @@
     function updateTree(event) {
       let content = '';
       for (let feature of event.features) {
+        console.log(feature)
         content += `
           <div class="container">
-            <h3>${feature.style.variables.type.value}</h3>
-            <p>Diameter <b>${feature.style.variables.diameter_number.value}</b></p>
-            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p>Total Pop: <b>${feature.style.variables.total_pop.value}</b></p>
+            <p>Asian Pop: <b>${feature.style.variables.asian_pop.value}</b></p>
+            <p>Black Pop: <b>${feature.style.variables.asian_pop.value}</b></p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>
         `;

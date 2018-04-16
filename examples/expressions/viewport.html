@@ -43,9 +43,10 @@
     `);
     const style = new carto.Style(`
         width: sqrt($amount)/2
-        color: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),bluyl)
-        strokeColor: rgba(51,51,51,0.3)
+        color: opacity(ramp(linear($amount,viewportMax($amount),viewportMin($amount)),emrld),0.7)
+        strokeColor: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),emrld)
         strokeWidth: 1
+        order: desc(width())
     `);
     const layer = new carto.Layer('layer', source, style);
 
