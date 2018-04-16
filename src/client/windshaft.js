@@ -181,7 +181,7 @@ export default class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
-        
+
         return { MNS, resolution, filters, metadata, urlTemplate };
     }
 
@@ -526,9 +526,7 @@ export default class Windshaft {
             t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
             columns.push(t);
         });
-        const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
-        console.log(metadata);
-        return metadata;
+        return  new Metadata(categoryIDs, columns, featureCount, sample);
     }
 
     /**
@@ -567,7 +565,6 @@ export default class Windshaft {
 
         const response = await getSQL(q, conf);
         const json = await response.json();
-        console.log(json);
         return json.rows;
     }
 
