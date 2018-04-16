@@ -92,8 +92,9 @@ Object.keys(cartocolor).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, cartocolor[name]);
 });
 
-class Inverse {
+class Inverse extends Expression{
     constructor(palette) {
+        super({});
         this.type = 'palette';
         this._originalPalette = palette;
         this.tags = palette.tags;

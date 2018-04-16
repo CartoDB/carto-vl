@@ -44,6 +44,9 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
+        if (!this.style){
+            return [];
+        }
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
 
             const genReset = styleProperty =>
