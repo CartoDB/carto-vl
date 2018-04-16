@@ -106,8 +106,8 @@ export default class Buckets extends Expression {
             }
         });
     }
-    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(uniformIDMaker, getGLSLforProperty));
+    _applyToShaderSource(getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         const funcName = `buckets${this.bucketUID}`;
@@ -123,7 +123,7 @@ export default class Buckets extends Expression {
         }`;
 
         return {
-            preface: childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface,
+            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
             inline: `${funcName}(${childInlines.input})`
         };
     }

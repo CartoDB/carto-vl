@@ -32,20 +32,19 @@ export default class Float extends Expression {
         this.type = 'float';
     }
 
-    _applyToShaderSource(uniformIDMaker) {
-        this._uniformID = uniformIDMaker();
+    _applyToShaderSource() {
         return {
-            preface: `uniform float float${this._uniformID};\n`,
-            inline: `float${this._uniformID}`
+            preface: this._prefaceCode(`uniform float float${this._uid};`),
+            inline: `float${this._uid}`
         };
     }
 
     _postShaderCompile(program, gl) {
-        this._uniformLocation = gl.getUniformLocation(program, `float${this._uniformID}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `float${this._uid}`);
     }
 
-    _preDraw(drawMetadata, gl) {
-        gl.uniform1f(this._uniformLocation, this.expr);
+    _preDraw(program, drawMetadata, gl) {
+        gl.uniform1f(this._getBinding(program).uniformLocation, this.expr);
     }
 
     isAnimated() {

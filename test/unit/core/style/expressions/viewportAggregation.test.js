@@ -74,31 +74,31 @@ describe('src/core/style/expressions/aggregation', () => {
         };
         it('viewportMin($price) should return the metadata min', () => {
             const viewportMin = s.viewportMin($price);
-            viewportMin._preDraw(fakeDrawMetadata, fakeGl);
+            viewportMin._preDraw(null, fakeDrawMetadata, fakeGl);
             expect(viewportMin.eval()).toEqual(0);
         });
 
         it('viewportAvg($price) should return the metadata avg', () => {
             const viewportAvg = s.viewportAvg($price);
-            viewportAvg._preDraw(fakeDrawMetadata, fakeGl);
+            viewportAvg._updateDrawMetadata(fakeDrawMetadata);
             expect(viewportAvg.eval()).toEqual(1);
         });
 
         it('viewportMax($price) should return the metadata max', () => {
             const viewportMax = s.viewportMax($price);
-            viewportMax._preDraw(fakeDrawMetadata, fakeGl);
+            viewportMax._updateDrawMetadata(fakeDrawMetadata);            
             expect(viewportMax.eval()).toEqual(2);
         });
 
         it('viewportSum($price) should return the metadata sum', () => {
             const viewportSum = s.viewportSum($price);
-            viewportSum._preDraw(fakeDrawMetadata, fakeGl);
+            viewportSum._updateDrawMetadata(fakeDrawMetadata);            
             expect(viewportSum.eval()).toEqual(3);
         });
 
         it('viewportCount($price) should return the metadata count', () => {
             const viewportCount = s.viewportCount($price);
-            viewportCount._preDraw(fakeDrawMetadata, fakeGl);
+            viewportCount._updateDrawMetadata(fakeDrawMetadata);            
             expect(viewportCount.eval()).toEqual(4);
         });
 
@@ -109,7 +109,7 @@ describe('src/core/style/expressions/aggregation', () => {
                 fakeDrawMetadata.columns[0].accumHistogram[i] = i + 1;
             }
             const viewportPercentile = s.viewportPercentile($price, 30);
-            viewportPercentile._preDraw(fakeDrawMetadata, fakeGl);
+            viewportPercentile._preDraw(null, fakeDrawMetadata, fakeGl);
             expect(viewportPercentile.eval()).toBeCloseTo(0.3 * (fakeDrawMetadata.columns[0].max - fakeDrawMetadata.columns[0].min) + fakeDrawMetadata.columns[0].min, 2);
         });
     });

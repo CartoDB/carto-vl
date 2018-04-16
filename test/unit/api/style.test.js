@@ -211,7 +211,7 @@ describe('api/style', () => {
             style.onChange(done);
             const t = Date.now() + 1000;
             Date.now = () => t;
-            style._styleSpec.filter._preDraw({}, { uniform1f: () => { } });
+            style._styleSpec.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
     });
 
@@ -225,6 +225,15 @@ describe('api/style', () => {
             const actual = style.getFilter();
 
             expect(actual).toEqual(expected);
+        });
+    });
+
+    describe('aliases', () => {
+        it('should throw an error when the graph is not a DAG', () => {
+            expect(()=>new Style(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
+                __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
+                __cartovl_variable_ten: __cartovl_variable_oneHundred / 10
+            `)).toThrowError('Viz contains a circular dependency');
         });
     });
 });

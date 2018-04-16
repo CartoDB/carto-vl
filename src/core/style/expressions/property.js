@@ -44,7 +44,13 @@ export default class Property extends Expression {
         if (this.type == 'category') {
             this.numCategories = metaColumn.categoryNames.length;
         }
-        super._setGenericGLSL((childInlines, uniformIDMaker, getGLSLforProperty) => getGLSLforProperty(this.name));
+        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
+    }
+    _applyToShaderSource(getGLSLforProperty) {
+        return {
+            preface: '',
+            inline: getGLSLforProperty(this.name)
+        };
     }
     _getMinimumNeededSchema() {
         return {

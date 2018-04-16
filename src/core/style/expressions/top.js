@@ -17,12 +17,11 @@ export default class Top extends Expression {
         this.othersBucket = true;
         this._meta = metadata;
     }
-    _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
-        this._UID = uniformIDMaker();
-        const property = this.property._applyToShaderSource(uniformIDMaker, getGLSLforProperty);
+    _applyToShaderSource(getGLSLforProperty) {
+        const property = this.property._applyToShaderSource(getGLSLforProperty);
         return {
-            preface: property.preface + `uniform sampler2D topMap${this._UID};\n`,
-            inline: `(255.*texture2D(topMap${this._UID}, vec2(${property.inline}/1024., 0.5)).a)`
+            preface: this._prefaceCode(property.preface + `uniform sampler2D topMap${this._uid};\n`),
+            inline: `(255.*texture2D(topMap${this._uid}, vec2(${property.inline}/1024., 0.5)).a)`
         };
     }
     eval(feature) {
@@ -61,13 +60,13 @@ export default class Top extends Expression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
         this.property._postShaderCompile(program);
-        this._texLoc = gl.getUniformLocation(program, `topMap${this._UID}`);
+        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
     }
-    _preDraw(drawMetadata, gl) {
-        this.property._preDraw(drawMetadata);
+    _preDraw(program, drawMetadata, gl) {
+        this.property._preDraw(program, drawMetadata);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._texLoc, drawMetadata.freeTexUnit);
+        gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
         drawMetadata.freeTexUnit++;
     }
     //TODO _free

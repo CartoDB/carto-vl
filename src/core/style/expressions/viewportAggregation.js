@@ -50,13 +50,12 @@ function generateAggregattion(metadataPropertyName, global) {
                 return { columns: [] };
             }
         }
-        _preDraw(drawMetadata, gl) {
+        _updateDrawMetadata(drawMetadata){
             const name = this._getColumnName();
             const column = drawMetadata.columns.find(c => c.name === name);
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
-            this.value._preDraw(drawMetadata, gl);
         }
         _getColumnName() {
             if (this.property.aggName) {
@@ -105,7 +104,8 @@ function generatePercentile(global) {
                 return { columns: [] };
             }
         }
-        _preDraw(drawMetadata, gl) {
+        _preDraw(program, drawMetadata, gl) {
+            // TODO use _updateDrawMetadata
             const name = this._getColumnName();
             if (!global) {
                 const column = drawMetadata.columns.find(c => c.name === name);
@@ -119,7 +119,7 @@ function generatePercentile(global) {
                 const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
                 this.value.expr = br;
             }
-            this.value._preDraw(drawMetadata, gl);
+            this.value._preDraw(program, drawMetadata, gl);
         }
         eval() {
             return this.value.expr;

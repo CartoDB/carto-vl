@@ -1,7 +1,6 @@
 export function compileShader(gl, styleRootExpr, shaderCreator) {
-    let uniformIDcounter = 0;
     let tid = {};
-    const colorModifier = styleRootExpr._applyToShaderSource(() => uniformIDcounter++, name => {
+    const colorModifier = styleRootExpr._applyToShaderSource(name => {
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }

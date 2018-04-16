@@ -8,6 +8,7 @@ import Expression from '../core/style/expressions/expression';
 import { implicitCast } from '../core/style/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
+// TODO rename to Viz
 
 const DEFAULT_RESOLUTION = () => 1;
 const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
@@ -23,7 +24,8 @@ const SUPPORTED_PROPERTIES = [
     'strokeColor',
     'strokeWidth',
     'order',
-    'filter'
+    'filter',
+    'variables'
 ];
 
 const MIN_RESOLUTION = 0;
@@ -64,18 +66,30 @@ export default class Style {
 
         this.updated = true;
         this._changeCallback = null;
-        this._styleSpec.color.parent = this;
-        this._styleSpec.width.parent = this;
-        this._styleSpec.strokeColor.parent = this;
-        this._styleSpec.strokeWidth.parent = this;
-        this._styleSpec.order.parent = this;
-        this._styleSpec.filter.parent = this;
-        this._styleSpec.color.notify = this._changed.bind(this);
-        this._styleSpec.width.notify = this._changed.bind(this);
-        this._styleSpec.strokeColor.notify = this._changed.bind(this);
-        this._styleSpec.strokeWidth.notify = this._changed.bind(this);
-        this._styleSpec.order.notify = this._changed.bind(this);
-        this._styleSpec.filter.notify = this._changed.bind(this);
+
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
+
+        Object.keys(this._styleSpec.variables).map(varName => {
+            this._styleSpec['__cartovl_variable_' + varName] = this._styleSpec.variables[varName];
+        });
+
+        this._resolveAliases();
+        this._validateAliasDAG();
+    }
+
+    _getRootExpressions() {
+        return [
+            this._styleSpec.color,
+            this._styleSpec.width,
+            this._styleSpec.strokeColor,
+            this._styleSpec.strokeWidth,
+            this._styleSpec.order,
+            this._styleSpec.filter,
+            ...Object.values(this._styleSpec.variables)
+        ];
     }
 
     /**
@@ -185,7 +199,7 @@ export default class Style {
             this._styleSpec.strokeColor,
             this._styleSpec.strokeWidth,
             this._styleSpec.filter,
-        ].filter(x => x && x._getMinimumNeededSchema);
+        ].concat(Object.values(this._styleSpec.variables)).filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
@@ -195,6 +209,49 @@ export default class Style {
         this._compileStrokeColorShader(gl, metadata);
         this._compileStrokeWidthShader(gl, metadata);
         this._compileFilterShader(gl, metadata);
+
+        Object.values(this._styleSpec.variables).map(v => {
+            v._bind(metadata);
+        });
+    }
+
+
+    _resolveAliases() {
+        [
+            this._styleSpec.color,
+            this._styleSpec.width,
+            this._styleSpec.strokeColor,
+            this._styleSpec.strokeWidth,
+            this._styleSpec.filter,
+        ].concat(Object.values(this._styleSpec.variables)).forEach(expr =>
+            expr._resolveAliases(this._styleSpec.variables)
+        );
+    }
+
+    _validateAliasDAG() {
+        const permanentMarkedSet = new Set();
+        const temporarilyMarkedSet = new Set();
+        const visit = node => {
+            if (permanentMarkedSet.has(node)) {
+                // Node is already a processed dependency
+                return;
+            }
+            if (temporarilyMarkedSet.has(node)) {
+                throw new Error('Viz contains a circular dependency');
+            }
+            temporarilyMarkedSet.add(node);
+            node._getDependencies().forEach(visit);
+            permanentMarkedSet.add(node);
+        };
+        const unmarked = [
+            ...this._styleSpec.color._getDependencies(),
+            ...this._styleSpec.strokeColor._getDependencies(),
+            ...this._styleSpec.width._getDependencies(),
+            ...this._styleSpec.strokeWidth._getDependencies(),
+            ...this._styleSpec.filter._getDependencies()];
+        while (unmarked.length) {
+            visit(unmarked.pop());
+        }
     }
 
     _compileColorShader(gl, metadata) {
@@ -233,7 +290,14 @@ export default class Style {
     }
 
     replaceChild(toReplace, replacer) {
-        if (toReplace == this._styleSpec.color) {
+        if (Object.values(this._styleSpec.variables).includes(toReplace)) {
+            const varName = Object.keys(this._styleSpec.variables).find(varName => this._styleSpec.variables[varName] == toReplace);
+            this._styleSpec.variables[varName] = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+            this._resolveAliases();
+            this._validateAliasDAG();
+        } else if (toReplace == this._styleSpec.color) {
             this._styleSpec.color = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
@@ -296,6 +360,7 @@ export default class Style {
         styleSpec.strokeWidth = styleSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
         styleSpec.order = styleSpec.order || DEFAULT_ORDER_EXPRESSION();
         styleSpec.filter = styleSpec.filter || DEFAULT_FILTER_EXPRESSION();
+        styleSpec.variables = styleSpec.variables || {};
         return styleSpec;
     }
 
@@ -319,10 +384,10 @@ export default class Style {
         if (!util.isNumber(styleSpec.resolution)) {
             throw new CartoValidationError('style', 'resolutionNumberRequired');
         }
-        if (styleSpec.resolution<=MIN_RESOLUTION){
+        if (styleSpec.resolution <= MIN_RESOLUTION) {
             throw new CartoValidationError('style', `resolutionTooSmall[${MIN_RESOLUTION}]`);
         }
-        if (styleSpec.resolution>=MAX_RESOLUTION){
+        if (styleSpec.resolution >= MAX_RESOLUTION) {
             throw new CartoValidationError('style', `resolutionTooBig[${MAX_RESOLUTION}]`);
         }
         if (!(styleSpec.color instanceof Expression)) {

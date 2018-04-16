@@ -35,7 +35,7 @@ function genAggregationOp(aggName, aggType) {
             super._compile(metadata);
             checkType(aggName, 'property', 0, aggType, this.property);
         }
-        _applyToShaderSource(uniformIDMaker, getGLSLforProperty) {
+        _applyToShaderSource(getGLSLforProperty) {
             return {
                 preface: '',
                 inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, aggName))}`

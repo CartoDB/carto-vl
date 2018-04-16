@@ -159,7 +159,9 @@ class Renderer {
         const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
         const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
         const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
-        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements]
+        const styleVariables = style._styleSpec.variables;
+        const variables = Object.values(styleVariables);
+        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
             .reduce(schema.union, schema.IDENTITY).columns;
 
         if (requiredColumns.length == 0) {
@@ -279,6 +281,10 @@ class Renderer {
 
         const drawMetadata = this._computeDrawMetadata(renderLayer);
 
+        Object.values(style._styleSpec.variables).map(v => {
+            v._updateDrawMetadata(drawMetadata);
+        });
+
         const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
@@ -288,7 +294,8 @@ class Renderer {
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(TID).length;
             styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-            styleExpr._preDraw(drawMetadata, gl);
+            styleExpr._updateDrawMetadata(drawMetadata);
+            styleExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);

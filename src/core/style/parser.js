@@ -25,7 +25,7 @@ export function parseStyleExpression(str) {
 export function parseStyleDefinition(str) {
     prepareJsep();
     const ast = jsep(str);
-    let styleSpec = {};
+    let styleSpec = { variables: {} };
     if (ast.type == 'Compound') {
         ast.body.map(node => parseStyleNamedExpr(styleSpec, node));
     } else {
@@ -39,13 +39,23 @@ function parseStyleNamedExpr(styleSpec, node) {
     if (node.operator != ':') {
         throw new Error('Invalid syntax');
     }
+    if (node.left.name.length && node.left.name[0] == '@') {
+        node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
+    }
     const name = node.left.name;
     if (!name) {
         throw new Error('Invalid syntax');
     }
-    const value = parseNode(node.right);
-    // Don't cast resolution properties implicitly since they must be of type Number
-    styleSpec[name] = name == 'resolution' ? value : implicitCast(value);
+    if (name.startsWith('__cartovl_variable_')) {
+        styleSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
+    } else if (name == 'resolution') {
+        const value = parseNode(node.right);
+        styleSpec[name] = value;
+    } else {
+        const value = parseNode(node.right);
+        styleSpec[name] = implicitCast(value);
+    }
+
 }
 
 function parseFunctionCall(node) {
@@ -109,7 +119,12 @@ function parseUnaryOperation(node) {
 }
 
 function parseIdentifier(node) {
-    if (node.name[0] == '$') {
+    if (node.name.length && node.name[0] == '@') {
+        node.name = '__cartovl_variable_' + node.name.substr(1);
+    }
+    if (node.name.startsWith('__cartovl_variable_')) {
+        return functions.variable(node.name.substr('__cartovl_variable_'.length));
+    } else if (node.name[0] == '$') {
         return functions.property(node.name.substring(1));
     } else if (functions.palettes[node.name.toLowerCase()]) {
         return functions.palettes[node.name.toLowerCase()];
@@ -137,21 +152,23 @@ function parseNode(node) {
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
 }
 
-function prepareJsep(){
+function prepareJsep() {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp(':', 0);
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addIdentifierChar('@');
     jsep.removeLiteral('true');
     jsep.removeLiteral('false');
 }
 
-function cleanJsep(){
+function cleanJsep() {
     jsep.removeBinaryOp('and');
     jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
+    jsep.removeIdentifierChar('@');
     jsep.addLiteral('true');
     jsep.addLiteral('false');
 }

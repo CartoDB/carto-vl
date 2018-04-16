@@ -13,9 +13,9 @@ export default class Zoom extends Expression {
         super._compile(metadata);
         super.inlineMaker = inline => inline.zoom;
     }
-    _preDraw(drawMetadata, gl) {
+    _preDraw(program, drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;
-        this.zoom._preDraw(drawMetadata, gl);
+        this.zoom._preDraw(program, drawMetadata, gl);
     }
     eval() {
         return this.zoom.expr;
