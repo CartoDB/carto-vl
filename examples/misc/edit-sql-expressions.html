@@ -116,14 +116,14 @@ strokeColor: rgb(255, 255, 255)
 filter: $pop_max > 10000
           </textarea>
           <div class="action-container">
-            <button class="button-update" onclick="updateStyle()">
+            <button class="button-update" onclick="updateViz()">
               <span>UPDATE STYLE</span>
             </button>
           </div>
       </div>
       <div class="control-inner">
-        <p>This example only uses one style and one layer whose content is changed.</p>
-        <p>Since the style and source objects are the same the wont trigger events, you need to use the promise to handle errors.</p>
+        <p>This example only uses one viz and one layer whose content is changed.</p>
+        <p>Since the viz and source objects are the same the wont trigger events, you need to use the promise to handle errors.</p>
       </div>
     </div>
   </div>
@@ -142,22 +142,22 @@ filter: $pop_max > 10000
     });
 
     const populatedPlacesSource = new carto.source.SQL(getValue('#sql'));
-    const populatedPlacesStyle = new carto.Style(getValue('#expressions'));
-    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, populatedPlacesStyle);
+    const populatedPlacesViz = new carto.Viz(getValue('#expressions'));
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, populatedPlacesViz);
 
     populatedPlacesLayer.addTo(map, 'watername_ocean');
 
     function updateSource() {
       reset('#sql');
-      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')), populatedPlacesLayer.getStyle())
+      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')), populatedPlacesLayer.getViz())
         // .catch(cartoError => {
         //   error('#sql', cartoError);
         // });
     }
 
-    function updateStyle() {
+    function updateViz() {
       reset('#expressions')
-      populatedPlacesLayer.blendToStyle(new carto.Style(getValue('#expressions')))
+      populatedPlacesLayer.blendToViz(new carto.Viz(getValue('#expressions')))
         // .catch(cartoError => {
         //   error('#expressions', cartoError);
         // });

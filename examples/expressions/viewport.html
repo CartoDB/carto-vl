@@ -41,14 +41,14 @@
     const source = new carto.source.Dataset(`
       tx_0125_copy_copy
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
         width: sqrt($amount)/2
         color: opacity(ramp(linear($amount,viewportMax($amount),viewportMin($amount)),emrld),0.7)
         strokeColor: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),emrld)
         strokeWidth: 1
         order: desc(width())
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>

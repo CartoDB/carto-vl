@@ -30,22 +30,22 @@ describe('src/core/dataframe', () => {
             });
             const feature1 = { id: 0, properties: { id: 1 } };
             const feature2 = { id: 1, properties: { id: 2 } };
-            const style = {
+            const viz = {
                 getWidth: () => ({ eval: () => 0.5 }),
                 getStrokeWidth: () => ({ eval: () => 0.5 })
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
             it('should return an empty list when there are no points at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, style)).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 5 }, style)).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 1.001 / 1024 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 5 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 1.001 / 1024 }, viz)).toEqual([]);
             });
 
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, style)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, style)).toEqual([feature2]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 0.999 / 1024 }, style)).toEqual([feature2]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, viz)).toEqual([feature2]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 0.999 / 1024 }, viz)).toEqual([feature2]);
             });
         });
 
@@ -81,7 +81,7 @@ describe('src/core/dataframe', () => {
                     numeric_prop: 1
                 }
             };
-            const style = {
+            const viz = {
                 getWidth: () => ({
                     eval: () => {
                         return 1;
@@ -90,13 +90,13 @@ describe('src/core/dataframe', () => {
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001 / 1024 }, style)).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, style)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001 / 1024 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, viz)).toEqual([]);
 
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, style)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, style)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, viz)).toEqual([feature1]);
             });
         });
 

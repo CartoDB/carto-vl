@@ -11,9 +11,9 @@ carto.setDefaultAuth({
 });
 
 const source = new carto.source.Dataset('mnmappluto');
-const style = new carto.Style(`
+const viz = new carto.Viz(`
     color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])
 `);
-const layer = new carto.Layer('myCartoLayer', source, style);
+const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);
