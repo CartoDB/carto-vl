@@ -57,7 +57,7 @@ export default class RenderLayer {
                             // animate(0) is used to ensure that blend._predraw() "GC" collects it
                             blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
                         );
-                        this.viz._vizSpec[vizProperty].notify();
+                        this.viz[vizProperty].notify();
                         this.customizedFeatures[feature.id][vizProperty] = undefined;
                     }
                 };
@@ -73,28 +73,28 @@ export default class RenderLayer {
                     }
                     const blendExpr = blend(
                         newExpression,
-                        this.viz._vizSpec[vizProperty],
+                        this.viz[vizProperty],
                         blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
                     );
                     this.trackFeatureViz(feature.id, vizProperty, blendExpr);
                     this.viz.replaceChild(
-                        this.viz._vizSpec[vizProperty],
+                        this.viz[vizProperty],
                         blendExpr,
                     );
-                    this.viz._vizSpec[vizProperty].notify();
+                    this.viz[vizProperty].notify();
                 };
                 const self = this;
                 const properties = feature.properties;
                 return {
                     get value(){
-                        return self.viz._vizSpec[vizProperty].eval(properties);
+                        return self.viz[vizProperty].eval(properties);
                     },
                     blendTo: blender,
                     reset: genReset(vizProperty)
                 };
             };
             const variables = {};
-            Object.keys(this.viz._vizSpec.variables).map(varName => {
+            Object.keys(this.viz.variables).map(varName => {
                 variables[varName] = genVizProperty('__cartovl_variable_' + varName);
             });
             feature.viz = {
@@ -108,7 +108,7 @@ export default class RenderLayer {
                     genReset('width')(duration);
                     genReset('strokeColor')(duration);
                     genReset('strokeWidth')(duration);
-                    Object.keys(this.viz._vizSpec.variables).map(varName => {
+                    Object.keys(this.viz.variables).map(varName => {
                         variables[varName] = genReset('__cartovl_variable_' + varName)(duration);
                     });
                 }

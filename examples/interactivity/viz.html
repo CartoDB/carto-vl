@@ -86,8 +86,8 @@
 
         map.on('move', () => {
             const obj = {
-                global_pop_avg: viz._vizSpec.variables.global_pop_avg.eval(),
-                view_pop_avg: viz._vizSpec.variables.view_pop_avg.eval(),
+                global_pop_avg: viz.variables.global_pop_avg.eval(),
+                view_pop_avg: viz.variables.view_pop_avg.eval(),
             }
             console.log(obj);
         });
@@ -110,7 +110,7 @@
                 feature.viz.strokeWidth.blendTo('4', 100);
                 feature.viz.strokeColor.blendTo('rgb(255,20,138)', 100);
                 updateTitle(`${feature.viz.variables.name.value}: ${feature.viz.variables.pop_max.value}`);
-                viz._vizSpec.variables.wadus.blendTo(0.1);
+                viz.variables.wadus.blendTo(0.1);
             }
         });
 
