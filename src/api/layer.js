@@ -120,27 +120,6 @@ export default class Layer {
     }
 
     /**
-     * Set a new style for this layer.
-     *
-     * This transition happens instantly, for smooth animations use {@link carto.Layer#blendToStyle|blendToStyle}
-     *
-     * @param {carto.Style} style - New style
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
-    async setStyle(style) {
-        this._checkStyle(style);
-
-        await this._styleChanged(style);
-        if (this._style) {
-            this._style.onChange(null);
-        }
-        this._style = style;
-        this._style.onChange(this._styleChanged.bind(this));
-    }
-
-    /**
      * Blend the current style with another style.
      *
      * This allows smooth transforms between two different styles.

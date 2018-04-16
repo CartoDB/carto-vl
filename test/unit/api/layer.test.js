@@ -96,10 +96,6 @@ describe('api/layer', () => {
         });
     });
 
-    describe('.setStyle', () => {
-
-    });
-
     describe('.blendToStyle', () => {
         it('should not throw an error if a valid style is passed', () => {
             const layer = new Layer('layer0', source, style);
