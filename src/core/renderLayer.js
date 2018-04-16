@@ -9,11 +9,23 @@ export default class RenderLayer {
         this.type = null;
         this.styledFeatures = {};
     }
+
+    getRenderer() {
+        return this.renderer;
+    }
+
+    setRenderer(renderer) {
+        this.renderer = renderer;
+    }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
     addDataframe(dataframe) {
         if (this.type) {
             this._checkDataframeType(dataframe);
+        }
+        if (!this.renderer) {
+            console.error('renderLayer has no renderer attached');
+            return;
         }
         this.type = dataframe.type;
         dataframe.bind(this.renderer);
@@ -44,7 +56,7 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        if (!this.style){
+        if (!this.style) {
             return [];
         }
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {

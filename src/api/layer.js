@@ -50,14 +50,13 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
-        this._context = new Promise((resolve) => {
-            this._contextInitCallback = resolve;
-        });
-
         this.metadata = null;
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this.isLoaded = false;
+
+        this._source = source;
+        this._style = style;
 
         this.update(source, style);
     }
@@ -92,10 +91,12 @@ export default class Layer {
     async update(source, style) {
         this._checkSource(source);
         this._checkStyle(style);
+        if (!this._renderLayer.getRenderer()) {
+            return;
+        }
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
-        await this._context;
         const metadata = await source.requestMetadata(style);
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
@@ -160,11 +161,9 @@ export default class Layer {
         });
     }
 
-    // The integrator will call this method once the webgl context is ready.
-    initCallback() {
-        this._renderLayer.renderer = this._integrator.renderer;
-        this._contextInitCallback();
-        this.requestMetadata();
+    setRenderer(renderer) {
+        this._renderLayer.setRenderer(renderer);
+        this.update(this._source, this._style);
     }
 
     async requestMetadata(style) {
@@ -172,7 +171,6 @@ export default class Layer {
         if (!style) {
             return;
         }
-        await this._context;
         return this._source.requestMetadata(style);
     }
 
@@ -291,7 +289,6 @@ export default class Layer {
     }
 
     async _styleChanged(style) {
-        await this._context;
         if (!this._source) {
             throw new Error('A source is required before changing the style');
         }
