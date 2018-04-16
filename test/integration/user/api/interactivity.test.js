@@ -10,7 +10,8 @@ describe('Interactivity', () => {
         map = setup.map;
 
         source = new carto.source.GeoJSON(featureJson);
-        style = new carto.Style('color: rgb(255, 0, 0)');
+        style = new carto.Style(`color: rgb(255, 0, 0)
+                                 @wadus: 123`);
         layer = new carto.Layer('layer', source, style);
         layer.addTo(map);
     });
@@ -70,7 +71,7 @@ describe('Interactivity', () => {
                     expect(event.features[0].style.color.blendTo).toBeDefined();
                     expect(event.features[0].style.color.reset).toBeDefined();
                     expect(event.features[0].style.reset).toBeDefined();
-                    expect(event.features[0].style.variables).toEqual({});
+                    expect(event.features[0].style.variables.wadus.value).toEqual(123);
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', style: jasmine.any(Object) });
                     done();
                 });
