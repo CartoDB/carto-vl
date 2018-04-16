@@ -1,7 +1,7 @@
 import * as shaders from './shaders';
 import * as schema from './schema';
 import Dataframe from './dataframe';
-import { Asc, Desc } from './style/functions';
+import { Asc, Desc } from './viz/functions';
 
 const HISTOGRAM_BUCKETS = 1000;
 
@@ -148,19 +148,19 @@ class Renderer {
 
     _computeDrawMetadata(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
-        const style = renderLayer.style;
+        const viz = renderLayer.viz;
         const aspect = this.getAspect();
         let drawMetadata = {
             zoom: 1. / this._zoom,
             columns: []
         };
-        const colorRequirements = style.getColor()._getDrawMetadataRequirements();
-        const widthRequirements = style.getWidth()._getDrawMetadataRequirements();
-        const strokeColorRequirements = style.getStrokeColor()._getDrawMetadataRequirements();
-        const strokeWidthRequirements = style.getStrokeWidth()._getDrawMetadataRequirements();
-        const filterRequirements = style.getFilter()._getDrawMetadataRequirements();
-        const styleVariables = style._styleSpec.variables;
-        const variables = Object.values(styleVariables);
+        const colorRequirements = viz.getColor()._getDrawMetadataRequirements();
+        const widthRequirements = viz.getWidth()._getDrawMetadataRequirements();
+        const strokeColorRequirements = viz.getStrokeColor()._getDrawMetadataRequirements();
+        const strokeWidthRequirements = viz.getStrokeWidth()._getDrawMetadataRequirements();
+        const filterRequirements = viz.getFilter()._getDrawMetadataRequirements();
+        const vizVariables = viz._vizSpec.variables;
+        const variables = Object.values(vizVariables);
         let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
             .reduce(schema.union, schema.IDENTITY).columns;
 
@@ -194,18 +194,18 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = style.getFilter()._getMinimumNeededSchema().columns;
+            const columnNames = viz.getFilter()._getMinimumNeededSchema().columns;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (style.getFilter()) {
+                    if (viz.getFilter()) {
                         columnNames.forEach(name => {
                             f[name] = d.properties[name][i];
                         });
-                        if (style.getFilter().eval(f) < 0.5) {
+                        if (viz.getFilter().eval(f) < 0.5) {
                             continue;
                         }
                     }
@@ -262,7 +262,7 @@ class Renderer {
 
     renderLayer(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
-        const style = renderLayer.style;
+        const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
 
@@ -281,11 +281,11 @@ class Renderer {
 
         const drawMetadata = this._computeDrawMetadata(renderLayer);
 
-        Object.values(style._styleSpec.variables).map(v => {
+        Object.values(viz._vizSpec.variables).map(v => {
             v._updateDrawMetadata(drawMetadata);
         });
 
-        const styleTile = (tile, tileTexture, shader, styleExpr, TID) => {
+        const styleDataframe = (tile, tileTexture, shader, vizExpr, TID) => {
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -293,9 +293,9 @@ class Renderer {
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(TID).length;
-            styleExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-            styleExpr._updateDrawMetadata(drawMetadata);
-            styleExpr._preDraw(shader.program, drawMetadata, gl);
+            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+            vizExpr._updateDrawMetadata(drawMetadata);
+            vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
@@ -310,11 +310,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleTile(tile, tile.texColor, style.colorShader, style.getColor(), style.propertyColorTID));
-        tiles.map(tile => styleTile(tile, tile.texWidth, style.widthShader, style.getWidth(), style.propertyWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeColor, style.strokeColorShader, style.getStrokeColor(), style.propertyStrokeColorTID));
-        tiles.map(tile => styleTile(tile, tile.texStrokeWidth, style.strokeWidthShader, style.getStrokeWidth(), style.propertyStrokeWidthTID));
-        tiles.map(tile => styleTile(tile, tile.texFilter, style.filterShader, style.getFilter(), style.propertyFilterTID));
+        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.getColor(), viz.propertyColorTID));
+        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.getWidth(), viz.propertyWidthTID));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.getStrokeColor(), viz.propertyStrokeColorTID));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.getStrokeWidth(), viz.propertyStrokeWidthTID));
+        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.getFilter(), viz.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -464,7 +464,7 @@ class Renderer {
 }
 
 function getOrderingRenderBuckets(renderLayer) {
-    const orderer = renderLayer.style.getOrder();
+    const orderer = renderLayer.viz.getOrder();
     let orderingMins = [0];
     let orderingMaxs = [1000];
     if (orderer instanceof Asc) {

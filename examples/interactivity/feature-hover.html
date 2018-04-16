@@ -85,11 +85,11 @@
     const source = new carto.source.Dataset(`
       london_neighbourhoods
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       color: ramp($neighbourhood, bold)
       @neighbourhood: $neighbourhood
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureHover', updateNeighbourhood);
@@ -109,7 +109,7 @@
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.style.variables.neighbourhood.value}</h3>
+            <h3>${feature.viz.variables.neighbourhood.value}</h3>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

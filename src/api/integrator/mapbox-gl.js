@@ -78,7 +78,7 @@ class MGLIntegrator {
             if (this._paintedLayers % this._layers.length == 0) {
                 // Last layer has been painted
                 const isAnimated = this._layers.some(layer =>
-                    layer.getStyle() && layer.getStyle().isAnimated());
+                    layer.getViz() && layer.getViz().isAnimated());
                 if (!isAnimated && this.map.repaint) {
                     this.map.repaint = false;
                 }
