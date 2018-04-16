@@ -113,7 +113,7 @@ export default class RenderLayer {
                     });
                 }
             };
-            feature.properties = undefined;
+            delete feature.properties;
             return feature;
         });
     }
