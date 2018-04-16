@@ -1,12 +1,12 @@
 import mitt from 'mitt';
 import * as util from './util';
 import SourceBase from './source/base';
-import Viz from './style';
+import Viz from './viz';
 import CartoMap from './map';
 import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
-import { cubic } from '../core/style/functions';
+import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
 
@@ -272,7 +272,7 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        if (map.isVizLoaded()) {
+        if (map.isStyleLoaded()) {
             this._onMapLoaded(map, beforeLayerID);
         } else {
             map.on('load', () => {
@@ -329,7 +329,7 @@ export default class Layer {
 
     _checkViz(style) {
         if (util.isUndefined(style)) {
-            throw new CartoValidationError('layer', 'styleRequired');
+            throw new CartoValidationError('layer', 'vizRequired');
         }
         if (!(style instanceof Viz)) {
             throw new CartoValidationError('layer', 'nonValidViz');
