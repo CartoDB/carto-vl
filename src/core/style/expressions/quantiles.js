@@ -74,7 +74,6 @@ function genQuantiles(global) {
             const column = drawMetadata.columns.find(c => c.name == name);
             let i = 0;
             const total = column.accumHistogram[column.histogramBuckets - 1];
-            const r = Math.random();
             let brs = [];
 
             // TODO OPT: this could be faster with binary search
@@ -89,9 +88,6 @@ function genQuantiles(global) {
                     brs.push(percentileValue);
                     breakpoint.expr = percentileValue;
                 });
-            }
-            if (r > 0.99) {
-                console.log(this.breakpoints.map(br => br.expr));
             }
             super._preDraw(program, drawMetadata, gl);
         }

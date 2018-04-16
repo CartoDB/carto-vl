@@ -56,9 +56,6 @@ function generateAggregattion(metadataPropertyName, global) {
             if (!global) {
                 this.value.expr = column[metadataPropertyName];
             }
-            if (Math.random() > 0.999) {
-                console.log(metadataPropertyName, name, this.value.expr);
-            }
         }
         _getColumnName() {
             if (this.property.aggName) {
@@ -121,9 +118,6 @@ function generatePercentile(global) {
                 }
                 const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
                 this.value.expr = br;
-            }
-            if (Math.random() > 0.99) {
-                console.log(`percentile${this.percentile}`, name, this.value.expr);
             }
             this.value._preDraw(program, drawMetadata, gl);
         }
