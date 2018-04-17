@@ -185,7 +185,7 @@ export default class Windshaft {
         return { MNS, resolution, filters, metadata, urlTemplate };
     }
 
-    _updateStateAfterInstantiating({MNS, resolution, filters, metadata, urlTemplate}) {
+    _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
         this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
@@ -526,7 +526,7 @@ export default class Windshaft {
             t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
             columns.push(t);
         });
-        return  new Metadata(categoryIDs, columns, featureCount, sample);
+        return new Metadata(categoryIDs, columns, featureCount, sample);
     }
 
     /**
