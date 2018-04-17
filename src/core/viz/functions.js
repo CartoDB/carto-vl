@@ -99,6 +99,12 @@ import { HSLA } from './expressions/hsl';
 import { HSV } from './expressions/hsv';
 import { HSVA } from './expressions/hsv';
 
+import { Cubic } from './expressions/interpolators';
+import { ILinear } from './expressions/interpolators';
+
+import Linear from './expressions/linear';
+
+
 import Number from './expressions/number';
 
 
@@ -109,7 +115,7 @@ import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 
 
 
-import Linear from './expressions/linear';
+
 import Near from './expressions/near';
 import Now from './expressions/now';
 import Property from './expressions/property';
@@ -134,21 +140,12 @@ import { Not } from './expressions/unary';
 // Classifiers
 import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
 
-// Interpolators
-import { ILinear } from './expressions/interpolators';
-import { Cubic } from './expressions/interpolators';
-
 import { Torque, Fade } from './expressions/torque';
 
 // Colors
 import {RGB, RGBA} from './expressions/rgb';
 
-
-
 import NamedColor from './expressions/named-color';
-
-export { Cubic };
-
 
 import {
     ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
@@ -213,7 +210,10 @@ export const hsla = (...args) => new HSLA(...args);
 export const hsv = (...args) => new HSV(...args);
 export const hsva = (...args) => new HSVA(...args);
 
+export const cubic = (...args) => new Cubic(...args);
+export const ilinear = (...args) => new ILinear(...args);
 
+export const linear = (...args) => new Linear(...args);
 
 export const number = (...args) => new Number(...args);
 
@@ -242,9 +242,8 @@ export const ramp = (...args) => new Ramp(...args);
 export const prop = property;
 
 export const top = (...args) => new Top(...args);
-export const linear = (...args) => new Linear(...args);
-export const cubic = (...args) => new Cubic(...args);
-export const ilinear = (...args) => new ILinear(...args);
+
+
 export const now = (...args) => new Now(...args);
 export const zoom = (...args) => new Zoom(...args);
 

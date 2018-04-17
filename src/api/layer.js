@@ -154,6 +154,7 @@ export default class Layer {
      *
      * @param {carto.Viz} viz - The final viz
      * @param {number} [duration=400] - The animation duration in milliseconds
+     *
      * @memberof carto.Layer
      * @instance
      * @api

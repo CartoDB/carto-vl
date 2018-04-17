@@ -4,6 +4,7 @@ import BaseExpression from './base';
 // TODO type checking
 
 export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+
 export class BounceEaseIn extends genInterpolator(
     inner => `BounceEaseIn(${inner})`,
     `
@@ -37,24 +38,6 @@ export class BounceEaseIn extends genInterpolator(
 `,
     inner => inner // TODO FIXME
 ) { }
-export class Cubic extends genInterpolator(
-    inner => `cubicEaseInOut(${inner})`,
-    `
-    #ifndef CUBIC
-    #define CUBIC
-    float cubicEaseInOut(float p){
-        if (p < 0.5) {
-            return 4. * p * p * p;
-        }else {
-            float f = ((2. * p) - 2.);
-            return 0.5 * f * f * f + 1.;
-        }
-    }
-    #endif
-`,
-    inner => inner // TODO FIXME
-) { }
-
 
 // Interpolators
 function genInterpolator(inlineMaker, preface, jsEval) {
@@ -62,6 +45,9 @@ function genInterpolator(inlineMaker, preface, jsEval) {
         constructor(m) {
             m = implicitCast(m);
             super({ m: m });
+        }
+        eval(feature) {
+            return jsEval(this.m.eval(feature));
         }
         _compile(meta) {
             super._compile(meta);
@@ -71,11 +57,7 @@ function genInterpolator(inlineMaker, preface, jsEval) {
             this.type = 'number';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
-        eval(feature) {
-            return jsEval(this.m.eval(feature));
-        }
     };
     fn.type = 'interpolator';
     return fn;
-
 }
