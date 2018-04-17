@@ -2,13 +2,14 @@ import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
- * @description Wrapper around category names
+ * Wrapper around category names.
+ *
  * @param {string} categoryName
- * @returns {carto.expressions.Expression} category expression with the category name provided
+ * @returns {carto.expressions.Base} category expression with the category name provided
  *
  * @memberof carto.expressions
- * @name category
  * @function
+ * @name category
  * @api
  */
 export default class Category extends BaseExpression {
@@ -17,6 +18,12 @@ export default class Category extends BaseExpression {
         super({});
         this.expr = categoryName;
         this.type = 'category';
+    }
+    eval() {
+        return this._metadata.categoryIDs[this.expr];
+    }
+    isAnimated() {
+        return false;
     }
     _compile(metadata) {
         this._metadata = metadata;
@@ -33,11 +40,5 @@ export default class Category extends BaseExpression {
     _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
-    }
-    eval() {
-        return this._metadata.categoryIDs[this.expr];
-    }
-    isAnimated() {
-        return false;
     }
 }
