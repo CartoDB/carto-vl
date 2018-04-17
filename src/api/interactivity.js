@@ -141,8 +141,8 @@ export default class Interactivity {
     /**
      * Register an event handler for the given type.
      *
-     * @param {string} eventName - type of event to listen for
-     * @param {function} callback - function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
+     * @param {string} eventName - Type of event to listen for
+     * @param {function} callback - Function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
      * @memberof carto.Interactivity
      * @instance
      * @api
@@ -155,8 +155,8 @@ export default class Interactivity {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - type of event to unregister
-     * @param {function} callback - handler function to unregister
+     * @param {string} eventName - Type of event to unregister
+     * @param {function} callback - Handler function to unregister
      * @memberof carto.Interactivity
      * @instance
      * @api

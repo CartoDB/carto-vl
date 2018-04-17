@@ -9,7 +9,6 @@ import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
-
 export default class Layer {
     /**
     *
@@ -20,12 +19,12 @@ export default class Layer {
     * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
     * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
     *
-    * @param {string} id
-    * @param {carto.source.Base} source
-    * @param {carto.Viz} viz
+    * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+    * @param {carto.source.Base} source - The source of the data
+    * @param {carto.Viz} viz - The description of the visualization of the data
     *
     * @example
-    * new carto.Layer('layer0', source, viz);
+    * const layer = new carto.Layer('layer0', source, viz);
     *
     * @fires CartoError
     *
@@ -62,19 +61,37 @@ export default class Layer {
         this.update(source, viz);
     }
 
-    on(eventType, callback) {
-        return this._emitter.on(eventType, callback);
+    /**
+     * Register an event handler for the given type.
+     *
+     * @param {string} eventName - Type of event to listen for
+     * @param {function} callback - Function to call in response to given event
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    on(eventName, callback) {
+        return this._emitter.on(eventName, callback);
     }
 
-    off(eventType, callback) {
-        return this._emitter.off(eventType, callback);
+    /**
+     * Remove an event handler for the given type.
+     *
+     * @param {string} eventName - Type of event to unregister
+     * @param {function} callback - Handler function to unregister
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    off(eventName, callback) {
+        return this._emitter.off(eventName, callback);
     }
 
     /**
      * Add this layer to a map.
      *
-     * @param {mapboxgl.Map} map
-     * @param {string} beforeLayerID
+     * @param {mapboxgl.Map} map - The map on which to add the layer
+     * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before.
      * @memberof carto.Layer
      * @instance
      * @api
@@ -126,8 +143,8 @@ export default class Layer {
      *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different vizs varying the width
-     * const viz0 = new carto.viz({ width: 10 });
-     * const viz1 = new carto.viz({ width: 20 });
+     * const viz0 = new carto.Viz({ width: 10 });
+     * const viz1 = new carto.Viz({ width: 20 });
      * // Create a layer with the first viz
      * const layer = new carto.Layer('layer', source, viz0);
      * // We add the layer to the map, the points in this layer will have widh 10
