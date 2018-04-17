@@ -104,9 +104,11 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
+import Near from './expressions/near';
+
+import Now from './expressions/now';
 
 import Number from './expressions/number';
-
 
 
 
@@ -116,8 +118,8 @@ import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 
 
 
-import Near from './expressions/near';
-import Now from './expressions/now';
+
+
 import Property from './expressions/property';
 import Variable from './expressions/variable';
 import Ramp from './expressions/ramp';
@@ -215,6 +217,10 @@ export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
 
+export const near = (...args) => new Near(...args);
+
+export const now = (...args) => new Now(...args);
+
 export const number = (...args) => new Number(...args);
 
 
@@ -229,7 +235,7 @@ export const sin = (...args) => new Sin(...args);
 export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
-export const near = (...args) => new Near(...args);
+
 export const rgba = (...args) => new RGBA(...args);
 export const rgb = (...args) => new RGB(...args);
 export const property = (...args) => new Property(...args);
@@ -244,12 +250,11 @@ export const prop = property;
 export const top = (...args) => new Top(...args);
 
 
-export const now = (...args) => new Now(...args);
+
 export const zoom = (...args) => new Zoom(...args);
 
 export const xyz = (...args) => new XYZ(...args);
 export const abs = (...args) => new Abs(...args);
-
 
 export const quantiles = (...args) => new Quantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);

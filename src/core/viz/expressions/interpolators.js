@@ -44,7 +44,7 @@ function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends BaseExpression {
         constructor(m) {
             m = implicitCast(m);
-            super({ m: m });
+            super({ m });
         }
         eval(feature) {
             return jsEval(this.m.eval(feature));

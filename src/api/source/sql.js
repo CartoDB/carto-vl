@@ -54,7 +54,7 @@ export default class SQL extends BaseWindshaft {
         this.initialize(auth, config);
     }
 
-    _clone(){
+    _clone() {
         return new SQL(this._query, this._auth, this._config);
     }
 

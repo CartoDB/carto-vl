@@ -31,7 +31,7 @@ export default class NamedColor extends BaseExpression {
         this.name = colorName;
         this.color = this._nameToRGB(this.name);
     }
-    eval(){
+    eval() {
         return this.color;
     }
     _compile(meta) {

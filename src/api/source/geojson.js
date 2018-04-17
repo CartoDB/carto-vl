@@ -49,7 +49,7 @@ export default class GeoJSON extends Base {
         this._loaded = false;
     }
 
-    _clone(){
+    _clone() {
         return new GeoJSON(this._data);
     }
 

@@ -1,27 +1,45 @@
 import BaseExpression from './base';
 import { implicitCast, clamp } from './utils';
 
+/**
+ * Near returns zero for inputs that are far away from center.
+ * This can be useful for filtering out features by setting their size to zero.
+ *       _____
+ * _____/     \_____
+ *
+ * @param {carto.expressions.property} input
+ * @param {carto.expressions.number|number} center
+ * @param {carto.expressions.number|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {carto.expressions.number|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
+ * });
+ *
+ * @memberof carto.expressions
+ * @function
+ * @name near
+ * @api
+ */
 // TODO type checking
 export default class Near extends BaseExpression {
-    /**
-     * @description Near returns zero for inputs that are far away from center.
-     * This can be useful for filtering out features by setting their size to zero.
-     *
-     *       _____
-     * _____/     \_____
-     *
-     * @param {*} input
-     * @param {*} center
-     * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
-     * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
-     */
     constructor(input, center, threshold, falloff) {
         input = implicitCast(input);
         center = implicitCast(center);
         threshold = implicitCast(threshold);
         falloff = implicitCast(falloff);
 
-        super({ input: input, center: center, threshold: threshold, falloff: falloff });
+        super({ input, center, threshold, falloff });
+    }
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const center = this.center.eval(feature);
+        const threshold = this.threshold.eval(feature);
+        const falloff = this.falloff.eval(feature);
+        return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
     _compile(meta) {
         super._compile(meta);
@@ -31,12 +49,5 @@ export default class Near extends BaseExpression {
         this.type = 'number';
         this.inlineMaker = (inline) =>
             `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
-    }
-    eval(feature) {
-        const input = this.input.eval(feature);
-        const center = this.center.eval(feature);
-        const threshold = this.threshold.eval(feature);
-        const falloff = this.falloff.eval(feature);
-        return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
 }

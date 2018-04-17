@@ -1,12 +1,31 @@
 import BaseExpression from './base';
 import { number } from '../functions';
 
+/**
+ * Get the current timestamp.
+ *
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.mod(s.now(), 10);
+ * });
+ *
+ * @memberof carto.expressions
+ * @function
+ * @name now
+ * @api
+ */
 export default class Now extends BaseExpression {
-    /**
-     * @description get the current timestamp
-     */
     constructor() {
         super({ now: number(0) });
+    }
+    eval() {
+        return this.now.expr;
+    }
+    isAnimated() {
+        return true;
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -18,11 +37,5 @@ export default class Now extends BaseExpression {
     }
     _setTimestamp(timestamp){
         this.now.expr = timestamp;
-    }
-    isAnimated() {
-        return true;
-    }
-    eval(){
-        return this.now.expr;
     }
 }
