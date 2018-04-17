@@ -41,7 +41,7 @@
     const source = new carto.source.Dataset(`
       wwi
     `);
-    const s = carto.viz.expressions;
+    const s = carto.expressions;
     const viz = new carto.Viz({
         width: s.mul(s.blend(1, 2, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
         color: s.ramp(s.linear(s.avg(s.prop('temp')), 0, 30), s.palettes.tealrose),

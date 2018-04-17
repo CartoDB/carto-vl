@@ -11,7 +11,7 @@ carto.setDefaultAuth({
 });
 
 const source = new carto.source.Dataset('pop_density_points');
-const s = carto.viz.expressions;
+const s = carto.expressions;
 const $dn = s.property('dn');
 const viz = new carto.Viz({
     width: 4 * s.zoom(),

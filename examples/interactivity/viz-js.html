@@ -64,7 +64,7 @@
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 
-    const s = carto.viz.expressions;
+    const s = carto.expressions;
     const viz = new carto.Viz({
       width: 15,
       color: s.hsva(0.73, 0.69, 0.89, s.div(s.var('view_pop_avg'), s.var('global_pop_avg'))),

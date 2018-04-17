@@ -11,7 +11,7 @@ carto.setDefaultAuth({
 });
 
 const source = new carto.source.Dataset('sf_stclines');
-const s = carto.viz.expressions;
+const s = carto.expressions;
 const viz = new carto.Viz({
     width: 3,
     color: s.hsv(0.2, 1, .9),

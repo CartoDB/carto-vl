@@ -38,7 +38,7 @@ export default class Viz {
     * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
     *
     * A Viz is created from an {@link VizSpec|vizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.viz.expressions|expression}.
+    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.expressions|expression}.
     * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -373,11 +373,11 @@ export default class Viz {
         /**
          * @typedef {object} VizSpec
          * @property {number} resolution
-         * @property {carto.viz.expressions.Expression} color
-         * @property {carto.viz.expressions.Expression} width
-         * @property {carto.viz.expressions.Expression} strokeColor
-         * @property {carto.viz.expressions.Expression} strokeWidth
-         * @property {carto.viz.expressions.Expression} order
+         * @property {carto.expressions.Expression} color
+         * @property {carto.expressions.Expression} width
+         * @property {carto.expressions.Expression} strokeColor
+         * @property {carto.expressions.Expression} strokeWidth
+         * @property {carto.expressions.Expression} order
          * @api
          */
 
