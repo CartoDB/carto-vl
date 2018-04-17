@@ -153,7 +153,7 @@ export default class Layer {
      * layer.blendToViz(viz1, 500);
      *
      * @param {carto.Viz} viz - The final viz
-     * @param {number} duration - The animation duration in milliseconds [default:400]
+     * @param {number} [duration=400] - The animation duration in milliseconds
      * @memberof carto.Layer
      * @instance
      * @api

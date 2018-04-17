@@ -15,14 +15,14 @@ export default class GeoJSON extends Base {
      * @param {object} data - A GeoJSON data object
      *
      * @example
-     * new carto.source.GeoJSON({
+     * const source = new carto.source.GeoJSON({
      *   "type": "Feature",
      *   "geometry": {
      *     "type": "Point",
      *     "coordinates": [ 0, 0 ]
      *   },
      *   "properties": {
-     *     "cartodb_id": 1
+     *     "index": 1
      *   }
      * });
      *
