@@ -87,30 +87,30 @@
 
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
-        event.features[0].viz.color.blendTo('rgba(255,20,255,0.7)', 100)
+        event.features[0].color.blendTo('rgba(255,20,255,0.7)', 100)
       }
     });
 
     interactivity.on('featureLeave', event => {
       if (event.features.length > 0) {
-        event.features[0].viz.color.reset(100);
+        event.features[0].color.reset(100);
       }
     });
 
     interactivity.on('featureClick', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.viz.strokeWidth.blendTo('4', 100);
-        feature.viz.strokeColor.blendTo('rgb(255,20,138)', 100);
-        updateTitle(feature.viz.variables.name.value);
+        feature.strokeWidth.blendTo('4', 100);
+        feature.strokeColor.blendTo('rgb(255,20,138)', 100);
+        updateTitle(feature.variables.name.value);
       }
     });
 
     interactivity.on('featureClickOut', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.viz.strokeWidth.reset(100);
-        feature.viz.strokeColor.reset(100);
+        feature.strokeWidth.reset(100);
+        feature.strokeColor.reset(100);
       }
     });
 

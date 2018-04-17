@@ -8,8 +8,8 @@ const DEFAULT_FADE = 0.15;
 /**
  * Create a Torque FadeIn/FadeOut configuration
  *
- * @param {carto.expressions.Number|number} param1 expression of type number or Number
- * @param {carto.expression.Number|number} param2 expression of type number or Number
+ * @param {carto.expressions.number|number} param1 expression of type number or Number
+ * @param {carto.expression.number|number} param2 expression of type number or Number
  * @return {carto.expressions.fade}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>

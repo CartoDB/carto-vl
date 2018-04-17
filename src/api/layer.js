@@ -260,6 +260,7 @@ export default class Layer {
     _onDataFrameRemoved(dataframe) {
         this._renderLayer.removeDataframe(dataframe);
         this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
     }
 
     /**
@@ -267,6 +268,7 @@ export default class Layer {
      */
     _onDataLoaded() {
         this.state = 'dataLoaded';
+        this._integrator.needRefresh();
     }
 
     _addLayerIdToFeature(feature) {

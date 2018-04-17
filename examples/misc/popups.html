@@ -144,7 +144,7 @@
 
     function updatePopup(event) {
       if (event.features.length > 0) {
-        const vars = event.features[0].viz.variables;
+        const vars = event.features[0].variables;
         popup.setHTML(`
         <div class="popup-container">
           <h2>${vars.country_name.value}</h2>
