@@ -392,7 +392,7 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
                 }
             }
 
-            super({ a: a, b: b });
+            super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
         }
         eval(feature) {
