@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
@@ -26,7 +26,7 @@ export const HSL = genHSL('hsl', false);
 export const HSLA = genHSL('hsla', true);
 
 function genHSL(name, alpha) {
-    return class HSLA extends Expression {
+    return class HSLA extends BaseExpression {
         constructor(h, s, l, a) {
             [h, s, l, a] = [h, s, l, a].map(implicitCast);
 

@@ -1,5 +1,5 @@
 import { float, category, customPalette } from '../functions';
-import Expression from './expression';
+import BaseExpression from './base';
 
 export const DEFAULT = undefined;
 
@@ -89,9 +89,9 @@ export function checkLooseType(expressionName, parameterName, parameterIndex, ex
 }
 
 export function checkExpression(expressionName, parameterName, parameterIndex, parameter) {
-    if (!(parameter instanceof Expression)) {
+    if (!(parameter instanceof BaseExpression)) {
         throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type Expression`);
+        '${parameter}' is not of type carto.expressions.Base`);
     }
 }
 

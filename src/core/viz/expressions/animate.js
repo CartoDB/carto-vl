@@ -1,9 +1,9 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkNumber, getStringErrorPreface } from './utils';
 
 
 //TODO refactor to use uniformfloat class
-export default class Animate extends Expression {
+export default class Animate extends BaseExpression {
     /**
      * @jsapi
      * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.

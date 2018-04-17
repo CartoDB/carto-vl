@@ -13,10 +13,11 @@ let uid = 0;
  * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.expressions
- * @name Expression
+ * @abstract
+ * @name Base
  * @api
  */
-export default class Expression {
+export default class Base {
     /**
      * @hideconstructor
      * @param {*} children

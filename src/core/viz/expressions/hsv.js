@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
@@ -26,7 +26,7 @@ export const HSV = genHSV('hsv', false);
 export const HSVA = genHSV('hsva', true);
 
 function genHSV(name, alpha) {
-    return class extends Expression {
+    return class extends BaseExpression {
         constructor(h, s, v, a) {
             h = implicitCast(h);
             s = implicitCast(s);

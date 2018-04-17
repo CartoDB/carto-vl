@@ -4,7 +4,7 @@ import * as schema from '../core/schema';
 import * as shaders from '../core/shaders';
 import { compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
-import Expression from '../core/viz/expressions/expression';
+import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
@@ -399,22 +399,22 @@ export default class Viz {
         if (vizSpec.resolution >= MAX_RESOLUTION) {
             throw new CartoValidationError('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
         }
-        if (!(vizSpec.color instanceof Expression)) {
+        if (!(vizSpec.color instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[color]');
         }
-        if (!(vizSpec.strokeColor instanceof Expression)) {
+        if (!(vizSpec.strokeColor instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[strokeColor]');
         }
-        if (!(vizSpec.width instanceof Expression)) {
+        if (!(vizSpec.width instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[width]');
         }
-        if (!(vizSpec.strokeWidth instanceof Expression)) {
+        if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
         }
-        if (!(vizSpec.order instanceof Expression)) {
+        if (!(vizSpec.order instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[order]');
         }
-        if (!(vizSpec.filter instanceof Expression)) {
+        if (!(vizSpec.filter instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[filter]');
         }
         for (let key in vizSpec) {

@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString, hexToRgb, getStringErrorPreface } from './utils';
 
 /**
@@ -19,7 +19,7 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  * @function
  * @api
  */
-export default class Hex extends Expression {
+export default class Hex extends BaseExpression {
     constructor(hexadecimalColor) {
         checkString('hex', 'hexadecimalColor', 0, hexadecimalColor);
         super({});

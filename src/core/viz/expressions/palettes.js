@@ -1,6 +1,6 @@
 
 import * as cartocolor from 'cartocolor';
-import Expression from './expression';
+import BaseExpression from './base';
 import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
 
 /**
@@ -28,7 +28,7 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
  */
 const palettes = {};
 
-class PaletteGenerator extends Expression {
+class PaletteGenerator extends BaseExpression {
     constructor(name, subPalettes) {
         super({});
         this.type = 'palette';
@@ -52,7 +52,7 @@ class PaletteGenerator extends Expression {
     }
 }
 
-export class CustomPalette extends Expression {
+export class CustomPalette extends BaseExpression {
     // colors is a list of expression of type 'color'
     constructor(...elems) {
         elems = elems.map(implicitCast);
@@ -92,7 +92,7 @@ Object.keys(cartocolor).map(name => {
     palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, cartocolor[name]);
 });
 
-class Inverse extends Expression{
+class Inverse extends BaseExpression{
     constructor(palette) {
         super({});
         this.type = 'palette';

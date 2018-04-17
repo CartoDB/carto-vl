@@ -1,6 +1,6 @@
-import Expression from './expression';
+import BaseExpression from './base';
 
-export default class Time extends Expression {
+export default class Time extends BaseExpression {
     constructor(date) {
         if (!(date instanceof Date)) {
             date = new Date(date);

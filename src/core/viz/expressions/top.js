@@ -1,6 +1,6 @@
-import Expression from './expression';
+import BaseExpression from './base';
 
-export default class Top extends Expression {
+export default class Top extends BaseExpression {
     constructor(property, buckets) {
         // TODO 'cat'
         super({ property: property });

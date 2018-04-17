@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import * as schema from '../../schema';
 import Property from './property';
 import { checkInstance, checkType } from './utils';
@@ -11,7 +11,7 @@ export const Sum = genAggregationOp('sum', 'float');
 export const Mode = genAggregationOp('mode', 'category');
 
 function genAggregationOp(aggName, aggType) {
-    return class AggregationOperation extends Expression {
+    return class AggregationOperation extends BaseExpression {
         constructor(property) {
             checkInstance(aggName, 'property', 0, Property, property);
             super({ property });

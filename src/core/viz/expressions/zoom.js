@@ -1,7 +1,7 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { float } from '../functions';
 
-export default class Zoom extends Expression {
+export default class Zoom extends BaseExpression {
     /**
      * @description get the current zoom level
      */

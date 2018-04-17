@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { float } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
@@ -7,7 +7,7 @@ import * as schema from '../../schema';
 let quantilesUID = 0;
 
 function genQuantiles(global) {
-    return class Quantiles extends Expression {
+    return class Quantiles extends BaseExpression {
         constructor(input, buckets) {
             checkInstance('quantiles', 'input', 0, Property, input && (input.property || input));
             checkNumber('quantiles', 'buckets', 1, buckets);

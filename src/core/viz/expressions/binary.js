@@ -1,6 +1,6 @@
 import { float } from '../functions';
 import { implicitCast } from './utils';
-import Expression from './expression';
+import BaseExpression from './base';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
 const UNSUPPORTED_SIGNATURE = 0;
@@ -390,7 +390,7 @@ export const And = genBinaryOp('and',
 );
 
 function genBinaryOp(name, allowedSignature, jsFn, glsl) {
-    return class BinaryOperation extends Expression {
+    return class BinaryOperation extends BaseExpression {
         /**
          * @jsapi
          * @name BinaryOperation

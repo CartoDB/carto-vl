@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkExpression, checkLooseType, implicitCast, checkType } from './utils';
 
 /**
@@ -21,7 +21,7 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * @function
 * @api
 */
-export default class Linear extends Expression {
+export default class Linear extends BaseExpression {
     constructor(input, min, max) {
         input = implicitCast(input);
         min = implicitCast(min);

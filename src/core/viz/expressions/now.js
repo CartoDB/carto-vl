@@ -1,7 +1,7 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { float } from '../functions';
 
-export default class Now extends Expression {
+export default class Now extends BaseExpression {
     /**
      * @description get the current timestamp
      */

@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkNumber } from './utils';
 
 
@@ -20,7 +20,7 @@ import { checkNumber } from './utils';
  * @function
  * @api
  */
-export default class Float extends Expression {
+export default class Float extends BaseExpression {
     /**
      * @jsapi
      * @param {*} x

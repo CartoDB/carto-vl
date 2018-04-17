@@ -1,7 +1,7 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString } from './utils';
 
-export default class Variable extends Expression {
+export default class Variable extends BaseExpression {
     /**
      * @jsapi
      * @param {*} name Property/column name

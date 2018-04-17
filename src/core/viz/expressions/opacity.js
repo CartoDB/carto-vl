@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { float } from '../functions';
 import { checkLooseType, checkType } from './utils';
 
@@ -20,7 +20,7 @@ import { checkLooseType, checkType } from './utils';
  * @function
  * @api
  */
-export default class Opacity extends Expression {
+export default class Opacity extends BaseExpression {
     /**
      * @description Override the input color opacity
      * @param {*} color input color

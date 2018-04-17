@@ -1,9 +1,9 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex } from './utils';
 
 let bucketUID = 0;
 
-export default class Buckets extends Expression {
+export default class Buckets extends BaseExpression {
 
     /**
      * Given a property create "sub-groups" based on the given breakpoints.

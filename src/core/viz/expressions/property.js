@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
@@ -22,7 +22,7 @@ import { checkString } from './utils';
  * @function
  * @api
  */
-export default class Property extends Expression {
+export default class Property extends BaseExpression {
     /**
      * @jsapi
      * @param {*} name Property/column name

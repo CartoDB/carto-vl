@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp } from './utils';
 import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './property';
@@ -28,7 +28,7 @@ const DEFAULT_FADE = 0.15;
  * @name fade
  * @function
 */
-export class Fade extends Expression {
+export class Fade extends BaseExpression {
     constructor(param1 = DEFAULT, param2 = DEFAULT) {
         let fadeIn = param1;
         let fadeOut = param2;
@@ -76,7 +76,7 @@ export class Fade extends Expression {
  * @name torque
  * @function
 */
-export class Torque extends Expression {
+export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         if (!Number.isFinite(duration)) {
             throw new Error('Torque(): invalid second parameter, duration.');

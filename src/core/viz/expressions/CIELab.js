@@ -1,7 +1,7 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkType, checkExpression } from './utils';
 
-export default class CIELab extends Expression {
+export default class CIELab extends BaseExpression {
     constructor(l, a, b) {
         l = implicitCast(l);
         a = implicitCast(a);

@@ -1,8 +1,8 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, clamp } from './utils';
 
 // TODO type checking
-export default class Near extends Expression {
+export default class Near extends BaseExpression {
     /**
      * @description Near returns zero for inputs that are far away from center.
      * This can be useful for filtering out features by setting their size to zero.

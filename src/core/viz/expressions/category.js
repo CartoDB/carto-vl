@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
@@ -11,7 +11,7 @@ import { checkString } from './utils';
  * @function
  * @api
  */
-export default class Category extends Expression {
+export default class Category extends BaseExpression {
     constructor(categoryName) {
         checkString('category', 'categoryName', 0, categoryName);
         super({});

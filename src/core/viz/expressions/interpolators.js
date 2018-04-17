@@ -1,5 +1,5 @@
 import { implicitCast } from './utils';
-import Expression from './expression';
+import BaseExpression from './base';
 
 // TODO type checking
 
@@ -58,7 +58,7 @@ export class Cubic extends genInterpolator(
 
 // Interpolators
 function genInterpolator(inlineMaker, preface, jsEval) {
-    const fn = class Interpolator extends Expression {
+    const fn = class Interpolator extends BaseExpression {
         constructor(m) {
             m = implicitCast(m);
             super({ m: m });

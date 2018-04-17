@@ -1,5 +1,5 @@
 import { implicitCast, checkLooseType, checkType } from './utils';
-import Expression from './expression';
+import BaseExpression from './base';
 
 
 /**
@@ -169,7 +169,7 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
 
 function genUnaryOp(name, jsFn, glsl) {
-    return class UnaryOperation extends Expression {
+    return class UnaryOperation extends BaseExpression {
         constructor(a) {
             a = implicitCast(a);
             checkLooseType(name, 'x', 0, 'float', a);

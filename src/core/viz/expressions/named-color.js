@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString, getStringErrorPreface } from './utils';
 
 
@@ -22,7 +22,7 @@ export const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine
  * @function
  * @api
  */
-export class NamedColor extends Expression {
+export class NamedColor extends BaseExpression {
     constructor(colorName) {
         checkString('namedColor', 'colorName', 0, colorName);
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {

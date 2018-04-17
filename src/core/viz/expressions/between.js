@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkType } from './utils';
 
 /**
@@ -22,7 +22,7 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * @function
  * @api
  */
-export default class Between extends Expression {
+export default class Between extends BaseExpression {
     constructor(value, lowerLimit, upperLimit) {
         value = implicitCast(value);
         lowerLimit = implicitCast(lowerLimit);

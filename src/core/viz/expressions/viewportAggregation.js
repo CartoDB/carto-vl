@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { float } from '../functions';
 import * as schema from '../../schema';
 
@@ -18,7 +18,7 @@ export const ViewportPercentile = generatePercentile();
 export const GlobalPercentile = generatePercentile(true);
 
 function generateAggregattion(metadataPropertyName, global) {
-    return class Aggregattion extends Expression {
+    return class Aggregattion extends BaseExpression {
         /**
          * @jsapi
          * @param {*} property
@@ -68,7 +68,7 @@ function generateAggregattion(metadataPropertyName, global) {
 }
 
 function generatePercentile(global) {
-    return class Percentile extends Expression {
+    return class Percentile extends BaseExpression {
         /**
          * @jsapi
          * @param {*} property

@@ -1,5 +1,5 @@
 import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
-import Expression from './expression';
+import BaseExpression from './base';
 
 
 function IN_INLINE_MAKER(categories) {
@@ -63,7 +63,7 @@ export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) 
 
 function generateBelongsExpression(name, inlineMaker, jsEval) {
 
-    return class BelongExpression extends Expression {
+    return class BelongExpression extends BaseExpression {
         constructor(value, ...categories) {
             value = implicitCast(value);
             checkExpression(name, 'value', 0, value);

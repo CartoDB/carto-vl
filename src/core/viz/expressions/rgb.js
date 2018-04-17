@@ -1,4 +1,4 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkType } from './utils';
 
 //TODO refactor to uniformcolor, write color (plain, literal)
@@ -28,7 +28,7 @@ export const RGBA = genRGB('rgba', true);
 export const RGB = genRGB('rgb', false);
 
 function genRGB(name, alpha) {
-    return class RGBA extends Expression {
+    return class RGBA extends BaseExpression {
         constructor(r, g, b, a) {
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
             checkLooseType(name, 'r', 0, 'float', r);

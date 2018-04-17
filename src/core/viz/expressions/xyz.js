@@ -1,9 +1,9 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast } from './utils';
 
 
 // TODO should this expression be removed?
-export default class XYZ extends Expression {
+export default class XYZ extends BaseExpression {
     constructor(x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);

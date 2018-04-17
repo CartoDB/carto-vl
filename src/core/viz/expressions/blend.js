@@ -1,6 +1,6 @@
 import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression } from './utils';
 import Animate from './animate';
-import Expression from './expression';
+import BaseExpression from './base';
 
 /**
  * @description Linearly interpolate from *a* to *b* based on *mix*
@@ -14,7 +14,7 @@ import Expression from './expression';
  * @function
  * @api
  */
-export default class Blend extends Expression {
+export default class Blend extends BaseExpression {
     constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);

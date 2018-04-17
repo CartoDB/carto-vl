@@ -1,8 +1,8 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 
-export default class Ramp extends Expression {
+export default class Ramp extends BaseExpression {
     /**
     * Create a color ramp based on input property.
     *
