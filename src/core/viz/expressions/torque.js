@@ -8,23 +8,23 @@ const DEFAULT_FADE = 0.15;
 /**
  * Create a Torque FadeIn/FadeOut configuration
  *
- * @param {carto.viz.expression.expression.number|number} param1 expression of type number or Number
- * @param {carto.viz.expression.expression.number|number} param2 expression of type number or Number
- * @return {carto.viz.expressions.fade}
+ * @param {carto.expression.expression.number|number} param1 expression of type number or Number
+ * @param {carto.expression.expression.number|number} param2 expression of type number or Number
+ * @return {carto.expressions.fade}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * new carto.Viz({
  *  filter: s.torque($day, 40, s.fade(0.1, 0.3))
  * });
  *
  * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * new carto.Viz({
  *  filter: s.torque($day, 40, s.fade(0.5))
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name fade
  * @function
 */
@@ -53,14 +53,14 @@ export class Fade extends Expression {
 /**
  * Create an animated temporal filter (torque)
  *
- * @param {carto.viz.expression.expression} input input to base the temporal filter,
+ * @param {carto.expression.expression} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
- * @param {carto.viz.expression.fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
- * @return {carto.viz.expressions.torque}
+ * @param {carto.expression.fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
+ * @return {carto.expressions.torque}
  *
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`width:    2
@@ -72,7 +72,7 @@ export class Fade extends Expression {
  * color:     ramp(linear(AVG($temp), 0,30), tealrose)
  * filter:    torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name torque
  * @function
 */

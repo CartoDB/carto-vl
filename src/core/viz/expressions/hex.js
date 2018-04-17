@@ -6,15 +6,15 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  * Create a color from its hexadecimal description
  *
  * @param {string} hexadecimalColor - color in the form #ABC or #ABCDEF
- * @return {carto.viz.expressions.hex}
+ * @return {carto.expressions.hex}
  *
  * @example <caption>Display blue points.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.hex('#00F');
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name hex
  * @function
  * @api
@@ -32,7 +32,7 @@ export default class Hex extends Expression {
     }
     _compile(meta) {
         super._compile(meta);
-        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a / 255).toFixed(4)})`;
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
     }
     eval(){
         return this.color;

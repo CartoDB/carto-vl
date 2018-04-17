@@ -41,7 +41,7 @@
     const source = new carto.source.Dataset(`
       temporal_circle
     `);
-    const s = carto.viz.expressions;
+    const s = carto.expressions;
     const torque = s.torque(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 2, s.fade(0, 2));
     setInterval(() =>
         console.log(torque.getSimTime())

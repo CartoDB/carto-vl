@@ -9,15 +9,15 @@ import { checkString } from './utils';
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
  * @param {string} name - The property in the dataset that is going to be evaluated
- * @return {carto.viz.expressions.property}
+ * @return {carto.expressions.property}
  *
  * @example <caption>Display only cities with name different from "London"</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *  filter: s.neq(s.prop('name'), 'london'),
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name prop
  * @function
  * @api

@@ -5,18 +5,18 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * Linearly interpolates the value of a given input between min and max.
 *
 *
-* @param {carto.viz.expressions.expression} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {carto.viz.expressions.expression} min - Numeric or date expression pointing to the lower limit
-* @param {carto.viz.expressions.expression} max - Numeric or date expression pointing to the higher limit
-* @return {carto.viz.expressions.expression}
+* @param {carto.expressions.expression} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {carto.expressions.expression} min - Numeric or date expression pointing to the lower limit
+* @param {carto.expressions.expression} max - Numeric or date expression pointing to the higher limit
+* @return {carto.expressions.expression}
 *
 * @example <caption> Display points with a different color depending on the `category` property. </caption>
-* const s = carto.viz.expressions;
+* const s = carto.expressions;
 * const viz = new carto.Viz({
 *  color: s.ramp(s.linear(s.prop('speed', 10, 100), PRISM),
 * });
 *
-* @memberof carto.viz.expressions
+* @memberof carto.expressions
 * @name linear
 * @function
 * @api

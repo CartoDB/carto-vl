@@ -159,8 +159,7 @@ class Renderer {
         const strokeColorRequirements = viz.getStrokeColor()._getDrawMetadataRequirements();
         const strokeWidthRequirements = viz.getStrokeWidth()._getDrawMetadataRequirements();
         const filterRequirements = viz.getFilter()._getDrawMetadataRequirements();
-        const vizVariables = viz._vizSpec.variables;
-        const variables = Object.values(vizVariables);
+        const variables = Object.values(viz.variables);
         let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
             .reduce(schema.union, schema.IDENTITY).columns;
 
@@ -281,7 +280,7 @@ class Renderer {
 
         const drawMetadata = this._computeDrawMetadata(renderLayer);
 
-        Object.values(viz._vizSpec.variables).map(v => {
+        Object.values(viz.variables).map(v => {
             v._updateDrawMetadata(drawMetadata);
         });
 

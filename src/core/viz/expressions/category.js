@@ -4,9 +4,9 @@ import { checkString } from './utils';
 /**
  * @description Wrapper around category names
  * @param {string} categoryName
- * @returns {carto.viz.expressions.Expression} category expression with the category name provided
+ * @returns {carto.expressions.Expression} category expression with the category name provided
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name category
  * @function
  * @api

@@ -9,7 +9,7 @@ export function implicitCast(value) {
         return float(value);
     } else if (typeof value == 'string') {
         return category(value);
-    }else if(Array.isArray(value)){
+    } else if (Array.isArray(value)) {
         return customPalette(...value);
     }
     return value;
@@ -26,6 +26,19 @@ export function hexToRgb(hex) {
             a: 1
         };
     }
+
+    // Evaluate #ABCD
+    result = /^#?([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})$/i.exec(hex);
+    if (result) {
+        return {
+            r: parseInt(result[1] + result[1], 16),
+            g: parseInt(result[2] + result[2], 16),
+            b: parseInt(result[3] + result[3], 16),
+            a: parseInt(result[4] + result[4], 16) / 255,
+        };
+    }
+
+
     // Evaluate #ABCDEF
     result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (result) {
@@ -36,6 +49,18 @@ export function hexToRgb(hex) {
             a: 1
         };
     }
+
+    // Evaluate #ABCDEFAF
+    result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+        return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16),
+            a: parseInt(result[4], 16) / 255,
+        };
+    }
+
     throw new Error('Invalid hexadecimal color');
 }
 

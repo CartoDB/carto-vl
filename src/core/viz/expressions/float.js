@@ -7,15 +7,15 @@ import { checkNumber } from './utils';
  * Wraps a number.
  *
  * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.viz.expressions.Expression} numeric expression
+ * @return {carto.expressions.Expression} numeric expression
  *
  * @example <caption>Creating a number expression.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *  width: s.number(15);  // Elements will have width 15
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name number
  * @function
  * @api

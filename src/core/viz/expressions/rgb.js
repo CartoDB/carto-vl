@@ -7,19 +7,19 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *
  * Evaluates to a rgba color.
  *
- * @param {carto.viz.expressions.number|number} r - The amount of red in the color
- * @param {carto.viz.expressions.number|number} g - The amount of green in the color
- * @param {carto.viz.expressions.number|number} b - The amount of blue in the color
- * @param {carto.viz.expressions.number|number} a - The alpha value of the color
- * @return {carto.viz.expressions.rgba}
+ * @param {carto.expressions.number|number} r - The amount of red in the color
+ * @param {carto.expressions.number|number} g - The amount of green in the color
+ * @param {carto.expressions.number|number} b - The amount of blue in the color
+ * @param {carto.expressions.number|number} a - The alpha value of the color
+ * @return {carto.expressions.rgba}
  *
  * @example <caption>Display blue points.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.rgba(0, 0, 255, 1)
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name rgba
  * @function
  * @api
