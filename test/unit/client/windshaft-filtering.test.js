@@ -1,20 +1,20 @@
 import * as f from '../../../src/client/windshaft-filtering';
-import Style from '../../../src/api/style';
-import * as s from '../../../src/core/style/functions';
+import Viz from '../../../src/api/viz';
+import * as s from '../../../src/core/viz/functions';
 
-function preFilters(f, styleFilter) {
-    const style = (styleFilter === undefined) ? new Style() : new Style({ filter: styleFilter });
-    return f.getFiltering(style).preaggregation;
+function preFilters(f, vizFilter) {
+    const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
+    return f.getFiltering(viz).preaggregation;
 }
 
-function aggrFilters(f, styleFilter) {
-    const style = (styleFilter === undefined) ? new Style() : new Style({ filter: styleFilter });
-    return f.getFiltering(style, { exclusive: false }).aggregation;
+function aggrFilters(f, vizFilter) {
+    const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
+    return f.getFiltering(viz, { exclusive: false }).aggregation;
 }
 
-function aggrFiltersExclusive(f, styleFilter) {
-    const style = (styleFilter === undefined) ? new Style() : new Style({ filter: styleFilter });
-    return f.getFiltering(style, { exclusive: true }).aggregation;
+function aggrFiltersExclusive(f, vizFilter) {
+    const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
+    return f.getFiltering(viz, { exclusive: true }).aggregation;
 }
 
 function preSQL(f, preFilters) {

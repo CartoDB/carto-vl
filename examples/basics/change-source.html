@@ -96,26 +96,26 @@
         FROM ne_10m_populated_places_simple
         WHERE adm0name = \'Spain\'
     `);
-    const citiesStyle = new carto.Style(`
+    const citiesViz = new carto.Viz(`
       width: 6
       color: rgb(237, 76, 89)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
     `);
-    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesStyle);
+    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
     citiesLayer.addTo(map, 'watername_ocean');
 
     function setAllCities() {
-      citiesLayer.update(allCitiesSource, citiesLayer.getStyle());
+      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
     }
 
     function setEuropeanCities() {
-      citiesLayer.update(europeanCitiesSource, citiesLayer.getStyle());
+      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
     }
 
     function setSpanishCities() {
-      citiesLayer.update(spanishCitiesSource, citiesLayer.getStyle());
+      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
     }
   </script>
 </body>

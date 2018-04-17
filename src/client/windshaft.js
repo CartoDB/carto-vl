@@ -64,15 +64,15 @@ export default class Windshaft {
     }
 
     /**
-     * Should be called whenever the style changes (even if metadata is not going to be used)
-     * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
+     * Should be called whenever the viz changes (even if metadata is not going to be used)
+     * This not only computes metadata: it also updates the map (instantiates) for the new viz if needed
      * Returns  a promise to a Metadata
-     * @param {*} style
+     * @param {*} viz
      */
-    async getMetadata(style) {
-        const MNS = style.getMinimumNeededSchema();
-        const resolution = style.getResolution();
-        const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
+    async getMetadata(viz) {
+        const MNS = viz.getMinimumNeededSchema();
+        const resolution = viz.getResolution();
+        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS.columns.includes('cartodb_id')) {
@@ -87,9 +87,9 @@ export default class Windshaft {
 
     /**
      * After calling getMetadata(), data for a viewport can be obtained with this function.
-     * So long as the style doesn't change, getData() can be called repeatedly for different
-     * viewports. If style changes getMetadata() should be called before requesting data
-     * for the new style.
+     * So long as the viz doesn't change, getData() can be called repeatedly for different
+     * viewports. If viz changes getMetadata() should be called before requesting data
+     * for the new viz.
      * @param {*} viewport
      */
     getData(viewport) {

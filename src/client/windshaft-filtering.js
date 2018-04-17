@@ -1,20 +1,20 @@
-import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/style/expressions/binary';
-import { In, Nin } from '../core/style/expressions/belongs';
-import Between from '../core/style/expressions/between';
-import Category from '../core/style/expressions/category';
-import Float from '../core/style/expressions/float';
-import Property from '../core/style/expressions/property';
-import Blend from '../core/style/expressions/blend';
-import Animate from '../core/style/expressions/animate';
-import FloatConstant from '../core/style/expressions/floatConstant';
-import { Max, Min, Avg, Sum, Mode } from '../core/style/expressions/aggregation';
+import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/viz/expressions/binary';
+import { In, Nin } from '../core/viz/expressions/belongs';
+import Between from '../core/viz/expressions/between';
+import Category from '../core/viz/expressions/category';
+import Float from '../core/viz/expressions/float';
+import Property from '../core/viz/expressions/property';
+import Blend from '../core/viz/expressions/blend';
+import Animate from '../core/viz/expressions/animate';
+import FloatConstant from '../core/viz/expressions/floatConstant';
+import { Max, Min, Avg, Sum, Mode } from '../core/viz/expressions/aggregation';
 import * as schema from '../core/schema';
 
 class AggregationFiltering {
 
     /**
      * Generate aggregation filters:
-     * This extracts, from the styles filters, those compatible to be
+     * This extracts, from the vizs filters, those compatible to be
      * executed through the Maps API aggregation API.
      * The extracted filters are in the format admitted by the Maps API
      * `filters` parameter.
@@ -30,9 +30,9 @@ class AggregationFiltering {
     }
 
     // return (partial) filters as an object (JSON) in the format of the Maps API aggregation interface
-    getFilters(styleFilter) {
+    getFilters(vizFilter) {
         let filters = {};
-        let filterList = this._and(styleFilter).filter(Boolean);
+        let filterList = this._and(vizFilter).filter(Boolean);
         for (let p of filterList) {
             let name = p.property;
             let existingFilter = filters[name];
@@ -235,7 +235,7 @@ class PreaggregationFiltering {
     /**
      * Generate pre-aggregation filters, i.e. filters that can be
      * applied to the dataset before aggregation.
-     * This extracts, from the styles filters, those compatible to be
+     * This extracts, from the vizs filters, those compatible to be
      * executed before aggregation.
      * The extracted filters are in an internal tree-like format;
      * each node has a `type` property and various other parameters
@@ -245,8 +245,8 @@ class PreaggregationFiltering {
     }
 
     // return (partial) filters as an object (JSON) representing the SQL syntax tree
-    getFilter(styleFilter) {
-        return this._filter(styleFilter);
+    getFilter(vizFilter) {
+        return this._filter(vizFilter);
     }
 
     _filter(f) {
@@ -441,16 +441,16 @@ const SQLGenerators = {
 };
 
 /**
- * Returns supported windshaft filters for the style
- * @param {*} style
+ * Returns supported windshaft filters for the viz
+ * @param {*} viz
  * @returns {Filtering}
  */
-export function getFiltering(style, options = {}) {
+export function getFiltering(viz, options = {}) {
     const aggrFiltering = new AggregationFiltering(options);
     const preFiltering = new PreaggregationFiltering(options);
     const filtering = {
-        preaggregation: preFiltering.getFilter(style.getFilter()),
-        aggregation: aggrFiltering.getFilters(style.getFilter())
+        preaggregation: preFiltering.getFilter(viz.getFilter()),
+        aggregation: aggrFiltering.getFilters(viz.getFilter())
     };
     if (!filtering.preaggregation && !filtering.aggregation) {
         return null;

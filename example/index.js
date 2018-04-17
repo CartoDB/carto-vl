@@ -2,7 +2,7 @@
 /*eslint-env jquery*/
 /*eslint no-console: ["off"] */
 
-const styles = [
+const vizs = [
     `width: 3
 color: rgb(204,0,0)`,
 
@@ -82,7 +82,7 @@ const texts = [
     'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE',
 ];
 
-const shipsStyle = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    opacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+const shipsViz = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    opacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 const BASEMAPS = {
     DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -116,20 +116,20 @@ map.on('zoom', event => document.querySelector('.map-info').innerText = `zoom: $
 
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
-    let index = 0;//styles.length - 1;
+    let index = 0;//vizs.length - 1;
 
     function handleError(error) {
-        const err = `Invalid style: ${error}:${error.stack}`;
+        const err = `Invalid viz: ${error}:${error.stack}`;
         console.warn(err);
         document.getElementById('feedback').value = err;
         document.getElementById('feedback').style.display = 'block';
     }
-    function updateStyle(v) {
+    function updateViz(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const promise = layer.blendToStyle(new carto.Style(v));
+            const promise = layer.blendToViz(new carto.Viz(v));
             document.getElementById('feedback').style.display = 'none';
             if (promise) {
                 promise.catch(handleError);
@@ -148,7 +148,7 @@ map.on('load', () => {
         $('#user').val('cartogl');
         $('#serverURL').val('https://{user}.carto.com');
 
-        document.getElementById('styleEntry').value = styles[index];
+        document.getElementById('styleEntry').value = vizs[index];
         superRefresh();
     }
     function wwi() {
@@ -160,7 +160,7 @@ map.on('load', () => {
         $('#user').val('cartogl');
         $('#serverURL').val('https://{user}.carto.com');
 
-        document.getElementById('styleEntry').value = shipsStyle;
+        document.getElementById('styleEntry').value = shipsViz;
         superRefresh();
     }
 
@@ -170,7 +170,7 @@ map.on('load', () => {
         if (index > 0) {
             index--;
             $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
+            updateViz(vizs[index]);
         }
         if (index == 0) {
             $('#prev').attr('disabled', true);
@@ -179,19 +179,19 @@ map.on('load', () => {
     $('#next').click(() => {
         $('#prev').attr('disabled', false);
         $('#next').attr('disabled', false);
-        if (index < styles.length - 1) {
+        if (index < vizs.length - 1) {
             index++;
             $('#tutorial').text(texts[index]);
-            updateStyle(styles[index]);
+            updateViz(vizs[index]);
         }
-        if (index == styles.length - 1) {
+        if (index == vizs.length - 1) {
             $('#next').prop('disabled', true);
         }
     });
 
     $('#barcelona').click(barcelona);
     $('#wwi').click(wwi);
-    $('#styleEntry').on('input', () => updateStyle());
+    $('#styleEntry').on('input', () => updateViz());
     function getConfig() {
         return '#' + btoa(JSON.stringify({
             a: $('#dataset').val(),
@@ -237,13 +237,13 @@ map.on('load', () => {
                 serverURL: $('#serverURL').val()
             }
         );
-        const styleStr = document.getElementById('styleEntry').value;
-        const style = new carto.Style(styleStr);
+        const vizStr = document.getElementById('styleEntry').value;
+        const viz = new carto.Viz(vizStr);
         if (!layer) {
-            layer = new carto.Layer('myCartoLayer', source, style);
+            layer = new carto.Layer('myCartoLayer', source, viz);
             layer.addTo(map, 'watername_ocean');
         } else {
-            layer.update(source, style);
+            layer.update(source, viz);
         }
     };
 
