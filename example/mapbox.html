@@ -38,6 +38,8 @@
             min-height: 40px;
             height: auto;
             max-height: 400px;
+            font-size: 14px;
+            font-family: monospace;
         }
 
         .text {
@@ -111,7 +113,6 @@
         <textarea class="u-full-width" id="feedback">¿?</textarea>
         <div id='map' class='map'></div>
         <div class="map-info"></div>
-        <button id="fullscreen">Fullscreen</button>
     </div>
     <div class="container">
         <div class="row">
@@ -130,8 +131,8 @@
                 <textarea class="four columns" id="dataset">tx_0125_copy_copy</textarea>
                 <textarea class="four columns" id="serverURL">https://{user}.carto.com</textarea>
             </div>
-
             <div id='buttonlist'>
+                <button id="fullscreen">Fullscreen</button>
                 <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
                 <button id='barcelona'>Barcelona (with tutorial)</button>
             </div>
