@@ -10,7 +10,7 @@ describe('src/core/viz/expressions/palettes', () => {
 
     describe('type', () => {
         validateStaticType('customPalette', [rgb(0, 0, 0), rgb(0, 0, 0)], 'customPalette');
-        validateStaticType('customPalette', [10, 20], 'customPaletteFloat');
+        validateStaticType('customPalette', [10, 20], 'customPaletteNumber');
     });
     describe('custom color palettes', () => {
         it('should work with rgb/rgba children', () => {

@@ -126,8 +126,8 @@ function parseIdentifier(node) {
         return functions.variable(node.name.substr('__cartovl_variable_'.length));
     } else if (node.name[0] == '$') {
         return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toLowerCase()]) {
-        return functions.palettes[node.name.toLowerCase()];
+    } else if (functions.palettes[node.name.toUpperCase()]) {
+        return functions.palettes[node.name.toUpperCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {

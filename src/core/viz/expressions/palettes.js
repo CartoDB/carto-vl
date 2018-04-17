@@ -74,7 +74,7 @@ export class CustomPalette extends BaseExpression {
             }
         });
         super({});
-        this.type = type == 'color' ? 'customPalette' : 'customPaletteFloat';
+        this.type = type == 'color' ? 'customPalette' : 'customPaletteNumber';
         try {
             if (type == 'color') {
                 // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]

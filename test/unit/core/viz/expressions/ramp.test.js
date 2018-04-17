@@ -11,7 +11,7 @@ describe('src/core/viz/expressions/ramp', () => {
         validateStaticType('ramp', ['number', 'palette'], 'color');
         validateStaticType('ramp', ['category', 'palette'], 'color');
         validateStaticType('ramp', ['category', 'customPalette'], 'color');
-        validateStaticType('ramp', ['category', 'customPaletteFloat'], 'number');
+        validateStaticType('ramp', ['category', 'customPaletteNumber'], 'number');
     });
 
     describe('eval', () => {

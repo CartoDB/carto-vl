@@ -39,13 +39,13 @@ export default class Ramp extends BaseExpression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteFloat'], palette);
+        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        if (palette.type == 'customPaletteFloat') {
+        if (palette.type == 'customPaletteNumber') {
             this.type = 'number';
         } else {
             this.type = 'color';
@@ -70,7 +70,7 @@ export default class Ramp extends BaseExpression {
         uniform float keyMin${this._uid};
         uniform float keyWidth${this._uid};
         `),
-            inline: this.palette.type == 'customPaletteFloat' ?
+            inline: this.palette.type == 'customPaletteNumber' ?
                 `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };

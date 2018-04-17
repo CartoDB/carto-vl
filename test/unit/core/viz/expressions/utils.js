@@ -103,7 +103,7 @@ function getSimpleArg(type) {
             return [s.palettes.PRISM, 'PRISM'];
         case 'customPalette':
             return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteFloat':
+        case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
@@ -123,7 +123,7 @@ function getPropertyArg(type) {
             return [s.palettes.PRISM, 'PRISM'];
         case 'customPalette':
             return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteFloat':
+        case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
