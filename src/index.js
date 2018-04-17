@@ -8,7 +8,7 @@
  * - {@link carto.source.Dataset|carto.source.Dataset}
  * - {@link carto.source.SQL|carto.source.SQL}
  * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
- * - {@link carto.viz.expressions|carto.viz.expressions}
+ * - {@link carto.expressions|carto.expressions}
  * - {@link carto.Layer|carto.Layer}
  * - {@link carto.Viz|carto.Viz}
  * - {@link carto.Interactivity|carto.Interactivity}
@@ -29,15 +29,14 @@ import Interactivity from './api/interactivity';
 
 // Namespaces
 
-const viz = { expressions };
 const source = { Dataset, SQL, GeoJSON };
 
 export {
-    source,
-    Layer,
     setDefaultAuth,
     setDefaultConfig,
-    viz,
+    source,
+    expressions,
+    Layer,
     Viz,
     Map,
     Interactivity

@@ -8,8 +8,6 @@ import Expression from '../core/viz/expressions/expression';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
-// TODO rename to Viz
-
 const DEFAULT_RESOLUTION = () => 1;
 const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
 const DEFAULT_WIDTH_EXPRESSION = () => s.float(5);
@@ -17,6 +15,10 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.float(0);
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.floatConstant(1);
+
+const MIN_RESOLUTION = 0;
+const MAX_RESOLUTION = 256;
+
 const SUPPORTED_PROPERTIES = [
     'resolution',
     'color',
@@ -28,9 +30,6 @@ const SUPPORTED_PROPERTIES = [
     'variables'
 ];
 
-const MIN_RESOLUTION = 0;
-const MAX_RESOLUTION = 256;
-
 export default class Viz {
 
     /**
@@ -38,7 +37,7 @@ export default class Viz {
     * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
     *
     * A Viz is created from an {@link VizSpec|vizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.viz.expressions|expression}.
+    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.expressions|expression}.
     * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -368,11 +367,11 @@ export default class Viz {
         /**
          * @typedef {object} VizSpec
          * @property {number} resolution
-         * @property {carto.viz.expressions.Expression} color
-         * @property {carto.viz.expressions.Expression} width
-         * @property {carto.viz.expressions.Expression} strokeColor
-         * @property {carto.viz.expressions.Expression} strokeWidth
-         * @property {carto.viz.expressions.Expression} order
+         * @property {carto.expressions.Expression} color
+         * @property {carto.expressions.Expression} width
+         * @property {carto.expressions.Expression} strokeColor
+         * @property {carto.expressions.Expression} strokeWidth
+         * @property {carto.expressions.Expression} order
          * @api
          */
 

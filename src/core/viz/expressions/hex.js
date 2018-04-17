@@ -6,15 +6,15 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  * Create a color from its hexadecimal description
  *
  * @param {string} hexadecimalColor - color in the form #ABC or #ABCDEF
- * @return {carto.viz.expressions.hex}
+ * @return {carto.expressions.hex}
  *
  * @example <caption>Display blue points.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.hex('#00F');
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name hex
  * @function
  * @api

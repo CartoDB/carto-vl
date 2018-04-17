@@ -85,7 +85,7 @@
     const source = new carto.source.Dataset(`
       tx_0125_copy_copy
     `);
-    const s = carto.viz.expressions;
+    const s = carto.expressions;
     const viz = new carto.Viz({
       color: s.ramp(s.prop('category'), s.palettes.vivid)
     });

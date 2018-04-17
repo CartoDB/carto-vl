@@ -5,19 +5,19 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *
  * Check if a given value is contained within an inclusive range (including the limits).
  *
- * @param {carto.viz.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {carto.viz.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
- * @param {carto.viz.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
- * @return {carto.viz.expressions.Expression} numeric expression with the result of the check
+ * @param {carto.expressions.Expression | number} value - numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {carto.expressions.Expression | number} lowerLimit - numeric expression with the lower limit of the range
+ * @param {carto.expressions.Expression | number} upperLimit -  numeric expression with the upper limit of the range
+ * @return {carto.expressions.Expression} numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const $dn = s.property('populationDensity');
  * const viz = new carto.Viz({
  *  filter: s.between($dn, 50, 100);
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name between
  * @function
  * @api

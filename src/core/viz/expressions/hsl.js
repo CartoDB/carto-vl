@@ -5,19 +5,19 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  *
  * Evaluates to a hsla color.
  *
- * @param {carto.viz.expressions.number|number} h - The hue of the color
- * @param {carto.viz.expressions.number|number} s - The saturation of the color
- * @param {carto.viz.expressions.number|number} l - The lightness of the color
- * @param {carto.viz.expressions.number|number} a - The alpha value of the color
- * @return {carto.viz.expressions.hsla}
+ * @param {carto.expressions.number|number} h - The hue of the color
+ * @param {carto.expressions.number|number} s - The saturation of the color
+ * @param {carto.expressions.number|number} l - The lightness of the color
+ * @param {carto.expressions.number|number} a - The alpha value of the color
+ * @return {carto.expressions.hsla}
  *
  * @example <caption>Display blue points.</caption>
- * const s = carto.viz.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
  * });
  *
- * @memberof carto.viz.expressions
+ * @memberof carto.expressions
  * @name hsla
  * @function
  * @api
