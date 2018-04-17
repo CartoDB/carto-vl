@@ -53,8 +53,18 @@
  *
  */
 
-import { palettes, Inverse, CustomPalette } from './expressions/palettes';
+// Aggregation ops
+import { Avg } from './expressions/aggregation';
+import { Max } from './expressions/aggregation';
+import { Min } from './expressions/aggregation';
+import { Sum } from './expressions/aggregation';
+import { Mode } from './expressions/aggregation';
+
 import Animate from './expressions/animate';
+import { In, Nin } from './expressions/belongs.js';
+import Between from './expressions/between';
+
+import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 import Blend from './expressions/blend';
 import Buckets from './expressions/buckets';
 import CIELab from './expressions/CIELab';
@@ -71,8 +81,6 @@ import Opacity from './expressions/opacity';
 import Top from './expressions/top';
 import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
-import { In, Nin } from './expressions/belongs.js';
-import Between from './expressions/between';
 import Time from './expressions/time';
 
 // Unary ops
@@ -99,14 +107,6 @@ import { LessThanOrEqualTo } from './expressions/binary';
 import { Equals } from './expressions/binary';
 import { NotEquals } from './expressions/binary';
 import { Or, And } from './expressions/binary';
-
-
-// Aggregation ops
-import { Max } from './expressions/aggregation';
-import { Min } from './expressions/aggregation';
-import { Avg } from './expressions/aggregation';
-import { Sum } from './expressions/aggregation';
-import { Mode } from './expressions/aggregation';
 
 // Classifiers
 import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
@@ -135,7 +135,23 @@ import {
 
 import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
 
-// Expose classes as constructor functions
+/* Expose classes as constructor functions */
+
+// Aggregation ops
+export const avg = (...args) => new Avg(...args);
+export const max = (...args) => new Max(...args);
+export const min = (...args) => new Min(...args);
+export const sum = (...args) => new Sum(...args);
+export const mode = (...args) => new Mode(...args);
+
+export const animate = (...args) => new Animate(...args);
+
+const _in = (...args) => new In(...args);
+export const nin = (...args) => new Nin(...args);
+export { _in as in };
+
+export const between = (...args) => new Between(...args);
+
 export const asc = (...args) => new Asc(...args);
 export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
@@ -159,7 +175,6 @@ export const rgb = (...args) => new RGB(...args);
 export const hex = (...args) => new Hex(...args);
 export const property = (...args) => new Property(...args);
 export const variable = (...args) => new Variable(...args);
-export const animate = (...args) => new Animate(...args);
 export const hsv = (...args) => new HSV(...args);
 export const hsva = (...args) => new HSVA(...args);
 export const hsl = (...args) => new HSL(...args);
@@ -169,11 +184,6 @@ export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
 export const float = (...args) => new Float(...args);
 export const category = (...args) => new Category(...args);
-export const max = (...args) => new Max(...args);
-export const min = (...args) => new Min(...args);
-export const sum = (...args) => new Sum(...args);
-export const avg = (...args) => new Avg(...args);
-export const mode = (...args) => new Mode(...args);
 export const top = (...args) => new Top(...args);
 export const linear = (...args) => new Linear(...args);
 export const cubic = (...args) => new Cubic(...args);
@@ -221,7 +231,6 @@ export const gt = greaterThan;
 export const gte = greaterThanOrEqualTo;
 export const lt = lessThan;
 export const lte = lessThanOrEqualTo;
-const _in = (...args) => new In(...args);
 
 export const number = float;
 export const add = floatAdd;
@@ -234,10 +243,7 @@ export const prop = property;
 
 export const eq = equals;
 export const neq = notEquals;
-export const nin = (...args) => new Nin(...args);
-export const between = (...args) => new Between(...args);
 
 export { variable as var };
 
-export { _in as in };
 export { palettes, Asc, Desc };
