@@ -5,8 +5,8 @@
   <title>Feature click | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -85,13 +85,15 @@
     const source = new carto.source.Dataset(`
       tree_inventory_sloans
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       width: $diameter_number*4
       color: opacity(ramp($type,bold),0.7)
       strokeColor: ramp($type,bold)
       strokeWidth: 1
+      @type: $type
+      @diameter_number: $diameter_number
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureClick', updateTree);
@@ -111,8 +113,8 @@
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.properties.type}</h3>
-            <p>Diameter <b>${feature.properties.diameter_number}</b></p>
+            <h3>${feature.variables.type.value}</h3>
+            <p>Diameter <b>${feature.variables.diameter_number.value}</b></p>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

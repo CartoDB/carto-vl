@@ -4,7 +4,7 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['line-string']);
-const style = new carto.Style('width: 30');
-const layer = new carto.Layer('layer', source, style);
+const viz = new carto.Viz('width: 30');
+const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

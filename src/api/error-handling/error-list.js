@@ -20,17 +20,17 @@ const validation = {
             messageRegex: /nonValidSource/,
             friendlyMessage: 'The given object is not a valid source. See "carto.source.Base".'
         },
-        'style-required': {
-            messageRegex: /styleRequired/,
-            friendlyMessage: '`style` property required.'
+        'viz-required': {
+            messageRegex: /vizRequired/,
+            friendlyMessage: '`viz` property required.'
         },
-        'non-valid-style': {
-            messageRegex: /nonValidStyle/,
-            friendlyMessage: 'The given object is not a valid style. See "carto.Style".'
+        'non-valid-viz': {
+            messageRegex: /nonValidViz/,
+            friendlyMessage: 'The given object is not a valid viz. See "carto.Viz".'
         },
-        'shared-style': {
-            messageRegex: /sharedStyle/,
-            friendlyMessage: 'The given Style object is already bound to another layer. Styles cannot be shared between different layers'
+        'shared-viz': {
+            messageRegex: /sharedViz/,
+            friendlyMessage: 'The given Viz object is already bound to another layer. Vizs cannot be shared between different layers'
         }
     },
     setup: {
@@ -133,14 +133,14 @@ const validation = {
             friendlyMessage: '`cartodb_id` is a reserved property so it can not be used'
         }
     },
-    style: {
+    viz: {
         'non-valid-definition': {
             messageRegex: /nonValidDefinition$/,
-            friendlyMessage: 'style definition should be a styleSpec object or a valid style string.'
+            friendlyMessage: 'viz definition should be a vizSpec object or a valid viz string.'
         },
         'non-valid-expression': {
             messageRegex: /nonValidExpression\[(.+)\]$/,
-            friendlyMessage: '`$0` parameter is not a valid style Expresion.'
+            friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,

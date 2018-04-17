@@ -8,7 +8,8 @@
         "coordinates": [ -20, 0 ]
       },
       "properties": {
-        "numeric": 0
+        "numeric": 0,
+        "cat": "0"
       }
     },
     {
@@ -18,7 +19,8 @@
         "coordinates": [ 0, 0 ]
       },
       "properties": {
-        "numeric": 5
+        "numeric": 5,
+        "cat": "1"
       }
     },
     {
@@ -28,7 +30,8 @@
         "coordinates": [ 20, 0 ]
       },
       "properties": {
-        "numeric": 10
+        "numeric": 10,
+        "cat": "2"
       }
     }
   ]

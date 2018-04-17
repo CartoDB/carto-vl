@@ -1,6 +1,6 @@
 # CARTO VL
 
-[![CircleCI](https://circleci.com/gh/CartoDB/renderer-prototype.svg?style=svg)](https://circleci.com/gh/CartoDB/renderer-prototype)
+[![CircleCI](https://circleci.com/gh/CartoDB/carto-vl.svg?style=svg)](https://circleci.com/gh/CartoDB/carto-vl)
 
 CARTO VL is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/).
 
@@ -54,7 +54,7 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/renderer-prototype/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/carto-vl/tags).
 
 
 ## Development

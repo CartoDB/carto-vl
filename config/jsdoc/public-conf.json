@@ -10,7 +10,7 @@
             "outputSourceFiles": false,
             "useLongnameInNav": true
         },
-        "referenceTitle": "CARTO GL"
+        "referenceTitle": "CARTO VL"
     },
     "plugins": [
         "plugins/api",

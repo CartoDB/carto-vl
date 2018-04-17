@@ -5,8 +5,8 @@
   <title>Feature hover | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -85,10 +85,11 @@
     const source = new carto.source.Dataset(`
       london_neighbourhoods
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       color: ramp($neighbourhood, bold)
+      @neighbourhood: $neighbourhood
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureHover', updateNeighbourhood);
@@ -108,7 +109,7 @@
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.properties.neighbourhood}</h3>
+            <h3>${feature.variables.neighbourhood.value}</h3>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

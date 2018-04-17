@@ -2,7 +2,7 @@ import * as carto from '../../../../src/';
 import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
-    let div, source, style, layer, map;
+    let div, source, viz, layer, map;
 
     beforeEach(() => {
         const setup = _setup('map');
@@ -10,8 +10,9 @@ describe('Interactivity', () => {
         map = setup.map;
 
         source = new carto.source.GeoJSON(featureJson);
-        style = new carto.Style('color: rgb(255, 0, 0)');
-        layer = new carto.Layer('layer', source, style);
+        viz = new carto.Viz(`color: rgb(255, 0, 0)
+                                 @wadus: 123`);
+        layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
     });
 
@@ -22,8 +23,8 @@ describe('Interactivity', () => {
             const div2 = setup.div;
             const map2 = setup.map;
             const source2 = new carto.source.GeoJSON(featureJson);
-            const style2 = new carto.Style('color: rgb(255, 0, 0)');
-            const layer2 = new carto.Layer('layer2', source2, style2);
+            const viz2 = new carto.Viz('color: rgb(255, 0, 0)');
+            const layer2 = new carto.Layer('layer2', source2, viz2);
 
             layer.on('loaded', _testHelper);
             layer2.on('loaded', _testHelper);
@@ -67,10 +68,12 @@ describe('Interactivity', () => {
             it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 interactivity = new carto.Interactivity(layer);
                 interactivity.on('featureClick', event => {
-                    expect(event.features[0].style.color.blendTo).toBeDefined();
-                    expect(event.features[0].style.color.reset).toBeDefined();
-                    expect(event.features[0].style.reset).toBeDefined();
-                    expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                    expect(event.features[0].color.blendTo).toBeDefined();
+                    expect(event.features[0].color.reset).toBeDefined();
+                    expect(event.features[0].reset).toBeDefined();
+                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    expect(event.features[0].id).toEqual(0);
+                    expect(event.features[0].layerId).toEqual('layer');
                     done();
                 });
                 layer.on('loaded', () => {
@@ -102,11 +105,13 @@ describe('Interactivity', () => {
             describe('and multiple features are clicked', () => {
                 it('should return the right feature.id', done => {
                     source = new carto.source.GeoJSON(featureCollectionJson);
-                    layer = new carto.Layer('layer', source, new carto.Style());
+                    layer = new carto.Layer('layer', source, new carto.Viz());
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureClick', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
-                        expect(event.features[1]).toEqual({ id: 1, layerId: 'layer', properties: { cartodb_id: 1 }, style: jasmine.any(Object) });
+                        expect(event.features[0].id).toEqual(0);
+                        expect(event.features[0].layerId).toEqual('layer');
+                        expect(event.features[1].id).toEqual(1);
+                        expect(event.features[1].layerId).toEqual('layer');
                         done();
                     });
                     layer.on('loaded', () => {
@@ -135,7 +140,8 @@ describe('Interactivity', () => {
                     it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
                         interactivity = new carto.Interactivity(layer);
                         interactivity.on('featureClickOut', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                            expect(event.features[0].id).toEqual(0);
+                            expect(event.features[0].layerId).toEqual('layer');
                             done();
                         });
                         layer.on('loaded', () => {
@@ -159,7 +165,8 @@ describe('Interactivity', () => {
                 it('should fire a featureHover event with a features list containing the entered feature', done => {
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureHover', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                        expect(event.features[0].id).toEqual(0);
+                        expect(event.features[0].layerId).toEqual('layer');
                         done();
                     });
                     layer.on('loaded', () => {
@@ -172,7 +179,8 @@ describe('Interactivity', () => {
                 it('should fire a featureEnter event with a features list containing the entered feature', done => {
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureEnter', event => {
-                        expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                        expect(event.features[0].id).toEqual(0);
+                        expect(event.features[0].layerId).toEqual('layer');
                         done();
                     });
                     layer.on('loaded', () => {
@@ -222,7 +230,8 @@ describe('Interactivity', () => {
                         // Move mouse inside a feature
                         map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
                         interactivity.on('featureLeave', event => {
-                            expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', properties: { cartodb_id: 0 }, style: jasmine.any(Object) });
+                            expect(event.features[0].id).toEqual(0);
+                            expect(event.features[0].layerId).toEqual('layer');
                             done();
                         });
                         // Move mouse outside the feature

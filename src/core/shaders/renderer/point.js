@@ -98,6 +98,9 @@ void main(void) {
     if (fillScale==strokeScale){
         stroke.a=0.;
     }
+    if (size > 126.){
+        size = 126.;
+    }
     gl_PointSize = size * devicePixelRatio + 2.;
     dp = 1.0/(size+1.);
     sizeNormalizer = (size+1.)/(size);

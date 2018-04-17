@@ -4,8 +4,8 @@
   <title>Torque | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -41,16 +41,16 @@
     const source = new carto.source.Dataset(`
       temporal_circle
     `);
-    const s = carto.style.expressions;
-    const torque = s.torque(s.linear(s.prop('date'), '2022-03-09T00:00:00Z', "2033-08-12T00:00:00Z"), 2, s.fade(0, 2));
+    const s = carto.expressions;
+    const torque = s.torque(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 2, s.fade(0, 2));
     setInterval(() =>
         console.log(torque.getSimTime())
         , 100);
-    const style = new carto.Style({
+    const viz = new carto.Viz({
         color: s.hsv(torque, 1, 1),
         resolution: 0.0000001,
     });
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>
