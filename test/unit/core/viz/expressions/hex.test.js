@@ -18,8 +18,16 @@ describe('src/core/viz/expressions/hex', () => {
         it('should work with #FFF forms', () => {
             expect(hex('#FFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
         });
+        it('should work with #FFF0 forms', () => {
+            expect(hex('#FFF0').eval()).toEqual({ r: 255, g: 255, b: 255, a: 0 });
+            expect(hex('#FFFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+        });
         it('should work with #FFFFFF forms', () => {
             expect(hex('#FFFFFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+        });
+        it('should work with #FFFFFF00 forms', () => {
+            expect(hex('#FFFFFF00').eval()).toEqual({ r: 255, g: 255, b: 255, a: 0 });
+            expect(hex('#FFFFFFFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
         });
     });
 });
