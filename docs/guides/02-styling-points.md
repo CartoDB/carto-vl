@@ -4,12 +4,12 @@ This guide walks through making a variety of common thematic map types for point
 
 ## Basic Styling Properties
 
-+ Point Size
-+ Point Color
-+ Point Stroke Widthe-width
-+ Point Stroke Colore-color
-+ Cluster Resolutionolution
-+ Point Draw Orderorder
++ Size
++ Color
++ Stroke width
++ Stroke color
++ Cluster resolution
++ Draw order
 
 ### Point Size
 
