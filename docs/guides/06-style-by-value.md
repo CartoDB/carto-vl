@@ -1,18 +1,22 @@
-# Color guide
+# Styling by Value
 
-## Fixed colors
+## Styling by a categorical property
 
-### Named colors
+### Specifying a color <=> category relation
 
-### Hexadecimal
+### Showing the Most common categories
 
-### RGB / RGBA
+### Showing all categories automatically
 
-### HSV / HSVA
+## Styling by a numeric property
 
-### HSL / HSLA
+### Unclassed maps
 
-### CieLab
+### Classed maps
+
+### Alpha by value
+
+
 
 ## Color by Value: Categorical properties
 + Unique Values
