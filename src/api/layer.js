@@ -112,8 +112,8 @@ export default class Layer {
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
-        await this._context;
         const metadata = await source.requestMetadata(viz);
+        await this._context;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
         }

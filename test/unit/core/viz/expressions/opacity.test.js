@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/opacity', () => {
     describe('error control', () => {
         validateStaticTypeErrors('opacity', []);
         validateStaticTypeErrors('opacity', ['number']);
-        validateStaticTypeErrors('opacity', ['number', 'number']);
+        validateDynamicTypeErrors('opacity', ['number', 'number']);
         validateDynamicTypeErrors('opacity', ['color', 'category']);
     });
 
@@ -19,5 +19,3 @@ describe('src/core/viz/expressions/opacity', () => {
         });
     });
 });
-
-

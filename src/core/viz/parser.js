@@ -3,6 +3,7 @@ import jsep from 'jsep';
 import * as functions from './functions';
 import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES, NamedColor } from './expressions/named-color';
+import Hex from './expressions/hex';
 
 // TODO use Schema classes
 
@@ -124,6 +125,8 @@ function parseIdentifier(node) {
     }
     if (node.name.startsWith('__cartovl_variable_')) {
         return functions.variable(node.name.substr('__cartovl_variable_'.length));
+    } else if (node.name[0] == '#') {
+        return new Hex(node.name);
     } else if (node.name[0] == '$') {
         return functions.property(node.name.substring(1));
     } else if (functions.palettes[node.name.toUpperCase()]) {
@@ -159,6 +162,7 @@ function prepareJsep() {
     jsep.addBinaryOp('or', 1);
     jsep.addBinaryOp('and', 2);
     jsep.addIdentifierChar('@');
+    jsep.addIdentifierChar('#');
     jsep.removeLiteral('true');
     jsep.removeLiteral('false');
 }
@@ -169,6 +173,7 @@ function cleanJsep() {
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
     jsep.removeIdentifierChar('@');
+    jsep.removeIdentifierChar('#');
     jsep.addLiteral('true');
     jsep.addLiteral('false');
 }

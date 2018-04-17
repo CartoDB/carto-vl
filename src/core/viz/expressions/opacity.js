@@ -29,20 +29,21 @@ export default class Opacity extends BaseExpression {
         if (Number.isFinite(alpha)) {
             alpha = number(alpha);
         }
-        checkType('opacity', 'color', 0, 'color', color);
+        checkLooseType('opacity', 'color', 0, 'color', color);
         checkLooseType('opacity', 'alpha', 1, 'number', alpha);
         super({ color, alpha });
         this.type = 'color';
+    }
+    _compile(meta) {
+        super._compile(meta);
+        checkType('opacity', 'color', 0, 'color', this.color);
+        checkType('opacity', 'alpha', 1, 'number', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
     eval(f) {
         const color = this.color.eval(f);
         const alpha = this.alpha.eval(f);
         color.a = alpha;
         return color;
-    }
-    _compile(meta) {
-        super._compile(meta);
-        checkType('opacity', 'alpha', 1, 'number', this.alpha);
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
 }
