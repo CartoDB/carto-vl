@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/opacity', () => {
     describe('error control', () => {
         validateStaticTypeErrors('opacity', []);
         validateStaticTypeErrors('opacity', ['float']);
-        validateStaticTypeErrors('opacity', ['float', 'float']);
+        validateDynamicTypeErrors('opacity', ['float', 'float']);
         validateDynamicTypeErrors('opacity', ['color', 'category']);
     });
 
