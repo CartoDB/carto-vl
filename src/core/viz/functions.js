@@ -91,7 +91,13 @@ import CIELab from './expressions/CIELab';
 
 import Constant from './expressions/constant';
 
+import Hex from './expressions/hex';
 
+import { HSL } from './expressions/hsl';
+import { HSLA } from './expressions/hsl';
+
+import { HSV } from './expressions/hsv';
+import { HSVA } from './expressions/hsv';
 
 import Number from './expressions/number';
 
@@ -136,9 +142,9 @@ import { Torque, Fade } from './expressions/torque';
 
 // Colors
 import {RGB, RGBA} from './expressions/rgb';
-import {HSV, HSVA} from './expressions/hsv';
-import {HSL, HSLA} from './expressions/hsl';
-import Hex from './expressions/hex';
+
+
+
 import NamedColor from './expressions/named-color';
 
 export { Cubic };
@@ -162,9 +168,9 @@ export const mode = (...args) => new Mode(...args);
 
 export const animate = (...args) => new Animate(...args);
 
-const _in = (...args) => new In(...args);
+const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
-export { _in as in };
+export { in_ as in };
 
 export const between = (...args) => new Between(...args);
 
@@ -199,6 +205,15 @@ export const cielab = (...args) => new CIELab(...args);
 
 export const constant = (...args) => new Constant(...args);
 
+export const hex = (...args) => new Hex(...args);
+
+export const hsl = (...args) => new HSL(...args);
+export const hsla = (...args) => new HSLA(...args);
+
+export const hsv = (...args) => new HSV(...args);
+export const hsva = (...args) => new HSVA(...args);
+
+
 
 export const number = (...args) => new Number(...args);
 
@@ -217,13 +232,9 @@ export const sign = (...args) => new Sign(...args);
 export const near = (...args) => new Near(...args);
 export const rgba = (...args) => new RGBA(...args);
 export const rgb = (...args) => new RGB(...args);
-export const hex = (...args) => new Hex(...args);
 export const property = (...args) => new Property(...args);
 export const variable = (...args) => new Variable(...args);
-export const hsv = (...args) => new HSV(...args);
-export const hsva = (...args) => new HSVA(...args);
-export const hsl = (...args) => new HSL(...args);
-export const hsla = (...args) => new HSLA(...args);
+
 export const namedColor = (...args) => new NamedColor(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);

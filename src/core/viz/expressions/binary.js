@@ -14,7 +14,7 @@ const CATEGORIES_TO_NUMBER = 8;
  *
  * @param {carto.expressions.Base|number} x - Numeric expression
  * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Mumeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Simple multiplication.</caption>
  * const s = carto.expressions;

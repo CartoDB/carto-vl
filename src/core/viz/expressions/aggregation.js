@@ -1,13 +1,13 @@
 import BaseExpression from './base';
 import * as schema from '../../schema';
-import Property from './property';
+import PropertyExpression from './property';
 import { checkInstance, checkType } from './utils';
 
 /**
  * Aggregate using the average value. This operation disables the access to the property
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
- * @return {carto.expressions.Property} Aggregated column
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
+ * @return {carto.expressions.property} Aggregated column
  *
  * @example
  * const s = carto.expressions;
@@ -26,8 +26,8 @@ export const Avg = genAggregationOp('avg', 'number');
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
- * @return {carto.expressions.Property} Aggregated column
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
+ * @return {carto.expressions.property} Aggregated column
  *
  * @example
  * const s = carto.expressions;
@@ -46,8 +46,8 @@ export const Max = genAggregationOp('max', 'number');
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
- * @return {carto.expressions.Property} Aggregated column
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
+ * @return {carto.expressions.property} Aggregated column
  *
  * @example
  * const s = carto.expressions;
@@ -66,8 +66,8 @@ export const Min = genAggregationOp('min', 'number');
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
- * @return {carto.expressions.Property} Aggregated column
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
+ * @return {carto.expressions.property} Aggregated column
  *
  * @example
  * const s = carto.expressions;
@@ -86,7 +86,7 @@ export const Sum = genAggregationOp('sum', 'number');
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
  * @return {carto.expressions.Property} Aggregated column
  *
  * @example
@@ -106,7 +106,7 @@ export const Mode = genAggregationOp('mode', 'category');
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends BaseExpression {
         constructor(property) {
-            checkInstance(aggName, 'property', 0, Property, property);
+            checkInstance(aggName, 'property', 0, PropertyExpression, property);
             super({ property });
             this._aggName = aggName;
             this.type = aggType;

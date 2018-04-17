@@ -2,14 +2,34 @@ import BaseExpression from './base';
 import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
+ * Evaluates to a hsl color.
  *
+ * @param {carto.expressions.number|number} h - The hue of the color
+ * @param {carto.expressions.number|number} s - The saturation of the color
+ * @param {carto.expressions.number|number} l - The lightness of the color
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.hsl(0.67, 1.0, 0.5)
+ * });
+ *
+ * @memberof carto.expressions
+ * @function
+ * @name hsl
+ * @api
+ */
+export const HSL = genHSL('hsl', false);
+
+/**
  * Evaluates to a hsla color.
  *
  * @param {carto.expressions.number|number} h - The hue of the color
  * @param {carto.expressions.number|number} s - The saturation of the color
  * @param {carto.expressions.number|number} l - The lightness of the color
  * @param {carto.expressions.number|number} a - The alpha value of the color
- * @return {carto.expressions.hsla}
+ * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -18,11 +38,10 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  * });
  *
  * @memberof carto.expressions
- * @name hsla
  * @function
+ * @name hsla
  * @api
  */
-export const HSL = genHSL('hsl', false);
 export const HSLA = genHSL('hsla', true);
 
 function genHSL(name, alpha) {
@@ -42,40 +61,6 @@ function genHSL(name, alpha) {
 
             super(children);
             this.type = 'color';
-        }
-        _compile(meta) {
-            super._compile(meta);
-            hslCheckType('h', 0, this.h);
-            hslCheckType('s', 1, this.s);
-            hslCheckType('l', 2, this.l);
-            if (alpha) {
-                checkType('hsla', 'a', 3, 'number', this.a);
-            }
-            const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
-                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
-                }
-                return '';
-            };
-            super._setGenericGLSL(inline =>
-                `vec4(HSLtoRGB(vec3(
-                    ${inline.h}${normalize(this.h, true)},
-                    clamp(${inline.s}${normalize(this.s)}, 0., 1.),
-                    clamp(${inline.l}${normalize(this.l)}, 0., 1.)
-                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
-                , `
-    #ifndef HSL2RGB
-    #define HSL2RGB
-    vec3 HSLtoRGB(vec3 HSL) {
-      float R = abs(HSL.x * 6. - 3.) - 1.;
-      float G = 2. - abs(HSL.x * 6. - 2.);
-      float B = 2. - abs(HSL.x * 6. - 4.);
-      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
-      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
-      return (RGB - 0.5) * C + HSL.z;
-    }
-    #endif
-    `);
         }
         eval(f) {
             const normalize = (value, hue = false) => {
@@ -110,6 +95,40 @@ function genHSL(name, alpha) {
             };
 
             return hslToRgb(h, s, l);
+        }
+        _compile(meta) {
+            super._compile(meta);
+            hslCheckType('h', 0, this.h);
+            hslCheckType('s', 1, this.s);
+            hslCheckType('l', 2, this.l);
+            if (alpha) {
+                checkType('hsla', 'a', 3, 'number', this.a);
+            }
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
+                }
+                return '';
+            };
+            super._setGenericGLSL(inline =>
+                `vec4(HSLtoRGB(vec3(
+                    ${inline.h}${normalize(this.h, true)},
+                    clamp(${inline.s}${normalize(this.s)}, 0., 1.),
+                    clamp(${inline.l}${normalize(this.l)}, 0., 1.)
+                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
+                , `
+    #ifndef HSL2RGB
+    #define HSL2RGB
+    vec3 HSLtoRGB(vec3 HSL) {
+      float R = abs(HSL.x * 6. - 3.) - 1.;
+      float G = 2. - abs(HSL.x * 6. - 2.);
+      float B = 2. - abs(HSL.x * 6. - 4.);
+      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
+      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+      return (RGB - 0.5) * C + HSL.z;
+    }
+    #endif
+    `);
         }
     };
 

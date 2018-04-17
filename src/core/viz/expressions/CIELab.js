@@ -7,7 +7,7 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from './util
  * @param {carto.expressions.number|number} l - The lightness of the color
  * @param {carto.expressions.number|number} a - The color component green–red
  * @param {carto.expressions.number|number} b - The color component blue–yellow
- * @return {carto.expressions.cielab}
+ * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;

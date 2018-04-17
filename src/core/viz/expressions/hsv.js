@@ -2,14 +2,34 @@ import BaseExpression from './base';
 import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
 
 /**
+ * Evaluates to a hsv color.
  *
+ * @param {carto.expressions.number|number} h - The hue of the color
+ * @param {carto.expressions.number|number} s - The saturation of the color
+ * @param {carto.expressions.number|number} v - The value (brightness) of the color
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.hsv(0.67, 1.0, 1.0)
+ * });
+ *
+ * @memberof carto.expressions
+ * @function
+ * @name hsv
+ * @api
+ */
+export const HSV = genHSV('hsv', false);
+
+/**
  * Evaluates to a hsva color.
  *
  * @param {carto.expressions.number|number} h - The hue of the color
  * @param {carto.expressions.number|number} s - The saturation of the color
  * @param {carto.expressions.number|number} v - The value (brightness) of the color
  * @param {carto.expressions.number|number} a - The alpha value of the color
- * @return {carto.expressions.hsva}
+ * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -18,11 +38,10 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  * });
  *
  * @memberof carto.expressions
- * @name hsva
  * @function
+ * @name hsva
  * @api
  */
-export const HSV = genHSV('hsv', false);
 export const HSVA = genHSV('hsva', true);
 
 function genHSV(name, alpha) {
@@ -44,6 +63,38 @@ function genHSV(name, alpha) {
 
             super(children);
             this.type = 'color';
+        }
+        eval(f) {
+            const normalize = (value, hue = false) => {
+                if (value.type == 'category') {
+                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                }
+                return value.eval(f);
+            };
+            const h = clamp(normalize(this.h, true), 0, 1);
+            const s = clamp(normalize(this.s), 0, 1);
+            const v = clamp(normalize(this.v), 0, 1);
+
+            const hsvToRgb = (h, s, v) => {
+                const c = {
+                    r: Math.abs(h * 6 - 3) - 1,
+                    g: 2 - Math.abs(h * 6 - 2),
+                    b: 2 - Math.abs(h * 6 - 4),
+                    a: alpha ? clamp(this.a.eval(f), 0,1) : 1,
+                };
+
+                c.r = clamp(c.r, 0, 1);
+                c.g = clamp(c.g, 0, 1);
+                c.b = clamp(c.b, 0, 1);
+
+                c.r = ((c.r - 1) * s + 1) * v * 255;
+                c.g = ((c.g - 1) * s + 1) * v * 255;
+                c.b = ((c.b - 1) * s + 1) * v * 255;
+
+                return c;
+            };
+
+            return hsvToRgb(h, s, v);
         }
         _compile(metadata) {
             super._compile(metadata);
@@ -77,39 +128,6 @@ function genHSV(name, alpha) {
     }
     #endif
     `);
-        }
-
-        eval(f) {
-            const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
-                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
-                }
-                return value.eval(f);
-            };
-            const h = clamp(normalize(this.h, true), 0, 1);
-            const s = clamp(normalize(this.s), 0, 1);
-            const v = clamp(normalize(this.v), 0, 1);
-
-            const hsvToRgb = (h, s, v) => {
-                const c = {
-                    r: Math.abs(h * 6 - 3) - 1,
-                    g: 2 - Math.abs(h * 6 - 2),
-                    b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? clamp(this.a.eval(f), 0,1) : 1,
-                };
-
-                c.r = clamp(c.r, 0, 1);
-                c.g = clamp(c.g, 0, 1);
-                c.b = clamp(c.b, 0, 1);
-
-                c.r = ((c.r - 1) * s + 1) * v * 255;
-                c.g = ((c.g - 1) * s + 1) * v * 255;
-                c.b = ((c.b - 1) * s + 1) * v * 255;
-
-                return c;
-            };
-
-            return hsvToRgb(h, s, v);
         }
     };
 
