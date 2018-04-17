@@ -86,7 +86,7 @@ export default class RenderLayer {
                 const self = this;
                 const properties = feature.properties;
                 return {
-                    get value(){
+                    get value() {
                         return self.viz[vizProperty].eval(properties);
                     },
                     blendTo: blender,
@@ -97,7 +97,9 @@ export default class RenderLayer {
             Object.keys(this.viz.variables).map(varName => {
                 variables[varName] = genVizProperty('__cartovl_variable_' + varName);
             });
-            feature.viz = {
+
+            return {
+                id: feature.id,
                 color: genVizProperty('color'),
                 width: genVizProperty('width'),
                 strokeColor: genVizProperty('strokeColor'),
@@ -113,8 +115,6 @@ export default class RenderLayer {
                     });
                 }
             };
-            delete feature.properties;
-            return feature;
         });
     }
 

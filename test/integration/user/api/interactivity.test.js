@@ -68,10 +68,10 @@ describe('Interactivity', () => {
             it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 interactivity = new carto.Interactivity(layer);
                 interactivity.on('featureClick', event => {
-                    expect(event.features[0].viz.color.blendTo).toBeDefined();
-                    expect(event.features[0].viz.color.reset).toBeDefined();
-                    expect(event.features[0].viz.reset).toBeDefined();
-                    expect(event.features[0].viz.variables.wadus.value).toEqual(123);
+                    expect(event.features[0].color.blendTo).toBeDefined();
+                    expect(event.features[0].color.reset).toBeDefined();
+                    expect(event.features[0].reset).toBeDefined();
+                    expect(event.features[0].variables.wadus.value).toEqual(123);
                     expect(event.features[0]).toEqual({ id: 0, layerId: 'layer', viz: jasmine.any(Object) });
                     done();
                 });

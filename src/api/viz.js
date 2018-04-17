@@ -50,7 +50,7 @@ export default class Viz {
     *
     * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
     * new carto.Viz({
-    *   color: carto.viz.expression.rgb(0,0,0)
+    *   color: carto.expression.rgb(0,0,0)
     * });
     *
     * @fires CartoError
@@ -113,7 +113,7 @@ export default class Viz {
     /**
      * Return the color expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -126,7 +126,7 @@ export default class Viz {
     /**
      * Return the width expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -139,7 +139,7 @@ export default class Viz {
     /**
      * Return the strokeColor expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -152,7 +152,7 @@ export default class Viz {
     /**
      * Return the strokeWidth expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -165,7 +165,7 @@ export default class Viz {
     /**
      * Return the order expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
