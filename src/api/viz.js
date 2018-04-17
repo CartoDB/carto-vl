@@ -38,7 +38,7 @@ export default class Viz {
     * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
     *
     * A Viz is created from an {@link VizSpec|vizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.viz.expressions|expression}.
+    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.expressions|expression}.
     * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -50,7 +50,7 @@ export default class Viz {
     *
     * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
     * new carto.Viz({
-    *   color: carto.viz.expression.rgb(0,0,0)
+    *   color: carto.expression.rgb(0,0,0)
     * });
     *
     * @fires CartoError
@@ -62,7 +62,12 @@ export default class Viz {
     constructor(definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
-        this._vizSpec = vizSpec;
+
+        Object.keys(vizSpec).forEach(property => {
+            if (SUPPORTED_PROPERTIES.includes(property)) {
+                this[property] = vizSpec[property];
+            }
+        });
 
         this.updated = true;
         this._changeCallback = null;
@@ -72,8 +77,8 @@ export default class Viz {
             expr.notify = this._changed.bind(this);
         });
 
-        Object.keys(this._vizSpec.variables).map(varName => {
-            this._vizSpec['__cartovl_variable_' + varName] = this._vizSpec.variables[varName];
+        Object.keys(this.variables).map(varName => {
+            this['__cartovl_variable_' + varName] = this.variables[varName];
         });
 
         this._resolveAliases();
@@ -82,13 +87,13 @@ export default class Viz {
 
     _getRootExpressions() {
         return [
-            this._vizSpec.color,
-            this._vizSpec.width,
-            this._vizSpec.strokeColor,
-            this._vizSpec.strokeWidth,
-            this._vizSpec.order,
-            this._vizSpec.filter,
-            ...Object.values(this._vizSpec.variables)
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.order,
+            this.filter,
+            ...Object.values(this.variables)
         ];
     }
 
@@ -102,76 +107,76 @@ export default class Viz {
      * @api
      */
     getResolution() {
-        return this._vizSpec.resolution;
+        return this.resolution;
     }
 
     /**
      * Return the color expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
      * @api
      */
     getColor() {
-        return this._vizSpec.color;
+        return this.color;
     }
 
     /**
      * Return the width expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
      * @api
      */
     getWidth() {
-        return this._vizSpec.width;
+        return this.width;
     }
 
     /**
      * Return the strokeColor expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
      * @api
      */
     getStrokeColor() {
-        return this._vizSpec.strokeColor;
+        return this.strokeColor;
     }
 
     /**
      * Return the strokeWidth expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
      * @api
      */
     getStrokeWidth() {
-        return this._vizSpec.strokeWidth;
+        return this.strokeWidth;
     }
 
     /**
      * Return the order expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expression}
      *
      * @memberof carto.Viz
      * @instance
      * @api
      */
     getOrder() {
-        return this._vizSpec.order;
+        return this.order;
     }
 
     getFilter() {
-        return this._vizSpec.filter;
+        return this.filter;
     }
 
     isAnimated() {
@@ -194,12 +199,12 @@ export default class Viz {
 
     getMinimumNeededSchema() {
         const exprs = [
-            this._vizSpec.color,
-            this._vizSpec.width,
-            this._vizSpec.strokeColor,
-            this._vizSpec.strokeWidth,
-            this._vizSpec.filter,
-        ].concat(Object.values(this._vizSpec.variables)).filter(x => x && x._getMinimumNeededSchema);
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.filter,
+        ].concat(Object.values(this.variables)).filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
@@ -210,7 +215,7 @@ export default class Viz {
         this._compileStrokeWidthShader(gl, metadata);
         this._compileFilterShader(gl, metadata);
 
-        Object.values(this._vizSpec.variables).map(v => {
+        Object.values(this.variables).map(v => {
             v._bind(metadata);
         });
     }
@@ -218,13 +223,13 @@ export default class Viz {
 
     _resolveAliases() {
         [
-            this._vizSpec.color,
-            this._vizSpec.width,
-            this._vizSpec.strokeColor,
-            this._vizSpec.strokeWidth,
-            this._vizSpec.filter,
-        ].concat(Object.values(this._vizSpec.variables)).forEach(expr =>
-            expr._resolveAliases(this._vizSpec.variables)
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.filter,
+        ].concat(Object.values(this.variables)).forEach(expr =>
+            expr._resolveAliases(this.variables)
         );
     }
 
@@ -244,77 +249,77 @@ export default class Viz {
             permanentMarkedSet.add(node);
         };
         const unmarked = [
-            ...this._vizSpec.color._getDependencies(),
-            ...this._vizSpec.strokeColor._getDependencies(),
-            ...this._vizSpec.width._getDependencies(),
-            ...this._vizSpec.strokeWidth._getDependencies(),
-            ...this._vizSpec.filter._getDependencies()];
+            ...this.color._getDependencies(),
+            ...this.strokeColor._getDependencies(),
+            ...this.width._getDependencies(),
+            ...this.strokeWidth._getDependencies(),
+            ...this.filter._getDependencies()];
         while (unmarked.length) {
             visit(unmarked.pop());
         }
     }
 
     _compileColorShader(gl, metadata) {
-        this._vizSpec.color._bind(metadata);
-        const r = compileShader(gl, this._vizSpec.color, shaders.styler.createColorShader);
+        this.color._bind(metadata);
+        const r = compileShader(gl, this.color, shaders.styler.createColorShader);
         this.propertyColorTID = r.tid;
         this.colorShader = r.shader;
     }
 
     _compileWidthShader(gl, metadata) {
-        this._vizSpec.width._bind(metadata);
-        const r = compileShader(gl, this._vizSpec.width, shaders.styler.createWidthShader);
+        this.width._bind(metadata);
+        const r = compileShader(gl, this.width, shaders.styler.createWidthShader);
         this.propertyWidthTID = r.tid;
         this.widthShader = r.shader;
     }
 
     _compileStrokeColorShader(gl, metadata) {
-        this._vizSpec.strokeColor._bind(metadata);
-        const r = compileShader(gl, this._vizSpec.strokeColor, shaders.styler.createColorShader);
+        this.strokeColor._bind(metadata);
+        const r = compileShader(gl, this.strokeColor, shaders.styler.createColorShader);
         this.propertyStrokeColorTID = r.tid;
         this.strokeColorShader = r.shader;
     }
 
     _compileStrokeWidthShader(gl, metadata) {
-        this._vizSpec.strokeWidth._bind(metadata);
-        const r = compileShader(gl, this._vizSpec.strokeWidth, shaders.styler.createWidthShader);
+        this.strokeWidth._bind(metadata);
+        const r = compileShader(gl, this.strokeWidth, shaders.styler.createWidthShader);
         this.propertyStrokeWidthTID = r.tid;
         this.strokeWidthShader = r.shader;
     }
 
     _compileFilterShader(gl, metadata) {
-        this._vizSpec.filter._bind(metadata);
-        const r = compileShader(gl, this._vizSpec.filter, shaders.styler.createFilterShader);
+        this.filter._bind(metadata);
+        const r = compileShader(gl, this.filter, shaders.styler.createFilterShader);
         this.propertyFilterTID = r.tid;
         this.filterShader = r.shader;
     }
 
     replaceChild(toReplace, replacer) {
-        if (Object.values(this._vizSpec.variables).includes(toReplace)) {
-            const varName = Object.keys(this._vizSpec.variables).find(varName => this._vizSpec.variables[varName] == toReplace);
-            this._vizSpec.variables[varName] = replacer;
+        if (Object.values(this.variables).includes(toReplace)) {
+            const varName = Object.keys(this.variables).find(varName => this.variables[varName] == toReplace);
+            this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
             this._resolveAliases();
             this._validateAliasDAG();
-        } else if (toReplace == this._vizSpec.color) {
-            this._vizSpec.color = replacer;
+        } else if (toReplace == this.color) {
+            this.color = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this._vizSpec.width) {
-            this._vizSpec.width = replacer;
+        } else if (toReplace == this.width) {
+            this.width = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this._vizSpec.strokeColor) {
-            this._vizSpec.strokeColor = replacer;
+        } else if (toReplace == this.strokeColor) {
+            this.strokeColor = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this._vizSpec.strokeWidth) {
-            this._vizSpec.strokeWidth = replacer;
+        } else if (toReplace == this.strokeWidth) {
+            this.strokeWidth = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this._vizSpec.filter) {
-            this._vizSpec.filter = replacer;
+        } else if (toReplace == this.filter) {
+            this.filter = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -368,11 +373,11 @@ export default class Viz {
         /**
          * @typedef {object} VizSpec
          * @property {number} resolution
-         * @property {carto.viz.expressions.Expression} color
-         * @property {carto.viz.expressions.Expression} width
-         * @property {carto.viz.expressions.Expression} strokeColor
-         * @property {carto.viz.expressions.Expression} strokeWidth
-         * @property {carto.viz.expressions.Expression} order
+         * @property {carto.expressions.Expression} color
+         * @property {carto.expressions.Expression} width
+         * @property {carto.expressions.Expression} strokeColor
+         * @property {carto.expressions.Expression} strokeWidth
+         * @property {carto.expressions.Expression} order
          * @api
          */
 

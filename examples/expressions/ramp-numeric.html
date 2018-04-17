@@ -85,7 +85,7 @@
     const source = new carto.source.Dataset(`
       us_county_points
     `);
-    const s = carto.viz.expressions;
+    const s = carto.expressions;
     const viz = new carto.Viz({
       color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.sunsetdark)
     });

@@ -14,12 +14,12 @@ export default class Buckets extends Expression {
      *
      *
      * We´ll need:
-     *  - A {@link carto.viz.expressions.ramp|ramp } to add a color for every bucket.
-     *  - A {@link carto.viz.expressions.palettes|colorPalette } to define de color scheme.
+     *  - A {@link carto.expressions.ramp|ramp } to add a color for every bucket.
+     *  - A {@link carto.expressions.palettes|colorPalette } to define de color scheme.
      *
      *
      * ```javascript
-     *  const s = carto.viz.expressions;
+     *  const s = carto.expressions;
      *  const $speed = s.prop('speed');
      *  const viz = new carto.Viz({
      *  color: s.ramp(
@@ -39,7 +39,7 @@ export default class Buckets extends Expression {
      * procesed in a new categorical `procesedSpeed` column:
      *
      * ```javascript
-     *  const s = carto.viz.expressions;
+     *  const s = carto.expressions;
      *  const $procesedSpeed = s.prop('procesedSpeed');
      *  const viz = new carto.Viz({
      *  color: s.ramp(
@@ -48,11 +48,11 @@ export default class Buckets extends Expression {
      * });
      * ```
      *
-     * @param {carto.viz.expressions.property} property - The property to be evaluated and interpolated
-     * @param {...carto.viz.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
-     * @return {carto.viz.expressions.expression}
+     * @param {carto.expressions.property} property - The property to be evaluated and interpolated
+     * @param {...carto.expressions.expression} breakpoints - Numeric expression containing the different breakpoints.
+     * @return {carto.expressions.expression}
      *
-     * @memberof carto.viz.expressions
+     * @memberof carto.expressions
      * @name buckets
      * @function
      * @api

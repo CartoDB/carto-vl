@@ -127,14 +127,14 @@
       for (let feature of event.features) {
         if (feature.layerId === 'europeCountriesLayer') {
           content += `
-            <h3><b>${feature.viz.variables.admin.value}</b></h3>
+            <h3><b>${feature.variables.admin.value}</b></h3>
 
           `;
         }
         if (feature.layerId === 'spainCitiesLayer') {
           content += `
-            <h3>${feature.viz.variables.name.value}</h3>
-            <p>Population <b>${feature.viz.variables.pop_max.value}</b></p><br>
+            <h3>${feature.variables.name.value}</h3>
+            <p>Population <b>${feature.variables.pop_max.value}</b></p><br>
           `;
         }
       }

@@ -1,6 +1,6 @@
 /**
  *  @api
- *  @namespace carto.viz.expressions
+ *  @namespace carto.expressions
  *  @description
  *  Expressions are used to define vizs, a viz is composed of an expression for every configurable attribute.
  *  Remember a viz has the following attributes:
@@ -15,7 +15,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *  width: carto.viz.expressions.number(10)
+ *  width: carto.expressions.number(10)
  * });
  * ```
  *
@@ -24,7 +24,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *  width: carto.viz.expressions.property('population')
+ *  width: carto.expressions.property('population')
  * });
  * ```
  *
@@ -32,7 +32,7 @@
  * for example lets divide the population between a number using the `div` expression to make points smaller:
  *
  * ```javascript
- * const s = carto.viz.expressions; // We use this alias along documentation.
+ * const s = carto.expressions; // We use this alias along documentation.
  * const viz = new carto.Viz({
  *  width: s.div(
  *      property('population'),

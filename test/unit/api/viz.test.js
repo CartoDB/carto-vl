@@ -211,7 +211,7 @@ describe('api/viz', () => {
             viz.onChange(done);
             const t = Date.now() + 1000;
             Date.now = () => t;
-            viz._vizSpec.filter._preDraw(null, {}, { uniform1f: () => { } });
+            viz.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
     });
 
