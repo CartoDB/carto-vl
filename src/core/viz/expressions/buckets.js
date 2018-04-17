@@ -51,8 +51,8 @@ let bucketUID = 0;
  * @return {carto.expressions.Base}
  *
  * @memberof carto.expressions
- * @function
  * @name buckets
+ * @function
  * @api
  */
 export default class Buckets extends BaseExpression {

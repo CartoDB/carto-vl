@@ -5,6 +5,24 @@ import BaseExpression from './base';
 
 export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
 
+export class Cubic extends genInterpolator(
+    inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`,
+    inner => inner // TODO FIXME
+) { }
+
 export class BounceEaseIn extends genInterpolator(
     inner => `BounceEaseIn(${inner})`,
     `

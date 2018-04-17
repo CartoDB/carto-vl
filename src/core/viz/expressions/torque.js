@@ -14,19 +14,22 @@ const DEFAULT_FADE = 0.15;
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
  * const s = carto.expressions;
+ * const $day = s.prop('day');
  * new carto.Viz({
- *  filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ *   filter: s.torque($day, 40, s.fade(0.1, 0.3))
  * });
  *
  * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
  * const s = carto.expressions;
+ * const $day = s.prop('day');
  * new carto.Viz({
- *  filter: s.torque($day, 40, s.fade(0.5))
+ *   filter: s.torque($day, 40, s.fade(0.5))
  * });
  *
  * @memberof carto.expressions
  * @name fade
  * @function
+ * @api
 */
 export class Fade extends BaseExpression {
     constructor(param1 = DEFAULT, param2 = DEFAULT) {
@@ -63,18 +66,21 @@ export class Fade extends BaseExpression {
  * @return {carto.expressions.Torque}
  *
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`width:    2
- * color:     ramp(linear(AVG($temp), 0,30), tealrose)
- * filter:       torque($day, 40, fade(0.1, 0.3))`);
+ * new carto.Viz(`
+ *   width: 2
+ *   color: ramp(linear(AVG($temp), 0,30), tealrose)
+ *   filter: torque($day, 40, fade(0.1, 0.3))`);
  *
  * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`width:    2
- * color:     ramp(linear(AVG($temp), 0,30), tealrose)
- * filter:    torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
+ * new carto.Viz(`
+ *   width:    2
+ *   color: ramp(linear(AVG($temp), 0,30), tealrose)
+ *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.expressions
  * @name torque
  * @function
+ * @api
 */
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
@@ -89,17 +95,13 @@ export class Torque extends BaseExpression {
         // TODO improve type check
         this.duration = duration;
     }
-    _compile(meta) {
-        super._compile(meta);
-        if (this.input.type != 'number') {
-            throw new Error('Torque(): invalid first parameter, input.');
-        } else if (this.fade.type != 'fade') {
-            throw new Error('Torque(): invalid third parameter, fade.');
-        }
-        this.type = 'number';
-
-        this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const cycle = this._cycle.eval(feature);
+        const duration = this.duration;
+        const fadeIn = this.fade.fadeIn.eval(feature);
+        const fadeOut = this.fade.fadeOut.eval(feature);
+        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     getSimTime() {
         if (!(this.input.min.eval() instanceof Date)){
@@ -121,12 +123,16 @@ export class Torque extends BaseExpression {
         return date;
 
     }
-    eval(feature) {
-        const input = this.input.eval(feature);
-        const cycle = this._cycle.eval(feature);
-        const duration = this.duration;
-        const fadeIn = this.fade.fadeIn.eval(feature);
-        const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+    _compile(meta) {
+        super._compile(meta);
+        if (this.input.type != 'number') {
+            throw new Error('Torque(): invalid first parameter, input.');
+        } else if (this.fade.type != 'fade') {
+            throw new Error('Torque(): invalid third parameter, fade.');
+        }
+        this.type = 'number';
+
+        this.inlineMaker = (inline) =>
+            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
 }

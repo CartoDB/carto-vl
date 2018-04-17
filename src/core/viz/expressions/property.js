@@ -2,7 +2,6 @@ import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
- *
  * Evaluates the value of a column for every row in the dataset.
  *
  * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
@@ -23,10 +22,6 @@ import { checkString } from './utils';
  * @api
  */
 export default class Property extends BaseExpression {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
     constructor(name) {
         checkString('property', 'name', 0, name);
         if (name == '') {
@@ -34,6 +29,9 @@ export default class Property extends BaseExpression {
         }
         super({});
         this.name = name;
+    }
+    eval(feature) {
+        return feature[this.name];
     }
     _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
@@ -58,8 +56,5 @@ export default class Property extends BaseExpression {
                 this.name
             ]
         };
-    }
-    eval(feature) {
-        return feature[this.name];
     }
 }

@@ -20,8 +20,8 @@ import { implicitCast, clamp } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name near
+ * @function
  * @api
  */
 // TODO type checking

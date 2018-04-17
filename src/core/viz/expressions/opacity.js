@@ -3,20 +3,19 @@ import { number } from '../functions';
 import { checkLooseType, checkType } from './utils';
 
 /**
+ * Override the input color opacity.
  *
- * Override the input color opacity
+ * @param {carto.expressions.number|number} x - A number to be warped in a numeric expression
+ * @return {carto.expressions.Base}
  *
- * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.expressions.Base} Numeric expression
- *
- * @example <caption>Creating a number expression.</caption>
+ * @example
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.number(15);  // Elements will have width 15
+ *   width: s.opacity(s.rgb(255,0,0), 0.5);  // Equivalent to `s.rgba(255,0,0,0.5)`
  * });
  *
  * @memberof carto.expressions
- * @name number
+ * @name opacity
  * @function
  * @api
  */
@@ -35,15 +34,15 @@ export default class Opacity extends BaseExpression {
         super({ color, alpha });
         this.type = 'color';
     }
-    _compile(meta) {
-        super._compile(meta);
-        checkType('opacity', 'alpha', 1, 'number', this.alpha);
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
-    }
     eval(f) {
         const color = this.color.eval(f);
         const alpha = this.alpha.eval(f);
         color.a = alpha;
         return color;
+    }
+    _compile(meta) {
+        super._compile(meta);
+        checkType('opacity', 'alpha', 1, 'number', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
 }

@@ -9,6 +9,9 @@ export default class Zoom extends BaseExpression {
         super({ zoom: number(0) });
         this.type = 'number';
     }
+    eval() {
+        return this.zoom.expr;
+    }
     _compile(metadata) {
         super._compile(metadata);
         super.inlineMaker = inline => inline.zoom;
@@ -16,8 +19,5 @@ export default class Zoom extends BaseExpression {
     _preDraw(program, drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;
         this.zoom._preDraw(program, drawMetadata, gl);
-    }
-    eval() {
-        return this.zoom.expr;
     }
 }

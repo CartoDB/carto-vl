@@ -12,12 +12,12 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * @example <caption> Display points with a different color depending on the `category` property. </caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.PRISM),
+*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM),
 * });
 *
 * @memberof carto.expressions
-* @function
 * @name linear
+* @function
 * @api
 */
 export default class Linear extends BaseExpression {

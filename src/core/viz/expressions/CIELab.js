@@ -16,8 +16,8 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from './util
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name cielab
+ * @function
  * @api
  */
 export default class CIELab extends BaseExpression {

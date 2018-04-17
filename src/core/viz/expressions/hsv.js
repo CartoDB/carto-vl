@@ -16,8 +16,8 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name hsv
+ * @function
  * @api
  */
 export const HSV = genHSV('hsv', false);

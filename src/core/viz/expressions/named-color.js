@@ -16,11 +16,11 @@ export const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name namedColor
+ * @function
  * @api
  */
-export default class NamedColor extends BaseExpression {
+export class NamedColor extends BaseExpression {
     constructor(colorName) {
         checkString('namedColor', 'colorName', 0, colorName);
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
@@ -39,7 +39,7 @@ export default class NamedColor extends BaseExpression {
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
     _nameToRGB(name) {
-        const colorRegex = /rgb\((\d{1,3}),(\d{1,3}),(\d{1,3})\)/;
+        const colorRegex = /rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/;
         const fakeDiv = document.createElement('div');
         fakeDiv.style.color = name;
         document.body.appendChild(fakeDiv);

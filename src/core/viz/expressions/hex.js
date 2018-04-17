@@ -14,8 +14,8 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name hex
+ * @function
  * @api
  */
 export default class Hex extends BaseExpression {

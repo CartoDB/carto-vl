@@ -20,7 +20,6 @@ export const GlobalPercentile = generatePercentile(true);
 function generateAggregattion(metadataPropertyName, global) {
     return class Aggregattion extends BaseExpression {
         /**
-         * @jsapi
          * @param {*} property
          */
         constructor(property) {
@@ -70,7 +69,6 @@ function generateAggregattion(metadataPropertyName, global) {
 function generatePercentile(global) {
     return class Percentile extends BaseExpression {
         /**
-         * @jsapi
          * @param {*} property
          */
         constructor(property, percentile) {
@@ -81,6 +79,9 @@ function generatePercentile(global) {
             // TODO improve type check
             this.property = property;
             this.percentile = percentile;
+        }
+        eval() {
+            return this.value.expr;
         }
         _compile(metadata) {
             super._compile(metadata);
@@ -120,9 +121,6 @@ function generatePercentile(global) {
                 this.value.expr = br;
             }
             this.value._preDraw(program, drawMetadata, gl);
-        }
-        eval() {
-            return this.value.expr;
         }
         _getColumnName() {
             if (this.property.aggName) {

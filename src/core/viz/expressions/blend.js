@@ -11,8 +11,8 @@ import BaseExpression from './base';
  * @returns {carto.expressions.Base} Numeric expression
  *
  * @memberof carto.expressions
- * @function
  * @name blend
+ * @function
  * @api
  */
 export default class Blend extends BaseExpression {

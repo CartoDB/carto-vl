@@ -8,8 +8,8 @@ import { checkNumber, getStringErrorPreface } from './utils';
  * @param {number} duration - Animation duration in milliseconds
  *
  * @memberof carto.expressions
- * @function
  * @name animate
+ * @function
  * @api
  */
 //TODO refactor to use uniformfloat class

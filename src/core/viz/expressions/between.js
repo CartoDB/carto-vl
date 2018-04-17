@@ -17,8 +17,8 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name between
+ * @function
  * @api
  */
 export default class Between extends BaseExpression {

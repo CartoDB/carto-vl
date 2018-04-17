@@ -4,7 +4,7 @@ import BaseExpression from './base';
 import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
 
 /**
- * ### Color palettes
+ * Color palettes.
  *
  * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
  * Use them with a {@link carto.expressions.ramp|ramp}
@@ -16,15 +16,15 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
  *  - Numeric
  *      - ...
  *
- * @api
- * @name carto.expressions.palettes
- * @memberof carto.expressions
- *
  * @example <caption> Using a color scheme </caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.ramp(s.property('type'), s.palettes.PRISM);
+ *   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
  * });
+ *
+ * @name carto.expressions.palettes
+ * @memberof carto.expressions
+ * @api
  */
 const palettes = {};
 
@@ -89,7 +89,7 @@ export class CustomPalette extends BaseExpression {
 }
 
 Object.keys(cartocolor).map(name => {
-    palettes[`${name.toLowerCase()}`] = new PaletteGenerator(name, cartocolor[name]);
+    palettes[`${name.toUpperCase()}`] = new PaletteGenerator(name, cartocolor[name]);
 });
 
 class Inverse extends BaseExpression{

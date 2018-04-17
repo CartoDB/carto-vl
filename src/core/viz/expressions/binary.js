@@ -23,8 +23,8 @@ const CATEGORIES_TO_NUMBER = 8;
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name mul
+ * @function
  * @api
  */
 export const Mul = genBinaryOp('mul',
@@ -47,8 +47,8 @@ export const Mul = genBinaryOp('mul',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name div
+ * @function
  * @api
  */
 export const Div = genBinaryOp('div',
@@ -71,8 +71,8 @@ export const Div = genBinaryOp('div',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name add
+ * @function
  * @api
  */
 export const Add = genBinaryOp('add',
@@ -95,8 +95,8 @@ export const Add = genBinaryOp('add',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name sub
+ * @function
  * @api
  */
 export const Sub = genBinaryOp('sub',
@@ -119,8 +119,8 @@ export const Sub = genBinaryOp('sub',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name mod
+ * @function
  * @api
  */
 export const Mod = genBinaryOp('mod',
@@ -144,8 +144,8 @@ export const Mod = genBinaryOp('mod',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name pow
+ * @function
  * @api
  */
 export const Pow = genBinaryOp('pow',
@@ -170,8 +170,8 @@ export const Pow = genBinaryOp('pow',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name gt
+ * @function
  * @api
  */
 export const GreaterThan = genBinaryOp('greaterThan',
@@ -196,8 +196,8 @@ export const GreaterThan = genBinaryOp('greaterThan',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name gte
+ * @function
  * @api
  */
 export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
@@ -222,8 +222,8 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name lt
+ * @function
  * @api
  */
 export const LessThan = genBinaryOp('lessThan',
@@ -248,8 +248,8 @@ export const LessThan = genBinaryOp('lessThan',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name lte
+ * @function
  * @api
  */
 export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
@@ -274,8 +274,8 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name eq
+ * @function
  * @api
  */
 export const Equals = genBinaryOp('equals',
@@ -300,8 +300,8 @@ export const Equals = genBinaryOp('equals',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name neq
+ * @function
  * @api
  */
 export const NotEquals = genBinaryOp('notEquals',
@@ -332,8 +332,8 @@ export const NotEquals = genBinaryOp('notEquals',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name or
+ * @function
  * @api
  */
 export const Or = genBinaryOp('or',
@@ -366,8 +366,8 @@ export const Or = genBinaryOp('or',
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name and
+ * @function
  * @api
  */
 export const And = genBinaryOp('and',

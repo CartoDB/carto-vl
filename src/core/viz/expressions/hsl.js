@@ -16,8 +16,8 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name hsl
+ * @function
  * @api
  */
 export const HSL = genHSL('hsl', false);

@@ -13,8 +13,8 @@ import { number } from '../functions';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name now
+ * @function
  * @api
  */
 export default class Now extends BaseExpression {

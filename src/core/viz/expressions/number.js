@@ -14,8 +14,8 @@ import { checkNumber } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name number
+ * @function
  * @api
  */
 export default class Number extends BaseExpression {

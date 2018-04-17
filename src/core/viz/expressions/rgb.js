@@ -4,7 +4,27 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 //TODO refactor to uniformcolor, write color (plain, literal)
 
 /**
+ * Evaluates to a rgb color.
  *
+ * @param {carto.expressions.number|number} r - The amount of red in the color
+ * @param {carto.expressions.number|number} g - The amount of green in the color
+ * @param {carto.expressions.number|number} b - The amount of blue in the color
+ * @return {carto.expressions.rgb}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.rgb(0, 0, 255)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name rgb
+ * @function
+ * @api
+ */
+export const RGB = genRGB('rgb', false);
+
+/**
  * Evaluates to a rgba color.
  *
  * @param {carto.expressions.number|number} r - The amount of red in the color
@@ -25,7 +45,6 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * @api
  */
 export const RGBA = genRGB('rgba', true);
-export const RGB = genRGB('rgb', false);
 
 function genRGB(name, alpha) {
     return class RGBA extends BaseExpression {
@@ -43,6 +62,14 @@ function genRGB(name, alpha) {
             super(children);
             this.type = 'color';
         }
+        eval(f) {
+            return {
+                r: this.r.eval(f),
+                g: this.g.eval(f),
+                b: this.b.eval(f),
+                a: alpha ? this.a.eval(f) : 1,
+            };
+        }
         _compile(meta) {
             super._compile(meta);
             checkType(name, 'r', 0, 'number', this.r);
@@ -52,14 +79,6 @@ function genRGB(name, alpha) {
                 checkType('rgba', 'a', 3, 'number', this.a);
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
-        }
-        eval(f) {
-            return {
-                r: this.r.eval(f),
-                g: this.g.eval(f),
-                b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 1,
-            };
         }
     };
 }

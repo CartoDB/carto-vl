@@ -17,8 +17,8 @@ import { checkInstance, checkType } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name avg
+ * @function
  * @api
  */
 export const Avg = genAggregationOp('avg', 'number');
@@ -37,8 +37,8 @@ export const Avg = genAggregationOp('avg', 'number');
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name max
+ * @function
  * @api
  */
 export const Max = genAggregationOp('max', 'number');
@@ -57,8 +57,8 @@ export const Max = genAggregationOp('max', 'number');
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name min
+ * @function
  * @api
  */
 export const Min = genAggregationOp('min', 'number');
@@ -77,8 +77,8 @@ export const Min = genAggregationOp('min', 'number');
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name sum
+ * @function
  * @api
  */
 export const Sum = genAggregationOp('sum', 'number');
@@ -97,8 +97,8 @@ export const Sum = genAggregationOp('sum', 'number');
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name mode
+ * @function
  * @api
  */
 export const Mode = genAggregationOp('mode', 'category');

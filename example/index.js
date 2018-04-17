@@ -25,30 +25,30 @@ color: hsv(0.7, 0.7, 1.)`,
 color: hsv($category, 0.7, 1.)`,
 
     `width: 3
-color: ramp($category, Prism)`,
+color: ramp($category, PRISM)`,
 
     `width: 3
-color: ramp(top($category, 4), Prism)`,
+color: ramp(top($category, 4), PRISM)`,
 
     `width: 3
-color: opacity( ramp($category, Prism), $amount/5000)`,
+color: opacity( ramp($category, PRISM), $amount/5000)`,
 
     `width: 3
-color: ramp($category, Prism)`,
+color: ramp($category, PRISM)`,
 
     `width: sqrt($amount/5000)*20
-color: ramp($category, Prism)`,
+color: ramp($category, PRISM)`,
 
     `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)`,
+color: ramp($category, PRISM)`,
 
     `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
-color: ramp($category, Prism)
+color: ramp($category, PRISM)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`,
 
     `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
-color: ramp(MODE($category), Prism)
+color: ramp(MODE($category), PRISM)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`,
 ];

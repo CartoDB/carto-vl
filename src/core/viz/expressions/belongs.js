@@ -16,8 +16,8 @@ import BaseExpression from './base';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name in
+ * @function
  * @api
  */
 export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
@@ -37,8 +37,8 @@ export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => 
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name nin
+ * @function
  * @api
  */
 export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);

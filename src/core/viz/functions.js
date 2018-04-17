@@ -104,32 +104,42 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
+import { NamedColor } from './expressions/named-color';
+
 import Near from './expressions/near';
 
 import Now from './expressions/now';
 
 import Number from './expressions/number';
 
+import Opacity from './expressions/opacity';
 
+import { Asc } from './expressions/ordering';
+import { Desc } from './expressions/ordering';
+import { NoOrder } from './expressions/ordering';
+import { Width } from './expressions/ordering';
 
-import { palettes, Inverse, CustomPalette } from './expressions/palettes';
-
-
-
-
-
-
+import { palettes } from './expressions/palettes';
+import { Inverse } from './expressions/palettes';
+import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
-import Variable from './expressions/variable';
+
+import { Quantiles } from './expressions/quantiles';
+import { GlobalQuantiles } from './expressions/quantiles';
+
 import Ramp from './expressions/ramp';
-import Opacity from './expressions/opacity';
-import Top from './expressions/top';
-import XYZ from './expressions/xyz';
-import Zoom from './expressions/zoom';
+
+import { RGB } from './expressions/rgb';
+import { RGBA } from './expressions/rgb';
+
 import Time from './expressions/time';
 
-// Unary ops
+import Top from './expressions/top';
+
+import { Fade } from './expressions/torque';
+import { Torque } from './expressions/torque';
+
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
 import { Sin } from './expressions/unary';
@@ -139,23 +149,25 @@ import { Sign } from './expressions/unary';
 import { Abs } from './expressions/unary';
 import { Not } from './expressions/unary';
 
-// Classifiers
-import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
+import Variable from './expressions/variable';
 
-import { Torque, Fade } from './expressions/torque';
+import { ViewportMax } from './expressions/viewportAggregation';
+import { ViewportMin } from './expressions/viewportAggregation';
+import { ViewportAvg } from './expressions/viewportAggregation';
+import { ViewportSum } from './expressions/viewportAggregation';
+import { ViewportCount } from './expressions/viewportAggregation';
+import { ViewportPercentile } from './expressions/viewportAggregation';
+import { GlobalMax } from './expressions/viewportAggregation';
+import { GlobalMin } from './expressions/viewportAggregation';
+import { GlobalAvg } from './expressions/viewportAggregation';
+import { GlobalSum } from './expressions/viewportAggregation';
+import { GlobalCount } from './expressions/viewportAggregation';
+import { GlobalPercentile } from './expressions/viewportAggregation';
 
-// Colors
-import {RGB, RGBA} from './expressions/rgb';
+import XYZ from './expressions/xyz';
 
-import NamedColor from './expressions/named-color';
+import Zoom from './expressions/zoom';
 
-import {
-    ViewportMax, ViewportMin, ViewportAvg, ViewportSum, ViewportCount, ViewportPercentile,
-    GlobalMax, GlobalMin, GlobalAvg, GlobalSum, GlobalCount, GlobalPercentile
-}
-    from './expressions/viewportAggregation';
-
-import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
 
 /* Expose classes as constructor functions */
 
@@ -217,17 +229,42 @@ export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
 
+export const namedColor = (...args) => new NamedColor(...args);
+
 export const near = (...args) => new Near(...args);
 
 export const now = (...args) => new Now(...args);
 
 export const number = (...args) => new Number(...args);
 
+export const opacity = (...args) => new Opacity(...args);
 
 export const asc = (...args) => new Asc(...args);
 export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
+
+export const inverse = (...args) => new Inverse(...args);
+
+export const customPalette = (...args) => new CustomPalette(...args);
+
+export const property = (...args) => new Property(...args);
+export const prop = property;
+
+export const quantiles = (...args) => new Quantiles(...args);
+export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+
+export const ramp = (...args) => new Ramp(...args);
+
+export const rgb = (...args) => new RGB(...args);
+export const rgba = (...args) => new RGBA(...args);
+
+export const time = (...args) => new Time(...args);
+
+export const top = (...args) => new Top(...args);
+
+export const fade = (...args) => new Fade(...args);
+export const torque = (...args) => new Torque(...args);
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
@@ -235,29 +272,12 @@ export const sin = (...args) => new Sin(...args);
 export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
-
-export const rgba = (...args) => new RGBA(...args);
-export const rgb = (...args) => new RGB(...args);
-export const property = (...args) => new Property(...args);
-export const variable = (...args) => new Variable(...args);
-
-export const namedColor = (...args) => new NamedColor(...args);
-export const opacity = (...args) => new Opacity(...args);
-export const ramp = (...args) => new Ramp(...args);
-
-export const prop = property;
-
-export const top = (...args) => new Top(...args);
-
-
-
-export const zoom = (...args) => new Zoom(...args);
-
-export const xyz = (...args) => new XYZ(...args);
 export const abs = (...args) => new Abs(...args);
+export const not = (...args) => new Not(...args);
 
-export const quantiles = (...args) => new Quantiles(...args);
-export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const variable = (...args) => new Variable(...args);
+export { variable as var };
+
 export const viewportMax = (...args) => new ViewportMax(...args);
 export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportAvg = (...args) => new ViewportAvg(...args);
@@ -270,16 +290,12 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
-export const inverse = (...args) => new Inverse(...args);
-export const torque = (...args) => new Torque(...args);
-export const fade = (...args) => new Fade(...args);
-export const time = (...args) => new Time(...args);
-export const customPalette = (...args) => new CustomPalette(...args);
+
+export const xyz = (...args) => new XYZ(...args);
+
+export const zoom = (...args) => new Zoom(...args);
 
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
-export const not = (...args) => new Not(...args);
-
-export { variable as var };
 
 export { palettes, Asc, Desc };

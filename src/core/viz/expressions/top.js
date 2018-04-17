@@ -7,6 +7,17 @@ export default class Top extends BaseExpression {
         // TODO improve type check
         this.buckets = buckets; //TODO force fixed literal
     }
+    eval(feature) {
+        const p = this.property.eval(feature);
+        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        let ret;
+        metaColumn.categoryNames.map((name, i) => {
+            if (i==p){
+                ret = i < this.buckets? i+1:0;
+            }
+        });
+        return ret;
+    }
     _compile(metadata) {
         super._compile(metadata);
         if (this.property.type != 'category') {
@@ -23,17 +34,6 @@ export default class Top extends BaseExpression {
             preface: this._prefaceCode(property.preface + `uniform sampler2D topMap${this._uid};\n`),
             inline: `(255.*texture2D(topMap${this._uid}, vec2(${property.inline}/1024., 0.5)).a)`
         };
-    }
-    eval(feature) {
-        const p = this.property.eval(feature);
-        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
-        let ret;
-        metaColumn.categoryNames.map((name, i) => {
-            if (i==p){
-                ret = i < this.buckets? i+1:0;
-            }
-        });
-        return ret;
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {

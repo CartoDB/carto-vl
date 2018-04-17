@@ -2,10 +2,6 @@ import BaseExpression from './base';
 import { checkString } from './utils';
 
 export default class Variable extends BaseExpression {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
     constructor(name) {
         checkString('name', 'name', 0, name);
         if (name == '') {
@@ -13,6 +9,9 @@ export default class Variable extends BaseExpression {
         }
         super({});
         this.name = name;
+    }
+    eval(feature) {
+        return this.alias.eval(feature);
     }
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
@@ -34,8 +33,5 @@ export default class Variable extends BaseExpression {
     }
     _getMinimumNeededSchema() {
         return this.alias._getMinimumNeededSchema();
-    }
-    eval(feature) {
-        return this.alias.eval(feature);
     }
 }

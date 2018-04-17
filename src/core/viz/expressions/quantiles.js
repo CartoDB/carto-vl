@@ -6,6 +6,9 @@ import * as schema from '../../schema';
 
 let quantilesUID = 0;
 
+export const Quantiles = genQuantiles(false);
+export const GlobalQuantiles = genQuantiles(true);
+
 function genQuantiles(global) {
     return class Quantiles extends BaseExpression {
         constructor(input, buckets) {
@@ -100,6 +103,3 @@ function genQuantiles(global) {
         }
     };
 }
-
-export const Quantiles = genQuantiles(false);
-export const GlobalQuantiles = genQuantiles(true);

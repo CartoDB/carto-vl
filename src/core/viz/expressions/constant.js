@@ -14,8 +14,8 @@ import { checkNumber } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @function
  * @name constant
+ * @function
  * @api
  */
 export default class Constant extends BaseExpression {

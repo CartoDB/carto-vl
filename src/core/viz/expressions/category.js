@@ -8,8 +8,8 @@ import { checkString } from './utils';
  * @returns {carto.expressions.Base} category expression with the category name provided
  *
  * @memberof carto.expressions
- * @function
  * @name category
+ * @function
  * @api
  */
 export default class Category extends BaseExpression {

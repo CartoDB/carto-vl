@@ -15,7 +15,7 @@ const s = carto.expressions;
 const $dn = s.property('dn');
 const viz = new carto.Viz({
     width: 4 * s.zoom(),
-    color: s.ramp(s.linear($dn, 1, 300), s.palettes.prism),
+    color: s.ramp(s.linear($dn, 1, 300), s.palettes.PRISM),
     strokeColor: s.rgba(0, 0, 0, 0.2),
     strokeWidth: 1,
     filter: s.between($dn, 100, 140)

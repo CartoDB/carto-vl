@@ -1,9 +1,7 @@
 import { implicitCast, checkLooseType, checkType } from './utils';
 import BaseExpression from './base';
 
-
 /**
- *
  * Compute the natural logarithm (base e) of a number x
  *
  * @param {carto.expressions.number|number} x - Number to compute the natural logarithm
@@ -12,7 +10,7 @@ import BaseExpression from './base';
  * @example <caption>Natural Logarithm.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.log(10);  // 2.302585092994046
+ *   width: s.log(10);  // 2.302585092994046
  * });
  *
  * @memberof carto.expressions
@@ -23,7 +21,6 @@ import BaseExpression from './base';
 export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 
 /**
- *
  * Compute the square root of a number x
  *
  * @param {carto.expressions.number|number} x - Number to compute the square root
@@ -32,7 +29,7 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
  * @example <caption>Square root.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.sqrt(4);  // 2
+ *   width: s.sqrt(4);  // 2
  * });
  *
  * @memberof carto.expressions
@@ -43,7 +40,6 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 
 /**
- *
  * Compute the sine of a number x
  *
  * @param {carto.expressions.number|number} x - Number to compute the sine in radians
@@ -52,7 +48,7 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
  * @example <caption>Sin</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.sin(Math.PI/2);  // 1
+ *   width: s.sin(Math.PI/2);  // 1
  * });
  *
  * @memberof carto.expressions
@@ -63,7 +59,6 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 
 /**
- *
  * Compute the cosine of a number x
  *
  * @param {carto.expressions.number|number} x - Number to compute the cosine in radians
@@ -72,7 +67,7 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
  * @example <caption>Cos</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.cos(0);  // 1
+ *   width: s.cos(0);  // 1
  * });
  *
  * @memberof carto.expressions
@@ -83,7 +78,6 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 
 /**
- *
  * Compute the tangent of a number x
  *
  * @param {carto.expressions.number|number} x - Number to compute the tangent in radians
@@ -92,7 +86,7 @@ export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
  * @example <caption>Tan</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.tan(0);  // 0
+ *   width: s.tan(0);  // 0
  * });
  *
  * @memberof carto.expressions
@@ -103,7 +97,6 @@ export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 
 /**
- *
  * Compute the sign of a number x, indicating whether the number is positive, negative or zero
  * This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
  * -0 if the number is -0.
@@ -114,7 +107,7 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
  * @example <caption>Sign</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.sign(100);  // 1
+ *   width: s.sign(100);  // 1
  * });
  *
  * @memberof carto.expressions
@@ -125,7 +118,6 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 
 /**
- *
  * Compute the absolute value of a number x.
  *
  * @param {carto.expressions.number|number} x - Number to compute the absolute value
@@ -134,7 +126,7 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
  * @example <caption>Abs</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.abs(100);  // 1
+ *   width: s.abs(100);  // 1
  * });
  *
  * @memberof carto.expressions
@@ -145,7 +137,6 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 
 /**
- *
  * Compute the logical negation of the given expression.
  * This is internally computed as 1 - x preserving boolean behavior and allowing fuzzy logic.
  *
@@ -158,7 +149,7 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @example <caption>Not</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.not(0);  // 1
+ *   width: s.not(0);  // 1
  * });
  *
  * @memberof carto.expressions
@@ -173,8 +164,11 @@ function genUnaryOp(name, jsFn, glsl) {
         constructor(a) {
             a = implicitCast(a);
             checkLooseType(name, 'x', 0, 'number', a);
-            super({ a: a });
+            super({ a });
             this.type = 'number';
+        }
+        eval(feature) {
+            return jsFn(this.a.eval(feature));
         }
         _compile(meta) {
             super._compile(meta);
@@ -183,9 +177,6 @@ function genUnaryOp(name, jsFn, glsl) {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
             this.inlineMaker = inlines => glsl(inlines.a);
-        }
-        eval(feature) {
-            return jsFn(this.a.eval(feature));
         }
     };
 }
