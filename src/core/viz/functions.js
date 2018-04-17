@@ -61,8 +61,27 @@ import { Sum } from './expressions/aggregation';
 import { Mode } from './expressions/aggregation';
 
 import Animate from './expressions/animate';
-import { In, Nin } from './expressions/belongs.js';
+
+import { In } from './expressions/belongs.js';
+import { Nin } from './expressions/belongs.js';
+
 import Between from './expressions/between';
+
+// Binary ops
+import { FloatMul } from './expressions/binary';
+import { FloatDiv } from './expressions/binary';
+import { FloatAdd } from './expressions/binary';
+import { FloatSub } from './expressions/binary';
+import { FloatMod } from './expressions/binary';
+import { FloatPow } from './expressions/binary';
+import { GreaterThan } from './expressions/binary';
+import { GreaterThanOrEqualTo } from './expressions/binary';
+import { LessThan } from './expressions/binary';
+import { LessThanOrEqualTo } from './expressions/binary';
+import { Equals } from './expressions/binary';
+import { NotEquals } from './expressions/binary';
+import { Or } from './expressions/binary';
+import { And } from './expressions/binary';
 
 import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 import Blend from './expressions/blend';
@@ -92,21 +111,6 @@ import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
 import { Abs } from './expressions/unary';
 import { Not } from './expressions/unary';
-
-// Binary ops
-import { FloatMul } from './expressions/binary';
-import { FloatDiv } from './expressions/binary';
-import { FloatAdd } from './expressions/binary';
-import { FloatSub } from './expressions/binary';
-import { FloatMod } from './expressions/binary';
-import { FloatPow } from './expressions/binary';
-import { GreaterThan } from './expressions/binary';
-import { GreaterThanOrEqualTo } from './expressions/binary';
-import { LessThan } from './expressions/binary';
-import { LessThanOrEqualTo } from './expressions/binary';
-import { Equals } from './expressions/binary';
-import { NotEquals } from './expressions/binary';
-import { Or, And } from './expressions/binary';
 
 // Classifiers
 import { Quantiles, GlobalQuantiles } from './expressions/quantiles';
@@ -151,6 +155,24 @@ export const nin = (...args) => new Nin(...args);
 export { _in as in };
 
 export const between = (...args) => new Between(...args);
+
+// Binary ops
+export const number = float;
+export const add = floatAdd;
+export const sub = floatSub;
+export const mul = floatMul;
+export const div = floatDiv;
+export const pow = floatPow;
+export const mod = floatMod;
+export const prop = property;
+export const gt = greaterThan;
+export const gte = greaterThanOrEqualTo;
+export const lt = lessThan;
+export const lte = lessThanOrEqualTo;
+export const eq = equals;
+export const neq = notEquals;
+export const and = (...args) => new And(...args);
+export const or = (...args) => new Or(...args);
 
 export const asc = (...args) => new Asc(...args);
 export const desc = (...args) => new Desc(...args);
@@ -223,26 +245,7 @@ export const customPalette = (...args) => new CustomPalette(...args);
 
 export const TRUE = new FloatConstant(1);
 export const FALSE = new FloatConstant(0);
-export const and = (...args) => new And(...args);
-export const or = (...args) => new Or(...args);
 export const not = (...args) => new Not(...args);
-
-export const gt = greaterThan;
-export const gte = greaterThanOrEqualTo;
-export const lt = lessThan;
-export const lte = lessThanOrEqualTo;
-
-export const number = float;
-export const add = floatAdd;
-export const sub = floatSub;
-export const mul = floatMul;
-export const div = floatDiv;
-export const pow = floatPow;
-export const mod = floatMod;
-export const prop = property;
-
-export const eq = equals;
-export const neq = notEquals;
 
 export { variable as var };
 

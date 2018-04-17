@@ -10,22 +10,21 @@ const COLORS_TO_COLOR = 4;
 const CATEGORIES_TO_FLOAT = 8;
 
 /**
- *
  * Multiply two numeric expressions.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Mumeric expression
  *
  * @example <caption>Simple multiplication.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+ *   width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
  * });
  *
  * @memberof carto.expressions
- * @name mul
  * @function
+ * @name mul
  * @api
  */
 export const FloatMul = genBinaryOp('mul',
@@ -35,22 +34,21 @@ export const FloatMul = genBinaryOp('mul',
 );
 
 /**
- *
  * Divide two numeric expressions.
  *
- * @param {carto.expressions.Expression | number} numerator - Numerator of the division
- * @param {carto.expressions.Expression | number} denominator - Denominator of the division
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} numerator - Numerator of the division
+ * @param {carto.expressions.Base|number} denominator - Denominator of the division
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Number division.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
+ *   width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
  * });
  *
  * @memberof carto.expressions
- * @name div
  * @function
+ * @name div
  * @api
  */
 export const FloatDiv = genBinaryOp('div',
@@ -60,22 +58,21 @@ export const FloatDiv = genBinaryOp('div',
 );
 
 /**
- *
  * Add two numeric expressions.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Number addition.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
+ *   width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
  * });
  *
  * @memberof carto.expressions
- * @name add
  * @function
+ * @name add
  * @api
  */
 export const FloatAdd = genBinaryOp('add',
@@ -85,22 +82,21 @@ export const FloatAdd = genBinaryOp('add',
 );
 
 /**
- *
  * Substract two numeric expressions.
  *
- * @param {carto.expressions.Expression | number} minuend - The minuend of the subtraction
- * @param {carto.expressions.Expression | number} subtrahend - The subtrahend of the subtraction
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} minuend - The minuend of the subtraction
+ * @param {carto.expressions.Base|number} subtrahend - The subtrahend of the subtraction
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Number subtraction.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+ *   width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
  * });
  *
  * @memberof carto.expressions
- * @name sub
  * @function
+ * @name sub
  * @api
  */
 export const FloatSub = genBinaryOp('sub',
@@ -110,22 +106,21 @@ export const FloatSub = genBinaryOp('sub',
 );
 
 /**
- *
  * Modulus of two numeric expressions, mod returns a numeric expression with the value of x modulo y. This is computed as x - y * floor(x/y).
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Number modulus.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.mod(10, 6);  // 4
+ *   width: s.mod(10, 6);  // 4
  * });
  *
  * @memberof carto.expressions
- * @name mod
  * @function
+ * @name mod
  * @api
  */
 export const FloatMod = genBinaryOp('mod',
@@ -135,23 +130,22 @@ export const FloatMod = genBinaryOp('mod',
 );
 
 /**
- *
  * Compute the base to the exponent power, return a numeric expression with the value of the first parameter raised to the power of the second.
  * The result is undefined if x<0 or if x=0 and y≤0.
  *
- * @param {carto.expressions.Expression | number} base numeric expression
- * @param {carto.expressions.Expression | number} exponent numeric expression
- * @return {carto.expressions.Expression} numeric expression with base ^ exponent
+ * @param {carto.expressions.Base|number} base - Numeric expression
+ * @param {carto.expressions.Base|number} exponent - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression with base ^ exponent
  *
  * @example <caption>Power of two numbers.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  width: s.pow(2, 3);  // 8
+ *   width: s.pow(2, 3);  // 8
  * });
  *
  * @memberof carto.expressions
- * @name pow
  * @function
+ * @name pow
  * @api
  */
 export const FloatPow = genBinaryOp('pow',
@@ -161,24 +155,23 @@ export const FloatPow = genBinaryOp('pow',
 );
 
 /**
- *
  * Compare if x is greater than y.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price > 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.gt(s.property('price'), 30);
+ *   filter: s.gt(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name gt
  * @function
+ * @name gt
  * @api
  */
 export const GreaterThan = genBinaryOp('greaterThan',
@@ -188,24 +181,23 @@ export const GreaterThan = genBinaryOp('greaterThan',
 );
 
 /**
- *
  * Compare if x is greater than or equal to y.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price >= 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.gte(s.property('price'), 30);
+ *   filter: s.gte(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name gte
  * @function
+ * @name gte
  * @api
  */
 export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
@@ -215,24 +207,23 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
 );
 
 /**
- *
  * Compare if x is lower than y.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price < 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.lt(s.property('price'), 30);
+ *   filter: s.lt(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name lt
  * @function
+ * @name lt
  * @api
  */
 export const LessThan = genBinaryOp('lessThan',
@@ -242,24 +233,23 @@ export const LessThan = genBinaryOp('lessThan',
 );
 
 /**
- *
  * Compare if x is lower than or equal to y.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price <= 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.lte(s.property('price'), 30);
+ *   filter: s.lte(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name lte
  * @function
+ * @name lte
  * @api
  */
 export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
@@ -269,24 +259,23 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
 );
 
 /**
- *
  * Compare if x is equal to a y.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price === 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.eq(s.property('price'), 30);
+ *   filter: s.eq(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name eq
  * @function
+ * @name eq
  * @api
  */
 export const Equals = genBinaryOp('equals',
@@ -296,24 +285,23 @@ export const Equals = genBinaryOp('equals',
 );
 
 /**
- *
  * Compare if x is different than y.
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price !== 30</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.neq(s.property('price'), 30);
+ *   filter: s.neq(s.prop('price'), 30);
  * });
  *
  * @memberof carto.expressions
- * @name neq
  * @function
+ * @name neq
  * @api
  */
 export const NotEquals = genBinaryOp('notEquals',
@@ -322,31 +310,30 @@ export const NotEquals = genBinaryOp('notEquals',
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
 
-
 /**
- *
  * Perform a binary OR between two numeric expressions.
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Show only elements with price < 30 or price > 1000</caption>
  * const s = carto.expressions;
- * const $price = s.property('price');
+ * const $price = s.prop('price');
  * const viz = new carto.Viz({
- *  filter: s.or(
- *      s.lt($price, 30)
- *      s.gt($price, 1000)
+ *   filter: s.or(
+ *     s.lt($price, 30),
+ *     s.gt($price, 1000)
+ *   )
  * });
  *
  * @memberof carto.expressions
- * @name or
  * @function
+ * @name or
  * @api
  */
 export const Or = genBinaryOp('or',
@@ -356,31 +343,31 @@ export const Or = genBinaryOp('or',
 );
 
 /**
- *
  * Perform a binary AND between two numeric expressions.
  * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Expression | number} x numeric expression
- * @param {carto.expressions.Expression | number} y numeric expression
- * @return {carto.expressions.Expression} numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric expression
+ * @param {carto.expressions.Base|number} y - Numeric expression
+ * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Show only elements with price < 30 AND category === 'fruit'</caption>
  * const s = carto.expressions;
- * const $price = s.property('price');
- * const $category = s.property('category');
+ * const $price = s.prop('price');
+ * const $category = s.prop('category');
  *
  * const viz = new carto.Viz({
- *  filter: s.and(
- *      s.lt($price, 30)
- *      s.eq($category, 'fruit')
+ *   filter: s.and(
+ *     s.lt($price, 30),
+ *     s.eq($category, 'fruit')
+ *   )
  * });
  *
  * @memberof carto.expressions
- * @name and
  * @function
+ * @name and
  * @api
  */
 export const And = genBinaryOp('and',
@@ -391,15 +378,6 @@ export const And = genBinaryOp('and',
 
 function genBinaryOp(name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends BaseExpression {
-        /**
-         * @jsapi
-         * @name BinaryOperation
-         * @hideconstructor
-         * @augments Expression
-         * @constructor
-         * @param {*} a
-         * @param {*} b
-         */
         constructor(a, b) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return float(jsFn(a, b));
@@ -417,6 +395,9 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             super({ a: a, b: b });
             this.type = getReturnTypeFromSignature(signature);
         }
+        eval(feature) {
+            return jsFn(this.a.eval(feature), this.b.eval(feature));
+        }
         _compile(meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
@@ -428,9 +409,6 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             this.type = getReturnTypeFromSignature(signature);
 
             this.inlineMaker = inline => glsl(inline.a, inline.b);
-        }
-        eval(feature) {
-            return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
     };
 }
