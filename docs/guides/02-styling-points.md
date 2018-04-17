@@ -13,7 +13,9 @@ This guide walks through making a variety of common thematic map types for point
 
 ### Point Size
 
-To adjust the point size, use the `width` property.
+To adjust the point size, use the `width` property. This will set the point `diameter` in pixels.
+
+Remember there is a limitation in the total diameter (fill + stroke)  of **124px**. This means the maximun size never will exceed this limit.
 
 ```
 width: 5
