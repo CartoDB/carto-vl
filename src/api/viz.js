@@ -36,20 +36,20 @@ export default class Viz {
     * A Viz defines how the data will be displayed: the color of the elements and size are basic things that can be
     * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
     *
-    * A Viz is created from an {@link VizSpec|vizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.expressions|expression}.
+    * A Viz is created from an {@link VizSpec|VizSpec} object or from a string.
+    * Each attribute in the {@link VizSpec|VizSpec} must be a valid {@link carto.expressions|expression}.
     * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
     * @example <caption> Create a viz with black dots using the string constructor </caption>
-    * new carto.Viz(`
+    * const viz = new carto.Viz(`
     *   color: rgb(0,0,0)
     * `);
     *
     * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
-    * new carto.Viz({
-    *   color: carto.viz.expression.rgb(0,0,0)
+    * const viz = new carto.Viz({
+    *   color: carto.expressions.rgb(0,0,0)
     * });
     *
     * @fires CartoError
@@ -107,7 +107,7 @@ export default class Viz {
     /**
      * Return the color expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expressions.Expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -120,7 +120,7 @@ export default class Viz {
     /**
      * Return the width expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expressions.Expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -133,7 +133,7 @@ export default class Viz {
     /**
      * Return the strokeColor expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expressions.Expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -146,7 +146,7 @@ export default class Viz {
     /**
      * Return the strokeWidth expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expressions.Expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -159,7 +159,7 @@ export default class Viz {
     /**
      * Return the order expression.
      *
-     * @return {carto.viz.expression}
+     * @return {carto.expressions.Expression}
      *
      * @memberof carto.Viz
      * @instance
@@ -169,6 +169,15 @@ export default class Viz {
         return this._vizSpec.order;
     }
 
+    /**
+     * Return the filter expression.
+     *
+     * @return {carto.expressions.Expression}
+     *
+     * @memberof carto.Viz
+     * @instance
+     * @api
+     */
     getFilter() {
         return this._vizSpec.filter;
     }
@@ -372,6 +381,7 @@ export default class Viz {
          * @property {carto.expressions.Expression} strokeColor
          * @property {carto.expressions.Expression} strokeWidth
          * @property {carto.expressions.Expression} order
+         * @property {carto.expressions.Expression} filter
          * @api
          */
 
