@@ -4,7 +4,7 @@ import { validateStaticType, validateStaticTypeErrors } from './utils';
 describe('src/core/viz/expressions/palettes', () => {
     describe('error control', () => {
         validateStaticTypeErrors('customPalette', []);
-        validateStaticTypeErrors('customPalette', ['float-property']);
+        validateStaticTypeErrors('customPalette', ['number-property']);
         validateStaticTypeErrors('customPalette', ['category']);
     });
 

@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp } from './utils';
-import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
+import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './property';
 
 const DEFAULT_FADE = 0.15;
@@ -9,7 +9,7 @@ const DEFAULT_FADE = 0.15;
  * Create a Torque FadeIn/FadeOut configuration
  *
  * @param {carto.expressions.number|number} param1 expression of type number or Number
- * @param {carto.expression.number|number} param2 expression of type number or Number
+ * @param {carto.expressions.number|number} param2 expression of type number or Number
  * @return {carto.expressions.fade}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
@@ -53,7 +53,7 @@ export class Fade extends BaseExpression {
 /**
  * Create an animated temporal filter (torque)
  *
- * @param {carto.expressions.Expression} input input to base the temporal filter,
+ * @param {carto.expressions.Base} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
  *
@@ -84,19 +84,19 @@ export class Torque extends BaseExpression {
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         }
-        const _cycle = floatDiv(floatMod(now(), duration), duration);
+        const _cycle = div(mod(now(), duration), duration);
         super({ input, _cycle, fade });
         // TODO improve type check
         this.duration = duration;
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.input.type != 'float') {
+        if (this.input.type != 'number') {
             throw new Error('Torque(): invalid first parameter, input.');
         } else if (this.fade.type != 'fade') {
             throw new Error('Torque(): invalid third parameter, fade.');
         }
-        this.type = 'float';
+        this.type = 'number';
 
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;

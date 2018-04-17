@@ -172,14 +172,14 @@ function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends BaseExpression {
         constructor(a) {
             a = implicitCast(a);
-            checkLooseType(name, 'x', 0, 'float', a);
+            checkLooseType(name, 'x', 0, 'number', a);
             super({ a: a });
-            this.type = 'float';
+            this.type = 'number';
         }
         _compile(meta) {
             super._compile(meta);
-            checkType(name, 'x', 0, 'float', this.a);
-            if (this.a.type != 'float') {
+            checkType(name, 'x', 0, 'number', this.a);
+            if (this.a.type != 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
             this.inlineMaker = inlines => glsl(inlines.a);

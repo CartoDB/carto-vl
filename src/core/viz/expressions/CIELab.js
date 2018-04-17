@@ -28,10 +28,10 @@ export default class CIELab extends BaseExpression {
 
         checkExpression('cielab', 'l', 0, l);
         checkExpression('cielab', 'a', 1, a);
-        checkExpression('blend', 'b', 2, b);
-        checkLooseType('cielab', 'l', 0, 'float', l);
-        checkLooseType('cielab', 'a', 1, 'float', a);
-        checkLooseType('cielab', 'b', 2, 'float', b);
+        checkExpression('cielab', 'b', 2, b);
+        checkLooseType('cielab', 'l', 0, 'number', l);
+        checkLooseType('cielab', 'a', 1, 'number', a);
+        checkLooseType('cielab', 'b', 2, 'number', b);
 
         super({ l, a, b });
         this.type = 'color';
@@ -40,9 +40,9 @@ export default class CIELab extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
 
-        checkType('cielab', 'l', 0, 'float', this.l);
-        checkType('cielab', 'a', 1, 'float', this.a);
-        checkType('cielab', 'b', 2, 'float', this.b);
+        checkType('cielab', 'l', 0, 'number', this.l);
+        checkType('cielab', 'a', 1, 'number', this.a);
+        checkType('cielab', 'b', 2, 'number', this.b);
 
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(

@@ -4,13 +4,13 @@ import { opacity, rgba } from '../../../../../src/core/viz/functions';
 describe('src/core/viz/expressions/opacity', () => {
     describe('error control', () => {
         validateStaticTypeErrors('opacity', []);
-        validateStaticTypeErrors('opacity', ['float']);
-        validateStaticTypeErrors('opacity', ['float', 'float']);
+        validateStaticTypeErrors('opacity', ['number']);
+        validateStaticTypeErrors('opacity', ['number', 'number']);
         validateDynamicTypeErrors('opacity', ['color', 'category']);
     });
 
     describe('type', () => {
-        validateStaticType('opacity', ['color', 'float'], 'color');
+        validateStaticType('opacity', ['color', 'number'], 'color');
     });
 
     describe('eval', () => {

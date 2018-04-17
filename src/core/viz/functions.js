@@ -15,7 +15,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *  width: carto.expressions.number(10)
+ *   width: carto.expressions.number(10)
  * });
  * ```
  *
@@ -24,7 +24,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *  width: carto.expressions.property('population')
+ *   width: carto.expressions.property('population')
  * });
  * ```
  *
@@ -34,10 +34,10 @@
  * ```javascript
  * const s = carto.expressions; // We use this alias along documentation.
  * const viz = new carto.Viz({
- *  width: s.div(
- *      property('population'),
- *      s.number(10000)
- *  ),
+ *   width: s.div(
+ *     s.property('population'),
+ *     s.number(10000)
+ *  )
  * });
  * ```
  *
@@ -53,7 +53,6 @@
  *
  */
 
-// Aggregation ops
 import { Avg } from './expressions/aggregation';
 import { Max } from './expressions/aggregation';
 import { Min } from './expressions/aggregation';
@@ -67,13 +66,12 @@ import { Nin } from './expressions/belongs.js';
 
 import Between from './expressions/between';
 
-// Binary ops
-import { FloatMul } from './expressions/binary';
-import { FloatDiv } from './expressions/binary';
-import { FloatAdd } from './expressions/binary';
-import { FloatSub } from './expressions/binary';
-import { FloatMod } from './expressions/binary';
-import { FloatPow } from './expressions/binary';
+import { Mul } from './expressions/binary';
+import { Div } from './expressions/binary';
+import { Add } from './expressions/binary';
+import { Sub } from './expressions/binary';
+import { Mod } from './expressions/binary';
+import { Pow } from './expressions/binary';
 import { GreaterThan } from './expressions/binary';
 import { GreaterThanOrEqualTo } from './expressions/binary';
 import { LessThan } from './expressions/binary';
@@ -83,13 +81,28 @@ import { NotEquals } from './expressions/binary';
 import { Or } from './expressions/binary';
 import { And } from './expressions/binary';
 
-import { palettes, Inverse, CustomPalette } from './expressions/palettes';
 import Blend from './expressions/blend';
+
 import Buckets from './expressions/buckets';
-import CIELab from './expressions/CIELab';
-import Float from './expressions/float';
-import FloatConstant from './expressions/floatConstant';
+
 import Category from './expressions/category';
+
+import CIELab from './expressions/CIELab';
+
+import Constant from './expressions/constant';
+
+
+
+import Number from './expressions/number';
+
+
+
+
+import { palettes, Inverse, CustomPalette } from './expressions/palettes';
+
+
+
+
 import Linear from './expressions/linear';
 import Near from './expressions/near';
 import Now from './expressions/now';
@@ -141,7 +154,6 @@ import { Asc, Desc, NoOrder, Width } from './expressions/ordering';
 
 /* Expose classes as constructor functions */
 
-// Aggregation ops
 export const avg = (...args) => new Avg(...args);
 export const max = (...args) => new Max(...args);
 export const min = (...args) => new Min(...args);
@@ -156,34 +168,46 @@ export { _in as in };
 
 export const between = (...args) => new Between(...args);
 
-// Binary ops
-export const number = float;
-export const add = floatAdd;
-export const sub = floatSub;
-export const mul = floatMul;
-export const div = floatDiv;
-export const pow = floatPow;
-export const mod = floatMod;
-export const prop = property;
+export const mul = (...args) => new Mul(...args);
+export const div = (...args) => new Div(...args);
+export const add = (...args) => new Add(...args);
+export const sub = (...args) => new Sub(...args);
+export const pow = (...args) => new Pow(...args);
+export const mod = (...args) => new Mod(...args);
+export const greaterThan = (...args) => new GreaterThan(...args);
+export const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
+export const lessThan = (...args) => new LessThan(...args);
+export const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
+export const equals = (...args) => new Equals(...args);
+export const notEquals = (...args) => new NotEquals(...args);
+export const and = (...args) => new And(...args);
+export const or = (...args) => new Or(...args);
 export const gt = greaterThan;
 export const gte = greaterThanOrEqualTo;
 export const lt = lessThan;
 export const lte = lessThanOrEqualTo;
 export const eq = equals;
 export const neq = notEquals;
-export const and = (...args) => new And(...args);
-export const or = (...args) => new Or(...args);
+
+export const blend = (...args) => new Blend(...args);
+
+export const buckets = (...args) => new Buckets(...args);
+
+export const category = (...args) => new Category(...args);
+
+export const cielab = (...args) => new CIELab(...args);
+
+export const constant = (...args) => new Constant(...args);
+
+
+export const number = (...args) => new Number(...args);
+
 
 export const asc = (...args) => new Asc(...args);
 export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
-export const floatMul = (...args) => new FloatMul(...args);
-export const floatDiv = (...args) => new FloatDiv(...args);
-export const floatAdd = (...args) => new FloatAdd(...args);
-export const floatSub = (...args) => new FloatSub(...args);
-export const floatPow = (...args) => new FloatPow(...args);
-export const floatMod = (...args) => new FloatMod(...args);
+
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
 export const sin = (...args) => new Sin(...args);
@@ -191,7 +215,6 @@ export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const near = (...args) => new Near(...args);
-export const blend = (...args) => new Blend(...args);
 export const rgba = (...args) => new RGBA(...args);
 export const rgb = (...args) => new RGB(...args);
 export const hex = (...args) => new Hex(...args);
@@ -204,24 +227,20 @@ export const hsla = (...args) => new HSLA(...args);
 export const namedColor = (...args) => new NamedColor(...args);
 export const opacity = (...args) => new Opacity(...args);
 export const ramp = (...args) => new Ramp(...args);
-export const float = (...args) => new Float(...args);
-export const category = (...args) => new Category(...args);
+
+export const prop = property;
+
 export const top = (...args) => new Top(...args);
 export const linear = (...args) => new Linear(...args);
 export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 export const now = (...args) => new Now(...args);
 export const zoom = (...args) => new Zoom(...args);
-export const cielab = (...args) => new CIELab(...args);
+
 export const xyz = (...args) => new XYZ(...args);
 export const abs = (...args) => new Abs(...args);
-export const greaterThan = (...args) => new GreaterThan(...args);
-export const greaterThanOrEqualTo = (...args) => new GreaterThanOrEqualTo(...args);
-export const lessThan = (...args) => new LessThan(...args);
-export const lessThanOrEqualTo = (...args) => new LessThanOrEqualTo(...args);
-export const equals = (...args) => new Equals(...args);
-export const notEquals = (...args) => new NotEquals(...args);
-export const buckets = (...args) => new Buckets(...args);
+
+
 export const quantiles = (...args) => new Quantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
 export const viewportMax = (...args) => new ViewportMax(...args);
@@ -237,14 +256,13 @@ export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const inverse = (...args) => new Inverse(...args);
-export const floatConstant = (...args) => new FloatConstant(...args);
 export const torque = (...args) => new Torque(...args);
 export const fade = (...args) => new Fade(...args);
 export const time = (...args) => new Time(...args);
 export const customPalette = (...args) => new CustomPalette(...args);
 
-export const TRUE = new FloatConstant(1);
-export const FALSE = new FloatConstant(0);
+export const TRUE = new Constant(1);
+export const FALSE = new Constant(0);
 export const not = (...args) => new Not(...args);
 
 export { variable as var };

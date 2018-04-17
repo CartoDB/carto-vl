@@ -63,7 +63,7 @@ export class CustomPalette extends BaseExpression {
         if (type == undefined) {
             throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
         }
-        checkType('customPalette', 'colors[0]', 0, ['color', 'float'], elems[0]);
+        checkType('customPalette', 'colors[0]', 0, ['color', 'number'], elems[0]);
         elems.map((color, index) => {
             checkExpression('customPalette', `colors[${index}]`, index, color);
             if (color.type == undefined) {

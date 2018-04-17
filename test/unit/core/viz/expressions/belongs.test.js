@@ -10,7 +10,7 @@ describe('src/core/viz/expressions/belongs', () => {
         },
         {
             name: 'price',
-            type: 'float',
+            type: 'number',
         }
         ],
         categoryIDs: {
@@ -30,13 +30,13 @@ describe('src/core/viz/expressions/belongs', () => {
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
         validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['float', 'category']);
-        validateDynamicTypeErrors('in', ['category', 'float']);
+        validateDynamicTypeErrors('in', ['number', 'category']);
+        validateDynamicTypeErrors('in', ['category', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category'], 'float');
-        validateStaticType('in', ['category', 'category', 'category'], 'float');
+        validateStaticType('in', ['category', 'category'], 'number');
+        validateStaticType('in', ['category', 'category', 'category'], 'number');
     });
 
     describe('eval', () => {

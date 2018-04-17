@@ -27,7 +27,7 @@ export default class Blend extends BaseExpression {
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        checkLooseType('blend', 'mix', 2, 'float', mix);
+        checkLooseType('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
@@ -57,7 +57,7 @@ export default class Blend extends BaseExpression {
         super._compile(meta);
 
         abTypeCheck(this.a, this.b);
-        checkType('blend', 'mix', 1, 'float', this.mix);
+        checkType('blend', 'mix', 1, 'number', this.mix);
 
         this.type = this.a.type;
 
@@ -73,7 +73,7 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck(a, b) {
-    if (!((a.type == 'float' && b.type == 'float') || (a.type == 'color' && b.type == 'color'))) {
+    if (!((a.type == 'number' && b.type == 'number') || (a.type == 'color' && b.type == 'color'))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }

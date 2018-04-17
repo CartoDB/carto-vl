@@ -65,10 +65,10 @@ function genInterpolator(inlineMaker, preface, jsEval) {
         }
         _compile(meta) {
             super._compile(meta);
-            if (this.m.type != 'float') {
+            if (this.m.type != 'number') {
                 throw new Error(`Blending cannot be performed by '${this.m.type}'`);
             }
-            this.type = 'float';
+            this.type = 'number';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
         }
         eval(feature) {

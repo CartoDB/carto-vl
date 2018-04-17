@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { float } from '../functions';
+import { number } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
 import * as schema from '../../schema';
@@ -17,7 +17,7 @@ function genQuantiles(global) {
             };
             let breakpoints = [];
             for (let i = 0; i < buckets - 1; i++) {
-                children[`arg${i}`] = float(i * 10);
+                children[`arg${i}`] = number(i * 10);
                 breakpoints.push(children[`arg${i}`]);
             }
             super(children);
@@ -37,7 +37,7 @@ function genQuantiles(global) {
         }
         _compile(metadata) {
             super._compile(metadata);
-            checkType('quantiles', 'input', 0, 'float', this.input);
+            checkType('quantiles', 'input', 0, 'number', this.input);
             if (global) {
                 const copy = metadata.sample.map(s => s[this.input.name]);
                 copy.sort((x, y) => x - y);

@@ -21,7 +21,7 @@ import { checkInstance, checkType } from './utils';
  * @name avg
  * @api
  */
-export const Avg = genAggregationOp('avg', 'float');
+export const Avg = genAggregationOp('avg', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -41,7 +41,7 @@ export const Avg = genAggregationOp('avg', 'float');
  * @name max
  * @api
  */
-export const Max = genAggregationOp('max', 'float');
+export const Max = genAggregationOp('max', 'number');
 
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
@@ -61,7 +61,7 @@ export const Max = genAggregationOp('max', 'float');
  * @name min
  * @api
  */
-export const Min = genAggregationOp('min', 'float');
+export const Min = genAggregationOp('min', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -81,7 +81,7 @@ export const Min = genAggregationOp('min', 'float');
  * @name sum
  * @api
  */
-export const Sum = genAggregationOp('sum', 'float');
+export const Sum = genAggregationOp('sum', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property

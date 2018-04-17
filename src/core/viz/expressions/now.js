@@ -1,16 +1,16 @@
 import BaseExpression from './base';
-import { float } from '../functions';
+import { number } from '../functions';
 
 export default class Now extends BaseExpression {
     /**
      * @description get the current timestamp
      */
     constructor() {
-        super({ now: float(0) });
+        super({ now: number(0) });
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.type = 'float';
+        this.type = 'number';
         super.inlineMaker = inline => inline.now;
     }
     _preDraw(...args) {

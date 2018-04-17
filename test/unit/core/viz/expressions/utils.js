@@ -4,7 +4,7 @@ const metadata = {
     columns: [
         {
             name: 'price',
-            type: 'float'
+            type: 'number'
         },
         {
             name: 'cat',
@@ -89,12 +89,12 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 
 function getSimpleArg(type) {
     switch (type) {
-        case 'float-property':
+        case 'number-property':
             return [s.property('price'), '$price'];
         case 'category-property':
             return [s.property('cat'), '$cat'];
-        case 'float':
-            return [s.float(0), '0'];
+        case 'number':
+            return [s.number(0), '0'];
         case 'category':
             return [s.category('red'), '\'red\''];
         case 'color':
@@ -111,8 +111,8 @@ function getSimpleArg(type) {
 }
 function getPropertyArg(type) {
     switch (type) {
-        case 'float-property':
-        case 'float':
+        case 'number-property':
+        case 'number':
             return [s.property('price'), '$price'];
         case 'category-property':
         case 'category':

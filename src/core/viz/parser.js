@@ -77,17 +77,17 @@ function parseBinaryOperation(node) {
     const right = parseNode(node.right);
     switch (node.operator) {
         case '*':
-            return functions.floatMul(left, right);
+            return functions.mul(left, right);
         case '/':
-            return functions.floatDiv(left, right);
+            return functions.div(left, right);
         case '+':
-            return functions.floatAdd(left, right);
+            return functions.add(left, right);
         case '-':
-            return functions.floatSub(left, right);
+            return functions.sub(left, right);
         case '%':
-            return functions.floatMod(left, right);
+            return functions.mod(left, right);
         case '^':
-            return functions.floatPow(left, right);
+            return functions.pow(left, right);
         case '>':
             return functions.greaterThan(left, right);
         case '>=':
@@ -110,7 +110,7 @@ function parseBinaryOperation(node) {
 function parseUnaryOperation(node) {
     switch (node.operator) {
         case '-':
-            return functions.floatMul(-1, parseNode(node.argument));
+            return functions.mul(-1, parseNode(node.argument));
         case '+':
             return parseNode(node.argument);
         default:

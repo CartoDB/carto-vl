@@ -118,7 +118,7 @@ describe('api/source/geojson', () => {
                 columns: [
                     {
                         name: 'numeric',
-                        type: 'float',
+                        type: 'number',
                         min: 1,
                         max: 2,
                         avg: 1.5,
@@ -133,7 +133,7 @@ describe('api/source/geojson', () => {
                     },
                     {
                         name: 'cartodb_id',
-                        type: 'float',
+                        type: 'number',
                         min: 0,
                         max: 1,
                         avg: 0.5,

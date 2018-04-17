@@ -142,7 +142,7 @@ describe('src/client/windshaft-filtering', () => {
                     upper: 20
                 };
                 const actual = preFilters(f,
-                    s.between(s.property('numericProperty'), s.floatConstant(10), 20)
+                    s.between(s.property('numericProperty'), s.constant(10), 20)
                 );
                 expect(actual).toEqual(expected);
             });
@@ -506,7 +506,7 @@ describe('src/client/windshaft-filtering', () => {
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.between(s.property('numericProperty'), s.floatConstant(10), 20)
+                    s.between(s.property('numericProperty'), s.constant(10), 20)
                 );
                 expect(actual).toEqual(expected);
             });

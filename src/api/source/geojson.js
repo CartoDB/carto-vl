@@ -164,7 +164,7 @@ export default class GeoJSON extends Base {
             this._numFields.push(propertyName);
             columns.push({
                 name: propertyName,
-                type: 'float',
+                type: 'number',
                 min: Number.POSITIVE_INFINITY,
                 max: Number.NEGATIVE_INFINITY,
                 avg: Number.NaN,

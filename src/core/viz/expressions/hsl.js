@@ -32,7 +32,7 @@ function genHSL(name, alpha) {
 
             const children = { h, s, l };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'float', a);
+                checkLooseType(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -49,7 +49,7 @@ function genHSL(name, alpha) {
             hslCheckType('s', 1, this.s);
             hslCheckType('l', 2, this.l);
             if (alpha) {
-                checkType('hsla', 'a', 3, 'float', this.a);
+                checkType('hsla', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -115,7 +115,7 @@ function genHSL(name, alpha) {
 
     function hslCheckType(parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
-        if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+        if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }

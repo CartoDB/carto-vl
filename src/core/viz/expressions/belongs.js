@@ -6,7 +6,7 @@ import BaseExpression from './base';
  *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical whitelist
  * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the whitelist
- * @return {carto.expressions.Base} numeric expression with the result of the check
+ * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
  * const s = carto.expressions;
@@ -27,7 +27,7 @@ export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => 
  *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical blacklist
  * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the blacklist
- * @return {carto.expressions.Base} numeric expression with the result of the check
+ * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
  * const s = carto.expressions;
@@ -75,7 +75,7 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             super(children);
             this.categories = categories;
             this.inlineMaker = inlineMaker(this.categories);
-            this.type = 'float';
+            this.type = 'number';
         }
         eval(feature) {
             return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));

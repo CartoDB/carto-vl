@@ -1,13 +1,13 @@
 import BaseExpression from './base';
-import { float } from '../functions';
+import { number } from '../functions';
 
 export default class Zoom extends BaseExpression {
     /**
      * @description get the current zoom level
      */
     constructor() {
-        super({ zoom: float(0) });
-        this.type = 'float';
+        super({ zoom: number(0) });
+        this.type = 'number';
     }
     _compile(metadata) {
         super._compile(metadata);

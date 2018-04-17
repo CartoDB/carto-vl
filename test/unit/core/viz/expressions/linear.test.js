@@ -4,16 +4,16 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 describe('src/core/viz/expressions/linear', () => {
     describe('error control', () => {
         validateStaticTypeErrors('linear', []);
-        validateStaticTypeErrors('linear', ['float']);
-        validateStaticTypeErrors('linear', ['float', 'float']);
-        validateStaticTypeErrors('linear', ['float', 'color']);
-        validateStaticTypeErrors('linear', ['float', 'color', 'float']);
-        validateDynamicTypeErrors('linear', ['category', 'float', 'float']);
-        validateDynamicTypeErrors('linear', ['float', 'float', 'category']);
+        validateStaticTypeErrors('linear', ['number']);
+        validateStaticTypeErrors('linear', ['number', 'number']);
+        validateStaticTypeErrors('linear', ['number', 'color']);
+        validateStaticTypeErrors('linear', ['number', 'color', 'number']);
+        validateDynamicTypeErrors('linear', ['category', 'number', 'number']);
+        validateDynamicTypeErrors('linear', ['number', 'number', 'category']);
     });
 
     describe('type', () => {
-        validateStaticType('linear', ['float', 'float', 'float'], 'float');
+        validateStaticType('linear', ['number', 'number', 'number'], 'number');
     });
 
     describe('.eval()', () => {

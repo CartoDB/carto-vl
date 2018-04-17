@@ -31,13 +31,13 @@ function genRGB(name, alpha) {
     return class RGBA extends BaseExpression {
         constructor(r, g, b, a) {
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
-            checkLooseType(name, 'r', 0, 'float', r);
-            checkLooseType(name, 'g', 1, 'float', g);
-            checkLooseType(name, 'b', 2, 'float', b);
+            checkLooseType(name, 'r', 0, 'number', r);
+            checkLooseType(name, 'g', 1, 'number', g);
+            checkLooseType(name, 'b', 2, 'number', b);
 
             const children = { r, g, b };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'float', a);
+                checkLooseType(name, 'a', 3, 'number', a);
                 children.a = a;
             }
             super(children);
@@ -45,11 +45,11 @@ function genRGB(name, alpha) {
         }
         _compile(meta) {
             super._compile(meta);
-            checkType(name, 'r', 0, 'float', this.r);
-            checkType(name, 'g', 1, 'float', this.g);
-            checkType(name, 'b', 2, 'float', this.b);
+            checkType(name, 'r', 0, 'number', this.r);
+            checkType(name, 'g', 1, 'number', this.g);
+            checkType(name, 'b', 2, 'number', this.b);
             if (alpha) {
-                checkType('rgba', 'a', 3, 'float', this.a);
+                checkType('rgba', 'a', 3, 'number', this.a);
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }

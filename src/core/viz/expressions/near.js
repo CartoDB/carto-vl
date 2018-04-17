@@ -25,10 +25,10 @@ export default class Near extends BaseExpression {
     }
     _compile(meta) {
         super._compile(meta);
-        if (this.input.type != 'float' || this.center.type != 'float' || this.threshold.type != 'float' || this.falloff.type != 'float') {
+        if (this.input.type != 'number' || this.center.type != 'number' || this.threshold.type != 'number' || this.falloff.type != 'number') {
             throw new Error('Near(): invalid parameter type');
         }
-        this.type = 'float';
+        this.type = 'number';
         this.inlineMaker = (inline) =>
             `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
     }

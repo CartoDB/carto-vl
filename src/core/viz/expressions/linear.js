@@ -5,10 +5,10 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * Linearly interpolates the value of a given input between min and max.
 *
 *
-* @param {carto.expressions.expression} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {carto.expressions.expression} min - Numeric or date expression pointing to the lower limit
-* @param {carto.expressions.expression} max - Numeric or date expression pointing to the higher limit
-* @return {carto.expressions.expression}
+* @param {carto.expressions.Base} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {carto.expressions.Base} min - Numeric or date expression pointing to the lower limit
+* @param {carto.expressions.Base} max - Numeric or date expression pointing to the higher limit
+* @return {carto.expressions.Base}
 *
 * @example <caption> Display points with a different color depending on the `category` property. </caption>
 * const s = carto.expressions;
@@ -34,11 +34,11 @@ export default class Linear extends BaseExpression {
         super({ input, min, max });
 
         if (this.min.type != 'time') {
-            checkLooseType('linear', 'input', 0, 'float', this.input);
-            checkLooseType('linear', 'min', 1, 'float', this.min);
-            checkLooseType('linear', 'max', 2, 'float', this.max);
+            checkLooseType('linear', 'input', 0, 'number', this.input);
+            checkLooseType('linear', 'min', 1, 'number', this.min);
+            checkLooseType('linear', 'max', 2, 'number', this.max);
         }
-        this.type = 'float';
+        this.type = 'number';
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -56,9 +56,9 @@ export default class Linear extends BaseExpression {
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
 
         } else {
-            checkType('linear', 'input', 0, 'float', this.input);
-            checkType('linear', 'min', 1, 'float', this.min);
-            checkType('linear', 'max', 2, 'float', this.max);
+            checkType('linear', 'input', 0, 'number', this.input);
+            checkType('linear', 'min', 1, 'number', this.min);
+            checkType('linear', 'max', 2, 'number', this.max);
 
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }

@@ -34,7 +34,7 @@ function genHSV(name, alpha) {
             const children = { h, s, v };
             if (alpha) {
                 a = implicitCast(a);
-                checkLooseType(name, 'a', 3, 'float', a);
+                checkLooseType(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -51,7 +51,7 @@ function genHSV(name, alpha) {
             hsvCheckType('s', 1, this.s);
             hsvCheckType('v', 2, this.v);
             if (alpha) {
-                checkType('hsva', 'a', 3, 'float', this.a);
+                checkType('hsva', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -115,7 +115,7 @@ function genHSV(name, alpha) {
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
-        if (parameter.type != 'float' && parameter.type != 'category' && parameter.type !== undefined) {
+        if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }

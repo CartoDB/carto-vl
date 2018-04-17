@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { float } from '../functions';
+import { number } from '../functions';
 import * as schema from '../../schema';
 
 export const ViewportMax = generateAggregattion('max');
@@ -24,7 +24,7 @@ function generateAggregattion(metadataPropertyName, global) {
          * @param {*} property
          */
         constructor(property) {
-            super({ value: float(0) });
+            super({ value: number(0) });
             this.property = property;
         }
         eval() {
@@ -34,7 +34,7 @@ function generateAggregattion(metadataPropertyName, global) {
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
-            this.type = 'float';
+            this.type = 'number';
             super.inlineMaker = inline => inline.value;
             if (global) {
                 this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
@@ -77,7 +77,7 @@ function generatePercentile(global) {
             if (!Number.isFinite(percentile)) {
                 throw new Error('Percentile must be a fixed literal number');
             }
-            super({ value: float(0) });
+            super({ value: number(0) });
             // TODO improve type check
             this.property = property;
             this.percentile = percentile;
@@ -85,7 +85,7 @@ function generatePercentile(global) {
         _compile(metadata) {
             super._compile(metadata);
             this.property._compile(metadata);
-            this.type = 'float';
+            this.type = 'number';
             super.inlineMaker = inline => inline.value;
             if (global) {
                 const copy = metadata.sample.map(s => s[this.property.name]);

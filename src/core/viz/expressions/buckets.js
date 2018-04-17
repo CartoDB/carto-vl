@@ -62,7 +62,7 @@ export default class Buckets extends BaseExpression {
 
         let looseType = undefined;
         if (input.type) {
-            if (input.type != 'float' && input.type != 'category') {
+            if (input.type != 'number' && input.type != 'category') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
@@ -72,7 +72,7 @@ export default class Buckets extends BaseExpression {
                 if (looseType && looseType != arg.type) {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
-                } else if (arg.type != 'float' && arg.type != 'category') {
+                } else if (arg.type != 'number' && arg.type != 'category') {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
                 }
             }
@@ -94,7 +94,7 @@ export default class Buckets extends BaseExpression {
         for (i = 0; i < this.args.length; i++) {
             if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
                 return i;
-            } else if (this.input.type == 'float' && v < this.args[i].eval(feature)) {
+            } else if (this.input.type == 'number' && v < this.args[i].eval(feature)) {
                 return i;
             }
         }
@@ -105,14 +105,14 @@ export default class Buckets extends BaseExpression {
         this.othersBucket = this.input.type == 'category';
 
         const input = this.input;
-        if (input.type != 'float' && input.type != 'category') {
+        if (input.type != 'number' && input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
         this.args.map((arg, index) => {
             if (input.type != arg.type) {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                     `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
-            } else if (arg.type != 'float' && arg.type != 'category') {
+            } else if (arg.type != 'number' && arg.type != 'category') {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
             }
         });

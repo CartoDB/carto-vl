@@ -3,17 +3,17 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 describe('src/core/viz/expressions/rgb', () => {
     describe('error control', () => {
         validateStaticTypeErrors('rgba', []);
-        validateStaticTypeErrors('rgba', ['float', 'float', 'float']);
-        validateDynamicTypeErrors('rgba', ['float', 'float', 'category', 'float']);
+        validateStaticTypeErrors('rgba', ['number', 'number', 'number']);
+        validateDynamicTypeErrors('rgba', ['number', 'number', 'category', 'number']);
 
         validateStaticTypeErrors('rgb', []);
-        validateStaticTypeErrors('rgb', ['float', 'float']);
-        validateDynamicTypeErrors('rgb', ['float', 'float', 'category']);
+        validateStaticTypeErrors('rgb', ['number', 'number']);
+        validateDynamicTypeErrors('rgb', ['number', 'number', 'category']);
     });
 
     describe('type', () => {
-        validateStaticType('rgb', ['float', 'float', 'float'], 'color');
-        validateStaticType('rgba', ['float', 'float', 'float', 'float'], 'color');
+        validateStaticType('rgb', ['number', 'number', 'number'], 'color');
+        validateStaticType('rgba', ['number', 'number', 'number', 'number'], 'color');
     });
 
     describe('eval', () => {

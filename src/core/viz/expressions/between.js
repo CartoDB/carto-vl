@@ -27,12 +27,12 @@ export default class Between extends BaseExpression {
         lowerLimit = implicitCast(lowerLimit);
         upperLimit = implicitCast(upperLimit);
 
-        checkLooseType('between', 'value', 0, 'float', value);
-        checkLooseType('between', 'lowerLimit', 1, 'float', lowerLimit);
-        checkLooseType('between', 'upperLimit', 2, 'float', upperLimit);
+        checkLooseType('between', 'value', 0, 'number', value);
+        checkLooseType('between', 'lowerLimit', 1, 'number', lowerLimit);
+        checkLooseType('between', 'upperLimit', 2, 'number', upperLimit);
 
         super({ value, lowerLimit, upperLimit });
-        this.type = 'float';
+        this.type = 'number';
     }
     eval(feature) {
         const value = this.value.eval(feature);
@@ -43,9 +43,9 @@ export default class Between extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
 
-        checkType('between', 'value', 0, 'float', this.value);
-        checkType('between', 'lowerLimit', 1, 'float', this.lowerLimit);
-        checkType('between', 'upperLimit', 2, 'float', this.upperLimit);
+        checkType('between', 'value', 0, 'number', this.value);
+        checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
+        checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
 
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }

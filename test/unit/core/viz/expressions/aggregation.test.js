@@ -22,11 +22,11 @@ describe('src/core/viz/expressions/aggregation', () => {
         validateStaticTypeErrors('max', ['color']);
         validateStaticTypeErrors('max', [0]);
         validateDynamicTypeErrors('max', ['category']);
-        validateDynamicTypeErrors('mode', ['float']);
+        validateDynamicTypeErrors('mode', ['number']);
     });
 
     describe('type', () => {
-        validateStaticType('max', ['float-property'], 'float');
+        validateStaticType('max', ['number-property'], 'number');
         validateStaticType('mode', ['category-property'], 'category');
     });
 

@@ -1,4 +1,4 @@
-import { float, category, customPalette } from '../functions';
+import { number, category, customPalette } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -6,7 +6,7 @@ export const DEFAULT = undefined;
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
-        return float(value);
+        return number(value);
     } else if (typeof value == 'string') {
         return category(value);
     }else if(Array.isArray(value)){

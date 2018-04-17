@@ -22,7 +22,7 @@ export default class Animate extends BaseExpression {
         super({});
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
-        this.type = 'float';
+        this.type = 'number';
     }
     eval() {
         const time = Date.now();
