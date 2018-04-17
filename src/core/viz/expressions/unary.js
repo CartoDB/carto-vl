@@ -152,7 +152,7 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  *  - When x is equal to 1 not(x) will be evaluated to 0
  *  - When x is equal to 0 not(x) will be evaluated to 1
  *
- * @param {carto.expressions.number|number} x - Number to compute the absolute value
+ * @param {carto.expressions.number|number} x - Number to compute the not value
  * @return {carto.expressions.number}
  *
  * @example <caption>Not</caption>
@@ -168,7 +168,53 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  */
 export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
 
+/**
+ *
+ * Compute the floor of the given expression.
+ * Find the nearest integer less than or equal to the expression value.
+ *
+ *  - When x is equal to 0.8 floor(x) will be evaluated to 0
+ *  - When x is equal to 1.3 floor(x) will be evaluated to 1
+ *
+ * @param {carto.expressions.number|number} x - Number to compute the floor value
+ * @return {carto.expressions.number}
+ *
+ * @example <caption>Floor</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *  width: s.floor(5.9);  // 5
+ * });
+ *
+ * @memberof carto.expressions
+ * @name floor
+ * @function
+ * @api
+ */
 export const Floor = genUnaryOp('floor', x =>Math.floor(x), x => `floor(${x})`);
+
+/**
+ *
+ * Compute the ceil of the given expression.
+ * Find the nearest integer that is greater than or equal to the expression value.
+ *
+ *  - When x is equal to 0.8 ceil(x) will be evaluated to 1
+ *  - When x is equal to 1.3 ceil(x) will be evaluated to 2
+ *
+ * @param {carto.expressions.number|number} x - Number to compute the ceil value
+ * @return {carto.expressions.number}
+ *
+ * @example <caption>Ceil</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *  width: s.ceil(5.1);  // 6
+ * });
+ *
+ * @memberof carto.expressions
+ * @name ceil
+ * @function
+ * @api
+ */
+export const Ceil = genUnaryOp('ceil', x =>Math.ceil(x), x => `ceil(${x})`);
 
 function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends Expression {

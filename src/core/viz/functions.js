@@ -76,7 +76,7 @@ import Between from './expressions/between';
 import Time from './expressions/time';
 
 // Unary ops
-import { Log, Floor } from './expressions/unary';
+import { Log, Floor, Ceil } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
 import { Sin } from './expressions/unary';
 import { Cos } from './expressions/unary';
@@ -217,6 +217,7 @@ export const and = (...args) => new And(...args);
 export const or = (...args) => new Or(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
+export const ceil = (...args) => new Ceil(...args);
 
 export const gt = greaterThan;
 export const gte = greaterThanOrEqualTo;
