@@ -1,15 +1,19 @@
 import BaseExpression from './base';
 import { checkNumber, getStringErrorPreface } from './utils';
 
-
+/**
+ * Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
+ * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
+ *
+ * @param {number} duration - Animation duration in milliseconds
+ *
+ * @memberof carto.expressions
+ * @function
+ * @name animate
+ * @api
+ */
 //TODO refactor to use uniformfloat class
 export default class Animate extends BaseExpression {
-    /**
-     * @jsapi
-     * @description Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
-     * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
-     * @param {*} duration animation duration in milliseconds
-     */
     constructor(duration) {
         checkNumber('animate', 'duration', 0, duration);
         if (duration < 0) {
@@ -19,6 +23,14 @@ export default class Animate extends BaseExpression {
         this.aTime = Date.now();
         this.bTime = this.aTime + Number(duration);
         this.type = 'float';
+    }
+    eval() {
+        const time = Date.now();
+        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
+        return Math.min(this.mix, 1.);
+    }
+    isAnimated() {
+        return !this.mix || this.mix <= 1.;
     }
     _applyToShaderSource() {
         return {
@@ -37,13 +49,5 @@ export default class Animate extends BaseExpression {
         } else {
             gl.uniform1f(this._getBinding(program).uniformLocation, this.mix);
         }
-    }
-    eval() {
-        const time = Date.now();
-        this.mix = (time - this.aTime) / (this.bTime - this.aTime);
-        return Math.min(this.mix, 1.);
-    }
-    isAnimated() {
-        return !this.mix || this.mix <= 1.;
     }
 }

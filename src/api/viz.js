@@ -112,7 +112,7 @@ export default class Viz {
     /**
      * Return the color expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -125,7 +125,7 @@ export default class Viz {
     /**
      * Return the width expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -138,7 +138,7 @@ export default class Viz {
     /**
      * Return the strokeColor expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -151,7 +151,7 @@ export default class Viz {
     /**
      * Return the strokeWidth expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -164,7 +164,7 @@ export default class Viz {
     /**
      * Return the order expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -177,7 +177,7 @@ export default class Viz {
     /**
      * Return the filter expression.
      *
-     * @return {carto.expressions.Expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -381,12 +381,12 @@ export default class Viz {
         /**
          * @typedef {object} VizSpec
          * @property {number} resolution
-         * @property {carto.expressions.Expression} color
-         * @property {carto.expressions.Expression} width
-         * @property {carto.expressions.Expression} strokeColor
-         * @property {carto.expressions.Expression} strokeWidth
-         * @property {carto.expressions.Expression} order
-         * @property {carto.expressions.Expression} filter
+         * @property {carto.expressions.Base} color
+         * @property {carto.expressions.Base} width
+         * @property {carto.expressions.Base} strokeColor
+         * @property {carto.expressions.Base} strokeWidth
+         * @property {carto.expressions.Base} order
+         * @property {carto.expressions.Base} filter
          * @api
          */
 
