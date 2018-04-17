@@ -47,9 +47,9 @@ TBD
     // Set the source of your data
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     // Set the look and feel of your data
-    const style = new carto.Style();
+    const viz = new carto.Viz();
     // Create a new layer
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
     // Add the new layer to the map
     layer.addTo(map, 'watername_ocean');
   </script>

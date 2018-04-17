@@ -87,22 +87,25 @@
       FROM ne_10m_populated_places_simple
       WHERE adm0name = \'Spain\'
     `);
-    const spainCitiesStyle = new carto.Style(`
+    const spainCitiesViz = new carto.Viz(`
       width: sqrt($pop_max/2000)
       color: opacity(ramp($name, bold), 0.8)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
       order: asc(width())
+      @name: $name
+      @pop_max: $pop_max
     `);
-    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesStyle);
+    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesViz);
 
     const europeCountriesSource = new carto.source.Dataset(`
       ne_adm0_europe
     `);
-    const europeCountriesStyle = new carto.Style(`
+    const europeCountriesViz = new carto.Viz(`
       color: opacity(ramp($admin, bold),0.4)
+      @admin: $admin
     `);
-    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesStyle);
+    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesViz);
 
     // Detect first `europeCountriesLayer` features, then `spainCitiesLayer` features
     const interactivity = new carto.Interactivity([europeCountriesLayer, spainCitiesLayer]);
@@ -124,14 +127,14 @@
       for (let feature of event.features) {
         if (feature.layerId === 'europeCountriesLayer') {
           content += `
-            <h3><b>${feature.properties.admin}</b></h3>
+            <h3><b>${feature.variables.admin.value}</b></h3>
 
           `;
         }
         if (feature.layerId === 'spainCitiesLayer') {
           content += `
-            <h3>${feature.properties.name}</h3>
-            <p>Population <b>${feature.properties.pop_max}</b></p><br>
+            <h3>${feature.variables.name.value}</h3>
+            <p>Population <b>${feature.variables.pop_max.value}</b></p><br>
           `;
         }
       }

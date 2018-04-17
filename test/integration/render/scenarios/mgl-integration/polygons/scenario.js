@@ -6,7 +6,7 @@ const map = new mapboxgl.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['polygon']);
-const style = new carto.Style();
-const layer = new carto.Layer('layer', source, style);
+const viz = new carto.Viz();
+const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

@@ -60,42 +60,42 @@
     const source = new carto.source.Dataset(`
       world_population_2015
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       width: 50 * sqrt($pop_2015) / sqrt(globalMax($pop_2015))*zoom()
       color: hsva(0.73,0.69,0.89,0.4)
       strokeColor: hsva(0.73,0.69,0.89,0.5)
       strokeWidth: 1
       order: asc(width())
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
 
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
-        event.features[0].style.color.blendTo('rgba(255,20,255,0.7)', 100)
+        event.features[0].color.blendTo('rgba(255,20,255,0.7)', 100)
       }
     });
 
     interactivity.on('featureLeave', event => {
       if (event.features.length > 0) {
-        event.features[0].style.color.reset(100);
+        event.features[0].color.reset(100);
       }
     });
 
     interactivity.on('featureClick', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.style.strokeWidth.blendTo('4', 100);
-        feature.style.strokeColor.blendTo('rgb(255,20,138)', 100);
+        feature.strokeWidth.blendTo('4', 100);
+        feature.strokeColor.blendTo('rgb(255,20,138)', 100);
       }
     });
 
     interactivity.on('featureClickOut', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.style.strokeWidth.reset(100);
-        feature.style.strokeColor.reset(100);
+        feature.strokeWidth.reset(100);
+        feature.strokeColor.reset(100);
       }
     });
 

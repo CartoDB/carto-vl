@@ -6,9 +6,9 @@ const map = new mapboxgl.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['line-string']);
-const style = new carto.Style(`
+const viz = new carto.Viz(`
     width: 20
 `);
-const layer = new carto.Layer('layer', source, style);
+const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

@@ -1,29 +1,29 @@
 import Dataset from '../../../src/api/source/dataset';
 import SQL from '../../../src/api/source/sql';
 import GeoJSON from '../../../src/api/source/geojson';
-import Style from '../../../src/api/style';
+import Viz from '../../../src/api/viz';
 import Layer from '../../../src/api/layer';
 
 describe('api/layer', () => {
     let source;
-    let style, style2;
+    let viz, viz2;
 
     beforeEach(() => {
         source = new Dataset('ne_10m_populated_places_simple', {
             user: 'test',
             apiKey: '1234567890'
         });
-        style = new Style();
-        style2 = new Style();
+        viz = new Viz();
+        viz2 = new Viz();
     });
 
     describe('constructor', () => {
-        it('should build a new Layer with (id, source, style)', () => {
-            const layer = new Layer('layer0', source, style);
+        it('should build a new Layer with (id, source, viz)', () => {
+            const layer = new Layer('layer0', source, viz);
             expect(layer.getId()).toEqual('layer0');
             expect(layer.getSource()).toEqual(source);
             pending('Layer constructor can fail asynchronously, therefore, we must have some way to detect load event');
-            expect(layer.getStyle()).toEqual(style);
+            expect(layer.getViz()).toEqual(viz);
         });
 
         it('should throw an error if id is not valid', () => {
@@ -47,21 +47,21 @@ describe('api/layer', () => {
             }).toThrowError('The given object is not a valid source. See "carto.source.Base".');
         });
 
-        it('should throw an error if style is not valid', () => {
+        it('should throw an error if viz is not valid', () => {
             expect(() => {
                 new Layer('layer0', source);
-            }).toThrowError('`style` property required.');
+            }).toThrowError('`viz` property required.');
             expect(() => {
                 new Layer('layer0', source, {});
-            }).toThrowError('The given object is not a valid style. See "carto.Style".');
+            }).toThrowError('The given object is not a valid viz. See "carto.Viz".');
         });
 
 
-        it('should throw an error if a style is already added to another layer', () => {
-            new Layer('layer1', source, style);
+        it('should throw an error if a viz is already added to another layer', () => {
+            new Layer('layer1', source, viz);
             expect(() => {
-                new Layer('layer2', source, style);
-            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
+                new Layer('layer2', source, viz);
+            }).toThrowError('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
         });
     });
 
@@ -71,7 +71,7 @@ describe('api/layer', () => {
                 user: 'test',
                 apiKey: '1234567890'
             });
-            const layer = new Layer('layer0', source, new Style());
+            const layer = new Layer('layer0', source, new Viz());
             expect(layer.getSource()).not.toBe(source);
         });
         it('should be done with SQL sources', () => {
@@ -79,7 +79,7 @@ describe('api/layer', () => {
                 user: 'test',
                 apiKey: '1234567890'
             });
-            const layer = new Layer('layer0', source, new Style());
+            const layer = new Layer('layer0', source, new Viz());
             expect(layer.getSource()).not.toBe(source);
         });
         it('should be done with GeoJSON sources', () => {
@@ -91,47 +91,43 @@ describe('api/layer', () => {
                 },
                 properties: {}
             });
-            const layer = new Layer('layer0', source, new Style());
+            const layer = new Layer('layer0', source, new Viz());
             expect(layer.getSource()).not.toBe(source);
         });
     });
 
-    describe('.setStyle', () => {
-
-    });
-
-    describe('.blendToStyle', () => {
-        it('should not throw an error if a valid style is passed', () => {
-            const layer = new Layer('layer0', source, style);
+    describe('.blendToViz', () => {
+        it('should not throw an error if a valid viz is passed', () => {
+            const layer = new Layer('layer0', source, viz);
             expect(function () {
-                layer.blendToStyle(style2);
+                layer.blendToViz(viz2);
             }).not.toThrow();
         });
-        it('should throw an error if style is undefined', () => {
-            const layer = new Layer('layer0', source, style);
+        it('should throw an error if viz is undefined', () => {
+            const layer = new Layer('layer0', source, viz);
             expect(function () {
-                layer.blendToStyle();
-            }).toThrowError('`style` property required.');
+                layer.blendToViz();
+            }).toThrowError('`viz` property required.');
         });
-        it('should throw an error when style is not a valid style', () => {
-            const layer = new Layer('layer0', source, style);
+        it('should throw an error when viz is not a valid viz', () => {
+            const layer = new Layer('layer0', source, viz);
             expect(function () {
-                layer.blendToStyle(2);
-            }).toThrowError('The given object is not a valid style. See "carto.Style".');
+                layer.blendToViz(2);
+            }).toThrowError('The given object is not a valid viz. See "carto.Viz".');
         });
-        it('should throw an error if a style is already added to another layer', () => {
-            const layer = new Layer('layer0', source, style);
-            new Layer('layer1', source, style2);
+        it('should throw an error if a viz is already added to another layer', () => {
+            const layer = new Layer('layer0', source, viz);
+            new Layer('layer1', source, viz2);
             expect(() => {
-                layer.blendToStyle(style2);
-            }).toThrowError('The given Style object is already bound to another layer. Styles cannot be shared between different layers');
+                layer.blendToViz(viz2);
+            }).toThrowError('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
         });
     });
 
     describe('.addTo', () => {
         describe('._addToMGLMap', () => {
             beforeEach(() => {
-                this.layer = new Layer('layer0', source, style);
+                this.layer = new Layer('layer0', source, viz);
                 this.layer._onMapLoaded = () => { };
                 spyOn(this.layer, '_onMapLoaded');
             });
@@ -178,7 +174,7 @@ describe('api/layer', () => {
 
     describe('.getFeaturesAtPosition', () => {
         it('should add a layerId to every feature in the list', () => {
-            const layer = new Layer('layer0', source, style);
+            const layer = new Layer('layer0', source, viz);
             const fakeFeature0 = {
                 properties: {},
                 id: 'fakeId0'
