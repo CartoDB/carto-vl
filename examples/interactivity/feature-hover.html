@@ -86,8 +86,8 @@
       london_neighbourhoods
     `);
     const viz = new carto.Viz(`
-      color: ramp($neighbourhood, bold)
       @neighbourhood: $neighbourhood
+      color: ramp($neighbourhood, bold)
     `);
     const layer = new carto.Layer('layer', source, viz);
 

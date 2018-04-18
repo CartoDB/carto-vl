@@ -88,13 +88,13 @@
       WHERE adm0name = \'Spain\'
     `);
     const spainCitiesViz = new carto.Viz(`
+      @name: $name
+      @pop_max: $pop_max
       width: sqrt($pop_max/2000)
       color: opacity(ramp($name, bold), 0.8)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
       order: asc(width())
-      @name: $name
-      @pop_max: $pop_max
     `);
     const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesViz);
 
@@ -102,8 +102,8 @@
       ne_adm0_europe
     `);
     const europeCountriesViz = new carto.Viz(`
-      color: opacity(ramp($admin, bold),0.4)
       @admin: $admin
+      color: opacity(ramp($admin, bold),0.4)
     `);
     const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesViz);
 
@@ -128,7 +128,6 @@
         if (feature.layerId === 'europeCountriesLayer') {
           content += `
             <h3><b>${feature.variables.admin.value}</b></h3>
-
           `;
         }
         if (feature.layerId === 'spainCitiesLayer') {

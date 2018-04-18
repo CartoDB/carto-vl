@@ -13,7 +13,7 @@ import { checkInstance, checkType } from './utils';
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.avg($population);
+ *   width: s.propertyAvg($population);
  * });
  *
  * @memberof carto.expressions
@@ -33,7 +33,7 @@ export const PropertyAvg = genAggregationOp('avg', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.max($population);
+ *   width: s.propertyMax($population);
  * });
  *
  * @memberof carto.expressions
@@ -53,7 +53,7 @@ export const PropertyMax = genAggregationOp('max', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.min($population);
+ *   width: s.propertyMin($population);
  * });
  *
  * @memberof carto.expressions
@@ -73,7 +73,7 @@ export const PropertyMin = genAggregationOp('min', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.mode($population);
+ *   width: s.propertyMode($population);
  * });
  *
  * @memberof carto.expressions
@@ -93,7 +93,7 @@ export const PropertyMode = genAggregationOp('mode', 'category');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.sum($population);
+ *   width: s.propertySum($population);
  * });
  *
  * @memberof carto.expressions
