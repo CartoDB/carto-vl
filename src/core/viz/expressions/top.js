@@ -4,7 +4,7 @@ import BaseExpression from './base';
  * Get the top `n` properties
  *
  * @param {carto.expressions.property} property - Column of the table
- * @param {carto.expressions.number} n - Number of top properties to be returned
+ * @param {number} n - Number of top properties to be returned
  * @return {carto.expressions.property}
  *
  * @example
