@@ -3,9 +3,9 @@ import BaseExpression from './base';
 /**
  * Get the top `n` properties
  *
- * @param {carto.expressions.property} property - Column of the table
+ * @param {carto.expressions.Base} property - Column of the table
  * @param {number} n - Number of top properties to be returned
- * @return {carto.expressions.property}
+ * @return {carto.expressions.Base}
  *
  * @example
  * const s = carto.expressions;

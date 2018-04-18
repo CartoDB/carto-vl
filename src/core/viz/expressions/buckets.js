@@ -46,7 +46,7 @@ let bucketUID = 0;
  * });
  * ```
  *
- * @param {carto.expressions.property} property - The property to be evaluated and interpolated
+ * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
  * @param {...carto.expressions.Base} breakpoints - Numeric expression containing the different breakpoints.
  * @return {carto.expressions.Base}
  *

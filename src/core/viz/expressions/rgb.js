@@ -4,9 +4,9 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 /**
  * Evaluates to a rgb color.
  *
- * @param {carto.expressions.number|number} r - The amount of red in the color
- * @param {carto.expressions.number|number} g - The amount of green in the color
- * @param {carto.expressions.number|number} b - The amount of blue in the color
+ * @param {carto.expressions.Base|number} r - The amount of red in the color
+ * @param {carto.expressions.Base|number} g - The amount of green in the color
+ * @param {carto.expressions.Base|number} b - The amount of blue in the color
  * @return {carto.expressions.rgb}
  *
  * @example <caption>Display blue points.</caption>
@@ -25,10 +25,10 @@ export const RGB = genRGB('rgb', false);
 /**
  * Evaluates to a rgba color.
  *
- * @param {carto.expressions.number|number} r - The amount of red in the color
- * @param {carto.expressions.number|number} g - The amount of green in the color
- * @param {carto.expressions.number|number} b - The amount of blue in the color
- * @param {carto.expressions.number|number} a - The alpha value of the color
+ * @param {carto.expressions.Base|number} r - The amount of red in the color
+ * @param {carto.expressions.Base|number} g - The amount of green in the color
+ * @param {carto.expressions.Base|number} b - The amount of blue in the color
+ * @param {carto.expressions.Base|number} a - The alpha value of the color
  * @return {carto.expressions.rgba}
  *
  * @example <caption>Display blue points.</caption>

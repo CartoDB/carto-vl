@@ -244,7 +244,7 @@ export const inverse = (...args) => new Inverse(...args);
 export const customPalette = (...args) => new CustomPalette(...args);
 
 export const property = (...args) => new Property(...args);
-export { variable as prop };
+export { property as prop };
 
 export const propertyAvg = (...args) => new PropertyAvg(...args);
 export const propertyMax = (...args) => new PropertyMax(...args);

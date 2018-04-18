@@ -7,10 +7,10 @@ import { implicitCast, clamp } from './utils';
  *       _____
  * _____/     \_____
  *
- * @param {carto.expressions.property} input
- * @param {carto.expressions.number|number} center
- * @param {carto.expressions.number|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
- * @param {carto.expressions.number|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @param {carto.expressions.Base} input
+ * @param {carto.expressions.Base|number} center
+ * @param {carto.expressions.Base|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
  * @return {carto.expressions.Base}
  *
  * @example

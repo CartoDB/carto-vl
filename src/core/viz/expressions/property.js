@@ -8,7 +8,7 @@ import { checkString } from './utils';
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
  * @param {string} name - The property in the dataset that is going to be evaluated
- * @return {carto.expressions.property}
+ * @return {carto.expressions.Base}
  *
  * @example <caption>Display only cities with name different from "London"</caption>
  * const s = carto.expressions;

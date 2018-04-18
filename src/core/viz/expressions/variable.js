@@ -5,7 +5,7 @@ import { checkString } from './utils';
  * Loads a variable aliased expresion by the name
  *
  * @param {string} name - The variable name that is going to be evaluated
- * @return {carto.expressions.property}
+ * @return {carto.expressions.Base}
  *
  * @example
  * const s = carto.expressions;

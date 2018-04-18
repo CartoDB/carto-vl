@@ -4,9 +4,9 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
 /**
  * Evaluates to a hsv color.
  *
- * @param {carto.expressions.number|number} h - The hue of the color
- * @param {carto.expressions.number|number} s - The saturation of the color
- * @param {carto.expressions.number|number} v - The value (brightness) of the color
+ * @param {carto.expressions.Base|number} h - The hue of the color
+ * @param {carto.expressions.Base|number} s - The saturation of the color
+ * @param {carto.expressions.Base|number} v - The value (brightness) of the color
  * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
@@ -25,10 +25,10 @@ export const HSV = genHSV('hsv', false);
 /**
  * Evaluates to a hsva color.
  *
- * @param {carto.expressions.number|number} h - The hue of the color
- * @param {carto.expressions.number|number} s - The saturation of the color
- * @param {carto.expressions.number|number} v - The value (brightness) of the color
- * @param {carto.expressions.number|number} a - The alpha value of the color
+ * @param {carto.expressions.Base|number} h - The hue of the color
+ * @param {carto.expressions.Base|number} s - The saturation of the color
+ * @param {carto.expressions.Base|number} v - The value (brightness) of the color
+ * @param {carto.expressions.Base|number} a - The alpha value of the color
  * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>

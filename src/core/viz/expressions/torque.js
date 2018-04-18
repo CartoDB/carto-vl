@@ -8,9 +8,9 @@ const DEFAULT_FADE = 0.15;
 /**
  * Create an animated FadeIn/FadeOut configuration
  *
- * @param {carto.expressions.number|number} param1 expression of type number or Number
- * @param {carto.expressions.number|number} param2 expression of type number or Number
- * @return {carto.expressions.fade}
+ * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
+ * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
+ * @return {carto.expressions.Base}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
  * const s = carto.expressions;
@@ -62,8 +62,8 @@ export class Fade extends BaseExpression {
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
- * @param {carto.expressions.Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
- * @return {carto.expressions.Torque}
+ * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
+ * @return {carto.expressions.Base}
  *
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`

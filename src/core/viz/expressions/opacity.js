@@ -5,7 +5,7 @@ import { checkLooseType, checkType } from './utils';
 /**
  * Override the input color opacity.
  *
- * @param {carto.expressions.number|number} x - A number to be warped in a numeric expression
+ * @param {carto.expressions.Base|number} x - A number to be warped in a numeric expression
  * @return {carto.expressions.Base}
  *
  * @example
