@@ -6,7 +6,7 @@ import Property from './property';
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create a Torque FadeIn/FadeOut configuration
+ * Create an animated FadeIn/FadeOut configuration
  *
  * @param {carto.expressions.number|number} param1 expression of type number or Number
  * @param {carto.expressions.number|number} param2 expression of type number or Number
@@ -68,13 +68,13 @@ export class Fade extends BaseExpression {
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`
  *   width: 2
- *   color: ramp(linear(AVG($temp), 0,30), tealrose)
+ *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
  *   filter: torque($day, 40, fade(0.1, 0.3))`);
  *
  * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`
  *   width:    2
- *   color: ramp(linear(AVG($temp), 0,30), tealrose)
+ *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
  *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.expressions

@@ -1,6 +1,31 @@
 import BaseExpression from './base';
 import { checkString } from './utils';
 
+/**
+ * Loads a variable aliased expresion by the name
+ *
+ * @param {string} name - The variable name that is going to be evaluated
+ * @return {carto.expressions.property}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *     sum_price: s.propertySum(s.prop('price'))
+ *   }
+ *  filter: s.neq(s.var('sum_price'), 'london'),
+ * });
+ *
+ * const viz = new carto.Viz(`
+ *   @sum_price: propertySum($price)
+ *   filter: @sum_price != 'london'
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name var
+ * @function
+ * @api
+ */
 export default class Variable extends BaseExpression {
     constructor(name) {
         checkString('name', 'name', 0, name);

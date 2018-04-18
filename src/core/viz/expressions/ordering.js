@@ -1,13 +1,23 @@
 import BaseExpression from './base';
 import { checkInstance } from './utils';
 
-export class Width extends BaseExpression {
-    constructor() {
-        super({});
-        this.type = 'propertyReference';
-    }
-}
-
+/**
+ * Order ascending by a provided expression. NOTE: only works with `width()`.
+ *
+ * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   order: s.asc(s.width())
+ * });
+ *
+ * @memberof carto.expressions
+ * @name asc
+ * @function
+ * @api
+ */
 export class Asc extends BaseExpression {
     constructor(by) {
         super({});
@@ -16,6 +26,23 @@ export class Asc extends BaseExpression {
     }
 }
 
+/**
+ * Order descending by a provided expression. NOTE: only works with `width()`.
+ *
+ * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   order: s.desc(s.width())
+ * });
+ *
+ * @memberof carto.expressions
+ * @name desc
+ * @function
+ * @api
+ */
 export class Desc extends BaseExpression {
     constructor(by) {
         super({});
@@ -24,9 +51,48 @@ export class Desc extends BaseExpression {
     }
 }
 
+/**
+ * No order expression.
+ *
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   order: s.noOrder()
+ * });
+ *
+ * @memberof carto.expressions
+ * @name noOrder
+ * @function
+ * @api
+ */
 export class NoOrder extends BaseExpression {
     constructor() {
         super({});
         this.type = 'orderer';
+    }
+}
+
+/**
+ * Return the expression assigned in the `width` property
+ *
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   order: s.asc(s.width())
+ * });
+ *
+ * @memberof carto.expressions
+ * @name width
+ * @function
+ * @api
+ */
+export class Width extends BaseExpression {
+    constructor() {
+        super({});
+        this.type = 'propertyReference';
     }
 }

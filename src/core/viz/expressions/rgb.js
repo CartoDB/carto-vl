@@ -1,8 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkType } from './utils';
 
-//TODO refactor to uniformcolor, write color (plain, literal)
-
 /**
  * Evaluates to a rgb color.
  *
@@ -45,6 +43,8 @@ export const RGB = genRGB('rgb', false);
  * @api
  */
 export const RGBA = genRGB('rgba', true);
+
+//TODO refactor to uniformcolor, write color (plain, literal)
 
 function genRGB(name, alpha) {
     return class RGBA extends BaseExpression {
