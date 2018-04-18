@@ -1,5 +1,23 @@
 import BaseExpression from './base';
 
+/**
+ * Get the top `n` properties
+ *
+ * @param {carto.expressions.property} property - Column of the table
+ * @param {carto.expressions.number} n - Number of top properties to be returned
+ * @return {carto.expressions.property}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name top
+ * @function
+ * @api
+ */
 export default class Top extends BaseExpression {
     constructor(property, buckets) {
         // TODO 'cat'

@@ -47,8 +47,8 @@ color: ramp($category, PRISM)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`,
 
-    `width: sqrt(SUM($amount)/50000)*20*(zoom()/4000+0.01)*1.5
-color: ramp(MODE($category), PRISM)
+    `width: sqrt(propertySum($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp(propertyMode($category), PRISM)
 strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`,
 ];
@@ -79,10 +79,10 @@ const texts = [
     'We can make them proportional to the scale too, to avoid not very attractive overlaps',
 
     'And... let\'s put a nice stroke',
-    'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: MIN, MAX, SUM, AVG and MODE',
+    'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: propertyMin, propertyMax, propertySum, propertyAvg and propertyMode',
 ];
 
-const shipsViz = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    opacity(ramp(AVG($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
+const shipsViz = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    opacity(ramp(propertyAvg($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
 
 const BASEMAPS = {
     DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
