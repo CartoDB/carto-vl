@@ -91,7 +91,7 @@ export default class Layer {
      * Add this layer to a map.
      *
      * @param {mapboxgl.Map} map - The map on which to add the layer
-     * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before.
+     * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before. If this values is not passed the layer will be added on the top of the existing layers.
      * @memberof carto.Layer
      * @instance
      * @api

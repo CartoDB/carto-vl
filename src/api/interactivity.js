@@ -20,15 +20,6 @@ import { wToR } from '../client/rsys';
  *
  * @typedef {object} Feature
  * @property {number} id - Unique identification code
- * @property {FeatureViz} viz
- * @api
- */
-
-/**
- *
- * FeatureViz objects can be accessed through {@link Feature} objects.
- *
- * @typedef {object} FeatureViz
  * @property {FeatureVizProperty} color
  * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty} colorStroke
@@ -40,7 +31,7 @@ import { wToR } from '../client/rsys';
 
 /**
  *
- * FeatureVizProperty objects can be accessed through {@link FeatureViz} objects.
+ * FeatureVizProperty objects can be accessed through {@link Feature} objects.
  *
  * @typedef {object} FeatureVizProperty
  * @property {function} blendTo - Change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one

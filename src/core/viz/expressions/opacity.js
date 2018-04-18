@@ -11,7 +11,7 @@ import { checkLooseType, checkType } from './utils';
  * @example
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.opacity(s.rgb(255,0,0), 0.5);  // Equivalent to `s.rgba(255,0,0,0.5)`
+ *   color: s.opacity(s.rgb(255,0,0), 0.5);  // Equivalent to `s.rgba(255,0,0,0.5)`
  * });
  *
  * @memberof carto.expressions

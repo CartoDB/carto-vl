@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { number } from '../functions';
 
 /**
- * Get the current zoom level
+ * Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.
  *
  * @return {carto.expressions.Base}
  *
