@@ -10,7 +10,7 @@
  *  - **filter**: This is a special property used to remove elements that do not meet the expression.
  *  - **resolution**: Determine the resolution of the property-aggregation functions.
  *
- * For example the point radius could be vizd using the `number` expression:
+ * For example the point diameter could be using the `number` expression:
  *
  * ```javascript
  * const viz = new carto.Viz({
@@ -299,4 +299,4 @@ export const zoom = (...args) => new Zoom(...args);
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 
-export { palettes };
+export { palettes, Asc, Desc };
