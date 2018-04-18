@@ -30,13 +30,14 @@ export default class Opacity extends Expression {
         if (Number.isFinite(alpha)) {
             alpha = float(alpha);
         }
-        checkType('opacity', 'color', 0, 'color', color);
+        checkLooseType('opacity', 'color', 0, 'color', color);
         checkLooseType('opacity', 'alpha', 1, 'float', alpha);
         super({ color, alpha });
         this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
+        checkType('opacity', 'color', 0, 'color', this.color);
         checkType('opacity', 'alpha', 1, 'float', this.alpha);
         this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
