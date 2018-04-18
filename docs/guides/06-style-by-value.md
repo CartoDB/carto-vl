@@ -1,49 +1,80 @@
 # Styling by Value
 
-## Styling by a categorical property
+## Overview of Ramp
+
+The `ramp` expression can be used in many forms. Summarizing, `ramp` maps some kind of input (both categorical and numerical data) to some kind of output (both colors and numbers). This can be used to create choropleth maps and bubble maps with ease.
+
+## Styling by a categorical expression
 
 ### Specifying a color <=> category relation
 
-### Showing the Most common categories
+To map colors to particular categories, use the classification operator `buckets`.
+
+The map below will assign colors from the `Prism` palette to the categories 'SOYBEANS', 'RICE', 'WHEAT', the rest of the categories will receive the last color `others`.
+
+```
+width: 5
+color: ramp(buckets($commodity_name,'SOYBEANS', 'RICE', 'WHEAT'), Prism)
+```
+[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcChidWNrZXRzKCRjb21tb2RpdHlfbmFtZSwnU09ZQkVBTlMnLCAnUklDRScsICdXSEVBVCcpLCBQcmlzbSkiLCJmIjp7ImxuZyI6LTk2LjExNjkyMzY3OTM0Nzc5LCJsYXQiOjQ3LjU1MjE2MDkwNTk5MjExfSwiZyI6My4wNjg0NTQxMjAzMzc2Mjg4fQ==)
+
+### Showing the Most Common Categories
+The map below uses the expression `top` to retrieve the top 4 values in the `commodity_name` field. Each of those categories category will be colored with a unique color and all other features will be colored as `others`.
+
+```
+width: 5
+color: ramp(top($commodity_name,5), Prism)
+```
+[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCh0b3AoJGNvbW1vZGl0eV9uYW1lLDUpLFByaXNtKVxuIiwiZiI6eyJsbmciOi05Ni4xMTY5MjM2NzkzNDc3OSwibGF0Ijo0Ny41NTIxNjA5MDU5OTIxMX0sImciOjMuMDY4NDU0MTIwMzM3NjI4OH0=)
 
 ### Showing all categories automatically
+The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. When the number of categories is bigger than the number of colors in the palette color interpolation will be used.
 
-## Styling by a numeric property
+```
+width: 5
+color: ramp($commodity_name, Prism)
+```
+[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCgkY29tbW9kaXR5X25hbWUsIFByaXNtKSIsImYiOnsibG5nIjotOTYuNjUyNzk0MzM1NDU5MjUsImxhdCI6NDguMDA3MjQzOTI3MjYxMzZ9LCJnIjoyLjk3NzcxOTAyOTc4NTY3M30=)
+
+### Classifying a numeric expression
+
+## Styling by a numeric expression
 
 ### Unclassed maps
+You can make an unclassed map by using `linear`.
+
+In this example, the color will be set for each feature based on the `total_pop` property, where features with a `total_pop` of 1000 or less will be colored with the first color from the palette, features with a `total_pop` of 500000 or more will be colored with the last color from the palette and features in between will receive an interpolated color.
+```
+color: ramp(linear($total_pop,1000,500000),ag_sunset)
+```
+![screen shot 2018-02-15 at 3 34 18 pm](https://user-images.githubusercontent.com/1566273/36285405-a5c20e98-1268-11e8-9c7a-5598ad0438cd.png)
 
 ### Classed maps
+Use an [available classification method](LINK), to group features into a set of bins and color them using a sequential color scheme.
+
+#### Quantiles
+This example will classify the `total_pop` property using the `quantiles` method with `5` buckets.
+```
+color: ramp(quantiles($total_pop, 5), Emrld)
+```
+![screen shot 2018-02-15 at 2 59 39 pm](https://user-images.githubusercontent.com/1566273/36283177-e2bb2aee-1260-11e8-9a48-147b2a193a0a.png)
+
+#### Manual classification
+
+This example will classify the `total_pop` property using two custom breakpoints (`10` and `250`), which will generate 3 classes.
+```
+color: ramp(buckets($price, 10, 250), Emrld)
+```
+
 
 ### Alpha by value
 
+## Making a bubble map
+
+## Using custom color palettes
 
 
-## Color by Value: Categorical properties
-+ Unique Values
-+ Most Common
-+ Attribute
 
-### Unique Values
-The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together.
-
-```
-width: 5
-color: ramp($commodity_name,Prism)
-```
-[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCgkY29tbW9kaXR5X25hbWUsUHJpc20pIiwiZiI6eyJsbmciOi05Ni42NTI3OTQzMzU0NTkyNSwibGF0Ijo0OC4wMDcyNDM5MjcyNjEzNn0sImciOjIuOTc3NzE5MDI5Nzg1NjczfQ==)
-
-### Most common category
-
-To color features by the most common category, you can use a metadata operatoror an aggregation operator.
-
-#### Metadata Operator
-The map below uses the metadata operator `top` to retrieve the top 4 values in the `commodity_name` field. Each category is colored with a unique color and all other features are colored as other.
-
-```
-width: 5
-color: ramp(top($commodity_name,5),Prism)
-```
-[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcCh0b3AoJGNvbW1vZGl0eV9uYW1lLDUpLFByaXNtKVxuIiwiZiI6eyJsbmciOi05Ni4xMTY5MjM2NzkzNDc3OSwibGF0Ijo0Ny41NTIxNjA5MDU5OTIxMX0sImciOjMuMDY4NDU0MTIwMzM3NjI4OH0=)
 
 #### Aggregation Operator
 The map below uses the aggregation operator `MODE` coloring features by the mode of the `commodity_name` field.
@@ -56,15 +87,6 @@ color: ramp(MODE($commodity_name),Prism)
 
 ### Attribute Values
 
-To map colors to particular categories, use the classification operator `buckets`.
-
-The map below colors fires that were caused by `Lightning` or `Arson` and all other categories are colored as other.
-
-```
-width: 5
-color: ramp(buckets($commodity_name,"SOYBEANS","RICE","WHEAT"),Prism)
-```
-[Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcChidWNrZXRzKCRjb21tb2RpdHlfbmFtZSxcIlNPWUJFQU5TXCIsXCJSSUNFXCIsXCJXSEVBVFwiKSxQcmlzbSlcbiIsImYiOnsibG5nIjotOTYuMTE2OTIzNjc5MzQ3NzksImxhdCI6NDcuNTUyMTYwOTA1OTkyMTF9LCJnIjozLjA2ODQ1NDEyMDMzNzYyODh9)
 
 ## Color and Size by Value: Numbers
 There are a variety of ways to symbolize points using numeric attributes.
@@ -77,14 +99,7 @@ There are a variety of ways to symbolize points using numeric attributes.
 + Manual Classed Size
 
 
-### Classed Color
-Use an [available classification method](LINK), to group features into a defined set of bins and color them using a sequential color scheme.
 
-```
-width:  3
-color: ramp(quantiles($total_pop,5),Emrld)
-```
-![screen shot 2018-02-15 at 2 59 39 pm](https://user-images.githubusercontent.com/1566273/36283177-e2bb2aee-1260-11e8-9a48-147b2a193a0a.png)
 
 ### Classed Size
 TBD

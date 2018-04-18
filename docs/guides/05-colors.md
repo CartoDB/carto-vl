@@ -1,6 +1,6 @@
 # Color guide
 
-## Fixed colors
+## Color constructors
 CARTO VL offers expression 5 color expressions:
 
 - Named
@@ -26,7 +26,7 @@ color: #ff0000
 ### RGB / RGBA
 A `rgb/rgba color` represents a color using a rgb function.
 
-- `rgb(r, g, b):` receives numeric expressions evaluated from 0 to 255 
+- `rgb(r, g, b):` receives numeric expressions evaluated from 0 to 255
     - r: is a numeric expression that indicates the red amount from 0 to 255
     - g: is a numeric expression that indicates the green amount from 0 to 255
     - b: is a numeric expression that indicates the blue amount from 0 to 255
@@ -99,9 +99,15 @@ color: cielab(53, 80, 67)
 
 
 
-## Variable colors
+## Color by value
 
-You can use an expression whenever you want, this means you can pass a `property` 
+### Using Ramp
+
+The ramp expression can be used as described in style-by-value.md
+
+### Using color constructors
+
+You can use an expression whenever you want, this means you can pass a `property`
 
 Example: Higher prices will be more red.
 
