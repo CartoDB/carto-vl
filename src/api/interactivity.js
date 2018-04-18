@@ -33,7 +33,7 @@ import { wToR } from '../client/rsys';
  * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty} colorStroke
  * @property {FeatureVizProperty} widthStroke
- * @property {FeatureVizProperty[]} variables - Declared variables in the
+ * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
  */

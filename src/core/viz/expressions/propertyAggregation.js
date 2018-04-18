@@ -17,11 +17,11 @@ import { checkInstance, checkType } from './utils';
  * });
  *
  * @memberof carto.expressions
- * @name avg
+ * @name propertyAvg
  * @function
  * @api
  */
-export const Avg = genAggregationOp('avg', 'number');
+export const PropertyAvg = genAggregationOp('avg', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -37,11 +37,11 @@ export const Avg = genAggregationOp('avg', 'number');
  * });
  *
  * @memberof carto.expressions
- * @name max
+ * @name propertyMax
  * @function
  * @api
  */
-export const Max = genAggregationOp('max', 'number');
+export const PropertyMax = genAggregationOp('max', 'number');
 
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
@@ -57,31 +57,11 @@ export const Max = genAggregationOp('max', 'number');
  * });
  *
  * @memberof carto.expressions
- * @name min
+ * @name propertyMin
  * @function
  * @api
  */
-export const Min = genAggregationOp('min', 'number');
-
-/**
- * Aggregate using the maximum value. This operation disables the access to the property
- *
- * @param {carto.expressions.property} property - Column of the table to be aggregated
- * @return {carto.expressions.property} Aggregated column
- *
- * @example
- * const s = carto.expressions;
- * const $population = s.prop('population');
- * const viz = new carto.Viz({
- *   width: s.sum($population);
- * });
- *
- * @memberof carto.expressions
- * @name sum
- * @function
- * @api
- */
-export const Sum = genAggregationOp('sum', 'number');
+export const PropertyMin = genAggregationOp('min', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -97,11 +77,31 @@ export const Sum = genAggregationOp('sum', 'number');
  * });
  *
  * @memberof carto.expressions
- * @name mode
+ * @name propertyMode
  * @function
  * @api
  */
-export const Mode = genAggregationOp('mode', 'category');
+export const PropertyMode = genAggregationOp('mode', 'category');
+
+/**
+ * Aggregate using the maximum value. This operation disables the access to the property
+ *
+ * @param {carto.expressions.property} property - Column of the table to be aggregated
+ * @return {carto.expressions.property} Aggregated column
+ *
+ * @example
+ * const s = carto.expressions;
+ * const $population = s.prop('population');
+ * const viz = new carto.Viz({
+ *   width: s.sum($population);
+ * });
+ *
+ * @memberof carto.expressions
+ * @name propertySum
+ * @function
+ * @api
+ */
+export const PropertySum = genAggregationOp('sum', 'number');
 
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends BaseExpression {

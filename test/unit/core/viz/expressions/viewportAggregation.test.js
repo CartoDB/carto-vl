@@ -1,6 +1,6 @@
 import * as s from '../../../../../src/core/viz/functions';
 
-describe('src/core/viz/expressions/aggregation', () => {
+describe('src/core/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
     describe('global filtering', () => {
         const fakeMetadata = {
@@ -114,5 +114,3 @@ describe('src/core/viz/expressions/aggregation', () => {
         });
     });
 });
-
-

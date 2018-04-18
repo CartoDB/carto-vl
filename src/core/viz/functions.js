@@ -1,21 +1,20 @@
 /**
- *  @api
- *  @namespace carto.expressions
- *  @description
  *  Expressions are used to define vizs, a viz is composed of an expression for every configurable attribute.
  *  Remember a viz has the following attributes:
  *
  *  - **color**: Determine the element fill color.
  *  - **strokeColor**: Determine the element border color.
- *  - **width**: Determine the element width: radius when points, thickness when lines, ignored for polygons.
+ *  - **width**: Determine the element width: diameter when points, thickness when lines, not used for polygons.
  *  - **strokeWidth**: Determine the element border size.
+ *  - **order**: This is a special property used to order the elements in ascendent/descendent order.
  *  - **filter**: This is a special property used to remove elements that do not meet the expression.
+ *  - **resolution**: Determine the resolution of the property-aggregation functions.
  *
  * For example the point radius could be vizd using the `number` expression:
  *
  * ```javascript
  * const viz = new carto.Viz({
- *   width: carto.expressions.number(10)
+ *   width: carto.expressions.number(10)  // Equivalent to `width: 10`
  * });
  * ```
  *
@@ -24,7 +23,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *   width: carto.expressions.property('population')
+ *   width: carto.expressions.prop('population')
  * });
  * ```
  *
@@ -35,8 +34,8 @@
  * const s = carto.expressions; // We use this alias along documentation.
  * const viz = new carto.Viz({
  *   width: s.div(
- *     s.property('population'),
- *     s.number(10000)
+ *     s.prop('population'),
+ *     s.number(10000)  // Equivalent to 10000
  *  )
  * });
  * ```
@@ -51,13 +50,9 @@
  *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
+ * @namespace carto.expressions
+ * @api
  */
-
-import { Avg } from './expressions/aggregation';
-import { Max } from './expressions/aggregation';
-import { Min } from './expressions/aggregation';
-import { Sum } from './expressions/aggregation';
-import { Mode } from './expressions/aggregation';
 
 import Animate from './expressions/animate';
 
@@ -125,6 +120,12 @@ import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
 
+import { PropertyAvg } from './expressions/propertyAggregation';
+import { PropertyMax } from './expressions/propertyAggregation';
+import { PropertyMin } from './expressions/propertyAggregation';
+import { PropertyMode } from './expressions/propertyAggregation';
+import { PropertySum } from './expressions/propertyAggregation';
+
 import { Quantiles } from './expressions/quantiles';
 import { GlobalQuantiles } from './expressions/quantiles';
 
@@ -151,15 +152,15 @@ import { Not } from './expressions/unary';
 
 import Variable from './expressions/variable';
 
+import { ViewportAvg } from './expressions/viewportAggregation';
 import { ViewportMax } from './expressions/viewportAggregation';
 import { ViewportMin } from './expressions/viewportAggregation';
-import { ViewportAvg } from './expressions/viewportAggregation';
 import { ViewportSum } from './expressions/viewportAggregation';
 import { ViewportCount } from './expressions/viewportAggregation';
 import { ViewportPercentile } from './expressions/viewportAggregation';
+import { GlobalAvg } from './expressions/viewportAggregation';
 import { GlobalMax } from './expressions/viewportAggregation';
 import { GlobalMin } from './expressions/viewportAggregation';
-import { GlobalAvg } from './expressions/viewportAggregation';
 import { GlobalSum } from './expressions/viewportAggregation';
 import { GlobalCount } from './expressions/viewportAggregation';
 import { GlobalPercentile } from './expressions/viewportAggregation';
@@ -170,12 +171,6 @@ import Zoom from './expressions/zoom';
 
 
 /* Expose classes as constructor functions */
-
-export const avg = (...args) => new Avg(...args);
-export const max = (...args) => new Max(...args);
-export const min = (...args) => new Min(...args);
-export const sum = (...args) => new Sum(...args);
-export const mode = (...args) => new Mode(...args);
 
 export const animate = (...args) => new Animate(...args);
 
@@ -249,7 +244,13 @@ export const inverse = (...args) => new Inverse(...args);
 export const customPalette = (...args) => new CustomPalette(...args);
 
 export const property = (...args) => new Property(...args);
-export const prop = property;
+export { variable as prop };
+
+export const propertyAvg = (...args) => new PropertyAvg(...args);
+export const propertyMax = (...args) => new PropertyMax(...args);
+export const propertyMin = (...args) => new PropertyMin(...args);
+export const propertyMode = (...args) => new PropertyMode(...args);
+export const propertySum = (...args) => new PropertySum(...args);
 
 export const quantiles = (...args) => new Quantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
@@ -278,18 +279,18 @@ export const not = (...args) => new Not(...args);
 export const variable = (...args) => new Variable(...args);
 export { variable as var };
 
+export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportMax = (...args) => new ViewportMax(...args);
 export const viewportMin = (...args) => new ViewportMin(...args);
-export const viewportAvg = (...args) => new ViewportAvg(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
-export const globalPercentile = (...args) => new GlobalPercentile(...args);
+export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
-export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
+export const globalPercentile = (...args) => new GlobalPercentile(...args);
 
 export const xyz = (...args) => new XYZ(...args);
 
@@ -298,4 +299,4 @@ export const zoom = (...args) => new Zoom(...args);
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 
-export { palettes, Asc, Desc };
+export { palettes };
