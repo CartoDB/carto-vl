@@ -149,6 +149,8 @@ import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
 import { Abs } from './expressions/unary';
 import { Not } from './expressions/unary';
+import { Floor } from './expressions/unary';
+import { Ceil } from './expressions/unary';
 
 import Variable from './expressions/variable';
 
@@ -275,6 +277,8 @@ export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const abs = (...args) => new Abs(...args);
 export const not = (...args) => new Not(...args);
+export const floor = (...args) => new Floor(...args);
+export const ceil = (...args) => new Ceil(...args);
 
 export const variable = (...args) => new Variable(...args);
 export { variable as var };
