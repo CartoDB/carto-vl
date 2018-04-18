@@ -1,10 +1,23 @@
 import BaseExpression from './base';
 import { number } from '../functions';
 
+/**
+ * Get the current zoom level
+ *
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.div(s.zoom(), 1000)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name zoom
+ * @function
+ * @api
+ */
 export default class Zoom extends BaseExpression {
-    /**
-     * @description get the current zoom level
-     */
     constructor() {
         super({ zoom: number(0) });
         this.type = 'number';
