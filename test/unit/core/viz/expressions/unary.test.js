@@ -8,15 +8,15 @@ s.FALSE.toString = () => 's.FALSE';
 
 describe('src/core/viz/expressions/unary', () => {
     describe('error control', () => {
-        describe('Signature FLOATS_TO_FLOAT', () => {
+        describe('Signature NUMBERS_TO_NUMBER', () => {
             validateDynamicTypeErrors('sin', ['category']);
             validateStaticTypeErrors('sin', ['color']);
         });
     });
 
     describe('type', () => {
-        describe('Signature FLOATS_TO_FLOAT', () => {
-            validateStaticType('sin', ['float'], 'float');
+        describe('Signature NUMBERS_TO_NUMBER', () => {
+            validateStaticType('sin', ['number'], 'number');
         });
     });
 

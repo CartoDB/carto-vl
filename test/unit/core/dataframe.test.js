@@ -20,11 +20,11 @@ describe('src/core/dataframe', () => {
                 metadata: {
                     columns: [{
                         name: 'id',
-                        type: 'float'
+                        type: 'number'
                     },
                     {
                         name: 'cartodb_id',
-                        type: 'float'
+                        type: 'number'
                     }]
                 }
             });
@@ -68,10 +68,10 @@ describe('src/core/dataframe', () => {
                 metadata: {
                     columns: [{
                         name: 'numeric_prop',
-                        type: 'float'
+                        type: 'number'
                     }, {
                         name: 'cartodb_id',
-                        type: 'float'
+                        type: 'number'
                     }]
                 }
             });
@@ -124,11 +124,11 @@ describe('src/core/dataframe', () => {
                     columns: [
                         {
                             name: 'cartodb_id',
-                            type: 'float'
+                            type: 'number'
                         },
                         {
                             name: 'numeric_property',
-                            type: 'float'
+                            type: 'number'
                         }]
                 }
             });

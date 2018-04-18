@@ -78,17 +78,17 @@ function parseBinaryOperation(node) {
     const right = parseNode(node.right);
     switch (node.operator) {
         case '*':
-            return functions.floatMul(left, right);
+            return functions.mul(left, right);
         case '/':
-            return functions.floatDiv(left, right);
+            return functions.div(left, right);
         case '+':
-            return functions.floatAdd(left, right);
+            return functions.add(left, right);
         case '-':
-            return functions.floatSub(left, right);
+            return functions.sub(left, right);
         case '%':
-            return functions.floatMod(left, right);
+            return functions.mod(left, right);
         case '^':
-            return functions.floatPow(left, right);
+            return functions.pow(left, right);
         case '>':
             return functions.greaterThan(left, right);
         case '>=':
@@ -113,7 +113,7 @@ function parseBinaryOperation(node) {
 function parseUnaryOperation(node) {
     switch (node.operator) {
         case '-':
-            return functions.floatMul(-1, parseNode(node.argument));
+            return functions.mul(-1, parseNode(node.argument));
         case '+':
             return parseNode(node.argument);
         default:
@@ -131,8 +131,8 @@ function parseIdentifier(node) {
         return new Hex(node.name);
     } else if (node.name[0] == '$') {
         return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toLowerCase()]) {
-        return functions.palettes[node.name.toLowerCase()];
+    } else if (functions.palettes[node.name.toUpperCase()]) {
+        return functions.palettes[node.name.toUpperCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {

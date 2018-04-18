@@ -1,9 +1,28 @@
 import { implicitCast } from './utils';
-import Expression from './expression';
+import BaseExpression from './base';
 
 // TODO type checking
 
 export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+
+export class Cubic extends genInterpolator(
+    inner => `cubicEaseInOut(${inner})`,
+    `
+    #ifndef CUBIC
+    #define CUBIC
+    float cubicEaseInOut(float p){
+        if (p < 0.5) {
+            return 4. * p * p * p;
+        }else {
+            float f = ((2. * p) - 2.);
+            return 0.5 * f * f * f + 1.;
+        }
+    }
+    #endif
+`,
+    inner => inner // TODO FIXME
+) { }
+
 export class BounceEaseIn extends genInterpolator(
     inner => `BounceEaseIn(${inner})`,
     `
@@ -37,45 +56,26 @@ export class BounceEaseIn extends genInterpolator(
 `,
     inner => inner // TODO FIXME
 ) { }
-export class Cubic extends genInterpolator(
-    inner => `cubicEaseInOut(${inner})`,
-    `
-    #ifndef CUBIC
-    #define CUBIC
-    float cubicEaseInOut(float p){
-        if (p < 0.5) {
-            return 4. * p * p * p;
-        }else {
-            float f = ((2. * p) - 2.);
-            return 0.5 * f * f * f + 1.;
-        }
-    }
-    #endif
-`,
-    inner => inner // TODO FIXME
-) { }
-
 
 // Interpolators
 function genInterpolator(inlineMaker, preface, jsEval) {
-    const fn = class Interpolator extends Expression {
+    const fn = class Interpolator extends BaseExpression {
         constructor(m) {
             m = implicitCast(m);
-            super({ m: m });
-        }
-        _compile(meta) {
-            super._compile(meta);
-            if (this.m.type != 'float') {
-                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
-            }
-            this.type = 'float';
-            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+            super({ m });
         }
         eval(feature) {
             return jsEval(this.m.eval(feature));
         }
+        _compile(meta) {
+            super._compile(meta);
+            if (this.m.type != 'number') {
+                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+            }
+            this.type = 'number';
+            this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
+        }
     };
     fn.type = 'interpolator';
     return fn;
-
 }

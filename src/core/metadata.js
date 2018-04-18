@@ -11,7 +11,7 @@ const metadataExample = {
     columns: [
         {
             name: 'temp',
-            type: 'float',
+            type: 'number',
             min: -10,
             max: 45,
             avg: 25,

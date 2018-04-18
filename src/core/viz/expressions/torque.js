@@ -1,34 +1,37 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp } from './utils';
-import { floatDiv, floatMod, now, linear, globalMin, globalMax } from '../functions';
+import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './property';
 
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create a Torque FadeIn/FadeOut configuration
+ * Create an animated FadeIn/FadeOut configuration
  *
- * @param {carto.expression.expression.number|number} param1 expression of type number or Number
- * @param {carto.expression.expression.number|number} param2 expression of type number or Number
- * @return {carto.expressions.fade}
+ * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
+ * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
+ * @return {carto.expressions.Base}
  *
  * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
  * const s = carto.expressions;
+ * const $day = s.prop('day');
  * new carto.Viz({
- *  filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ *   filter: s.torque($day, 40, s.fade(0.1, 0.3))
  * });
  *
  * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
  * const s = carto.expressions;
+ * const $day = s.prop('day');
  * new carto.Viz({
- *  filter: s.torque($day, 40, s.fade(0.5))
+ *   filter: s.torque($day, 40, s.fade(0.5))
  * });
  *
  * @memberof carto.expressions
  * @name fade
  * @function
+ * @api
 */
-export class Fade extends Expression {
+export class Fade extends BaseExpression {
     constructor(param1 = DEFAULT, param2 = DEFAULT) {
         let fadeIn = param1;
         let fadeOut = param2;
@@ -53,30 +56,33 @@ export class Fade extends Expression {
 /**
  * Create an animated temporal filter (torque)
  *
- * @param {carto.expression.expression} input input to base the temporal filter,
+ * @param {carto.expressions.Base} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
- * @param {carto.expression.fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
- * @return {carto.expressions.torque}
+ * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
+ * @return {carto.expressions.Base}
  *
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`width:    2
- * color:     ramp(linear(AVG($temp), 0,30), tealrose)
- * filter:       torque($day, 40, fade(0.1, 0.3))`);
+ * new carto.Viz(`
+ *   width: 2
+ *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+ *   filter: torque($day, 40, fade(0.1, 0.3))`);
  *
  * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`width:    2
- * color:     ramp(linear(AVG($temp), 0,30), tealrose)
- * filter:    torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
+ * new carto.Viz(`
+ *   width:    2
+ *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+ *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.expressions
  * @name torque
  * @function
+ * @api
 */
-export class Torque extends Expression {
+export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         if (!Number.isFinite(duration)) {
             throw new Error('Torque(): invalid second parameter, duration.');
@@ -84,22 +90,18 @@ export class Torque extends Expression {
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         }
-        const _cycle = floatDiv(floatMod(now(), duration), duration);
+        const _cycle = div(mod(now(), duration), duration);
         super({ input, _cycle, fade });
         // TODO improve type check
         this.duration = duration;
     }
-    _compile(meta) {
-        super._compile(meta);
-        if (this.input.type != 'float') {
-            throw new Error('Torque(): invalid first parameter, input.');
-        } else if (this.fade.type != 'fade') {
-            throw new Error('Torque(): invalid third parameter, fade.');
-        }
-        this.type = 'float';
-
-        this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const cycle = this._cycle.eval(feature);
+        const duration = this.duration;
+        const fadeIn = this.fade.fadeIn.eval(feature);
+        const fadeOut = this.fade.fadeOut.eval(feature);
+        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     getSimTime() {
         if (!(this.input.min.eval() instanceof Date)){
@@ -121,12 +123,16 @@ export class Torque extends Expression {
         return date;
 
     }
-    eval(feature) {
-        const input = this.input.eval(feature);
-        const cycle = this._cycle.eval(feature);
-        const duration = this.duration;
-        const fadeIn = this.fade.fadeIn.eval(feature);
-        const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+    _compile(meta) {
+        super._compile(meta);
+        if (this.input.type != 'number') {
+            throw new Error('Torque(): invalid first parameter, input.');
+        } else if (this.fade.type != 'fade') {
+            throw new Error('Torque(): invalid third parameter, fade.');
+        }
+        this.type = 'number';
+
+        this.inlineMaker = (inline) =>
+            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
 }

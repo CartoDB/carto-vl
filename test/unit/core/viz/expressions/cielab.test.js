@@ -2,19 +2,19 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 
 describe('src/core/viz/expressions/cielab', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('cielab', ['float', 'float']);
+        validateStaticTypeErrors('cielab', ['number', 'number']);
 
 
-        validateDynamicTypeErrors('cielab', ['category', 'float', 'float']);
-        validateDynamicTypeErrors('cielab', ['float', 'category', 'float']);
-        validateDynamicTypeErrors('cielab', ['float', 'float', 'category']);
+        validateDynamicTypeErrors('cielab', ['category', 'number', 'number']);
+        validateDynamicTypeErrors('cielab', ['number', 'category', 'number']);
+        validateDynamicTypeErrors('cielab', ['number', 'number', 'category']);
 
-        validateStaticTypeErrors('cielab', ['float', 'float', 'color']);
-        validateStaticTypeErrors('cielab', ['color', 'float', 'float']);
+        validateStaticTypeErrors('cielab', ['number', 'number', 'color']);
+        validateStaticTypeErrors('cielab', ['color', 'number', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('cielab', ['float', 'float', 'float'], 'color');
+        validateStaticType('cielab', ['number', 'number', 'number'], 'color');
     });
 
     describe('eval', () => {

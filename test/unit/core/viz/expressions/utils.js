@@ -4,7 +4,7 @@ const metadata = {
     columns: [
         {
             name: 'price',
-            type: 'float'
+            type: 'number'
         },
         {
             name: 'cat',
@@ -89,21 +89,21 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 
 function getSimpleArg(type) {
     switch (type) {
-        case 'float-property':
+        case 'number-property':
             return [s.property('price'), '$price'];
         case 'category-property':
             return [s.property('cat'), '$cat'];
-        case 'float':
-            return [s.float(0), '0'];
+        case 'number':
+            return [s.number(0), '0'];
         case 'category':
             return [s.category('red'), '\'red\''];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'palette':
-            return [s.palettes.prism, 'Prism'];
+            return [s.palettes.PRISM, 'PRISM'];
         case 'customPalette':
             return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteFloat':
+        case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
@@ -111,8 +111,8 @@ function getSimpleArg(type) {
 }
 function getPropertyArg(type) {
     switch (type) {
-        case 'float-property':
-        case 'float':
+        case 'number-property':
+        case 'number':
             return [s.property('price'), '$price'];
         case 'category-property':
         case 'category':
@@ -120,10 +120,10 @@ function getPropertyArg(type) {
         case 'color':
             return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
         case 'palette':
-            return [s.palettes.prism, 'Prism'];
+            return [s.palettes.PRISM, 'PRISM'];
         case 'customPalette':
             return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteFloat':
+        case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];

@@ -2,14 +2,14 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 
 describe('src/core/viz/expressions/buckets', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('buckets', ['float', 'category']);
-        validateDynamicTypeErrors('buckets', ['category', 'float']);
-        validateStaticTypeErrors('buckets', ['color', 'float']);
-        validateStaticTypeErrors('buckets', ['float', 'color']);
+        validateDynamicTypeErrors('buckets', ['number', 'category']);
+        validateDynamicTypeErrors('buckets', ['category', 'number']);
+        validateStaticTypeErrors('buckets', ['color', 'number']);
+        validateStaticTypeErrors('buckets', ['number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('buckets', ['float', 'float'], 'category');
+        validateStaticType('buckets', ['number', 'number'], 'category');
         validateStaticType('buckets', ['category', 'category'], 'category');
     });
 
