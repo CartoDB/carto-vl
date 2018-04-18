@@ -160,7 +160,7 @@ export default class Expression {
         return final;
     }
 
-    blendFrom(final, duration = 500, interpolator = null) {
+    _blendFrom(final, duration = 500, interpolator = null) {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
