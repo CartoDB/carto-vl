@@ -99,6 +99,8 @@ function parseBinaryOperation(node) {
             return functions.lessThanOrEqualTo(left, right);
         case '==':
             return functions.equals(left, right);
+        case '!=':
+            return functions.notEquals(left, right);
         case 'and':
             return functions.and(left, right);
         case 'or':
