@@ -162,11 +162,11 @@ export default class Layer {
     blendToViz(viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
         if (this._viz) {
-            viz.getColor().blendFrom(this._viz.getColor(), ms, interpolator);
-            viz.getStrokeColor().blendFrom(this._viz.getStrokeColor(), ms, interpolator);
-            viz.getWidth().blendFrom(this._viz.getWidth(), ms, interpolator);
-            viz.getStrokeWidth().blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
-            viz.getFilter().blendFrom(this._viz.getFilter(), ms, interpolator);
+            viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
+            viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
+            viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
+            viz.getStrokeWidth()._blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
+            viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
         }
 
         this._vizChanged(viz).then(() => {
