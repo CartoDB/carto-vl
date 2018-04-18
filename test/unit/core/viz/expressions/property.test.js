@@ -6,7 +6,7 @@ describe('src/core/viz/expressions/property', () => {
         validateStaticTypeErrors('property', []);
         validateStaticTypeErrors('property', [undefined]);
         validateStaticTypeErrors('property', [123]);
-        validateStaticTypeErrors('property', ['float']);
+        validateStaticTypeErrors('property', ['number']);
     });
 
     describe('.eval()', () => {

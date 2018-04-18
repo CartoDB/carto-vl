@@ -1,11 +1,11 @@
 # CARTO VL
 
-CARTO VL is a javascript library to render map data in the browser using the [webgl](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) capabilities.
+CARTO VL is a javascript library to render map data in the browser using [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) capabilities.
 
 
 ## Getting started
 
-TBD
+https://github.com/CartoDB/carto-vl-webpack-demo
 
 ## Drawing a simple map using MapboxGL
 

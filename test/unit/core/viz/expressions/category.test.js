@@ -6,7 +6,7 @@ describe('src/core/viz/expressions/category', () => {
         validateStaticTypeErrors('category', []);
         validateStaticTypeErrors('category', [undefined]);
         validateStaticTypeErrors('category', [123]);
-        validateStaticTypeErrors('category', ['float']);
+        validateStaticTypeErrors('category', ['number']);
     });
 
     describe('type', () => {

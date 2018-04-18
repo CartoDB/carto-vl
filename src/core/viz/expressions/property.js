@@ -1,15 +1,14 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
- *
  * Evaluates the value of a column for every row in the dataset.
  *
  * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
  * @param {string} name - The property in the dataset that is going to be evaluated
- * @return {carto.expressions.property}
+ * @return {carto.expressions.Base}
  *
  * @example <caption>Display only cities with name different from "London"</caption>
  * const s = carto.expressions;
@@ -22,11 +21,7 @@ import { checkString } from './utils';
  * @function
  * @api
  */
-export default class Property extends Expression {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
+export default class Property extends BaseExpression {
     constructor(name) {
         checkString('property', 'name', 0, name);
         if (name == '') {
@@ -34,6 +29,9 @@ export default class Property extends Expression {
         }
         super({});
         this.name = name;
+    }
+    eval(feature) {
+        return feature[this.name];
     }
     _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
@@ -58,8 +56,5 @@ export default class Property extends Expression {
                 this.name
             ]
         };
-    }
-    eval(feature) {
-        return feature[this.name];
     }
 }

@@ -6,13 +6,13 @@ describe('src/core/viz/expressions/animate', () => {
         validateStaticTypeErrors('animate', [undefined]);
         validateStaticTypeErrors('animate', ['123']);
         validateStaticTypeErrors('animate', [-4]);
-        validateStaticTypeErrors('animate', ['float']);
+        validateStaticTypeErrors('animate', ['number']);
         validateStaticTypeErrors('animate', ['color']);
         validateStaticTypeErrors('animate', ['category']);
     });
 
     describe('type', () => {
-        validateStaticType('animate', [100], 'float');
+        validateStaticType('animate', [100], 'number');
     });
 
     describe('eval', () => {

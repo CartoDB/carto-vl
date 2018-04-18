@@ -1,24 +1,22 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/float', () => {
+describe('src/core/viz/expressions/number', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('float', [undefined]);
-        validateStaticTypeErrors('float', ['123']);
-        validateStaticTypeErrors('float', ['color', 'float']);
+        validateStaticTypeErrors('number', [undefined]);
+        validateStaticTypeErrors('number', ['123']);
+        validateStaticTypeErrors('number', ['color', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('float', [123], 'float');
+        validateStaticType('number', [123], 'number');
     });
 
     describe('eval', () => {
         it('should return the float value', () => {
-            const actual = s.float(101).eval();
+            const actual = s.number(101).eval();
 
             expect(actual).toEqual(101);
         });
     });
 });
-
-

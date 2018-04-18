@@ -8,65 +8,65 @@ s.FALSE.toString = () => 's.FALSE';
 
 describe('src/core/viz/expressions/binary', () => {
     describe('error control', () => {
-        describe('Signature FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('mul', ['float', 'category']);
-            validateDynamicTypeErrors('mul', ['category', 'float']);
+        describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
+            validateDynamicTypeErrors('mul', ['number', 'category']);
+            validateDynamicTypeErrors('mul', ['category', 'number']);
 
             validateDynamicTypeErrors('mul', ['category', 'category']);
         });
 
-        describe('Signature FLOATS_TO_FLOAT | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('add', ['float', 'category']);
-            validateDynamicTypeErrors('add', ['category', 'float']);
+        describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
+            validateDynamicTypeErrors('add', ['number', 'category']);
+            validateDynamicTypeErrors('add', ['category', 'number']);
 
             validateDynamicTypeErrors('add', ['category', 'category']);
 
-            validateDynamicTypeErrors('add', ['float', 'color']);
-            validateDynamicTypeErrors('add', ['color', 'float']);
+            validateDynamicTypeErrors('add', ['number', 'color']);
+            validateDynamicTypeErrors('add', ['color', 'number']);
         });
 
-        describe('Signature FLOATS_TO_FLOAT', () => {
-            validateDynamicTypeErrors('mod', ['float', 'category']);
-            validateDynamicTypeErrors('mod', ['category', 'float']);
+        describe('Signature NUMBERS_TO_NUMBER', () => {
+            validateDynamicTypeErrors('mod', ['number', 'category']);
+            validateDynamicTypeErrors('mod', ['category', 'number']);
 
             validateDynamicTypeErrors('mod', ['category', 'category']);
 
-            validateDynamicTypeErrors('mod', ['float', 'color']);
-            validateDynamicTypeErrors('mod', ['color', 'float']);
+            validateDynamicTypeErrors('mod', ['number', 'color']);
+            validateDynamicTypeErrors('mod', ['color', 'number']);
 
             validateStaticTypeErrors('mod', ['color', 'color']);
         });
 
-        describe('Signature FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT', () => {
-            validateDynamicTypeErrors('equals', ['float', 'category']);
-            validateDynamicTypeErrors('equals', ['category', 'float']);
+        describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
+            validateDynamicTypeErrors('equals', ['number', 'category']);
+            validateDynamicTypeErrors('equals', ['category', 'number']);
 
-            validateDynamicTypeErrors('equals', ['float', 'color']);
-            validateDynamicTypeErrors('equals', ['color', 'float']);
+            validateDynamicTypeErrors('equals', ['number', 'color']);
+            validateDynamicTypeErrors('equals', ['color', 'number']);
 
             validateStaticTypeErrors('equals', ['color', 'color']);
         });
     });
 
     describe('type', () => {
-        describe('Signature FLOATS_TO_FLOAT | FLOAT_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            validateDynamicType('mul', ['float', 'float'], 'float');
-            validateDynamicType('mul', ['float', 'color'], 'color');
+        describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
+            validateDynamicType('mul', ['number', 'number'], 'number');
+            validateDynamicType('mul', ['number', 'color'], 'color');
             validateStaticType('mul', ['color', 'color'], 'color');
         });
 
-        describe('Signature FLOATS_TO_FLOAT | COLORS_TO_COLOR', () => {
-            validateDynamicType('add', ['float', 'float'], 'float');
+        describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
+            validateDynamicType('add', ['number', 'number'], 'number');
             validateDynamicType('add', ['color', 'color'], 'color');
         });
 
-        describe('Signature FLOATS_TO_FLOAT', () => {
-            validateDynamicType('mod', ['float', 'float'], 'float');
+        describe('Signature NUMBERS_TO_NUMBER', () => {
+            validateDynamicType('mod', ['number', 'number'], 'number');
         });
 
-        describe('Signature FLOATS_TO_FLOAT | CATEGORIES_TO_FLOAT', () => {
-            validateDynamicType('equals', ['float', 'float'], 'float');
-            validateDynamicType('equals', ['category', 'category'], 'float');
+        describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
+            validateDynamicType('equals', ['number', 'number'], 'number');
+            validateDynamicType('equals', ['category', 'category'], 'number');
         });
     });
 
@@ -86,52 +86,52 @@ describe('src/core/viz/expressions/binary', () => {
             test('or', 0.5, 1, 1);
         });
 
-        describe('floatMul', () => {
-            test('floatMul', 0, 0, 0);
-            test('floatMul', 1, 0, 0);
-            test('floatMul', 1, 1, 1);
-            test('floatMul', 1, 2, 2);
-            test('floatMul', -1, 2, -2);
+        describe('mul', () => {
+            test('mul', 0, 0, 0);
+            test('mul', 1, 0, 0);
+            test('mul', 1, 1, 1);
+            test('mul', 1, 2, 2);
+            test('mul', -1, 2, -2);
         });
 
-        describe('floatDiv', () => {
-            it('floatdiv(1, 0) should return an error', () => expect(() => s.floatDiv(1, 0)).toThrow());
-            test('floatDiv', 0, 1, 0);
-            test('floatDiv', 4, 2, 2);
-            test('floatDiv', -4, 2, -2);
+        describe('div', () => {
+            it('div(1, 0) should return an error', () => expect(() => s.div(1, 0)).toThrow());
+            test('div', 0, 1, 0);
+            test('div', 4, 2, 2);
+            test('div', -4, 2, -2);
         });
 
-        describe('floatAdd', () => {
-            test('floatAdd', 0, 0, 0);
-            test('floatAdd', 0, 1, 1);
-            test('floatAdd', 2, 2, 4);
-            test('floatAdd', -2, 2, 0);
-            test('floatAdd', -2, -3, -5);
+        describe('add', () => {
+            test('add', 0, 0, 0);
+            test('add', 0, 1, 1);
+            test('add', 2, 2, 4);
+            test('add', -2, 2, 0);
+            test('add', -2, -3, -5);
         });
 
-        describe('floatSub', () => {
-            test('floatSub', 0, 0, 0);
-            test('floatSub', 0, 1, -1);
-            test('floatSub', 2, 2, 0);
-            test('floatSub', -2, 2, -4);
-            test('floatSub', -2, -3, 1);
+        describe('sub', () => {
+            test('sub', 0, 0, 0);
+            test('sub', 0, 1, -1);
+            test('sub', 2, 2, 0);
+            test('sub', -2, 2, -4);
+            test('sub', -2, -3, 1);
         });
 
-        describe('floatMod', () => {
-            it('floatdiv(1, 0) should return an error', () => expect(() => s.floatMod(3, 0)).toThrow());
-            test('floatMod', 0, 1, 0);
-            test('floatMod', 2, 1, 0);
-            test('floatMod', 2, 2, 0);
-            test('floatMod', 6, 4, 2);
-            test('floatMod', -6, 4, -2);
+        describe('mod', () => {
+            it('div(1, 0) should return an error', () => expect(() => s.mod(3, 0)).toThrow());
+            test('mod', 0, 1, 0);
+            test('mod', 2, 1, 0);
+            test('mod', 2, 2, 0);
+            test('mod', 6, 4, 2);
+            test('mod', -6, 4, -2);
         });
 
-        describe('floatPow', () => {
-            test('floatPow', 0, 0, 1);
-            test('floatPow', 0, 1, 0);
-            test('floatPow', 2, 2, 4);
-            test('floatPow', -2, 2, 4);
-            test('floatPow', -2, -3, -0.125);
+        describe('pow', () => {
+            test('pow', 0, 0, 1);
+            test('pow', 0, 1, 0);
+            test('pow', 2, 2, 4);
+            test('pow', -2, 2, 4);
+            test('pow', -2, -3, -0.125);
         });
 
         describe('gt', () => {
@@ -198,5 +198,3 @@ describe('src/core/viz/expressions/binary', () => {
         }
     });
 });
-
-

@@ -1,7 +1,26 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkType, checkExpression } from './utils';
 
-export default class CIELab extends Expression {
+/**
+ * Evaluates to a CIELab color.
+ *
+ * @param {carto.expressions.Base|number} l - The lightness of the color
+ * @param {carto.expressions.Base|number} a - The color component green–red
+ * @param {carto.expressions.Base|number} b - The color component blue–yellow
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Display blue points.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.cielab(32.3, 79.2, -107.86)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name cielab
+ * @function
+ * @api
+ */
+export default class CIELab extends BaseExpression {
     constructor(l, a, b) {
         l = implicitCast(l);
         a = implicitCast(a);
@@ -9,20 +28,21 @@ export default class CIELab extends Expression {
 
         checkExpression('cielab', 'l', 0, l);
         checkExpression('cielab', 'a', 1, a);
-        checkExpression('blend', 'b', 2, b);
-        checkLooseType('cielab', 'l', 0, 'float', l);
-        checkLooseType('cielab', 'a', 1, 'float', a);
-        checkLooseType('cielab', 'b', 2, 'float', b);
+        checkExpression('cielab', 'b', 2, b);
+        checkLooseType('cielab', 'l', 0, 'number', l);
+        checkLooseType('cielab', 'a', 1, 'number', a);
+        checkLooseType('cielab', 'b', 2, 'number', b);
 
-        super({ l: l, a: a, b: b });
+        super({ l, a, b });
         this.type = 'color';
     }
+    // TODO EVAL
     _compile(meta) {
         super._compile(meta);
 
-        checkType('cielab', 'l', 0, 'float', this.l);
-        checkType('cielab', 'a', 1, 'float', this.a);
-        checkType('cielab', 'b', 2, 'float', this.b);
+        checkType('cielab', 'l', 0, 'number', this.l);
+        checkType('cielab', 'a', 1, 'number', this.a);
+        checkType('cielab', 'b', 2, 'number', this.b);
 
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
@@ -73,5 +93,4 @@ export default class CIELab extends Expression {
         #endif
         `);
     }
-    // TODO EVAL
 }

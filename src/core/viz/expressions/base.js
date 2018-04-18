@@ -13,10 +13,11 @@ let uid = 0;
  * This means that you can't a numeric expression where a color expression is expected.
  *
  * @memberof carto.expressions
- * @name Expression
+ * @name Base
+ * @abstract
  * @api
  */
-export default class Expression {
+export default class Base {
     /**
      * @hideconstructor
      * @param {*} children
@@ -160,7 +161,7 @@ export default class Expression {
         return final;
     }
 
-    blendFrom(final, duration = 500, interpolator = null) {
+    _blendFrom(final, duration = 500, interpolator = null) {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);

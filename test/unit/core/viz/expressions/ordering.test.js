@@ -6,12 +6,12 @@ describe('src/core/viz/expressions/ordering', () => {
         validateStaticTypeErrors('asc', []);
         validateStaticTypeErrors('asc', [undefined]);
         validateStaticTypeErrors('asc', [123]);
-        validateStaticTypeErrors('asc', ['float']);
+        validateStaticTypeErrors('asc', ['number']);
 
         validateStaticTypeErrors('desc', []);
         validateStaticTypeErrors('desc', [undefined]);
         validateStaticTypeErrors('desc', [123]);
-        validateStaticTypeErrors('desc', ['float']);
+        validateStaticTypeErrors('desc', ['number']);
     });
 
     describe('type', () => {

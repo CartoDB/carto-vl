@@ -1,12 +1,12 @@
-import { float, category, customPalette } from '../functions';
-import Expression from './expression';
+import { number, category, customPalette } from '../functions';
+import BaseExpression from './base';
 
 export const DEFAULT = undefined;
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
     if (Number.isFinite(value)) {
-        return float(value);
+        return number(value);
     } else if (typeof value == 'string') {
         return category(value);
     } else if (Array.isArray(value)) {
@@ -114,9 +114,9 @@ export function checkLooseType(expressionName, parameterName, parameterIndex, ex
 }
 
 export function checkExpression(expressionName, parameterName, parameterIndex, parameter) {
-    if (!(parameter instanceof Expression)) {
+    if (!(parameter instanceof BaseExpression)) {
         throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type Expression`);
+        '${parameter}' is not of type carto.expressions.Base`);
     }
 }
 
