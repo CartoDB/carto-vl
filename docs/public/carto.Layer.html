@@ -107,7 +107,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The ID of the layer. Can be used in the addTo function</p></td>
         </tr>
 
     
@@ -130,7 +130,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The source of the data</p></td>
         </tr>
 
     
@@ -153,7 +153,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The description of the visualization of the data</p></td>
         </tr>
 
     
@@ -206,7 +206,7 @@
 
 <h5>Fires:</h5>
 <ul>
-    <li>event:CartoError</li>
+    <li><a href="global.html#event:CartoError">event:CartoError</a></li>
 </ul>
 
 
@@ -223,7 +223,7 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>new carto.Layer('layer0', source, viz);</code></pre>
+    <pre class="prettyprint"><code>const layer = new carto.Layer('layer0', source, viz);</code></pre>
 
 
 
@@ -253,7 +253,7 @@
     
 
     
-    <h4 class="name" id="addTo"><span class="type-signature"></span>addTo<span class="signature">(map, beforeLayerID)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addTo"><span class="type-signature"></span>addTo<span class="signature">(map, beforeLayerID<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -285,6 +285,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -310,10 +312,18 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The map on which to add the layer</p></td>
         </tr>
 
     
@@ -333,10 +343,20 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>The ID of an existing layer to insert the new layer before. If this values is not passed the layer will be added on the top of the existing layers.</p></td>
         </tr>
 
     
@@ -406,7 +426,7 @@
     
 
     
-    <h4 class="name" id="blendToViz"><span class="type-signature"></span>blendToViz<span class="signature">(viz, duration)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="blendToViz"><span class="type-signature"></span>blendToViz<span class="signature">(viz, duration<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -439,7 +459,11 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -464,7 +488,19 @@
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>The final viz</p></td>
@@ -487,10 +523,26 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
             
 
-            <td class="description last"><p>The animation duration in milliseconds [default:400]</p></td>
+            
+                <td class="default">
+                
+                    400
+                
+                </td>
+            
+
+            <td class="description last"><p>The animation duration in milliseconds</p></td>
         </tr>
 
     
@@ -558,14 +610,320 @@
         <p class="code-caption"> Smooth transition variating point size </p>
     
     <pre class="prettyprint"><code>// We create two different vizs varying the width
-const viz0 = new carto.viz({ width: 10 });
-const viz1 = new carto.viz({ width: 20 });
+const viz0 = new carto.Viz({ width: 10 });
+const viz1 = new carto.Viz({ width: 20 });
 // Create a layer with the first viz
 const layer = new carto.Layer('layer', source, viz0);
 // We add the layer to the map, the points in this layer will have widh 10
 layer.addTo(map, 'layer0');
 // The points will be animated from 10px to 20px for 500ms.
 layer.blendToViz(viz1, 500);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="off"><span class="type-signature"></span>off<span class="signature">(eventName, callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Remove an event handler for the given type.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>eventName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Type of event to unregister</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Handler function to unregister</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="on"><span class="type-signature"></span>on<span class="signature">(eventName, callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Register an event handler for the given type.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>eventName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Type of event to listen for</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Function to call in response to given event</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -585,13 +943,13 @@ layer.blendToViz(viz1, 500);</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Apr 17 2018 16:44:31 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Apr 20 2018 17:40:57 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
