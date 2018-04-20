@@ -1,16 +1,35 @@
-import Expression from './expression';
-import { float } from '../functions';
+import BaseExpression from './base';
+import { number } from '../functions';
 
-export default class Now extends Expression {
-    /**
-     * @description get the current timestamp
-     */
+/**
+ * Get the current timestamp.
+ *
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.mod(s.now(), 10);
+ * });
+ *
+ * @memberof carto.expressions
+ * @name now
+ * @function
+ * @api
+ */
+export default class Now extends BaseExpression {
     constructor() {
-        super({ now: float(0) });
+        super({ now: number(0) });
+    }
+    eval() {
+        return this.now.expr;
+    }
+    isAnimated() {
+        return true;
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.type = 'float';
+        this.type = 'number';
         super.inlineMaker = inline => inline.now;
     }
     _preDraw(...args) {
@@ -18,11 +37,5 @@ export default class Now extends Expression {
     }
     _setTimestamp(timestamp){
         this.now.expr = timestamp;
-    }
-    isAnimated() {
-        return true;
-    }
-    eval(){
-        return this.now.expr;
     }
 }

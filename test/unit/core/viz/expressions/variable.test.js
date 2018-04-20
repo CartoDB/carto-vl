@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/variable', () => {
         validateStaticTypeErrors('variable', []);
         validateStaticTypeErrors('variable', [undefined]);
         validateStaticTypeErrors('variable', [123]);
-        validateStaticTypeErrors('variable', ['float']);
+        validateStaticTypeErrors('variable', ['number']);
     });
 });
 

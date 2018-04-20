@@ -1,13 +1,55 @@
-import Expression from './expression';
-import { float } from '../functions';
+import BaseExpression from './base';
+import { number } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
 import * as schema from '../../schema';
 
 let quantilesUID = 0;
 
+/**
+ * Generate quantiles of size `n` from the features on the viewport
+ *
+ * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {number} n - Number of buckets to be returned
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const $density = s.prop('density');
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.quantiles($density, 5), s.palettes.PRISM)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name quantiles
+ * @function
+ * @api
+ */
+export const Quantiles = genQuantiles(false);
+
+/**
+ * Generate quantiles of size `n` from all the features
+ *
+ * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {number} n - Number of buckets to be returned
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const $density = s.prop('density');
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalQuantiles($density, 5), s.palettes.PRISM)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name globalQuantiles
+ * @function
+ * @api
+ */
+export const GlobalQuantiles = genQuantiles(true);
+
 function genQuantiles(global) {
-    return class Quantiles extends Expression {
+    return class Quantiles extends BaseExpression {
         constructor(input, buckets) {
             checkInstance('quantiles', 'input', 0, Property, input && (input.property || input));
             checkNumber('quantiles', 'buckets', 1, buckets);
@@ -17,7 +59,7 @@ function genQuantiles(global) {
             };
             let breakpoints = [];
             for (let i = 0; i < buckets - 1; i++) {
-                children[`arg${i}`] = float(i * 10);
+                children[`arg${i}`] = number(i * 10);
                 breakpoints.push(children[`arg${i}`]);
             }
             super(children);
@@ -37,7 +79,7 @@ function genQuantiles(global) {
         }
         _compile(metadata) {
             super._compile(metadata);
-            checkType('quantiles', 'input', 0, 'float', this.input);
+            checkType('quantiles', 'input', 0, 'number', this.input);
             if (global) {
                 const copy = metadata.sample.map(s => s[this.input.name]);
                 copy.sort((x, y) => x - y);
@@ -100,6 +142,3 @@ function genQuantiles(global) {
         }
     };
 }
-
-export const Quantiles = genQuantiles(false);
-export const GlobalQuantiles = genQuantiles(true);

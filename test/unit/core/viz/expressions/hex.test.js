@@ -4,7 +4,7 @@ import { hex } from '../../../../../src/core/viz/functions';
 describe('src/core/viz/expressions/hex', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hex', []);
-        validateStaticTypeErrors('hex', ['float']);
+        validateStaticTypeErrors('hex', ['number']);
         validateStaticTypeErrors('hex', ['category']);
         validateStaticTypeErrors('hex', ['#Z08080']);
     });

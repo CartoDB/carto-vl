@@ -4,18 +4,18 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 describe('src/core/viz/expressions/blend', () => {
     describe('error control', () => {
         validateStaticTypeErrors('blend', []);
-        validateStaticTypeErrors('blend', ['float']);
-        validateStaticTypeErrors('blend', ['float', 'float']);
-        validateDynamicTypeErrors('blend', ['float', 'color', 'float']);
-        validateDynamicTypeErrors('blend', ['color', 'float', 'float']);
-        validateDynamicTypeErrors('blend', ['category', 'float', 'float']);
-        validateDynamicTypeErrors('blend', ['float', 'category', 'float']);
-        validateDynamicTypeErrors('blend', ['float', 'float', 'category']);
+        validateStaticTypeErrors('blend', ['number']);
+        validateStaticTypeErrors('blend', ['number', 'number']);
+        validateDynamicTypeErrors('blend', ['number', 'color', 'number']);
+        validateDynamicTypeErrors('blend', ['color', 'number', 'number']);
+        validateDynamicTypeErrors('blend', ['category', 'number', 'number']);
+        validateDynamicTypeErrors('blend', ['number', 'category', 'number']);
+        validateDynamicTypeErrors('blend', ['number', 'number', 'category']);
     });
 
     describe('type', () => {
-        validateDynamicType('blend', ['float', 'float', 'float'], 'float');
-        validateStaticType('blend', ['color', 'color', 'float'], 'color');
+        validateDynamicType('blend', ['number', 'number', 'number'], 'number');
+        validateStaticType('blend', ['color', 'color', 'number'], 'color');
     });
 
     describe('eval()', () => {

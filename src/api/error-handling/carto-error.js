@@ -13,6 +13,8 @@ const GENERIC_ORIGIN = 'generic';
  * @property {object} originalError - An object containing the internal/original error
  * @property {object} stack - Error stack trace
  * @property {string} type - Error type
+ *
+ * @event CartoError
  * @api
  */
 class CartoError extends Error {

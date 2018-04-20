@@ -142,7 +142,7 @@ describe('src/client/windshaft-filtering', () => {
                     upper: 20
                 };
                 const actual = preFilters(f,
-                    s.between(s.property('numericProperty'), s.floatConstant(10), 20)
+                    s.between(s.property('numericProperty'), s.constant(10), 20)
                 );
                 expect(actual).toEqual(expected);
             });
@@ -463,7 +463,7 @@ describe('src/client/windshaft-filtering', () => {
 
             it('with aggregate properties', () => {
                 expect(preFilters(f,
-                    s.lt(s.sum(s.property('property')), 10)
+                    s.lt(s.propertySum(s.property('property')), 10)
                 )).toBeNull();
             });
 
@@ -485,7 +485,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(actual).toEqual(expected);
             });
 
-            it('between(avg($numericProperty), 10, 20)', () => {
+            it('between(propertyAvg($numericProperty), 10, 20)', () => {
                 const expected = {
                     _cdb_agg_avg_numericProperty: [{
                         greater_than_or_equal_to:  10,
@@ -493,7 +493,7 @@ describe('src/client/windshaft-filtering', () => {
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.between(s.avg(s.property('numericProperty')), 10, 20)
+                    s.between(s.propertyAvg(s.property('numericProperty')), 10, 20)
                 );
                 expect(actual).toEqual(expected);
             });
@@ -506,7 +506,7 @@ describe('src/client/windshaft-filtering', () => {
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.between(s.property('numericProperty'), s.floatConstant(10), 20)
+                    s.between(s.property('numericProperty'), s.constant(10), 20)
                 );
                 expect(actual).toEqual(expected);
             });

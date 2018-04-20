@@ -1,13 +1,13 @@
 import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/viz/expressions/binary';
 import { In, Nin } from '../core/viz/expressions/belongs';
 import Between from '../core/viz/expressions/between';
-import Category from '../core/viz/expressions/category';
-import Float from '../core/viz/expressions/float';
 import Property from '../core/viz/expressions/property';
 import Blend from '../core/viz/expressions/blend';
 import Animate from '../core/viz/expressions/animate';
-import FloatConstant from '../core/viz/expressions/floatConstant';
-import { Max, Min, Avg, Sum, Mode } from '../core/viz/expressions/aggregation';
+import NumberExpression from '../core/viz/expressions/number';
+import ConstantExpression from '../core/viz/expressions/constant';
+import CategoryExpression from '../core/viz/expressions/category';
+import { PropertyAvg, PropertyMax, PropertyMin, PropertyMode, PropertySum } from '../core/viz/expressions/propertyAggregation';
 import * as schema from '../core/schema';
 
 class AggregationFiltering {
@@ -92,7 +92,7 @@ class AggregationFiltering {
 
     _value(f) {
         f = this._removeBlend(f);
-        if (f instanceof Float || f instanceof FloatConstant || f instanceof Category) {
+        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
             return f.expr;
         }
     }
@@ -164,7 +164,7 @@ class AggregationFiltering {
 
     _aggregation(f) {
         f = this._removeBlend(f);
-        if (f instanceof Max || f instanceof Min || f instanceof Avg || f instanceof Sum || f instanceof Mode) {
+        if (f instanceof PropertyAvg || f instanceof PropertyMax || f instanceof PropertyMin || f instanceof PropertyMode || f instanceof PropertySum) {
             let p = this._property(f.property);
             if (p) {
                 p.property = schema.column.aggColumn(p.property, f.aggName);
@@ -346,7 +346,7 @@ class PreaggregationFiltering {
     }
 
     _value(f) {
-        if (f instanceof Float || f instanceof FloatConstant || f instanceof Category) {
+        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
             return {
                 type: 'value',
                 value: f.expr

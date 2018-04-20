@@ -1,4 +1,3 @@
-
 export default class Base {
 
     /**
@@ -11,9 +10,9 @@ export default class Base {
      * {@link carto.source.Base} should not be used directly use {@link carto.source.Dataset}, {@link carto.source.SQL} of {@link carto.source.GeoJSON} instead.
      *
      *
+     * @memberof carto.source
      * @constructor Base
      * @abstract
-     * @memberof carto.source
      * @api
      */
     constructor() {

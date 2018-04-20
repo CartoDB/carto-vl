@@ -1,11 +1,40 @@
-import Expression from './expression';
+import BaseExpression from './base';
 
-export default class Top extends Expression {
+/**
+ * Get the top `n` properties
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @param {number} n - Number of top properties to be returned
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name top
+ * @function
+ * @api
+ */
+export default class Top extends BaseExpression {
     constructor(property, buckets) {
         // TODO 'cat'
         super({ property: property });
         // TODO improve type check
         this.buckets = buckets; //TODO force fixed literal
+    }
+    eval(feature) {
+        const p = this.property.eval(feature);
+        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        let ret;
+        metaColumn.categoryNames.map((name, i) => {
+            if (i==p){
+                ret = i < this.buckets? i+1:0;
+            }
+        });
+        return ret;
     }
     _compile(metadata) {
         super._compile(metadata);
@@ -23,17 +52,6 @@ export default class Top extends Expression {
             preface: this._prefaceCode(property.preface + `uniform sampler2D topMap${this._uid};\n`),
             inline: `(255.*texture2D(topMap${this._uid}, vec2(${property.inline}/1024., 0.5)).a)`
         };
-    }
-    eval(feature) {
-        const p = this.property.eval(feature);
-        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
-        let ret;
-        metaColumn.categoryNames.map((name, i) => {
-            if (i==p){
-                ret = i < this.buckets? i+1:0;
-            }
-        });
-        return ret;
     }
     _postShaderCompile(program, gl) {
         if (!this.init) {

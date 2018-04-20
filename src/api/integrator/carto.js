@@ -19,6 +19,6 @@ class CartoMapIntegrator {
     addLayer(layerId, layer) {
         this.map.addLayer(layerId, layer);
     }
-    needRefresh(){
+    needRefresh() {
     }
 }

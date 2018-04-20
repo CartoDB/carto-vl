@@ -1,25 +1,25 @@
 import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression } from './utils';
 import Animate from './animate';
-import Expression from './expression';
+import BaseExpression from './base';
 
 /**
- * @description Linearly interpolate from *a* to *b* based on *mix*
- * @param {carto.expressions.Expression | number} a numeric or color expression
- * @param {carto.expressions.Expression | number} b numeric or color expression
- * @param {carto.expressions.Expression | number} mix numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.expressions.Expression} numeric expression
+ * Linearly interpolate from *a* to *b* based on *mix*.
+ *
+ * @param {carto.expressions.Base|number} a - Numeric or color expression
+ * @param {carto.expressions.Base|number} b - Numeric or color expression
+ * @param {carto.expressions.Base|number} mix - Numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {carto.expressions.Base} Numeric expression
  *
  * @memberof carto.expressions
  * @name blend
  * @function
  * @api
  */
-export default class Blend extends Expression {
+export default class Blend extends BaseExpression {
     constructor(a, b, mix, interpolator) {
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);
-
 
         checkExpression('blend', 'a', 0, a);
         checkExpression('blend', 'b', 1, b);
@@ -27,25 +27,37 @@ export default class Blend extends Expression {
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        checkLooseType('blend', 'mix', 2, 'float', mix);
+        checkLooseType('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
         if (interpolator) {
             mix = interpolator(mix);
         }
-        super({ a: a, b: b, mix: mix });
+        super({ a, b, mix });
         this.originalMix = originalMix;
 
         if (a.type && b.type) {
             this.type = a.type;
         }
     }
+    eval(feature) {
+        const a = clamp(this.mix.eval(feature), 0, 1);
+        const x = this.a.eval(feature);
+        const y = this.b.eval(feature);
+        return mix(x, y, a);
+    }
+    replaceChild(toReplace, replacer) {
+        if (toReplace == this.mix) {
+            this.originalMix = replacer;
+        }
+        super.replaceChild(toReplace, replacer);
+    }
     _compile(meta) {
         super._compile(meta);
 
         abTypeCheck(this.a, this.b);
-        checkType('blend', 'mix', 1, 'float', this.mix);
+        checkType('blend', 'mix', 1, 'number', this.mix);
 
         this.type = this.a.type;
 
@@ -58,22 +70,10 @@ export default class Blend extends Expression {
             this.notify();
         }
     }
-    replaceChild(toReplace, replacer) {
-        if (toReplace == this.mix) {
-            this.originalMix = replacer;
-        }
-        super.replaceChild(toReplace, replacer);
-    }
-    eval(feature) {
-        const a = clamp(this.mix.eval(feature), 0, 1);
-        const x = this.a.eval(feature);
-        const y = this.b.eval(feature);
-        return mix(x, y, a);
-    }
 }
 
 function abTypeCheck(a, b) {
-    if (!((a.type == 'float' && b.type == 'float') || (a.type == 'color' && b.type == 'color'))) {
+    if (!((a.type == 'number' && b.type == 'number') || (a.type == 'color' && b.type == 'color'))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }

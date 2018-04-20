@@ -364,7 +364,7 @@ export default class Windshaft {
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(name);
-                    } else if (type == 'float') {
+                    } else if (type == 'number') {
                         numFields.push(name);
                     } else if (type == 'date') {
                         dateFields.push(name);
@@ -611,7 +611,7 @@ export default class Windshaft {
         return names.map(name => {
             return {
                 name,
-                type: 'float',
+                type: 'number',
                 min: json.rows[0][`${name}_min`],
                 max: json.rows[0][`${name}_max`],
                 avg: json.rows[0][`${name}_avg`],

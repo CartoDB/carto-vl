@@ -13,10 +13,10 @@ describe('src/core/viz/expressions/torque', () => {
                 expect(() => s.torque('cat')._compile()).toThrow();
             });
             it('should throw with a float duration', () => {
-                expect(() => s.torque(5, s.float(10))._compile()).toThrow();
+                expect(() => s.torque(5, s.number(10))._compile()).toThrow();
             });
             it('should throw with a float fade', () => {
-                expect(() => s.torque(5, 10, s.float(10))._compile()).toThrow();
+                expect(() => s.torque(5, 10, s.number(10))._compile()).toThrow();
             });
         });
         describe('.eval()', () => {

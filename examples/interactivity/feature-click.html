@@ -86,12 +86,12 @@
       tree_inventory_sloans
     `);
     const viz = new carto.Viz(`
-      width: $diameter_number*4
-      color: opacity(ramp($type,bold),0.7)
-      strokeColor: ramp($type,bold)
-      strokeWidth: 1
       @type: $type
       @diameter_number: $diameter_number
+      width: $diameter_number * 4
+      color: opacity(ramp($type, bold), 0.7)
+      strokeColor: ramp($type, bold)
+      strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, viz);
 

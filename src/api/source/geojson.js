@@ -15,14 +15,14 @@ export default class GeoJSON extends Base {
      * @param {object} data - A GeoJSON data object
      *
      * @example
-     * new carto.source.GeoJSON({
+     * const source = new carto.source.GeoJSON({
      *   "type": "Feature",
      *   "geometry": {
      *     "type": "Point",
      *     "coordinates": [ 0, 0 ]
      *   },
      *   "properties": {
-     *     "cartodb_id": 1
+     *     "index": 1
      *   }
      * });
      *
@@ -49,7 +49,7 @@ export default class GeoJSON extends Base {
         this._loaded = false;
     }
 
-    _clone(){
+    _clone() {
         return new GeoJSON(this._data);
     }
 
@@ -164,7 +164,7 @@ export default class GeoJSON extends Base {
             this._numFields.push(propertyName);
             columns.push({
                 name: propertyName,
-                type: 'float',
+                type: 'number',
                 min: Number.POSITIVE_INFINITY,
                 max: Number.NEGATIVE_INFINITY,
                 avg: Number.NaN,

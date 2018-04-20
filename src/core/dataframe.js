@@ -93,9 +93,9 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
-            const spw = vizWidth.eval(f);
-            const ssw = vizStrokeWidth.eval(f);
-            const diameter = Math.min(spw + ssw, 126);
+            const pointWidth = vizWidth.eval(f);
+            const pointStrokeWidth = vizStrokeWidth.eval(f);
+            const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
 
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
             const scale = diameter / 2 * widthScale;

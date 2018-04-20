@@ -3,15 +3,15 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 
 describe('src/core/viz/expressions/between', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('between', ['category', 'float', 'float']);
-        validateDynamicTypeErrors('between', ['float', 'category', 'float']);
-        validateDynamicTypeErrors('between', ['float', 'float', 'category']);
-        validateStaticTypeErrors('between', ['float', 'float', 'color']);
-        validateStaticTypeErrors('between', ['color', 'float', 'color']);
+        validateDynamicTypeErrors('between', ['category', 'number', 'number']);
+        validateDynamicTypeErrors('between', ['number', 'category', 'number']);
+        validateDynamicTypeErrors('between', ['number', 'number', 'category']);
+        validateStaticTypeErrors('between', ['number', 'number', 'color']);
+        validateStaticTypeErrors('between', ['color', 'number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('between', ['float', 'float', 'float'], 'float');
+        validateStaticType('between', ['number', 'number', 'number'], 'number');
     });
 
     describe('eval', () => {
