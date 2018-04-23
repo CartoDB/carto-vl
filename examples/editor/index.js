@@ -107,16 +107,14 @@ setInterval(() => {
 
 map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
 
+map.on('moveend', () => {
+    location.hash = getConfig();
+});
+
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0; //vizs.length - 1;
 
-    function handleError(error) {
-        const err = `Invalid viz: ${error}:${error.stack}`;
-        console.warn(err);
-        document.getElementById('feedback').value = err;
-        document.getElementById('feedback').style.display = 'block';
-    }
     function updateViz(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
@@ -127,7 +125,9 @@ map.on('load', () => {
                 document.getElementById('feedback').style.display = 'none';
                 const promise = layer.blendToViz(new carto.Viz(v));
                 if (promise) {
-                    promise.catch(error => {
+                    promise.then(() => {
+                        $('#loader').removeClass('spin');
+                    }).catch(error => {
                         handleError(error);
                         $('#loader').removeClass('spin');
                     });
@@ -181,85 +181,6 @@ map.on('load', () => {
 
     $('#barcelona').click(barcelona);
     $('#styleEntry').on('input', () => updateViz());
-    function getConfig() {
-        return '#' + btoa(JSON.stringify({
-            a: $('#dataset').val(),
-            b: '',
-            c: $('#user').val(),
-            d: $('#serverURL').val(),
-            e: $('#styleEntry').val(),
-            f: map.getCenter(),
-            g: map.getZoom(),
-        }));
-    }
-    function setConfig(input) {
-        let c = JSON.parse(atob(input));
-        if (c.c == 'dmanzanares-ded13') {
-            c.c = 'cartogl';
-            c.d = 'https://{user}.carto.com';
-        }
-        if (c.d == 'carto.com') {
-            c.d = 'https://{user}.carto.com';
-        }
-        $('#dataset').val(c.a);
-        $('#user').val(c.c);
-        $('#serverURL').val(c.d);
-        $('#styleEntry').val(c.e);
-        try {
-            superRefresh({ zoom: c.g, center: c.f, nosave: true });
-        } catch (error) {
-            handleError(error);
-            $('#loader').removeClass('spin');
-        }
-    }
-
-    const superRefresh = (opts) => {
-        opts = opts || {};
-        if (opts.nosave) {
-            location.hash = getConfig();
-        }
-        $('#loader').addClass('spin');
-        document.getElementById('feedback').style.display = 'none';
-        const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
-        const source = new SourceClass(
-            $('#dataset').val(),
-            {
-                user: $('#user').val(),
-                apiKey: 'YOUR_API_KEY'
-            },
-            {
-                serverURL: $('#serverURL').val()
-            }
-        );
-        const vizStr = document.getElementById('styleEntry').value;
-        const viz = new carto.Viz(vizStr);
-        if (!layer) {
-            layer = new carto.Layer('myCartoLayer', source, viz);
-            layer.on('loaded', () => {
-                if (opts.zoom !== undefined) {
-                    map.setZoom(opts.zoom);
-                }
-                if (opts.center !== undefined) {
-                    map.setCenter(opts.center);
-                }
-                $('#loader').removeClass('spin');
-            });
-            layer.addTo(map, 'watername_ocean');
-        } else {
-            layer.update(source, viz).then(() => {
-                if (opts.zoom !== undefined) {
-                    map.setZoom(opts.zoom);
-                }
-                if (opts.center !== undefined) {
-                    map.setCenter(opts.center);
-                }
-                $('#loader').removeClass('spin');
-            }).catch(error => {
-                handleError(error);
-                $('#loader').removeClass('spin');
-            });
-        }
-    };
 
     $('#dataset').on('input', superRefresh);
     $('#user').on('input', superRefresh);
@@ -299,6 +220,91 @@ map.on('load', () => {
         barcelona();
     }
 });
+
+function getConfig() {
+    return '#' + btoa(JSON.stringify({
+        a: $('#dataset').val(),
+        b: '',
+        c: $('#user').val(),
+        d: $('#serverURL').val(),
+        e: $('#styleEntry').val(),
+        f: map.getCenter(),
+        g: map.getZoom(),
+    }));
+}
+
+function setConfig(input) {
+    let c = JSON.parse(atob(input));
+    if (c.c == 'dmanzanares-ded13') {
+        c.c = 'cartogl';
+        c.d = 'https://{user}.carto.com';
+    }
+    if (c.d == 'carto.com') {
+        c.d = 'https://{user}.carto.com';
+    }
+    $('#dataset').val(c.a);
+    $('#user').val(c.c);
+    $('#serverURL').val(c.d);
+    $('#styleEntry').val(c.e);
+    try {
+        superRefresh({ zoom: c.g, center: c.f, nosave: true });
+    } catch (error) {
+        handleError(error);
+        $('#loader').removeClass('spin');
+    }
+}
+
+const superRefresh = (opts) => {
+    opts = opts || {};
+    $('#loader').addClass('spin');
+    document.getElementById('feedback').style.display = 'none';
+    const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
+    const source = new SourceClass(
+        $('#dataset').val(),
+        {
+            user: $('#user').val(),
+            apiKey: 'YOUR_API_KEY'
+        },
+        {
+            serverURL: $('#serverURL').val()
+        }
+    );
+    const vizStr = document.getElementById('styleEntry').value;
+    const viz = new carto.Viz(vizStr);
+    if (!layer) {
+        layer = new carto.Layer('myCartoLayer', source, viz);
+        layer.on('loaded', () => {
+            if (opts.zoom !== undefined) {
+                map.setZoom(opts.zoom);
+            }
+            if (opts.center !== undefined) {
+                map.setCenter(opts.center);
+            }
+            $('#loader').removeClass('spin');
+        });
+        layer.addTo(map, 'watername_ocean');
+    } else {
+        layer.update(source, viz).then(() => {
+            if (opts.zoom !== undefined) {
+                map.setZoom(opts.zoom);
+            }
+            if (opts.center !== undefined) {
+                map.setCenter(opts.center);
+            }
+            $('#loader').removeClass('spin');
+        }).catch(error => {
+            handleError(error);
+            $('#loader').removeClass('spin');
+        });
+    }
+};
+
+function handleError(error) {
+    const err = `Invalid viz: ${error}:${error.stack}`;
+    console.warn(err);
+    document.getElementById('feedback').value = err;
+    document.getElementById('feedback').style.display = 'block';
+}
 
 const basemapSelector = document.querySelector('#basemap');
 Object.keys(BASEMAPS).forEach(id => {
