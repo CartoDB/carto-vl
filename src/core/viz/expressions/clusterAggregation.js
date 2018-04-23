@@ -13,15 +13,15 @@ import { checkInstance, checkType } from './utils';
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyAvg($population);
+ *   width: s.clusterAvg($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyAvg
+ * @name clusterAvg
  * @function
  * @api
  */
-export const PropertyAvg = genAggregationOp('avg', 'number');
+export const ClusterAvg = genAggregationOp('avg', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -33,15 +33,15 @@ export const PropertyAvg = genAggregationOp('avg', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMax($population);
+ *   width: s.clusterMax($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMax
+ * @name clusterMax
  * @function
  * @api
  */
-export const PropertyMax = genAggregationOp('max', 'number');
+export const ClusterMax = genAggregationOp('max', 'number');
 
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
@@ -53,15 +53,15 @@ export const PropertyMax = genAggregationOp('max', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMin($population);
+ *   width: s.clusterMin($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMin
+ * @name clusterMin
  * @function
  * @api
  */
-export const PropertyMin = genAggregationOp('min', 'number');
+export const ClusterMin = genAggregationOp('min', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -73,15 +73,15 @@ export const PropertyMin = genAggregationOp('min', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMode($population);
+ *   width: s.clusterMode($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMode
+ * @name clusterMode
  * @function
  * @api
  */
-export const PropertyMode = genAggregationOp('mode', 'category');
+export const ClusterMode = genAggregationOp('mode', 'category');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
@@ -93,15 +93,15 @@ export const PropertyMode = genAggregationOp('mode', 'category');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertySum($population);
+ *   width: s.clusterSum($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertySum
+ * @name clusterSum
  * @function
  * @api
  */
-export const PropertySum = genAggregationOp('sum', 'number');
+export const ClusterSum = genAggregationOp('sum', 'number');
 
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends BaseExpression {

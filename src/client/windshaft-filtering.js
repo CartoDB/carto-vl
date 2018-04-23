@@ -7,7 +7,7 @@ import Animate from '../core/viz/expressions/animate';
 import NumberExpression from '../core/viz/expressions/number';
 import ConstantExpression from '../core/viz/expressions/constant';
 import CategoryExpression from '../core/viz/expressions/category';
-import { PropertyAvg, PropertyMax, PropertyMin, PropertyMode, PropertySum } from '../core/viz/expressions/propertyAggregation';
+import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/clusterAggregation';
 import * as schema from '../core/schema';
 
 class AggregationFiltering {
@@ -164,7 +164,7 @@ class AggregationFiltering {
 
     _aggregation(f) {
         f = this._removeBlend(f);
-        if (f instanceof PropertyAvg || f instanceof PropertyMax || f instanceof PropertyMin || f instanceof PropertyMode || f instanceof PropertySum) {
+        if (f instanceof ClusterAvg || f instanceof ClusterMax || f instanceof ClusterMin || f instanceof ClusterMode || f instanceof ClusterSum) {
             let p = this._property(f.property);
             if (p) {
                 p.property = schema.column.aggColumn(p.property, f.aggName);
