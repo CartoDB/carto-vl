@@ -84,6 +84,12 @@ import Category from './expressions/category';
 
 import CIELab from './expressions/CIELab';
 
+import { ClusterAvg } from './expressions/clusterAggregation';
+import { ClusterMax } from './expressions/clusterAggregation';
+import { ClusterMin } from './expressions/clusterAggregation';
+import { ClusterMode } from './expressions/clusterAggregation';
+import { ClusterSum } from './expressions/clusterAggregation';
+
 import Constant from './expressions/constant';
 
 import Hex from './expressions/hex';
@@ -119,12 +125,6 @@ import { Inverse } from './expressions/palettes';
 import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
-
-import { PropertyAvg } from './expressions/propertyAggregation';
-import { PropertyMax } from './expressions/propertyAggregation';
-import { PropertyMin } from './expressions/propertyAggregation';
-import { PropertyMode } from './expressions/propertyAggregation';
-import { PropertySum } from './expressions/propertyAggregation';
 
 import { Quantiles } from './expressions/quantiles';
 import { GlobalQuantiles } from './expressions/quantiles';
@@ -211,6 +211,12 @@ export const category = (...args) => new Category(...args);
 
 export const cielab = (...args) => new CIELab(...args);
 
+export const clusterAvg = (...args) => new ClusterAvg(...args);
+export const clusterMax = (...args) => new ClusterMax(...args);
+export const clusterMin = (...args) => new ClusterMin(...args);
+export const clusterMode = (...args) => new ClusterMode(...args);
+export const clusterSum = (...args) => new ClusterSum(...args);
+
 export const constant = (...args) => new Constant(...args);
 
 export const hex = (...args) => new Hex(...args);
@@ -247,12 +253,6 @@ export const customPalette = (...args) => new CustomPalette(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
-
-export const propertyAvg = (...args) => new PropertyAvg(...args);
-export const propertyMax = (...args) => new PropertyMax(...args);
-export const propertyMin = (...args) => new PropertyMin(...args);
-export const propertyMode = (...args) => new PropertyMode(...args);
-export const propertySum = (...args) => new PropertySum(...args);
 
 export const quantiles = (...args) => new Quantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
