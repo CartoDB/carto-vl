@@ -493,21 +493,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(46);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_constant__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_hex__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hsl__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsv__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_interpolators__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_linear__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_named_color__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_near__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_now__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_number__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_opacity__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_palettes__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_property__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_constant__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hex__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_number__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_property__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(30);
@@ -519,9 +519,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_xyz__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__expressions_zoom__ = __webpack_require__(62);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_palettes__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["b"]; });
 /**
  *  Expressions are used to define vizs, a viz is composed of an expression for every configurable attribute.
  *  Remember a viz has the following attributes:
@@ -789,99 +789,99 @@ const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab_
 /* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
 
 
-const constant = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_constant__["a" /* default */](...args);
+const clusterAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["a" /* ClusterAvg */](...args);
+/* harmony export (immutable) */ __webpack_exports__["clusterAvg"] = clusterAvg;
+
+const clusterMax = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["b" /* ClusterMax */](...args);
+/* harmony export (immutable) */ __webpack_exports__["clusterMax"] = clusterMax;
+
+const clusterMin = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["c" /* ClusterMin */](...args);
+/* harmony export (immutable) */ __webpack_exports__["clusterMin"] = clusterMin;
+
+const clusterMode = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["d" /* ClusterMode */](...args);
+/* harmony export (immutable) */ __webpack_exports__["clusterMode"] = clusterMode;
+
+const clusterSum = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["e" /* ClusterSum */](...args);
+/* harmony export (immutable) */ __webpack_exports__["clusterSum"] = clusterSum;
+
+
+const constant = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["constant"] = constant;
 
 
-const hex = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_hex__["a" /* default */](...args);
+const hex = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_hex__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hex"] = hex;
 
 
-const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_hsl__["a" /* HSL */](...args);
+const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__["a" /* HSL */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsl"] = hsl;
 
-const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_hsl__["b" /* HSLA */](...args);
+const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__["b" /* HSLA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsla"] = hsla;
 
 
-const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsv__["a" /* HSV */](...args);
+const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__["a" /* HSV */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
 
-const hsva = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsv__["b" /* HSVA */](...args);
+const hsva = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__["b" /* HSVA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsva"] = hsva;
 
 
-const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_interpolators__["a" /* Cubic */](...args);
+const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__["a" /* Cubic */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
 
-const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_interpolators__["b" /* ILinear */](...args);
+const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__["b" /* ILinear */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
 
 
-const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_linear__["a" /* default */](...args);
+const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_linear__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
 
 
-const namedColor = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_named_color__["b" /* NamedColor */](...args);
+const namedColor = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__["b" /* NamedColor */](...args);
 /* harmony export (immutable) */ __webpack_exports__["namedColor"] = namedColor;
 
 
-const near = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_near__["a" /* default */](...args);
+const near = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_near__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["near"] = near;
 
 
-const now = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_now__["a" /* default */](...args);
+const now = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_now__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["now"] = now;
 
 
-const number = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_number__["a" /* default */](...args);
+const number = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_number__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["number"] = number;
 
 
-const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_opacity__["a" /* default */](...args);
+const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
 
 
-const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["a" /* Asc */](...args);
+const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["a" /* Asc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["asc"] = asc;
 
-const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["b" /* Desc */](...args);
+const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["b" /* Desc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["desc"] = desc;
 
-const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["c" /* NoOrder */](...args);
+const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["c" /* NoOrder */](...args);
 /* harmony export (immutable) */ __webpack_exports__["noOrder"] = noOrder;
 
-const width = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_ordering__["d" /* Width */](...args);
+const width = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["d" /* Width */](...args);
 /* harmony export (immutable) */ __webpack_exports__["width"] = width;
 
 
-const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_palettes__["b" /* Inverse */](...args);
+const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["b" /* Inverse */](...args);
 /* harmony export (immutable) */ __webpack_exports__["inverse"] = inverse;
 
 
-const customPalette = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_palettes__["a" /* CustomPalette */](...args);
+const customPalette = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["a" /* CustomPalette */](...args);
 /* harmony export (immutable) */ __webpack_exports__["customPalette"] = customPalette;
 
 
-const property = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_property__["a" /* default */](...args);
+const property = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_property__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["property"] = property;
 
-
-
-const propertyAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__["a" /* PropertyAvg */](...args);
-/* harmony export (immutable) */ __webpack_exports__["propertyAvg"] = propertyAvg;
-
-const propertyMax = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__["b" /* PropertyMax */](...args);
-/* harmony export (immutable) */ __webpack_exports__["propertyMax"] = propertyMax;
-
-const propertyMin = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__["c" /* PropertyMin */](...args);
-/* harmony export (immutable) */ __webpack_exports__["propertyMin"] = propertyMin;
-
-const propertyMode = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__["d" /* PropertyMode */](...args);
-/* harmony export (immutable) */ __webpack_exports__["propertyMode"] = propertyMode;
-
-const propertySum = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_propertyAggregation__["e" /* PropertySum */](...args);
-/* harmony export (immutable) */ __webpack_exports__["propertySum"] = propertySum;
 
 
 const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["b" /* Quantiles */](...args);
@@ -998,10 +998,10 @@ const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_zoom__["
 /* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
 
 
-const TRUE = new __WEBPACK_IMPORTED_MODULE_8__expressions_constant__["a" /* default */](1);
+const TRUE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](1);
 /* harmony export (immutable) */ __webpack_exports__["TRUE"] = TRUE;
 
-const FALSE = new __WEBPACK_IMPORTED_MODULE_8__expressions_constant__["a" /* default */](0);
+const FALSE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](0);
 /* harmony export (immutable) */ __webpack_exports__["FALSE"] = FALSE;
 
 
@@ -2314,16 +2314,16 @@ const column = {
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyAvg($population);
+ *   width: s.clusterAvg($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyAvg
+ * @name clusterAvg
  * @function
  * @api
  */
-const PropertyAvg = genAggregationOp('avg', 'number');
-/* harmony export (immutable) */ __webpack_exports__["a"] = PropertyAvg;
+const ClusterAvg = genAggregationOp('avg', 'number');
+/* harmony export (immutable) */ __webpack_exports__["a"] = ClusterAvg;
 
 
 /**
@@ -2336,16 +2336,16 @@ const PropertyAvg = genAggregationOp('avg', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMax($population);
+ *   width: s.clusterMax($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMax
+ * @name clusterMax
  * @function
  * @api
  */
-const PropertyMax = genAggregationOp('max', 'number');
-/* harmony export (immutable) */ __webpack_exports__["b"] = PropertyMax;
+const ClusterMax = genAggregationOp('max', 'number');
+/* harmony export (immutable) */ __webpack_exports__["b"] = ClusterMax;
 
 
 /**
@@ -2358,16 +2358,16 @@ const PropertyMax = genAggregationOp('max', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMin($population);
+ *   width: s.clusterMin($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMin
+ * @name clusterMin
  * @function
  * @api
  */
-const PropertyMin = genAggregationOp('min', 'number');
-/* harmony export (immutable) */ __webpack_exports__["c"] = PropertyMin;
+const ClusterMin = genAggregationOp('min', 'number');
+/* harmony export (immutable) */ __webpack_exports__["c"] = ClusterMin;
 
 
 /**
@@ -2380,16 +2380,16 @@ const PropertyMin = genAggregationOp('min', 'number');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertyMode($population);
+ *   width: s.clusterMode($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertyMode
+ * @name clusterMode
  * @function
  * @api
  */
-const PropertyMode = genAggregationOp('mode', 'category');
-/* harmony export (immutable) */ __webpack_exports__["d"] = PropertyMode;
+const ClusterMode = genAggregationOp('mode', 'category');
+/* harmony export (immutable) */ __webpack_exports__["d"] = ClusterMode;
 
 
 /**
@@ -2402,16 +2402,16 @@ const PropertyMode = genAggregationOp('mode', 'category');
  * const s = carto.expressions;
  * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.propertySum($population);
+ *   width: s.clusterSum($population);
  * });
  *
  * @memberof carto.expressions
- * @name propertySum
+ * @name clusterSum
  * @function
  * @api
  */
-const PropertySum = genAggregationOp('sum', 'number');
-/* harmony export (immutable) */ __webpack_exports__["e"] = PropertySum;
+const ClusterSum = genAggregationOp('sum', 'number');
+/* harmony export (immutable) */ __webpack_exports__["e"] = ClusterSum;
 
 
 function genAggregationOp(aggName, aggType) {
@@ -4867,13 +4867,13 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`
  *   width: 2
- *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+ *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: torque($day, 40, fade(0.1, 0.3))`);
  *
  * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
  * new carto.Viz(`
  *   width:    2
- *   color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+ *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
  *
  * @memberof carto.expressions
@@ -10691,13 +10691,13 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *     sum_price: s.propertySum(s.prop('price'))
+ *     sum_price: s.clusterSum(s.prop('price'))
  *   }
  *  filter: s.neq(s.var('sum_price'), 'london'),
  * });
  *
  * const viz = new carto.Viz(`
- *   @sum_price: propertySum($price)
+ *   @sum_price: clusterSum($price)
  *   filter: @sum_price != 'london'
  * `);
  *
@@ -15922,7 +15922,7 @@ function Node (value, prev, next, list) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(8);
 
 
@@ -16090,7 +16090,7 @@ class AggregationFiltering {
 
     _aggregation(f) {
         f = this._removeBlend(f);
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__["a" /* PropertyAvg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__["b" /* PropertyMax */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__["c" /* PropertyMin */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__["d" /* PropertyMode */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_propertyAggregation__["e" /* PropertySum */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["a" /* ClusterAvg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["b" /* ClusterMax */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["c" /* ClusterMin */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["d" /* ClusterMode */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["e" /* ClusterSum */]) {
             let p = this._property(f.property);
             if (p) {
                 p.property = __WEBPACK_IMPORTED_MODULE_10__core_schema__["column"].aggColumn(p.property, f.aggName);

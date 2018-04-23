@@ -2299,6 +2299,811 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".clusterAvg"><span class="type-signature">(static) </span>clusterAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Aggregate using the average value. This operation disables the access to the property</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Aggregated column</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const $population = s.prop('population');
+const viz = new carto.Viz({
+  width: s.clusterAvg($population);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clusterMax"><span class="type-signature">(static) </span>clusterMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Aggregated column</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const $population = s.prop('population');
+const viz = new carto.Viz({
+  width: s.clusterMax($population);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clusterMin"><span class="type-signature">(static) </span>clusterMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Aggregate using the minimum value. This operation disables the access to the property</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Aggregated column</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const $population = s.prop('population');
+const viz = new carto.Viz({
+  width: s.clusterMin($population);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clusterMode"><span class="type-signature">(static) </span>clusterMode<span class="signature">(property)</span><span class="type-signature"> &rarr; {carto.expressions.Property}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Aggregated column</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">carto.expressions.Property</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const $population = s.prop('population');
+const viz = new carto.Viz({
+  width: s.clusterMode($population);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clusterSum"><span class="type-signature">(static) </span>clusterSum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Aggregated column</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const $population = s.prop('population');
+const viz = new carto.Viz({
+  width: s.clusterSum($population);
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".constant"><span class="type-signature">(static) </span>constant<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
@@ -9462,811 +10267,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".propertyAvg"><span class="type-signature">(static) </span>propertyAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Aggregate using the average value. This operation disables the access to the property</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Column of the table to be aggregated</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Aggregated column</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
-const viz = new carto.Viz({
-  width: s.propertyAvg($population);
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".propertyMax"><span class="type-signature">(static) </span>propertyMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Column of the table to be aggregated</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Aggregated column</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
-const viz = new carto.Viz({
-  width: s.propertyMax($population);
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".propertyMin"><span class="type-signature">(static) </span>propertyMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Aggregate using the minimum value. This operation disables the access to the property</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Column of the table to be aggregated</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Aggregated column</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
-const viz = new carto.Viz({
-  width: s.propertyMin($population);
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".propertyMode"><span class="type-signature">(static) </span>propertyMode<span class="signature">(property)</span><span class="type-signature"> &rarr; {carto.expressions.Property}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Column of the table to be aggregated</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Aggregated column</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">carto.expressions.Property</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
-const viz = new carto.Viz({
-  width: s.propertyMode($population);
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".propertySum"><span class="type-signature">(static) </span>propertySum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Column of the table to be aggregated</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Aggregated column</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
-const viz = new carto.Viz({
-  width: s.propertySum($population);
-});</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".quantiles"><span class="type-signature">(static) </span>quantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
@@ -12460,14 +12460,14 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
     
     <pre class="prettyprint"><code>new carto.Viz(`
   width: 2
-  color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
   filter: torque($day, 40, fade(0.1, 0.3))`);</code></pre>
 
         <p class="code-caption"> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </p>
     
     <pre class="prettyprint"><code>new carto.Viz(`
   width:    2
-  color: ramp(linear(propertyAvg($temp), 0,30), tealrose)
+  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);</code></pre>
 
 
@@ -12624,7 +12624,7 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
-    sum_price: s.propertySum(s.prop('price'))
+    sum_price: s.clusterSum(s.prop('price'))
   }
  filter: s.neq(s.var('sum_price'), 'london'),
 });
@@ -13830,7 +13830,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Apr 20 2018 17:43:03 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Apr 23 2018 15:40:51 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
