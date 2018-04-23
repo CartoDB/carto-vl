@@ -61,28 +61,28 @@ export default class Dataframe {
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    getFeaturesAtPosition(pos, style) {
+    getFeaturesAtPosition(pos, viz) {
         switch (this.type) {
             case 'point':
-                return this._getPointsAtPosition(pos, style);
+                return this._getPointsAtPosition(pos, viz);
             case 'line':
-                return this._getLinesAtPosition(pos, style);
+                return this._getLinesAtPosition(pos, viz);
             case 'polygon':
-                return this._getPolygonAtPosition(pos, style);
+                return this._getPolygonAtPosition(pos, viz);
             default:
                 return [];
         }
     }
 
-    _getPointsAtPosition(p, style) {
+    _getPointsAtPosition(p, viz) {
         p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const styleWidth = style.getWidth();
-        const styleStrokeWidth = style.getStrokeWidth();
+        const vizWidth = viz.getWidth();
+        const vizStrokeWidth = viz.getStrokeWidth();
         for (let i = 0; i < points.length; i += 2) {
             const featureIndex = i / 2;
             const center = {
@@ -93,9 +93,9 @@ export default class Dataframe {
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
             });
-            const spw = styleWidth.eval(f);
-            const ssw = styleStrokeWidth.eval(f);
-            const diameter = Math.min(spw + ssw, 126);
+            const pointWidth = vizWidth.eval(f);
+            const pointStrokeWidth = vizStrokeWidth.eval(f);
+            const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
 
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
             const scale = diameter / 2 * widthScale;
@@ -107,7 +107,7 @@ export default class Dataframe {
         return features;
     }
 
-    _getLinesAtPosition(pos, style) {
+    _getLinesAtPosition(pos, viz) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
@@ -117,7 +117,7 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const styleWidth = style.getWidth();
+        const vizWidth = viz.getWidth();
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -130,7 +130,7 @@ export default class Dataframe {
                 f[name] = this.properties[name][featureIndex];
             });
             // Line with is saturated at 336px
-            const lineWidth = Math.min(styleWidth.eval(f), 336);
+            const lineWidth = Math.min(vizWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
             const scale = lineWidth / 2 * widthScale;
             const v1 = {

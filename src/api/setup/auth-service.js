@@ -1,7 +1,6 @@
 import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
 
-
 let defaultAuth = undefined;
 
 /**

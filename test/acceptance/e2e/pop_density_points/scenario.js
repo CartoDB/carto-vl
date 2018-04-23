@@ -11,15 +11,15 @@ carto.setDefaultAuth({
 });
 
 const source = new carto.source.Dataset('pop_density_points');
-const s = carto.style.expressions;
+const s = carto.expressions;
 const $dn = s.property('dn');
-const style = new carto.Style({
+const viz = new carto.Viz({
     width: 4 * s.zoom(),
-    color: s.ramp(s.linear($dn, 1, 300), s.palettes.prism),
+    color: s.ramp(s.linear($dn, 1, 300), s.palettes.PRISM),
     strokeColor: s.rgba(0, 0, 0, 0.2),
     strokeWidth: 1,
     filter: s.between($dn, 100, 140)
 });
-const layer = new carto.Layer('myCartoLayer', source, style);
+const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);
