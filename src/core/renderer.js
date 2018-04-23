@@ -269,6 +269,9 @@ class Renderer {
             return;
         }
 
+        const HACK_BUFFER = gl.getVertexAttrib(0, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING);
+        const HACK_BUFFER2 = gl.getVertexAttrib(1, gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING);
+
         gl.enable(gl.CULL_FACE);
 
         gl.disable(gl.BLEND);
@@ -448,6 +451,14 @@ class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
+
+        gl.enableVertexAttribArray(0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, HACK_BUFFER);
+        gl.vertexAttribPointer(0, 4, gl.SHORT, false, 12, 0);
+
+        gl.enableVertexAttribArray(1);
+        gl.bindBuffer(gl.ARRAY_BUFFER, HACK_BUFFER2);
+        return;
     }
 
 
