@@ -40,8 +40,8 @@ export default class GeoJSON extends Base {
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
-        this._numFields = [];
-        this._catFields = [];
+        this._numFields = new Set();
+        this._catFields = new Set();
         this._data = data;
         this._features = this._getFeatures(data);
         this._metadata = this._computeMetadata();
@@ -133,13 +133,13 @@ export default class GeoJSON extends Base {
             });
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
-        this._numFields.map(name => {
+        this._numFields.forEach(name => {
             const column = columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
-        this._catFields.map(name => {
+        this._catFields.forEach(name => {
             const column = columns.find(c => c.name == name);
-            column.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            column.categoryNames.forEach(name => categoryIDs[name] = this._getCategoryIDFromString(name));
         });
 
         this._metadata = new Metadata(categoryIDs, columns, featureCount, sample);
@@ -157,11 +157,11 @@ export default class GeoJSON extends Base {
     }
 
     _addNumericPropertyToMetadata(propertyName, value, columns) {
-        if (this._catFields.includes(propertyName)) {
+        if (this._catFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        if (!this._numFields.includes(propertyName)) {
-            this._numFields.push(propertyName);
+        if (!this._numFields.has(propertyName)) {
+            this._numFields.add(propertyName);
             columns.push({
                 name: propertyName,
                 type: 'number',
@@ -179,39 +179,36 @@ export default class GeoJSON extends Base {
         column.count++;
     }
     _addCategoryPropertyToMetadata(propertyName, value, columns) {
-        if (this._numFields.includes(propertyName)) {
+        if (this._numFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        if (!this._catFields.includes(propertyName)) {
-            this._catFields.push(propertyName);
+        if (!this._catFields.has(propertyName)) {
+            this._catFields.add(propertyName);
             columns.push({
                 name: propertyName,
                 type: 'category',
-                categoryNames: [],
-                categoryCounts: [],
+                categoryNames: new Set(),
             });
         }
         const column = columns.find(c => c.name == propertyName);
-        if (!column.categoryNames.includes(value)) {
-            column.categoryNames.push(value);
-            column.categoryCounts.push(0);
+        if (!column.categoryNames.has(value)) {
+            column.categoryNames.add(value);
         }
-        column.categoryCounts[column.categoryNames.indexOf(value)]++;
     }
 
     _decodeProperties() {
         const properties = {};
-        this._numFields.concat(this._catFields).map(name => {
+        [...this._numFields].concat([...this._catFields]).map(name => {
             // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
         for (var i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
-            this._catFields.map(name => {
+            this._catFields.forEach(name => {
                 properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
             });
-            this._numFields.map(name => {
+            this._numFields.forEach(name => {
                 properties[name][i] = Number(f.properties[name]);
             });
             // TODO support date / timestamp properties

@@ -128,8 +128,7 @@ describe('api/source/geojson', () => {
                     {
                         name: 'category',
                         type: 'category',
-                        categoryNames: ['red', 'blue'],
-                        categoryCounts: [1, 1],
+                        categoryNames: new Set(['red', 'blue']),
                     },
                     {
                         name: 'cartodb_id',
