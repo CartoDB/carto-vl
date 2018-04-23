@@ -63,7 +63,7 @@ describe('Interactivity', () => {
         });
     });
 
-    fdescribe('when the user clicks on the map', () => {
+    describe('when the user clicks on the map', () => {
         let interactivity;
 
         describe('and the click is in a feature', () => {
@@ -128,8 +128,8 @@ describe('Interactivity', () => {
                 });
                 layer.on('loaded', () => {
                     // Move mouse inside a feature
-                    map.fire('click', { lngLat: { lng: -10, lat: -10 } });
-                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    map.fire({ type: 'click', lngLat: { lng: -10, lat: -10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 10, lat: 10 } });
                 });
             });
 
@@ -142,7 +142,7 @@ describe('Interactivity', () => {
                 });
                 layer.on('loaded', () => {
                     // Move mouse inside a feature
-                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 10, lat: 10 } });
                 });
             });
 
@@ -151,14 +151,14 @@ describe('Interactivity', () => {
                 const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
                 layer.on('loaded', () => {
                     // Move mouse inside a feature
-                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureEnter', featureClickOutSpy);
                     interactivity.on('featureHover', () => {
                         expect(featureClickOutSpy).not.toHaveBeenCalled();
                         done();
                     });
                     // Move mouse inside the same feature
-                    map.fire('mousemove', { lngLat: { lng: 20, lat: 20 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 20, lat: 20 } });
                 });
             });
         });
@@ -168,13 +168,13 @@ describe('Interactivity', () => {
                 interactivity = new carto.Interactivity(layer);
                 layer.on('loaded', () => {
                     // Move mouse inside a feature
-                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureHover', event => {
                         expect(event.features.length).toEqual(0);
                         done();
                     });
                     // Move mouse outside any feature
-                    map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: -10, lat: -10 } });
                 });
             });
 
@@ -182,14 +182,14 @@ describe('Interactivity', () => {
                 interactivity = new carto.Interactivity(layer);
                 layer.on('loaded', () => {
                     // Move mouse inside a feature
-                    map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: 10, lat: 10 } });
                     interactivity.on('featureLeave', event => {
                         expect(event.features[0].id).toEqual(0);
                         expect(event.features[0].layerId).toEqual('layer');
                         done();
                     });
                     // Move mouse outside the feature
-                    map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: -10, lat: -10 } });
                 });
             });
 
@@ -198,14 +198,14 @@ describe('Interactivity', () => {
                 layer.on('loaded', () => {
                     const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
                     // Move mouse outside any feature
-                    map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: -10, lat: -10 } });
                     interactivity.on('featureLeave', featureLeaveSpy);
                     interactivity.on('featureHover', () => {
                         expect(featureLeaveSpy).not.toHaveBeenCalled();
                         done();
                     });
                     // Move mouse outside any feature
-                    map.fire('mousemove', { lngLat: { lng: -20, lat: -20 } });
+                    map.fire({ type: 'mousemove', lngLat: { lng: -20, lat: -20 } });
                 });
             });
         });
