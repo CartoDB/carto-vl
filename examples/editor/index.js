@@ -82,8 +82,6 @@ const texts = [
     'Finally, we can use the new Windshaft aggregations, just use the aggregator functions: clusterMin, clusterMax, clusterSum, clusterAvg and clusterMode',
 ];
 
-const shipsViz = 'width:    blend(1,2,near($day, (25*now()) %1000, 0, 10), cubic) *zoom()\ncolor:    opacity(ramp(clusterAvg($temp), tealrose, 0, 30), blend(0.005,1,near($day, (25*now()) %1000, 0, 10), cubic))';
-
 const BASEMAPS = {
     DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
     Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
@@ -133,6 +131,8 @@ map.on('load', () => {
                         handleError(error);
                         $('#loader').removeClass('spin');
                     });
+                } else {
+                    $('#loader').removeClass('spin');
                 }
             }
         } catch (error) {
@@ -151,19 +151,7 @@ map.on('load', () => {
         $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = vizs[index];
-        superRefresh();
-    }
-    function wwi() {
-        $('.step').css('display', 'none');
-        $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-        $('#tutorial').text('');
-
-        $('#dataset').val('wwi');
-        $('#user').val('cartogl');
-        $('#serverURL').val('https://{user}.carto.com');
-
-        document.getElementById('styleEntry').value = shipsViz;
-        superRefresh();
+        superRefresh({ zoom: 13, center: [2.17, 41.38] });
     }
 
     $('#prev').click(() => {
@@ -192,7 +180,6 @@ map.on('load', () => {
     });
 
     $('#barcelona').click(barcelona);
-    $('#wwi').click(wwi);
     $('#styleEntry').on('input', () => updateViz());
     function getConfig() {
         return '#' + btoa(JSON.stringify({
@@ -218,8 +205,6 @@ map.on('load', () => {
         $('#user').val(c.c);
         $('#serverURL').val(c.d);
         $('#styleEntry').val(c.e);
-        $('#loader').addClass('spin');
-        document.getElementById('feedback').style.display = 'none';
         try {
             superRefresh({ zoom: c.g, center: c.f, nosave: true });
         } catch (error) {
@@ -233,6 +218,8 @@ map.on('load', () => {
         if (opts.nosave) {
             location.hash = getConfig();
         }
+        $('#loader').addClass('spin');
+        document.getElementById('feedback').style.display = 'none';
         const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
         const source = new SourceClass(
             $('#dataset').val(),
@@ -249,15 +236,23 @@ map.on('load', () => {
         if (!layer) {
             layer = new carto.Layer('myCartoLayer', source, viz);
             layer.on('loaded', () => {
-                map.setZoom(opts.zoom);
-                map.setCenter(opts.center);
+                if (opts.zoom !== undefined) {
+                    map.setZoom(opts.zoom);
+                }
+                if (opts.center !== undefined) {
+                    map.setCenter(opts.center);
+                }
                 $('#loader').removeClass('spin');
             });
             layer.addTo(map, 'watername_ocean');
         } else {
             layer.update(source, viz).then(() => {
-                map.setZoom(opts.zoom);
-                map.setCenter(opts.center);
+                if (opts.zoom !== undefined) {
+                    map.setZoom(opts.zoom);
+                }
+                if (opts.center !== undefined) {
+                    map.setCenter(opts.center);
+                }
                 $('#loader').removeClass('spin');
             }).catch(error => {
                 handleError(error);
@@ -291,12 +286,12 @@ map.on('load', () => {
         'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiBvcGFjaXR5KHJhbXAobGluZWFyKCRjYXVzZSwgMSwxNCksIFByaXNtKSwkZ2lzX2FjcmVzLzEwMDAwMClcblxuXG5cblxuIiwiZiI6eyJsbmciOi0xMTUuNjI3MzM0MDY1MjkzMSwibGF0Ijo0MS4yMDU5MDgwMjA2MzQzNTR9LCJnIjozLjkyMzIzMjk2NDMzNzM1NzZ9');
     addButton('Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiB6b29tKClcbmNvbG9yOiByYW1wKGJ1Y2tldHMoJGRuLCA4MCwgMTAwLCAxNDApLCBwcmlzbSlcbmZpbHRlcjogJGRuID4gNjBcblxuXG5cbiIsImYiOnsibG5nIjotMTAuODQwNzIxNDAxNDUzMjY2LCJsYXQiOjQwLjA2NDA1NDE1NjU3MDk2fSwiZyI6MS40OTE3MDE3MTg1OTc1MzI1fQ==');
     addButton('Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogJHdvcmtlcnNfaW5fZmxvdy8yOTAzNDYxKjEwMCo0XG5jb2xvcjogb3BhY2l0eShyYW1wKGxpbmVhcigkd29ya2Vyc19pbl9mbG93LDAsMTAwMDAwKSAsYWdfR3JuWWwpLCAkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KVxuXG5cblxuXG5cblxuIiwiZiI6eyJsbmciOi05NS45OTY1MzU1NDYxNTc5OSwibGF0IjozNC40NDM5MjMyNDc4NzUwMzR9LCJnIjoyLjYzODUyMzM4NDkxNjQ3NTh9');
-    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpLzQwMCp6b29tKClcbmNvbG9yOiBvcGFjaXR5KGhzdigwLiwxLDEpKnN1bSgkYmxhY2tfcG9wKS8oc3VtKCRhc2lhbl9wb3ApK3N1bSgkYmxhY2tfcG9wKStzdW0oJGhpc3BhbmljX28pK3N1bSgkd2hpdGVfcG9wKSkqMStcbiAgICAgICAgICAgIGhzdigwLjY2LDEsMSkqc3VtKCRhc2lhbl9wb3ApLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSozK1xuICAgICAgICAgICAgaHN2KDAuMzMsMSwxKSpzdW0oJGhpc3BhbmljX28pLyhzdW0oJGFzaWFuX3BvcCkrc3VtKCRibGFja19wb3ApK3N1bSgkaGlzcGFuaWNfbykrc3VtKCR3aGl0ZV9wb3ApKSoxK1xuICAgICAgICAgICAgaHN2KDAuMTUsMCwxKSpzdW0oJHdoaXRlX3BvcCkvKHN1bSgkYXNpYW5fcG9wKStzdW0oJGJsYWNrX3BvcCkrc3VtKCRoaXNwYW5pY19vKStzdW0oJHdoaXRlX3BvcCkpKjAuOCwgMC44KVxuc3Ryb2tlQ29sb3I6IHJnYigwLDAsMC4pXG5zdHJva2VXaWR0aDogMVxucmVzb2x1dGlvbjogNCIsImYiOnsibG5nIjotOTcuNTYzMjU1MjU1NzM2NjksImxhdCI6NDEuMDE3NzE5NjEzMTAyMjl9LCJnIjo0LjA0NjgwODgwMTM4OTk4ODZ9');
-    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDEsIDQpLCBFYXJ0aClcbiIsImYiOnsibG5nIjotNzMuOTA0MzkwOTA1NTU1NDMsImxhdCI6NDAuNzQ5MTE4Nzc2NDIxNH0sImciOjExLjc0ODMxNjMyODkxMDYyMn0=');
+    addButton('Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IkBzdW1fYXNpYW46IGNsdXN0ZXJTdW0oJGFzaWFuX3BvcClcbkBzdW1fYmxhY2s6IGNsdXN0ZXJTdW0oJGJsYWNrX3BvcClcbkBzdW1fd2hpdGU6IGNsdXN0ZXJTdW0oJHdoaXRlX3BvcClcbkBzdW1faGlzcGFuaWM6IGNsdXN0ZXJTdW0oJGhpc3BhbmljX28pXG5Ac3VtX2FsbDogQHN1bV9hc2lhbiArIEBzdW1fYmxhY2sgKyBAc3VtX2hpc3BhbmljICsgQHN1bV93aGl0ZVxuXG53aWR0aDogc3FydChAc3VtX2FsbCkgLyA0MDAgKiB6b29tKClcbmNvbG9yOiBvcGFjaXR5KGhzdigwLjAwLDEsMSkgKiBAc3VtX2JsYWNrIC8gQHN1bV9hbGwgKiAxICtcbiAgICAgICAgICAgICAgIGhzdigwLjY2LDEsMSkgKiBAc3VtX2FzaWFuIC8gQHN1bV9hbGwgKiAzICtcbiAgICAgICAgICAgICAgIGhzdigwLjE1LDAsMSkgKiBAc3VtX3doaXRlIC8gQHN1bV9hbGwgKiAwLjggK1xuICAgICAgICAgICAgICAgaHN2KDAuMzMsMSwxKSAqIEBzdW1faGlzcGFuaWMgLyBAc3VtX2FsbCAqIDEsIDAuOClcbnN0cm9rZVdpZHRoOiAxXG5zdHJva2VDb2xvcjogIzAwMFxub3JkZXI6IGRlc2Mod2lkdGgoKSlcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTkzLjg5NzI0MjE0OTA1MTA3LCJsYXQiOjM1Ljg3NTA1MDE3MjkzNjN9LCJnIjozLjEwODA4MjQ3OTIxNTU5MDh9');
+    addButton('Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDEsIDQpLCBFYXJ0aClcbiIsImYiOnsibG5nIjotNzMuOTgxNjMyMTQyOTE3MjUsImxhdCI6NDAuNzMwMDAzMTU1NTU5NjR9LCJnIjoxMS44OTk2NTkwOTAyNTM4Mzh9');
     addButton('Pluto - filtered', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDIsIDQpLCB0ZW1wcylcbmZpbHRlcjogYmV0d2VlbigkbnVtZmxvb3JzLCAxMCwgMTIwKSIsImYiOnsibG5nIjotNzMuOTgzNTMzNDQzODA2MzIsImxhdCI6NDAuNzQ3OTc2NzUxMzI3fSwiZyI6MTIuNTYyOTM2MzA1NDQ4NjgyfQ==');
     addButton('SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiIiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6ImNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcCgkc3RfdHlwZSwgcHJpc20pIFxud2lkdGg6IDEuNSIsImYiOnsibG5nIjotMTIyLjQ0NDA4NDg2ODYxMTkyLCJsYXQiOjM3Ljc3MzcwNjczNjE0OTcwNX0sImciOjExLjY2NDMxMDgwMjg2NjgwNX0=');
-    addButton('Gecat', 'eyJhIjoic2VsZWN0ICosIDEgYXMgY28gZnJvbSBnZWNhdF9nZW9kYXRhX2NvcHkiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIobG9nKGF2Zygkc3BlZWQpKSwgMCwgNCksIEdleXNlciksICBzdW0oJGNvKSp6b29tKCkvMTAwMDAwKjEuOCo0KVxud2lkdGg6IDJcbnJlc29sdXRpb246IDAuMjUgIiwiZiI6eyJsbmciOjEuMjYxNjc5MjY2OTU0ODQzMSwibGF0Ijo0MS43MDQxMDQ5NzQ5MjA0NTV9LCJnIjo3LjM0NjUzOTQ5NzYwMzA0fQ==');
-    addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KFNVTSgkYW1vdW50KS81MDAwMCkqMjAqKHpvb20oKS80MDAwKzAuMDEpKjEuNVxuY29sb3I6IHJhbXAoTU9ERSgkY2F0ZWdvcnkpLCBQcmlzbSlcbmZpbHRlcjogTU9ERSgkY2F0ZWdvcnkpID09IFwiVHJhbnNwb3J0ZXNcIiAgICBvciAgIE1PREUoJGNhdGVnb3J5KSA9PSBcIlNhbHVkXCIiLCJmIjp7ImxuZyI6Mi4xNjU4NTg4OTcwMDI3NDk1LCJsYXQiOjQxLjM3MDU1MjA4MDk0Mzg3fSwiZyI6MTEuNjg4MjUzMTg3MjM4MTk4fQ==');
+    addButton('Gecat', 'eyJhIjoic2VsZWN0ICosIDEgYXMgY28gZnJvbSBnZWNhdF9nZW9kYXRhX2NvcHkiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIobG9nKGNsdXN0ZXJBdmcoJHNwZWVkKSksIDAsIDQpLCBHZXlzZXIpLCBjbHVzdGVyU3VtKCRjbykqem9vbSgpLzEwMDAwMCoxLjgqNClcbndpZHRoOiAyXG5yZXNvbHV0aW9uOiAwLjI1IiwiZiI6eyJsbmciOjIuMTI4NjA0MDYzNjA0ODI1NiwibGF0Ijo0MS4zODg4NDYxMTA0MDAwNH0sImciOjExLjM5MzcxOTA1NjQ0ODMxOX0=');
+    addButton('BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KGNsdXN0ZXJTdW0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjVcbmNvbG9yOiByYW1wKGNsdXN0ZXJNb2RlKCRjYXRlZ29yeSksIFByaXNtKVxuZmlsdGVyOiBjbHVzdGVyTW9kZSgkY2F0ZWdvcnkpID09IFwiVHJhbnNwb3J0ZXNcIiAgb3IgIGNsdXN0ZXJNb2RlKCRjYXRlZ29yeSkgPT0gXCJTYWx1ZFwiIiwiZiI6eyJsbmciOjIuMTc5MTYzODUxODk5NzE2LCJsYXQiOjQxLjQwMTIwMTkwNjA2MzYyfSwiZyI6MTEuNTk5MzIwMDEyNTA1NTAzfQ==');
 
     if (location.hash.length > 1) {
         setConfig(location.hash.substring(1));
