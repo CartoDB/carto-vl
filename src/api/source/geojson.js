@@ -139,6 +139,7 @@ export default class GeoJSON extends Base {
         });
         this._catFields.forEach(name => {
             const column = columns.find(c => c.name == name);
+            column.categoryNames = [...column.categoryNames];
             column.categoryNames.forEach(name => categoryIDs[name] = this._getCategoryIDFromString(name));
         });
 
