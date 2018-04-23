@@ -5,7 +5,7 @@ describe('Interactivity', () => {
     let div, source, viz, layer, map;
 
     beforeEach(() => {
-        const setup = _setup('map');
+        const setup = createMap('map');
         div = setup.div;
         map = setup.map;
 
@@ -19,7 +19,7 @@ describe('Interactivity', () => {
     describe('When the user creates a new Interactivity object', () => {
         xit('should throw an error when layers belong to different maps', done => {
             let loadedLayers = 0;
-            const setup = _setup('map1');
+            const setup = createMap('map1');
             const div2 = setup.div;
             const map2 = setup.map;
             const source2 = new carto.source.GeoJSON(featureJson);
@@ -65,7 +65,7 @@ describe('Interactivity', () => {
         let interactivity;
 
         describe('and the click is in a feature', () => {
-            it('should fire a featureClick event with a features list containing the clicked feature', done => {
+            fit('should fire a featureClick event with a features list containing the clicked feature', done => {
                 interactivity = new carto.Interactivity(layer);
                 interactivity.on('featureClick', event => {
                     expect(event.features[0].color.blendTo).toBeDefined();
@@ -78,7 +78,7 @@ describe('Interactivity', () => {
                 });
                 layer.on('loaded', () => {
                     // Click inside the feature
-                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                    simulateClick(30, -30);
                 });
                 layer.addTo(map);
             });
@@ -264,7 +264,7 @@ describe('Interactivity', () => {
         });
     });
 
-    function _setup(name) {
+    function createMap(name) {
         const div = document.createElement('div');
         div.id = name;
         div.style.width = '100px';
@@ -274,11 +274,27 @@ describe('Interactivity', () => {
         const map = new mapboxgl.Map({
             container: name,
             style: { version: 8, sources: {}, layers: [] },
-            center: [0, 30],
-            zoom: 2
+            center: [17, -17],
+            zoom: 1
         });
 
         return { div, map };
+    }
+
+    function simulateClick(x, y) {
+        // x, y (px) ~> lng, lat (deg)
+        // 0, 0      ~> 0, 0
+        const el = document.querySelector('.mapboxgl-canvas-container');
+        const offset = { x: -8, y: -62 };
+        const params = { clientX: x - offset.x, clientY: y - offset.y };
+
+        const mousedown = new MouseEvent('mousedown', params);
+        const click = new MouseEvent('click', params);
+        const mouseup = new MouseEvent('mouseup', params);
+
+        el.dispatchEvent(mousedown);
+        el.dispatchEvent(click);
+        el.dispatchEvent(mouseup);
     }
 
     const featureJson = {
