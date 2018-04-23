@@ -100,11 +100,6 @@ var map = new mapboxgl.Map({
     dragRotate: false // disable drag to rotate handling
 });
 
-const auth = {
-    user: 'dmanzanares',
-    apiKey: 'YOUR_API_KEY'
-};
-
 let layer = null;
 setInterval(() => {
     if (layer) {
@@ -112,7 +107,7 @@ setInterval(() => {
     }
 }, 500);
 
-map.on('zoom', event => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
+map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
 
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
@@ -299,7 +294,7 @@ Object.keys(BASEMAPS).forEach(id => {
     i.onclick = () => {
         map.setStyle(BASEMAPS[id]);
         let added = false;
-        map.on('sourcedata', event => {
+        map.on('sourcedata', () => {
             if (map.isStyleLoaded() && !added) {
                 layer.addTo(map, 'watername_ocean');
                 added = true;
