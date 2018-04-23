@@ -192,9 +192,7 @@ export default class GeoJSON extends Base {
             });
         }
         const column = columns.find(c => c.name == propertyName);
-        if (!column.categoryNames.has(value)) {
-            column.categoryNames.add(value);
-        }
+        column.categoryNames.add(value);
     }
 
     _decodeProperties() {
