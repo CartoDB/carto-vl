@@ -10,8 +10,10 @@ describe('Interactivity', () => {
         map = setup.map;
 
         source = new carto.source.GeoJSON(featureJson);
-        viz = new carto.Viz(`color: rgb(255, 0, 0)
-                                 @wadus: 123`);
+        viz = new carto.Viz(`
+            color: rgb(255, 0, 0)
+            @wadus: 123`
+        );
         layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
     });
@@ -76,10 +78,7 @@ describe('Interactivity', () => {
                     expect(event.features[0].layerId).toEqual('layer');
                     done();
                 });
-                layer.on('loaded', () => {
-                    // Click inside the feature
-                    click();
-                });
+                layer.on('loaded', click);
             });
 
             it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
@@ -110,10 +109,7 @@ describe('Interactivity', () => {
                         expect(event.features[1].layerId).toEqual('layer2');
                         done();
                     });
-                    layer2.on('loaded', () => {
-                        // Click inside the features
-                        click();
-                    });
+                    layer2.on('loaded', click);
                 });
             });
         });
