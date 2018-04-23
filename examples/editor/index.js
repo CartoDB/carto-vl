@@ -111,7 +111,7 @@ map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${ma
 
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
-    let index = 0;//vizs.length - 1;
+    let index = 0; //vizs.length - 1;
 
     function handleError(error) {
         const err = `Invalid viz: ${error}:${error.stack}`;
@@ -124,13 +124,20 @@ map.on('load', () => {
         document.getElementById('styleEntry').value = v;
         location.hash = getConfig();
         try {
-            const promise = layer.blendToViz(new carto.Viz(v));
-            document.getElementById('feedback').style.display = 'none';
-            if (promise) {
-                promise.catch(handleError);
+            if (layer) {
+                $('#loader').addClass('spin');
+                document.getElementById('feedback').style.display = 'none';
+                const promise = layer.blendToViz(new carto.Viz(v));
+                if (promise) {
+                    promise.catch(error => {
+                        handleError(error);
+                        $('#loader').removeClass('spin');
+                    });
+                }
             }
         } catch (error) {
             handleError(error);
+            $('#loader').removeClass('spin');
         }
     }
 
@@ -211,14 +218,19 @@ map.on('load', () => {
         $('#user').val(c.c);
         $('#serverURL').val(c.d);
         $('#styleEntry').val(c.e);
-        superRefresh(true);
-        map.setZoom(c.g);
-        map.setCenter(c.f);
-        location.hash = getConfig();
+        $('#loader').addClass('spin');
+        document.getElementById('feedback').style.display = 'none';
+        try {
+            superRefresh({ zoom: c.g, center: c.f, nosave: true });
+        } catch (error) {
+            handleError(error);
+            $('#loader').removeClass('spin');
+        }
     }
 
-    const superRefresh = (nosave) => {
-        if (nosave) {
+    const superRefresh = (opts) => {
+        opts = opts || {};
+        if (opts.nosave) {
             location.hash = getConfig();
         }
         const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
@@ -236,12 +248,23 @@ map.on('load', () => {
         const viz = new carto.Viz(vizStr);
         if (!layer) {
             layer = new carto.Layer('myCartoLayer', source, viz);
+            layer.on('loaded', () => {
+                map.setZoom(opts.zoom);
+                map.setCenter(opts.center);
+                $('#loader').removeClass('spin');
+            });
             layer.addTo(map, 'watername_ocean');
         } else {
-            layer.update(source, viz);
+            layer.update(source, viz).then(() => {
+                map.setZoom(opts.zoom);
+                map.setCenter(opts.center);
+                $('#loader').removeClass('spin');
+            }).catch(error => {
+                handleError(error);
+                $('#loader').removeClass('spin');
+            });
         }
     };
-
 
     $('#dataset').on('input', superRefresh);
     $('#user').on('input', superRefresh);
@@ -258,8 +281,8 @@ map.on('load', () => {
         };
         document.getElementById('buttonlist').appendChild(button);
     };
-    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJjYXJ0b2dsIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAgem9vbSgpICogKHRvcnF1ZSgkZGF5LCAxNDAsIGZhZGUoMC4wNSwgMC4yKSkgKyAwLjUpXG5jb2xvcjogICAgIHJhbXAobGluZWFyKEFWRygkdGVtcCksIDAsMzApLCB0ZWFscm9zZSlcbmZpbHRlcjogICAgICB0b3JxdWUoJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC4wNSIsImYiOnsibG5nIjo3Mi42OTY3MDEyMjkzNjQ3NSwibGF0IjoyNy4wMjgwNjIyOTcyNzc5NH0sImciOjEuMTk3MjI5MjYwOTc2ODM3OH0=');
-    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydCgkbnVtYmVyLzEwKVxuY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIoTUFYKCRudW1iZXIpXjAuNSwgMCwgNTApLCBTdW5zZXQpLDAuNylcbnN0cm9rZUNvbG9yOiByYW1wKGxpbmVhcihNQVgoJG51bWJlcileMC41LDAsIDUwKSwgU3Vuc2V0KVxuc3Ryb2tlV2lkdGg6IDFcblxuXG5cblxuXG4iLCJmIjp7ImxuZyI6LTg3LjUyMDYzMDE3NjQwMzk4LCJsYXQiOjM3LjM3NzY5OTc2NjUzOTMxfSwiZyI6Mi43NDY1OTQ2MTU2NjYxODl9');
+    addButton('WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJjYXJ0b2dsIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogIHpvb20oKSAqICh0b3JxdWUoJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC41KVxuY29sb3I6ICByYW1wKGxpbmVhcihjbHVzdGVyQXZnKCR0ZW1wKSwgMCwzMCksIHRlYWxyb3NlKVxuZmlsdGVyOiB0b3JxdWUoJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC4wNSIsImYiOnsibG5nIjoyNC43MzU1Njg1MjA0MDI5MiwibGF0IjoxOS4xNjM0NzA5Nzg3NTQ5NDR9LCJnIjowLjg0Mzg2NjQzOTIzMTI4NH0=');
+    addButton('Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydCgkbnVtYmVyLzEwKVxuY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsMCwgNTApLCBTdW5zZXQpXG5zdHJva2VXaWR0aDogMVxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotODcuNzA5OTUzMDUwNzA4MDEsImxhdCI6MzcuMzcwMDQ5NTk5ODkzNDM0fSwiZyI6Mi44Mzc3OTI1MDM2MzI1Njc1fQ==');
     addButton('Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiAoJGFzaWFuX3BvcCskYmxhY2tfcG9wKyRoaXNwYW5pY19vKS8kd2hpdGVfcG9wXG5jb2xvcjogaHN2YSgwLjUsIDEsIDEsIDAuNykiLCJmIjp7ImxuZyI6LTkwLjY5OTA1ODUxMjQxMTk3LCJsYXQiOjQwLjYyMTQ3NTIzNDQxNjY2NH0sImciOjIuNDU3MzM2MDY0MjIzNTMxfQ==');
     addButton('Denver accidents',
         'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAkY291bnQvMlxuY29sb3I6IG9wYWNpdHkoIHJhbXAobGluZWFyKCRjb3VudCwgMCwxMjApLCBSZWRPciksICRjb3VudC8yMClcblxuXG4iLCJmIjp7ImxuZyI6LTEwNC45NjUwNTYyMTU2Njc0NiwibGF0IjozOS43NDk2MTkzNzgyNDYyMn0sImciOjExLjQxODcxODc3MDkwNDQ5NH0=');
