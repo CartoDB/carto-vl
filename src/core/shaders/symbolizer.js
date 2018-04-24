@@ -79,7 +79,7 @@ varying highp float sizeNormalizer;
 $PREFACE
 
 void main(void) {
-    vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
-    gl_FragColor = $INLINE;
+    vec2 spriteUV = gl_PointCoord * sizeNormalizer;
+    gl_FragColor = vec4($INLINE.a)*color;
 }`
 };

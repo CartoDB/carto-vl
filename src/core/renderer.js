@@ -350,7 +350,9 @@ class Renderer {
 
             let renderer = null;
             // TODO viz.symbol
-            if (tile.type == 'point') {
+            if (true) {
+                renderer = viz.symbolShader.shader;
+            } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
                 renderer = this.lineRendererProgram;
@@ -408,18 +410,20 @@ class Renderer {
             gl.uniform1i(renderer.filterTexture, 2);
 
             // TODO if viz.symbol=>
-            /*
-                        // Enforce that property texture TextureUnit don't clash with auxiliar ones
-                        drawMetadata.freeTexUnit = Object.keys(TID).length;
-                        vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-                        vizExpr._updateDrawMetadata(drawMetadata);
-                        vizExpr._preDraw(shader.program, drawMetadata, gl);
+            if (true) {
+                // Enforce that property texture TextureUnit don't clash with auxiliar ones
+                const TID = viz.symbolShader.tid;
+                drawMetadata.freeTexUnit = 5;
+                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbol._updateDrawMetadata(drawMetadata);
+                viz.symbol._preDraw(viz.symbolShader.shader.program, drawMetadata, gl);
 
-                        Object.keys(TID).forEach((name, i) => {
-                            gl.activeTexture(gl.TEXTURE0 + i);
-                            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                            gl.uniform1i(TID[name], i);
-                        });*/
+                Object.keys(TID).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                    gl.uniform1i(TID[name], i);
+                });
+            }
 
             if (tile.type == 'point') {
                 // Lines and polygons don't support stroke
