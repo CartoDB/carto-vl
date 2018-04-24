@@ -42,6 +42,10 @@ export default class GeoJSON extends Base {
         this._numCategories = 0;
         this._numFields = new Set();
         this._catFields = new Set();
+        this._columns = [];
+        this._categoryIDs = {};
+        this._boundColumns = new Set();
+
         this._data = data;
         if (data.type === 'FeatureCollection') {
             this._features = data.features;
@@ -67,20 +71,26 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
-        if (this._lastDataframe) {
-            this._removeDataframe(this._lastDataframe);
+        if (this._dataframe) {
+            const newProperties = this._decodeUnboundProperties();
+            this._dataframe.addProperties(newProperties);
+            Object.keys(newProperties).forEach(propertyName => {
+                this._boundColumns.add(propertyName);
+            });
+            return;
         }
         const dataframe = new Dataframe({
             active: true,
             center: { x: 0, y: 0 },
             geom: this._decodeGeometry(),
-            properties: this._decodeProperties(),
+            properties: this._decodeUnboundProperties(),
             scale: 1,
             size: this._features.length,
             type: this._getDataframeType(this._type),
             metadata: this._metadata,
         });
-        this._lastDataframe = dataframe;
+        this._boundColumns = new Set(Object.keys(dataframe.properties));
+        this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
     }
@@ -95,40 +105,40 @@ export default class GeoJSON extends Base {
     }
 
     _computeMetadata(viz) {
-        const categoryIDs = {};
-        this._numFields.clear();
-        this._catFields.clear();
-        const columns = [];
         const sample = [];
+        this._addNumericColumnField('cartodb_id');
+
         const featureCount = this._features.length;
-        this._addNumericColumnField('cartodb_id', columns);
         const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             const keys = Object.keys(properties);
             for (let j = 0, len = keys.length; j < len; j++) {
                 const name = keys[j];
-                if (!requiredColumns.has(name)) {
+                if (!requiredColumns.has(name) || this._boundColumns.has(name)) {
                     continue;
                 }
                 const value = properties[name];
                 Number.isFinite(value) ?
-                    this._addNumericPropertyToMetadata(name, value, columns) :
-                    this._addCategoryPropertyToMetadata(name, value, columns);
+                    this._addNumericPropertyToMetadata(name, value) :
+                    this._addCategoryPropertyToMetadata(name, value);
             }
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
+
         this._numFields.forEach(name => {
-            const column = columns.find(c => c.name == name);
+            const column = this._columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
         this._catFields.forEach(name => {
-            const column = columns.find(c => c.name == name);
-            column.categoryNames = [...column.categoryNames];
-            column.categoryNames.forEach(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+            if (!this._boundColumns.has(name)) {
+                const column = this._columns.find(c => c.name == name);
+                column.categoryNames = [...column.categoryNames];
+                column.categoryNames.forEach(name => this._categoryIDs[name] = this._getCategoryIDFromString(name));
+            }
         });
 
-        this._metadata = new Metadata(categoryIDs, columns, featureCount, sample);
+        this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample);
         return this._metadata;
     }
 
@@ -142,22 +152,22 @@ export default class GeoJSON extends Base {
         sample.push(properties);
     }
 
-    _addNumericPropertyToMetadata(propertyName, value, columns) {
+    _addNumericPropertyToMetadata(propertyName, value) {
         if (this._catFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        this._addNumericColumnField(propertyName, columns);
-        const column = columns.find(c => c.name == propertyName);
+        this._addNumericColumnField(propertyName, this._columns);
+        const column = this._columns.find(c => c.name == propertyName);
         column.min = Math.min(column.min, value);
         column.max = Math.max(column.max, value);
         column.sum += value;
         column.count++;
     }
 
-    _addNumericColumnField(propertyName, columns) {
+    _addNumericColumnField(propertyName) {
         if (!this._numFields.has(propertyName)) {
             this._numFields.add(propertyName);
-            columns.push({
+            this._columns.push({
                 name: propertyName,
                 type: 'number',
                 min: Number.POSITIVE_INFINITY,
@@ -169,35 +179,41 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _addCategoryPropertyToMetadata(propertyName, value, columns) {
+    _addCategoryPropertyToMetadata(propertyName, value) {
         if (this._numFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._catFields.has(propertyName)) {
             this._catFields.add(propertyName);
-            columns.push({
+            this._columns.push({
                 name: propertyName,
                 type: 'category',
                 categoryNames: new Set(),
             });
         }
-        const column = columns.find(c => c.name == propertyName);
+        const column = this._columns.find(c => c.name == propertyName);
         column.categoryNames.add(value);
     }
 
-    _decodeProperties() {
+    _decodeUnboundProperties() {
         const properties = {};
         [...this._numFields].concat([...this._catFields]).map(name => {
+            if (this._boundColumns.has(name)) {
+                return;
+            }
             // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
+
+        const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
+        const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         for (var i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
-            this._catFields.forEach(name => {
+            catFields.forEach(name => {
                 properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
             });
-            this._numFields.forEach(name => {
+            numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
