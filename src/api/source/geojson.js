@@ -199,7 +199,7 @@ export default class GeoJSON extends Base {
             });
             this._numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
-                    f.properties.cartodb_id = -i;
+                    f.properties.cartodb_id = i;
                 }
                 properties[name][i] = Number(f.properties[name]);
             });
