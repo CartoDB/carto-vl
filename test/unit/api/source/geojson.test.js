@@ -36,10 +36,10 @@ describe('api/source/geojson', () => {
         };
     };
 
-    it('_decodeProperties() should return a valid Dataframe properties object', done => {
+    it('_decodeUnboundProperties() should return a valid Dataframe properties object', done => {
         const source = new GeoJSON(createData());
         source.requestMetadata(createVizMock(['numeric', 'category'])).then(() => {
-            const properties = source._decodeProperties();
+            const properties = source._decodeUnboundProperties();
             const expected = {
                 numeric: new Float32Array(2 + 1024),
                 category: new Float32Array(2 + 1024),
@@ -215,7 +215,7 @@ describe('api/source/geojson', () => {
                 };
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
-                    const properties = source._decodeProperties();
+                    const properties = source._decodeUnboundProperties();
                     expect(properties.cartodb_id[0]).toEqual(0);
                     done();
                 });
@@ -243,7 +243,7 @@ describe('api/source/geojson', () => {
                 };
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
-                    const props = source._decodeProperties();
+                    const props = source._decodeUnboundProperties();
                     expect(props.cartodb_id[0]).toEqual(0);
                     expect(props.cartodb_id[1]).toEqual(1);
                     expect(props.cartodb_id[2]).toEqual(2);
@@ -282,29 +282,4 @@ describe('api/source/geojson', () => {
         expect(fakeDataLoaded).toHaveBeenCalled();
     });
 
-    it('should remove previous dataframes on consecutive requestData calls', () => {
-        const source = new GeoJSON({
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [0, 0]
-            },
-            properties: {}
-        });
-
-        const addDataframe = jasmine.createSpy('addDataframe');
-        const removeDataframe = jasmine.createSpy('removeDataframe');
-        source.bindLayer(addDataframe, removeDataframe, _ => _);
-
-        expect(addDataframe).not.toHaveBeenCalled();
-        expect(removeDataframe).not.toHaveBeenCalled();
-
-        source.requestData();
-        expect(addDataframe).toHaveBeenCalledTimes(1);
-        expect(removeDataframe).not.toHaveBeenCalled();
-
-        source.requestData();
-        expect(addDataframe).toHaveBeenCalledTimes(2);
-        expect(removeDataframe).toHaveBeenCalledTimes(1);
-    });
 });
