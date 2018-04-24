@@ -220,8 +220,6 @@ map.on('load', () => {
     } else {
         barcelona();
     }
-
-    createBasemapElements();
 });
 
 function getConfig() {
@@ -250,9 +248,8 @@ function setConfig(input) {
     $('#user').val(c.c);
     $('#serverURL').val(c.d);
     $('#styleEntry').val(c.e);
-    setBasemap(c.h || DEFAULT_BASEMAP);
     try {
-        superRefresh({ zoom: c.g, center: c.f, nosave: true });
+        superRefresh({ zoom: c.g, center: c.f, basemap: c.h });
     } catch (error) {
         handleError(error);
         $('#loader').removeClass('spin');
@@ -286,6 +283,8 @@ const superRefresh = (opts) => {
                 map.setCenter(opts.center);
             }
             $('#loader').removeClass('spin');
+            setBasemap(opts.basemap || DEFAULT_BASEMAP);
+            createBasemapElements();
         });
         layer.addTo(map, 'watername_ocean');
     } else {
@@ -297,6 +296,8 @@ const superRefresh = (opts) => {
                 map.setCenter(opts.center);
             }
             $('#loader').removeClass('spin');
+            setBasemap(opts.basemap || DEFAULT_BASEMAP);
+            createBasemapElements();
         }).catch(error => {
             handleError(error);
             $('#loader').removeClass('spin');
@@ -313,16 +314,17 @@ function handleError(error) {
 
 function createBasemapElements() {
     const basemapSelector = document.querySelector('#basemap');
+    basemapSelector.innerHTML = '';
     Object.keys(BASEMAPS).forEach(id => {
         const l = document.createElement('label');
         const i = document.createElement('input');
         i.type = 'radio';
-        i.id = id;
+        i.value = id;
         i.name = 'basemap';
         i.checked = id === basemap;
 
         i.onclick = (event) => {
-            setBasemap(event.target.id);
+            setBasemap(event.target.value);
             location.hash = getConfig();
         };
         i.selected = 'selected';
