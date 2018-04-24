@@ -98,6 +98,8 @@ export default class GeoJSON extends Base {
 
     _computeMetadata(viz) {
         const categoryIDs = {};
+        this._numFields.clear();
+        this._catFields.clear();
         const columns = [];
         const sample = [];
         const featureCount = this._features.length;
