@@ -3,6 +3,7 @@ import { projectToWebMercator, WM_2R } from '../../../../src/api//util';
 import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
+    const mapSize = 600;
     let div, source, viz, layer, map;
 
     beforeEach(() => {
@@ -10,9 +11,11 @@ describe('Interactivity', () => {
         div = setup.div;
         map = setup.map;
 
-        source = new carto.source.GeoJSON(featureJson);
-        viz = new carto.Viz(`color: rgb(255, 0, 0)
-                                 @wadus: 123`);
+        source = new carto.source.GeoJSON(featureJSON);
+        viz = new carto.Viz(`
+            color: rgb(255, 0, 0)
+            @wadus: 123
+        `);
         layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
     });
@@ -23,7 +26,7 @@ describe('Interactivity', () => {
             const setup = createMap('map1');
             const div2 = setup.div;
             const map2 = setup.map;
-            const source2 = new carto.source.GeoJSON(featureJson);
+            const source2 = new carto.source.GeoJSON(featureJSON);
             const viz2 = new carto.Viz('color: rgb(255, 0, 0)');
             const layer2 = new carto.Layer('layer2', source2, viz2);
 
@@ -46,27 +49,11 @@ describe('Interactivity', () => {
         });
     });
 
-    describe('.on', () => {
-        let interactivity;
-        it('should throw an error when subscribing to an invalid event', () => {
-            interactivity = new carto.Interactivity(layer);
-            expect(() => { interactivity.on('invalidEventName'); }).toThrowError(/Unrecognized event/);
-        });
-    });
-
-    describe('.off', () => {
-        let interactivity;
-        it('should throw an error when unsubscribing to an invalid event', () => {
-            interactivity = new carto.Interactivity(layer);
-            expect(() => { interactivity.off('invalidEventName'); }).toThrowError(/Unrecognized event/);
-        });
-    });
-
     describe('when the user clicks on the map', () => {
         let interactivity;
 
         describe('and the click is in a feature', () => {
-            fit('should fire a featureClick event with a features list containing the clicked feature', done => {
+            it('should fire a featureClick event with a features list containing the clicked feature', done => {
                 interactivity = new carto.Interactivity(layer);
                 interactivity.on('featureClick', event => {
                     expect(event.features[0].color.blendTo).toBeDefined();
@@ -88,21 +75,17 @@ describe('Interactivity', () => {
             it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
                 interactivity = new carto.Interactivity(layer);
                 const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
-                interactivity.on('featureClick', event => {
-                    console.log(event.position, event.coordinates);
+                interactivity.on('featureClick', () => {
                     expect(featureClickOutSpy).not.toHaveBeenCalled();
                     done();
                 });
                 interactivity.on('featureClickOut', featureClickOutSpy);
                 layer.on('loaded', () => {
                     // Click inside the feature
-                    // map.fire('click', { lngLat: { lng: 10, lat: 10 } });
                     simulateClick({ lng: 10, lat: 10 });
                     // Move the mouse
-                    // map.fire('mousemove', { lngLat: { lng: 15, lat: 15 } });
-                    simulateClick({ lng: 15, lat: 15 });
+                    simulateMove({ lng: 15, lat: 15 });
                     // Click inside the same feature
-                    // map.fire('click', { lngLat: { lng: 20, lat: 20 } });
                     simulateClick({ lng: 20, lat: 20 });
                 });
                 layer.addTo(map);
@@ -110,7 +93,7 @@ describe('Interactivity', () => {
 
             describe('and multiple features are clicked', () => {
                 it('should return the right feature.id', done => {
-                    source = new carto.source.GeoJSON(featureCollectionJson);
+                    source = new carto.source.GeoJSON(featureCollectionJSON);
                     layer = new carto.Layer('layer', source, new carto.Viz());
                     interactivity = new carto.Interactivity(layer);
                     interactivity.on('featureClick', event => {
@@ -122,7 +105,7 @@ describe('Interactivity', () => {
                     });
                     layer.on('loaded', () => {
                         // Click inside the features
-                        map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                        simulateClick({ lng: 10, lat: 10 });
                     });
                     layer.addTo(map);
                 });
@@ -137,7 +120,7 @@ describe('Interactivity', () => {
                     });
                     // Click outside the feature
                     layer.on('loaded', () => {
-                        map.fire('click', { lngLat: { lng: -10, lat: -10 } });
+                        simulateClick({ lng: -10, lat: -10 });
                     });
                     layer.addTo(map);
                 });
@@ -152,11 +135,11 @@ describe('Interactivity', () => {
                         });
                         layer.on('loaded', () => {
                             // Click inside the feature
-                            map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                            simulateClick({ lng: 10, lat: 10 });
                             // Move the mouse
-                            map.fire('mousemove', { lngLat: { lng: 0, lat: 0 } });
+                            simulateMove({ lng: 0, lat: 0 });
                             // Click outside the feature
-                            map.fire('click', { lngLat: { lng: -10, lat: -10 } });
+                            simulateClick({ lng: -10, lat: -10 });
                         });
                         layer.addTo(map);
                     });
@@ -177,7 +160,7 @@ describe('Interactivity', () => {
                     });
                     layer.on('loaded', () => {
                         // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                        simulateMove({ lng: 10, lat: 10 });
                     });
                     layer.addTo(map);
                 });
@@ -191,7 +174,7 @@ describe('Interactivity', () => {
                     });
                     layer.on('loaded', () => {
                         // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                        simulateMove({ lng: 10, lat: 10 });
                     });
                     layer.addTo(map);
                 });
@@ -201,14 +184,14 @@ describe('Interactivity', () => {
                     const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
                     layer.on('loaded', () => {
                         // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                        simulateMove({ lng: 10, lat: 10 });
                         interactivity.on('featureEnter', featureClickOutSpy);
                         interactivity.on('featureHover', () => {
                             expect(featureClickOutSpy).not.toHaveBeenCalled();
                             done();
                         });
                         // Move mouse inside the same feature
-                        map.fire('mousemove', { lngLat: { lng: 20, lat: 20 } });
+                        simulateMove({ lng: 20, lat: 20 });
                     });
                     layer.addTo(map);
                 });
@@ -219,13 +202,13 @@ describe('Interactivity', () => {
                     interactivity = new carto.Interactivity(layer);
                     layer.on('loaded', () => {
                         // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                        simulateMove({ lng: 10, lat: 10 });
                         interactivity.on('featureHover', event => {
                             expect(event.features.length).toEqual(0);
                             done();
                         });
                         // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                        simulateMove({ lng: -10, lat: -10 });
                     });
                     layer.addTo(map);
                 });
@@ -234,14 +217,14 @@ describe('Interactivity', () => {
                     interactivity = new carto.Interactivity(layer);
                     layer.on('loaded', () => {
                         // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
+                        simulateMove({ lng: 10, lat: 10 });
                         interactivity.on('featureLeave', event => {
                             expect(event.features[0].id).toEqual(0);
                             expect(event.features[0].layerId).toEqual('layer');
                             done();
                         });
                         // Move mouse outside the feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                        simulateMove({ lng: -10, lat: -10 });
                     });
                     layer.addTo(map);
                 });
@@ -251,14 +234,14 @@ describe('Interactivity', () => {
                     layer.on('loaded', () => {
                         const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
                         // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
+                        simulateMove({ lng: -10, lat: -10 });
                         interactivity.on('featureLeave', featureLeaveSpy);
                         interactivity.on('featureHover', () => {
                             expect(featureLeaveSpy).not.toHaveBeenCalled();
                             done();
                         });
                         // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -20, lat: -20 } });
+                        simulateMove({ lng: -20, lat: -20 });
                     });
                     layer.addTo(map);
                 });
@@ -270,14 +253,28 @@ describe('Interactivity', () => {
         });
     });
 
-    const size = 600;
+    describe('.on', () => {
+        let interactivity;
+        it('should throw an error when subscribing to an invalid event', () => {
+            interactivity = new carto.Interactivity(layer);
+            expect(() => { interactivity.on('invalidEventName'); }).toThrowError(/Unrecognized event/);
+        });
+    });
+
+    describe('.off', () => {
+        let interactivity;
+        it('should throw an error when unsubscribing to an invalid event', () => {
+            interactivity = new carto.Interactivity(layer);
+            expect(() => { interactivity.off('invalidEventName'); }).toThrowError(/Unrecognized event/);
+        });
+    });
 
     function createMap(name) {
         const div = document.createElement('div');
         div.id = name;
         div.style.margin = '0';
-        div.style.width = `${size}px`;
-        div.style.height = `${size}px`;
+        div.style.width = `${mapSize}px`;
+        div.style.height = `${mapSize}px`;
         document.body.appendChild(div);
 
         const map = new mapboxgl.Map({
@@ -299,11 +296,11 @@ describe('Interactivity', () => {
         const click = new MouseEvent('click', params);
         const mouseup = new MouseEvent('mouseup', params);
 
-        setTimeout(() => {
+        if (el) {
             el.dispatchEvent(mousedown);
             el.dispatchEvent(click);
             el.dispatchEvent(mouseup);
-        });
+        }
     }
 
     function simulateMove(coordinates) {
@@ -313,20 +310,20 @@ describe('Interactivity', () => {
 
         const mousemove = new MouseEvent('mousemove', params);
 
-        setTimeout(() => {
+        if (el) {
             el.dispatchEvent(mousemove);
-        });
+        }
     }
 
     function project(coordinates) {
         const wm = projectToWebMercator(coordinates);
         return {
-            x: size * (0.5 + wm.x / WM_2R),
-            y: size * (0.5 - wm.y / WM_2R)
+            x: mapSize * (0.5 + wm.x / WM_2R),
+            y: mapSize * (0.5 - wm.y / WM_2R)
         };
     }
 
-    const featureJson = {
+    const featureJSON = {
         type: 'Feature',
         geometry: {
             type: 'Polygon',
@@ -343,7 +340,7 @@ describe('Interactivity', () => {
         properties: {}
     };
 
-    const featureCollectionJson = {
+    const featureCollectionJSON = {
         type: 'FeatureCollection',
         features: [
             {
