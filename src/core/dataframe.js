@@ -16,6 +16,8 @@ export default class Dataframe {
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
+        this.propertyID = {}; //Name => PID
+        this.propertyCount = 0;
     }
 
     bind(renderer) {
@@ -25,7 +27,7 @@ export default class Dataframe {
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
 
-        this._genDataframePropertyTextures(gl);
+        this.addProperties(this.properties);
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
@@ -211,33 +213,44 @@ export default class Dataframe {
         features.push({ id, properties });
     }
 
-    _genDataframePropertyTextures() {
+    _addProperty(propertyName, propertiesFloat32Array) {
+        if (!this.renderer) {
+            // Properties will be bound to the GL context on the initial this.bind() call
+            return;
+        }
+        // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
 
-        this.height = height;
-        this.propertyID = {}; //Name => PID
-        this.propertyCount = 0;
-        for (const k in this.properties) {
-            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                let propertyID = this.propertyID[k];
-                if (propertyID === undefined) {
-                    propertyID = this.propertyCount;
-                    this.propertyCount++;
-                    this.propertyID[k] = propertyID;
-                }
-                this.propertyTex[propertyID] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, height, 0, gl.ALPHA, gl.FLOAT,
-                    this.properties[k]);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
+        let propertyID = this.propertyID[propertyName];
+        if (propertyID === undefined) {
+            propertyID = this.propertyCount;
+            this.propertyCount++;
+            this.propertyID[propertyName] = propertyID;
         }
+        this.propertyTex[propertyID] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.FLOAT,
+            propertiesFloat32Array);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+
+    // Add new properties to the dataframe or overwrite previously stored ones.
+    // `properties` is of the form: {propertyName: Float32Array}
+    addProperties(properties) {
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.height = height;
+        Object.keys(properties).forEach(propertyName => {
+            this._addProperty(propertyName, properties[propertyName]);
+            this.properties[propertyName] = properties[propertyName];
+        });
     }
 
     _createStyleTileTexture(numFeatures) {
