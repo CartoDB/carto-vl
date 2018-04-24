@@ -43,8 +43,13 @@ export default class GeoJSON extends Base {
         this._numFields = new Set();
         this._catFields = new Set();
         this._data = data;
-        this._features = this._getFeatures(data);
-        this._metadata = this._computeMetadata();
+        if (data.type === 'FeatureCollection') {
+            this._features = data.features;
+        } else if (data.type === 'Feature') {
+            this._features = [data];
+        } else {
+            throw new CartoValidationError('source', 'nonValidGeoJSONData');
+        }
 
         this._loaded = false;
     }
@@ -59,8 +64,8 @@ export default class GeoJSON extends Base {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestMetadata() {
-        return Promise.resolve(this._metadata);
+    requestMetadata(viz) {
+        return Promise.resolve(this._computeMetadata(viz));
     }
 
     requestData() {
@@ -91,46 +96,26 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _getFeatures(data) {
-        // Create a copy to avoid modifications to the original data
-        let dataCopy = JSON.parse(JSON.stringify(data));
-        if (dataCopy.type === 'FeatureCollection') {
-            return this._addCartodbId(dataCopy.features);
-        }
-        if (dataCopy.type === 'Feature') {
-            return this._addCartodbId([dataCopy]);
-        }
-        throw new CartoValidationError('source', 'nonValidGeoJSONData');
-    }
-
-    _addCartodbId(features) {
-        return features.map((feature, i) => {
-            this._checkFeature(feature);
-            feature.properties.cartodb_id = i;
-            return feature;
-        }) || [];
-    }
-
-    _checkFeature(feature) {
-        if (feature.properties && feature.properties.cartodb_id) {
-            throw new CartoValidationError('source', 'featureHasCartodbId');
-        }
-    }
-
-    _computeMetadata() {
+    _computeMetadata(viz) {
         const categoryIDs = {};
         const columns = [];
         const sample = [];
         const featureCount = this._features.length;
-
+        this._addNumericColumnField('cartodb_id', columns);
+        const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
-            Object.keys(properties).map(name => {
+            const keys = Object.keys(properties);
+            for (let j = 0, len = keys.length; j < len; j++) {
+                const name = keys[j];
+                if (!requiredColumns.has(name)) {
+                    continue;
+                }
                 const value = properties[name];
                 Number.isFinite(value) ?
                     this._addNumericPropertyToMetadata(name, value, columns) :
                     this._addCategoryPropertyToMetadata(name, value, columns);
-            });
+            }
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
         this._numFields.forEach(name => {
@@ -161,6 +146,15 @@ export default class GeoJSON extends Base {
         if (this._catFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
+        this._addNumericColumnField(propertyName, columns);
+        const column = columns.find(c => c.name == propertyName);
+        column.min = Math.min(column.min, value);
+        column.max = Math.max(column.max, value);
+        column.sum += value;
+        column.count++;
+    }
+
+    _addNumericColumnField(propertyName, columns) {
         if (!this._numFields.has(propertyName)) {
             this._numFields.add(propertyName);
             columns.push({
@@ -173,12 +167,8 @@ export default class GeoJSON extends Base {
                 count: 0
             });
         }
-        const column = columns.find(c => c.name == propertyName);
-        column.min = Math.min(column.min, value);
-        column.max = Math.max(column.max, value);
-        column.sum += value;
-        column.count++;
     }
+
     _addCategoryPropertyToMetadata(propertyName, value, columns) {
         if (this._numFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
@@ -208,6 +198,9 @@ export default class GeoJSON extends Base {
                 properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
             });
             this._numFields.forEach(name => {
+                if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
+                    f.properties.cartodb_id = i;
+                }
                 properties[name][i] = Number(f.properties[name]);
             });
             // TODO support date / timestamp properties
