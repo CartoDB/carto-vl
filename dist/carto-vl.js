@@ -5135,6 +5135,8 @@ class Dataframe {
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
+        this.propertyID = {}; //Name => PID
+        this.propertyCount = 0;
     }
 
     bind(renderer) {
@@ -5144,7 +5146,7 @@ class Dataframe {
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
 
-        this._genDataframePropertyTextures(gl);
+        this.addProperties(this.properties);
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
@@ -5330,33 +5332,44 @@ class Dataframe {
         features.push({ id, properties });
     }
 
-    _genDataframePropertyTextures() {
+    _addProperty(propertyName, propertiesFloat32Array) {
+        if (!this.renderer) {
+            // Properties will be bound to the GL context on the initial this.bind() call
+            return;
+        }
+        // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
 
-        this.height = height;
-        this.propertyID = {}; //Name => PID
-        this.propertyCount = 0;
-        for (const k in this.properties) {
-            if (this.properties.hasOwnProperty(k) && this.properties[k].length > 0) {
-                let propertyID = this.propertyID[k];
-                if (propertyID === undefined) {
-                    propertyID = this.propertyCount;
-                    this.propertyCount++;
-                    this.propertyID[k] = propertyID;
-                }
-                this.propertyTex[propertyID] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, height, 0, gl.ALPHA, gl.FLOAT,
-                    this.properties[k]);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
+        let propertyID = this.propertyID[propertyName];
+        if (propertyID === undefined) {
+            propertyID = this.propertyCount;
+            this.propertyCount++;
+            this.propertyID[propertyName] = propertyID;
         }
+        this.propertyTex[propertyID] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.FLOAT,
+            propertiesFloat32Array);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    }
+
+    // Add new properties to the dataframe or overwrite previously stored ones.
+    // `properties` is of the form: {propertyName: Float32Array}
+    addProperties(properties) {
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        this.height = height;
+        Object.keys(properties).forEach(propertyName => {
+            this._addProperty(propertyName, properties[propertyName]);
+            this.properties[propertyName] = properties[propertyName];
+        });
     }
 
     _createStyleTileTexture(numFeatures) {
@@ -6662,13 +6675,9 @@ const SUPPORTED_PROPERTIES = [
 class Viz {
 
     /**
-    * A Viz defines how the data will be displayed: the color of the elements and size are basic things that can be
-    * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
-    *
-    * A Viz is created from an {@link VizSpec|VizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|VizSpec} must be a valid {@link carto.expressions|expression}.
-    * Those expressions will be evaluated dynamically for every element in the dataset.
-    *
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
+    * 
+    * 
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
     * @example <caption> Create a viz with black dots using the string constructor </caption>
@@ -7008,14 +7017,17 @@ class Viz {
 
     _checkVizSpec(vizSpec) {
         /**
+         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
+         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution
-         * @property {carto.expressions.Base} color
-         * @property {carto.expressions.Base} width
-         * @property {carto.expressions.Base} strokeColor
-         * @property {carto.expressions.Base} strokeWidth
-         * @property {carto.expressions.Base} order
-         * @property {carto.expressions.Base} filter
+         * @property {number} resolution - Control the aggregation level
+         * @property {object} variables - An object describing the variables used.
+         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
+         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
+         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
+         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
+         * @property {carto.expressions.Base} order - Define how the elements will be stacked
+         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 
@@ -10928,13 +10940,20 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
-        this._numFields = [];
-        this._catFields = [];
-        this._data = data;
-        this._features = this._getFeatures(data);
-        this._metadata = this._computeMetadata();
+        this._numFields = new Set();
+        this._catFields = new Set();
+        this._columns = [];
+        this._categoryIDs = {};
+        this._boundColumns = new Set();
 
-        this._loaded = false;
+        this._data = data;
+        if (data.type === 'FeatureCollection') {
+            this._features = data.features;
+        } else if (data.type === 'Feature') {
+            this._features = [data];
+        } else {
+            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidGeoJSONData');
+        }
     }
 
     _clone() {
@@ -10947,25 +10966,31 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestMetadata() {
-        return Promise.resolve(this._metadata);
+    requestMetadata(viz) {
+        return Promise.resolve(this._computeMetadata(viz));
     }
 
     requestData() {
-        if (this._loaded) {
+        if (this._dataframe) {
+            const newProperties = this._decodeUnboundProperties();
+            this._dataframe.addProperties(newProperties);
+            Object.keys(newProperties).forEach(propertyName => {
+                this._boundColumns.add(propertyName);
+            });
             return;
         }
-        this._loaded = true;
         const dataframe = new __WEBPACK_IMPORTED_MODULE_1__core_renderer__["a" /* Dataframe */]({
             active: true,
             center: { x: 0, y: 0 },
             geom: this._decodeGeometry(),
-            properties: this._decodeProperties(),
+            properties: this._decodeUnboundProperties(),
             scale: 1,
             size: this._features.length,
             type: this._getDataframeType(this._type),
             metadata: this._metadata,
         });
+        this._boundColumns = new Set(Object.keys(dataframe.properties));
+        this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
     }
@@ -10979,58 +11004,41 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
     }
 
-    _getFeatures(data) {
-        // Create a copy to avoid modifications to the original data
-        let dataCopy = JSON.parse(JSON.stringify(data));
-        if (dataCopy.type === 'FeatureCollection') {
-            return this._addCartodbId(dataCopy.features);
-        }
-        if (dataCopy.type === 'Feature') {
-            return this._addCartodbId([dataCopy]);
-        }
-        throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidGeoJSONData');
-    }
-
-    _addCartodbId(features) {
-        return features.map((feature, i) => {
-            this._checkFeature(feature);
-            feature.properties.cartodb_id = i;
-            return feature;
-        }) || [];
-    }
-
-    _checkFeature(feature) {
-        if (feature.properties && feature.properties.cartodb_id) {
-            throw new __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__["a" /* default */]('source', 'featureHasCartodbId');
-        }
-    }
-
-    _computeMetadata() {
-        const categoryIDs = {};
-        const columns = [];
+    _computeMetadata(viz) {
         const sample = [];
-        const featureCount = this._features.length;
+        this._addNumericColumnField('cartodb_id');
 
+        const featureCount = this._features.length;
+        const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
         for (var i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
-            Object.keys(properties).map(name => {
+            const keys = Object.keys(properties);
+            for (let j = 0, len = keys.length; j < len; j++) {
+                const name = keys[j];
+                if (!requiredColumns.has(name) || this._boundColumns.has(name)) {
+                    continue;
+                }
                 const value = properties[name];
                 Number.isFinite(value) ?
-                    this._addNumericPropertyToMetadata(name, value, columns) :
-                    this._addCategoryPropertyToMetadata(name, value, columns);
-            });
+                    this._addNumericPropertyToMetadata(name, value) :
+                    this._addCategoryPropertyToMetadata(name, value);
+            }
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
-        this._numFields.map(name => {
-            const column = columns.find(c => c.name == name);
+
+        this._numFields.forEach(name => {
+            const column = this._columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
-        this._catFields.map(name => {
-            const column = columns.find(c => c.name == name);
-            column.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name));
+        this._catFields.forEach(name => {
+            if (!this._boundColumns.has(name)) {
+                const column = this._columns.find(c => c.name == name);
+                column.categoryNames = [...column.categoryNames];
+                column.categoryNames.forEach(name => this._categoryIDs[name] = this._getCategoryIDFromString(name));
+            }
         });
 
-        this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, sample);
+        this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](this._categoryIDs, this._columns, featureCount, sample);
         return this._metadata;
     }
 
@@ -11044,13 +11052,22 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         sample.push(properties);
     }
 
-    _addNumericPropertyToMetadata(propertyName, value, columns) {
-        if (this._catFields.includes(propertyName)) {
+    _addNumericPropertyToMetadata(propertyName, value) {
+        if (this._catFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        if (!this._numFields.includes(propertyName)) {
-            this._numFields.push(propertyName);
-            columns.push({
+        this._addNumericColumnField(propertyName, this._columns);
+        const column = this._columns.find(c => c.name == propertyName);
+        column.min = Math.min(column.min, value);
+        column.max = Math.max(column.max, value);
+        column.sum += value;
+        column.count++;
+    }
+
+    _addNumericColumnField(propertyName) {
+        if (!this._numFields.has(propertyName)) {
+            this._numFields.add(propertyName);
+            this._columns.push({
                 name: propertyName,
                 type: 'number',
                 min: Number.POSITIVE_INFINITY,
@@ -11060,46 +11077,47 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
                 count: 0
             });
         }
-        const column = columns.find(c => c.name == propertyName);
-        column.min = Math.min(column.min, value);
-        column.max = Math.max(column.max, value);
-        column.sum += value;
-        column.count++;
-    }
-    _addCategoryPropertyToMetadata(propertyName, value, columns) {
-        if (this._numFields.includes(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
-        }
-        if (!this._catFields.includes(propertyName)) {
-            this._catFields.push(propertyName);
-            columns.push({
-                name: propertyName,
-                type: 'category',
-                categoryNames: [],
-                categoryCounts: [],
-            });
-        }
-        const column = columns.find(c => c.name == propertyName);
-        if (!column.categoryNames.includes(value)) {
-            column.categoryNames.push(value);
-            column.categoryCounts.push(0);
-        }
-        column.categoryCounts[column.categoryNames.indexOf(value)]++;
     }
 
-    _decodeProperties() {
+    _addCategoryPropertyToMetadata(propertyName, value) {
+        if (this._numFields.has(propertyName)) {
+            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+        }
+        if (!this._catFields.has(propertyName)) {
+            this._catFields.add(propertyName);
+            this._columns.push({
+                name: propertyName,
+                type: 'category',
+                categoryNames: new Set(),
+            });
+        }
+        const column = this._columns.find(c => c.name == propertyName);
+        column.categoryNames.add(value);
+    }
+
+    _decodeUnboundProperties() {
         const properties = {};
-        this._numFields.concat(this._catFields).map(name => {
+        [...this._numFields].concat([...this._catFields]).map(name => {
+            if (this._boundColumns.has(name)) {
+                return;
+            }
             // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
             properties[name] = new Float32Array(this._features.length + 1024);
         });
+
+        const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
+        const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         for (var i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
-            this._catFields.map(name => {
+            catFields.forEach(name => {
                 properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
             });
-            this._numFields.map(name => {
+            numFields.forEach(name => {
+                if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
+                    // Using negative ids for GeoJSON features
+                    f.properties.cartodb_id = -i;
+                }
                 properties[name][i] = Number(f.properties[name]);
             });
             // TODO support date / timestamp properties
