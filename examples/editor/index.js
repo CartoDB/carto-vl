@@ -87,8 +87,9 @@ const BASEMAPS = {
     Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
 };
+const DEFAULT_BASEMAP = 'DarkMatter';
 
-var basemap = 'DarkMatter';
+var basemap = DEFAULT_BASEMAP;
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
     container: 'map', // container id
@@ -230,6 +231,7 @@ function getConfig() {
         e: $('#styleEntry').val(),
         f: map.getCenter(),
         g: map.getZoom(),
+        h: basemap
     }));
 }
 
@@ -247,7 +249,7 @@ function setConfig(input) {
     $('#serverURL').val(c.d);
     $('#styleEntry').val(c.e);
     try {
-        superRefresh({ zoom: c.g, center: c.f, nosave: true });
+        superRefresh({ zoom: c.g, center: c.f, basemap: c.h });
     } catch (error) {
         handleError(error);
         $('#loader').removeClass('spin');
@@ -281,6 +283,8 @@ const superRefresh = (opts) => {
                 map.setCenter(opts.center);
             }
             $('#loader').removeClass('spin');
+            setBasemap(opts.basemap || DEFAULT_BASEMAP);
+            createBasemapElements();
         });
         layer.addTo(map, 'watername_ocean');
     } else {
@@ -292,6 +296,8 @@ const superRefresh = (opts) => {
                 map.setCenter(opts.center);
             }
             $('#loader').removeClass('spin');
+            setBasemap(opts.basemap || DEFAULT_BASEMAP);
+            createBasemapElements();
         }).catch(error => {
             handleError(error);
             $('#loader').removeClass('spin');
@@ -306,34 +312,43 @@ function handleError(error) {
     document.getElementById('feedback').style.display = 'block';
 }
 
-const basemapSelector = document.querySelector('#basemap');
-Object.keys(BASEMAPS).forEach(id => {
-    const l = document.createElement('label');
+function createBasemapElements() {
+    const basemapSelector = document.querySelector('#basemap');
+    basemapSelector.innerHTML = '';
+    Object.keys(BASEMAPS).forEach(id => {
+        const l = document.createElement('label');
+        const i = document.createElement('input');
+        i.type = 'radio';
+        i.value = id;
+        i.name = 'basemap';
+        i.checked = id === basemap;
 
-    const i = document.createElement('input');
-    i.type = 'radio';
-    i.name = 'basemap';
-    i.value = id;
-    i.checked = id === basemap;
-    i.onclick = () => {
-        map.setStyle(BASEMAPS[id]);
-        let added = false;
-        map.on('sourcedata', () => {
-            if (map.isStyleLoaded() && !added) {
-                layer.addTo(map, 'watername_ocean');
-                added = true;
-            }
-        });
-    };
-    i.selected = 'selected';
-    l.appendChild(i);
+        i.onclick = (event) => {
+            setBasemap(event.target.value);
+            location.hash = getConfig();
+        };
+        i.selected = 'selected';
+        l.appendChild(i);
 
-    const s = document.createElement('span');
-    s.innerText = id;
-    l.appendChild(s);
+        const s = document.createElement('span');
+        s.innerText = id;
+        l.appendChild(s);
 
-    basemapSelector.appendChild(l);
-});
+        basemapSelector.appendChild(l);
+    });
+}
+
+function setBasemap(id) {
+    basemap = id;
+    map.setStyle(BASEMAPS[id]);
+    let added = false;
+    map.on('sourcedata', () => {
+        if (map.isStyleLoaded() && !added) {
+            layer.addTo(map, 'watername_ocean');
+            added = true;
+        }
+    });
+}
 
 document.getElementById('fullscreen').onclick = () => {
     document.getElementById('mapDiv').style.height = '100%';
