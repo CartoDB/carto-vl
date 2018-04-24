@@ -101,7 +101,7 @@ function loadOptions() {
         viewportWidth: 400,
         viewportHeight: 300,
         headless: process.platform === 'linux',
-        threshold: 0.125
+        threshold: process.platform === 'linux' ? 0.1 : 0.2,
     };
 }
 
