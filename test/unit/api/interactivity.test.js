@@ -1,19 +1,19 @@
 import Dataset from '../../../src/api/source/dataset';
-import Style from '../../../src/api/style';
+import Viz from '../../../src/api/viz';
 import Layer from '../../../src/api/layer';
 import Interactivity from '../../../src/api/interactivity';
 
 describe('api/interactivity', () => {
     describe('constructor', () => {
-        let source, style, layer, mockIntegrator;
+        let source, viz, layer, mockIntegrator;
 
         beforeEach(() => {
             source = new Dataset('ne_10m_populated_places_simple', {
                 user: 'test',
                 apiKey: '1234567890'
             });
-            style = new Style();
-            layer = new Layer('layer', source, style);
+            viz = new Viz();
+            layer = new Layer('layer', source, viz);
             mockIntegrator = { on: () => {} };
             layer.getIntegrator = () => mockIntegrator;
         });
@@ -33,7 +33,7 @@ describe('api/interactivity', () => {
         });
 
         it('should build a new Interactivity object with two layers with the same integrator', () => {
-            const layer2 = new Layer('layer2', source, new Style());
+            const layer2 = new Layer('layer2', source, new Viz());
             layer2.getIntegrator = () => mockIntegrator;
             const interactivity = new Interactivity([layer, layer2]);
 
@@ -54,7 +54,7 @@ describe('api/interactivity', () => {
         });
 
         xit('should throw an error when the layers have different integrator', () => {
-            const layer2 = new Layer('layer2', source, style);
+            const layer2 = new Layer('layer2', source, viz);
             const mockIntegrator2 = { on: () => {} };
             layer2.getIntegrator = () => mockIntegrator2;
 

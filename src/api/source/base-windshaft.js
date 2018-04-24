@@ -4,7 +4,6 @@ import CartoValidationError from '../error-handling/carto-validation-error';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
-
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
 
 export default class BaseWindshaft extends Base {
@@ -28,8 +27,8 @@ export default class BaseWindshaft extends Base {
         this._client._bindLayer(...args);
     }
 
-    requestMetadata(style) {
-        return this._client.getMetadata(style);
+    requestMetadata(viz) {
+        return this._client.getMetadata(viz);
     }
 
     requestData(viewport) {

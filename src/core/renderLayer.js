@@ -1,13 +1,13 @@
-import { blend, property, animate, notEquals } from './style/functions';
-import { parseStyleExpression } from './style/parser';
+import { blend, property, animate, notEquals } from './viz/functions';
+import { parseVizExpression } from './viz/parser';
 
 export default class RenderLayer {
     constructor() {
         this.dataframes = [];
         this.renderer = null;
-        this.style = null;
+        this.viz = null;
         this.type = null;
-        this.styledFeatures = {};
+        this.customizedFeatures = {};
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
@@ -44,67 +44,83 @@ export default class RenderLayer {
     }
 
     getFeaturesAtPosition(pos) {
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.style))).map(feature => {
+        if (!this.viz) {
+            return [];
+        }
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(feature => {
 
-            const genReset = styleProperty =>
+            const genReset = vizProperty =>
                 (duration = 500) => {
-                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
-                        this.styledFeatures[feature.id][styleProperty].replaceChild(
-                            this.styledFeatures[feature.id][styleProperty].mix,
+                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
+                        this.customizedFeatures[feature.id][vizProperty].replaceChild(
+                            this.customizedFeatures[feature.id][vizProperty].mix,
                             // animate(0) is used to ensure that blend._predraw() "GC" collects it
                             blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
                         );
-                        this.style._styleSpec[styleProperty].notify();
-                        this.styledFeatures[feature.id][styleProperty] = undefined;
+                        this.viz[vizProperty].notify();
+                        this.customizedFeatures[feature.id][vizProperty] = undefined;
                     }
                 };
 
-            const genStyleProperty = styleProperty => {
+            const genVizProperty = vizProperty => {
                 const blender = (newExpression, duration = 500) => {
                     if (typeof newExpression == 'string') {
-                        newExpression = parseStyleExpression(newExpression);
+                        newExpression = parseVizExpression(newExpression);
                     }
-                    if (this.styledFeatures[feature.id] && this.styledFeatures[feature.id][styleProperty]) {
-                        this.styledFeatures[feature.id][styleProperty].a.blendTo(newExpression, duration);
+                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
+                        this.customizedFeatures[feature.id][vizProperty].a.blendTo(newExpression, duration);
                         return;
                     }
                     const blendExpr = blend(
                         newExpression,
-                        this.style._styleSpec[styleProperty],
+                        this.viz[vizProperty],
                         blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
                     );
-                    this.trackFeatureStyle(feature.id, styleProperty, blendExpr);
-                    this.style.replaceChild(
-                        this.style._styleSpec[styleProperty],
+                    this.trackFeatureViz(feature.id, vizProperty, blendExpr);
+                    this.viz.replaceChild(
+                        this.viz[vizProperty],
                         blendExpr,
                     );
-                    this.style._styleSpec[styleProperty].notify();
+                    this.viz[vizProperty].notify();
                 };
+                const self = this;
+                const properties = feature.properties;
                 return {
+                    get value() {
+                        return self.viz[vizProperty].eval(properties);
+                    },
                     blendTo: blender,
-                    reset: genReset(styleProperty)
+                    reset: genReset(vizProperty)
                 };
             };
+            const variables = {};
+            Object.keys(this.viz.variables).map(varName => {
+                variables[varName] = genVizProperty('__cartovl_variable_' + varName);
+            });
 
-            feature.style = {
-                color: genStyleProperty('color'),
-                width: genStyleProperty('width'),
-                strokeColor: genStyleProperty('strokeColor'),
-                strokeWidth: genStyleProperty('strokeWidth'),
+            return {
+                id: feature.id,
+                color: genVizProperty('color'),
+                width: genVizProperty('width'),
+                strokeColor: genVizProperty('strokeColor'),
+                strokeWidth: genVizProperty('strokeWidth'),
+                variables,
                 reset: (duration = 500) => {
                     genReset('color')(duration);
                     genReset('width')(duration);
                     genReset('strokeColor')(duration);
                     genReset('strokeWidth')(duration);
+                    Object.keys(this.viz.variables).map(varName => {
+                        variables[varName] = genReset('__cartovl_variable_' + varName)(duration);
+                    });
                 }
             };
-            return feature;
         });
     }
 
-    trackFeatureStyle(featureID, styleProperty, newStyle) {
-        this.styledFeatures[featureID] = this.styledFeatures[featureID] || {};
-        this.styledFeatures[featureID][styleProperty] = newStyle;
+    trackFeatureViz(featureID, vizProperty, newViz) {
+        this.customizedFeatures[featureID] = this.customizedFeatures[featureID] || {};
+        this.customizedFeatures[featureID][vizProperty] = newViz;
     }
 
     freeDataframes() {

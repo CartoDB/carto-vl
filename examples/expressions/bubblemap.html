@@ -4,8 +4,8 @@
   <title>Default | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -39,11 +39,11 @@
     });
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
     width: ramp(buckets($pop_max, 100000, 1000000), [1, 2, 4]) * zoom()
     color: ramp(buckets($pop_max, 100000, 1000000), teal)
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>

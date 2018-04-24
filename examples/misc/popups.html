@@ -4,8 +4,8 @@
   <title>Pop-ups | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -110,14 +110,16 @@
     const source = new carto.source.Dataset(`
       world_population_2015
     `);
-    const style = new carto.Style(`
+    const viz = new carto.Viz(`
       width: 50*sqrt($pop_2015)/sqrt(globalMax($pop_2015))*zoom()
       color: opacity(ramp($country_name,bold),0.8)
       strokeColor: ramp($country_name,bold)
       strokeWidth: 1.5
       order: asc(width())
+      @country_name: $country_name
+      @pop_2015: $pop_2015
     `);
-    const layer = new carto.Layer('layer', source, style);
+    const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity([layer]);
     layer.on('loaded', () => {
@@ -142,13 +144,13 @@
 
     function updatePopup(event) {
       if (event.features.length > 0) {
-        const properties = event.features[0].properties;
+        const vars = event.features[0].variables;
         popup.setHTML(`
         <div class="popup-container">
-          <h2>${properties.country_name}</h2>
+          <h2>${vars.country_name.value}</h2>
           <ul>
             <h3>Population:</h3>
-            <h4>${properties.pop_2015}</h4>
+            <h4>${vars.pop_2015.value}</h4>
           </ul>
         </div>
         `);

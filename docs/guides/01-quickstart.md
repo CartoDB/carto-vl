@@ -1,7 +1,5 @@
 ## Quickstart Guide
 
-Welcome to the CARTO GL internal release documentation.
+Welcome to the CARTO VL internal release documentation.
 
 ### About this Guide
-
-

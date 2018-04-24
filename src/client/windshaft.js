@@ -64,31 +64,32 @@ export default class Windshaft {
     }
 
     /**
-     * Should be called whenever the style changes (even if metadata is not going to be used)
-     * This not only computes metadata: it also updates the map (instantiates) for the new style if needed
+     * Should be called whenever the viz changes (even if metadata is not going to be used)
+     * This not only computes metadata: it also updates the map (instantiates) for the new viz if needed
      * Returns  a promise to a Metadata
-     * @param {*} style
+     * @param {*} viz
      */
-    async getMetadata(style) {
-        const MNS = style.getMinimumNeededSchema();
-        const resolution = style.getResolution();
-        const filtering = windshaftFiltering.getFiltering(style, { exclusive: this._exclusive });
+    async getMetadata(viz) {
+        const MNS = viz.getMinimumNeededSchema();
+        const resolution = viz.getResolution();
+        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS.columns.includes('cartodb_id')) {
             MNS.columns.push('cartodb_id');
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            await this._instantiate(MNS, resolution, filtering);
+            const instantiationData = await this._instantiate(MNS, resolution, filtering);
+            this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
     }
 
     /**
      * After calling getMetadata(), data for a viewport can be obtained with this function.
-     * So long as the style doesn't change, getData() can be called repeatedly for different
-     * viewports. If style changes getMetadata() should be called before requesting data
-     * for the new style.
+     * So long as the viz doesn't change, getData() can be called repeatedly for different
+     * viewports. If viz changes getMetadata() should be called before requesting data
+     * for the new viz.
      * @param {*} viewport
      */
     getData(viewport) {
@@ -138,13 +139,13 @@ export default class Windshaft {
     }
 
     _getCategoryIDFromString(category, readonly = true) {
-        if (category === undefined){
+        if (category === undefined) {
             category = 'null';
         }
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
         }
-        if (readonly){
+        if (readonly) {
             console.warn(`category ${category} not present in metadata`);
             return -1;
         }
@@ -164,6 +165,8 @@ export default class Windshaft {
         const metadata = await this._getMetadata(query, MNS, conf);
 
         select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
+        aggSQL = this._buildQuery(select);
+
         // If the number of features is higher than the minimun, enable server filtering.
         let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
 
@@ -178,6 +181,11 @@ export default class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+
+        return { MNS, resolution, filters, metadata, urlTemplate };
+    }
+
+    _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
         this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
@@ -186,18 +194,15 @@ export default class Windshaft {
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
-
-        // Store instantiation
-        return metadata;
     }
+
     async _instantiate(MNS, resolution, filters) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
         }
-        console.log(this._getInstantiationID(MNS, resolution, filters));
-        const promise = this._instantiateUncached(MNS, resolution, filters);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = promise;
-        return promise;
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
+        return instantiationPromise;
     }
 
     _checkLayerMeta(MNS) {
@@ -359,7 +364,7 @@ export default class Windshaft {
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
                         catFields.push(name);
-                    } else if (type == 'float') {
+                    } else if (type == 'number') {
                         numFields.push(name);
                     } else if (type == 'date') {
                         dateFields.push(name);
@@ -447,9 +452,9 @@ export default class Windshaft {
         featureGeometries.push(geometry);
     }
 
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, datesField) {
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
         const properties = [];
-        for (let i = 0; i < catFields.length + numFields.length; i++) {
+        for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
         if (this.geomType == 'point') {
@@ -476,7 +481,7 @@ export default class Windshaft {
             numFields.map((name, index) => {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
-            datesField.map((name, index) => {
+            dateFields.map((name, index) => {
                 const d = Date.parse(f.properties[name]);
                 if (Number.isNaN(d)) {
                     throw new Error('invalid MVT date');
@@ -521,9 +526,7 @@ export default class Windshaft {
             t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
             columns.push(t);
         });
-        const metadata = new Metadata(categoryIDs, columns, featureCount, sample);
-        console.log(metadata);
-        return metadata;
+        return new Metadata(categoryIDs, columns, featureCount, sample);
     }
 
     /**
@@ -562,7 +565,6 @@ export default class Windshaft {
 
         const response = await getSQL(q, conf);
         const json = await response.json();
-        console.log(json);
         return json.rows;
     }
 
@@ -609,7 +611,7 @@ export default class Windshaft {
         return names.map(name => {
             return {
                 name,
-                type: 'float',
+                type: 'number',
                 min: json.rows[0][`${name}_min`],
                 max: json.rows[0][`${name}_max`],
                 avg: json.rows[0][`${name}_avg`],

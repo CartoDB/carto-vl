@@ -4,8 +4,8 @@
   <title>Populated places | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -85,21 +85,21 @@
     const populatedPlacesSource = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
-    const allPlacesStyle = new carto.Style(`
+    const allPlacesViz = new carto.Viz(`
       width: 6
       color: rgb(237, 76, 89)
       strokeWidth: 1
       strokeColor: rgb(255, 255,255)
       filter: $pop_max >= 0
     `);
-    const veryPopulatedStyle = new carto.Style(`
+    const veryPopulatedViz = new carto.Viz(`
       width: 11
       color: rgb(105, 181, 158)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
       filter: $pop_max > 5000000
     `);
-    const lessPopulatedStyle = new carto.Style(`
+    const lessPopulatedViz = new carto.Viz(`
       width: 11
       color: rgb(242, 87, 66)
       strokeWidth: 1
@@ -107,20 +107,20 @@
       filter: $pop_max < 100
     `);
 
-    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesStyle);
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesViz);
 
     populatedPlacesLayer.addTo(map, 'watername_ocean');
 
     function setAll() {
-      populatedPlacesLayer.blendToStyle(allPlacesStyle);
+      populatedPlacesLayer.blendToViz(allPlacesViz);
     }
 
     function setVeryPopulated() {
-      populatedPlacesLayer.blendToStyle(veryPopulatedStyle);
+      populatedPlacesLayer.blendToViz(veryPopulatedViz);
     }
 
     function setLessPopulated() {
-      populatedPlacesLayer.blendToStyle(lessPopulatedStyle);
+      populatedPlacesLayer.blendToViz(lessPopulatedViz);
     }
   </script>
 </body>
