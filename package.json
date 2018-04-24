@@ -53,7 +53,7 @@
     "sloc": "^0.2.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.8.1",
-    "@carto/mapbox-gl": "0.44.1-0"
+    "@carto/mapbox-gl": "0.44.1-carto1"
   },
   "main": "src/index.js",
   "module": "src/index.js",
