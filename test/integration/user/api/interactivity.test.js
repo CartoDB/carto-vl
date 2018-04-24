@@ -1,4 +1,5 @@
 import * as carto from '../../../../src/';
+import { projectToWebMercator, WM_2R } from '../../../../src/api//util';
 import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
@@ -76,9 +77,10 @@ describe('Interactivity', () => {
                     expect(event.features[0].layerId).toEqual('layer');
                     done();
                 });
+
                 layer.on('loaded', () => {
                     // Click inside the feature
-                    simulateClick(30, -30);
+                    simulateClick({ lng: 10, lat: 10 });
                 });
                 layer.addTo(map);
             });
@@ -86,18 +88,22 @@ describe('Interactivity', () => {
             it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
                 interactivity = new carto.Interactivity(layer);
                 const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
-                interactivity.on('featureClick', () => {
+                interactivity.on('featureClick', event => {
+                    console.log(event.position, event.coordinates);
                     expect(featureClickOutSpy).not.toHaveBeenCalled();
                     done();
                 });
                 interactivity.on('featureClickOut', featureClickOutSpy);
                 layer.on('loaded', () => {
                     // Click inside the feature
-                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                    // map.fire('click', { lngLat: { lng: 10, lat: 10 } });
+                    simulateClick({ lng: 10, lat: 10 });
                     // Move the mouse
-                    map.fire('mousemove', { lngLat: { lng: 15, lat: 15 } });
+                    // map.fire('mousemove', { lngLat: { lng: 15, lat: 15 } });
+                    simulateClick({ lng: 15, lat: 15 });
                     // Click inside the same feature
-                    map.fire('click', { lngLat: { lng: 20, lat: 20 } });
+                    // map.fire('click', { lngLat: { lng: 20, lat: 20 } });
+                    simulateClick({ lng: 20, lat: 20 });
                 });
                 layer.addTo(map);
             });
@@ -264,37 +270,60 @@ describe('Interactivity', () => {
         });
     });
 
+    const size = 600;
+
     function createMap(name) {
         const div = document.createElement('div');
         div.id = name;
-        div.style.width = '100px';
-        div.style.height = '100px';
+        div.style.margin = '0';
+        div.style.width = `${size}px`;
+        div.style.height = `${size}px`;
         document.body.appendChild(div);
 
         const map = new mapboxgl.Map({
             container: name,
             style: { version: 8, sources: {}, layers: [] },
-            center: [17, -17],
-            zoom: 1
+            center: [0, 0],
+            zoom: 0
         });
 
         return { div, map };
     }
 
-    function simulateClick(x, y) {
-        // x, y (px) ~> lng, lat (deg)
-        // 0, 0      ~> 0, 0
+    function simulateClick(coordinates) {
         const el = document.querySelector('.mapboxgl-canvas-container');
-        const offset = { x: -8, y: -62 };
-        const params = { clientX: x - offset.x, clientY: y - offset.y };
+        const position = project(coordinates);
+        const params = { clientX: position.x, clientY: position.y };
 
         const mousedown = new MouseEvent('mousedown', params);
         const click = new MouseEvent('click', params);
         const mouseup = new MouseEvent('mouseup', params);
 
-        el.dispatchEvent(mousedown);
-        el.dispatchEvent(click);
-        el.dispatchEvent(mouseup);
+        setTimeout(() => {
+            el.dispatchEvent(mousedown);
+            el.dispatchEvent(click);
+            el.dispatchEvent(mouseup);
+        });
+    }
+
+    function simulateMove(coordinates) {
+        const el = document.querySelector('.mapboxgl-canvas-container');
+        const position = project(coordinates);
+        const params = { clientX: position.x, clientY: position.y };
+
+        const mousemove = new MouseEvent('mousemove', params);
+
+        setTimeout(() => {
+            el.dispatchEvent(mousemove);
+        });
+    }
+
+    function project(coordinates) {
+        const wm = projectToWebMercator(coordinates);
+        return {
+            x: size * (0.5 + wm.x / WM_2R),
+            y: size * (0.5 - wm.y / WM_2R)
+        };
     }
 
     const featureJson = {
