@@ -78,27 +78,6 @@ describe('api/source/geojson', () => {
             }]);
         });
 
-        it('should requestData just once', () => {
-            const data = {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [0, 0]
-                },
-                properties: {}
-            };
-            const source = new GeoJSON(data);
-
-            source.bindLayer(_ => _, _ => _, _ => _);
-            spyOn(source, '_addDataframe');
-
-            expect(source._addDataframe).toHaveBeenCalledTimes(0);
-            source.requestData();
-            expect(source._addDataframe).toHaveBeenCalledTimes(1);
-            source.requestData();
-            expect(source._addDataframe).toHaveBeenCalledTimes(1);
-        });
-
         it('should build a new Source with (data) as a FeatureCollection', () => {
             const data = {
                 type: 'FeatureCollection',
@@ -301,5 +280,31 @@ describe('api/source/geojson', () => {
         expect(fakeDataLoaded).not.toHaveBeenCalled();
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();
+    });
+
+    it('should remove previous dataframes on consecutive requestData calls', () => {
+        const source = new GeoJSON({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [0, 0]
+            },
+            properties: {}
+        });
+
+        const addDataframe = jasmine.createSpy('addDataframe');
+        const removeDataframe = jasmine.createSpy('removeDataframe');
+        source.bindLayer(addDataframe, removeDataframe, _ => _);
+
+        expect(addDataframe).not.toHaveBeenCalled();
+        expect(removeDataframe).not.toHaveBeenCalled();
+
+        source.requestData();
+        expect(addDataframe).toHaveBeenCalledTimes(1);
+        expect(removeDataframe).not.toHaveBeenCalled();
+
+        source.requestData();
+        expect(addDataframe).toHaveBeenCalledTimes(2);
+        expect(removeDataframe).toHaveBeenCalledTimes(1);
     });
 });

@@ -50,8 +50,6 @@ export default class GeoJSON extends Base {
         } else {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
-
-        this._loaded = false;
     }
 
     _clone() {
@@ -69,10 +67,9 @@ export default class GeoJSON extends Base {
     }
 
     requestData() {
-        if (this._loaded) {
-            return;
+        if (this._lastDataframe) {
+            this._removeDataframe(this._lastDataframe);
         }
-        this._loaded = true;
         const dataframe = new Dataframe({
             active: true,
             center: { x: 0, y: 0 },
@@ -83,6 +80,7 @@ export default class GeoJSON extends Base {
             type: this._getDataframeType(this._type),
             metadata: this._metadata,
         });
+        this._lastDataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
     }
