@@ -49,8 +49,8 @@ describe('api/source/geojson', () => {
             expected.numeric[1] = 2;
             expected.category[0] = 0;
             expected.category[1] = 1;
-            expected.cartodb_id[0] = 0;
-            expected.cartodb_id[1] = 1;
+            expected.cartodb_id[0] = -0;
+            expected.cartodb_id[1] = -1;
             expect(properties).toEqual(expected);
 
             done();
@@ -216,7 +216,7 @@ describe('api/source/geojson', () => {
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
                     const properties = source._decodeProperties();
-                    expect(properties.cartodb_id[0]).toEqual(0);
+                    expect(properties.cartodb_id[0]).toEqual(-0);
                     done();
                 });
 
@@ -244,9 +244,9 @@ describe('api/source/geojson', () => {
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
                     const props = source._decodeProperties();
-                    expect(props.cartodb_id[0]).toEqual(0);
-                    expect(props.cartodb_id[1]).toEqual(1);
-                    expect(props.cartodb_id[2]).toEqual(2);
+                    expect(props.cartodb_id[0]).toEqual(-0);
+                    expect(props.cartodb_id[1]).toEqual(-1);
+                    expect(props.cartodb_id[2]).toEqual(-2);
                     done();
                 });
             });
