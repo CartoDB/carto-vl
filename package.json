@@ -52,7 +52,8 @@
     "puppeteer": "^1.1.0",
     "sloc": "^0.2.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.8.1"
+    "webpack": "^3.8.1",
+    "@carto/mapbox-gl": "0.44.1-0"
   },
   "main": "src/index.js",
   "module": "src/index.js",
