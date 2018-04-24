@@ -2,6 +2,7 @@ import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
 import * as aaBlenderGLSL from './aaBlender';
 import ShaderCache from './shader-cache';
+import { symbolizerGLSL } from './symbolizer';
 
 const shaderCache = new ShaderCache();
 
@@ -153,5 +154,36 @@ const styler = {
         return new Filter(gl, preface, inline);
     }
 };
+
+// TODO remove class nonsense
+
+function compileProgram2(gl, glslVS, glslFS) {
+    const shader = {};
+    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
+    shader.program = gl.createProgram();
+    gl.attachShader(shader.program, VS);
+    gl.attachShader(shader.program, FS);
+    gl.linkProgram(shader.program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
+    }
+    shader.programID = programID++;
+    return shader;
+}
+
+function createShader(gl, glslTemplate, preface, inline) {
+    const VS = glslTemplate.VS;
+    const FS = glslTemplate.FS.replace('$PREFACE', preface).replace('$INLINE', inline);
+    const shader = compileProgram2(gl, VS, FS);
+    shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
+    return shader;
+}
+
+export function createSymbolizerShader(gl, preface, inline) {
+    return createShader(gl, symbolizerGLSL, '/*Symbolizer*/' + preface, inline);
+}
 
 export { renderer, styler, AABlender };

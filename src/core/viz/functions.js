@@ -170,6 +170,7 @@ import { GlobalPercentile } from './expressions/viewportAggregation';
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
+import Sprite from './expressions/sprite';
 
 
 /* Expose classes as constructor functions */
@@ -218,6 +219,7 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
+export const sprite = (...args) => new Sprite(...args);
 
 export const hex = (...args) => new Hex(...args);
 

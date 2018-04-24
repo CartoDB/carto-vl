@@ -349,6 +349,7 @@ class Renderer {
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
             let renderer = null;
+            // TODO viz.symbol
             if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
@@ -405,6 +406,20 @@ class Renderer {
             gl.activeTexture(gl.TEXTURE2);
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, 2);
+
+            // TODO if viz.symbol=>
+            /*
+                        // Enforce that property texture TextureUnit don't clash with auxiliar ones
+                        drawMetadata.freeTexUnit = Object.keys(TID).length;
+                        vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                        vizExpr._updateDrawMetadata(drawMetadata);
+                        vizExpr._preDraw(shader.program, drawMetadata, gl);
+
+                        Object.keys(TID).forEach((name, i) => {
+                            gl.activeTexture(gl.TEXTURE0 + i);
+                            gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                            gl.uniform1i(TID[name], i);
+                        });*/
 
             if (tile.type == 'point') {
                 // Lines and polygons don't support stroke

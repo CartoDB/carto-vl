@@ -1,13 +1,12 @@
-import Expression from './expression';
-import { implicitCast, checkLooseType, checkExpression, checkType } from './utils';
+import Base from './base';
 
-export default class Sprite extends Expression {
+export default class Sprite extends Base {
     constructor(sprite) {
         super({});
         this.type = 'color';
         this.image = new Image();
         this.image.onload = () => this.ready = true;
-        this.image.src = '/gopherbw.png';
+        this.image.src = sprite;
     }
     _compile(meta) {
         super._compile(meta);
@@ -15,8 +14,7 @@ export default class Sprite extends Expression {
     _free(gl) {
         gl.deleteTexture(this.texture);
     }
-    _applyToShaderSource(uniformIDMaker) {
-        this._UID = uniformIDMaker();
+    _applyToShaderSource() {
         return {
             preface: `
         uniform sampler2D texSprite${this._UID};

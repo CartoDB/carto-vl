@@ -15,6 +15,7 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.number(0);
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
+const DEFAULT_SYMBOL_EXPRESSION = () => s.FALSE;
 
 const MIN_RESOLUTION = 0;
 const MAX_RESOLUTION = 256;
@@ -27,7 +28,8 @@ const SUPPORTED_PROPERTIES = [
     'strokeWidth',
     'order',
     'filter',
-    'variables'
+    'variables',
+    'symbol'
 ];
 
 export default class Viz {
@@ -92,6 +94,7 @@ export default class Viz {
             this.strokeWidth,
             this.order,
             this.filter,
+            this.symbol,
             ...Object.values(this.variables)
         ];
     }
@@ -212,6 +215,7 @@ export default class Viz {
             this.strokeColor,
             this.strokeWidth,
             this.filter,
+            this.symbol,
         ].concat(Object.values(this.variables)).filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
@@ -222,6 +226,9 @@ export default class Viz {
         this._compileStrokeColorShader(gl, metadata);
         this._compileStrokeWidthShader(gl, metadata);
         this._compileFilterShader(gl, metadata);
+
+        this.symbol._bind(metadata);
+        this.symbolShader = compileShader(gl, this.symbol, shaders.createSymbolizerShader);
 
         Object.values(this.variables).map(v => {
             v._bind(metadata);
@@ -236,6 +243,7 @@ export default class Viz {
             this.strokeColor,
             this.strokeWidth,
             this.filter,
+            this.symbol
         ].concat(Object.values(this.variables)).forEach(expr =>
             expr._resolveAliases(this.variables)
         );
@@ -261,7 +269,8 @@ export default class Viz {
             ...this.strokeColor._getDependencies(),
             ...this.width._getDependencies(),
             ...this.strokeWidth._getDependencies(),
-            ...this.filter._getDependencies()];
+            ...this.filter._getDependencies(),
+            ...this.symbol._getDependencies()];
         while (unmarked.length) {
             visit(unmarked.pop());
         }
@@ -330,6 +339,10 @@ export default class Viz {
             this.filter = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
+        } else if (toReplace == this.symbol) {
+            this.symbol = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
         } else {
             throw new Error('No child found');
         }
@@ -373,6 +386,7 @@ export default class Viz {
         vizSpec.strokeWidth = vizSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
         vizSpec.order = vizSpec.order || DEFAULT_ORDER_EXPRESSION();
         vizSpec.filter = vizSpec.filter || DEFAULT_FILTER_EXPRESSION();
+        vizSpec.symbol = vizSpec.symbol || DEFAULT_SYMBOL_EXPRESSION();
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
@@ -420,6 +434,9 @@ export default class Viz {
             throw new CartoValidationError('viz', 'nonValidExpression[order]');
         }
         if (!(vizSpec.filter instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[filter]');
+        }
+        if (!(vizSpec.symbol instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[filter]');
         }
         for (let key in vizSpec) {
