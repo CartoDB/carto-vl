@@ -159,7 +159,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    blendToViz(viz, ms = 400, interpolator = cubic) {
+    async blendToViz(viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
         if (this._viz) {
             viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
@@ -169,7 +169,7 @@ export default class Layer {
             viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
         }
 
-        this._vizChanged(viz).then(() => {
+        return this._vizChanged(viz).then(() => {
             if (this._viz) {
                 this._viz.onChange(null);
             }

@@ -120,17 +120,12 @@ map.on('load', () => {
             if (layer) {
                 $('#loader').addClass('spin');
                 document.getElementById('feedback').style.display = 'none';
-                const promise = layer.blendToViz(new carto.Viz(v));
-                if (promise) {
-                    promise.then(() => {
-                        $('#loader').removeClass('spin');
-                    }).catch(error => {
-                        handleError(error);
-                        $('#loader').removeClass('spin');
-                    });
-                } else {
+                layer.blendToViz(new carto.Viz(v)).then(() => {
                     $('#loader').removeClass('spin');
-                }
+                }).catch(error => {
+                    handleError(error);
+                    $('#loader').removeClass('spin');
+                });
             }
         } catch (error) {
             handleError(error);
