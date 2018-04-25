@@ -92,10 +92,10 @@ const DEFAULT_BASEMAP = 'DarkMatter';
 var basemap = DEFAULT_BASEMAP;
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: BASEMAPS[basemap], // stylesheet location
-    center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 13, // starting zoom,
+    container: 'map',
+    style: { version: 8, sources: {}, layers: [] },
+    center: [0, 0],
+    zoom: 0,
     dragRotate: false // disable drag to rotate handling
 });
 
@@ -108,10 +108,6 @@ setInterval(() => {
 
 map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
 
-map.on('moveend', () => {
-    location.hash = getConfig();
-});
-
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0; //vizs.length - 1;
@@ -119,22 +115,17 @@ map.on('load', () => {
     function updateViz(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
-        location.hash = getConfig();
+        saveConfig();
         try {
             if (layer) {
                 $('#loader').addClass('spin');
                 document.getElementById('feedback').style.display = 'none';
-                const promise = layer.blendToViz(new carto.Viz(v));
-                if (promise) {
-                    promise.then(() => {
-                        $('#loader').removeClass('spin');
-                    }).catch(error => {
-                        handleError(error);
-                        $('#loader').removeClass('spin');
-                    });
-                } else {
+                layer.blendToViz(new carto.Viz(v)).then(() => {
                     $('#loader').removeClass('spin');
-                }
+                }).catch(error => {
+                    handleError(error);
+                    $('#loader').removeClass('spin');
+                });
             }
         } catch (error) {
             handleError(error);
@@ -152,7 +143,7 @@ map.on('load', () => {
         $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = vizs[index];
-        superRefresh({ zoom: 13, center: [2.17, 41.38] });
+        superRefresh({ zoom: 13, center: [2.17, 41.38], basemap: 'DarkMatter' });
     }
 
     $('#prev').click(() => {
@@ -220,7 +211,13 @@ map.on('load', () => {
     } else {
         barcelona();
     }
+
+    map.on('moveend', saveConfig);
 });
+
+function saveConfig() {
+    location.hash = getConfig();
+}
 
 function getConfig() {
     return '#' + btoa(JSON.stringify({
@@ -274,36 +271,34 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
     if (!layer) {
+        setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
-            if (opts.zoom !== undefined) {
-                map.setZoom(opts.zoom);
-            }
-            if (opts.center !== undefined) {
-                map.setCenter(opts.center);
-            }
             $('#loader').removeClass('spin');
-            setBasemap(opts.basemap || DEFAULT_BASEMAP);
-            createBasemapElements();
         });
         layer.addTo(map, 'watername_ocean');
     } else {
         layer.update(source, viz).then(() => {
-            if (opts.zoom !== undefined) {
-                map.setZoom(opts.zoom);
-            }
-            if (opts.center !== undefined) {
-                map.setCenter(opts.center);
-            }
+            setupMap(opts);
             $('#loader').removeClass('spin');
-            setBasemap(opts.basemap || DEFAULT_BASEMAP);
-            createBasemapElements();
         }).catch(error => {
             handleError(error);
             $('#loader').removeClass('spin');
         });
     }
 };
+
+function setupMap(opts) {
+    opts = opts || {};
+    if (opts.zoom !== undefined) {
+        map.setZoom(opts.zoom);
+    }
+    if (opts.center !== undefined) {
+        map.setCenter(opts.center);
+    }
+    setBasemap(opts.basemap || DEFAULT_BASEMAP);
+    createBasemapElements();
+}
 
 function handleError(error) {
     const err = `Invalid viz: ${error}:${error.stack}`;
@@ -325,7 +320,7 @@ function createBasemapElements() {
 
         i.onclick = (event) => {
             setBasemap(event.target.value);
-            location.hash = getConfig();
+            saveConfig();
         };
         i.selected = 'selected';
         l.appendChild(i);
@@ -340,7 +335,7 @@ function createBasemapElements() {
 
 function setBasemap(id) {
     basemap = id;
-    map.setStyle(BASEMAPS[id]);
+    map.setStyle(BASEMAPS[basemap]);
     let added = false;
     map.on('sourcedata', () => {
         if (map.isStyleLoaded() && !added) {
