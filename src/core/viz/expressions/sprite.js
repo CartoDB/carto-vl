@@ -1,32 +1,12 @@
 import Base from './base';
 
-function getBase64Image(img) {
-    // Create an empty canvas element
-    var canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-
-    // Copy the image contents to the canvas
-    var ctx = canvas.getContext('2d');
-
-    const max = Math.min(Math.max(img.width, img.height), 256);
-    const width = img.width / max * 256;
-    const height = img.height / max * 256;
-    ctx.drawImage(img, (256 - width) / 2, (256 - height) / 2, width, height);
-
-
-    return canvas;
-}
-
 export default class Sprite extends Base {
     constructor(sprite) {
         super({});
         this.type = 'color';
         this.image = new Image();
         this.image.onload = () => {
-            if (sprite.endsWith('.svg')) {
-                this.image = getBase64Image(this.image);
-            }
+            this.image = getCanvasFromImage(this.image);
             this.ready = true;
         };
         this.image.src = sprite;
@@ -77,4 +57,20 @@ export default class Sprite extends Base {
         }
     }
     // TODO eval
+}
+
+function getCanvasFromImage(img) {
+    const canvasSize = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
+
+    const ctx = canvas.getContext('2d');
+
+    const max = Math.min(Math.max(img.width, img.height), canvasSize);
+    const width = img.width / max * canvasSize;
+    const height = img.height / max * canvasSize;
+    ctx.drawImage(img, (canvasSize - width) / 2, (canvasSize - height) / 2, width, height);
+
+    return canvas;
 }
