@@ -6,10 +6,16 @@ let defaultAuth = undefined;
 
 /**
  * Set default authentication parameters: apiKey and user.
- *
+ * 
  * @param {object} auth
  * @param {string} auth.apiKey - API key used to authenticate against CARTO
  * @param {string} auth.user - Name of the user
+ * 
+ * @example
+ * carto.setDefaultAuth({
+ *   user: 'YOUR_USERNAME',
+ *   apiKey: 'YOUR_API_KEY'
+ * });
  *
  * @memberof carto
  * @api
