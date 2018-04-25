@@ -97,30 +97,33 @@ describe('api/layer', () => {
     });
 
     describe('.blendToViz', () => {
-        it('should not throw an error if a valid viz is passed', () => {
+        it('should resolve the promise if a valid viz is passed', (done) => {
             const layer = new Layer('layer0', source, viz);
-            expect(function () {
-                layer.blendToViz(viz2);
-            }).not.toThrow();
+            // Mock for _vizChanged
+            layer._vizChanged = () => Promise.resolve();
+            layer.blendToViz(viz2).then(done);
         });
-        it('should throw an error if viz is undefined', () => {
+        it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
-            expect(function () {
-                layer.blendToViz();
-            }).toThrowError('`viz` property required.');
+            layer.blendToViz().catch(error => {
+                expect(error.message).toBe('`viz` property required.');
+                done();
+            });
         });
-        it('should throw an error when viz is not a valid viz', () => {
+        it('should reject the promise when viz is not a valid viz', (done) => {
             const layer = new Layer('layer0', source, viz);
-            expect(function () {
-                layer.blendToViz(2);
-            }).toThrowError('The given object is not a valid viz. See "carto.Viz".');
+            layer.blendToViz(2).catch(error => {
+                expect(error.message).toBe('The given object is not a valid viz. See "carto.Viz".');
+                done();
+            });
         });
-        it('should throw an error if a viz is already added to another layer', () => {
+        it('should reject the promise if a viz is already added to another layer', (done) => {
             const layer = new Layer('layer0', source, viz);
             new Layer('layer1', source, viz2);
-            expect(() => {
-                layer.blendToViz(viz2);
-            }).toThrowError('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
+            layer.blendToViz(viz2).catch(error => {
+                expect(error.message).toBe('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
+                done();
+            });
         });
     });
 
