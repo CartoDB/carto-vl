@@ -14,3 +14,12 @@ only once and it is the client who decides its visualization, giving rise to inf
 To control all this, a new visualization definition language `MVML` (map visualization meta-language) has been designed. This allows to define in a simple way how we want our application to behave.
 
 Location intelligence means much more than maps so CARTO VL allows us to access geospatial data in a simple way being able to create widgets to understand our data in a deeper way.
+
+# What can be done with CARTO GL
+
+CARTO GL is the perfect library to create the location intelligence apps of the future, among its main features:
+
+- It allows to download and use vector data from the CARTO APIs
+- It allows to paint maps in client using webgl technologies
+- Enrich your maps with dynamic styles, animations and interactivity
+- Create widgets and elements to show geospatial data in different ways
