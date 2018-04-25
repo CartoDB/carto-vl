@@ -15,6 +15,8 @@ Object.keys(functions)
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
+lowerCaseFunctions.center = functions.CENTER;
+lowerCaseFunctions.bottom = functions.BOTTOM;
 
 export function parseVizExpression(str) {
     prepareJsep();

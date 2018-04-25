@@ -171,6 +171,7 @@ import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
 import Sprite from './expressions/sprite';
+import Placement from './expressions/placement';
 
 
 /* Expose classes as constructor functions */
@@ -301,8 +302,13 @@ export const globalPercentile = (...args) => new GlobalPercentile(...args);
 export const xyz = (...args) => new XYZ(...args);
 
 export const zoom = (...args) => new Zoom(...args);
+export const placement = (...args) => new Placement(...args);
 
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
+
+export const TOP = new Placement(constant(0), constant(1));
+export const CENTER = new Placement(constant(0), constant(0));
+export const BOTTOM = new Placement(constant(0), constant(-1));
 
 export { palettes, Asc, Desc };

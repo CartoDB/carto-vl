@@ -2,7 +2,6 @@ import * as rendererGLSL from './renderer';
 import * as stylerGLSL from './styler';
 import * as aaBlenderGLSL from './aaBlender';
 import ShaderCache from './shader-cache';
-import { symbolizerGLSL } from './symbolizer';
 
 const shaderCache = new ShaderCache();
 
@@ -174,9 +173,14 @@ function compileProgram2(gl, glslVS, glslFS) {
     return shader;
 }
 
-function createShader(gl, glslTemplate, preface, inline) {
-    const VS = glslTemplate.VS;
-    const FS = glslTemplate.FS.replace('$PREFACE', preface).replace('$INLINE', inline);
+export function createShader(gl, glslTemplate, codes) {
+    let VS = glslTemplate.VS;
+    let FS = glslTemplate.FS;
+
+    Object.keys(codes).forEach(codeName => {
+        VS = VS.replace('$' + codeName, codes[codeName]);
+        FS = FS.replace('$' + codeName, codes[codeName]);
+    });
     const shader = compileProgram2(gl, VS, FS);
     shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
@@ -191,11 +195,8 @@ function createShader(gl, glslTemplate, preface, inline) {
     shader.orderMaxWidth = gl.getUniformLocation(shader.program, 'orderMaxWidth');
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
     shader.devicePixelRatio = gl.getUniformLocation(shader.program, 'devicePixelRatio');
+    shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     return shader;
-}
-
-export function createSymbolizerShader(gl, preface, inline) {
-    return createShader(gl, symbolizerGLSL, '/*Symbolizer*/' + preface, inline);
 }
 
 export { renderer, styler, AABlender };

@@ -349,8 +349,7 @@ class Renderer {
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
             let renderer = null;
-            // TODO viz.symbol
-            if (true) {
+            if (!viz.symbol._default) {
                 renderer = viz.symbolShader.shader;
             } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
@@ -409,20 +408,24 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, 2);
 
-            // TODO if viz.symbol=>
-            if (true) {
-                // Enforce that property texture TextureUnit don't clash with auxiliar ones
-                const TID = viz.symbolShader.tid;
-                drawMetadata.freeTexUnit = 5;
+            if (!viz.symbol._default) {
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = 5 + Object.keys(viz.symbolShader.tid).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbol._updateDrawMetadata(drawMetadata);
                 viz.symbol._preDraw(viz.symbolShader.shader.program, drawMetadata, gl);
 
-                Object.keys(TID).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE0 + i);
+                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbolPlacement._updateDrawMetadata(drawMetadata);
+                viz.symbolPlacement._preDraw(viz.symbolShader.shader.program, drawMetadata, gl);
+
+                Object.keys(viz.symbolShader.tid).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE5 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                    gl.uniform1i(TID[name], i);
+                    gl.uniform1i(viz.symbolShader.tid[name], i);
                 });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
 
             if (tile.type == 'point') {
