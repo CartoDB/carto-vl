@@ -6408,23 +6408,27 @@ class Layer {
      * @instance
      * @api
      */
-    blendToViz(viz, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_8__core_viz_functions__["cubic"]) {
-        this._checkViz(viz);
-        if (this._viz) {
-            viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
-            viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
-            viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
-            viz.getStrokeWidth()._blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
-            viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
-        }
-
-        this._vizChanged(viz).then(() => {
+    async blendToViz(viz, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_8__core_viz_functions__["cubic"]) {
+        try {
+            this._checkViz(viz);
             if (this._viz) {
-                this._viz.onChange(null);
+                viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
+                viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
+                viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
+                viz.getStrokeWidth()._blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
+                viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
             }
-            this._viz = viz;
-            this._viz.onChange(this._vizChanged.bind(this));
-        });
+
+            return this._vizChanged(viz).then(() => {
+                if (this._viz) {
+                    this._viz.onChange(null);
+                }
+                this._viz = viz;
+                this._viz.onChange(this._vizChanged.bind(this));
+            });
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 
     // The integrator will call this method once the webgl context is ready.
