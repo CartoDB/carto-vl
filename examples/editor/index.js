@@ -212,9 +212,7 @@ map.on('load', () => {
         barcelona();
     }
 
-    map.on('moveend', () => {
-        saveConfig();
-    });
+    map.on('moveend', saveConfig);
 });
 
 function saveConfig() {
