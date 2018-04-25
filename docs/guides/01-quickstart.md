@@ -23,3 +23,8 @@ CARTO GL is the perfect library to create the location intelligence apps of the 
 - It allows to paint maps in client using webgl technologies
 - Enrich your maps with dynamic styles, animations and interactivity
 - Create widgets and elements to show geospatial data in different ways
+
+# Getting started
+
+First you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/) remember that to use CARTO VL you need to [autenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) first.
+
