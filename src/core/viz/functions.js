@@ -172,6 +172,7 @@ import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 import Sprite from './expressions/sprite';
 import Placement from './expressions/placement';
+import Sprites from './expressions/sprites';
 
 
 /* Expose classes as constructor functions */
@@ -282,6 +283,7 @@ export const abs = (...args) => new Abs(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
+export const sprites = (...args) => new Sprites(...args);
 
 export const variable = (...args) => new Variable(...args);
 export { variable as var };

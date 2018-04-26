@@ -422,7 +422,7 @@ class Renderer {
                 Object.keys(viz.symbolShader.tid).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE5 + i);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                    gl.uniform1i(viz.symbolShader.tid[name], i);
+                    gl.uniform1i(viz.symbolShader.tid[name], 5 + i);
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
