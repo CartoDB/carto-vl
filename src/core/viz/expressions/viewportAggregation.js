@@ -11,9 +11,9 @@ import * as schema from '../../schema';
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_avg: s.viewportAvg($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportAvg
@@ -31,9 +31,9 @@ export const ViewportAvg = generateAggregattion('avg');
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_max: s.viewportMax($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMax
@@ -51,9 +51,9 @@ export const ViewportMax = generateAggregattion('max');
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_min: s.viewportMin($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMin
@@ -71,9 +71,9 @@ export const ViewportMin = generateAggregattion('min');
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_sum: s.viewportSum($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportSum
@@ -91,9 +91,9 @@ export const ViewportSum = generateAggregattion('sum');
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_count: s.viewportCount($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportCount
@@ -111,9 +111,9 @@ export const ViewportCount = generateAggregattion('count');
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @v_percentile: s.viewportPercentile($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportPercentile
@@ -131,9 +131,9 @@ export const ViewportPercentile = generatePercentile();
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_avg: s.globalAvg($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalAvg
@@ -151,9 +151,9 @@ export const GlobalAvg = generateAggregattion('avg', true);
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_max: s.globalMax($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMax
@@ -171,9 +171,9 @@ export const GlobalMax = generateAggregattion('max', true);
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_min: s.globalMin($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMin
@@ -191,9 +191,9 @@ export const GlobalMin = generateAggregattion('min', true);
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_sum: s.globalSum($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalSum
@@ -211,9 +211,9 @@ export const GlobalSum = generateAggregattion('sum', true);
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_count: s.globalCount($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalCount
@@ -231,9 +231,9 @@ export const GlobalCount = generateAggregattion('count', true);
  * @example
  * const s = carto.expressions;
  * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   @g_percentile: s.globalPercentile($amount)
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name globalPercentile
