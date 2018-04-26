@@ -88,7 +88,7 @@
     const viz = new carto.Viz(`
       @type: $type
       @diameter_number: $diameter_number
-      width: ramp(buckets($diameter_number, 1), [10, 25])
+      width: $diameter_number * 4
       color: opacity(ramp($type, bold), 0.7)
       strokeColor: ramp($type, bold)
       strokeWidth: 1
