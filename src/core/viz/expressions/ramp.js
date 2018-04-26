@@ -39,7 +39,8 @@ export default class Ramp extends BaseExpression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
+        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber', 'sprites'], palette);
+        // TOCO check that if sprites => input must be cat
 
         super({ input: input });
         this.minKey = 0;
@@ -55,15 +56,26 @@ export default class Ramp extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
+        // TODO check that if sprites => input must be cat
+
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
         }
     }
     _free(gl) {
-        gl.deleteTexture(this.texture);
+        if (this.texture) {
+            gl.deleteTexture(this.texture);
+        }
     }
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
+        if (this.palette.type == 'sprites') {
+            const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
+            return {
+                preface: input.preface + sprites.preface,
+                inline: `${sprites.inline}(spriteUV, ${input.inline})`
+            };
+        }
         return {
             preface: this._prefaceCode(input.preface + `
         uniform sampler2D texRamp${this._uid};
@@ -100,6 +112,11 @@ export default class Ramp extends BaseExpression {
         }
     }
     _postShaderCompile(program, gl) {
+        if (this.palette.type == 'sprites') {
+            this.palette._postShaderCompile(program, gl);
+            super._postShaderCompile(program, gl);
+            return;
+        }
         if (!this.init) {
             this.init = true;
             this.texture = gl.createTexture();
@@ -152,6 +169,10 @@ export default class Ramp extends BaseExpression {
     }
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
+        if (this.palette.type == 'sprites') {
+            this.palette._preDraw(program, drawMetadata, gl);
+            return;
+        }
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);

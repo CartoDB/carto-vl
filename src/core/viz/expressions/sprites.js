@@ -1,18 +1,16 @@
 import Base from './base';
 
 export default class Sprites extends Base {
-    constructor(category, ...sprites) {
-        const children = { category };
+    constructor(...sprites) {
+        const children = {};
         sprites.forEach((sprite, i) => children[`sprite${i}`] = sprite);
         super(children);
         this.numSprites = sprites.length;
-        this.type = 'color';
+        this.type = 'sprites';
     }
-    _applyToShaderSource(getGLSLforProperty) {
-        const categoryCodes = this.category._applyToShaderSource(getGLSLforProperty);
-        const cat = categoryCodes.inline;
+    _applyToShaderSource() {
         return {
-            preface: categoryCodes.preface + this._prefaceCode(`
+            preface: this._prefaceCode(`
         uniform sampler2D atlas${this._uid};
 
         vec4 atlas${this._uid}Fn(vec2 spriteUV, float cat){
@@ -24,19 +22,17 @@ export default class Sprites extends Base {
             return texture2D(atlas${this._uid}, spriteUV/16.  + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
         }
         `),
-            inline: `atlas${this._uid}Fn(spriteUV, ${cat})`
+            inline: `atlas${this._uid}Fn`
         };
     }
     _postShaderCompile(program, gl) {
-        this.category._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `atlas${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
-        this.category._preDraw(program, drawMetadata, gl);
         this.init = true;
         for (let i = 0; i < this.numSprites; i++) {
             const sprite = this[`sprite${i}`];
-            this.ready = this.ready && sprite.ready;
+            this.init = this.init && sprite.ready;
         }
         if (this.init && !this.ready) {
             const textureAtlasSize = 4096;
