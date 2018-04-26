@@ -57,11 +57,12 @@ export default class Ramp extends BaseExpression {
         }
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
-        const lowIndex = clamp(Math.floor(this.pixel.length * m), 0, this.pixel.length - 1);
-        const highIndex = clamp(Math.ceil(this.pixel.length * m), 0, this.pixel.length - 1);
+        const len = this.pixel.length - 1;
+        const lowIndex = clamp(Math.floor(len * m), 0, len);
+        const highIndex = clamp(Math.ceil(len * m), 0, len);
         const low = this.pixel[lowIndex];
         const high = this.pixel[highIndex];
-        const fract = this.pixel.length * m - Math.floor(this.pixel.length * m);
+        const fract = len * m - Math.floor(len * m);
         return fract * high + (1 - fract) * low;
     }
     _compile(meta) {
