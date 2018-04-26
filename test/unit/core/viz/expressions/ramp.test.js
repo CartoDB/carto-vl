@@ -20,6 +20,11 @@ describe('src/core/viz/expressions/ramp', () => {
             const r = ramp(buckets(0, 10), [31, 57]);
             r._compile();
             expect(r.eval()).toEqual(31);
+
+            const r2 = ramp(buckets(11, 10), [31, 57]);
+            r2._compile();
+            console.log(r2.pixel);
+            expect(r2.eval()).toEqual(57);
         });
         // TODO colors
     });
