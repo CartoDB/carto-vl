@@ -9,6 +9,8 @@ A viz object can be created using two different apis: the `string` API and the `
 To create a [layer](https://carto.com/developers/carto-vl/reference/#cartolayer) you will need two things: the `source` and the `viz`. 
 The source answers `which` data will be displayed and the viz points `how` the data will be shown.
 
+### Properties
+
 A viz is formed by multiple properties each one attached to an [expression](https://carto.com/developers/carto-vl/reference/#cartoexpressions)
 the configurable properties are:
 
@@ -44,3 +46,31 @@ const viz = new carto.Viz({
 As you see we are specifying `HOW` the data should be displayed using a [color expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionsnamedcolor) and a [number expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionsnumber)
 
 The point about expressions is that you can combine them to form more powerful ones
+
+## Dataset columns
+
+You can style your map based on the values of the columns using the [prop](https://carto.com/developers/carto-vl/reference/#cartoexpressionsprop) expression. When using the `string` option, you just need to prefix the property name with a `$`.
+
+Using the string API:
+
+```js
+const viz = new carto.Viz(`
+    width: $price
+`);
+```
+
+Using the javascript API:
+
+```js
+const s = carto.expressions;
+const viz = new carto.Viz({
+    width: s.prop('price'),
+});
+```
+
+## Variables
+The VIZ object has a `variables` section where you can define custom variables. This section is used to:
+
+- **Specify interative fields**: All variables will be availiable in the interactivity API.
+- **Create new aggregated data**: 
+- Create an alias
