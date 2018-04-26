@@ -53,7 +53,7 @@ export default class Ramp extends BaseExpression {
     }
     eval(o) {
         if (this.palette.type != 'customPaletteNumber') {
-            super._eval(o);
+            super.eval(o);
         }
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
