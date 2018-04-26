@@ -88,7 +88,7 @@
     const s = carto.expressions;
     const viz = new carto.Viz({
         width: s.sqrt(s.prop('amount')),
-        color: s.ramp(s.prop('category'), s.palettes.prism),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
         strokeColor: s.rgba(255, 255, 255, 0.5),
         strokeWidth: 1,
     });
@@ -99,7 +99,7 @@
     function setDefaultOrder() {
       layer.blendToViz(new carto.Viz({
           width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.prism),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
           strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
       }));
@@ -108,7 +108,7 @@
     function setAscOrder() {
       layer.blendToViz(new carto.Viz({
           width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.prism),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
           strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
           order: s.asc(s.width())
@@ -118,7 +118,7 @@
     function setDescOrder() {
       layer.blendToViz(new carto.Viz({
           width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.prism),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
           strokeColor: s.rgba(255, 255, 255, 0.5),
           strokeWidth: 1,
           order: s.desc(s.width())

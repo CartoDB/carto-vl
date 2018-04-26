@@ -32,11 +32,11 @@ import Interactivity from './api/interactivity';
 const source = { Dataset, SQL, GeoJSON };
 
 export {
-    source,
-    Layer,
     setDefaultAuth,
     setDefaultConfig,
+    source,
     expressions,
+    Layer,
     Viz,
     Map,
     Interactivity

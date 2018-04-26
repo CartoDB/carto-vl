@@ -3,20 +3,18 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 describe('src/core/viz/expressions/quantiles', () => {
     describe('error control', () => {
         validateStaticTypeErrors('quantiles', []);
-        validateStaticTypeErrors('quantiles', ['float']);
-        validateStaticTypeErrors('quantiles', ['float', 'category']);
+        validateStaticTypeErrors('quantiles', ['number']);
+        validateStaticTypeErrors('quantiles', ['number', 'category']);
         validateDynamicTypeErrors('quantiles', ['category', 2]);
         validateStaticTypeErrors('quantiles', ['color', 2]);
-        validateStaticTypeErrors('quantiles', ['float', 'color']);
+        validateStaticTypeErrors('quantiles', ['number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('quantiles', ['float-property', 2], 'category');
+        validateStaticType('quantiles', ['number-property', 2], 'category');
     });
 
     describe('eval', () => {
         // TODO
     });
 });
-
-

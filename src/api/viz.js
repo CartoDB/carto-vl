@@ -4,19 +4,21 @@ import * as schema from '../core/schema';
 import * as shaders from '../core/shaders';
 import { compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
-import Expression from '../core/viz/expressions/expression';
+import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
-// TODO rename to Viz
-
 const DEFAULT_RESOLUTION = () => 1;
 const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = () => s.float(5);
+const DEFAULT_WIDTH_EXPRESSION = () => s.number(5);
 const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.float(0);
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.number(0);
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
-const DEFAULT_FILTER_EXPRESSION = () => s.floatConstant(1);
+const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
+
+const MIN_RESOLUTION = 0;
+const MAX_RESOLUTION = 256;
+
 const SUPPORTED_PROPERTIES = [
     'resolution',
     'color',
@@ -28,29 +30,22 @@ const SUPPORTED_PROPERTIES = [
     'variables'
 ];
 
-const MIN_RESOLUTION = 0;
-const MAX_RESOLUTION = 256;
-
 export default class Viz {
 
     /**
-    * A Viz defines how the data will be displayed: the color of the elements and size are basic things that can be
-    * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
-    *
-    * A Viz is created from an {@link VizSpec|vizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|vizSpec} must be a valid {@link carto.expressions|expression}.
-    * Those expressions will be evaluated dynamically for every element in the dataset.
-    *
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
+    * 
+    * 
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
     * @example <caption> Create a viz with black dots using the string constructor </caption>
-    * new carto.Viz(`
+    * const viz = new carto.Viz(`
     *   color: rgb(0,0,0)
     * `);
     *
     * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
-    * new carto.Viz({
-    *   color: carto.expression.rgb(0,0,0)
+    * const viz = new carto.Viz({
+    *   color: carto.expressions.rgb(0,0,0)
     * });
     *
     * @fires CartoError
@@ -113,7 +108,7 @@ export default class Viz {
     /**
      * Return the color expression.
      *
-     * @return {carto.expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -126,7 +121,7 @@ export default class Viz {
     /**
      * Return the width expression.
      *
-     * @return {carto.expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -139,7 +134,7 @@ export default class Viz {
     /**
      * Return the strokeColor expression.
      *
-     * @return {carto.expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -152,7 +147,7 @@ export default class Viz {
     /**
      * Return the strokeWidth expression.
      *
-     * @return {carto.expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -165,7 +160,7 @@ export default class Viz {
     /**
      * Return the order expression.
      *
-     * @return {carto.expression}
+     * @return {carto.expressions.Base}
      *
      * @memberof carto.Viz
      * @instance
@@ -175,6 +170,15 @@ export default class Viz {
         return this.order;
     }
 
+    /**
+     * Return the filter expression.
+     *
+     * @return {carto.expressions.Base}
+     *
+     * @memberof carto.Viz
+     * @instance
+     * @api
+     */
     getFilter() {
         return this.filter;
     }
@@ -371,13 +375,17 @@ export default class Viz {
 
     _checkVizSpec(vizSpec) {
         /**
+         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
+         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution
-         * @property {carto.expressions.Expression} color
-         * @property {carto.expressions.Expression} width
-         * @property {carto.expressions.Expression} strokeColor
-         * @property {carto.expressions.Expression} strokeWidth
-         * @property {carto.expressions.Expression} order
+         * @property {number} resolution - Control the aggregation level
+         * @property {object} variables - An object describing the variables used.
+         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
+         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
+         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
+         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
+         * @property {carto.expressions.Base} order - Define how the elements will be stacked
+         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 
@@ -395,22 +403,22 @@ export default class Viz {
         if (vizSpec.resolution >= MAX_RESOLUTION) {
             throw new CartoValidationError('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
         }
-        if (!(vizSpec.color instanceof Expression)) {
+        if (!(vizSpec.color instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[color]');
         }
-        if (!(vizSpec.strokeColor instanceof Expression)) {
+        if (!(vizSpec.strokeColor instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[strokeColor]');
         }
-        if (!(vizSpec.width instanceof Expression)) {
+        if (!(vizSpec.width instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[width]');
         }
-        if (!(vizSpec.strokeWidth instanceof Expression)) {
+        if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
         }
-        if (!(vizSpec.order instanceof Expression)) {
+        if (!(vizSpec.order instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[order]');
         }
-        if (!(vizSpec.filter instanceof Expression)) {
+        if (!(vizSpec.filter instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[filter]');
         }
         for (let key in vizSpec) {

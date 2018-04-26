@@ -4,25 +4,25 @@ import { hsv, hsva } from '../../../../../src/core/viz/functions';
 describe('src/core/viz/expressions/hsv', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hsv', []);
-        validateStaticTypeErrors('hsv', ['float']);
-        validateStaticTypeErrors('hsv', ['float', 'category']);
-        validateStaticTypeErrors('hsv', ['float', 'float', 'color']);
+        validateStaticTypeErrors('hsv', ['number']);
+        validateStaticTypeErrors('hsv', ['number', 'category']);
+        validateStaticTypeErrors('hsv', ['number', 'number', 'color']);
 
-        validateStaticTypeErrors('hsva', ['float', 'float', 'float']);
+        validateStaticTypeErrors('hsva', ['number', 'number', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('hsv', ['float', 'float', 'float'], 'color');
-        validateStaticType('hsv', ['category', 'float', 'float'], 'color');
-        validateStaticType('hsv', ['float', 'category', 'float'], 'color');
-        validateStaticType('hsv', ['float', 'float', 'category'], 'color');
+        validateStaticType('hsv', ['number', 'number', 'number'], 'color');
+        validateStaticType('hsv', ['category', 'number', 'number'], 'color');
+        validateStaticType('hsv', ['number', 'category', 'number'], 'color');
+        validateStaticType('hsv', ['number', 'number', 'category'], 'color');
         validateStaticType('hsv', ['category', 'category', 'category'], 'color');
 
-        validateStaticType('hsva', ['float', 'float', 'float', 'float'], 'color');
-        validateStaticType('hsva', ['category', 'float', 'float', 'float'], 'color');
-        validateStaticType('hsva', ['float', 'category', 'float', 'float'], 'color');
-        validateStaticType('hsva', ['float', 'float', 'category', 'float'], 'color');
-        validateStaticType('hsva', ['category', 'category', 'category', 'float'], 'color');
+        validateStaticType('hsva', ['number', 'number', 'number', 'number'], 'color');
+        validateStaticType('hsva', ['category', 'number', 'number', 'number'], 'color');
+        validateStaticType('hsva', ['number', 'category', 'number', 'number'], 'color');
+        validateStaticType('hsva', ['number', 'number', 'category', 'number'], 'color');
+        validateStaticType('hsva', ['category', 'category', 'category', 'number'], 'color');
     });
 
     describe('eval', () => {

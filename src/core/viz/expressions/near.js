@@ -1,36 +1,38 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { implicitCast, clamp } from './utils';
 
+/**
+ * Near returns zero for inputs that are far away from center.
+ * This can be useful for filtering out features by setting their size to zero.
+ *       _____
+ * _____/     \_____
+ *
+ * @param {carto.expressions.Base} input
+ * @param {carto.expressions.Base|number} center
+ * @param {carto.expressions.Base|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name near
+ * @function
+ * @api
+ */
 // TODO type checking
-export default class Near extends Expression {
-    /**
-     * @description Near returns zero for inputs that are far away from center.
-     * This can be useful for filtering out features by setting their size to zero.
-     *
-     *       _____
-     * _____/     \_____
-     *
-     * @param {*} input
-     * @param {*} center
-     * @param {*} threshold size of the allowed distance between input and center that is filtered in (returning one)
-     * @param {*} falloff size of the distance to be used as a falloff to linearly interpolate between zero and one
-     */
+export default class Near extends BaseExpression {
     constructor(input, center, threshold, falloff) {
         input = implicitCast(input);
         center = implicitCast(center);
         threshold = implicitCast(threshold);
         falloff = implicitCast(falloff);
 
-        super({ input: input, center: center, threshold: threshold, falloff: falloff });
-    }
-    _compile(meta) {
-        super._compile(meta);
-        if (this.input.type != 'float' || this.center.type != 'float' || this.threshold.type != 'float' || this.falloff.type != 'float') {
-            throw new Error('Near(): invalid parameter type');
-        }
-        this.type = 'float';
-        this.inlineMaker = (inline) =>
-            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
+        super({ input, center, threshold, falloff });
     }
     eval(feature) {
         const input = this.input.eval(feature);
@@ -38,5 +40,14 @@ export default class Near extends Expression {
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
         return 1. - clamp((Math.abs(input - center) - threshold) / falloff, 0, 1);
+    }
+    _compile(meta) {
+        super._compile(meta);
+        if (this.input.type != 'number' || this.center.type != 'number' || this.threshold.type != 'number' || this.falloff.type != 'number') {
+            throw new Error('Near(): invalid parameter type');
+        }
+        this.type = 'number';
+        this.inlineMaker = (inline) =>
+            `(1.-clamp((abs(${inline.input}-${inline.center})-${inline.threshold})/${inline.falloff},0., 1.))`;
     }
 }

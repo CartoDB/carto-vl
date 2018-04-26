@@ -13,9 +13,9 @@ describe('api/viz', () => {
                 // Check returned object properties
                 expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getWidth().eval()).toEqual(s.float(5).eval());
+                expect(actual.getWidth().eval()).toEqual(s.number(5).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.float(0).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.number(0).eval());
                 expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
@@ -25,9 +25,9 @@ describe('api/viz', () => {
                 expect(actual).toEqual(jasmine.any(Viz));
                 expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getWidth().eval()).toEqual(s.float(5).eval());
+                expect(actual.getWidth().eval()).toEqual(s.number(5).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.float(0).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.number(0).eval());
                 expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
             });
 
@@ -35,9 +35,9 @@ describe('api/viz', () => {
                 const vizSpec = {
                     resolution: 2,
                     color: s.rgba(255, 0, 0, 1),
-                    width: s.float(10),
+                    width: s.number(10),
                     strokeColor: s.rgba(0, 0, 255, 1),
-                    strokeWidth: s.float(15),
+                    strokeWidth: s.number(15),
                     order: s.asc(s.width())
                 };
                 const actual = new Viz(vizSpec);
@@ -45,9 +45,9 @@ describe('api/viz', () => {
                 expect(actual).toEqual(jasmine.any(Viz));
                 expect(actual.getResolution()).toEqual(2);
                 expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(s.float(10).eval());
+                expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.float(15).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
 
@@ -58,8 +58,8 @@ describe('api/viz', () => {
                 });
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getWidth().eval()).toEqual(s.float(1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.float(10).eval());
+                expect(actual.getWidth().eval()).toEqual(s.number(1).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.number(10).eval());
             });
         });
 
@@ -144,7 +144,7 @@ describe('api/viz', () => {
 
             it('should add a console.warn when non supported properties are included', () => {
                 const vizSpec = {
-                    notSupported: s.float(5)
+                    notSupported: s.number(5)
                 };
                 spyOn(console, 'warn');
                 new Viz(vizSpec);
@@ -156,9 +156,9 @@ describe('api/viz', () => {
             it('should set the viz properties defined in the string', () => {
                 const vizSpec = `
                     color: rgba(255, 0, 0, 1)
-                    width: float(10)
+                    width: number(10)
                     strokeColor: rgba(0, 0, 255, 1)
-                    strokeWidth: float(15)
+                    strokeWidth: number(15)
                     order: asc(width())
                 `;
                 const actual = new Viz(vizSpec);
@@ -166,9 +166,9 @@ describe('api/viz', () => {
                 expect(actual).toEqual(jasmine.any(Viz));
                 expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(s.float(10).eval());
+                expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.float(15).eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
             });
         });
@@ -180,34 +180,34 @@ describe('api/viz', () => {
             Date.now = dateNow;
         });
         it('should return the new/final expression', () => {
-            const float = s.float(1);
-            const floatB = s.float(2);
-            const expected = s.gt(s.property('fake_property'), float);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(s.property('fake_property'), numberA);
             new Viz({
                 filter: expected,
             });
 
-            const final = float.blendTo(floatB, 10);
-            expect(final).toBe(floatB);
+            const final = numberA.blendTo(numberB, 10);
+            expect(final).toBe(numberB);
         });
         it('should notify the viz on change', done => {
-            const float = s.float(1);
-            const floatB = s.float(2);
-            const expected = s.gt(s.property('fake_property'), float);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(s.property('fake_property'), numberA);
             const viz = new Viz({
                 filter: expected,
             });
             viz.onChange(done);
-            float.blendTo(floatB, 10);
+            numberA.blendTo(numberB, 10);
         }, 10);
         it('should notify the viz after the final blending', done => {
-            const float = s.float(1);
-            const floatB = s.float(2);
-            const expected = s.gt(7, float);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(7, numberA);
             const viz = new Viz({
                 filter: expected,
             });
-            float.blendTo(floatB, 999);
+            numberA.blendTo(numberB, 999);
             viz.onChange(done);
             const t = Date.now() + 1000;
             Date.now = () => t;

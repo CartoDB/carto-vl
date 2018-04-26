@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CARTO Vector library",
   "repository": {
     "type": "git",
@@ -66,7 +66,7 @@
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "yarn lint && yarn docs && yarn test:unit",
+    "test": "yarn test:unit && yarn lint && yarn docs",
     "test:unit": "karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js",
     "test:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js",
     "test:watchc": "karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js",

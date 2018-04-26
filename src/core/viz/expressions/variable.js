@@ -1,11 +1,32 @@
-import Expression from './expression';
+import BaseExpression from './base';
 import { checkString } from './utils';
 
-export default class Variable extends Expression {
-    /**
-     * @jsapi
-     * @param {*} name Property/column name
-     */
+/**
+ * Loads a variable aliased expresion by the name
+ *
+ * @param {string} name - The variable name that is going to be evaluated
+ * @return {carto.expressions.Base}
+ *
+ * @example
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *     sum_price: s.clusterSum(s.prop('price'))
+ *   }
+ *  filter: s.neq(s.var('sum_price'), 'london'),
+ * });
+ *
+ * const viz = new carto.Viz(`
+ *   @sum_price: clusterSum($price)
+ *   filter: @sum_price != 'london'
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name var
+ * @function
+ * @api
+ */
+export default class Variable extends BaseExpression {
     constructor(name) {
         checkString('name', 'name', 0, name);
         if (name == '') {
@@ -13,6 +34,9 @@ export default class Variable extends Expression {
         }
         super({});
         this.name = name;
+    }
+    eval(feature) {
+        return this.alias.eval(feature);
     }
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
@@ -34,8 +58,5 @@ export default class Variable extends Expression {
     }
     _getMinimumNeededSchema() {
         return this.alias._getMinimumNeededSchema();
-    }
-    eval(feature) {
-        return this.alias.eval(feature);
     }
 }

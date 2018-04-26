@@ -7,12 +7,12 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
-    <script src='../vendor/mapbox-gl-dev.js'></script>
+    <script src='../../vendor/mapbox-gl-dev.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.42.2/mapbox-gl.css' rel='stylesheet' />
     <link href='css/normalize.css' rel='stylesheet' />
     <link href='css/skeleton.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
-    <script src="../dist/carto-vl.js"></script>
+    <script src="../../dist/carto-vl.js"></script>
     <script src="index.js" defer></script>
     <style>
         html,
@@ -104,6 +104,31 @@
             bottom: 0;
             background: rgba(255, 255, 255, .5);
         }
+
+        .spin {
+          position: absolute;
+          border: 8px solid #FFF3;
+          border-radius: 50%;
+          border-top: 8px solid #0095dd;
+          top: 45%;
+          left: 45%;
+          width: 60px;
+          height: 60px;
+          -webkit-animation: spin 2s linear infinite; /* Safari */
+          animation: spin 2s linear infinite;
+          z-index: 100000;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
@@ -111,6 +136,7 @@
     <textarea id='popup'>test</textarea>
     <div id='mapDiv' class='mapClass u-full-width'>
         <textarea class="u-full-width" id="feedback">¿?</textarea>
+        <div id="loader"></div>
         <div id='map' class='map'></div>
         <div class="map-info"></div>
     </div>

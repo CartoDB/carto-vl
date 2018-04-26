@@ -1,17 +1,21 @@
 import * as carto from '../../../../src/';
+import { projectToWebMercator, WM_2R } from '../../../../src/api//util';
 import mapboxgl from '../../../../vendor/mapbox-gl-dev';
 
 describe('Interactivity', () => {
+    const mapSize = 600;
     let div, source, viz, layer, map;
 
     beforeEach(() => {
-        const setup = _setup('map');
+        const setup = createMap('map');
         div = setup.div;
         map = setup.map;
 
-        source = new carto.source.GeoJSON(featureJson);
-        viz = new carto.Viz(`color: rgb(255, 0, 0)
-                                 @wadus: 123`);
+        source = new carto.source.GeoJSON(featureJSON);
+        viz = new carto.Viz(`
+            color: rgb(255, 0, 0)
+            @wadus: 123
+        `);
         layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
     });
@@ -19,10 +23,10 @@ describe('Interactivity', () => {
     describe('When the user creates a new Interactivity object', () => {
         xit('should throw an error when layers belong to different maps', done => {
             let loadedLayers = 0;
-            const setup = _setup('map1');
+            const setup = createMap('map1');
             const div2 = setup.div;
             const map2 = setup.map;
-            const source2 = new carto.source.GeoJSON(featureJson);
+            const source2 = new carto.source.GeoJSON(featureJSON);
             const viz2 = new carto.Viz('color: rgb(255, 0, 0)');
             const layer2 = new carto.Layer('layer2', source2, viz2);
 
@@ -45,6 +49,210 @@ describe('Interactivity', () => {
         });
     });
 
+    describe('when the user clicks on the map', () => {
+        let interactivity;
+
+        describe('and the click is in a feature', () => {
+            it('should fire a featureClick event with a features list containing the clicked feature', done => {
+                interactivity = new carto.Interactivity(layer);
+                interactivity.on('featureClick', event => {
+                    expect(event.features[0].color.blendTo).toBeDefined();
+                    expect(event.features[0].color.reset).toBeDefined();
+                    expect(event.features[0].reset).toBeDefined();
+                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    expect(event.features[0].id).toEqual(-0);
+                    expect(event.features[0].layerId).toEqual('layer');
+                    done();
+                });
+
+                layer.on('loaded', () => {
+                    // Click inside the feature
+                    simulateClick({ lng: 10, lat: 10 });
+                });
+                layer.addTo(map);
+            });
+
+            it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
+                interactivity = new carto.Interactivity(layer);
+                const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                interactivity.on('featureClick', () => {
+                    expect(featureClickOutSpy).not.toHaveBeenCalled();
+                    done();
+                });
+                interactivity.on('featureClickOut', featureClickOutSpy);
+                layer.on('loaded', () => {
+                    // Click inside the feature
+                    simulateClick({ lng: 10, lat: 10 });
+                    // Move the mouse
+                    simulateMove({ lng: 15, lat: 15 });
+                    // Click inside the same feature
+                    simulateClick({ lng: 20, lat: 20 });
+                });
+                layer.addTo(map);
+            });
+
+            describe('and multiple features are clicked', () => {
+                it('should return the right feature.id', done => {
+                    source = new carto.source.GeoJSON(featureCollectionJSON);
+                    layer = new carto.Layer('layer', source, new carto.Viz());
+                    interactivity = new carto.Interactivity(layer);
+                    interactivity.on('featureClick', event => {
+                        expect(event.features[0].id).toEqual(-0);
+                        expect(event.features[0].layerId).toEqual('layer');
+                        expect(event.features[1].id).toEqual(-1);
+                        expect(event.features[1].layerId).toEqual('layer');
+                        done();
+                    });
+                    layer.on('loaded', () => {
+                        // Click inside the features
+                        simulateClick({ lng: 10, lat: 10 });
+                    });
+                    layer.addTo(map);
+                });
+            });
+
+            describe('and the click is not in a feature', () => {
+                it('should fire a featureClick event with an empty features list', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    interactivity.on('featureClick', event => {
+                        expect(event.features.length).toEqual(0);
+                        done();
+                    });
+                    // Click outside the feature
+                    layer.on('loaded', () => {
+                        simulateClick({ lng: -10, lat: -10 });
+                    });
+                    layer.addTo(map);
+                });
+
+                describe('and a feature was previously clicked', () => {
+                    it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
+                        interactivity = new carto.Interactivity(layer);
+                        interactivity.on('featureClickOut', event => {
+                            expect(event.features[0].id).toEqual(-0);
+                            expect(event.features[0].layerId).toEqual('layer');
+                            done();
+                        });
+                        layer.on('loaded', () => {
+                            // Click inside the feature
+                            simulateClick({ lng: 10, lat: 10 });
+                            // Move the mouse
+                            simulateMove({ lng: 0, lat: 0 });
+                            // Click outside the feature
+                            simulateClick({ lng: -10, lat: -10 });
+                        });
+                        layer.addTo(map);
+                    });
+                });
+            });
+        });
+
+        describe('when the user move the mouse on the map', () => {
+            let interactivity;
+
+            describe('and the mouse enters in a feature', () => {
+                it('should fire a featureHover event with a features list containing the entered feature', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    interactivity.on('featureHover', event => {
+                        expect(event.features[0].id).toEqual(-0);
+                        expect(event.features[0].layerId).toEqual('layer');
+                        done();
+                    });
+                    layer.on('loaded', () => {
+                        // Move mouse inside a feature
+                        simulateMove({ lng: 10, lat: 10 });
+                    });
+                    layer.addTo(map);
+                });
+
+                it('should fire a featureEnter event with a features list containing the entered feature', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    interactivity.on('featureEnter', event => {
+                        expect(event.features[0].id).toEqual(-0);
+                        expect(event.features[0].layerId).toEqual('layer');
+                        done();
+                    });
+                    layer.on('loaded', () => {
+                        // Move mouse inside a feature
+                        simulateMove({ lng: 10, lat: 10 });
+                    });
+                    layer.addTo(map);
+                });
+
+                it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                    layer.on('loaded', () => {
+                        // Move mouse inside a feature
+                        simulateMove({ lng: 10, lat: 10 });
+                        interactivity.on('featureEnter', featureClickOutSpy);
+                        interactivity.on('featureHover', () => {
+                            expect(featureClickOutSpy).not.toHaveBeenCalled();
+                            done();
+                        });
+                        // Move mouse inside the same feature
+                        simulateMove({ lng: 20, lat: 20 });
+                    });
+                    layer.addTo(map);
+                });
+            });
+
+            describe('and the mouse leaves a feature', () => {
+                it('should fire a featureHover event with an empty features list', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    layer.on('loaded', () => {
+                        // Move mouse inside a feature
+                        simulateMove({ lng: 10, lat: 10 });
+                        interactivity.on('featureHover', event => {
+                            expect(event.features.length).toEqual(0);
+                            done();
+                        });
+                        // Move mouse outside any feature
+                        simulateMove({ lng: -10, lat: -10 });
+                    });
+                    layer.addTo(map);
+                });
+
+                it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    layer.on('loaded', () => {
+                        // Move mouse inside a feature
+                        simulateMove({ lng: 10, lat: 10 });
+                        interactivity.on('featureLeave', event => {
+                            expect(event.features[0].id).toEqual(-0);
+                            expect(event.features[0].layerId).toEqual('layer');
+                            done();
+                        });
+                        // Move mouse outside the feature
+                        simulateMove({ lng: -10, lat: -10 });
+                    });
+                    layer.addTo(map);
+                });
+
+                it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
+                    interactivity = new carto.Interactivity(layer);
+                    layer.on('loaded', () => {
+                        const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
+                        // Move mouse outside any feature
+                        simulateMove({ lng: -10, lat: -10 });
+                        interactivity.on('featureLeave', featureLeaveSpy);
+                        interactivity.on('featureHover', () => {
+                            expect(featureLeaveSpy).not.toHaveBeenCalled();
+                            done();
+                        });
+                        // Move mouse outside any feature
+                        simulateMove({ lng: -20, lat: -20 });
+                    });
+                    layer.addTo(map);
+                });
+            });
+        });
+
+        afterEach(() => {
+            document.body.removeChild(div);
+        });
+    });
+
     describe('.on', () => {
         let interactivity;
         it('should throw an error when subscribing to an invalid event', () => {
@@ -61,227 +269,61 @@ describe('Interactivity', () => {
         });
     });
 
-    describe('when the user clicks on the map', () => {
-        let interactivity;
-
-        describe('and the click is in a feature', () => {
-            it('should fire a featureClick event with a features list containing the clicked feature', done => {
-                interactivity = new carto.Interactivity(layer);
-                interactivity.on('featureClick', event => {
-                    expect(event.features[0].color.blendTo).toBeDefined();
-                    expect(event.features[0].color.reset).toBeDefined();
-                    expect(event.features[0].reset).toBeDefined();
-                    expect(event.features[0].variables.wadus.value).toEqual(123);
-                    expect(event.features[0].id).toEqual(0);
-                    expect(event.features[0].layerId).toEqual('layer');
-                    done();
-                });
-                layer.on('loaded', () => {
-                    // Click inside the feature
-                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
-                });
-                layer.addTo(map);
-            });
-
-            it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
-                interactivity = new carto.Interactivity(layer);
-                const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
-                interactivity.on('featureClick', () => {
-                    expect(featureClickOutSpy).not.toHaveBeenCalled();
-                    done();
-                });
-                interactivity.on('featureClickOut', featureClickOutSpy);
-                layer.on('loaded', () => {
-                    // Click inside the feature
-                    map.fire('click', { lngLat: { lng: 10, lat: 10 } });
-                    // Move the mouse
-                    map.fire('mousemove', { lngLat: { lng: 15, lat: 15 } });
-                    // Click inside the same feature
-                    map.fire('click', { lngLat: { lng: 20, lat: 20 } });
-                });
-                layer.addTo(map);
-            });
-
-            describe('and multiple features are clicked', () => {
-                it('should return the right feature.id', done => {
-                    source = new carto.source.GeoJSON(featureCollectionJson);
-                    layer = new carto.Layer('layer', source, new carto.Viz());
-                    interactivity = new carto.Interactivity(layer);
-                    interactivity.on('featureClick', event => {
-                        expect(event.features[0].id).toEqual(0);
-                        expect(event.features[0].layerId).toEqual('layer');
-                        expect(event.features[1].id).toEqual(1);
-                        expect(event.features[1].layerId).toEqual('layer');
-                        done();
-                    });
-                    layer.on('loaded', () => {
-                        // Click inside the features
-                        map.fire('click', { lngLat: { lng: 10, lat: 10 } });
-                    });
-                    layer.addTo(map);
-                });
-            });
-
-            describe('and the click is not in a feature', () => {
-                it('should fire a featureClick event with an empty features list', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    interactivity.on('featureClick', event => {
-                        expect(event.features.length).toEqual(0);
-                        done();
-                    });
-                    // Click outside the feature
-                    layer.on('loaded', () => {
-                        map.fire('click', { lngLat: { lng: -10, lat: -10 } });
-                    });
-                    layer.addTo(map);
-                });
-
-                describe('and a feature was previously clicked', () => {
-                    it('should fire a featureClickOut event with a features list containing the previously clicked feature', done => {
-                        interactivity = new carto.Interactivity(layer);
-                        interactivity.on('featureClickOut', event => {
-                            expect(event.features[0].id).toEqual(0);
-                            expect(event.features[0].layerId).toEqual('layer');
-                            done();
-                        });
-                        layer.on('loaded', () => {
-                            // Click inside the feature
-                            map.fire('click', { lngLat: { lng: 10, lat: 10 } });
-                            // Move the mouse
-                            map.fire('mousemove', { lngLat: { lng: 0, lat: 0 } });
-                            // Click outside the feature
-                            map.fire('click', { lngLat: { lng: -10, lat: -10 } });
-                        });
-                        layer.addTo(map);
-                    });
-                });
-            });
-        });
-
-        describe('when the user move the mouse on the map', () => {
-            let interactivity;
-
-            describe('and the mouse enters in a feature', () => {
-                it('should fire a featureHover event with a features list containing the entered feature', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    interactivity.on('featureHover', event => {
-                        expect(event.features[0].id).toEqual(0);
-                        expect(event.features[0].layerId).toEqual('layer');
-                        done();
-                    });
-                    layer.on('loaded', () => {
-                        // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
-                    });
-                    layer.addTo(map);
-                });
-
-                it('should fire a featureEnter event with a features list containing the entered feature', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    interactivity.on('featureEnter', event => {
-                        expect(event.features[0].id).toEqual(0);
-                        expect(event.features[0].layerId).toEqual('layer');
-                        done();
-                    });
-                    layer.on('loaded', () => {
-                        // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
-                    });
-                    layer.addTo(map);
-                });
-
-                it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
-                    layer.on('loaded', () => {
-                        // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
-                        interactivity.on('featureEnter', featureClickOutSpy);
-                        interactivity.on('featureHover', () => {
-                            expect(featureClickOutSpy).not.toHaveBeenCalled();
-                            done();
-                        });
-                        // Move mouse inside the same feature
-                        map.fire('mousemove', { lngLat: { lng: 20, lat: 20 } });
-                    });
-                    layer.addTo(map);
-                });
-            });
-
-            describe('and the mouse leaves a feature', () => {
-                it('should fire a featureHover event with an empty features list', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    layer.on('loaded', () => {
-                        // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
-                        interactivity.on('featureHover', event => {
-                            expect(event.features.length).toEqual(0);
-                            done();
-                        });
-                        // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
-                    });
-                    layer.addTo(map);
-                });
-
-                it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    layer.on('loaded', () => {
-                        // Move mouse inside a feature
-                        map.fire('mousemove', { lngLat: { lng: 10, lat: 10 } });
-                        interactivity.on('featureLeave', event => {
-                            expect(event.features[0].id).toEqual(0);
-                            expect(event.features[0].layerId).toEqual('layer');
-                            done();
-                        });
-                        // Move mouse outside the feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
-                    });
-                    layer.addTo(map);
-                });
-
-                it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
-                    interactivity = new carto.Interactivity(layer);
-                    layer.on('loaded', () => {
-                        const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
-                        // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -10, lat: -10 } });
-                        interactivity.on('featureLeave', featureLeaveSpy);
-                        interactivity.on('featureHover', () => {
-                            expect(featureLeaveSpy).not.toHaveBeenCalled();
-                            done();
-                        });
-                        // Move mouse outside any feature
-                        map.fire('mousemove', { lngLat: { lng: -20, lat: -20 } });
-                    });
-                    layer.addTo(map);
-                });
-            });
-        });
-
-        afterEach(() => {
-            document.body.removeChild(div);
-        });
-    });
-
-    function _setup(name) {
+    function createMap(name) {
         const div = document.createElement('div');
         div.id = name;
-        div.style.width = '100px';
-        div.style.height = '100px';
+        div.style.margin = '0';
+        div.style.width = `${mapSize}px`;
+        div.style.height = `${mapSize}px`;
         document.body.appendChild(div);
 
         const map = new mapboxgl.Map({
             container: name,
             style: { version: 8, sources: {}, layers: [] },
-            center: [0, 30],
-            zoom: 2
+            center: [0, 0],
+            zoom: 0
         });
 
         return { div, map };
     }
 
-    const featureJson = {
+    function simulateClick(coordinates) {
+        const el = document.querySelector('.mapboxgl-canvas-container');
+        const position = project(coordinates);
+        const params = { clientX: position.x, clientY: position.y };
+
+        const mousedown = new MouseEvent('mousedown', params);
+        const click = new MouseEvent('click', params);
+        const mouseup = new MouseEvent('mouseup', params);
+
+        if (el) {
+            el.dispatchEvent(mousedown);
+            el.dispatchEvent(click);
+            el.dispatchEvent(mouseup);
+        }
+    }
+
+    function simulateMove(coordinates) {
+        const el = document.querySelector('.mapboxgl-canvas-container');
+        const position = project(coordinates);
+        const params = { clientX: position.x, clientY: position.y };
+
+        const mousemove = new MouseEvent('mousemove', params);
+
+        if (el) {
+            el.dispatchEvent(mousemove);
+        }
+    }
+
+    function project(coordinates) {
+        const wm = projectToWebMercator(coordinates);
+        return {
+            x: mapSize * (0.5 + wm.x / WM_2R),
+            y: mapSize * (0.5 - wm.y / WM_2R)
+        };
+    }
+
+    const featureJSON = {
         type: 'Feature',
         geometry: {
             type: 'Polygon',
@@ -298,7 +340,7 @@ describe('Interactivity', () => {
         properties: {}
     };
 
-    const featureCollectionJson = {
+    const featureCollectionJSON = {
         type: 'FeatureCollection',
         features: [
             {

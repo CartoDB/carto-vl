@@ -3,45 +3,40 @@ import Layer from './layer';
 import { WM_R, projectToWebMercator } from './util';
 import { wToR } from '../client/rsys';
 
-
 /**
  *
  * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
- * @typedef {Object} FeatureEvent
- * @property {object} coordinates LongLat coordinates in {lng: 0, lat:0} form
- * @property {object} position pixel coordinates in {x: 0, y: 0} form
- * @property {Array<carto.Feature>} features array of {@link carto.Feature}
+ *
+ * @typedef {object} FeatureEvent
+ * @property {object} coordinates - LongLat coordinates in { lng, lat } form
+ * @property {object} position - Pixel coordinates in { x, y } form
+ * @property {Feature[]} features - Array of {@link Feature}
  * @api
  */
 
 /**
  *
- * Feature objects are provided by {@link carto.FeatureEvent} events.
- * @typedef {Object} Feature
- * @property {Number} id cartodb_id
- * @property {Object} properties Object with the feature properties in {propertyName1: 12.4, propertyName2: 'red'} form
- * @property {carto.FeatureViz} viz
- * @api
- */
-
-/**
+ * Feature objects are provided by {@link FeatureEvent} events.
  *
- * FeatureViz objects can be accessed through {@link carto.Feature} objects.
- * @typedef {Object} FeatureViz
+ * @typedef {object} Feature
+ * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
  * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty} colorStroke
  * @property {FeatureVizProperty} widthStroke
- * @property {Function} reset reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
+ * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
  */
 
 /**
  *
- * FeatureVizProperty objects can be accessed through {@link carto.FeatureViz} objects.
- * @typedef {Object} FeatureVizProperty
- * @property {Function} blendTo change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
- * @property {Function} reset reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * FeatureVizProperty objects can be accessed through {@link Feature} objects.
+ *
+ * @typedef {object} FeatureVizProperty
+ * @property {function} blendTo - Change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
+ * @property {function} reset - Reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @property {function} value - Getter that evaluates the property and returns the computed value
  * @api
  */
 
@@ -105,14 +100,20 @@ export default class Interactivity {
     * To create a Interactivity object an array of {@link carto.Layer} is required.
     * Events fired from interactivity objects will refer to the features of these layers and only these layers.
     *
-    * @param {carto.Layer|Array<carto.Layer>} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
+    * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
     * @example
-    * const layer = new carto.Layer('layer', source, viz);
     * const interactivity = new carto.Interactivity(layer);
-    * interactivity.on('click', event => console.log(event));
-    * layer.addTo(myMap);
+    * interactivity.on('click', event => {
+    *   style(event.features);
+    *   show(event.coordinates);
+    * });
     *
+    * @fires featureClick
+    * @fires featureClickOut
+    * @fires featureHover
+    * @fires featureEnter
+    * @fires featureLeave
     * @fires CartoError
     *
     * @constructor Interactivity
@@ -131,8 +132,8 @@ export default class Interactivity {
     /**
      * Register an event handler for the given type.
      *
-     * @param {string} eventName - type of event to listen for
-     * @param {function} callback - function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
+     * @param {string} eventName - Type of event to listen for
+     * @param {function} callback - Function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
      * @memberof carto.Interactivity
      * @instance
      * @api
@@ -145,8 +146,8 @@ export default class Interactivity {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - type of event to unregister
-     * @param {function} callback - handler function to unregister
+     * @param {string} eventName - Type of event to unregister
+     * @param {function} callback - Handler function to unregister
      * @memberof carto.Interactivity
      * @instance
      * @api
