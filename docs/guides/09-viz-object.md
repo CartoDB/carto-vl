@@ -71,6 +71,33 @@ const viz = new carto.Viz({
 ## Variables
 The VIZ object has a `variables` section where you can define custom variables. This section is used to:
 
-- **Specify interative fields**: All variables will be availiable in the interactivity API.
-- **Create new aggregated data**: 
-- Create an alias
+- **Specify interative fields**: All declared variables will be availiable in the interactivity API.
+- **Alias**: If you use a long named property you can give it an alias.
+- **Create new data**: Create new properties derived from another ones or agregate data.
+
+With the `javascript` api you need your key-value pairs in an object called variables, the new variable will have the key name.
+
+To declare a variable with the `string` api you just need to prefix it with `@`. Use the [var expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionsvar) with the javascript API.
+
+> Example: Create a variable named `p` and use it in the width.
+
+With the string API:
+
+```js
+const viz = new carto.Viz(`
+    @p: $price / 100
+    width: @p
+`);
+```
+
+With the javascript API:
+
+```js
+const s = carto.expressions;
+const viz = new carto.Viz({
+    variables: {
+        p: s.div(s.prop('price'), 100),
+    },
+    width: s.var('p')
+});
+```

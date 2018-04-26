@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Single layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
@@ -22,6 +24,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <script>
@@ -39,15 +42,15 @@
     });
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const viz = new carto.Viz(`
-      width: 6
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
+    const s = carto.expressions;
+    const viz = new carto.Viz({
+      width:  s.div(s.clusterAvg(s.prop('pop_max')), 100000),
+      resolution: 6
+    });
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>
 </body>
+
 </html>
