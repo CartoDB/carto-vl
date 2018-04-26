@@ -1,4 +1,5 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { ramp, buckets } from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/ramp', () => {
     describe('error control', () => {
@@ -15,7 +16,12 @@ describe('src/core/viz/expressions/ramp', () => {
     });
 
     describe('eval', () => {
-        // TODO
+        it('should work with numeric palettes', () => {
+            const r = ramp(buckets(0, 10), [31, 57]);
+            r._compile();
+            expect(r.eval()).toEqual(31);
+        });
+        // TODO colors
     });
 });
 
