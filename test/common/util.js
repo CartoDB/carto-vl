@@ -100,7 +100,8 @@ function loadOptions() {
         delay: 100,
         viewportWidth: 400,
         viewportHeight: 300,
-        headless: process.platform === 'linux'
+        headless: process.platform === 'linux',
+        threshold: 0.125
     };
 }
 
