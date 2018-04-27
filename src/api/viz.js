@@ -34,8 +34,8 @@ export default class Viz {
 
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
-    * 
-    * 
+    *
+    *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
     * @example <caption> Create a viz with black dots using the string constructor </caption>
@@ -196,6 +196,8 @@ export default class Viz {
     }
 
     _changed() {
+        this._resolveAliases();
+        this._validateAliasDAG();
         if (this._changeCallback) {
             this._changeCallback(this);
         }
@@ -304,8 +306,6 @@ export default class Viz {
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-            this._resolveAliases();
-            this._validateAliasDAG();
         } else if (toReplace == this.color) {
             this.color = replacer;
             replacer.parent = this;
