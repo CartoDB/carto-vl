@@ -49,6 +49,10 @@ export default class Base {
         `;
     }
 
+    _fetch(){
+        return Promise.all(this._getChildren().map(child => child._fetch()));
+    }
+
     _getDependencies() {
         return this._getChildren().map(child => child._getDependencies()).reduce((x, y) => x.concat(y), []);
     }

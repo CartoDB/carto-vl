@@ -103,6 +103,10 @@ export default class Viz {
         ];
     }
 
+    _fetch() {
+        return Promise.all(this._getRootExpressions().map(expr => expr._fetch()));
+    }
+
     /**
      * Return the resolution.
      *

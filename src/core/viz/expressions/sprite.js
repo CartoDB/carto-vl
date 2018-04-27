@@ -1,15 +1,22 @@
 import Base from './base';
 
 export default class Sprite extends Base {
-    constructor(sprite) {
+    constructor(url) {
         super({});
         this.type = 'color';
-        this.image = new Image();
-        this.image.onload = () => {
-            this.image = getCanvasFromImage(this.image);
-            this.ready = true;
-        };
-        this.image.src = sprite;
+        this._url = url;
+    }
+    _fetch() {
+        return new Promise((resolve, reject) => {
+            this.image = new Image();
+            this.image.onload = () => {
+                this.image = getCanvasFromImage(this.image);
+                this.ready = true;
+                resolve();
+            };
+            this.image.onerror = reject;
+            this.image.src = this._url;
+        });
     }
     _compile(meta) {
         super._compile(meta);

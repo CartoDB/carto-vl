@@ -67,6 +67,9 @@ export default class Ramp extends BaseExpression {
             gl.deleteTexture(this.texture);
         }
     }
+    _fetch(){
+        return Promise.all([this.input._fetch(), this.palette._fetch()]);
+    }
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
         if (this.palette.type == 'sprites') {
