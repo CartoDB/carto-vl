@@ -205,7 +205,7 @@ export default class Dataframe {
             } else {
                 const column = this.metadata.columns.find(c => c.name == propertyName);
                 if (column && column.type == 'category') {
-                    prop = column.categoryNames[prop];
+                    prop = this.metadata.categoryIDsToName[prop];
                 }
                 properties[propertyName] = prop;
             }
