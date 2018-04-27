@@ -2,7 +2,7 @@ import * as util from './util';
 import * as s from '../core/viz/functions';
 import * as schema from '../core/schema';
 import * as shaders from '../core/shaders';
-import { compileShader, compileShader2 } from '../core/viz/shader-compiler';
+import { compileShader, compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
 import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
@@ -217,28 +217,6 @@ export default class Viz {
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
-    compileShaders(gl, metadata) {
-        this._compileColorShader(gl, metadata);
-        this._compileWidthShader(gl, metadata);
-        this._compileStrokeColorShader(gl, metadata);
-        this._compileStrokeWidthShader(gl, metadata);
-        this._compileFilterShader(gl, metadata);
-
-        this.symbol._bind(metadata);
-        this.symbolPlacement._bind(metadata);
-        if (!this.symbol._default) {
-            this.symbolShader = compileShader2(gl, symbolizerGLSL, {
-                symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement
-            });
-        }
-
-        Object.values(this.variables).map(v => {
-            v._bind(metadata);
-        });
-    }
-
-
     _resolveAliases() {
         [
             this.color,
@@ -281,39 +259,31 @@ export default class Viz {
         }
     }
 
-    _compileColorShader(gl, metadata) {
+    compileShaders(gl, metadata) {
         this.color._bind(metadata);
-        const r = compileShader(gl, this.color, shaders.styler.createColorShader);
-        this.propertyColorTID = r.tid;
-        this.colorShader = r.shader;
-    }
-
-    _compileWidthShader(gl, metadata) {
         this.width._bind(metadata);
-        const r = compileShader(gl, this.width, shaders.styler.createWidthShader);
-        this.propertyWidthTID = r.tid;
-        this.widthShader = r.shader;
-    }
-
-    _compileStrokeColorShader(gl, metadata) {
         this.strokeColor._bind(metadata);
-        const r = compileShader(gl, this.strokeColor, shaders.styler.createColorShader);
-        this.propertyStrokeColorTID = r.tid;
-        this.strokeColorShader = r.shader;
-    }
-
-    _compileStrokeWidthShader(gl, metadata) {
         this.strokeWidth._bind(metadata);
-        const r = compileShader(gl, this.strokeWidth, shaders.styler.createWidthShader);
-        this.propertyStrokeWidthTID = r.tid;
-        this.strokeWidthShader = r.shader;
-    }
-
-    _compileFilterShader(gl, metadata) {
+        this.symbol._bind(metadata);
         this.filter._bind(metadata);
-        const r = compileShader(gl, this.filter, shaders.styler.createFilterShader);
-        this.propertyFilterTID = r.tid;
-        this.filterShader = r.shader;
+
+        this.colorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.color });
+        this.widthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.width });
+        this.strokeColorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.strokeColor });
+        this.strokeWidthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.strokeWidth });
+        this.filterShader = compileShader(gl, shaders.styleFilterGLSL, { filter: this.filter });
+
+        this.symbolPlacement._bind(metadata);
+        if (!this.symbol._default) {
+            this.symbolShader = compileShader(gl, symbolizerGLSL, {
+                symbol: this.symbol,
+                symbolPlacement: this.symbolPlacement
+            });
+        }
+
+        Object.values(this.variables).map(v => {
+            v._bind(metadata);
+        });
     }
 
     replaceChild(toReplace, replacer) {

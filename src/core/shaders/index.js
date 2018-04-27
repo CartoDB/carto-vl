@@ -1,11 +1,36 @@
 import * as rendererGLSL from './renderer';
-import * as stylerGLSL from './styler';
 import * as aaBlenderGLSL from './aaBlender';
 import ShaderCache from './shader-cache';
+
+import * as stylerGLSL from './styler';
 
 const shaderCache = new ShaderCache();
 
 let programID = 1;
+
+export const styleColorGLSL = {VS: stylerGLSL.VS,
+    FS: stylerGLSL.FS.replace('$style_inline', '$color_inline').replace('$style_preface', '$color_preface')
+};
+export const styleWidthGLSL = {VS: stylerGLSL.VS,
+    FS: stylerGLSL.FS.replace('$style_inline', 'vec4(encodeWidth($width_inline))').replace('$style_preface',
+        `   // From pixels in [0.,255.] to [0.,1.] in exponential-like form
+        float encodeWidth(float x){
+            if (x<16.){
+                x = x*4.;
+            }else if (x<80.){
+                x = (x-16.)+64.;
+            }else{
+                x = (x-80.)*0.5 + 128.;
+            }
+            return x / 255.;
+        }
+
+        $width_preface
+        ` )
+};
+export const styleFilterGLSL = {VS: stylerGLSL.VS,
+    FS: stylerGLSL.FS.replace('$style_inline', 'vec4($filter_inline)').replace('$style_preface', '$filter_preface')
+};
 
 function compileShader(gl, sourceCode, type) {
     if (shaderCache.has(gl, sourceCode)) {
@@ -88,47 +113,6 @@ class Line {
         this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
     }
 }
-class GenericStyler {
-    constructor(gl, glsl, preface, inline) {
-        const VS = glsl.VS;
-        let FS = glsl.FS;
-        FS = FS.replace('$PREFACE', preface);
-        FS = FS.replace('$INLINE', inline);
-        compileProgram.call(this, gl, VS, FS);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-    }
-}
-class Color extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, stylerGLSL, '/*Color*/' + preface, inline);
-    }
-}
-class Width extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, stylerGLSL,
-            `
-        /*Width*/
-        // From pixels in [0.,255.] to [0.,1.] in exponential-like form
-        float encodeWidth(float x){
-            if (x<16.){
-                x = x*4.;
-            }else if (x<80.){
-                x = (x-16.)+64.;
-            }else{
-                x = (x-80.)*0.5 + 128.;
-            }
-            return x / 255.;
-        }
-        ` + preface,
-            `vec4(encodeWidth(${inline}))`);
-    }
-}
-
-class Filter extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, stylerGLSL, '/*Filter*/' + preface, `vec4(${inline})`);
-    }
-}
 
 const renderer = {
     createPointShader: function (gl) {
@@ -139,18 +123,6 @@ const renderer = {
     },
     createLineShader: function (gl) {
         return new Line(gl);
-    }
-};
-
-const styler = {
-    createColorShader: function (gl, preface, inline) {
-        return new Color(gl, preface, inline);
-    },
-    createWidthShader: function (gl, preface, inline) {
-        return new Width(gl, preface, inline);
-    },
-    createFilterShader: function (gl, preface, inline) {
-        return new Filter(gl, preface, inline);
     }
 };
 
@@ -199,4 +171,4 @@ export function createShader(gl, glslTemplate, codes) {
     return shader;
 }
 
-export { renderer, styler, AABlender };
+export { renderer, AABlender };

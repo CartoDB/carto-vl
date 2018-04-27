@@ -1,4 +1,4 @@
-/** 
+/**
  * To avoid recompiling the shaders we keep a shader cache.
  * We need a different shader per webgl context so we use a 2 level cache where at the first level
  * the webgl context is the key and at the second level the shader code is the cache key.

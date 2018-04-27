@@ -284,7 +284,8 @@ class Renderer {
             v._updateDrawMetadata(drawMetadata);
         });
 
-        const styleDataframe = (tile, tileTexture, shader, vizExpr, TID) => {
+        const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
+            const TID = shader.tid;
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -309,11 +310,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.getColor(), viz.propertyColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.getWidth(), viz.propertyWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.getStrokeColor(), viz.propertyStrokeColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.getStrokeWidth(), viz.propertyStrokeWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.getFilter(), viz.propertyFilterTID));
+        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.getColor()));
+        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.getWidth()));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.getStrokeColor()));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.getStrokeWidth()));
+        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.getFilter()));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -350,7 +351,7 @@ class Renderer {
 
             let renderer = null;
             if (!viz.symbol._default) {
-                renderer = viz.symbolShader.shader;
+                renderer = viz.symbolShader;
             } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
@@ -413,11 +414,11 @@ class Renderer {
                 drawMetadata.freeTexUnit = 5 + Object.keys(viz.symbolShader.tid).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbol._updateDrawMetadata(drawMetadata);
-                viz.symbol._preDraw(viz.symbolShader.shader.program, drawMetadata, gl);
+                viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbolPlacement._updateDrawMetadata(drawMetadata);
-                viz.symbolPlacement._preDraw(viz.symbolShader.shader.program, drawMetadata, gl);
+                viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 Object.keys(viz.symbolShader.tid).forEach((name, i) => {
                     gl.activeTexture(gl.TEXTURE5 + i);
