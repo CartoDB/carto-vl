@@ -2,13 +2,15 @@
 
 ## Overview of Ramp
 
-The `ramp` expression can be used in many forms. Summarizing, `ramp` maps some kind of input (both categorical and numerical data) to some kind of output (both colors and numbers). This can be used to create choropleth maps and bubble maps with ease.
+The [ramp expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) can be used in many forms.
+
+`ramp` maps some kind of input (categorical or numerical) to some kind of output (colors or numbers). This can be used to create choropleth maps and bubble maps with ease.
 
 ## Styling by a categorical expression
 
 ### Specifying a color <=> category relation
 
-To map colors to particular categories, use the classification operator `buckets`.
+To map colors to particular categories use the [buckets expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets).
 
 The map below will assign colors from the `Prism` palette to the categories 'SOYBEANS', 'RICE', 'WHEAT', the rest of the categories will receive the last color `others`.
 
@@ -19,7 +21,7 @@ color: ramp(buckets($commodity_name,'SOYBEANS', 'RICE', 'WHEAT'), Prism)
 [Example](https://cartodb.github.io/carto-vl/example/mapbox.html#eyJhIjoiY3JvcF9sb3NzXzIwMTciLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiA1XG5jb2xvcjogcmFtcChidWNrZXRzKCRjb21tb2RpdHlfbmFtZSwnU09ZQkVBTlMnLCAnUklDRScsICdXSEVBVCcpLCBQcmlzbSkiLCJmIjp7ImxuZyI6LTk2LjExNjkyMzY3OTM0Nzc5LCJsYXQiOjQ3LjU1MjE2MDkwNTk5MjExfSwiZyI6My4wNjg0NTQxMjAzMzc2Mjg4fQ==)
 
 ### Showing the Most Common Categories
-The map below uses the expression `top` to retrieve the top 4 values in the `commodity_name` field. Each of those categories category will be colored with a unique color and all other features will be colored as `others`.
+The map below uses the  [top expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionstop) to retrieve the top 4 values in the `commodity_name` field. Each of those categories category will be colored with a unique color and all other features will be colored as `others`.
 
 ```
 width: 5
@@ -41,16 +43,16 @@ color: ramp($commodity_name, Prism)
 ## Styling by a numeric expression
 
 ### Unclassed maps
-You can make an unclassed map by using `linear`.
+You can make an unclassed map by using the [linear expression](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
 
 In this example, the color will be set for each feature based on the `total_pop` property, where features with a `total_pop` of 1000 or less will be colored with the first color from the palette, features with a `total_pop` of 500000 or more will be colored with the last color from the palette and features in between will receive an interpolated color.
 ```
-color: ramp(linear($total_pop,1000,500000),ag_sunset)
+color: ramp(linear($total_pop, 1000, 500000), AG_SUNSET)
 ```
 ![screen shot 2018-02-15 at 3 34 18 pm](https://user-images.githubusercontent.com/1566273/36285405-a5c20e98-1268-11e8-9c7a-5598ad0438cd.png)
 
 ### Classed maps
-Use an [available classification method](LINK), to group features into a set of bins and color them using a sequential color scheme.
+Use an [available classification method](TODO) to group features into a set of bins and color them using a sequential color scheme.
 
 #### Quantiles
 This example will classify the `total_pop` property using the `quantiles` method with `5` buckets.
@@ -63,7 +65,7 @@ color: ramp(quantiles($total_pop, 5), Emrld)
 
 This example will classify the `total_pop` property using two custom breakpoints (`10` and `250`), which will generate 3 classes.
 ```
-color: ramp(buckets($price, 10, 250), Emrld)
+color: ramp(buckets($total_pop, 10, 250), Emrld)
 ```
 
 
