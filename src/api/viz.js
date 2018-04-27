@@ -2,7 +2,7 @@ import * as util from './util';
 import * as s from '../core/viz/functions';
 import * as schema from '../core/schema';
 import * as shaders from '../core/shaders';
-import { compileShader, compileShader } from '../core/viz/shader-compiler';
+import { compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
 import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
