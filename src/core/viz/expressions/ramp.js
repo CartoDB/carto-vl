@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 
 /**
@@ -51,12 +51,53 @@ export default class Ramp extends BaseExpression {
             this.type = 'color';
         }
     }
-    // TODO eval
+    eval(o) {
+        if (this.palette.type != 'customPaletteNumber') {
+            super.eval(o);
+        }
+        const input = this.input.eval(o);
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+        const len = this.pixel.length - 1;
+        const lowIndex = clamp(Math.floor(len * m), 0, len);
+        const highIndex = clamp(Math.ceil(len * m), 0, len);
+        const low = this.pixel[lowIndex];
+        const high = this.pixel[highIndex];
+        const fract = len * m - Math.floor(len * m);
+        return fract * high + (1 - fract) * low;
+    }
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
+        }
+        const width = 256;
+        if (this.type == 'color') {
+            const pixel = new Uint8Array(4 * width);
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+            for (let i = 0; i < width; i++) {
+                const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
+                const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
+                const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+                const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
+                const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
+                const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+                pixel[4 * i + 0] = v.r * 255;
+                pixel[4 * i + 1] = v.g * 255;
+                pixel[4 * i + 2] = v.b * 255;
+                pixel[4 * i + 3] = v.a * 255;
+            }
+            this.pixel = pixel;
+        } else {
+            const pixel = new Float32Array(width);
+            const floats = this.palette.floats;
+            for (let i = 0; i < width; i++) {
+                const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
+                const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
+                const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+                pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+            }
+            this.pixel = pixel;
         }
     }
     _free(gl) {
@@ -105,21 +146,8 @@ export default class Ramp extends BaseExpression {
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 256;
+            const pixel = this.pixel;
             if (this.type == 'color') {
-                const pixel = new Uint8Array(4 * width);
-                const colors = this._getColorsFromPalette(this.input, this.palette);
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
-                    const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                    const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
-                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                    pixel[4 * i + 0] = v.r * 255;
-                    pixel[4 * i + 1] = v.g * 255;
-                    pixel[4 * i + 2] = v.b * 255;
-                    pixel[4 * i + 3] = v.a * 255;
-                }
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
@@ -127,14 +155,6 @@ export default class Ramp extends BaseExpression {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                const pixel = new Float32Array(width);
-                const floats = this.palette.floats;
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
-                    const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
-                    const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
-                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-                }
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
                     width, 1, 0, gl.ALPHA, gl.FLOAT,
                     pixel);
