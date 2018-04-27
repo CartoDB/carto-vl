@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>CARTO Staff location | CARTO</title>
+  <title>Staff location | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -27,36 +27,46 @@
 
     #controls {
       position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 200px;
+      top: 24px;
+      left: 24px;
+      width: 300px;
       z-index: 2;
     }
 
     #controls h2 {
-      font: 300 12px/16px 'Open Sans';
+      font: 600 18px/24px 'Open Sans';
+      color: #fff;
       background: rgba(0, 0, 0, 0.64);
       border-radius: 4px;
       padding: 8px 12px;
-      color: #fff;
     }
 
     .container {
-      padding: 8px 12px;
-      background: white;
+      padding: 12px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.64);
       box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
       border-radius: 4px;
-      color: #2E3C43;
       margin-top: 12px;
     }
 
+    #content {
+      overflow: scroll;
+      height: 90vh;
+    }
+
     #content h3 {
-      font: 400 16px/22px 'Open Sans';
+      font: 400 18px/24px 'Open Sans';
       margin-bottom: 4px;
     }
 
     #content p {
-      font: 400 12px/14px 'Open Sans';
+      font: 400 14px/16px 'Open Sans';
+      margin-bottom: 12px;
+    }
+
+    #content p:last-child {
+      margin-bottom: 0px;
     }
   </style>
 </head>
@@ -83,12 +93,13 @@
     });
 
     const source = new carto.source.Dataset(`
-      bamboo_locations_1
+      fake_staff
     `);
     const viz = new carto.Viz(`
-      @count: ramp(buckets($location,"ESP - Madrid","ESP - Valencia","ESP - Valladolid","EST - Tartu","GBR - London","USA - Brooklyn, NY","USA - Denver, CO","USA - Washington, DC"), [57, 2, 4, 3, 5, 25, 2, 12, 1])
+      @count:
+      ramp(buckets($location,"ESP - Madrid","ESP - Valencia","ESP - Valladolid","EST - Tartu","GBR - London","USA - Brooklyn, NY","USA - Denver, CO","USA - Washington, DC"), [57, 2, 4, 3, 5, 25, 2, 12, 1])
 
-      width: 20
+      width: sqrt(@count)*6
       order: asc(width())
       color: ramp(linear(@count,1,57), oryel)
       @name: $displayname
@@ -99,7 +110,7 @@
     interactivity.on('featureClick', updateTree);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the cities');
+      updateTitle('👉 Click on the cities');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -112,7 +123,7 @@
       let content = '<div class="container">';
         for (let feature of event.features) {
           content += `
-              <p>${feature.variables.name.value}</p>
+              <p>✨ ${feature.variables.name.value}</p>
           `;
         }
       content += '</div>';
