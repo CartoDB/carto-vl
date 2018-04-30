@@ -68,7 +68,7 @@ function uploadFiles(version) {
         localDir: 'dist',
         s3Params: {
             Bucket: secrets.AWS_S3_BUCKET,
-            Prefix: 'carto-vl/' + version + '/',
+            Prefix: 'carto-vl/' + version + '/'
         }
     });
     uploader.on('error', function(err) {
