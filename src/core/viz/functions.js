@@ -309,7 +309,6 @@ export const placement = (...args) => new Placement(...args);
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 
-export const TOP = new Placement(constant(0), constant(1));
 export const CENTER = new Placement(constant(0), constant(0));
 export const BOTTOM = new Placement(constant(0), constant(-1));
 
