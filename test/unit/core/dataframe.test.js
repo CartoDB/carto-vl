@@ -132,6 +132,14 @@ describe('src/core/dataframe', () => {
                         }]
                 }
             });
+            const viz = {
+                getWidth: () => ({
+                    eval: () => {
+                        return 1;
+                    }
+                })
+            };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
                 id: 0,
                 properties: {
@@ -139,16 +147,16 @@ describe('src/core/dataframe', () => {
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 })).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 }, viz)).toEqual([]);
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 })).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, viz)).toEqual([feature1]);
             });
         });
 

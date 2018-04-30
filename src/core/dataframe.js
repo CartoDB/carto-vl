@@ -159,12 +159,17 @@ export default class Dataframe {
 
     }
 
-    _getPolygonAtPosition(pos) {
+    _getPolygonAtPosition(pos, viz) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
         const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const vizWidth = viz.getWidth();
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -172,17 +177,25 @@ export default class Dataframe {
             if (i >= breakpoints[featureIndex]) {
                 featureIndex++;
             }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(vizWidth.eval(f), 336);
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
-                x: vertices[i + 0],
-                y: vertices[i + 1]
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
             };
             const v2 = {
-                x: vertices[i + 2],
-                y: vertices[i + 3]
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
             };
             const v3 = {
-                x: vertices[i + 4],
-                y: vertices[i + 5]
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
