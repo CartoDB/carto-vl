@@ -20,8 +20,8 @@
   ],
   "license": "BSD-3-Clause",
   "files": [
-      "src",
-      "dist"
+    "src",
+    "dist"
   ],
   "dependencies": {
     "@mapbox/vector-tile": "^1.3.0",
@@ -74,7 +74,7 @@
     "test:user:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js",
     "test:user:watchc": "karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
-    "test:render": "yarn build:dev && mocha test/integration/render/render.test.js",
+    "test:render": "yarn build:dev &&  serve -p 5000 & mocha test/integration/render/render.test.js",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
     "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
     "test:e2e": "yarn build:dev && mocha test/acceptance/e2e.test.js",

@@ -53,7 +53,7 @@ function takeReference(file, template, asyncLoad) {
 function testSST(file, template, asyncLoad) {
     writeTemplate(file, template);
     let options = loadOptions();
-    options.url = `file://${getHTML(file)}`;
+    options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
@@ -62,13 +62,12 @@ function testSST(file, template, asyncLoad) {
 }
 
 function writeTemplate(file, template) {
-    const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(getHTML(file), template({
-        file: file,
+        file: `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.js`,
         sources: sources,
-        cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
-        mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
-        mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
+        cartovl: '/dist/carto-vl.js',
+        mapboxgl: '/dist/mapbox-gl-dev.js',
+        mapboxglcss: '/dist/mapbox-gl-dev.css'
     }));
 }
 
