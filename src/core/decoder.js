@@ -63,6 +63,7 @@ function decodePolygon(geometry) {
 
             {
                 const lineString = polygon.flat;
+                polygon.clipped = polygon.clipped || [];
                 for (let i = 0; i < lineString.length - 2; i += 2) {
                     // TODO polygon holes must be taken into account for prev/next computation
 
