@@ -5324,7 +5324,7 @@ class Dataframe {
             } else {
                 const column = this.metadata.columns.find(c => c.name == propertyName);
                 if (column && column.type == 'category') {
-                    prop = column.categoryNames[prop];
+                    prop = this.metadata.categoryIDsToName[prop];
                 }
                 properties[propertyName] = prop;
             }
@@ -5494,6 +5494,11 @@ const metadataExample = {
 
 class Metadata {
     constructor(categoryIDs, columns, featureCount, sample) {
+        this.categoryIDsToName = {};
+        Object.keys(categoryIDs).forEach(name=>{
+            this.categoryIDsToName[categoryIDs[name]] = name;
+        });
+
         this.categoryIDs = categoryIDs;
         this.columns = columns;
         this.featureCount = featureCount;
@@ -6680,8 +6685,8 @@ class Viz {
 
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
-    * 
-    * 
+    *
+    *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
     * @example <caption> Create a viz with black dots using the string constructor </caption>
@@ -6842,6 +6847,8 @@ class Viz {
     }
 
     _changed() {
+        this._resolveAliases();
+        this._validateAliasDAG();
         if (this._changeCallback) {
             this._changeCallback(this);
         }
@@ -6950,8 +6957,6 @@ class Viz {
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-            this._resolveAliases();
-            this._validateAliasDAG();
         } else if (toReplace == this.color) {
             this.color = replacer;
             replacer.parent = this;
@@ -10279,12 +10284,53 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             this.type = 'color';
         }
     }
-    // TODO eval
+    eval(o) {
+        if (this.palette.type != 'customPaletteNumber') {
+            super.eval(o);
+        }
+        const input = this.input.eval(o);
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+        const len = this.pixel.length - 1;
+        const lowIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.floor(len * m), 0, len);
+        const highIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.ceil(len * m), 0, len);
+        const low = this.pixel[lowIndex];
+        const high = this.pixel[highIndex];
+        const fract = len * m - Math.floor(len * m);
+        return fract * high + (1 - fract) * low;
+    }
     _compile(meta) {
         super._compile(meta);
         Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
+        }
+        const width = 256;
+        if (this.type == 'color') {
+            const pixel = new Uint8Array(4 * width);
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+            for (let i = 0; i < width; i++) {
+                const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
+                const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
+                const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+                const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
+                const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
+                const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+                pixel[4 * i + 0] = v.r * 255;
+                pixel[4 * i + 1] = v.g * 255;
+                pixel[4 * i + 2] = v.b * 255;
+                pixel[4 * i + 3] = v.a * 255;
+            }
+            this.pixel = pixel;
+        } else {
+            const pixel = new Float32Array(width);
+            const floats = this.palette.floats;
+            for (let i = 0; i < width; i++) {
+                const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
+                const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
+                const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+                pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+            }
+            this.pixel = pixel;
         }
     }
     _free(gl) {
@@ -10333,21 +10379,8 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 256;
+            const pixel = this.pixel;
             if (this.type == 'color') {
-                const pixel = new Uint8Array(4 * width);
-                const colors = this._getColorsFromPalette(this.input, this.palette);
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = colors[Math.floor(i / width * (colors.length - 1))];
-                    const vhighRaw = colors[Math.ceil(i / width * (colors.length - 1))];
-                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                    const m = i / width * (colors.length - 1) - Math.floor(i / width * (colors.length - 1));
-                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                    pixel[4 * i + 0] = v.r * 255;
-                    pixel[4 * i + 1] = v.g * 255;
-                    pixel[4 * i + 2] = v.b * 255;
-                    pixel[4 * i + 3] = v.a * 255;
-                }
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
@@ -10355,14 +10388,6 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                const pixel = new Float32Array(width);
-                const floats = this.palette.floats;
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = floats[Math.floor(i / width * (floats.length - 1))];
-                    const vhighRaw = floats[Math.ceil(i / width * (floats.length - 1))];
-                    const m = i / width * (floats.length - 1) - Math.floor(i / width * (floats.length - 1));
-                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-                }
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
                     width, 1, 0, gl.ALPHA, gl.FLOAT,
                     pixel);
