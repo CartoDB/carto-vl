@@ -184,7 +184,11 @@ class Renderer {
         });
 
         const s = 1. / this._zoom;
-        // TODO go feature by feature instead of column by column
+
+        const rootExprs = viz._getRootExpressions();
+        const numRootExpr = rootExprs.length;
+        rootExprs.forEach(expr => expr._resetViewportAgg());
+
         tiles.forEach(d => {
             d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
             d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
@@ -194,32 +198,32 @@ class Renderer {
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
             const columnNames = viz.getFilter()._getMinimumNeededSchema().columns;
-            const f = {};
+            const propertyNames = Object.keys(d.properties);
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
                 if (x > minx && x < maxx && y > miny && y < maxy) {
+
+                    const f = {};
+                    propertyNames.forEach(name => {
+                        f[name] = d.properties[name][i];
+                    });
+
                     if (viz.getFilter()) {
-                        columnNames.forEach(name => {
-                            f[name] = d.properties[name][i];
-                        });
                         if (viz.getFilter().eval(f) < 0.5) {
                             continue;
                         }
                     }
-                    requiredColumns.forEach(column => {
-                        const values = d.properties[column];
-                        const v = values[i];
-                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                        metaColumn.min = Math.min(v, metaColumn.min);
-                        metaColumn.max = Math.max(v, metaColumn.max);
-                        metaColumn.count++;
-                        metaColumn.sum += v;
-                    });
+
+                    for (let i = 0; i < numRootExpr; i++) {
+                        const expr = rootExprs[i];
+                        expr._accumViewportAgg(f);
+                    }
                 }
             }
         });
+        return drawMetadata;
         requiredColumns.forEach(column => {
             const metaColumn = drawMetadata.columns.find(c => c.name == column);
             metaColumn.avg = metaColumn.sum / metaColumn.count;

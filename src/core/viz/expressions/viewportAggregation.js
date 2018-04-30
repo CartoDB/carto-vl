@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { number } from '../functions';
 import * as schema from '../../schema';
+import { implicitCast } from './utils';
 
 /**
  * Return the average value of the features showed in the viewport
@@ -80,7 +81,7 @@ export const ViewportMin = generateAggregattion('min');
  * @function
  * @api
  */
-export const ViewportSum = generateAggregattion('sum');
+export const ViewportSum = generateAggregattion('sum', false, 0, (x, y) => x + y);
 
 /**
  * Return the count of the features showed in the viewport
@@ -242,14 +243,14 @@ export const GlobalCount = generateAggregattion('count', true);
  */
 export const GlobalPercentile = generatePercentile(true);
 
-function generateAggregattion(metadataPropertyName, global) {
+function generateAggregattion(metadataPropertyName, global, zeroValue, accum) {
     return class Aggregattion extends BaseExpression {
         /**
          * @param {*} property
          */
         constructor(property) {
             super({ value: number(0) });
-            this.property = property;
+            this.property = implicitCast(property);
         }
         eval() {
             return this.value.expr;
@@ -267,18 +268,17 @@ function generateAggregattion(metadataPropertyName, global) {
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
         }
+        _resetViewportAgg() {
+            this.value.expr = zeroValue;
+        }
+        _accumViewportAgg(feature) {
+            this.value.expr = accum(this.value.expr, this.property.eval(feature));
+        }
         _getDrawMetadataRequirements() {
             if (!global) {
                 return { columns: [this._getColumnName()] };
             } else {
                 return { columns: [] };
-            }
-        }
-        _updateDrawMetadata(drawMetadata){
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name === name);
-            if (!global) {
-                this.value.expr = column[metadataPropertyName];
             }
         }
         _getColumnName() {
