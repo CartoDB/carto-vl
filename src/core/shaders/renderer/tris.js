@@ -40,19 +40,11 @@ void main(void) {
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).a);
 
-    // If fill
-
-    // vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-
-
-
-    // If stroke
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
 
     if (c.a==0.){
         p.x=10000.;
     }
-
     color = vec4(c.rgb*c.a, c.a);
     gl_Position  = p;
 }`;
