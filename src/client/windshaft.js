@@ -301,7 +301,7 @@ export default class Windshaft {
 
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 0
+                'mvt': 1
             },
             layers: [
                 {
@@ -420,7 +420,8 @@ export default class Windshaft {
                 }
                 polygon = {
                     flat: [],
-                    holes: []
+                    holes: [],
+                    clipped: []
                 };
             } else {
                 if (j == 0) {
@@ -429,8 +430,58 @@ export default class Windshaft {
                 polygon.holes.push(polygon.flat.length / 2);
             }
             for (let k = 0; k < geom[j].length; k++) {
-                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                // TODO should additional clipping be done here?
+                let isClipped = false;
+                let x = geom[j][k].x;
+                let y = geom[j][k].y;
+
+                let prevIndex = k > 0 ? k - 1 : geom[j].length - 1;
+                const p0x = geom[j][prevIndex].x;
+                const p0y = geom[j][prevIndex].y;
+                let dirx = x - p0x;
+                let diry = y - p0y;
+                if (x > mvt_extent) {
+                    // console.log(x);
+                    // x = mvt_extent + 16;
+                    // const lambda = (mvt_extent - p0x) / dirx;
+                    // x = mvt_extent;
+                    // y = p0y + diry * lambda;
+                    // y = clamp(y, 0, mvt_extent);
+                    // if (isNaN(y)) {
+                    //     y = p0y;
+                    // }
+                    isClipped = true;
+                } else if (x < 0) {
+                    isClipped = true;
+
+                }
+
+                if (y > mvt_extent) {
+                    // geom[j][k].x = mvt_extent;
+                    isClipped = true;
+                } else if (y < 0) {
+                    isClipped = true;
+                    // geom[j][k].x = -mvt_extent;
+                }
+                //     // geom[j][k].x = mvt_extent;
+                //     isClipped = true;
+                // } else if (geom[j][k].x < 0) {
+                //     geom[j][k].x = 0;
+                //     isClipped = true;
+                // }
+                // if (geom[j][k].y > mvt_extent) {
+                //     // geom[j][k].y = mvt_extent;
+                // isClipped = true;
+                // }
+                // else if (geom[j][k].y < 0) {
+                //     // geom[j][k].y = 0;
+                //     isClipped = true;
+                //}
+                if (isClipped) {
+                    polygon.clipped.push(polygon.flat.length);
+                }
+                polygon.flat.push(2 * x / mvt_extent - 1.);
+                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
             }
         }
         //if current polygon is not empty=> push it

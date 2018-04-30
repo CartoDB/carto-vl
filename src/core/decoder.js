@@ -38,37 +38,59 @@ function decodePoint(vertices) {
     };
 }
 
+function clip(x) {
+    if (x > 1) {
+        return 1;
+    }
+    if (x < -1) {
+        return -1;
+    }
+    return x;
+}
 
 function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let clipIndex = 0;
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
+                vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
                 normals.push(0, 0);
             });
 
             {
                 const lineString = polygon.flat;
-                // TODO use polygon holes
                 for (let i = 0; i < lineString.length - 2; i += 2) {
+                    // TODO polygon holes must be taken into account for prev/next computation
+
+                    // TODO performance
+                    // if (polygon.clipped[clipIndex] == i && polygon.clipped[clipIndex + 1] == i + 2) {
+                    if (polygon.clipped.includes(i) && (polygon.clipped.includes(i + 2) || (i + 2 == polygon.flat.length && polygon.clipped.includes(0)))) {
+                        clipIndex += 2;
+                        continue;
+                    }
+                    if (polygon.holes.includes((i + 2) / 2)) {
+                        continue;
+                    }
                     const a = [lineString[i + 0], lineString[i + 1]];
                     const b = [lineString[i + 2], lineString[i + 3]];
-                    const normal = getLineNormal(b, a);
+                    let normal = getLineNormal(b, a);
+
                     let na = normal;
                     let nb = normal;
 
-                    if (i > 0) {
+                    // TODO adapt
+                    /*if (i > 0 && polygon.clipped[clipIndex - 1] != i - 2) {
                         const prev = [lineString[i - 2], lineString[i - 1]];
                         na = getJointNormal(prev, a, b) || na;
                     }
-                    if (i < lineString.length - 4) {
+                    if (i < lineString.length - 4 && polygon.clipped[clipIndex] != i + 2) {
                         const next = [lineString[i + 4], lineString[i + 5]];
                         nb = getJointNormal(a, b, next) || nb;
-                    }
+                    }*/
 
                     // First triangle
 
