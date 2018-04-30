@@ -34,6 +34,11 @@ const metadataExample = {
 
 export default class Metadata {
     constructor(categoryIDs, columns, featureCount, sample) {
+        this.categoryIDsToName = {};
+        Object.keys(categoryIDs).forEach(name=>{
+            this.categoryIDsToName[categoryIDs[name]] = name;
+        });
+
         this.categoryIDs = categoryIDs;
         this.columns = columns;
         this.featureCount = featureCount;

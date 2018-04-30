@@ -87,14 +87,15 @@ const BASEMAPS = {
     Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
 };
+const DEFAULT_BASEMAP = 'DarkMatter';
 
-var basemap = 'DarkMatter';
+var basemap = DEFAULT_BASEMAP;
 var mapboxgl = window.mapboxgl;
 var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: BASEMAPS[basemap], // stylesheet location
-    center: [2.17, 41.38], // starting position [lng, lat]
-    zoom: 13, // starting zoom,
+    container: 'map',
+    style: { version: 8, sources: {}, layers: [] },
+    center: [0, 0],
+    zoom: 0,
     dragRotate: false // disable drag to rotate handling
 });
 
@@ -107,10 +108,6 @@ setInterval(() => {
 
 map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
 
-map.on('moveend', () => {
-    location.hash = getConfig();
-});
-
 map.on('load', () => {
     document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0; //vizs.length - 1;
@@ -118,22 +115,17 @@ map.on('load', () => {
     function updateViz(v) {
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
-        location.hash = getConfig();
+        saveConfig();
         try {
             if (layer) {
                 $('#loader').addClass('spin');
                 document.getElementById('feedback').style.display = 'none';
-                const promise = layer.blendToViz(new carto.Viz(v));
-                if (promise) {
-                    promise.then(() => {
-                        $('#loader').removeClass('spin');
-                    }).catch(error => {
-                        handleError(error);
-                        $('#loader').removeClass('spin');
-                    });
-                } else {
+                layer.blendToViz(new carto.Viz(v)).then(() => {
                     $('#loader').removeClass('spin');
-                }
+                }).catch(error => {
+                    handleError(error);
+                    $('#loader').removeClass('spin');
+                });
             }
         } catch (error) {
             handleError(error);
@@ -151,7 +143,7 @@ map.on('load', () => {
         $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = vizs[index];
-        superRefresh({ zoom: 13, center: [2.17, 41.38] });
+        superRefresh({ zoom: 13, center: [2.17, 41.38], basemap: 'DarkMatter' });
     }
 
     $('#prev').click(() => {
@@ -219,7 +211,13 @@ map.on('load', () => {
     } else {
         barcelona();
     }
+
+    map.on('moveend', saveConfig);
 });
+
+function saveConfig() {
+    location.hash = getConfig();
+}
 
 function getConfig() {
     return '#' + btoa(JSON.stringify({
@@ -230,6 +228,7 @@ function getConfig() {
         e: $('#styleEntry').val(),
         f: map.getCenter(),
         g: map.getZoom(),
+        h: basemap
     }));
 }
 
@@ -247,7 +246,7 @@ function setConfig(input) {
     $('#serverURL').val(c.d);
     $('#styleEntry').val(c.e);
     try {
-        superRefresh({ zoom: c.g, center: c.f, nosave: true });
+        superRefresh({ zoom: c.g, center: c.f, basemap: c.h });
     } catch (error) {
         handleError(error);
         $('#loader').removeClass('spin');
@@ -272,25 +271,15 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
     if (!layer) {
+        setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
-            if (opts.zoom !== undefined) {
-                map.setZoom(opts.zoom);
-            }
-            if (opts.center !== undefined) {
-                map.setCenter(opts.center);
-            }
             $('#loader').removeClass('spin');
         });
         layer.addTo(map, 'watername_ocean');
     } else {
         layer.update(source, viz).then(() => {
-            if (opts.zoom !== undefined) {
-                map.setZoom(opts.zoom);
-            }
-            if (opts.center !== undefined) {
-                map.setCenter(opts.center);
-            }
+            setupMap(opts);
             $('#loader').removeClass('spin');
         }).catch(error => {
             handleError(error);
@@ -299,6 +288,18 @@ const superRefresh = (opts) => {
     }
 };
 
+function setupMap(opts) {
+    opts = opts || {};
+    if (opts.zoom !== undefined) {
+        map.setZoom(opts.zoom);
+    }
+    if (opts.center !== undefined) {
+        map.setCenter(opts.center);
+    }
+    setBasemap(opts.basemap || DEFAULT_BASEMAP);
+    createBasemapElements();
+}
+
 function handleError(error) {
     const err = `Invalid viz: ${error}:${error.stack}`;
     console.warn(err);
@@ -306,34 +307,43 @@ function handleError(error) {
     document.getElementById('feedback').style.display = 'block';
 }
 
-const basemapSelector = document.querySelector('#basemap');
-Object.keys(BASEMAPS).forEach(id => {
-    const l = document.createElement('label');
+function createBasemapElements() {
+    const basemapSelector = document.querySelector('#basemap');
+    basemapSelector.innerHTML = '';
+    Object.keys(BASEMAPS).forEach(id => {
+        const l = document.createElement('label');
+        const i = document.createElement('input');
+        i.type = 'radio';
+        i.value = id;
+        i.name = 'basemap';
+        i.checked = id === basemap;
 
-    const i = document.createElement('input');
-    i.type = 'radio';
-    i.name = 'basemap';
-    i.value = id;
-    i.checked = id === basemap;
-    i.onclick = () => {
-        map.setStyle(BASEMAPS[id]);
-        let added = false;
-        map.on('sourcedata', () => {
-            if (map.isStyleLoaded() && !added) {
-                layer.addTo(map, 'watername_ocean');
-                added = true;
-            }
-        });
-    };
-    i.selected = 'selected';
-    l.appendChild(i);
+        i.onclick = (event) => {
+            setBasemap(event.target.value);
+            saveConfig();
+        };
+        i.selected = 'selected';
+        l.appendChild(i);
 
-    const s = document.createElement('span');
-    s.innerText = id;
-    l.appendChild(s);
+        const s = document.createElement('span');
+        s.innerText = id;
+        l.appendChild(s);
 
-    basemapSelector.appendChild(l);
-});
+        basemapSelector.appendChild(l);
+    });
+}
+
+function setBasemap(id) {
+    basemap = id;
+    map.setStyle(BASEMAPS[basemap]);
+    let added = false;
+    map.on('sourcedata', () => {
+        if (map.isStyleLoaded() && !added) {
+            layer.addTo(map, 'watername_ocean');
+            added = true;
+        }
+    });
+}
 
 document.getElementById('fullscreen').onclick = () => {
     document.getElementById('mapDiv').style.height = '100%';

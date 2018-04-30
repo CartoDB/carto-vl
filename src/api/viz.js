@@ -38,12 +38,8 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
 
     /**
-    * A Viz defines how the data will be displayed: the color of the elements and size are basic things that can be
-    * managed through vizs. Vizs also control the element visibility, ordering or aggregation level.
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
     *
-    * A Viz is created from an {@link VizSpec|VizSpec} object or from a string.
-    * Each attribute in the {@link VizSpec|VizSpec} must be a valid {@link carto.expressions|expression}.
-    * Those expressions will be evaluated dynamically for every element in the dataset.
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
     *
@@ -207,6 +203,8 @@ export default class Viz {
     }
 
     _changed() {
+        this._resolveAliases();
+        this._validateAliasDAG();
         if (this._changeCallback) {
             this._changeCallback(this);
         }
@@ -292,8 +290,6 @@ export default class Viz {
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-            this._resolveAliases();
-            this._validateAliasDAG();
         } else if (toReplace == this.color) {
             this.color = replacer;
             replacer.parent = this;
@@ -373,14 +369,17 @@ export default class Viz {
 
     _checkVizSpec(vizSpec) {
         /**
+         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
+         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution
-         * @property {carto.expressions.Base} color
-         * @property {carto.expressions.Base} width
-         * @property {carto.expressions.Base} strokeColor
-         * @property {carto.expressions.Base} strokeWidth
-         * @property {carto.expressions.Base} order
-         * @property {carto.expressions.Base} filter
+         * @property {number} resolution - Control the aggregation level
+         * @property {object} variables - An object describing the variables used.
+         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
+         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
+         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
+         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
+         * @property {carto.expressions.Base} order - Define how the elements will be stacked
+         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 

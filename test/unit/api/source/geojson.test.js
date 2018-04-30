@@ -1,46 +1,60 @@
 import GeoJSON from '../../../../src/api/source/geojson';
 
 describe('api/source/geojson', () => {
-    const data = {
-        type: 'FeatureCollection',
-        features: [{
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [0, 0]
-            },
-            properties: {
-                numeric: 1,
-                category: 'red'
-            }
-        }, {
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [1, 0]
-            },
-            properties: {
-                numeric: 2,
-                category: 'blue'
-            }
-        }]
+
+
+    const createVizMock = (columns = []) => {
+        return {
+            getMinimumNeededSchema: () => { return { columns }; }
+        };
     };
 
-    it('_decodeProperties() should return a valid Dataframe properties object', () => {
-        const source = new GeoJSON(data);
-        const properties = source._decodeProperties();
-        const expected = {
-            numeric: new Float32Array(2 + 1024),
-            category: new Float32Array(2 + 1024),
-            cartodb_id: new Float32Array(2 + 1024),
+    const createData = () => {
+        return {
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {
+                    numeric: 1,
+                    category: 'red'
+                }
+            }, {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [1, 0]
+                },
+                properties: {
+                    numeric: 2,
+                    category: 'blue'
+                }
+            }]
         };
-        expected.numeric[0] = 1;
-        expected.numeric[1] = 2;
-        expected.category[0] = 0;
-        expected.category[1] = 1;
-        expected.cartodb_id[0] = 0;
-        expected.cartodb_id[1] = 1;
-        expect(properties).toEqual(expected);
+    };
+
+    it('_decodeUnboundProperties() should return a valid Dataframe properties object', done => {
+        const source = new GeoJSON(createData());
+        source.requestMetadata(createVizMock(['numeric', 'category'])).then(() => {
+            const properties = source._decodeUnboundProperties();
+            const expected = {
+                numeric: new Float32Array(2 + 1024),
+                category: new Float32Array(2 + 1024),
+                cartodb_id: new Float32Array(2 + 1024),
+            };
+            expected.numeric[0] = 1;
+            expected.numeric[1] = 2;
+            expected.category[0] = 0;
+            expected.category[1] = 1;
+            expected.cartodb_id[0] = -0;
+            expected.cartodb_id[1] = -1;
+            expect(properties).toEqual(expected);
+
+            done();
+        });
     });
 
     describe('constructor', () => {
@@ -60,31 +74,8 @@ describe('api/source/geojson', () => {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
-                properties: {
-                    cartodb_id: 0
-                },
+                properties: {},
             }]);
-        });
-
-        it('should requestData just once', () => {
-            const data = {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [0, 0]
-                },
-                properties: {}
-            };
-            const source = new GeoJSON(data);
-
-            source.bindLayer(_ => _, _ => _, _ => _);
-            spyOn(source, '_addDataframe');
-
-            expect(source._addDataframe).toHaveBeenCalledTimes(0);
-            source.requestData();
-            expect(source._addDataframe).toHaveBeenCalledTimes(1);
-            source.requestData();
-            expect(source._addDataframe).toHaveBeenCalledTimes(1);
         });
 
         it('should build a new Source with (data) as a FeatureCollection', () => {
@@ -106,16 +97,23 @@ describe('api/source/geojson', () => {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
-                properties: {
-                    cartodb_id: 0
-                }
+                properties: {}
             }]);
         });
 
-        it('should compute metadata for numeric and category properties', () => {
-            const source = new GeoJSON(data);
+        it('should compute metadata for numeric and category properties', done => {
+            const source = new GeoJSON(createData());
             const expected = {
                 columns: [
+                    {
+                        name: 'cartodb_id',
+                        type: 'number',
+                        min: Number.POSITIVE_INFINITY,
+                        max: Number.NEGATIVE_INFINITY,
+                        avg: Number.NaN,
+                        sum: 0,
+                        count: 0
+                    },
                     {
                         name: 'numeric',
                         type: 'number',
@@ -130,15 +128,6 @@ describe('api/source/geojson', () => {
                         type: 'category',
                         categoryNames: ['red', 'blue'],
                     },
-                    {
-                        name: 'cartodb_id',
-                        type: 'number',
-                        min: 0,
-                        max: 1,
-                        avg: 0.5,
-                        sum: 1,
-                        count: 2
-                    }
                 ],
                 categoryIDs: {
                     red: 0,
@@ -149,19 +138,21 @@ describe('api/source/geojson', () => {
                     {
                         numeric: 1,
                         category: 'red',
-                        cartodb_id: 0,
                     },
                     {
                         numeric: 2,
                         category: 'blue',
-                        cartodb_id: 1,
                     }
                 ]
             };
-            expect(source._metadata.columns).toEqual(expected.columns);
-            expect(source._metadata.categoryIDs).toEqual(expected.categoryIDs);
-            expect(source._metadata.featureCount).toEqual(expected.featureCount);
-            expect(source._metadata.sample).toEqual(expected.sample);
+            source.requestMetadata(createVizMock(['numeric', 'category'])).then(metadata => {
+                expect(metadata.columns).toEqual(expected.columns);
+                expect(metadata.categoryIDs).toEqual(expected.categoryIDs);
+                expect(metadata.featureCount).toEqual(expected.featureCount);
+                expect(metadata.sample).toEqual(expected.sample);
+
+                done();
+            });
         });
 
         it('should throw an error if data is not valid', function () {
@@ -216,17 +207,22 @@ describe('api/source/geojson', () => {
         });
 
         describe('cartodb_id', () => {
-            it('should be auto generated and unique for a single feature', () => {
+            it('should be auto generated and unique for a single feature', done => {
                 const data = {
                     type: 'Feature',
                     geometry: { type: 'Point', coordinates: [0, 0] },
                     properties: {}
                 };
                 const source = new GeoJSON(data);
-                expect(source._features[0].properties.cartodb_id).toEqual(0);
+                source.requestMetadata(createVizMock()).then(() => {
+                    const properties = source._decodeUnboundProperties();
+                    expect(properties.cartodb_id[0]).toEqual(-0);
+                    done();
+                });
+
             });
 
-            it('should be auto generated and unique for every feature in a featureCollection', () => {
+            it('should be auto generated and unique for every feature in a featureCollection', done => {
                 const data = {
                     type: 'FeatureCollection',
                     features: [{
@@ -246,7 +242,13 @@ describe('api/source/geojson', () => {
                     }]
                 };
                 const source = new GeoJSON(data);
-                expect(source._features.map(feature => feature.properties.cartodb_id)).toEqual([0, 1, 2]);
+                source.requestMetadata(createVizMock()).then(() => {
+                    const props = source._decodeUnboundProperties();
+                    expect(props.cartodb_id[0]).toEqual(-0);
+                    expect(props.cartodb_id[1]).toEqual(-1);
+                    expect(props.cartodb_id[2]).toEqual(-2);
+                    done();
+                });
             });
 
             it('should not mutate the original data', () => {
@@ -257,17 +259,6 @@ describe('api/source/geojson', () => {
                 };
                 new GeoJSON(data);
                 expect(data.properties.cartodb_id).toBeUndefined();
-            });
-
-            it('should throw an error when feature already has a cartodb_id property ', () => {
-                const data = {
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
-                    properties: {
-                        cartodb_id: 'invalid'
-                    }
-                };
-                expect(() => new GeoJSON(data)).toThrowError('`cartodb_id` is a reserved property so it can not be used');
             });
         });
     });
@@ -290,4 +281,5 @@ describe('api/source/geojson', () => {
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();
     });
+
 });
