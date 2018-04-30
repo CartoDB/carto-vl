@@ -133,11 +133,11 @@ describe('src/core/dataframe', () => {
                 }
             });
             const viz = {
-                getWidth: () => ({
+                strokeWidth: {
                     eval: () => {
                         return 1;
                     }
-                })
+                }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
