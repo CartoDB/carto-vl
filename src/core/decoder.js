@@ -52,7 +52,7 @@ function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    let clipIndex = 0;
+    // let clipIndex = 0;
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
@@ -70,7 +70,7 @@ function decodePolygon(geometry) {
                     // TODO performance
                     // if (polygon.clipped[clipIndex] == i && polygon.clipped[clipIndex + 1] == i + 2) {
                     if (polygon.clipped.includes(i) && (polygon.clipped.includes(i + 2) || (i + 2 == polygon.flat.length && polygon.clipped.includes(0)))) {
-                        clipIndex += 2;
+                        // clipIndex += 2;
                         continue;
                     }
                     if (polygon.holes.includes((i + 2) / 2)) {

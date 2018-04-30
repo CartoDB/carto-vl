@@ -435,11 +435,11 @@ export default class Windshaft {
                 let x = geom[j][k].x;
                 let y = geom[j][k].y;
 
-                let prevIndex = k > 0 ? k - 1 : geom[j].length - 1;
-                const p0x = geom[j][prevIndex].x;
-                const p0y = geom[j][prevIndex].y;
-                let dirx = x - p0x;
-                let diry = y - p0y;
+                // let prevIndex = k > 0 ? k - 1 : geom[j].length - 1;
+                // const p0x = geom[j][prevIndex].x;
+                // const p0y = geom[j][prevIndex].y;
+                // let dirx = x - p0x;
+                // let diry = y - p0y;
                 if (x > mvt_extent) {
                     // console.log(x);
                     // x = mvt_extent + 16;
