@@ -41,20 +41,63 @@ function decodePoint(vertices) {
 
 function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
+    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertices.push(polygon.flat[2 * index]);
-                vertices.push(polygon.flat[2 * index + 1]);
+                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
+                normals.push(0, 0);
             });
+
+            {
+                const lineString = polygon.flat;
+                // TODO use polygon holes
+                for (let i = 0; i < lineString.length - 2; i += 2) {
+                    const a = [lineString[i + 0], lineString[i + 1]];
+                    const b = [lineString[i + 2], lineString[i + 3]];
+                    const normal = getLineNormal(b, a);
+                    let na = normal;
+                    let nb = normal;
+
+                    if (i > 0) {
+                        const prev = [lineString[i - 2], lineString[i - 1]];
+                        na = getJointNormal(prev, a, b) || na;
+                    }
+                    if (i < lineString.length - 4) {
+                        const next = [lineString[i + 4], lineString[i + 5]];
+                        nb = getJointNormal(a, b, next) || nb;
+                    }
+
+                    // First triangle
+
+                    normals.push(-na[0], -na[1]);
+                    normals.push(na[0], na[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    vertices.push(a[0], a[1]);
+                    vertices.push(a[0], a[1]);
+                    vertices.push(b[0], b[1]);
+
+                    // Second triangle
+
+                    normals.push(na[0], na[1]);
+                    normals.push(nb[0], nb[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    vertices.push(a[0], a[1]);
+                    vertices.push(b[0], b[1]);
+                    vertices.push(b[0], b[1]);
+                }
+            }
         });
         breakpoints.push(vertices.length);
     });
     return {
         vertices: new Float32Array(vertices),
-        breakpoints
+        breakpoints,
+        normals: new Float32Array(normals)
     };
 }
 
