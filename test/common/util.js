@@ -67,8 +67,8 @@ function writeTemplate(file, template) {
         file: file,
         sources: sources,
         cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
-        mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
-        mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
+        mapboxgl: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+        mapboxglcss: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
 }
 

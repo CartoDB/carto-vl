@@ -1,6 +1,6 @@
 import * as carto from '../../../../src/';
 import { projectToWebMercator, WM_2R } from '../../../../src/api//util';
-import mapboxgl from '../../../../vendor/mapbox-gl-dev';
+import mapboxgl from '@carto/mapbox-gl';
 
 describe('Interactivity', () => {
     const mapSize = 600;
