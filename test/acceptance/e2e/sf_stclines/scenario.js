@@ -7,7 +7,7 @@ const map = new mapboxgl.Map({
 
 carto.setDefaultAuth({
     user: 'cartogl',
-    apiKey: 'YOUR_API_KEY'
+    apiKey: 'default_public'
 });
 
 const source = new carto.source.Dataset('sf_stclines');

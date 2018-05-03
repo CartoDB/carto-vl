@@ -262,7 +262,7 @@ const superRefresh = (opts) => {
         $('#dataset').val(),
         {
             user: $('#user').val(),
-            apiKey: 'YOUR_API_KEY'
+            apiKey: 'default_public'
         },
         {
             serverURL: $('#serverURL').val()
