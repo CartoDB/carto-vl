@@ -21,7 +21,18 @@ import { implicitCast } from './utils';
  * @function
  * @api
  */
-export const ViewportAvg = generateAggregattion('avg');
+export const ViewportAvg = genViewportAgg('avg',
+    self => {
+        self._sum = 0; self._count = 0;
+    },
+    (self, x) => {
+        if (!Number.isNaN(x)) {
+            self._count++;
+            self._sum += x;
+        }
+    },
+    self => self._sum / self._count
+);
 
 /**
  * Return the maximum value of the features showed in the viewport
@@ -41,7 +52,11 @@ export const ViewportAvg = generateAggregattion('avg');
  * @function
  * @api
  */
-export const ViewportMax = generateAggregattion('max');
+export const ViewportMax = genViewportAgg('max',
+    self => { self._value = Number.NEGATIVE_INFINITY; },
+    (self, y) => { self._value = y; },
+    self => self._value
+);
 
 /**
  * Return the minimum value of the features showed in the viewport
@@ -61,7 +76,10 @@ export const ViewportMax = generateAggregattion('max');
  * @function
  * @api
  */
-export const ViewportMin = generateAggregattion('min');
+export const ViewportMin = genViewportAgg('min',
+    self => { self._value = Number.POSITIVE_INFINITY; },
+    (self, y) => { self._value = Math.min(self._value, y); },
+    self => self._value);
 
 /**
  * Return the sum of the values of the features showed in the viewport
@@ -81,7 +99,10 @@ export const ViewportMin = generateAggregattion('min');
  * @function
  * @api
  */
-export const ViewportSum = generateAggregattion('sum', false, 0, (x, y) => x + y);
+export const ViewportSum = genViewportAgg('sum',
+    self => { self._value = 0; },
+    (self, y) => { self._value = self._value + y; },
+    self => self._value);
 
 /**
  * Return the count of the features showed in the viewport
@@ -101,7 +122,10 @@ export const ViewportSum = generateAggregattion('sum', false, 0, (x, y) => x + y
  * @function
  * @api
  */
-export const ViewportCount = generateAggregattion('count');
+export const ViewportCount = genViewportAgg('count',
+    self => { self._value = 0; },
+    self => { self._value++; },
+    self => self._value);
 
 /**
  * Return the percentile of the features showed in the viewport
@@ -123,6 +147,60 @@ export const ViewportCount = generateAggregattion('count');
  */
 export const ViewportPercentile = generatePercentile();
 
+function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
+    return class ViewportAggregation extends BaseExpression {
+        /**
+         * @param {*} property
+         */
+        constructor(property) {
+            super({ value: number(0) });
+            this.property = implicitCast(property);
+            this._isViewport = true;
+        }
+        eval() {
+            return this.value.expr;
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            // TODO improve type check
+            this.property._compile(metadata);
+            this.type = 'number';
+            super.inlineMaker = inline => inline.value;
+            if (global) {
+                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
+            }
+        }
+        _getMinimumNeededSchema() {
+            return this.property._getMinimumNeededSchema();
+        }
+        _resetViewportAgg() {
+            zeroFn(this);
+        }
+        _accumViewportAgg(feature) {
+            accumFn(this, this.property.eval(feature));
+        }
+        _preDraw(...args) {
+            this.value.expr = resolveFn(this);
+            super._preDraw(...args);
+        }
+        _getDrawMetadataRequirements() {
+            if (!global) {
+                return { columns: [this._getColumnName()] };
+            } else {
+                return { columns: [] };
+            }
+        }
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return schema.column.aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
+        }
+    };
+}
+
+
 /**
  * Return the average value of all the features
  *
@@ -141,7 +219,7 @@ export const ViewportPercentile = generatePercentile();
  * @function
  * @api
  */
-export const GlobalAvg = generateAggregattion('avg', true);
+export const GlobalAvg = generateGlobalAggregattion('avg');
 
 /**
  * Return the maximum value of all the features
@@ -161,7 +239,7 @@ export const GlobalAvg = generateAggregattion('avg', true);
  * @function
  * @api
  */
-export const GlobalMax = generateAggregattion('max', true);
+export const GlobalMax = generateGlobalAggregattion('max');
 
 /**
  * Return the minimum value of all the features
@@ -181,7 +259,7 @@ export const GlobalMax = generateAggregattion('max', true);
  * @function
  * @api
  */
-export const GlobalMin = generateAggregattion('min', true);
+export const GlobalMin = generateGlobalAggregattion('min');
 
 /**
  * Return the sum of the values of all the features
@@ -201,7 +279,7 @@ export const GlobalMin = generateAggregattion('min', true);
  * @function
  * @api
  */
-export const GlobalSum = generateAggregattion('sum', true);
+export const GlobalSum = generateGlobalAggregattion('sum');
 
 /**
  * Return the count of all the features
@@ -221,7 +299,7 @@ export const GlobalSum = generateAggregattion('sum', true);
  * @function
  * @api
  */
-export const GlobalCount = generateAggregattion('count', true);
+export const GlobalCount = generateGlobalAggregattion('count');
 
 /**
  * Return the percentile of all the features
@@ -242,8 +320,7 @@ export const GlobalCount = generateAggregattion('count', true);
  * @api
  */
 export const GlobalPercentile = generatePercentile(true);
-
-function generateAggregattion(metadataPropertyName, global, zeroValue, accum) {
+function generateGlobalAggregattion(metadataPropertyName) {
     return class Aggregattion extends BaseExpression {
         /**
          * @param {*} property
@@ -261,25 +338,10 @@ function generateAggregattion(metadataPropertyName, global, zeroValue, accum) {
             this.property._compile(metadata);
             this.type = 'number';
             super.inlineMaker = inline => inline.value;
-            if (global) {
-                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
-            }
+            this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
-        }
-        _resetViewportAgg() {
-            this.value.expr = zeroValue;
-        }
-        _accumViewportAgg(feature) {
-            this.value.expr = accum(this.value.expr, this.property.eval(feature));
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
         }
         _getColumnName() {
             if (this.property.aggName) {

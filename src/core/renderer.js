@@ -154,41 +154,26 @@ class Renderer {
             zoom: 1. / this._zoom,
             columns: []
         };
-        const colorRequirements = viz.getColor()._getDrawMetadataRequirements();
-        const widthRequirements = viz.getWidth()._getDrawMetadataRequirements();
-        const strokeColorRequirements = viz.getStrokeColor()._getDrawMetadataRequirements();
-        const strokeWidthRequirements = viz.getStrokeWidth()._getDrawMetadataRequirements();
-        const filterRequirements = viz.getFilter()._getDrawMetadataRequirements();
-        const variables = Object.values(viz.variables);
-        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
-            .reduce(schema.union, schema.IDENTITY).columns;
-
-        if (requiredColumns.length == 0) {
-            return drawMetadata;
-        }
-
-        requiredColumns.forEach(column => {
-            drawMetadata.columns.push(
-                {
-                    name: column,
-                    min: Number.POSITIVE_INFINITY,
-                    max: Number.NEGATIVE_INFINITY,
-                    avg: undefined,
-                    count: 0,
-                    sum: 0,
-                    histogramBuckets: HISTOGRAM_BUCKETS,
-                    histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                    accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                }
-            );
-        });
 
         const s = 1. / this._zoom;
 
         const rootExprs = viz._getRootExpressions();
-        const numRootExpr = rootExprs.length;
-        rootExprs.forEach(expr => expr._resetViewportAgg());
+        // Performance optimization to avoid doing DFS at each feature iteration
+        const viewportExprs = [];
+        function dfs(expr) {
+            if (expr._isViewport) {
+                viewportExprs.push(expr);
+            } else {
+                expr._getChildren().map(dfs);
+            }
+        }
+        rootExprs.map(dfs);
+        const numViewportExprs = viewportExprs.length;
+        viewportExprs.forEach(expr => expr._resetViewportAgg());
 
+        if (!viewportExprs.length) {
+            return drawMetadata;
+        }
         tiles.forEach(d => {
             d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
             d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
@@ -197,67 +182,31 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = viz.getFilter()._getMinimumNeededSchema().columns;
             const propertyNames = Object.keys(d.properties);
+            const propertyNamesLength = propertyNames.length;
+            const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
                 const x = d.geom[2 * i + 0];
                 const y = d.geom[2 * i + 1];
+                // TODO polygon test
+                // TODO line test
                 if (x > minx && x < maxx && y > miny && y < maxy) {
 
-                    const f = {};
-                    propertyNames.forEach(name => {
+                    for (let j = 0; j < propertyNamesLength; j++) {
+                        const name = propertyNames[j];
                         f[name] = d.properties[name][i];
-                    });
-
-                    if (viz.getFilter()) {
-                        if (viz.getFilter().eval(f) < 0.5) {
-                            continue;
-                        }
                     }
 
-                    for (let i = 0; i < numRootExpr; i++) {
-                        const expr = rootExprs[i];
+                    if (viz.filter.eval(f) < 0.5) {
+                        continue;
+                    }
+
+                    for (let j = 0; j < numViewportExprs; j++) {
+                        const expr = viewportExprs[j];
                         expr._accumViewportAgg(f);
                     }
                 }
-            }
-        });
-        return drawMetadata;
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            metaColumn.avg = metaColumn.sum / metaColumn.count;
-        });
-        tiles.forEach(d => {
-            requiredColumns.forEach(column => {
-                const values = d.properties[column];
-                const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const vmin = metaColumn.min;
-                const vmax = metaColumn.max;
-                const vdiff = vmax - vmin;
-                for (let i = 0; i < d.numFeatures; i++) {
-                    const x = d.geom[2 * i + 0];
-                    const y = d.geom[2 * i + 1];
-                    if (x > minx && x < maxx && y > miny && y < maxy) {
-                        const v = values[i];
-                        if (!Number.isFinite(v)) {
-                            continue;
-                        }
-                        metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
-                    }
-                }
-            });
-        });
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            for (let i = 1; i < metaColumn.histogramBuckets; i++) {
-                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
             }
         });
         return drawMetadata;

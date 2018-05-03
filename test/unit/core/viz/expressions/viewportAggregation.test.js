@@ -58,47 +58,43 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
         });
     });
 
-    describe('viewport filtering', () => {
+    fdescribe('viewport filtering', () => {
         let fakeGl = jasmine.createSpyObj('fakeGl', ['uniform1f']);
-        const fakeDrawMetadata = {
-            columns: [{
-                type: 'number',
-                name: 'price',
-                min: 0,
-                avg: 1,
-                max: 2,
-                sum: 3,
-                count: 4,
-
-            }]
-        };
+        function fakeDrawMetadata(expr) {
+            expr._resetViewportAgg({ price: 0 });
+            expr._accumViewportAgg({ price: 0 });
+            expr._accumViewportAgg({ price: 0.5 });
+            expr._accumViewportAgg({ price: 1.5 });
+            expr._accumViewportAgg({ price: 2 });
+            expr._preDraw(null, null, fakeGl);
+        }
         it('viewportMin($price) should return the metadata min', () => {
             const viewportMin = s.viewportMin($price);
-            viewportMin._preDraw(null, fakeDrawMetadata, fakeGl);
+            fakeDrawMetadata(viewportMin);
             expect(viewportMin.eval()).toEqual(0);
         });
 
         it('viewportAvg($price) should return the metadata avg', () => {
             const viewportAvg = s.viewportAvg($price);
-            viewportAvg._updateDrawMetadata(fakeDrawMetadata);
+            fakeDrawMetadata(viewportAvg);
             expect(viewportAvg.eval()).toEqual(1);
         });
 
         it('viewportMax($price) should return the metadata max', () => {
             const viewportMax = s.viewportMax($price);
-            viewportMax._updateDrawMetadata(fakeDrawMetadata);
+            fakeDrawMetadata(viewportMax);
             expect(viewportMax.eval()).toEqual(2);
         });
 
         it('viewportSum($price) should return the metadata sum', () => {
             const viewportSum = s.viewportSum($price);
-            viewportSum._updateDrawMetadata(fakeDrawMetadata);
-            expect(viewportSum.eval()).toEqual(3);
+            fakeDrawMetadata(viewportSum);
+            expect(viewportSum.eval()).toEqual(4);
         });
 
         it('viewportCount($price) should return the metadata count', () => {
             const viewportCount = s.viewportCount($price);
-            viewportCount._updateDrawMetadata(fakeDrawMetadata);
+            fakeDrawMetadata(viewportCount);
             expect(viewportCount.eval()).toEqual(4);
         });
 

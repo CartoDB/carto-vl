@@ -99,10 +99,10 @@ export default class Base {
     }
 
     _resetViewportAgg(){
-        return this._getChildren().map(child => child._resetViewportAgg());
+        this._getChildren().forEach(child => child._resetViewportAgg());
     }
     _accumViewportAgg(f){
-        return this._getChildren().map(child => child._accumViewportAgg(f));
+        this._getChildren().forEach(child => child._accumViewportAgg(f));
     }
 
     _getDrawMetadataRequirements() {
