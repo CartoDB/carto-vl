@@ -1,4 +1,4 @@
-import { number, category, customPalette } from '../functions';
+import { number, category } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -9,8 +9,6 @@ export function implicitCast(value) {
         return number(value);
     } else if (typeof value == 'string') {
         return category(value);
-    } else if (Array.isArray(value)) {
-        return customPalette(...value);
     }
     return value;
 }

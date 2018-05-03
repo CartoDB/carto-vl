@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import { customPalette } from '../functions';
 
 /**
 * Create a color ramp based on input expression.
@@ -32,7 +33,9 @@ import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 export default class Ramp extends BaseExpression {
     constructor(input, palette) {
         input = implicitCast(input);
-        palette = implicitCast(palette);
+        if (Array.isArray(palette)) {
+            palette = customPalette(palette);
+        }
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
