@@ -63,35 +63,45 @@ function decodePolygon(geometry) {
 
             {
                 const lineString = polygon.flat;
+                let ringInit = 0;
                 polygon.clipped = polygon.clipped || [];
                 for (let i = 0; i < lineString.length - 2; i += 2) {
-                    // TODO polygon holes must be taken into account for prev/next computation
-
                     // TODO performance
-                    // if (polygon.clipped[clipIndex] == i && polygon.clipped[clipIndex + 1] == i + 2) {
-                    if (polygon.clipped.includes(i) && (polygon.clipped.includes(i + 2) || (i + 2 == polygon.flat.length && polygon.clipped.includes(0)))) {
-                        // clipIndex += 2;
-                        continue;
-                    }
-                    if (polygon.holes.includes((i + 2) / 2)) {
-                        continue;
+                    if (polygon.clipped.includes(i) &&
+                        (polygon.holes.includes((i + 2) / 2) ?
+                            polygon.clipped.includes(ringInit / 2)
+                            :
+                            polygon.clipped.includes(i + 2)
+                        )
+                    ) {
+                        const a = polygon.clippedType[polygon.clipped.indexOf(i)];
+                        const b = polygon.clippedType[
+                            (polygon.holes.includes((i + 2) / 2) ?
+                                polygon.clipped.indexOf(ringInit / 2)
+                                :
+                                polygon.clipped.indexOf(i + 2)
+                            )
+
+                        ];
+
+                        // Clipping must be on the same half-plane to skip the line segment
+                        if (a & b) {
+                            if (polygon.holes.includes((i + 2) / 2)) {
+                                ringInit = i + 2;
+                            }
+                            continue;
+                        }
                     }
                     const a = [lineString[i + 0], lineString[i + 1]];
-                    const b = [lineString[i + 2], lineString[i + 3]];
+                    let b = [lineString[i + 2], lineString[i + 3]];
+                    if (polygon.holes.includes((i + 2) / 2)) {
+                        b = [lineString[ringInit], lineString[ringInit + 1]];
+                        ringInit = i + 2;
+                    }
                     let normal = getLineNormal(b, a);
 
                     let na = normal;
                     let nb = normal;
-
-                    // TODO adapt
-                    /*if (i > 0 && polygon.clipped[clipIndex - 1] != i - 2) {
-                        const prev = [lineString[i - 2], lineString[i - 1]];
-                        na = getJointNormal(prev, a, b) || na;
-                    }
-                    if (i < lineString.length - 4 && polygon.clipped[clipIndex] != i + 2) {
-                        const next = [lineString[i + 4], lineString[i + 5]];
-                        nb = getJointNormal(a, b, next) || nb;
-                    }*/
 
                     // First triangle
 

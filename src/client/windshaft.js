@@ -421,7 +421,8 @@ export default class Windshaft {
                 polygon = {
                     flat: [],
                     holes: [],
-                    clipped: []
+                    clipped: [],
+                    clippedType: [], // Store a bitmask of the clipped half-planes
                 };
             } else {
                 if (j == 0) {
@@ -431,54 +432,24 @@ export default class Windshaft {
             }
             for (let k = 0; k < geom[j].length; k++) {
                 // TODO should additional clipping be done here?
-                let isClipped = false;
+                let clipping = 0;
                 let x = geom[j][k].x;
                 let y = geom[j][k].y;
 
-                // let prevIndex = k > 0 ? k - 1 : geom[j].length - 1;
-                // const p0x = geom[j][prevIndex].x;
-                // const p0y = geom[j][prevIndex].y;
-                // let dirx = x - p0x;
-                // let diry = y - p0y;
                 if (x > mvt_extent) {
-                    // console.log(x);
-                    // x = mvt_extent + 16;
-                    // const lambda = (mvt_extent - p0x) / dirx;
-                    // x = mvt_extent;
-                    // y = p0y + diry * lambda;
-                    // y = clamp(y, 0, mvt_extent);
-                    // if (isNaN(y)) {
-                    //     y = p0y;
-                    // }
-                    isClipped = true;
+                    clipping = clipping | 1;
                 } else if (x < 0) {
-                    isClipped = true;
+                    clipping = clipping | 2;
 
                 }
-
                 if (y > mvt_extent) {
-                    // geom[j][k].x = mvt_extent;
-                    isClipped = true;
+                    clipping = clipping | 4;
                 } else if (y < 0) {
-                    isClipped = true;
-                    // geom[j][k].x = -mvt_extent;
+                    clipping = clipping | 8;
                 }
-                //     // geom[j][k].x = mvt_extent;
-                //     isClipped = true;
-                // } else if (geom[j][k].x < 0) {
-                //     geom[j][k].x = 0;
-                //     isClipped = true;
-                // }
-                // if (geom[j][k].y > mvt_extent) {
-                //     // geom[j][k].y = mvt_extent;
-                // isClipped = true;
-                // }
-                // else if (geom[j][k].y < 0) {
-                //     // geom[j][k].y = 0;
-                //     isClipped = true;
-                //}
-                if (isClipped) {
+                if (clipping) {
                     polygon.clipped.push(polygon.flat.length);
+                    polygon.clippedType.push(clipping);
                 }
                 polygon.flat.push(2 * x / mvt_extent - 1.);
                 polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
