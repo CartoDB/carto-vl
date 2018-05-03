@@ -30,10 +30,7 @@ import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor(input, palette, ...args) {
-        if (args.length > 0) {
-            throw new Error('ramp(input, palette) only accepts two parameters');
-        }
+    constructor(input, palette) {
         input = implicitCast(input);
         palette = implicitCast(palette);
 
