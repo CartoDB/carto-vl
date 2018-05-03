@@ -77,6 +77,18 @@ To watch the files
 yarn build:watch
 ```
 
+### Release a version
+
+```
+yarn bump
+```
+
+To publish a release to the `CDN` and `npm`
+
+```
+yarn release
+```
+
 ### Run the tests
 
 - [Unit tests](./test/unit/README.md)
