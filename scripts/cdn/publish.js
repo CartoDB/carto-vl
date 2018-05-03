@@ -66,7 +66,9 @@ function uploadFiles(version) {
     console.log('Publish', version);
     var uploader = client.uploadDir({
         localDir: 'dist',
+        deleteRemoved: true,
         s3Params: {
+            ACL: 'public-read',
             Bucket: secrets.AWS_S3_BUCKET,
             Prefix: 'carto-vl/' + version + '/'
         }
