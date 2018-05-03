@@ -1,6 +1,5 @@
 import BaseExpression from './base';
 import { number } from '../functions';
-import * as schema from '../../schema';
 import { implicitCast, clamp } from './utils';
 
 /**

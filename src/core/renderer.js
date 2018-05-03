@@ -3,8 +3,6 @@ import * as schema from './schema';
 import Dataframe from './dataframe';
 import { Asc, Desc } from './viz/functions';
 
-const HISTOGRAM_BUCKETS = 1000;
-
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
