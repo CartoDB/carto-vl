@@ -65,6 +65,9 @@ export class CustomPalette extends BaseExpression {
     // colors is a list of expression of type 'color'
     constructor(elems) {
         elems = elems || [];
+        if (!Array.isArray(elems)) {
+            elems = [elems];
+        }
         elems = elems.map(implicitCast);
         if (!elems.length) {
             throw new Error('customPalette(): invalid parameters: must receive at least one argument');

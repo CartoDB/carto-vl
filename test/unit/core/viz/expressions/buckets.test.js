@@ -17,5 +17,3 @@ describe('src/core/viz/expressions/buckets', () => {
         // TODO
     });
 });
-
-

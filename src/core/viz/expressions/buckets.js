@@ -19,7 +19,7 @@ let bucketUID = 0;
  *  const $speed = s.prop('speed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, 30, 80, 120),
+ *      s.buckets($speed, [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
@@ -40,14 +40,14 @@ let bucketUID = 0;
  *  const $procesedSpeed = s.prop('procesedSpeed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+ *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
  *      s.palettes.PRISM)
  *    )
  * });
  * ```
  *
  * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {...carto.expressions.Base} breakpoints - Numeric expression containing the different breakpoints.
+ * @param {carto.expressions.Base[]} breakpoints - Numeric expression containing the different breakpoints.
  * @return {carto.expressions.Base}
  *
  * @memberof carto.expressions
@@ -56,8 +56,12 @@ let bucketUID = 0;
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor(input, ...args) {
+    constructor(input, args) {
         input = implicitCast(input);
+        args = args || [];
+        if (!Array.isArray(args)) {
+            args = [args];
+        }
         args = args.map(implicitCast);
 
         let looseType = undefined;
