@@ -3025,7 +3025,7 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type == 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
@@ -3044,7 +3044,7 @@ class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -3063,8 +3063,8 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, 2);
 
-            if (tile.type == 'point') {
-                // Lines and polygons don't support stroke
+            if (tile.type != 'line') {
+                // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE3);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
                 gl.uniform1i(renderer.colorStrokeTexture, 3);
@@ -3078,7 +3078,7 @@ class Renderer {
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
             }
         });
@@ -5020,11 +5020,15 @@ class Tri {
     constructor(gl) {
         compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].FS);
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
         this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'strokeColorTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
     }
 }
 class Line {
@@ -5278,12 +5282,17 @@ class Dataframe {
 
     }
 
-    _getPolygonAtPosition(pos) {
+    _getPolygonAtPosition(pos, viz) {
         const p = Object(__WEBPACK_IMPORTED_MODULE_1__client_rsys__["c" /* wToR */])(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
         const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const vizWidth = viz.strokeWidth;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -5291,17 +5300,25 @@ class Dataframe {
             if (i >= breakpoints[featureIndex]) {
                 featureIndex++;
             }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(vizWidth.eval(f), 336);
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
-                x: vertices[i + 0],
-                y: vertices[i + 1]
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
             };
             const v2 = {
-                x: vertices[i + 2],
-                y: vertices[i + 3]
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
             };
             const v3 = {
-                x: vertices[i + 4],
-                y: vertices[i + 5]
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
@@ -11497,21 +11514,44 @@ precision highp float;
 
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
+attribute vec2 normal;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
+uniform vec2 normalScale;
 
 uniform sampler2D colorTex;
+uniform sampler2D strokeColorTex;
+uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
 
 varying highp vec4 color;
 
+// From [0.,1.] in exponential-like form to pixels in [0.,255.]
+float decodeWidth(float x){
+    x*=255.;
+    if (x < 64.){
+        return x*0.25;
+    }else if (x<128.){
+        return (x-64.)+16.;
+    }else{
+        return (x-127.)*2.+80.;
+    }
+}
 
 void main(void) {
-    vec4 c = texture2D(colorTex, featureID);
+    vec4 c;
+    if (normal == vec2(0.)){
+        c = texture2D(colorTex, featureID);
+    }else{
+        c = texture2D(strokeColorTex, featureID);
+    }
     float filtering = texture2D(filterTex, featureID).a;
     c.a *= filtering;
-    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
+    float size = decodeWidth(texture2D(strokeWidthTex, featureID).a);
+
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+
     if (c.a==0.){
         p.x=10000.;
     }
@@ -11765,23 +11805,99 @@ function decodePoint(vertices) {
     };
 }
 
+function clip(x) {
+    if (x > 1) {
+        return 1;
+    }
+    if (x < -1) {
+        return -1;
+    }
+    return x;
+}
 
 function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
+    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    // let clipIndex = 0;
     geometry.map(feature => {
         feature.map(polygon => {
             const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
             triangles.map(index => {
-                vertices.push(polygon.flat[2 * index]);
-                vertices.push(polygon.flat[2 * index + 1]);
+                vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
+                normals.push(0, 0);
             });
+
+            {
+                const lineString = polygon.flat;
+                let ringInit = 0;
+                polygon.clipped = polygon.clipped || [];
+                for (let i = 0; i < lineString.length - 2; i += 2) {
+                    // TODO performance
+                    if (polygon.clipped.includes(i) &&
+                        (polygon.holes.includes((i + 2) / 2) ?
+                            polygon.clipped.includes(ringInit / 2)
+                            :
+                            polygon.clipped.includes(i + 2)
+                        )
+                    ) {
+                        const a = polygon.clippedType[polygon.clipped.indexOf(i)];
+                        const b = polygon.clippedType[
+                            (polygon.holes.includes((i + 2) / 2) ?
+                                polygon.clipped.indexOf(ringInit / 2)
+                                :
+                                polygon.clipped.indexOf(i + 2)
+                            )
+
+                        ];
+
+                        // Clipping must be on the same half-plane to skip the line segment
+                        if (a & b) {
+                            if (polygon.holes.includes((i + 2) / 2)) {
+                                ringInit = i + 2;
+                            }
+                            continue;
+                        }
+                    }
+                    const a = [lineString[i + 0], lineString[i + 1]];
+                    let b = [lineString[i + 2], lineString[i + 3]];
+                    if (polygon.holes.includes((i + 2) / 2)) {
+                        b = [lineString[ringInit], lineString[ringInit + 1]];
+                        ringInit = i + 2;
+                    }
+                    let normal = getLineNormal(b, a);
+
+                    let na = normal;
+                    let nb = normal;
+
+                    // First triangle
+
+                    normals.push(-na[0], -na[1]);
+                    normals.push(na[0], na[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    vertices.push(a[0], a[1]);
+                    vertices.push(a[0], a[1]);
+                    vertices.push(b[0], b[1]);
+
+                    // Second triangle
+
+                    normals.push(na[0], na[1]);
+                    normals.push(nb[0], nb[1]);
+                    normals.push(-nb[0], -nb[1]);
+
+                    vertices.push(a[0], a[1]);
+                    vertices.push(b[0], b[1]);
+                    vertices.push(b[0], b[1]);
+                }
+            }
         });
         breakpoints.push(vertices.length);
     });
     return {
         vertices: new Float32Array(vertices),
-        breakpoints
+        breakpoints,
+        normals: new Float32Array(normals)
     };
 }
 
@@ -13173,7 +13289,7 @@ class Windshaft {
 
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 0
+                'mvt': 1
             },
             layers: [
                 {
@@ -13292,7 +13408,9 @@ class Windshaft {
                 }
                 polygon = {
                     flat: [],
-                    holes: []
+                    holes: [],
+                    clipped: [],
+                    clippedType: [], // Store a bitmask of the clipped half-planes
                 };
             } else {
                 if (j == 0) {
@@ -13301,8 +13419,28 @@ class Windshaft {
                 polygon.holes.push(polygon.flat.length / 2);
             }
             for (let k = 0; k < geom[j].length; k++) {
-                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                // TODO should additional clipping be done here?
+                let clipping = 0;
+                let x = geom[j][k].x;
+                let y = geom[j][k].y;
+
+                if (x > mvt_extent) {
+                    clipping = clipping | 1;
+                } else if (x < 0) {
+                    clipping = clipping | 2;
+
+                }
+                if (y > mvt_extent) {
+                    clipping = clipping | 4;
+                } else if (y < 0) {
+                    clipping = clipping | 8;
+                }
+                if (clipping) {
+                    polygon.clipped.push(polygon.flat.length);
+                    polygon.clippedType.push(clipping);
+                }
+                polygon.flat.push(2 * x / mvt_extent - 1.);
+                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
             }
         }
         //if current polygon is not empty=> push it
