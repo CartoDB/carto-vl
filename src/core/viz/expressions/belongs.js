@@ -74,6 +74,9 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             checkExpression(name, 'value', 0, value);
 
             categories = categories || [];
+            if (!Array.isArray(categories)) {
+                categories = [categories];
+            }
             categories = categories.map(implicitCast);
 
             checkLooseType(name, 'value', 0, 'category', value);
