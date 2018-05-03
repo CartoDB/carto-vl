@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { number } from '../functions';
 import * as schema from '../../schema';
-import { implicitCast } from './utils';
+import { implicitCast, clamp } from './utils';
 
 /**
  * Return the average value of the features showed in the viewport
@@ -127,25 +127,7 @@ export const ViewportCount = genViewportAgg('count',
     self => { self._value++; },
     self => self._value);
 
-/**
- * Return the percentile of the features showed in the viewport
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz({
- *   @v_percentile: s.viewportPercentile($amount)
- * });
- *
- * @memberof carto.expressions
- * @name viewportPercentile
- * @function
- * @api
- */
-export const ViewportPercentile = generatePercentile();
+
 
 function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
     return class ViewportAggregation extends BaseExpression {
@@ -153,12 +135,14 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
          * @param {*} property
          */
         constructor(property) {
-            super({ value: number(0) });
-            this.property = implicitCast(property);
+            super({
+                property: implicitCast(property),
+                value: number(0)
+            });
             this._isViewport = true;
         }
         eval() {
-            return this.value.expr;
+            return resolveFn(this);
         }
         _compile(metadata) {
             super._compile(metadata);
@@ -177,72 +161,72 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             accumFn(this, this.property.eval(feature));
         }
         _preDraw(...args) {
-            this.value.expr = resolveFn(this);
+            this.value.expr = this.eval();
             super._preDraw(...args);
-        }
-        _getDrawMetadataRequirements() {
-            return { columns: [this._getColumnName()] };
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
         }
     };
 }
 
-function generatePercentile() {
-    return class Percentile extends BaseExpression {
-        /**
-         * @param {*} property
-         */
-        constructor(property, percentile) {
-            if (!Number.isFinite(percentile)) {
-                throw new Error('Percentile must be a fixed literal number');
-            }
-            super({ value: number(0) });
-            // TODO improve type check
-            this.property = property;
-            this.percentile = percentile;
+/**
+ * Return the percentile of the features showed in the viewport
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example
+ * const s = carto.expressions;
+ * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   @v_percentile: s.viewportPercentile($amount)
+ * });
+ *
+ * @memberof carto.expressions
+ * @name viewportPercentile
+ * @function
+ * @api
+ */
+export class ViewportPercentile extends BaseExpression {
+    /**
+     * @param {*} property
+     */
+    constructor(property, percentile) {
+        super({
+            property: implicitCast(property),
+            percentile: implicitCast(percentile),
+            impostor: number(0)
+        });
+        this._isViewport = true;
+    }
+    eval(f) {
+        if (this._value == null) {
+            this._array.sort((a, b) => a - b);
+            const index = clamp(
+                Math.floor(this.percentile.eval(f) / 100 * this._array.length),
+                0, this._array.length - 1);
+            this._value = this._array[index];
         }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            return { columns: [this._getColumnName()] };
-        }
-        _preDraw(program, drawMetadata, gl) {
-            // TODO use _updateDrawMetadata
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name === name);
-            const total = column.accumHistogram[column.histogramBuckets - 1];
-            // TODO OPT: this could be faster with binary search
-            for (var i = 0; i < column.histogramBuckets; i++) {
-                if (column.accumHistogram[i] >= this.percentile / 100 * total) {
-                    break;
-                }
-            }
-            const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
-            this.value.expr = br;
-            this.value._preDraw(program, drawMetadata, gl);
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
+        return this._value;
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
+    }
+    _getMinimumNeededSchema() {
+        return this.property._getMinimumNeededSchema();
+    }
+    _resetViewportAgg() {
+        this._value = null;
+        this._array = [];
+    }
+    _accumViewportAgg(feature) {
+        const v = this.property.eval(feature);
+        this._array.push(v);
+    }
+    _preDraw(...args) {
+        this.impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
 }

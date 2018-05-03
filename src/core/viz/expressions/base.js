@@ -105,11 +105,6 @@ export default class Base {
         this._getChildren().forEach(child => child._accumViewportAgg(f));
     }
 
-    _getDrawMetadataRequirements() {
-        // Depth First Search => reduce using union
-        return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(schema.union, schema.IDENTITY);
-    }
-
     /**
      * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
      * @param {number} timestamp

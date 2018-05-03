@@ -59,14 +59,12 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
     });
 
     describe('viewport filtering', () => {
-        let fakeGl = jasmine.createSpyObj('fakeGl', ['uniform1f']);
         function fakeDrawMetadata(expr) {
-            expr._resetViewportAgg({ price: 0 });
+            expr._resetViewportAgg();
             expr._accumViewportAgg({ price: 0 });
             expr._accumViewportAgg({ price: 0.5 });
             expr._accumViewportAgg({ price: 1.5 });
             expr._accumViewportAgg({ price: 2 });
-            expr._preDraw(null, null, fakeGl);
         }
         it('viewportMin($price) should return the metadata min', () => {
             const viewportMin = s.viewportMin($price);
@@ -99,14 +97,39 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
         });
 
         it('viewportPercentile($price) should return the metadata count', () => {
-            fakeDrawMetadata.columns[0].accumHistogram = [];
-            fakeDrawMetadata.columns[0].histogramBuckets = 1000;
-            for (let i = 0; i < 1000; i++) {
-                fakeDrawMetadata.columns[0].accumHistogram[i] = i + 1;
-            }
-            const viewportPercentile = s.viewportPercentile($price, 30);
-            viewportPercentile._preDraw(null, fakeDrawMetadata, fakeGl);
-            expect(viewportPercentile.eval()).toBeCloseTo(0.3 * (fakeDrawMetadata.columns[0].max - fakeDrawMetadata.columns[0].min) + fakeDrawMetadata.columns[0].min, 2);
+            let viewportPercentile;
+
+            viewportPercentile = s.viewportPercentile($price, 0);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(0);
+
+            viewportPercentile = s.viewportPercentile($price, 24);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(0);
+            viewportPercentile = s.viewportPercentile($price, 26);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(0.5);
+
+
+            viewportPercentile = s.viewportPercentile($price, 49);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(0.5);
+            viewportPercentile = s.viewportPercentile($price, 51);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(1.5);
+
+
+            viewportPercentile = s.viewportPercentile($price, 74);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(1.5);
+            viewportPercentile = s.viewportPercentile($price, 76);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(2);
+
+            viewportPercentile= s.viewportPercentile($price, 100);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.eval()).toEqual(2);
+
         });
     });
 });

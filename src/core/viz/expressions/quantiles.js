@@ -89,9 +89,6 @@ function genQuantiles(global) {
                 });
             }
         }
-        _getDrawMetadataRequirements() {
-            return { columns: [this._getColumnName()] };
-        }
         _applyToShaderSource(getGLSLforProperty) {
             const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
             let childInlines = {};
