@@ -58,7 +58,7 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
         });
     });
 
-    fdescribe('viewport filtering', () => {
+    describe('viewport filtering', () => {
         let fakeGl = jasmine.createSpyObj('fakeGl', ['uniform1f']);
         function fakeDrawMetadata(expr) {
             expr._resetViewportAgg({ price: 0 });
