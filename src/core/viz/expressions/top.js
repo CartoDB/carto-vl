@@ -7,11 +7,16 @@ import BaseExpression from './base';
  * @param {number} n - Number of top properties to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
  * });
+ *
+ * @example <caption>Use top 3 categories to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(top($category, 3), VIVID)
+ * `);
  *
  * @memberof carto.expressions
  * @name top

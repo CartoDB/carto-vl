@@ -12,19 +12,27 @@ const DEFAULT_FADE = 0.15;
  * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
  * @return {carto.expressions.Base}
  *
- * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
+ * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds.</caption>
  * const s = carto.expressions;
- * const $day = s.prop('day');
- * new carto.Viz({
- *   filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, 0.3))
  * });
  *
- * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
+ * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.1, 0.3))
+ * `);
+ *
+ * @example<caption>Fade in and fade out of 0.5 seconds.</caption>
  * const s = carto.expressions;
- * const $day = s.prop('day');
- * new carto.Viz({
- *   filter: s.torque($day, 40, s.fade(0.5))
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.5))
  * });
+ *
+ * @example<caption>Fade in and fade out of 0.5 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.5))
+ * `);
  *
  * @memberof carto.expressions
  * @name fade
@@ -65,17 +73,19 @@ export class Fade extends BaseExpression {
  * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {carto.expressions.Base}
  *
- *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque($day, 40, fade(0.1, 0.3))`);
+ *   filter: torque($day, 40, fade(0.1, 0.3))
+ * `);
  *
- * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`
- *   width:    2
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
+ *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
+ * `);
  *
  * @memberof carto.expressions
  * @name torque

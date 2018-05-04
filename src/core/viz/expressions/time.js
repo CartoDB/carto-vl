@@ -6,11 +6,16 @@ import BaseExpression from './base';
  * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Filter by a date between dates.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.between(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')
  * });
+ *
+ * @example <caption>Filter by a date between dates. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: time('2022-03-09T00:00:00Z') < $date < time('2033-08-12T00:00:00Z')
+ * `);
  *
  * @memberof carto.expressions
  * @name time
