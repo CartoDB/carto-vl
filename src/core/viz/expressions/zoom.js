@@ -6,12 +6,17 @@ import { number } from '../functions';
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Show constant width in zoom.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.div(s.zoom(), 1000)
  * });
  *
+ * @example <caption>Show constant width in zoom. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: zoom() / 1000
+ * `);
+ * 
  * @memberof carto.expressions
  * @name zoom
  * @function
