@@ -12,7 +12,16 @@ export const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.namedColor('blue');
+ *   color: s.namedColor('blue')  // Equivalent to `color: 'blue'`
+ * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz({
+ *   color: blue
+ * });
+ *
+ * const viz = new carto.Viz({
+ *   color: namedColor('blue')
  * });
  *
  * @memberof carto.expressions

@@ -13,6 +13,15 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  *   color: s.hex('#00F');  // Equivalent to `color: '#00F'`
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: #00F
+ * `);
+ *
+ * const viz = new carto.Viz(`
+ *   color: hex('#00F')
+ * `);
+ *
  * @memberof carto.expressions
  * @name hex
  * @function
