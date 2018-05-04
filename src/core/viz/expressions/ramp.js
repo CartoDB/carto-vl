@@ -13,17 +13,16 @@ import { customPalette } from '../functions';
 * @param {carto.expressions.palettes} palette - The color palette that is going to be used
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property. (We assume category has discrete values) </caption>
+* @example <caption>Display points with a different color depending on the `category` property. (We assume category has discrete values).</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.prop('category'), s.palettes.PRISM),
+*   color: s.ramp(s.prop('category'), s.palettes.PRISM)
 * });
 *
-* @example <caption> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</caption>
-* const s = carto.expressions;
-* const viz = new carto.Viz({
-*   color: s.ramp(s.prop('speed'), s.palettes.PRISM),
-* });
+* @example <caption>Display points with a different color depending on the `category` property. (We assume category has discrete values). (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp($category, PRISM)
+* `);
 *
 * @memberof carto.expressions
 * @name ramp
