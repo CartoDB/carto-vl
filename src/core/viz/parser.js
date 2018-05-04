@@ -25,7 +25,7 @@ export function parseVizExpression(str) {
 
 export function parseVizDefinition(str) {
     prepareJsep();
-    const ast = jsep(str);
+    const ast = jsep(cleanComments(str));
     let vizSpec = { variables: {} };
     if (ast.type == 'Compound') {
         ast.body.map(node => parseVizNamedExpr(vizSpec, node));
@@ -178,4 +178,13 @@ function cleanJsep() {
     jsep.removeIdentifierChar('#');
     jsep.addLiteral('true');
     jsep.addLiteral('false');
+}
+
+/**
+ * Remove comments from string
+ * - // one line comments
+ */
+function cleanComments(str) {
+    return str
+        .replace(/\/\/.*/g, '');
 }
