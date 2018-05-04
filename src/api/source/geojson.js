@@ -56,8 +56,8 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _clone() {
-        return new GeoJSON(this._data);
+    getGeomType() {
+        return this._getDataframeType(this._type);
     }
 
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -93,6 +93,10 @@ export default class GeoJSON extends Base {
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
+    }
+
+    _clone() {
+        return new GeoJSON(this._data);
     }
 
     _checkData(data) {

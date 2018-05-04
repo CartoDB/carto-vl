@@ -57,6 +57,7 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this.isLoaded = false;
+        this.geomType = '';
 
         this.update(source, viz);
     }
@@ -120,6 +121,7 @@ export default class Layer {
 
         // Everything was ok => commit changes
         this.metadata = metadata;
+        this.geomType = source.getGeomType();
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {

@@ -47,6 +47,7 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+        this.geomType = '';
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
