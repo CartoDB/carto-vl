@@ -182,9 +182,11 @@ function cleanJsep() {
 
 /**
  * Remove comments from string
- * - // one line comments
- */
+ * - // one-line comments
+ * - /* multi-line
+ *     comments */
 function cleanComments(str) {
     return str
-        .replace(/\/\/.*/g, '');
+        .replace(/\/\/.*/g, '')
+        .replace(/\/\*(\*(?!\/)|[^*])*\*\//g, '');
 }
