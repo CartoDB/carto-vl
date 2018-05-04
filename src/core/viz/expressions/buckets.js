@@ -13,7 +13,6 @@ let bucketUID = 0;
  *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
  *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
  *
- *
  * ```javascript
  *  const s = carto.expressions;
  *  const $speed = s.prop('speed');
@@ -23,6 +22,12 @@ let bucketUID = 0;
  *      s.palettes.PRISM
  *    )
  * });
+ * ```
+ *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+ * `);
  * ```
  *
  * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
@@ -44,6 +49,12 @@ let bucketUID = 0;
  *      s.palettes.PRISM)
  *    )
  * });
+ * ```
+ *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
  * ```
  *
  * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
