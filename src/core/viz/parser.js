@@ -185,7 +185,7 @@ function cleanJsep() {
  * - // one-line comments
  * - /* multi-line
  *     comments */
-function cleanComments(str) {
+export function cleanComments(str) {
     return str
         .replace(/\/\/.*/g, '')
         .replace(/\/\*(\*(?!\/)|[^*])*\*\//g, '');
