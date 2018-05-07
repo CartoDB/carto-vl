@@ -8,13 +8,13 @@ import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
-const DEFAULT_RESOLUTION = () => 1;
-const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = () => s.number(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.number(0);
+const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgba(0, 255, 0, 0.5));
+const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(5));
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgba(0, 255, 0, 0.5));
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
+const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
 const MAX_RESOLUTION = 256;
@@ -67,10 +67,7 @@ export default class Viz {
         this.updated = true;
         this._changeCallback = null;
 
-        this._getRootExpressions().forEach(expr => {
-            expr.parent = this;
-            expr.notify = this._changed.bind(this);
-        });
+        this._updateRootExpressions();
 
         Object.keys(this.variables).map(varName => {
             this['__cartovl_variable_' + varName] = this.variables[varName];
@@ -90,6 +87,13 @@ export default class Viz {
             this.filter,
             ...Object.values(this.variables)
         ];
+    }
+
+    _updateRootExpressions() {
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
     }
 
     /**
@@ -226,6 +230,50 @@ export default class Viz {
         });
     }
 
+    setDefaultsIfRequired(geomType) {
+        let defaults = this._getDefaultGeomStyle(geomType);
+        if (this.color.default) {
+            this.color = defaults.COLOR_EXPRESSION();
+        }
+        if (this.width.default) {
+            this.width = defaults.WIDTH_EXPRESSION();
+        }
+        if (this.strokeColor.default) {
+            this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
+        }
+        if (this.strokeWidth.default) {
+            this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
+        }
+        this._updateRootExpressions();
+    }
+
+    _getDefaultGeomStyle(geomType) {
+        if (geomType === 'point') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(7)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
+            };
+        }
+        if (geomType === 'line') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
+            };
+        }
+        if (geomType === 'polygon') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
+            };
+        }
+        return {};
+    }
 
     _resolveAliases() {
         [
@@ -362,7 +410,6 @@ export default class Viz {
      * @return {VizSpec}
      */
     _setDefaults(vizSpec) {
-        vizSpec.resolution = util.isUndefined(vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
         vizSpec.color = vizSpec.color || DEFAULT_COLOR_EXPRESSION();
         vizSpec.width = vizSpec.width || DEFAULT_WIDTH_EXPRESSION();
         vizSpec.strokeColor = vizSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
@@ -370,6 +417,7 @@ export default class Viz {
         vizSpec.order = vizSpec.order || DEFAULT_ORDER_EXPRESSION();
         vizSpec.filter = vizSpec.filter || DEFAULT_FILTER_EXPRESSION();
         vizSpec.variables = vizSpec.variables || {};
+        vizSpec.resolution = util.isUndefined(vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
         return vizSpec;
     }
 
@@ -427,4 +475,13 @@ export default class Viz {
             }
         }
     }
+}
+
+/**
+ * Mark default expressions to apply the style defaults for each
+ * geometry (point, line, polygon) when available.
+ */
+function _markDefault(expression) {
+    expression.default = true;
+    return expression;
 }
