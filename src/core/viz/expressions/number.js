@@ -15,11 +15,7 @@ import { checkNumber } from './utils';
  *
  * @example <caption>Creating a number expression. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: 15
- * `);
- *
- * const viz = new carto.Viz(`
- *   width: number(15)
+ *   width: 15  // Equivalent to number(15)
  * `);
  *
  * @memberof carto.expressions

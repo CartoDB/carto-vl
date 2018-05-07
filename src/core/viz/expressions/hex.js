@@ -15,11 +15,7 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  *
  * @example <caption>Display blue points. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: #00F
- * `);
- *
- * const viz = new carto.Viz(`
- *   color: hex('#00F')
+ *   color: #00F  // Equivalent to hex('#00F')
  * `);
  *
  * @memberof carto.expressions

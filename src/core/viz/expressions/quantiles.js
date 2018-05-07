@@ -7,7 +7,7 @@ import * as schema from '../../schema';
 let quantilesUID = 0;
 
 /**
- * Generate quantiles of size `n` from the features on the viewport
+ * Generate quantiles of size `n` from the features on the viewport.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
@@ -32,7 +32,7 @@ let quantilesUID = 0;
 export const Quantiles = genQuantiles(false);
 
 /**
- * Generate quantiles of size `n` from all the features
+ * Generate quantiles of size `n` from all the features.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned

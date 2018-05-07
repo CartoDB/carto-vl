@@ -3,7 +3,7 @@ import { number } from '../functions';
 import * as schema from '../../schema';
 
 /**
- * Return the average value of the features showed in the viewport
+ * Return the average value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -29,7 +29,7 @@ import * as schema from '../../schema';
 export const ViewportAvg = generateAggregattion('avg');
 
 /**
- * Return the maximum value of the features showed in the viewport
+ * Return the maximum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -55,7 +55,7 @@ export const ViewportAvg = generateAggregattion('avg');
 export const ViewportMax = generateAggregattion('max');
 
 /**
- * Return the minimum value of the features showed in the viewport
+ * Return the minimum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -81,7 +81,7 @@ export const ViewportMax = generateAggregattion('max');
 export const ViewportMin = generateAggregattion('min');
 
 /**
- * Return the sum of the values of the features showed in the viewport
+ * Return the sum of the values of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -107,7 +107,7 @@ export const ViewportMin = generateAggregattion('min');
 export const ViewportSum = generateAggregattion('sum');
 
 /**
- * Return the count of the features showed in the viewport
+ * Return the count of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -133,7 +133,7 @@ export const ViewportSum = generateAggregattion('sum');
 export const ViewportCount = generateAggregattion('count');
 
 /**
- * Return the percentile of the features showed in the viewport
+ * Return the percentile of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -159,7 +159,7 @@ export const ViewportCount = generateAggregattion('count');
 export const ViewportPercentile = generatePercentile();
 
 /**
- * Return the average value of all the features
+ * Return the average value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -185,7 +185,7 @@ export const ViewportPercentile = generatePercentile();
 export const GlobalAvg = generateAggregattion('avg', true);
 
 /**
- * Return the maximum value of all the features
+ * Return the maximum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -211,7 +211,7 @@ export const GlobalAvg = generateAggregattion('avg', true);
 export const GlobalMax = generateAggregattion('max', true);
 
 /**
- * Return the minimum value of all the features
+ * Return the minimum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -237,7 +237,7 @@ export const GlobalMax = generateAggregattion('max', true);
 export const GlobalMin = generateAggregattion('min', true);
 
 /**
- * Return the sum of the values of all the features
+ * Return the sum of the values of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -263,7 +263,7 @@ export const GlobalMin = generateAggregattion('min', true);
 export const GlobalSum = generateAggregattion('sum', true);
 
 /**
- * Return the count of all the features
+ * Return the count of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
@@ -289,7 +289,7 @@ export const GlobalSum = generateAggregattion('sum', true);
 export const GlobalCount = generateAggregattion('count', true);
 
 /**
- * Return the percentile of all the features
+ * Return the percentile of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation

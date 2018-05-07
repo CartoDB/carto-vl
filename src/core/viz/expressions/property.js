@@ -18,11 +18,11 @@ import { checkString } from './utils';
  *
  * @example <caption>Display only cities with name different from "London". (String)</caption>
  * const viz = new carto.Viz(`
- *  filter: neq(prop('name'), 'london')
+ *   filter: neq(prop('name'), 'london')
  * `);
  *
  * const viz = new carto.Viz(`
- *  filter: $name != 'london'
+ *   filter: $name != 'london'
  * `);
  *
  * @memberof carto.expressions

@@ -6,7 +6,7 @@ import Property from './property';
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create an animated FadeIn/FadeOut configuration
+ * Create an animated FadeIn/FadeOut configuration.
  *
  * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
  * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
@@ -62,7 +62,7 @@ export class Fade extends BaseExpression {
 }
 
 /**
- * Create an animated temporal filter (torque)
+ * Create an animated temporal filter (torque).
  *
  * @param {carto.expressions.Base} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,

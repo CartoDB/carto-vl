@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 
 /**
- * Get the top `n` properties
+ * Get the top `n` properties.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @param {number} n - Number of top properties to be returned

@@ -5,7 +5,7 @@ import { checkInstance, checkType } from './utils';
 
 /**
  * Aggregate using the average value. This operation disables the access to the property
- * except within other cluster aggregate functions
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
@@ -30,7 +30,7 @@ export const ClusterAvg = genAggregationOp('avg', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
- * except within other cluster aggregate functions
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
@@ -55,7 +55,7 @@ export const ClusterMax = genAggregationOp('max', 'number');
 
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
- * except within other cluster aggregate functions
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
@@ -80,7 +80,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
 
 /**
  * Aggregate using the mode value. This operation disables the access to the property
- * except within other cluster aggregate functions
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Property} Aggregated column
@@ -105,7 +105,7 @@ export const ClusterMode = genAggregationOp('mode', 'category');
 
 /**
  * Aggregate using the sum value. This operation disables the access to the property
- * except within other cluster aggregate functions
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column

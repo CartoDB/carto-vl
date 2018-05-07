@@ -2,7 +2,7 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 import BaseExpression from './base';
 
 /**
- * Compute the natural logarithm (base e) of a number x
+ * Compute the natural logarithm (base e) of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the natural logarithm
  * @return {carto.expressions.Base}
@@ -26,7 +26,7 @@ import BaseExpression from './base';
 export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 
 /**
- * Compute the square root of a number x
+ * Compute the square root of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the square root
  * @return {carto.expressions.Base}
@@ -50,7 +50,7 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 
 /**
- * Compute the sine of a number x
+ * Compute the sine of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the sine in radians
  * @return {carto.expressions.Base}
@@ -74,7 +74,7 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 
 /**
- * Compute the cosine of a number x
+ * Compute the cosine of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the cosine in radians
  * @return {carto.expressions.Base}
@@ -98,7 +98,7 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 
 /**
- * Compute the tangent of a number x
+ * Compute the tangent of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the tangent in radians
  * @return {carto.expressions.Base}
@@ -123,8 +123,8 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 
 /**
  * Compute the sign of a number x, indicating whether the number is positive, negative or zero
- * This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
- * -0 if the number is -0.
+ * This means this function will return 1 if the number is positive, -1 if the number is negative
+ * 0 if the number is 0 and -0 if the number is -0.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the sign
  * @return {carto.expressions.Base}

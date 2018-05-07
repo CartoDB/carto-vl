@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
- * Loads a variable aliased expresion by the name
+ * Loads a variable aliased expresion by the name.
  *
  * @param {string} name - The variable name that is going to be evaluated
  * @return {carto.expressions.Base}
