@@ -56,10 +56,6 @@ export default class GeoJSON extends Base {
         }
     }
 
-    getGeomType() {
-        return this._getDataframeType(this._type);
-    }
-
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
@@ -143,6 +139,13 @@ export default class GeoJSON extends Base {
         });
 
         this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample);
+
+        if (featureCount > 0) {
+            // Set the geomType of the first feature to the metadata
+            let geomType = this._getDataframeType(this._features[0].geometry.type);
+            this._metadata.setGeomType(geomType);
+        }
+
         return this._metadata;
     }
 

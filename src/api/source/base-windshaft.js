@@ -23,10 +23,6 @@ export default class BaseWindshaft extends Base {
         this._serverURL = this._generateURL(this._auth, this._config);
     }
 
-    getGeomType() {
-        return this._client.geomType;
-    }
-
     bindLayer(...args) {
         this._client._bindLayer(...args);
     }

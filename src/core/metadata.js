@@ -43,5 +43,10 @@ export default class Metadata {
         this.columns = columns;
         this.featureCount = featureCount;
         this.sample = sample;
+        this.geomType = '';
+    }
+
+    setGeomType(geomType) {
+        this.geomType = geomType;
     }
 }

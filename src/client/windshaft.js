@@ -183,6 +183,8 @@ export default class Windshaft {
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
 
+        metadata.setGeomType(this.geomType);
+
         return { MNS, resolution, filters, metadata, urlTemplate };
     }
 
