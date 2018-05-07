@@ -152,9 +152,9 @@ export function checkString(expressionName, parameterName, parameterIndex, str) 
     }
 }
 
-export function checkArray(expressionName, parameterName, parameterIndex, number) {
-    if (!Array.isArray(number)) {
-        throwInvalidArray(expressionName, parameterName, parameterIndex, number);
+export function checkArray(expressionName, parameterName, parameterIndex, array) {
+    if (!Array.isArray(array)) {
+        throwInvalidArray(expressionName, parameterName, parameterIndex, array);
     }
 }
 

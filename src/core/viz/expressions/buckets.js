@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkArray } from './utils';
 
 let bucketUID = 0;
 
@@ -70,9 +70,9 @@ export default class Buckets extends BaseExpression {
     constructor(input, args) {
         input = implicitCast(input);
         args = args || [];
-        if (!Array.isArray(args)) {
-            args = [args];
-        }
+
+        checkArray(name, 'args', 1, args);
+
         args = args.map(implicitCast);
 
         let looseType = undefined;

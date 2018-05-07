@@ -30,13 +30,16 @@ describe('src/core/viz/expressions/belongs', () => {
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
         validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'category']);
-        validateDynamicTypeErrors('in', ['category', 'number']);
+        validateDynamicTypeErrors('in', ['number', 'category-array']);
+        validateDynamicTypeErrors('in', ['category', 'number-array']);
+
+        it('should throw an error when the wrong parameters are passed', () => {
+            expect(() => s.in($category, '0')).toThrowError(/is not an array/g);
+        });
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category'], 'number');
-        validateStaticType('in', ['category', 'category', 'category'], 'number');
+        validateStaticType('in', ['category', 'category-array'], 'number');
     });
 
     describe('eval', () => {

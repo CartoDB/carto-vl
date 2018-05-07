@@ -1,4 +1,4 @@
-import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression, checkArray } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -71,12 +71,11 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
         constructor(value, categories) {
             value = implicitCast(value);
-            checkExpression(name, 'value', 0, value);
-
             categories = categories || [];
-            if (!Array.isArray(categories)) {
-                categories = [categories];
-            }
+
+            checkExpression(name, 'value', 0, value);
+            checkArray(name, 'categories', 1, categories);
+
             categories = categories.map(implicitCast);
 
             checkLooseType(name, 'value', 0, 'category', value);
