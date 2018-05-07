@@ -20,11 +20,16 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
  *  CB_DARK2, CB_PAIRED, CB_PASTEL1, CB_PASTEL2, CB_SET1, CB_SET2, CB_SET3
  *  ```
  *
- * @example <caption> Using a color scheme </caption>
+ * @example <caption>Using a color scheme.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
  * });
+ *
+ * @example <caption>Using a color scheme. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: ramp($type, PRISM)
+ * `);
  *
  * @name carto.expressions.palettes
  * @memberof carto.expressions
@@ -58,7 +63,11 @@ class PaletteGenerator extends BaseExpression {
 
 export class CustomPalette extends BaseExpression {
     // colors is a list of expression of type 'color'
-    constructor(...elems) {
+    constructor(elems) {
+        elems = elems || [];
+        if (!Array.isArray(elems)) {
+            elems = [elems];
+        }
         elems = elems.map(implicitCast);
         if (!elems.length) {
             throw new Error('customPalette(): invalid parameters: must receive at least one argument');

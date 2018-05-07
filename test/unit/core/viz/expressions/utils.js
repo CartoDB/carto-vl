@@ -95,8 +95,12 @@ function getSimpleArg(type) {
             return [s.property('cat'), '$cat'];
         case 'number':
             return [s.number(0), '0'];
+        case 'number-array':
+            return [[s.number(0)], '[0]'];
         case 'category':
             return [s.category('red'), '\'red\''];
+        case 'category-array':
+            return [[s.category('red')], '[\'red\']'];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'palette':
@@ -114,9 +118,13 @@ function getPropertyArg(type) {
         case 'number-property':
         case 'number':
             return [s.property('price'), '$price'];
+        case 'number-array':
+            return [[s.property('price')], '[$price]'];
         case 'category-property':
         case 'category':
             return [s.property('cat'), '$cat'];
+        case 'category-array':
+            return [[s.category('cat')], '[$cat]'];
         case 'color':
             return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
         case 'palette':

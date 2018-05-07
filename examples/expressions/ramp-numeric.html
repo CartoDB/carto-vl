@@ -101,7 +101,7 @@
 
     function setRampBuckets() {
       layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.buckets(s.prop('total_pop'), 10000, 25000, 100000, 500000, 1000000), s.palettes.SUNSETDARK)
+        color: s.ramp(s.buckets(s.prop('total_pop'), [10000, 25000, 100000, 500000, 1000000]), s.palettes.SUNSETDARK)
       }));
     }
 
