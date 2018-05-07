@@ -15,6 +15,7 @@ Object.keys(functions)
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
+lowerCaseFunctions.pi = functions.PI;
 
 export function parseVizExpression(str) {
     prepareJsep();
@@ -25,7 +26,7 @@ export function parseVizExpression(str) {
 
 export function parseVizDefinition(str) {
     prepareJsep();
-    const ast = jsep(str);
+    const ast = jsep(cleanComments(str));
     let vizSpec = { variables: {} };
     if (ast.type == 'Compound') {
         ast.body.map(node => parseVizNamedExpr(vizSpec, node));
@@ -178,4 +179,86 @@ function cleanJsep() {
     jsep.removeIdentifierChar('#');
     jsep.addLiteral('true');
     jsep.addLiteral('false');
+}
+
+/**
+ * Remove comments from string
+ * - // line comments
+ * - /* block comments
+ * - Keep comments inside single and double quotes tracking escape chars
+ * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
+ */
+export function cleanComments(str) {
+    var mode = {
+        singleQuote: false,
+        doubleQuote: false,
+        blockComment: false,
+        lineComment: false,
+        escape: 0
+    };
+
+    // Adding chars to avoid index checking
+    str = ('_' + str + '_').split('');
+
+    for (var i = 0, l = str.length; i < l; i++) {
+
+        if (mode.singleQuote) {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '\'' && mode.escape % 2 == 0) {
+                mode.singleQuote = false;
+                mode.escape = 0;
+            }
+            continue;
+        }
+
+        if (mode.doubleQuote) {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '"' && mode.escape % 2 == 0) {
+                mode.doubleQuote = false;
+                mode.escape = 0;
+            }
+            continue;
+        }
+
+        if (mode.blockComment) {
+            if (str[i] === '*' && str[i+1] === '/') {
+                str[i+1] = '';
+                mode.blockComment = false;
+            }
+            str[i] = '';
+            continue;
+        }
+
+        if (mode.lineComment) {
+            if (str[i+1] === '\n' || str[i+1] === '\r') {
+                mode.lineComment = false;
+            }
+            if (i+1 < l) {
+                str[i] = '';
+            }
+            continue;
+        }
+
+        mode.doubleQuote = str[i] === '"';
+        mode.singleQuote = str[i] === '\'';
+
+        if (str[i] === '/') {
+
+            if (str[i+1] === '*') {
+                str[i] = '';
+                mode.blockComment = true;
+                continue;
+            }
+            if (str[i+1] === '/') {
+                str[i] = '';
+                mode.lineComment = true;
+                continue;
+            }
+        }
+    }
+
+    // Remove chars added before
+    return str.join('').slice(1, -1);
 }

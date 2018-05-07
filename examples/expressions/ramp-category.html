@@ -101,7 +101,7 @@
 
     function setRampBuckets() {
       layer.blendToViz(new carto.Viz({
-          color: s.ramp(s.buckets(s.prop('category'), 'Moda y calzado'), s.palettes.VIVID)
+          color: s.ramp(s.buckets(s.prop('category'), ['Moda y calzado']), s.palettes.VIVID)
       }));
     }
 

@@ -15,6 +15,11 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from './util
  *   color: s.cielab(32.3, 79.2, -107.86)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: cielab(32.3, 79.2, -107.86)
+ * `);
+ *
  * @memberof carto.expressions
  * @name cielab
  * @function

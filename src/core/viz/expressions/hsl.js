@@ -15,6 +15,11 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  *   color: s.hsl(0.67, 1.0, 0.5)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsl(0.67, 1.0, 0.5)
+ * `);
+ *
  * @memberof carto.expressions
  * @name hsl
  * @function
@@ -36,6 +41,11 @@ export const HSL = genHSL('hsl', false);
  * const viz = new carto.Viz({
  *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsla(0.67, 1.0, 0.5, 1.0)
+ * `);
  *
  * @memberof carto.expressions
  * @function

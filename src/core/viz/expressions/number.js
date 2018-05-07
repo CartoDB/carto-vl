@@ -10,8 +10,13 @@ import { checkNumber } from './utils';
  * @example <caption>Creating a number expression.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.number(15);  // Equivalent to `width: 15`
+ *   width: s.number(15)  // Equivalent to `width: 15`
  * });
+ *
+ * @example <caption>Creating a number expression. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 15  // Equivalent to number(15)
+ * `);
  *
  * @memberof carto.expressions
  * @name number

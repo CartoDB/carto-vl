@@ -10,8 +10,13 @@ import { checkNumber } from './utils';
  * @example <caption>Creating a constant number expression.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.constant(15);
+ *   width: s.constant(15)
  * });
+ *
+ * @example <caption>Creating a constant number expression. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: constant(15)
+ * `);
  *
  * @memberof carto.expressions
  * @name constant

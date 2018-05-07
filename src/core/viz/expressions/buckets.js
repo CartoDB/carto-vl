@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkArray } from './utils';
 
 let bucketUID = 0;
 
@@ -13,16 +13,21 @@ let bucketUID = 0;
  *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
  *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
  *
- *
  * ```javascript
  *  const s = carto.expressions;
  *  const $speed = s.prop('speed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, 30, 80, 120),
+ *      s.buckets($speed, [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
+ * ```
+ *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+ * `);
  * ```
  *
  * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
@@ -40,14 +45,20 @@ let bucketUID = 0;
  *  const $procesedSpeed = s.prop('procesedSpeed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+ *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
  *      s.palettes.PRISM)
  *    )
  * });
  * ```
  *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
+ * ```
+ *
  * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {...carto.expressions.Base} breakpoints - Numeric expression containing the different breakpoints.
+ * @param {carto.expressions.Base[]} breakpoints - Numeric expression containing the different breakpoints.
  * @return {carto.expressions.Base}
  *
  * @memberof carto.expressions
@@ -56,8 +67,12 @@ let bucketUID = 0;
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor(input, ...args) {
+    constructor(input, args) {
         input = implicitCast(input);
+        args = args || [];
+
+        checkArray(name, 'args', 1, args);
+
         args = args.map(implicitCast);
 
         let looseType = undefined;

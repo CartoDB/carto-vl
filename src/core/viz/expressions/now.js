@@ -6,11 +6,16 @@ import { number } from '../functions';
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Update width during the time.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mod(s.now(), 10);
+ *   width: s.mod(s.now(), 10)
  * });
+ *
+ * @example <caption>Update width during the time. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: now() % 10
+ * `);
  *
  * @memberof carto.expressions
  * @name now

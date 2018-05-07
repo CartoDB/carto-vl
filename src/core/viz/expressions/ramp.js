@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import { customPalette } from '../functions';
 
 /**
 * Create a color ramp based on input expression.
@@ -12,17 +13,16 @@ import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 * @param {carto.expressions.palettes} palette - The color palette that is going to be used
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property. (We assume category has discrete values) </caption>
+* @example <caption>Display points with a different color depending on the `category` property.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.prop('category'), s.palettes.PRISM),
+*   color: s.ramp(s.prop('category'), s.palettes.PRISM)
 * });
 *
-* @example <caption> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</caption>
-* const s = carto.expressions;
-* const viz = new carto.Viz({
-*   color: s.ramp(s.prop('speed'), s.palettes.PRISM),
-* });
+* @example <caption>Display points with a different color depending on the `category` property. (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp($category, PRISM)
+* `);
 *
 * @memberof carto.expressions
 * @name ramp
@@ -30,12 +30,11 @@ import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor(input, palette, ...args) {
-        if (args.length > 0) {
-            throw new Error('ramp(input, palette) only accepts two parameters');
-        }
+    constructor(input, palette) {
         input = implicitCast(input);
-        palette = implicitCast(palette);
+        if (Array.isArray(palette)) {
+            palette = customPalette(palette);
+        }
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);

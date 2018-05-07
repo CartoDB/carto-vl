@@ -2,12 +2,12 @@ import BaseExpression from './base';
 import { checkString } from './utils';
 
 /**
- * Loads a variable aliased expresion by the name
+ * Loads a variable aliased expresion by the name.
  *
  * @param {string} name - The variable name that is going to be evaluated
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption></caption
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -16,6 +16,7 @@ import { checkString } from './utils';
  *  filter: s.neq(s.var('sum_price'), 'london'),
  * });
  *
+ * @example <caption>(String)</caption
  * const viz = new carto.Viz(`
  *   @sum_price: clusterSum($price)
  *   filter: @sum_price != 'london'

@@ -11,10 +11,14 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
  * const s = carto.expressions;
- * const $dn = s.prop('populationDensity');
  * const viz = new carto.Viz({
- *   filter: s.between($dn, 50, 100);
+ *   filter: s.between(s.prop('dn'), 50, 100);
  * });
+ *
+ * @example <caption>Display only cities where the population density is within the [50,100] range. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: 50 < $dn < 100  // Equivalent to between($dn, 50, 100)
+ * `);
  *
  * @memberof carto.expressions
  * @name between
