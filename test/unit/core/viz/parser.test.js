@@ -1,3 +1,5 @@
+/* eslint quotes: "off" */
+
 import { parseVizDefinition, cleanComments } from '../../../../src/core/viz/parser';
 
 describe('src/core/viz/parser', () => {
@@ -6,43 +8,49 @@ describe('src/core/viz/parser', () => {
 
     describe('.cleanComments', () => {
         it('should remove line comments without endline', () => {
-            const str = 'width: 1// line comment';
-            expect(cleanComments(str)).toBe('width: 1');
+            expect(cleanComments('width: 1// line comment')).toBe('width: 1');
         });
 
         it('should remove line comments with endline', () => {
-            const str = 'width: 1// line comment\n';
-            expect(cleanComments(str)).toBe('width: 1\n');
+            expect(cleanComments('width: 1// line comment\n')).toBe('width: 1\n');
         });
 
-        it('should keep line comments inside simple quotes', () => {
-            const str = '@var: \'// line comment\'';
-            expect(cleanComments(str)).toBe('@var: \'// line comment\'');
+        it('should keep line comments inside single quotes', () => {
+            expect(cleanComments("@var: '// line comment'")).toBe("@var: '// line comment'");
         });
 
-        it('should keep line comments inside simple quotes', () => {
-            const str = '@var: "// line comment"';
-            expect(cleanComments(str)).toBe('@var: "// line comment"');
+        it('should keep line comments inside double quotes', () => {
+            expect(cleanComments('@var: "// line comment"')).toBe('@var: "// line comment"');
         });
 
         it('should remove block comments without endline', () => {
-            const str = 'width: 1/* block\ncomment */';
-            expect(cleanComments(str)).toBe('width: 1');
+            expect(cleanComments('width: 1/* block\ncomment */')).toBe('width: 1');
         });
 
         it('should remove block comments with endline', () => {
-            const str = 'width: 1/* block\ncomment */\n';
-            expect(cleanComments(str)).toBe('width: 1\n');
+            expect(cleanComments('width: 1/* block\ncomment */\n')).toBe('width: 1\n');
         });
 
-        it('should keep block comments inside simple quotes', () => {
-            const str = '@var: \'/* block\ncomment */\'';
-            expect(cleanComments(str)).toBe('@var: \'/* block\ncomment */\'');
+        it('should keep block comments inside single quotes', () => {
+            expect(cleanComments("@var: '/* block\ncomment */'")).toBe("@var: '/* block\ncomment */'");
         });
 
-        it('should keep block comments inside simple quotes', () => {
-            const str = '@var: "/* block\ncomment */"';
-            expect(cleanComments(str)).toBe('@var: "/* block\ncomment */"');
+        it('should keep block comments inside double quotes', () => {
+            expect(cleanComments('@var: "/* block\ncomment */"')).toBe('@var: "/* block\ncomment */"');
+        });
+
+        it('should manage properly the escape chars for single quotes', () => {
+            expect(cleanComments("@var: '\\' // comment'")).toBe("@var: '\\' // comment'");
+            expect(cleanComments("@var: '\\\\' // comment")).toBe("@var: '\\\\' ");
+            expect(cleanComments("@var: '\\\\\\' // comment'")).toBe("@var: '\\\\\\' // comment'");
+            expect(cleanComments("@var: '\\\\\\\\' // comment")).toBe("@var: '\\\\\\\\' ");
+        });
+
+        it('should manage properly the escape chars for double quotes', () => {
+            expect(cleanComments('@var: "\\" // comment"')).toBe('@var: "\\" // comment"');
+            expect(cleanComments('@var: "\\\\" // comment"')).toBe('@var: "\\\\" ');
+            expect(cleanComments('@var: "\\\\\\" // comment"')).toBe('@var: "\\\\\\" // comment"');
+            expect(cleanComments('@var: "\\\\\\\\" // comment"')).toBe('@var: "\\\\\\\\" ');
         });
     });
 
