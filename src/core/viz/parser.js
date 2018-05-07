@@ -184,7 +184,7 @@ function cleanJsep() {
  * Remove comments from string
  * - // line comments
  * - /* block comments
- * - ' " Keep comments inside single and double quotes
+ * - Keep comments inside single and double quotes tracking escape chars
  * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
  */
 export function cleanComments(str) {
@@ -192,7 +192,8 @@ export function cleanComments(str) {
         singleQuote: false,
         doubleQuote: false,
         blockComment: false,
-        lineComment: false
+        lineComment: false,
+        escape: 0
     };
 
     // Adding chars to avoid index checking
@@ -201,15 +202,21 @@ export function cleanComments(str) {
     for (var i = 0, l = str.length; i < l; i++) {
 
         if (mode.singleQuote) {
-            if (str[i] === '\'' && str[i-1] !== '\\') {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '\'' && mode.escape % 2 == 0) {
                 mode.singleQuote = false;
+                mode.escape = 0;
             }
             continue;
         }
 
         if (mode.doubleQuote) {
-            if (str[i] === '"' && str[i-1] !== '\\') {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '"' && mode.escape % 2 == 0) {
                 mode.doubleQuote = false;
+                mode.escape = 0;
             }
             continue;
         }
