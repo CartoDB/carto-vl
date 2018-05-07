@@ -252,13 +252,13 @@ export const GreaterThan = genBinaryOp('greaterThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price greater or equal than 30.</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.gte(s.prop('price'), 30)
  * });
  *
- * @example <caption>Compare two numbers to show only elements with price greater or equal than 30. (String)</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $price >= 30
  * `);
@@ -287,13 +287,13 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price lower than 30.</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.lt(s.prop('price'), 30)
  * });
  *
- * @example <caption>Compare two numbers to show only elements with price lower than 30. (String)</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than 30. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $price < 30
  * `);
@@ -322,13 +322,13 @@ export const LessThan = genBinaryOp('lessThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price lower or equal than 30.</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.lte(s.prop('price'), 30)
  * });
  *
- * @example <caption>Compare two numbers to show only elements with price lower or equal than 30. (String)</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $price <= 30
  * `);
@@ -357,13 +357,13 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price equal than 30.</caption>
+ * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.eq(s.prop('price'), 30)
  * });
  *
- * @example <caption>Compare two numbers to show only elements with price equal than 30. (String)</caption>
+ * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $price == 30
  * `);
@@ -392,13 +392,13 @@ export const Equals = genBinaryOp('equals',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price not equal than 30.</caption>
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.neq(s.prop('price'), 30);
  * });
  *
- * @example <caption>Compare two numbers to show only elements with price not equal than 30. (String)</caption>
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $price != 30
  * `);
