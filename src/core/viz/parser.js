@@ -182,11 +182,75 @@ function cleanJsep() {
 
 /**
  * Remove comments from string
- * - // one-line comments
- * - /* multi-line
- *     comments */
+ * - // line comments
+ * - /* block comments
+ * - ' " Keep comments inside single and double quotes
+ * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
+ */
 export function cleanComments(str) {
-    return str
-        .replace(/\/\/.*/g, '')
-        .replace(/\/\*(\*(?!\/)|[^*])*\*\//g, '');
+    var mode = {
+        singleQuote: false,
+        doubleQuote: false,
+        blockComment: false,
+        lineComment: false
+    };
+
+    // Adding chars to avoid index checking
+    str = ('_' + str + '_').split('');
+
+    for (var i = 0, l = str.length; i < l; i++) {
+
+        if (mode.singleQuote) {
+            if (str[i] === '\'' && str[i-1] !== '\\') {
+                mode.singleQuote = false;
+            }
+            continue;
+        }
+
+        if (mode.doubleQuote) {
+            if (str[i] === '"' && str[i-1] !== '\\') {
+                mode.doubleQuote = false;
+            }
+            continue;
+        }
+
+        if (mode.blockComment) {
+            if (str[i] === '*' && str[i+1] === '/') {
+                str[i+1] = '';
+                mode.blockComment = false;
+            }
+            str[i] = '';
+            continue;
+        }
+
+        if (mode.lineComment) {
+            if (str[i+1] === '\n' || str[i+1] === '\r') {
+                mode.lineComment = false;
+            }
+            if (i+1 < l) {
+                str[i] = '';
+            }
+            continue;
+        }
+
+        mode.doubleQuote = str[i] === '"';
+        mode.singleQuote = str[i] === '\'';
+
+        if (str[i] === '/') {
+
+            if (str[i+1] === '*') {
+                str[i] = '';
+                mode.blockComment = true;
+                continue;
+            }
+            if (str[i+1] === '/') {
+                str[i] = '';
+                mode.lineComment = true;
+                continue;
+            }
+        }
+    }
+
+    // Remove chars added before
+    return str.join('').slice(1, -1);
 }

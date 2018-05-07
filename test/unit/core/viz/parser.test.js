@@ -4,7 +4,7 @@ describe('src/core/viz/parser', () => {
 
     // TODO: missing lots of tests here
 
-    fdescribe('.cleanComments', () => {
+    describe('.cleanComments', () => {
         it('should remove line comments without endline', () => {
             const str = 'width: 1// line comment';
             expect(cleanComments(str)).toBe('width: 1');
