@@ -114,7 +114,7 @@ class Base {
      */
     constructor(children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(children[name]));
+        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(children[name]));
         this._getChildren().map(child => child.parent = this);
         this._metaBindings = [];
         this.preface = '';
@@ -240,7 +240,7 @@ class Base {
      */
     //TODO blendFunc = 'linear'
     blendTo(final, duration = 500) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
         this._metaBindings.map(m => blender._bind(m));
@@ -250,7 +250,7 @@ class Base {
     }
 
     _blendFrom(final, duration = 500, interpolator = null) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
         this._metaBindings.map(m => blender._bind(m));
@@ -283,24 +283,24 @@ class Base {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["l"] = implicitCast;
-/* harmony export (immutable) */ __webpack_exports__["k"] = hexToRgb;
-/* harmony export (immutable) */ __webpack_exports__["i"] = getOrdinalFromIndex;
-/* harmony export (immutable) */ __webpack_exports__["j"] = getStringErrorPreface;
+/* harmony export (immutable) */ __webpack_exports__["m"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["l"] = hexToRgb;
+/* harmony export (immutable) */ __webpack_exports__["j"] = getOrdinalFromIndex;
+/* harmony export (immutable) */ __webpack_exports__["k"] = getStringErrorPreface;
 /* unused harmony export throwInvalidType */
 /* unused harmony export throwInvalidInstance */
 /* unused harmony export throwInvalidNumber */
 /* unused harmony export throwInvalidArray */
 /* unused harmony export throwInvalidString */
-/* harmony export (immutable) */ __webpack_exports__["d"] = checkLooseType;
-/* harmony export (immutable) */ __webpack_exports__["b"] = checkExpression;
-/* harmony export (immutable) */ __webpack_exports__["g"] = checkType;
-/* harmony export (immutable) */ __webpack_exports__["c"] = checkInstance;
-/* harmony export (immutable) */ __webpack_exports__["e"] = checkNumber;
-/* harmony export (immutable) */ __webpack_exports__["f"] = checkString;
-/* unused harmony export checkArray */
-/* harmony export (immutable) */ __webpack_exports__["h"] = clamp;
-/* harmony export (immutable) */ __webpack_exports__["m"] = mix;
+/* harmony export (immutable) */ __webpack_exports__["e"] = checkLooseType;
+/* harmony export (immutable) */ __webpack_exports__["c"] = checkExpression;
+/* harmony export (immutable) */ __webpack_exports__["h"] = checkType;
+/* harmony export (immutable) */ __webpack_exports__["d"] = checkInstance;
+/* harmony export (immutable) */ __webpack_exports__["f"] = checkNumber;
+/* harmony export (immutable) */ __webpack_exports__["g"] = checkString;
+/* harmony export (immutable) */ __webpack_exports__["b"] = checkArray;
+/* harmony export (immutable) */ __webpack_exports__["i"] = clamp;
+/* harmony export (immutable) */ __webpack_exports__["n"] = mix;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
 
@@ -316,8 +316,6 @@ function implicitCast(value) {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["number"])(value);
     } else if (typeof value == 'string') {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
-    } else if (Array.isArray(value)) {
-        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["customPalette"])(...value);
     }
     return value;
 }
@@ -461,9 +459,9 @@ function checkString(expressionName, parameterName, parameterIndex, str) {
     }
 }
 
-function checkArray(expressionName, parameterName, parameterIndex, number) {
-    if (!Array.isArray(number)) {
-        throwInvalidArray(expressionName, parameterName, parameterIndex, number);
+function checkArray(expressionName, parameterName, parameterIndex, array) {
+    if (!Array.isArray(array)) {
+        throwInvalidArray(expressionName, parameterName, parameterIndex, array);
     }
 }
 
@@ -559,9 +557,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * const viz = new carto.Viz({
  *   width: s.div(
  *     s.prop('population'),
- *     s.number(10000)  // Equivalent to 10000
+ *     10000
  *  )
  * });
+ * ```
+ *
+ * All these expressions can be used also from a String API. This API is a more compact way to create and use your expressions.
+ * It has shortcut notation to access your feature properties using the `$` symbol. It also allows inline comments using the JavaScript style.
+ *
+ * ```javascript
+ * const viz = new carto.Viz(`
+ *   width: $population / 10000  // Size proportional to the population for each feature
+ * `);
  * ```
  *
  * Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
@@ -1004,6 +1011,9 @@ const TRUE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* defa
 const FALSE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](0);
 /* harmony export (immutable) */ __webpack_exports__["FALSE"] = FALSE;
 
+const PI = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](Math.PI);
+/* harmony export (immutable) */ __webpack_exports__["PI"] = PI;
+
 
 
 
@@ -1034,11 +1044,16 @@ const CATEGORIES_TO_NUMBER = 8;
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Simple multiplication.</caption>
+ * @example <caption>Number multiplication.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+ *   width: s.mul(5, 5)  // 25
  * });
+ *
+ * @example <caption>Number multiplication. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 5 * 5  // Equivalent to mul(5, 5)
+ * `);
  *
  * @memberof carto.expressions
  * @name mul
@@ -1063,8 +1078,13 @@ const Mul = genBinaryOp('mul',
  * @example <caption>Number division.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
+ *   width: s.div(10, 2)  // 5
  * });
+ *
+ * @example <caption>Number division. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 / 2  // Equivalent to div(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name div
@@ -1089,8 +1109,13 @@ const Div = genBinaryOp('div',
  * @example <caption>Number addition.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
+ *   width: s.add(10, 2)  // 12
  * });
+ *
+ * @example <caption>Number addition. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 + 2  // Equivalent to add(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name add
@@ -1115,8 +1140,13 @@ const Add = genBinaryOp('add',
  * @example <caption>Number subtraction.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+ *   width: s.sub(10, 2)  // 8
  * });
+ *
+ * @example <caption>Number subtraction. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 - 2  // Equivalent to sub(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name sub
@@ -1141,8 +1171,13 @@ const Sub = genBinaryOp('sub',
  * @example <caption>Number modulus.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mod(10, 6);  // 4
+ *   width: s.mod(10, 6)  // 4
  * });
+ *
+ * @example <caption>Number modulus. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 % 6  // Equivalent to mod(10, 6)
+ * `);
  *
  * @memberof carto.expressions
  * @name mod
@@ -1165,11 +1200,16 @@ const Mod = genBinaryOp('mod',
  * @param {carto.expressions.Base|number} exponent - Numeric expression
  * @return {carto.expressions.Base} Numeric expression with base ^ exponent
  *
- * @example <caption>Power of two numbers.</caption>
+ * @example <caption>Number power.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.pow(2, 3);  // 8
+ *   width: s.pow(2, 3)  // 8
  * });
+ *
+ * @example <caption>Number power. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 2 ^ 3  // Equivalent to pow(2, 3)
+ * `);
  *
  * @memberof carto.expressions
  * @name pow
@@ -1193,11 +1233,16 @@ const Pow = genBinaryOp('pow',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price > 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.gt(s.prop('price'), 30);
+ *   filter: s.gt(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price greater than 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price > 30  // Equivalent to gt($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name gt
@@ -1221,11 +1266,16 @@ const GreaterThan = genBinaryOp('greaterThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price >= 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.gte(s.prop('price'), 30);
+ *   filter: s.gte(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price >= 30  // Equivalent to gte($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name gte
@@ -1249,11 +1299,16 @@ const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price < 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.lt(s.prop('price'), 30);
+ *   filter: s.lt(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price less than 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30  // Equivalent to lt($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name lt
@@ -1277,11 +1332,16 @@ const LessThan = genBinaryOp('lessThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price <= 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.lte(s.prop('price'), 30);
+ *   filter: s.lte(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price <= 30  // Equivalent to lte($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name lte
@@ -1305,11 +1365,16 @@ const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price === 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.eq(s.prop('price'), 30);
+ *   filter: s.eq(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name eq
@@ -1333,11 +1398,16 @@ const Equals = genBinaryOp('equals',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price !== 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.neq(s.prop('price'), 30);
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price != 30  // Equivalent to neq($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name neq
@@ -1363,15 +1433,19 @@ const NotEquals = genBinaryOp('notEquals',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Show only elements with price < 30 or price > 1000</caption>
+ * @example <caption>Show only elements with price < 30 OR price > 1000.</caption>
  * const s = carto.expressions;
- * const $price = s.prop('price');
  * const viz = new carto.Viz({
  *   filter: s.or(
- *     s.lt($price, 30),
- *     s.gt($price, 1000)
+ *     s.lt(s.prop('price'), 30),
+ *     s.gt(s.prop('price'), 1000)
  *   )
  * });
+ *
+ * @example <caption>Show only elements with price < 30 OR price > 1000. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30 or $price > 1000  // Equivalent to or(lt($price, 30), gt($price, 1000))
+ * `);
  *
  * @memberof carto.expressions
  * @name or
@@ -1388,7 +1462,7 @@ const Or = genBinaryOp('or',
 
 /**
  * Perform a binary AND between two numeric expressions.
- * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
+ * If the numbers are different from 0 or 1 this performs a [fuzzy and operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
@@ -1397,17 +1471,19 @@ const Or = genBinaryOp('or',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Show only elements with price < 30 AND category === 'fruit'</caption>
+ * @example <caption>Show only elements with price < 30 AND category == 'fruit'.</caption>
  * const s = carto.expressions;
- * const $price = s.prop('price');
- * const $category = s.prop('category');
- *
  * const viz = new carto.Viz({
  *   filter: s.and(
- *     s.lt($price, 30),
- *     s.eq($category, 'fruit')
+ *     s.lt(s.prop('price'), 30),
+ *     s.eq(s.prop('category'), 'fruit')
  *   )
  * });
+ *
+ * @example <caption>Show only elements with price < 30 AND category == 'fruit'. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+ * `);
  *
  * @memberof carto.expressions
  * @name and
@@ -1428,8 +1504,8 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["number"])(jsFn(a, b));
             }
-            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
-            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
+            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(b);
 
             const signature = getSignature(a, b);
             if (signature !== undefined) {
@@ -1506,17 +1582,23 @@ function getReturnTypeFromSignature(signature) {
 
 
 /**
- * Return the average value of the features showed in the viewport
+ * Return the average value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_avg: s.viewportAvg($amount)
+ *   variables: {
+ *      v_avg: s.viewportAvg(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_avg: viewportAvg($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportAvg
@@ -1528,17 +1610,23 @@ const ViewportAvg = generateAggregattion('avg');
 
 
 /**
- * Return the maximum value of the features showed in the viewport
+ * Return the maximum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_max: s.viewportMax($amount)
+ *   variables: {
+ *      v_max: s.viewportMax(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_max: viewportMax($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMax
@@ -1550,17 +1638,23 @@ const ViewportMax = generateAggregattion('max');
 
 
 /**
- * Return the minimum value of the features showed in the viewport
+ * Return the minimum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_min: s.viewportMin($amount)
+ *   variables: {
+ *      v_min: s.viewportMin(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_min: viewportMin($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMin
@@ -1572,17 +1666,23 @@ const ViewportMin = generateAggregattion('min');
 
 
 /**
- * Return the sum of the values of the features showed in the viewport
+ * Return the sum of the values of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_sum: s.viewportSum($amount)
+ *   variables: {
+ *      v_sum: s.viewportSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_sum: viewportSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportSum
@@ -1594,17 +1694,23 @@ const ViewportSum = generateAggregattion('sum');
 
 
 /**
- * Return the count of the features showed in the viewport
+ * Return the count of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_count: s.viewportCount($amount)
+ *   variables: {
+ *      v_count: s.viewportSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_count: viewportSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportCount
@@ -1616,17 +1722,23 @@ const ViewportCount = generateAggregattion('count');
 
 
 /**
- * Return the percentile of the features showed in the viewport
+ * Return the percentile of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_percentile: s.viewportPercentile($amount)
+ *   variables: {
+ *      v_percentile: s.viewportPercentile(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_percentile: viewportPercentile($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportPercentile
@@ -1638,17 +1750,23 @@ const ViewportPercentile = generatePercentile();
 
 
 /**
- * Return the average value of all the features
+ * Return the average value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_avg: s.globalAvg($amount)
+ *   variables: {
+ *      g_avg: s.globalAvg(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_avg: globalAvg($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalAvg
@@ -1660,17 +1778,23 @@ const GlobalAvg = generateAggregattion('avg', true);
 
 
 /**
- * Return the maximum value of all the features
+ * Return the maximum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_max: s.globalMax($amount)
+ *   variables: {
+ *      g_max: s.globalMax(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_max: globalMax($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMax
@@ -1682,17 +1806,23 @@ const GlobalMax = generateAggregattion('max', true);
 
 
 /**
- * Return the minimum value of all the features
+ * Return the minimum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_min: s.globalMin($amount)
+ *   variables: {
+ *      g_min: s.globalMin(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_min: globalMin($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMin
@@ -1704,17 +1834,23 @@ const GlobalMin = generateAggregattion('min', true);
 
 
 /**
- * Return the sum of the values of all the features
+ * Return the sum of the values of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_sum: s.globalSum($amount)
+ *   variables: {
+ *      g_sum: s.globalSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_sum: globalSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalSum
@@ -1726,17 +1862,23 @@ const GlobalSum = generateAggregattion('sum', true);
 
 
 /**
- * Return the count of all the features
+ * Return the count of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_count: s.globalCount($amount)
+ *   variables: {
+ *      g_count: s.globalCount(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_count: globalCount($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalCount
@@ -1748,17 +1890,23 @@ const GlobalCount = generateAggregattion('count', true);
 
 
 /**
- * Return the percentile of all the features
+ * Return the percentile of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_percentile: s.globalPercentile($amount)
+ *   variables: {
+ *      g_percentile: s.globalPercentile(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_percentile: globalPercentile($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalPercentile
@@ -1896,7 +2044,7 @@ function generatePercentile(global) {
 
 
 /**
- * Compute the natural logarithm (base e) of a number x
+ * Compute the natural logarithm (base e) of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the natural logarithm
  * @return {carto.expressions.Base}
@@ -1904,8 +2052,13 @@ function generatePercentile(global) {
  * @example <caption>Natural Logarithm.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.log(10);  // 2.302585092994046
+ *   width: s.log(10)  // 2.302585092994046
  * });
+ *
+ * @example <caption>Natural Logarithm. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: log(10)
+ * `);
  *
  * @memberof carto.expressions
  * @name log
@@ -1917,7 +2070,7 @@ const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 
 
 /**
- * Compute the square root of a number x
+ * Compute the square root of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the square root
  * @return {carto.expressions.Base}
@@ -1925,8 +2078,13 @@ const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
  * @example <caption>Square root.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sqrt(4);  // 2
+ *   width: s.sqrt(4)  // 2
  * });
+ *
+ * @example <caption>Square root. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sqrt(4)
+ * `);
  *
  * @memberof carto.expressions
  * @name sqrt
@@ -1938,16 +2096,21 @@ const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 
 
 /**
- * Compute the sine of a number x
+ * Compute the sine of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the sine in radians
  * @return {carto.expressions.Base}
  *
- * @example <caption>Sin</caption>
+ * @example <caption>Sin.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sin(Math.PI/2);  // 1
+ *   width: s.sin(Math.PI/2)  // 1
  * });
+ *
+ * @example <caption>Sin. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sin(PI/2)
+ * `);
  *
  * @memberof carto.expressions
  * @name sin
@@ -1959,7 +2122,7 @@ const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 
 
 /**
- * Compute the cosine of a number x
+ * Compute the cosine of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the cosine in radians
  * @return {carto.expressions.Base}
@@ -1967,8 +2130,13 @@ const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
  * @example <caption>Cos</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.cos(0);  // 1
+ *   width: s.cos(0)  // 1
  * });
+ *
+ * @example <caption>Cos. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: cos(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name cos
@@ -1980,7 +2148,7 @@ const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 
 
 /**
- * Compute the tangent of a number x
+ * Compute the tangent of a number x.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the tangent in radians
  * @return {carto.expressions.Base}
@@ -1988,8 +2156,13 @@ const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
  * @example <caption>Tan</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.tan(0);  // 0
+ *   width: s.tan(0)  // 0
  * });
+ *
+ * @example <caption>Tan. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: tan(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name tan
@@ -2002,17 +2175,22 @@ const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 
 /**
  * Compute the sign of a number x, indicating whether the number is positive, negative or zero
- * This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
- * -0 if the number is -0.
+ * This means this function will return 1 if the number is positive, -1 if the number is negative
+ * 0 if the number is 0 and -0 if the number is -0.
  *
  * @param {carto.expressions.Base|number} x - Number to compute the sign
  * @return {carto.expressions.Base}
  *
- * @example <caption>Sign</caption>
+ * @example <caption>Sign.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sign(100);  // 1
+ *   width: s.sign(100)  // 1
  * });
+ *
+ * @example <caption>Sign. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sign(100)
+ * `);
  *
  * @memberof carto.expressions
  * @name sign
@@ -2029,11 +2207,16 @@ const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the absolute value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Abs</caption>
+ * @example <caption>Abs.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.abs(100);  // 1
+ *   width: s.abs(100)  // 100
  * });
+ *
+ * @example <caption>Abs. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: abs(100)
+ * `);
  *
  * @memberof carto.expressions
  * @name abs
@@ -2054,11 +2237,16 @@ const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the not value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Not</caption>
+ * @example <caption>Not.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.not(0);  // 1
+ *   width: s.not(0)  // 1
  * });
+ *
+ * @example <caption>Not. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: not(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name not
@@ -2079,11 +2267,16 @@ const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the floor value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Floor</caption>
+ * @example <caption>Floor.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.floor(5.9);  // 5
+ *   width: s.floor(5.9)  // 5
  * });
+ *
+ * @example <caption>Floor. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: floor(5.9)
+ * `);
  *
  * @memberof carto.expressions
  * @name floor
@@ -2104,11 +2297,16 @@ const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the ceil value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Ceil</caption>
+ * @example <caption>Ceil.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.ceil(5.1);  // 6
  * });
+ *
+ * @example <caption>Ceil. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: ceil(5.1)
+ * `);
  *
  * @memberof carto.expressions
  * @name ceil
@@ -2122,8 +2320,8 @@ const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
         constructor(a) {
-            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'x', 0, 'number', a);
+            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(a);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
         }
@@ -2132,7 +2330,7 @@ function genUnaryOp(name, jsFn, glsl) {
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'x', 0, 'number', this.a);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, 'x', 0, 'number', this.a);
             if (this.a.type != 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
@@ -2306,16 +2504,21 @@ const column = {
 
 /**
  * Aggregate using the average value. This operation disables the access to the property
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
- * @example
+ * @example <caption>Use cluster average of the population as width.</caption>
  * const s = carto.expressions;
- * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.clusterAvg($population);
+ *   width: s.clusterAvg(s.prop('population'))
  * });
+ *
+ * @example <caption>Use cluster average of the population as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterAvg($population)
+ * `);
  *
  * @memberof carto.expressions
  * @name clusterAvg
@@ -2328,16 +2531,21 @@ const ClusterAvg = genAggregationOp('avg', 'number');
 
 /**
  * Aggregate using the maximum value. This operation disables the access to the property
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
- * @example
+ * @example <caption>Use cluster maximum of the population as width.</caption>
  * const s = carto.expressions;
- * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.clusterMax($population);
+ *   width: s.clusterMax(s.prop('population'))
  * });
+ *
+ * @example <caption>Use cluster maximum of the population as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterMax($population)
+ * `);
  *
  * @memberof carto.expressions
  * @name clusterMax
@@ -2350,16 +2558,21 @@ const ClusterMax = genAggregationOp('max', 'number');
 
 /**
  * Aggregate using the minimum value. This operation disables the access to the property
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
- * @example
+ * @example <caption>Use cluster minimum of the population as width.</caption>
  * const s = carto.expressions;
- * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.clusterMin($population);
+ *   width: s.clusterMin(s.prop('population'))
  * });
+ *
+ * @example <caption>Use cluster minimum of the population as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterMin($population)
+ * `);
  *
  * @memberof carto.expressions
  * @name clusterMin
@@ -2371,17 +2584,22 @@ const ClusterMin = genAggregationOp('min', 'number');
 
 
 /**
- * Aggregate using the maximum value. This operation disables the access to the property
+ * Aggregate using the mode value. This operation disables the access to the property
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Property} Aggregated column
  *
- * @example
+ * @example <caption>Use cluster mode of the population as width.</caption>
  * const s = carto.expressions;
- * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.clusterMode($population);
+ *   width: s.clusterMode(s.prop('population'))
  * });
+ *
+ * @example <caption>Use cluster mode of the population as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterMode($population)
+ * `);
  *
  * @memberof carto.expressions
  * @name clusterMode
@@ -2393,17 +2611,22 @@ const ClusterMode = genAggregationOp('mode', 'category');
 
 
 /**
- * Aggregate using the maximum value. This operation disables the access to the property
+ * Aggregate using the sum value. This operation disables the access to the property
+ * except within other cluster aggregate functions.
  *
  * @param {carto.expressions.Base} property - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
- * @example
+ * @example <caption>Use cluster sum of the population as width.</caption>
  * const s = carto.expressions;
- * const $population = s.prop('population');
  * const viz = new carto.Viz({
- *   width: s.clusterSum($population);
+ *   width: s.clusterSum(s.prop('population'))
  * });
+ *
+ * @example <caption>Use cluster sum of the population as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterSum($population)
+ * `);
  *
  * @memberof carto.expressions
  * @name clusterSum
@@ -2417,7 +2640,7 @@ const ClusterSum = genAggregationOp('sum', 'number');
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(property) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["d" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
             super({ property });
             this._aggName = aggName;
             this.type = aggType;
@@ -2437,7 +2660,7 @@ function genAggregationOp(aggName, aggType) {
         //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
         _compile(metadata) {
             super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["h" /* checkType */])(aggName, 'property', 0, aggType, this.property);
         }
         _applyToShaderSource(getGLSLforProperty) {
             return {
@@ -2476,11 +2699,20 @@ function genAggregationOp(aggName, aggType) {
  * @param {string} name - The property in the dataset that is going to be evaluated
  * @return {carto.expressions.Base}
  *
- * @example <caption>Display only cities with name different from "London"</caption>
+ * @example <caption>Display only cities with name different from "London".</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.neq(s.prop('name'), 'london'),
+ *  filter: s.neq(s.prop('name'), 'london')
  * });
+ *
+ * @example <caption>Display only cities with name different from "London". (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: neq(prop('name'), 'london')
+ * `);
+ *
+ * const viz = new carto.Viz(`
+ *   filter: $name != 'london'
+ * `);
  *
  * @memberof carto.expressions
  * @name prop
@@ -2489,7 +2721,7 @@ function genAggregationOp(aggName, aggType) {
  */
 class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(name) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('property', 'name', 0, name);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('property', 'name', 0, name);
         if (name == '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
@@ -2544,11 +2776,16 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.asc(s.width())
  * });
+ *
+ * @example <caption>Ascending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: asc(width())
+ * `);
  *
  * @memberof carto.expressions
  * @name asc
@@ -2558,7 +2795,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
         super({});
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('asc', 'by', 0, Width, by);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkInstance */])('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -2571,11 +2808,16 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Descending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.desc(s.width())
  * });
+ *
+ * @example <caption>Descending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: desc(width())
+ * `);
  *
  * @memberof carto.expressions
  * @name desc
@@ -2585,7 +2827,7 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
         super({});
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('desc', 'by', 0, Width, by);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkInstance */])('desc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -2597,11 +2839,16 @@ class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>No order.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.noOrder()
  * });
+ *
+ * @example <caption>No order. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: noOrder()
+ * `);
  *
  * @memberof carto.expressions
  * @name noOrder
@@ -2622,11 +2869,16 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.asc(s.width())
  * });
+ *
+ * @example <caption>Ascending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: asc(width())
+ * `);
  *
  * @memberof carto.expressions
  * @name width
@@ -3306,6 +3558,7 @@ function getRsysFromTile(x, y, z) {
  * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
  *
  * @param {number} duration - Animation duration in milliseconds
+ * @return {carto.expressions.Base}
  *
  * @memberof carto.expressions
  * @name animate
@@ -3315,9 +3568,9 @@ function getRsysFromTile(x, y, z) {
 //TODO refactor to use uniformfloat class
 class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(duration) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('animate', 'duration', 0, duration);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('animate', 'duration', 0, duration);
         if (duration < 0) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
         }
         super({});
         this.aTime = Date.now();
@@ -3369,15 +3622,20 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * Check if a categorical value belongs to a list of categories.
  *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical whitelist
- * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the whitelist
+ * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
  * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
- * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
+ * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
- * const $type = s.prop('type');
  * const viz = new carto.Viz({
- *   filter: s.in($type, 'metropolis', 'capital');
+ *   filter: s.in(s.prop('type'), ['metropolis', 'capital'])
  * });
+ *
+ * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
+ * const $type = s.prop('type');
+ * const viz = new carto.Viz(`
+ *   filter: in($type, ['metropolis', 'capital'])
+ * `);
  *
  * @memberof carto.expressions
  * @name in
@@ -3392,15 +3650,20 @@ const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.so
  * Check if value does not belong to the categories list given by the categories parameters.
  *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical blacklist
- * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the blacklist
+ * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the blacklist
  * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
- * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
+ * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
- * const $type = s.prop('type');
  * const viz = new carto.Viz({
- *   filter: s.nin($type, 'metropolis', 'capital');
+ *   filter: s.nin(s.prop('type'), ['metropolis', 'capital'])
  * });
+ *
+ * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *   filter: nin($type, ['metropolis', 'capital'])
+ * `);
  *
  * @memberof carto.expressions
  * @name nin
@@ -3427,14 +3690,17 @@ function NIN_INLINE_MAKER(categories) {
 
 function generateBelongsExpression(name, inlineMaker, jsEval) {
     return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
-        constructor(value, ...categories) {
-            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(value);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'value', 0, value);
+        constructor(value, categories) {
+            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(value);
+            categories = categories || [];
 
-            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */]);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])(name, 'value', 0, value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkArray */])(name, 'categories', 1, categories);
 
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'value', 0, 'category', value);
-            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, '', index + 1, 'category', cat));
+            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */]);
+
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, 'value', 0, 'category', value);
+            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, '', index + 1, 'category', cat));
 
             let children = {
                 value
@@ -3450,8 +3716,8 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'value', 0, 'category', this.value);
-            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, '', index + 1, 'category', cat));
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, 'value', 0, 'category', this.value);
+            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, '', index + 1, 'category', cat));
         }
     };
 }
@@ -3490,11 +3756,16 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
  *  CB_DARK2, CB_PAIRED, CB_PASTEL1, CB_PASTEL2, CB_SET1, CB_SET2, CB_SET3
  *  ```
  *
- * @example <caption> Using a color scheme </caption>
+ * @example <caption>Using a color scheme.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
  * });
+ *
+ * @example <caption>Using a color scheme. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: ramp($type, PRISM)
+ * `);
  *
  * @name carto.expressions.palettes
  * @memberof carto.expressions
@@ -3510,7 +3781,7 @@ class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* defaul
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
                 if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
-                    return target[name].map(__WEBPACK_IMPORTED_MODULE_2__utils__["k" /* hexToRgb */]);
+                    return target[name].map(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* hexToRgb */]);
                 }
             }
         });
@@ -3528,8 +3799,12 @@ class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* defaul
 
 class CustomPalette extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
     // colors is a list of expression of type 'color'
-    constructor(...elems) {
-        elems = elems.map(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */]);
+    constructor(elems) {
+        elems = elems || [];
+        if (!Array.isArray(elems)) {
+            elems = [elems];
+        }
+        elems = elems.map(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */]);
         if (!elems.length) {
             throw new Error('customPalette(): invalid parameters: must receive at least one argument');
         }
@@ -3537,9 +3812,9 @@ class CustomPalette extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default *
         if (type == undefined) {
             throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
         }
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('customPalette', 'colors[0]', 0, ['color', 'number'], elems[0]);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('customPalette', 'colors[0]', 0, ['color', 'number'], elems[0]);
         elems.map((color, index) => {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["b" /* checkExpression */])('customPalette', `colors[${index}]`, index, color);
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkExpression */])('customPalette', `colors[${index}]`, index, color);
             if (color.type == undefined) {
                 throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
             }
@@ -3721,10 +3996,14 @@ function mitt(all                 ) {
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
  * const s = carto.expressions;
- * const $dn = s.prop('populationDensity');
  * const viz = new carto.Viz({
- *   filter: s.between($dn, 50, 100);
+ *   filter: s.between(s.prop('dn'), 50, 100);
  * });
+ *
+ * @example <caption>Display only cities where the population density is within the [50,100] range. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: 50 < $dn < 100  // Equivalent to between($dn, 50, 100)
+ * `);
  *
  * @memberof carto.expressions
  * @name between
@@ -3733,13 +4012,13 @@ function mitt(all                 ) {
  */
 class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(value, lowerLimit, upperLimit) {
-        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(value);
-        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(lowerLimit);
-        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(upperLimit);
+        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(value);
+        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(lowerLimit);
+        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(upperLimit);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'value', 0, 'number', value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'lowerLimit', 1, 'number', lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'upperLimit', 2, 'number', upperLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'value', 0, 'number', value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'lowerLimit', 1, 'number', lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'upperLimit', 2, 'number', upperLimit);
 
         super({ value, lowerLimit, upperLimit });
         this.type = 'number';
@@ -3753,9 +4032,9 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _compile(meta) {
         super._compile(meta);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'value', 0, 'number', this.value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'lowerLimit', 1, 'number', this.lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'upperLimit', 2, 'number', this.upperLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'value', 0, 'number', this.value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'lowerLimit', 1, 'number', this.lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'upperLimit', 2, 'number', this.upperLimit);
 
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
@@ -3791,17 +4070,17 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
     constructor(a, b, mix, interpolator) {
-        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(b);
-        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(mix);
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(mix);
 
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'a', 0, a);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'b', 1, b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'mix', 2, mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'a', 0, a);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'b', 1, b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'mix', 2, mix);
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])('blend', 'mix', 2, 'number', mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
@@ -3816,10 +4095,10 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
         }
     }
     eval(feature) {
-        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
+        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* clamp */])(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* mix */])(x, y, a);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["n" /* mix */])(x, y, a);
     }
     replaceChild(toReplace, replacer) {
         if (toReplace == this.mix) {
@@ -3831,7 +4110,7 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
         super._compile(meta);
 
         abTypeCheck(this.a, this.b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])('blend', 'mix', 1, 'number', this.mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])('blend', 'mix', 1, 'number', this.mix);
 
         this.type = this.a.type;
 
@@ -3878,7 +4157,7 @@ function abTypeCheck(a, b) {
  */
 class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(categoryName) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('category', 'categoryName', 0, categoryName);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('category', 'categoryName', 0, categoryName);
         super({});
         this.expr = categoryName;
         this.type = 'category';
@@ -3929,8 +4208,13 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @example <caption>Creating a constant number expression.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.constant(15);
+ *   width: s.constant(15)
  * });
+ *
+ * @example <caption>Creating a constant number expression. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: constant(15)
+ * `);
  *
  * @memberof carto.expressions
  * @name constant
@@ -3939,7 +4223,7 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('constant', 'x', 0, x);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('constant', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
@@ -3975,6 +4259,11 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *   color: s.hex('#00F');  // Equivalent to `color: '#00F'`
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: #00F  // Equivalent to hex('#00F')
+ * `);
+ *
  * @memberof carto.expressions
  * @name hex
  * @function
@@ -3982,13 +4271,13 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(hexadecimalColor) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('hex', 'hexadecimalColor', 0, hexadecimalColor);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('hex', 'hexadecimalColor', 0, hexadecimalColor);
         super({});
         this.type = 'color';
         try {
-            this.color = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(hexadecimalColor);
+            this.color = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* hexToRgb */])(hexadecimalColor);
         } catch (error) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
     }
     eval() {
@@ -4027,6 +4316,11 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *   color: s.hsl(0.67, 1.0, 0.5)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsl(0.67, 1.0, 0.5)
+ * `);
+ *
  * @memberof carto.expressions
  * @name hsl
  * @function
@@ -4051,6 +4345,11 @@ const HSL = genHSL('hsl', false);
  *   color: s.hsla(0.67, 1.0, 0.5, 1.0)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsla(0.67, 1.0, 0.5, 1.0)
+ * `);
+ *
  * @memberof carto.expressions
  * @function
  * @name hsla
@@ -4063,11 +4362,11 @@ const HSLA = genHSL('hsla', true);
 function genHSL(name, alpha) {
     return class HSLA extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(h, s, l, a) {
-            [h, s, l, a] = [h, s, l, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+            [h, s, l, a] = [h, s, l, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
 
             const children = { h, s, l };
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -4085,9 +4384,9 @@ function genHSL(name, alpha) {
                 }
                 return value.eval(f);
             };
-            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
-            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
-            const l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.l), 0, 1);
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.s), 0, 1);
+            const l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.l), 0, 1);
 
             const hslToRgb = (h, s, l) => {
                 const c = {
@@ -4099,9 +4398,9 @@ function genHSL(name, alpha) {
 
                 const C = (1 - Math.abs(2 * l - 1)) * s;
 
-                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
-                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
-                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.b, 0, 1);
 
                 c.r = ((c.r - 0.5) * C + l) * 255;
                 c.g = ((c.g - 0.5) * C + l) * 255;
@@ -4118,7 +4417,7 @@ function genHSL(name, alpha) {
             hslCheckType('s', 1, this.s);
             hslCheckType('l', 2, this.l);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsla', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('hsla', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -4149,7 +4448,7 @@ function genHSL(name, alpha) {
     };
 
     function hslCheckType(parameterName, parameterIndex, parameter) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
         if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
@@ -4181,6 +4480,11 @@ function genHSL(name, alpha) {
  *   color: s.hsv(0.67, 1.0, 1.0)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsv(0.67, 1.0, 1.0)
+ * `);
+ *
  * @memberof carto.expressions
  * @name hsv
  * @function
@@ -4205,6 +4509,11 @@ const HSV = genHSV('hsv', false);
  *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsva(0.67, 1.0, 1.0, 1.0)
+ * `);
+ *
  * @memberof carto.expressions
  * @function
  * @name hsva
@@ -4217,13 +4526,13 @@ const HSVA = genHSV('hsva', true);
 function genHSV(name, alpha) {
     return class extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(h, s, v, a) {
-            h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(h);
-            s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(s);
-            v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(v);
+            h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(h);
+            s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(s);
+            v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(v);
             const children = { h, s, v };
             if (alpha) {
-                a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -4241,21 +4550,21 @@ function genHSV(name, alpha) {
                 }
                 return value.eval(f);
             };
-            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
-            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
-            const v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.v), 0, 1);
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.s), 0, 1);
+            const v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.v), 0, 1);
 
             const hsvToRgb = (h, s, v) => {
                 const c = {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(this.a.eval(f), 0,1) : 1,
+                    a: alpha ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(this.a.eval(f), 0,1) : 1,
                 };
 
-                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
-                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
-                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.b, 0, 1);
 
                 c.r = ((c.r - 1) * s + 1) * v * 255;
                 c.g = ((c.g - 1) * s + 1) * v * 255;
@@ -4272,7 +4581,7 @@ function genHSV(name, alpha) {
             hsvCheckType('s', 1, this.s);
             hsvCheckType('v', 2, this.v);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsva', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('hsva', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -4302,7 +4611,7 @@ function genHSV(name, alpha) {
     };
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
         if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
@@ -4386,7 +4695,7 @@ class BounceEaseIn extends genInterpolator(
 function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
         constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(m);
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(m);
             super({ m });
         }
         eval(feature) {
@@ -4429,7 +4738,12 @@ const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azu
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.namedColor('blue');
+ *   color: s.namedColor('blue')  // Equivalent to `color: 'blue'`
+ * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz({
+ *   color: blue  // Equivalent to namedColor('blue')
  * });
  *
  * @memberof carto.expressions
@@ -4439,9 +4753,9 @@ const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azu
  */
 class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(colorName) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('namedColor', 'colorName', 0, colorName);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('namedColor', 'colorName', 0, colorName);
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
         }
         super({});
         this.type = 'color';
@@ -4491,8 +4805,13 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
  * @example <caption>Creating a number expression.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.number(15);  // Equivalent to `width: 15`
+ *   width: s.number(15)  // Equivalent to `width: 15`
  * });
+ *
+ * @example <caption>Creating a number expression. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 15  // Equivalent to number(15)
+ * `);
  *
  * @memberof carto.expressions
  * @name number
@@ -4501,7 +4820,7 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
  */
 class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('number', 'x', 0, x);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('number', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
@@ -4548,18 +4867,22 @@ class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 let quantilesUID = 0;
 
 /**
- * Generate quantiles of size `n` from the features on the viewport
+ * Generate quantiles of size `n` from the features on the viewport.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
- * const $density = s.prop('density');
  * const viz = new carto.Viz({
- *   color: s.ramp(s.quantiles($density, 5), s.palettes.PRISM)
+ *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
+ *
+ * @example <caption>Use quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(quantiles($density, 5), PRISM)
+ * `);
  *
  * @memberof carto.expressions
  * @name quantiles
@@ -4571,18 +4894,22 @@ const Quantiles = genQuantiles(false);
 
 
 /**
- * Generate quantiles of size `n` from all the features
+ * Generate quantiles of size `n` from all the features.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
- * const $density = s.prop('density');
  * const viz = new carto.Viz({
- *   color: s.ramp(s.globalQuantiles($density, 5), s.palettes.PRISM)
+ *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
+ *
+ * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalQuantiles($density, 5), PRISM)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalQuantiles
@@ -4596,8 +4923,8 @@ const GlobalQuantiles = genQuantiles(true);
 function genQuantiles(global) {
     return class Quantiles extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(input, buckets) {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
 
             let children = {
                 input
@@ -4624,7 +4951,7 @@ function genQuantiles(global) {
         }
         _compile(metadata) {
             super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('quantiles', 'input', 0, 'number', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('quantiles', 'input', 0, 'number', this.input);
             if (global) {
                 const copy = metadata.sample.map(s => s[this.input.name]);
                 copy.sort((x, y) => x - y);
@@ -4713,6 +5040,11 @@ function genQuantiles(global) {
  *   color: s.rgb(0, 0, 255)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgb(0, 0, 255)
+ * `);
+ *
  * @memberof carto.expressions
  * @name rgb
  * @function
@@ -4737,6 +5069,11 @@ const RGB = genRGB('rgb', false);
  *   color: s.rgba(0, 0, 255, 1)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgba(0, 0, 255, 1)
+ * `);
+ *
  * @memberof carto.expressions
  * @name rgba
  * @function
@@ -4751,14 +5088,14 @@ const RGBA = genRGB('rgba', true);
 function genRGB(name, alpha) {
     return class RGBA extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(r, g, b, a) {
-            [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'r', 0, 'number', r);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'g', 1, 'number', g);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'b', 2, 'number', b);
+            [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'r', 0, 'number', r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'g', 1, 'number', g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'b', 2, 'number', b);
 
             const children = { r, g, b };
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
             super(children);
@@ -4774,11 +5111,11 @@ function genRGB(name, alpha) {
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'r', 0, 'number', this.r);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'g', 1, 'number', this.g);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'b', 2, 'number', this.b);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'r', 0, 'number', this.r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'g', 1, 'number', this.g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'b', 2, 'number', this.b);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('rgba', 'a', 3, 'number', this.a);
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
@@ -4803,25 +5140,33 @@ function genRGB(name, alpha) {
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create an animated FadeIn/FadeOut configuration
+ * Create an animated FadeIn/FadeOut configuration.
  *
  * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
  * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
  * @return {carto.expressions.Base}
  *
- * @example <caption> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </caption>
+ * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds.</caption>
  * const s = carto.expressions;
- * const $day = s.prop('day');
- * new carto.Viz({
- *   filter: s.torque($day, 40, s.fade(0.1, 0.3))
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, 0.3))
  * });
  *
- * @example <caption>   fadeIn and fadeOut of 0.5 seconds </caption>
+ * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.1, 0.3))
+ * `);
+ *
+ * @example<caption>Fade in and fade out of 0.5 seconds.</caption>
  * const s = carto.expressions;
- * const $day = s.prop('day');
- * new carto.Viz({
- *   filter: s.torque($day, 40, s.fade(0.5))
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.5))
  * });
+ *
+ * @example<caption>Fade in and fade out of 0.5 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.5))
+ * `);
  *
  * @memberof carto.expressions
  * @name fade
@@ -4838,8 +5183,8 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (param2 == __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
             fadeOut = fadeIn;
         }
-        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeIn);
-        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeOut);
+        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(fadeIn);
+        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(fadeOut);
         // TODO improve type check
         super({ fadeIn, fadeOut });
         this.type = 'fade';
@@ -4853,7 +5198,7 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /**
- * Create an animated temporal filter (torque)
+ * Create an animated temporal filter (torque).
  *
  * @param {carto.expressions.Base} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
@@ -4864,17 +5209,19 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {carto.expressions.Base}
  *
- *  @example <caption> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque($day, 40, fade(0.1, 0.3))`);
+ *   filter: torque($day, 40, fade(0.1, 0.3))
+ * `);
  *
- * @example <caption> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </caption>
- * new carto.Viz(`
- *   width:    2
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);
+ *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
+ * `);
  *
  * @memberof carto.expressions
  * @name torque
@@ -4900,7 +5247,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         const duration = this.duration;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     getSimTime() {
         if (!(this.input.min.eval() instanceof Date)){
@@ -7059,8 +7406,8 @@ class Viz {
 
         // TODO: Check expression types ie: color is not a number expression!
 
-        vizSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(vizSpec.width);
-        vizSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(vizSpec.strokeWidth);
+        vizSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(vizSpec.width);
+        vizSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(vizSpec.strokeWidth);
 
         if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isNumber */](vizSpec.resolution)) {
             throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('viz', 'resolutionNumberRequired');
@@ -7107,6 +7454,7 @@ class Viz {
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = parseVizExpression;
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseVizDefinition;
+/* unused harmony export cleanComments */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(93);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
@@ -7130,17 +7478,18 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__)
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = __WEBPACK_IMPORTED_MODULE_1__functions__[name]; });
 lowerCaseFunctions.true = __WEBPACK_IMPORTED_MODULE_1__functions__["TRUE"];
 lowerCaseFunctions.false = __WEBPACK_IMPORTED_MODULE_1__functions__["FALSE"];
+lowerCaseFunctions.pi = __WEBPACK_IMPORTED_MODULE_1__functions__["PI"];
 
 function parseVizExpression(str) {
     prepareJsep();
-    const r = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str)));
+    const r = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str)));
     cleanJsep();
     return r;
 }
 
 function parseVizDefinition(str) {
     prepareJsep();
-    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(str);
+    const ast = __WEBPACK_IMPORTED_MODULE_0_jsep___default()(cleanComments(str));
     let vizSpec = { variables: {} };
     if (ast.type == 'Compound') {
         ast.body.map(node => parseVizNamedExpr(vizSpec, node));
@@ -7163,13 +7512,13 @@ function parseVizNamedExpr(vizSpec, node) {
         throw new Error('Invalid syntax');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(parseNode(node.right));
+        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(parseNode(node.right));
     } else if (name == 'resolution') {
         const value = parseNode(node.right);
         vizSpec[name] = value;
     } else {
         const value = parseNode(node.right);
-        vizSpec[name] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(value);
+        vizSpec[name] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(value);
     }
 
 }
@@ -7293,6 +7642,88 @@ function cleanJsep() {
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.removeIdentifierChar('#');
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('true');
     __WEBPACK_IMPORTED_MODULE_0_jsep___default.a.addLiteral('false');
+}
+
+/**
+ * Remove comments from string
+ * - // line comments
+ * - /* block comments
+ * - Keep comments inside single and double quotes tracking escape chars
+ * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
+ */
+function cleanComments(str) {
+    var mode = {
+        singleQuote: false,
+        doubleQuote: false,
+        blockComment: false,
+        lineComment: false,
+        escape: 0
+    };
+
+    // Adding chars to avoid index checking
+    str = ('_' + str + '_').split('');
+
+    for (var i = 0, l = str.length; i < l; i++) {
+
+        if (mode.singleQuote) {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '\'' && mode.escape % 2 == 0) {
+                mode.singleQuote = false;
+                mode.escape = 0;
+            }
+            continue;
+        }
+
+        if (mode.doubleQuote) {
+            if (str[i] == '\\') {
+                mode.escape++;
+            } else if (str[i] === '"' && mode.escape % 2 == 0) {
+                mode.doubleQuote = false;
+                mode.escape = 0;
+            }
+            continue;
+        }
+
+        if (mode.blockComment) {
+            if (str[i] === '*' && str[i+1] === '/') {
+                str[i+1] = '';
+                mode.blockComment = false;
+            }
+            str[i] = '';
+            continue;
+        }
+
+        if (mode.lineComment) {
+            if (str[i+1] === '\n' || str[i+1] === '\r') {
+                mode.lineComment = false;
+            }
+            if (i+1 < l) {
+                str[i] = '';
+            }
+            continue;
+        }
+
+        mode.doubleQuote = str[i] === '"';
+        mode.singleQuote = str[i] === '\'';
+
+        if (str[i] === '/') {
+
+            if (str[i+1] === '*') {
+                str[i] = '';
+                mode.blockComment = true;
+                continue;
+            }
+            if (str[i+1] === '/') {
+                str[i] = '';
+                mode.lineComment = true;
+                continue;
+            }
+        }
+    }
+
+    // Remove chars added before
+    return str.join('').slice(1, -1);
 }
 
 
@@ -7519,16 +7950,21 @@ let bucketUID = 0;
  *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
  *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
  *
- *
  * ```javascript
  *  const s = carto.expressions;
  *  const $speed = s.prop('speed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, 30, 80, 120),
+ *      s.buckets($speed, [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
+ * ```
+ *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+ * `);
  * ```
  *
  * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
@@ -7546,14 +7982,20 @@ let bucketUID = 0;
  *  const $procesedSpeed = s.prop('procesedSpeed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+ *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
  *      s.palettes.PRISM)
  *    )
  * });
  * ```
  *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
+ * ```
+ *
  * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {...carto.expressions.Base} breakpoints - Numeric expression containing the different breakpoints.
+ * @param {carto.expressions.Base[]} breakpoints - Numeric expression containing the different breakpoints.
  * @return {carto.expressions.Base}
  *
  * @memberof carto.expressions
@@ -7562,9 +8004,13 @@ let bucketUID = 0;
  * @api
  */
 class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-    constructor(input, ...args) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
-        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+    constructor(input, args) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+        args = args || [];
+
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkArray */])(name, 'args', 1, args);
+
+        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
 
         let looseType = undefined;
         if (input.type) {
@@ -7576,10 +8022,10 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         args.map((arg, index) => {
             if (arg.type) {
                 if (looseType && looseType != arg.type) {
-                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type` +
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
                 } else if (arg.type != 'number' && arg.type != 'category') {
-                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
                 }
             }
         });
@@ -7616,10 +8062,10 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
         this.args.map((arg, index) => {
             if (input.type != arg.type) {
-                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type` +
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type` +
                     `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
             } else if (arg.type != 'number' && arg.type != 'category') {
-                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
             }
         });
     }
@@ -7673,6 +8119,11 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *   color: s.cielab(32.3, 79.2, -107.86)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: cielab(32.3, 79.2, -107.86)
+ * `);
+ *
  * @memberof carto.expressions
  * @name cielab
  * @function
@@ -7680,16 +8131,16 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(l, a, b) {
-        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(l);
-        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
+        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(l);
+        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(b);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'l', 0, l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'a', 1, a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'b', 2, b);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'l', 0, 'number', l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'a', 1, 'number', a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'b', 2, 'number', b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'l', 0, l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'a', 1, a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'b', 2, b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'l', 0, 'number', l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'a', 1, 'number', a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'b', 2, 'number', b);
 
         super({ l, a, b });
         this.type = 'color';
@@ -7698,9 +8149,9 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _compile(meta) {
         super._compile(meta);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'l', 0, 'number', this.l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'a', 1, 'number', this.a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'b', 2, 'number', this.b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'l', 0, 'number', this.l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'a', 1, 'number', this.a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'b', 2, 'number', this.b);
 
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
@@ -7774,11 +8225,16 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 * @param {carto.expressions.Base} max - Numeric or date expression pointing to the higher limit
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property. </caption>
+* @example <caption> Display points with a different color depending on the `category` property.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM),
+*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 * });
+*
+* @example <caption> Display points with a different color depending on the `category` property. (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp(linear($speed, 10, 100), PRISM)
+* `);
 *
 * @memberof carto.expressions
 * @name linear
@@ -7787,20 +8243,20 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 */
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, min, max) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
-        min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(min);
-        max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(max);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+        min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(min);
+        max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(max);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'input', 0, input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'min', 1, min);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'max', 2, max);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'min', 1, min);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'max', 2, max);
 
         super({ input, min, max });
 
         if (this.min.type != 'time') {
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'input', 0, 'number', this.input);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'min', 1, 'number', this.min);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'max', 2, 'number', this.max);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'input', 0, 'number', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'min', 1, 'number', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'max', 2, 'number', this.max);
         }
         this.type = 'number';
     }
@@ -7826,9 +8282,9 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
 
         } else {
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'input', 0, 'number', this.input);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'min', 1, 'number', this.min);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'max', 2, 'number', this.max);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'input', 0, 'number', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'min', 1, 'number', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'max', 2, 'number', this.max);
 
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
@@ -7860,12 +8316,17 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption></caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
  * });
  *
+ * @example <caption>(String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: near($day, (25 * now()) % 10000, 0, 10)
+ * `);
+ * 
  * @memberof carto.expressions
  * @name near
  * @function
@@ -7874,10 +8335,10 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 // TODO type checking
 class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, center, threshold, falloff) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
-        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(center);
-        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(threshold);
-        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(falloff);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(center);
+        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(threshold);
+        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(falloff);
 
         super({ input, center, threshold, falloff });
     }
@@ -7886,7 +8347,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
     _compile(meta) {
         super._compile(meta);
@@ -7917,11 +8378,16 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Update width during the time.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mod(s.now(), 10);
+ *   width: s.mod(s.now(), 10)
  * });
+ *
+ * @example <caption>Update width during the time. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: now() % 10
+ * `);
  *
  * @memberof carto.expressions
  * @name now
@@ -7972,11 +8438,16 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @param {carto.expressions.Base|number} x - A number to be warped in a numeric expression
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Display blue points with opacity.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.opacity(s.rgb(255,0,0), 0.5);  // Equivalent to `s.rgba(255,0,0,0.5)`
+ *   color: s.opacity(s.rgb(0,0,255), 0.5)  // Equivalent to `s.rgba(0,0,255,0.5)`
  * });
+ *
+ * @example <caption>Display blue points with opacity. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: opacity(rgb(0,0,255), 0.5)
+ * `);
  *
  * @memberof carto.expressions
  * @name opacity
@@ -7993,15 +8464,15 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (Number.isFinite(alpha)) {
             alpha = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(alpha);
         }
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'color', 0, 'color', color);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'alpha', 1, 'number', alpha);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkLooseType */])('opacity', 'color', 0, 'color', color);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkLooseType */])('opacity', 'alpha', 1, 'number', alpha);
         super({ color, alpha });
         this.type = 'color';
     }
     _compile(meta) {
         super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'color', 0, 'color', this.color);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'alpha', 1, 'number', this.alpha);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('opacity', 'color', 0, 'color', this.color);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('opacity', 'alpha', 1, 'number', this.alpha);
         this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
     eval(f) {
@@ -10248,6 +10719,8 @@ if (true) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__colorspaces__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__functions__ = __webpack_require__(2);
+
 
 
 
@@ -10262,17 +10735,16 @@ if (true) {
 * @param {carto.expressions.palettes} palette - The color palette that is going to be used
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property. (We assume category has discrete values) </caption>
+* @example <caption>Display points with a different color depending on the `category` property.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.prop('category'), s.palettes.PRISM),
+*   color: s.ramp(s.prop('category'), s.palettes.PRISM)
 * });
 *
-* @example <caption> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</caption>
-* const s = carto.expressions;
-* const viz = new carto.Viz({
-*   color: s.ramp(s.prop('speed'), s.palettes.PRISM),
-* });
+* @example <caption>Display points with a different color depending on the `category` property. (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp($category, PRISM)
+* `);
 *
 * @memberof carto.expressions
 * @name ramp
@@ -10280,16 +10752,15 @@ if (true) {
 * @api
 */
 class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-    constructor(input, palette, ...args) {
-        if (args.length > 0) {
-            throw new Error('ramp(input, palette) only accepts two parameters');
+    constructor(input, palette) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+        if (Array.isArray(palette)) {
+            palette = Object(__WEBPACK_IMPORTED_MODULE_3__functions__["customPalette"])(palette);
         }
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
-        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(palette);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('ramp', 'input', 0, input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('ramp', 'input', 0, ['number', 'category'], input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('ramp', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('ramp', 'input', 0, ['number', 'category'], input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
 
         super({ input: input });
         this.minKey = 0;
@@ -10308,8 +10779,8 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
-        const lowIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.floor(len * m), 0, len);
-        const highIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.ceil(len * m), 0, len);
+        const lowIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.floor(len * m), 0, len);
+        const highIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.ceil(len * m), 0, len);
         const low = this.pixel[lowIndex];
         const high = this.pixel[highIndex];
         const fract = len * m - Math.floor(len * m);
@@ -10317,7 +10788,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     }
     _compile(meta) {
         super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
         if (this.input.type == 'category') {
             this.maxKey = this.input.numCategories - 1;
         }
@@ -10557,9 +11028,9 @@ function XYZToSRGB({ x, y, z, a }) {
     // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space
 
     // Convert XYZ to linear RGB
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(3.2406 * x - 1.5372 * y - 0.4986 * z, 0, 1);
-    const g = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(-0.9689 * x + 1.8758 * y + 0.0415 * z, 0, 1);
-    const b = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(0.0557 * x - 0.2040 * y + 1.0570 * z, 0, 1);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(3.2406 * x - 1.5372 * y - 0.4986 * z, 0, 1);
+    const g = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(-0.9689 * x + 1.8758 * y + 0.0415 * z, 0, 1);
+    const b = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(0.0557 * x - 0.2040 * y + 1.0570 * z, 0, 1);
 
     return linearRGBToSRGB({ r, g, b, a });
 }
@@ -10595,11 +11066,16 @@ function cielabToXYZ({ l, a, b, alpha }) {
  * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Filter by a date between dates.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.between(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')
  * });
+ *
+ * @example <caption>Filter by a date between dates. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: time('2022-03-09T00:00:00Z') < $date < time('2033-08-12T00:00:00Z')
+ * `);
  *
  * @memberof carto.expressions
  * @name time
@@ -10637,17 +11113,22 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /**
- * Get the top `n` properties
+ * Get the top `n` properties.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @param {number} n - Number of top properties to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
  * });
+ *
+ * @example <caption>Use top 3 categories to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(top($category, 3), VIVID)
+ * `);
  *
  * @memberof carto.expressions
  * @name top
@@ -10740,12 +11221,12 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /**
- * Loads a variable aliased expresion by the name
+ * Loads a variable aliased expresion by the name.
  *
  * @param {string} name - The variable name that is going to be evaluated
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption></caption
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -10754,6 +11235,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *  filter: s.neq(s.var('sum_price'), 'london'),
  * });
  *
+ * @example <caption>(String)</caption
  * const viz = new carto.Viz(`
  *   @sum_price: clusterSum($price)
  *   filter: @sum_price != 'london'
@@ -10766,7 +11248,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(name) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('name', 'name', 0, name);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('name', 'name', 0, name);
         if (name == '') {
             throw new Error('variable(): invalid parameter, zero-length string');
         }
@@ -10815,9 +11297,9 @@ class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 // TODO should this expression be removed?
 class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x, y, z) {
-        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(x);
-        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(y);
-        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(z);
+        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(x);
+        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(y);
+        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(z);
         super({ x: x, y: y, z: z });
         // TODO improve type check
     }
@@ -10901,12 +11383,17 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Show constant width in zoom.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.div(s.zoom(), 1000)
  * });
  *
+ * @example <caption>Show constant width in zoom. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: zoom() / 1000
+ * `);
+ * 
  * @memberof carto.expressions
  * @name zoom
  * @function

@@ -62,9 +62,13 @@ for example lets divide the population between a number using the <code>div</cod
 const viz = new carto.Viz({
   width: s.div(
     s.prop('population'),
-    s.number(10000)  // Equivalent to 10000
+    10000
  )
-});</code></pre><p>Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
+});</code></pre><p>All these expressions can be used also from a String API. This API is a more compact way to create and use your expressions.
+It has shortcut notation to access your feature properties using the <code>$</code> symbol. It also allows inline comments using the JavaScript style.</p>
+<pre class="prettyprint source lang-javascript"><code>const viz = new carto.Viz(`
+  width: $population / 10000  // Size proportional to the population for each feature
+`);</code></pre><p>Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
 For example, the previous example is valid since we assumed that 'population' is a numeric property, it won't be valid if
 it was a categorical property. Each expression defines some restrictions regarding their parameters, particularly, the
 type of their parameters.</p>
@@ -259,14 +263,20 @@ Use them with a <a href="carto.expressions.html#.ramp">ramp</a></p>
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption"> Using a color scheme </p>
+        <p class="code-caption">Using a color scheme.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
 });</code></pre>
+
+        <p class="code-caption">Using a color scheme. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: ramp($type, PRISM)
+`);</code></pre>
 
 
 
@@ -426,14 +436,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Abs</p>
+        <p class="code-caption">Abs.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.abs(100);  // 1
+  width: s.abs(100)  // 100
 });</code></pre>
+
+        <p class="code-caption">Abs. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: abs(100)
+`);</code></pre>
 
 
 
@@ -617,14 +633,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Number addition.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
+  width: s.add(10, 2)  // 12
 });</code></pre>
+
+        <p class="code-caption">Number addition. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 10 + 2  // Equivalent to add(10, 2)
+`);</code></pre>
 
 
 
@@ -643,7 +665,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Perform a binary AND between two numeric expressions.
-If the numbers are different from 0 or 1 this performs a <a href="https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification">fuzzy or operation</a>.
+If the numbers are different from 0 or 1 this performs a <a href="https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification">fuzzy and operation</a>.
 This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.</p>
 <p>This returns a number expression where 0 means <code>false</code> and 1 means <code>true</code>.</p>
 </div>
@@ -811,20 +833,23 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Show only elements with price < 30 AND category === 'fruit'</p>
+        <p class="code-caption">Show only elements with price < 30 AND category == 'fruit'.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $price = s.prop('price');
-const $category = s.prop('category');
-
 const viz = new carto.Viz({
   filter: s.and(
-    s.lt($price, 30),
-    s.eq($category, 'fruit')
+    s.lt(s.prop('price'), 30),
+    s.eq(s.prop('category'), 'fruit')
   )
 });</code></pre>
+
+        <p class="code-caption">Show only elements with price < 30 AND category == 'fruit'. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price &lt; 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+`);</code></pre>
 
 
 
@@ -834,7 +859,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".animate"><span class="type-signature">(static) </span>animate<span class="signature">(duration)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".animate"><span class="type-signature">(static) </span>animate<span class="signature">(duration)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
     
@@ -954,6 +979,24 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1106,12 +1149,20 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Ascending order based on width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   order: s.asc(s.width())
 });</code></pre>
+
+        <p class="code-caption">Ascending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: asc(width())
+`);</code></pre>
 
 
 
@@ -1321,15 +1372,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display only cities where the population density is within the [50,100] range.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $dn = s.prop('populationDensity');
 const viz = new carto.Viz({
-  filter: s.between($dn, 50, 100);
+  filter: s.between(s.prop('dn'), 50, 100);
 });</code></pre>
+
+        <p class="code-caption">Display only cities where the population density is within the [50,100] range. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: 50 &lt; $dn &lt; 100  // Equivalent to between($dn, 50, 100)
+`);</code></pre>
 
 
 
@@ -1546,7 +1602,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, &hellip;breakpoints)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, breakpoints)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
     
@@ -1566,10 +1622,12 @@ const viz = new carto.Viz({
  const $speed = s.prop('speed');
  const viz = new carto.Viz({
    color: s.ramp(
-     s.buckets($speed, 30, 80, 120),
+     s.buckets($speed, [30, 80, 120]),
      s.palettes.PRISM
    )
-});</code></pre><p>Using the buckets <code>expression</code> we divide the dataset in 3 buckets according to the speed:</p>
+});</code></pre><pre class="prettyprint source lang-javascript"><code> const viz = new carto.Viz(`
+   color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+`);</code></pre><p>Using the buckets <code>expression</code> we divide the dataset in 3 buckets according to the speed:</p>
 <ul>
 <li>From 0 to 29</li>
 <li>From 30 to 79</li>
@@ -1582,10 +1640,12 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
  const $procesedSpeed = s.prop('procesedSpeed');
  const viz = new carto.Viz({
    color: s.ramp(
-     s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+     s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
      s.palettes.PRISM)
    )
-});</code></pre>
+});</code></pre><pre class="prettyprint source lang-javascript"><code> const viz = new carto.Viz(`
+   color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+`);</code></pre>
 </div>
 
 
@@ -1608,8 +1668,6 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
 
         <th>Type</th>
 
-        
-        <th>Attributes</th>
         
 
         
@@ -1636,14 +1694,6 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
@@ -1660,22 +1710,12 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+<span class="param-type">Array.&lt;<a href="carto.expressions.html#.Base">carto.expressions.Base</a>></span>
 
 
             
             </td>
 
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                    &lt;repeatable><br>
-                
-                </td>
             
 
             
@@ -2069,14 +2109,20 @@ Find the nearest integer that is greater than or equal to the expression value.<
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Ceil</p>
+        <p class="code-caption">Ceil.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   width: s.ceil(5.1);  // 6
 });</code></pre>
+
+        <p class="code-caption">Ceil. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: ceil(5.1)
+`);</code></pre>
 
 
 
@@ -2282,7 +2328,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -2290,6 +2336,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.cielab(32.3, 79.2, -107.86)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: cielab(32.3, 79.2, -107.86)
+`);</code></pre>
 
 
 
@@ -2307,7 +2359,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Aggregate using the average value. This operation disables the access to the property</p>
+    <p>Aggregate using the average value. This operation disables the access to the property
+except within other cluster aggregate functions.</p>
 </div>
 
 
@@ -2444,13 +2497,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster average of the population as width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
 const viz = new carto.Viz({
-  width: s.clusterAvg($population);
+  width: s.clusterAvg(s.prop('population'))
 });</code></pre>
+
+        <p class="code-caption">Use cluster average of the population as width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterAvg($population)
+`);</code></pre>
 
 
 
@@ -2468,7 +2528,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+    <p>Aggregate using the maximum value. This operation disables the access to the property
+except within other cluster aggregate functions.</p>
 </div>
 
 
@@ -2605,13 +2666,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster maximum of the population as width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
 const viz = new carto.Viz({
-  width: s.clusterMax($population);
+  width: s.clusterMax(s.prop('population'))
 });</code></pre>
+
+        <p class="code-caption">Use cluster maximum of the population as width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterMax($population)
+`);</code></pre>
 
 
 
@@ -2629,7 +2697,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Aggregate using the minimum value. This operation disables the access to the property</p>
+    <p>Aggregate using the minimum value. This operation disables the access to the property
+except within other cluster aggregate functions.</p>
 </div>
 
 
@@ -2766,13 +2835,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster minimum of the population as width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
 const viz = new carto.Viz({
-  width: s.clusterMin($population);
+  width: s.clusterMin(s.prop('population'))
 });</code></pre>
+
+        <p class="code-caption">Use cluster minimum of the population as width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterMin($population)
+`);</code></pre>
 
 
 
@@ -2790,7 +2866,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+    <p>Aggregate using the mode value. This operation disables the access to the property
+except within other cluster aggregate functions.</p>
 </div>
 
 
@@ -2927,13 +3004,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster mode of the population as width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
 const viz = new carto.Viz({
-  width: s.clusterMode($population);
+  width: s.clusterMode(s.prop('population'))
 });</code></pre>
+
+        <p class="code-caption">Use cluster mode of the population as width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterMode($population)
+`);</code></pre>
 
 
 
@@ -2951,7 +3035,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Aggregate using the maximum value. This operation disables the access to the property</p>
+    <p>Aggregate using the sum value. This operation disables the access to the property
+except within other cluster aggregate functions.</p>
 </div>
 
 
@@ -3088,13 +3173,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster sum of the population as width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $population = s.prop('population');
 const viz = new carto.Viz({
-  width: s.clusterSum($population);
+  width: s.clusterSum(s.prop('population'))
 });</code></pre>
+
+        <p class="code-caption">Use cluster sum of the population as width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterSum($population)
+`);</code></pre>
 
 
 
@@ -3249,14 +3341,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Creating a constant number expression.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.constant(15);
+  width: s.constant(15)
 });</code></pre>
+
+        <p class="code-caption">Creating a constant number expression. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: constant(15)
+`);</code></pre>
 
 
 
@@ -3274,7 +3372,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Compute the cosine of a number x</p>
+    <p>Compute the cosine of a number x.</p>
 </div>
 
 
@@ -3410,14 +3508,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Cos</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.cos(0);  // 1
+  width: s.cos(0)  // 1
 });</code></pre>
+
+        <p class="code-caption">Cos. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: cos(0)
+`);</code></pre>
 
 
 
@@ -3568,12 +3672,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Descending order based on width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   order: s.desc(s.width())
 });</code></pre>
+
+        <p class="code-caption">Descending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: desc(width())
+`);</code></pre>
 
 
 
@@ -3757,14 +3869,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Number division.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
+  width: s.div(10, 2)  // 5
 });</code></pre>
+
+        <p class="code-caption">Number division. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 10 / 2  // Equivalent to div(10, 2)
+`);</code></pre>
 
 
 
@@ -3949,14 +4067,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price === 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price equal to 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.eq(s.prop('price'), 30);
+  filter: s.eq(s.prop('price'), 30)
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price equal to 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price == 30  // Equivalent to eq($price, 30)
+`);</code></pre>
 
 
 
@@ -3974,7 +4098,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Create an animated FadeIn/FadeOut configuration</p>
+    <p>Create an animated FadeIn/FadeOut configuration.</p>
 </div>
 
 
@@ -4138,21 +4262,18 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption"> fadeIn of 0.1 seconds, fadeOut of 0.3 seconds </p>
+        <p class="code-caption">Fade in of 0.1 seconds, fade out of 0.3 seconds.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $day = s.prop('day');
-new carto.Viz({
-  filter: s.torque($day, 40, s.fade(0.1, 0.3))
+const viz = new carto.Viz({
+  filter: s.torque(s.prop('day'), 40, s.fade(0.1, 0.3))
 });</code></pre>
 
-        <p class="code-caption">   fadeIn and fadeOut of 0.5 seconds </p>
+        <p class="code-caption">Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</p>
     
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const $day = s.prop('day');
-new carto.Viz({
-  filter: s.torque($day, 40, s.fade(0.5))
-});</code></pre>
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: torque($day, 40, fade(0.1, 0.3))
+`);</code></pre>
 
 
 
@@ -4311,14 +4432,20 @@ Find the nearest integer less than or equal to the expression value.</p>
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Floor</p>
+        <p class="code-caption">Floor.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.floor(5.9);  // 5
+  width: s.floor(5.9)  // 5
 });</code></pre>
+
+        <p class="code-caption">Floor. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: floor(5.9)
+`);</code></pre>
 
 
 
@@ -4336,7 +4463,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the average value of all the features</p>
+    <p>Return the average value of all the features.</p>
 </div>
 
 
@@ -4473,11 +4600,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global average of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_avg: s.globalAvg(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global average of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -4496,7 +4632,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the count of all the features</p>
+    <p>Return the count of all the features.</p>
 </div>
 
 
@@ -4633,11 +4769,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global count of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_count: s.globalCount(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global count of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -4656,7 +4801,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the maximum value of all the features</p>
+    <p>Return the maximum value of all the features.</p>
 </div>
 
 
@@ -4793,11 +4938,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global maximum of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_max: s.globalMax(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global maximum of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -4816,7 +4970,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the minimum value of all the features</p>
+    <p>Return the minimum value of all the features.</p>
 </div>
 
 
@@ -4953,11 +5107,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global minimum of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_min: s.globalMin(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global minimum of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -4976,7 +5139,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the percentile of all the features</p>
+    <p>Return the percentile of all the features.</p>
 </div>
 
 
@@ -5113,11 +5276,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global percentile of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_percentile: s.globalPercentile(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global percentile of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -5136,7 +5308,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Generate quantiles of size <code>n</code> from all the features</p>
+    <p>Generate quantiles of size <code>n</code> from all the features.</p>
 </div>
 
 
@@ -5292,13 +5464,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use global quantiles to define a color ramp.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $density = s.prop('density');
 const viz = new carto.Viz({
-  color: s.ramp(s.globalQuantiles($density, 5), s.palettes.PRISM)
+  color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
 });</code></pre>
+
+        <p class="code-caption">Use global quantiles to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(globalQuantiles($density, 5), PRISM)
+`);</code></pre>
 
 
 
@@ -5316,7 +5495,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the sum of the values of all the features</p>
+    <p>Return the sum of the values of all the features.</p>
 </div>
 
 
@@ -5453,11 +5632,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the global sum of the `amout` property to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     g_sum: s.globalSum(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the global sum of the `amout` property to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -5643,14 +5831,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price > 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price greater than 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.gt(s.prop('price'), 30);
+  filter: s.gt(s.prop('price'), 30)
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price greater than 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price > 30  // Equivalent to gt($price, 30)
+`);</code></pre>
 
 
 
@@ -5835,14 +6029,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price >= 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price greater than or equal to 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.gte(s.prop('price'), 30);
+  filter: s.gte(s.prop('price'), 30)
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price greater than or equal to 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price >= 30  // Equivalent to gte($price, 30)
+`);</code></pre>
 
 
 
@@ -5993,7 +6193,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -6001,6 +6201,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.hex('#00F');  // Equivalent to `color: '#00F'`
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: #00F  // Equivalent to hex('#00F')
+`);</code></pre>
 
 
 
@@ -6206,7 +6412,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -6214,6 +6420,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.hsl(0.67, 1.0, 0.5)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: hsl(0.67, 1.0, 0.5)
+`);</code></pre>
 
 
 
@@ -6445,7 +6657,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -6453,6 +6665,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.hsla(0.67, 1.0, 0.5, 1.0)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: hsla(0.67, 1.0, 0.5, 1.0)
+`);</code></pre>
 
 
 
@@ -6658,7 +6876,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -6666,6 +6884,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.hsv(0.67, 1.0, 1.0)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: hsv(0.67, 1.0, 1.0)
+`);</code></pre>
 
 
 
@@ -6897,7 +7121,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -6905,6 +7129,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.hsva(0.67, 1.0, 1.0, 1.0)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: hsva(0.67, 1.0, 1.0, 1.0)
+`);</code></pre>
 
 
 
@@ -6990,10 +7220,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+<span class="param-type">Array.&lt;<a href="carto.expressions.html#.Base">carto.expressions.Base</a>></span>
 |
 
-<span class="param-type">string</span>
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -7088,15 +7318,21 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Display only cities where $type is "metropolis" or "capital".</p>
+        <p class="code-caption">Display only cities where $type is 'metropolis' or 'capital'.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $type = s.prop('type');
 const viz = new carto.Viz({
-  filter: s.in($type, 'metropolis', 'capital');
+  filter: s.in(s.prop('type'), ['metropolis', 'capital'])
 });</code></pre>
+
+        <p class="code-caption">Display only cities where $type is 'metropolis' or 'capital'. (String)</p>
+    
+    <pre class="prettyprint"><code>const $type = s.prop('type');
+const viz = new carto.Viz(`
+  filter: in($type, ['metropolis', 'capital'])
+`);</code></pre>
 
 
 
@@ -7293,14 +7529,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption"> Display points with a different color depending on the `category` property. </p>
+        <p class="code-caption"> Display points with a different color depending on the `category` property.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM),
+  color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 });</code></pre>
+
+        <p class="code-caption"> Display points with a different color depending on the `category` property. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(linear($speed, 10, 100), PRISM)
+`);</code></pre>
 
 
 
@@ -7318,7 +7560,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Compute the natural logarithm (base e) of a number x</p>
+    <p>Compute the natural logarithm (base e) of a number x.</p>
 </div>
 
 
@@ -7454,14 +7696,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Natural Logarithm.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.log(10);  // 2.302585092994046
+  width: s.log(10)  // 2.302585092994046
 });</code></pre>
+
+        <p class="code-caption">Natural Logarithm. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: log(10)
+`);</code></pre>
 
 
 
@@ -7646,14 +7894,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price < 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price less than 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.lt(s.prop('price'), 30);
+  filter: s.lt(s.prop('price'), 30)
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price less than 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price &lt; 30  // Equivalent to lt($price, 30)
+`);</code></pre>
 
 
 
@@ -7838,14 +8092,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price <= 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price less than or equal to 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.lte(s.prop('price'), 30);
+  filter: s.lte(s.prop('price'), 30)
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price less than or equal to 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price &lt;= 30  // Equivalent to lte($price, 30)
+`);</code></pre>
 
 
 
@@ -8029,14 +8289,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Number modulus.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.mod(10, 6);  // 4
+  width: s.mod(10, 6)  // 4
 });</code></pre>
+
+        <p class="code-caption">Number modulus. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 10 % 6  // Equivalent to mod(10, 6)
+`);</code></pre>
 
 
 
@@ -8220,14 +8486,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Simple multiplication.</p>
+        <p class="code-caption">Number multiplication.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+  width: s.mul(5, 5)  // 25
 });</code></pre>
+
+        <p class="code-caption">Number multiplication. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 5 * 5  // Equivalent to mul(5, 5)
+`);</code></pre>
 
 
 
@@ -8378,13 +8650,19 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  color: s.namedColor('blue');
+  color: s.namedColor('blue')  // Equivalent to `color: 'blue'`
+});</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz({
+  color: blue  // Equivalent to namedColor('blue')
 });</code></pre>
 
 
@@ -8617,12 +8895,19 @@ This can be useful for filtering out features by setting their size to zero.
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>const s = carto.expressions;
+    <pre class="prettyprint"><code>&lt;caption>&lt;/caption>
+const s = carto.expressions;
 const viz = new carto.Viz({
   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
 });</code></pre>
+
+        <p class="code-caption">(String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: near($day, (25 * now()) % 10000, 0, 10)
+`);</code></pre>
 
 
 
@@ -8807,14 +9092,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Compare two numbers to show only elements with price !== 30</p>
+        <p class="code-caption">Compare two numbers to show only elements with price not equal to 30.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   filter: s.neq(s.prop('price'), 30);
 });</code></pre>
+
+        <p class="code-caption">Compare two numbers to show only elements with price not equal to 30. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price != 30  // Equivalent to neq($price, 30)
+`);</code></pre>
 
 
 
@@ -8900,10 +9191,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+<span class="param-type">Array.&lt;<a href="carto.expressions.html#.Base">carto.expressions.Base</a>></span>
 |
 
-<span class="param-type">string</span>
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -8998,15 +9289,21 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Display only cities where $type is not "metropolis" nor "capital".</p>
+        <p class="code-caption">Display only cities where $type is not 'metropolis' or 'capital'.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $type = s.prop('type');
 const viz = new carto.Viz({
-  filter: s.nin($type, 'metropolis', 'capital');
+  filter: s.nin(s.prop('type'), ['metropolis', 'capital'])
 });</code></pre>
+
+        <p class="code-caption">Display only cities where $type is not 'metropolis' or 'capital'. (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(`
+  filter: nin($type, ['metropolis', 'capital'])
+`);</code></pre>
 
 
 
@@ -9108,12 +9405,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">No order.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   order: s.noOrder()
 });</code></pre>
+
+        <p class="code-caption">No order. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: noOrder()
+`);</code></pre>
 
 
 
@@ -9272,14 +9577,20 @@ This is internally computed as 1 - x preserving boolean behavior and allowing fu
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Not</p>
+        <p class="code-caption">Not.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.not(0);  // 1
+  width: s.not(0)  // 1
 });</code></pre>
+
+        <p class="code-caption">Not. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: not(0)
+`);</code></pre>
 
 
 
@@ -9381,12 +9692,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Update width during the time.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.mod(s.now(), 10);
+  width: s.mod(s.now(), 10)
 });</code></pre>
+
+        <p class="code-caption">Update width during the time. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: now() % 10
+`);</code></pre>
 
 
 
@@ -9541,14 +9860,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Creating a number expression.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.number(15);  // Equivalent to `width: 15`
+  width: s.number(15)  // Equivalent to `width: 15`
 });</code></pre>
+
+        <p class="code-caption">Creating a number expression. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 15  // Equivalent to number(15)
+`);</code></pre>
 
 
 
@@ -9702,12 +10027,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Display blue points with opacity.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  color: s.opacity(s.rgb(255,0,0), 0.5);  // Equivalent to `s.rgba(255,0,0,0.5)`
+  color: s.opacity(s.rgb(0,0,255), 0.5)  // Equivalent to `s.rgba(0,0,255,0.5)`
 });</code></pre>
+
+        <p class="code-caption">Display blue points with opacity. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: opacity(rgb(0,0,255), 0.5)
+`);</code></pre>
 
 
 
@@ -9894,18 +10227,23 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Show only elements with price < 30 or price > 1000</p>
+        <p class="code-caption">Show only elements with price < 30 OR price > 1000.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $price = s.prop('price');
 const viz = new carto.Viz({
   filter: s.or(
-    s.lt($price, 30),
-    s.gt($price, 1000)
+    s.lt(s.prop('price'), 30),
+    s.gt(s.prop('price'), 1000)
   )
 });</code></pre>
+
+        <p class="code-caption">Show only elements with price < 30 OR price > 1000. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: $price &lt; 30 or $price > 1000  // Equivalent to or(lt($price, 30), gt($price, 1000))
+`);</code></pre>
 
 
 
@@ -10090,14 +10428,20 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Power of two numbers.</p>
+        <p class="code-caption">Number power.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.pow(2, 3);  // 8
+  width: s.pow(2, 3)  // 8
 });</code></pre>
+
+        <p class="code-caption">Number power. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 2 ^ 3  // Equivalent to pow(2, 3)
+`);</code></pre>
 
 
 
@@ -10250,14 +10594,24 @@ The <code>prop('name')</code> will return the name of the current city for every
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Display only cities with name different from "London"</p>
+        <p class="code-caption">Display only cities with name different from "London".</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
- filter: s.neq(s.prop('name'), 'london'),
+ filter: s.neq(s.prop('name'), 'london')
 });</code></pre>
+
+        <p class="code-caption">Display only cities with name different from "London". (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: neq(prop('name'), 'london')
+`);
+
+const viz = new carto.Viz(`
+  filter: $name != 'london'
+`);</code></pre>
 
 
 
@@ -10275,7 +10629,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Generate quantiles of size <code>n</code> from the features on the viewport</p>
+    <p>Generate quantiles of size <code>n</code> from the features on the viewport.</p>
 </div>
 
 
@@ -10431,13 +10785,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use quantiles to define a color ramp.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $density = s.prop('density');
 const viz = new carto.Viz({
-  color: s.ramp(s.quantiles($density, 5), s.palettes.PRISM)
+  color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
 });</code></pre>
+
+        <p class="code-caption">Use quantiles to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(quantiles($density, 5), PRISM)
+`);</code></pre>
 
 
 
@@ -10615,19 +10976,18 @@ If there are more values than colors in the palette, new colors will be generate
 
     <h5>Examples</h5>
     
-        <p class="code-caption"> Display points with a different color depending on the `category` property. (We assume category has discrete values) </p>
+        <p class="code-caption">Display points with a different color depending on the `category` property.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  color: s.ramp(s.prop('category'), s.palettes.PRISM),
+  color: s.ramp(s.prop('category'), s.palettes.PRISM)
 });</code></pre>
 
-        <p class="code-caption"> Display points with a different color depending on the `speed` property. (We assume category has continuos numeric values)</p>
+        <p class="code-caption">Display points with a different color depending on the `category` property. (String)</p>
     
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  color: s.ramp(s.prop('speed'), s.palettes.PRISM),
-});</code></pre>
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp($category, PRISM)
+`);</code></pre>
 
 
 
@@ -10833,7 +11193,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -10841,6 +11201,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.rgb(0, 0, 255)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: rgb(0, 0, 255)
+`);</code></pre>
 
 
 
@@ -11072,7 +11438,7 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Display blue points.</p>
     
@@ -11080,6 +11446,12 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   color: s.rgba(0, 0, 255, 1)
 });</code></pre>
+
+        <p class="code-caption">Display blue points. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: rgba(0, 0, 255, 1)
+`);</code></pre>
 
 
 
@@ -11098,8 +11470,8 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Compute the sign of a number x, indicating whether the number is positive, negative or zero
-This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
--0 if the number is -0.</p>
+This means this function will return 1 if the number is positive, -1 if the number is negative
+0 if the number is 0 and -0 if the number is -0.</p>
 </div>
 
 
@@ -11235,14 +11607,20 @@ This means this function will return 1 if the number is positive, -1 if the numb
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Sign</p>
+        <p class="code-caption">Sign.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.sign(100);  // 1
+  width: s.sign(100)  // 1
 });</code></pre>
+
+        <p class="code-caption">Sign. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: sign(100)
+`);</code></pre>
 
 
 
@@ -11260,7 +11638,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Compute the sine of a number x</p>
+    <p>Compute the sine of a number x.</p>
 </div>
 
 
@@ -11396,14 +11774,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Sin</p>
+        <p class="code-caption">Sin.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.sin(Math.PI/2);  // 1
+  width: s.sin(Math.PI/2)  // 1
 });</code></pre>
+
+        <p class="code-caption">Sin. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: sin(PI/2)
+`);</code></pre>
 
 
 
@@ -11421,7 +11805,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Compute the square root of a number x</p>
+    <p>Compute the square root of a number x.</p>
 </div>
 
 
@@ -11557,14 +11941,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Square root.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.sqrt(4);  // 2
+  width: s.sqrt(4)  // 2
 });</code></pre>
+
+        <p class="code-caption">Square root. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: sqrt(4)
+`);</code></pre>
 
 
 
@@ -11748,14 +12138,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Number subtraction.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+  width: s.sub(10, 2)  // 8
 });</code></pre>
+
+        <p class="code-caption">Number subtraction. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 10 - 2  // Equivalent to sub(10, 2)
+`);</code></pre>
 
 
 
@@ -11773,7 +12169,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Compute the tangent of a number x</p>
+    <p>Compute the tangent of a number x.</p>
 </div>
 
 
@@ -11909,14 +12305,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Tan</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.tan(0);  // 0
+  width: s.tan(0)  // 0
 });</code></pre>
+
+        <p class="code-caption">Tan. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: tan(0)
+`);</code></pre>
 
 
 
@@ -12070,12 +12472,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Filter by a date between dates.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   filter: s.between(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')
 });</code></pre>
+
+        <p class="code-caption">Filter by a date between dates. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: time('2022-03-09T00:00:00Z') &lt; $date &lt; time('2033-08-12T00:00:00Z')
+`);</code></pre>
 
 
 
@@ -12093,7 +12503,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Get the top <code>n</code> properties</p>
+    <p>Get the top <code>n</code> properties.</p>
 </div>
 
 
@@ -12249,12 +12659,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use top 3 categories to define a color ramp.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
 });</code></pre>
+
+        <p class="code-caption">Use top 3 categories to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(top($category, 3), VIVID)
+`);</code></pre>
 
 
 
@@ -12272,7 +12690,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Create an animated temporal filter (torque)</p>
+    <p>Create an animated temporal filter (torque).</p>
 </div>
 
 
@@ -12456,19 +12874,21 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
 
     <h5>Examples</h5>
     
-        <p class="code-caption"> Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </p>
+        <p class="code-caption">Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
     
-    <pre class="prettyprint"><code>new carto.Viz(`
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: 2
   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
-  filter: torque($day, 40, fade(0.1, 0.3))`);</code></pre>
+  filter: torque($day, 40, fade(0.1, 0.3))
+`);</code></pre>
 
-        <p class="code-caption"> Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds </p>
+        <p class="code-caption">Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
     
-    <pre class="prettyprint"><code>new carto.Viz(`
-  width:    2
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 2
   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
-  filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))`);</code></pre>
+  filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
+`);</code></pre>
 
 
 
@@ -12486,7 +12906,7 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
 
 
 <div class="description">
-    <p>Loads a variable aliased expresion by the name</p>
+    <p>Loads a variable aliased expresion by the name.</p>
 </div>
 
 
@@ -12619,16 +13039,18 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>const s = carto.expressions;
+    <pre class="prettyprint"><code>&lt;caption>&lt;/caption
+const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
     sum_price: s.clusterSum(s.prop('price'))
   }
  filter: s.neq(s.var('sum_price'), 'london'),
-});
+});</code></pre>
 
+    <pre class="prettyprint"><code>&lt;caption>(String)&lt;/caption
 const viz = new carto.Viz(`
   </code></pre>
 
@@ -12648,7 +13070,7 @@ const viz = new carto.Viz(`
 
 
 <div class="description">
-    <p>Return the average value of the features showed in the viewport</p>
+    <p>Return the average value of the features showed in the viewport.</p>
 </div>
 
 
@@ -12785,11 +13207,20 @@ const viz = new carto.Viz(`
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the average of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_avg: s.viewportAvg(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the average of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -12808,7 +13239,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the count of the features showed in the viewport</p>
+    <p>Return the count of the features showed in the viewport.</p>
 </div>
 
 
@@ -12945,11 +13376,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the count of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_count: s.viewportSum(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the count of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -12968,7 +13408,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the maximum value of the features showed in the viewport</p>
+    <p>Return the maximum value of the features showed in the viewport.</p>
 </div>
 
 
@@ -13105,11 +13545,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the maximum of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_max: s.viewportMax(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the maximum of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -13128,7 +13577,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the minimum value of the features showed in the viewport</p>
+    <p>Return the minimum value of the features showed in the viewport.</p>
 </div>
 
 
@@ -13265,11 +13714,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the minimum of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_min: s.viewportMin(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the minimum of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -13288,7 +13746,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the percentile of the features showed in the viewport</p>
+    <p>Return the percentile of the features showed in the viewport.</p>
 </div>
 
 
@@ -13425,11 +13883,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the percentile of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_percentile: s.viewportPercentile(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the percentile of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -13448,7 +13915,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Return the sum of the values of the features showed in the viewport</p>
+    <p>Return the sum of the values of the features showed in the viewport.</p>
 </div>
 
 
@@ -13585,11 +14052,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the sum of the `amout` property in the viewport to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const $amount = s.prop('amount');
 const viz = new carto.Viz({
+  variables: {
+     v_sum: s.viewportSum(s.prop('amount'))
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the sum of the `amout` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -13692,12 +14168,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Ascending order based on width.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   order: s.asc(s.width())
 });</code></pre>
+
+        <p class="code-caption">Ascending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: asc(width())
+`);</code></pre>
 
 
 
@@ -13799,12 +14283,20 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Show constant width in zoom.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   width: s.div(s.zoom(), 1000)
 });</code></pre>
+
+        <p class="code-caption">Show constant width in zoom. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: zoom() / 1000
+`);</code></pre>
 
 
 
@@ -13830,7 +14322,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu May 03 2018 18:13:51 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 07 2018 17:16:20 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
