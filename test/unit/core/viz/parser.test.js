@@ -4,15 +4,45 @@ describe('src/core/viz/parser', () => {
 
     // TODO: missing lots of tests here
 
-    describe('.cleanComments', () => {
-        it('should remove the one-line comments', () => {
-            const str = 'width: 1// one-line comment';
+    fdescribe('.cleanComments', () => {
+        it('should remove line comments without endline', () => {
+            const str = 'width: 1// line comment';
             expect(cleanComments(str)).toBe('width: 1');
         });
 
-        it('should remove the multi-line comments', () => {
-            const str = 'width: 1/* multi-line \ncomment */\ncolor: blue';
-            expect(cleanComments(str)).toBe('width: 1\ncolor: blue');
+        it('should remove line comments with endline', () => {
+            const str = 'width: 1// line comment\n';
+            expect(cleanComments(str)).toBe('width: 1\n');
+        });
+
+        it('should keep line comments inside simple quotes', () => {
+            const str = '@var: \'// line comment\'';
+            expect(cleanComments(str)).toBe('@var: \'// line comment\'');
+        });
+
+        it('should keep line comments inside simple quotes', () => {
+            const str = '@var: "// line comment"';
+            expect(cleanComments(str)).toBe('@var: "// line comment"');
+        });
+
+        it('should remove block comments without endline', () => {
+            const str = 'width: 1/* block\ncomment */';
+            expect(cleanComments(str)).toBe('width: 1');
+        });
+
+        it('should remove block comments with endline', () => {
+            const str = 'width: 1/* block\ncomment */\n';
+            expect(cleanComments(str)).toBe('width: 1\n');
+        });
+
+        it('should keep block comments inside simple quotes', () => {
+            const str = '@var: \'/* block\ncomment */\'';
+            expect(cleanComments(str)).toBe('@var: \'/* block\ncomment */\'');
+        });
+
+        it('should keep block comments inside simple quotes', () => {
+            const str = '@var: "/* block\ncomment */"';
+            expect(cleanComments(str)).toBe('@var: "/* block\ncomment */"');
         });
     });
 
