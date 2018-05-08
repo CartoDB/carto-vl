@@ -3,10 +3,11 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['point']);
+const source = new carto.source.GeoJSON(sources['multi-polygon']);
 const viz = new carto.Viz(`
-    strokeWidth: 2
-    strokeColor: rgb(255, 0, 0)
+    color: red
+    strokeColor: green
+    strokeWidth: 3
 `);
 const layer = new carto.Layer('layer', source, viz);
 
