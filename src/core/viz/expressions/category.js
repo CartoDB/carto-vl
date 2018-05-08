@@ -25,6 +25,9 @@ export default class Category extends BaseExpression {
     isAnimated() {
         return false;
     }
+    getName() {
+        return this.expr;
+    }
     _compile(metadata) {
         this._metadata = metadata;
     }

@@ -463,7 +463,7 @@ describe('src/client/windshaft-filtering', () => {
 
             it('with aggregate properties', () => {
                 expect(preFilters(f,
-                    s.lt(s.clusterSum(s.property('property')), 10)
+                    s.lt(s.clusterSum(s.category('property')), 10)
                 )).toBeNull();
             });
 
@@ -485,7 +485,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(actual).toEqual(expected);
             });
 
-            it('between(clusterAvg($numericProperty), 10, 20)', () => {
+            it('between(clusterAvg("numericProperty"), 10, 20)', () => {
                 const expected = {
                     _cdb_agg_avg_numericProperty: [{
                         greater_than_or_equal_to:  10,
@@ -493,7 +493,7 @@ describe('src/client/windshaft-filtering', () => {
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.between(s.clusterAvg(s.property('numericProperty')), 10, 20)
+                    s.between(s.clusterAvg(s.category('numericProperty')), 10, 20)
                 );
                 expect(actual).toEqual(expected);
             });

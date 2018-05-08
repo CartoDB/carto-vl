@@ -1,7 +1,8 @@
 import BaseExpression from './base';
 import * as schema from '../../schema';
-import PropertyExpression from './property';
-import { checkInstance, checkType } from './utils';
+import Category from './category';
+import Property from './property';
+import { implicitCast, checkInstance, checkType } from './utils';
 
 /**
  * Aggregate using the average value. This operation disables the access to the property
@@ -130,9 +131,10 @@ export const ClusterSum = genAggregationOp('sum', 'number');
 
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends BaseExpression {
-        constructor(property) {
-            checkInstance(aggName, 'property', 0, PropertyExpression, property);
-            super({ property });
+        constructor(propertyName) {
+            propertyName = implicitCast(propertyName);
+            checkInstance(aggName, 'propertyName', 0, Category, propertyName);
+            super({ property: new Property(propertyName.getName()) });
             this._aggName = aggName;
             this.type = aggType;
         }
