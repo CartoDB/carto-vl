@@ -1,12 +1,11 @@
 import * as carto from '../../../../src/';
-import mapboxgl from '@carto/mapbox-gl';
+import * as util from '../../util';
 
 describe('Layer', () => {
-    const mapSize = 600;
     let source, viz, viz2, layer, map;
 
     beforeEach(() => {
-        const setup = createMap('map');
+        const setup = util.createMap('map');
         map = setup.map;
 
         source = new carto.source.GeoJSON(featureJSON);
@@ -29,37 +28,11 @@ describe('Layer', () => {
         });
     });
 
-    function createMap(name) {
-        const div = document.createElement('div');
-        div.id = name;
-        div.style.margin = '0';
-        div.style.width = `${mapSize}px`;
-        div.style.height = `${mapSize}px`;
-        document.body.appendChild(div);
-
-        const map = new mapboxgl.Map({
-            container: name,
-            style: { version: 8, sources: {}, layers: [] },
-            center: [0, 0],
-            zoom: 0
-        });
-
-        return { div, map };
-    }
-
     const featureJSON = {
         type: 'Feature',
         geometry: {
-            type: 'Polygon',
-            coordinates: [
-                [
-                    [0, 0],
-                    [50, 0],
-                    [50, 50],
-                    [0, 50],
-                    [0, 0]
-                ]
-            ]
+            type: 'Point',
+            coordinates: [0, 0]
         },
         properties: {}
     };
