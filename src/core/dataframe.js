@@ -18,6 +18,49 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
+        if (this.type == 'polygon') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(polygon => {
+                    const vertices = polygon.flat;
+                    const numVertices = polygon.holes[0] || polygon.flat.length / 2;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        } else if (this.type == 'line') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(line => {
+                    const vertices = line;
+                    const numVertices = line.length;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        }
     }
 
     bind(renderer) {
@@ -73,6 +116,26 @@ export default class Dataframe {
                 return this._getPolygonAtPosition(pos, viz);
             default:
                 return [];
+        }
+    }
+
+    inViewport(featureIndex, minx, miny, maxx, maxy) {
+        switch (this.type) {
+            case 'point':
+            {
+                const x = this.geom[2 * featureIndex + 0];
+                const y = this.geom[2 * featureIndex + 1];
+                return x > minx && x < maxx && y > miny && y < maxy;
+            }
+            case 'line':
+            case 'polygon':
+            {
+                const aabb = this._aabb[featureIndex];
+                return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
+
+            }
+            default:
+                return false;
         }
     }
 

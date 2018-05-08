@@ -53,14 +53,15 @@ function decodePolygon(geometry) {
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     // let clipIndex = 0;
-    geometry.map(feature => {
-        feature.map(polygon => {
+    geometry.forEach(feature => {
+        feature.forEach(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
-            triangles.map(index => {
+            const trianglesLength = triangles.length;
+            for (let i = 0; i < trianglesLength; i++) {
+                const index = triangles[i];
                 vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
                 normals.push(0, 0);
-            });
-
+            }
             {
                 const lineString = polygon.flat;
                 let ringInit = 0;
