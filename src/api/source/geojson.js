@@ -56,10 +56,6 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _clone() {
-        return new GeoJSON(this._data);
-    }
-
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
@@ -93,6 +89,10 @@ export default class GeoJSON extends Base {
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
+    }
+
+    _clone() {
+        return new GeoJSON(this._data);
     }
 
     _checkData(data) {
@@ -139,6 +139,13 @@ export default class GeoJSON extends Base {
         });
 
         this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample);
+
+        if (featureCount > 0) {
+            // Set the geomType of the first feature to the metadata
+            let geomType = this._getDataframeType(this._features[0].geometry.type);
+            this._metadata.setGeomType(geomType);
+        }
+
         return this._metadata;
     }
 

@@ -47,6 +47,7 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+        this.geomType = '';
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -181,6 +182,8 @@ export default class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+
+        metadata.setGeomType(this.geomType);
 
         return { MNS, resolution, filters, metadata, urlTemplate };
     }

@@ -101,6 +101,8 @@ describe('api/layer', () => {
             const layer = new Layer('layer0', source, viz);
             // Mock for _vizChanged
             layer._vizChanged = () => Promise.resolve();
+            // Mock metadata
+            layer.metadata = { geomType: 'point' };
             layer.blendToViz(viz2).then(done);
         });
         it('should reject the promise if viz is undefined', (done) => {
