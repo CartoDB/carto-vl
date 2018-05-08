@@ -148,14 +148,14 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
         }
         this._source = source;
         this.requestData();
+
+        viz.setDefaultsIfRequired(this.metadata.geomType);
 
         if (this._viz) {
             this._viz.onChange(null);

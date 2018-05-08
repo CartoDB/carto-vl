@@ -116,9 +116,28 @@ export default class MVT extends Base {
                 var tile = new VectorTile(new Protobuf(response));
                 const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
                 var fieldMap = {};
-                this._MNS.columns.map((name, i) => fieldMap[name] = i);
+                const numFields = [];
+                const jsonFields = [];
+                const stringFields = [];
+                this.metadata.columns.map(c => {
+                    const type = c.type;
+                    if (type == 'json') {
+                        jsonFields.push(c.name);
+                    } else if (type == 'float') {
+                        numFields.push(c.name);
+                    } else if (type == 'string') {
+                        stringFields.push(c.name);
+                    } else {
+                        throw new Error(`Column type '${type}' not supported`);
+                    }
 
-                const { points, featureGeometries, properties, geomType } = this._decodeMVTLayer(mvtLayer, mvt_extent, this._MNS);
+                });
+                numFields.map((name, i) => fieldMap[name] = i);
+                jsonFields.map((name, i) => fieldMap[name] = i + numFields.length);
+                stringFields.map((name, i) => fieldMap[name] = i + jsonFields.length);
+
+                const { points, featureGeometries, properties, geomType } = this._decodeMVTLayer(mvtLayer, mvt_extent, this._MNS, jsonFields, numFields, stringFields, fieldMap);
+                this.metadata.geomType = geomType;
 
                 var rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
@@ -193,11 +212,19 @@ export default class MVT extends Base {
         featureGeometries.push(geometry);
     }
 
-    _decodeMVTLayer(mvtLayer, mvt_extent, MNS) {
+    _decodeMVTLayer(mvtLayer, mvt_extent, MNS, jsonFields, numFields, stringFields, fieldMap) {
         const properties = [];
-        for (let i = 0; i < MNS.columns.length; i++) {
-            properties.push(new Float32Array(mvtLayer.length + 1024));
-        }
+        this.metadata.columns.map(c => {
+            var e = null;
+            if (c.type == 'float') {
+                e = new Float32Array(mvtLayer.length + 1024);
+            } else if (c.type == 'json') {
+                e = {};
+            } else if (c.type == 'string') {
+                e = {};
+            }
+            properties[fieldMap[c.name]] = e;
+        });
         var points = null;
         const geomType = VectorTileFeature.types[mvtLayer.feature(0).type].toLowerCase();
         let featureGeometries = [];
@@ -218,11 +245,18 @@ export default class MVT extends Base {
                 throw new Error(`Unimplemented geometry type: '${geomType}'`);
             }
 
-            var index = 0;
-            MNS.columns.map((name) => {
-                //TODO decode f.properties[name] and check type
-                properties[index][i] = Number(f.properties[name]);
-                index++;
+            // TODO check number of properties received and send error if not all the defined
+            // properties are being received
+            this.metadata.columns.map(c => {
+                var e = null;
+                if (c.type == 'float') {
+                    e = Number(f.properties[c.name]);
+                } else if (c.type == 'json') {
+                    e = JSON.parse(f.properties[c.name]);
+                } else if (c.type == 'string') {
+                    e = f.properties[c.name];
+                }
+                properties[fieldMap[c.name]][i] = e;
             });
         }
 
