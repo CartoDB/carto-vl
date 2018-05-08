@@ -185,11 +185,7 @@ class Renderer {
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
-                const x = d.geom[2 * i + 0];
-                const y = d.geom[2 * i + 1];
-                // TODO polygon test
-                // TODO line test
-                if (x > minx && x < maxx && y > miny && y < maxy) {
+                if (d.inViewport(i, minx, miny, maxx, maxy)) {
 
                     for (let j = 0; j < propertyNamesLength; j++) {
                         const name = propertyNames[j];

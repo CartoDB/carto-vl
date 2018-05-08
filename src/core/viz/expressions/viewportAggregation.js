@@ -65,7 +65,7 @@ export const ViewportAvg = genViewportAgg('avg',
  */
 export const ViewportMax = genViewportAgg('max',
     self => { self._value = Number.NEGATIVE_INFINITY; },
-    (self, y) => { self._value = y; },
+    (self, y) => { self._value = Math.max(self._value, y); },
     self => self._value
 );
 
