@@ -1,6 +1,16 @@
 import Viz from '../../../src/api/viz';
 import * as s from '../../../src/core/viz/functions';
 
+// Generic Style defaults
+
+const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
+const DEFAULT_WIDTH_EXPRESSION = s.number(1);
+const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
+const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
+const DEFAULT_FILTER_EXPRESSION = s.constant(1);
+const DEFAULT_ORDER_EXPRESSION = s.noOrder();
+const DEFAULT_RESOLUTION = 1;
+
 describe('api/viz', () => {
 
     describe('constructor', () => {
@@ -11,44 +21,48 @@ describe('api/viz', () => {
                 // Check returned object inherits from Viz
                 expect(actual).toEqual(jasmine.any(Viz));
                 // Check returned object properties
-                expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getWidth().eval()).toEqual(s.number(5).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.number(0).eval());
-                expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
+                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set default viz values when an empty object is given', () => {
                 const actual = new Viz({});
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getResolution()).toEqual(1);
-                expect(actual.getColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getWidth().eval()).toEqual(s.number(5).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 255, 0, 0.5).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.number(0).eval());
-                expect(actual.getOrder().expr).toEqual(s.noOrder().expr);
+                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set the viz properties defined in the vizSpec object', () => {
                 const vizSpec = {
-                    resolution: 2,
                     color: s.rgba(255, 0, 0, 1),
                     width: s.number(10),
                     strokeColor: s.rgba(0, 0, 255, 1),
                     strokeWidth: s.number(15),
-                    order: s.asc(s.width())
+                    filter: s.number(0.5),
+                    order: s.asc(s.width()),
+                    resolution: 2
                 };
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getResolution()).toEqual(2);
                 expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
                 expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
+                expect(actual.getFilter().eval()).toEqual(s.number(0.5).eval());
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.getResolution()).toEqual(2);
             });
 
             it('should allow the viz properties `width` and `strokeWidth` to be numbers', () => {
@@ -159,17 +173,20 @@ describe('api/viz', () => {
                     width: number(10)
                     strokeColor: rgba(0, 0, 255, 1)
                     strokeWidth: number(15)
+                    filter: 0.5
                     order: asc(width())
+                    resolution: 1
                 `;
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getResolution()).toEqual(1);
                 expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
                 expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
                 expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
+                expect(actual.getFilter().eval()).toEqual(s.number(0.5).eval());
                 expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.getResolution()).toEqual(1);
             });
         });
     });
