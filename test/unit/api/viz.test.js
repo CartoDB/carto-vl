@@ -3,9 +3,9 @@ import * as s from '../../../src/core/viz/functions';
 
 // Generic Style defaults
 
-const DEFAULT_COLOR_EXPRESSION = s.rgba(0, 255, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = s.number(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgba(0, 255, 0, 0.5);
+const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
+const DEFAULT_WIDTH_EXPRESSION = s.number(1);
+const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
 const DEFAULT_FILTER_EXPRESSION = s.constant(1);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();

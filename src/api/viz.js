@@ -8,9 +8,9 @@ import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
-const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgba(0, 255, 0, 0.5));
-const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(5));
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgba(0, 255, 0, 0.5));
+const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
+const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
@@ -20,13 +20,13 @@ const MIN_RESOLUTION = 0;
 const MAX_RESOLUTION = 256;
 
 const SUPPORTED_PROPERTIES = [
-    'resolution',
     'color',
     'width',
     'strokeColor',
     'strokeWidth',
     'order',
     'filter',
+    'resolution',
     'variables'
 ];
 
