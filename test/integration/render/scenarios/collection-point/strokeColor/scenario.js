@@ -5,8 +5,7 @@ const map = new carto.Map({
 
 const source = new carto.source.GeoJSON(sources['collection-point']);
 const viz = new carto.Viz(`
-    strokeWidth: 1,
-    strokeColor: rgb(255, 0, 0)
+    strokeColor: rgb(0, 0, 255)
 `);
 const layer = new carto.Layer('layer', source, viz);
 

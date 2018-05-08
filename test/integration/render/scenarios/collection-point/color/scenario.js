@@ -4,7 +4,9 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['collection-point']);
-const viz = new carto.Viz('color: rgba(255, 0, 0, 1)');
+const viz = new carto.Viz(`
+    color: rgba(0, 0, 255, 1)
+`);
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
