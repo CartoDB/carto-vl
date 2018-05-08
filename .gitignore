@@ -1,11 +1,12 @@
 *.log
 *_out.png
+secrets.json
+test/acceptance/e2e/**/*.html
+test/integration/render/**/*.html
 .DS_Store
-.vscode/
 
+.vscode/
 dist/
 docs/all
 docs/public
 node_modules/
-test/acceptance/e2e/**/*.html
-test/integration/render/**/*.html

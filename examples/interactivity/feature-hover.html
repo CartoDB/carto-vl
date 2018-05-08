@@ -8,7 +8,7 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://unpkg.com/@carto/mapbox-gl@0.44.1-carto1/dist/mapbox-gl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
   <style>
@@ -79,7 +79,7 @@
 
     carto.setDefaultAuth({
       user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      apiKey: 'default_public'
     });
 
     const source = new carto.source.Dataset(`
@@ -88,6 +88,8 @@
     const viz = new carto.Viz(`
       @neighbourhood: $neighbourhood
       color: ramp($neighbourhood, bold)
+      strokeColor: 0.5*ramp($neighbourhood, bold)
+      strokeWidth: 2
     `);
     const layer = new carto.Layer('layer', source, viz);
 

@@ -319,7 +319,7 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type == 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
@@ -338,7 +338,7 @@ class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -357,8 +357,8 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, 2);
 
-            if (tile.type == 'point') {
-                // Lines and polygons don't support stroke
+            if (tile.type != 'line') {
+                // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE3);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
                 gl.uniform1i(renderer.colorStrokeTexture, 3);
@@ -372,7 +372,7 @@ class Renderer {
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
             }
         });

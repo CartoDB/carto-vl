@@ -121,6 +121,8 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
@@ -162,6 +164,7 @@ export default class Layer {
     async blendToViz(viz, ms = 400, interpolator = cubic) {
         try {
             this._checkViz(viz);
+            viz.setDefaultsIfRequired(this.metadata.geomType);
             if (this._viz) {
                 viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
                 viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);

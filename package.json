@@ -20,8 +20,8 @@
   ],
   "license": "BSD-3-Clause",
   "files": [
-      "src",
-      "dist"
+    "src",
+    "dist"
   ],
   "dependencies": {
     "@mapbox/vector-tile": "^1.3.0",
@@ -33,10 +33,12 @@
     "pbf": "^3.1.0"
   },
   "devDependencies": {
+    "@carto/mapbox-gl": "0.44.1-carto1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "eslint": "^4.15.0",
     "exquisite-sst": "IagoLast/Exquisite#master",
+    "fastly": "^2.2.0",
     "glob": "^7.1.2",
     "http-server": "^0.11.1",
     "jasmine-core": "^2.99.1",
@@ -50,10 +52,10 @@
     "lodash.template": "^4.4.0",
     "mocha": "^5.0.0",
     "puppeteer": "^1.1.0",
+    "s3": "^4.4.0",
     "sloc": "^0.2.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.8.1",
-    "@carto/mapbox-gl": "0.44.1-carto1"
+    "webpack": "^3.8.1"
   },
   "main": "src/index.js",
   "module": "src/index.js",
@@ -83,8 +85,12 @@
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
     "serve": "yarn build:dev && yarn docs && http-server",
-    "loc": "sloc src/ examples/",
+    "bump": "npm version prerelease",
+    "bump:minor": "npm version minor",
+    "bump:patch": "npm version patch",
+    "release": "./scripts/release.sh",
+    "postversion": "git push origin HEAD --follow-tags",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
-    "prepublishOnly": "yarn build:dev"
+    "loc": "sloc src/ examples/"
   }
 }

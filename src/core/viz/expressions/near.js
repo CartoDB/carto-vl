@@ -13,12 +13,17 @@ import { implicitCast, clamp } from './utils';
  * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption></caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
  * });
  *
+ * @example <caption>(String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: near($day, (25 * now()) % 10000, 0, 10)
+ * `);
+ * 
  * @memberof carto.expressions
  * @name near
  * @function

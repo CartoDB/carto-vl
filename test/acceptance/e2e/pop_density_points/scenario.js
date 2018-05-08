@@ -7,14 +7,14 @@ const map = new mapboxgl.Map({
 
 carto.setDefaultAuth({
     user: 'cartogl',
-    apiKey: 'YOUR_API_KEY'
+    apiKey: 'default_public'
 });
 
 const source = new carto.source.Dataset('pop_density_points');
 const s = carto.expressions;
 const $dn = s.property('dn');
 const viz = new carto.Viz({
-    width: 4 * s.zoom(),
+    width: s.div(s.zoom(), 2),
     color: s.ramp(s.linear($dn, 1, 300), s.palettes.PRISM),
     strokeColor: s.rgba(0, 0, 0, 0.2),
     strokeWidth: 1,

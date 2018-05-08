@@ -35,9 +35,18 @@
  * const viz = new carto.Viz({
  *   width: s.div(
  *     s.prop('population'),
- *     s.number(10000)  // Equivalent to 10000
+ *     10000
  *  )
  * });
+ * ```
+ *
+ * All these expressions can be used also from a String API. This API is a more compact way to create and use your expressions.
+ * It has shortcut notation to access your feature properties using the `$` symbol. It also allows inline comments using the JavaScript style.
+ *
+ * ```javascript
+ * const viz = new carto.Viz(`
+ *   width: $population / 10000  // Size proportional to the population for each feature
+ * `);
  * ```
  *
  * Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
@@ -292,5 +301,6 @@ export const zoom = (...args) => new Zoom(...args);
 
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
+export const PI = new Constant(Math.PI);
 
 export { palettes, Asc, Desc };

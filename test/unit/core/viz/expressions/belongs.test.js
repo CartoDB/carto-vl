@@ -30,28 +30,31 @@ describe('src/core/viz/expressions/belongs', () => {
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
         validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'category']);
-        validateDynamicTypeErrors('in', ['category', 'number']);
+        validateDynamicTypeErrors('in', ['number', 'category-array']);
+        validateDynamicTypeErrors('in', ['category', 'number-array']);
+
+        it('should throw an error when the wrong parameters are passed', () => {
+            expect(() => s.in($category, '0')).toThrowError(/is not an array/g);
+        });
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category'], 'number');
-        validateStaticType('in', ['category', 'category', 'category'], 'number');
+        validateStaticType('in', ['category', 'category-array'], 'number');
     });
 
     describe('eval', () => {
         describe('in', () => {
-            it('in($category, "cat1", "cat2") should return 0', () => {
+            it('in($category, ["cat1", "cat2"]) should return 0', () => {
                 const fakeFeature = { category: 0 };
-                const sIn = s.in($category, 'cat1', 'cat2');
+                const sIn = s.in($category, ['cat1', 'cat2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
 
-            it('in($category, "cat1", "cat2") should return 1', () => {
+            it('in($category, ["cat1", "cat2"]) should return 1', () => {
                 const fakeFeature = { category: 1 };
-                const sIn = s.in($category, 'cat1', 'cat2');
+                const sIn = s.in($category, ['cat1', 'cat2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(1);
@@ -66,31 +69,29 @@ describe('src/core/viz/expressions/belongs', () => {
         });
 
         describe('nin', () => {
-            it('nin($category,, "cat1", "cat2") should return 1', () => {
+            it('nin($category, ["cat1", "cat2"]) should return 1', () => {
                 const fakeFeature = { category: 0 };
-                const nin = s.nin($category, 'cat1', 'cat2');
+                const nin = s.nin($category, ['cat1', 'cat2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
 
-            it('nin($category,, "cat1", "cat2") should return 0', () => {
+            it('nin($category, ["cat1", "cat2"]) should return 0', () => {
                 const fakeFeature = { category: 1 };
-                const nin = s.nin($category, 'cat1', 'cat2');
+                const nin = s.nin($category, ['cat1', 'cat2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
-        });
 
-        it('nin($category) should return 1', () => {
-            const fakeFeature = { category: 1 };
-            const nin = s.nin($category);
-            nin._compile(fakeMetadata);
-            const actual = nin.eval(fakeFeature);
-            expect(actual).toEqual(1);
+            it('nin($category) should return 1', () => {
+                const fakeFeature = { category: 1 };
+                const nin = s.nin($category);
+                nin._compile(fakeMetadata);
+                const actual = nin.eval(fakeFeature);
+                expect(actual).toEqual(1);
+            });
         });
     });
 });
-
-

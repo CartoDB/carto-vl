@@ -7,12 +7,13 @@ const map = new mapboxgl.Map({
 
 carto.setDefaultAuth({
     user: 'cartogl',
-    apiKey: 'YOUR_API_KEY'
+    apiKey: 'default_public'
 });
 
 const source = new carto.source.Dataset('mnmappluto');
 const viz = new carto.Viz(`
     color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])
+    strokeWidth: 0
 `);
 const layer = new carto.Layer('myCartoLayer', source, viz);
 
