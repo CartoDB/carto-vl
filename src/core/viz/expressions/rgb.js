@@ -15,6 +15,11 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *   color: s.rgb(0, 0, 255)
  * });
  *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgb(0, 0, 255)
+ * `);
+ *
  * @memberof carto.expressions
  * @name rgb
  * @function
@@ -36,6 +41,11 @@ export const RGB = genRGB('rgb', false);
  * const viz = new carto.Viz({
  *   color: s.rgba(0, 0, 255, 1)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgba(0, 0, 255, 1)
+ * `);
  *
  * @memberof carto.expressions
  * @name rgba

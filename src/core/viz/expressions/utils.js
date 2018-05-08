@@ -1,4 +1,4 @@
-import { number, category, customPalette } from '../functions';
+import { number, category } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -9,8 +9,6 @@ export function implicitCast(value) {
         return number(value);
     } else if (typeof value == 'string') {
         return category(value);
-    } else if (Array.isArray(value)) {
-        return customPalette(...value);
     }
     return value;
 }
@@ -154,9 +152,9 @@ export function checkString(expressionName, parameterName, parameterIndex, str) 
     }
 }
 
-export function checkArray(expressionName, parameterName, parameterIndex, number) {
-    if (!Array.isArray(number)) {
-        throwInvalidArray(expressionName, parameterName, parameterIndex, number);
+export function checkArray(expressionName, parameterName, parameterIndex, array) {
+    if (!Array.isArray(array)) {
+        throwInvalidArray(expressionName, parameterName, parameterIndex, array);
     }
 }
 

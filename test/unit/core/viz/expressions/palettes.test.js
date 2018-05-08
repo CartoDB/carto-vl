@@ -14,13 +14,13 @@ describe('src/core/viz/expressions/palettes', () => {
     });
     describe('custom color palettes', () => {
         it('should work with rgb/rgba children', () => {
-            expect(customPalette(rgb(0, 0, 0), rgba(255, 0, 0, 1)).colors).toEqual([{ r: 0, g: 0, b: 0, a: 1 }, { r: 255, g: 0, b: 0, a: 1 }]);
+            expect(customPalette([rgb(0, 0, 0), rgba(255, 0, 0, 1)]).colors).toEqual([{ r: 0, g: 0, b: 0, a: 1 }, { r: 255, g: 0, b: 0, a: 1 }]);
         });
         it('should work with hsv/hsva children', () => {
-            expect(customPalette(hsv(0, 1, 1), hsva(1, 1, 1, 1)).colors).toEqual([{ r: 255, g: 0, b: 0, a: 1 }, { r: 255, g: 0, b: 0, a: 1 }]);
+            expect(customPalette([hsv(0, 1, 1), hsva(1, 1, 1, 1)]).colors).toEqual([{ r: 255, g: 0, b: 0, a: 1 }, { r: 255, g: 0, b: 0, a: 1 }]);
         });
         it('should work with floats', () => {
-            expect(customPalette(10, 20, 30).floats).toEqual([10, 20, 30]);
+            expect(customPalette([10, 20, 30]).floats).toEqual([10, 20, 30]);
         });
     });
 });

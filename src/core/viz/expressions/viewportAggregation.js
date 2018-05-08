@@ -3,17 +3,23 @@ import { number } from '../functions';
 import * as schema from '../../schema';
 
 /**
- * Return the average value of the features showed in the viewport
+ * Return the average value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_avg: s.viewportAvg($amount)
+ *   variables: {
+ *      v_avg: s.viewportAvg(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_avg: viewportAvg($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportAvg
@@ -23,17 +29,23 @@ import * as schema from '../../schema';
 export const ViewportAvg = generateAggregattion('avg');
 
 /**
- * Return the maximum value of the features showed in the viewport
+ * Return the maximum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_max: s.viewportMax($amount)
+ *   variables: {
+ *      v_max: s.viewportMax(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_max: viewportMax($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMax
@@ -43,17 +55,23 @@ export const ViewportAvg = generateAggregattion('avg');
 export const ViewportMax = generateAggregattion('max');
 
 /**
- * Return the minimum value of the features showed in the viewport
+ * Return the minimum value of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_min: s.viewportMin($amount)
+ *   variables: {
+ *      v_min: s.viewportMin(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_min: viewportMin($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportMin
@@ -63,17 +81,23 @@ export const ViewportMax = generateAggregattion('max');
 export const ViewportMin = generateAggregattion('min');
 
 /**
- * Return the sum of the values of the features showed in the viewport
+ * Return the sum of the values of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_sum: s.viewportSum($amount)
+ *   variables: {
+ *      v_sum: s.viewportSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_sum: viewportSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportSum
@@ -83,17 +107,23 @@ export const ViewportMin = generateAggregattion('min');
 export const ViewportSum = generateAggregattion('sum');
 
 /**
- * Return the count of the features showed in the viewport
+ * Return the count of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_count: s.viewportCount($amount)
+ *   variables: {
+ *      v_count: s.viewportSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_count: viewportSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportCount
@@ -103,17 +133,23 @@ export const ViewportSum = generateAggregattion('sum');
 export const ViewportCount = generateAggregattion('count');
 
 /**
- * Return the percentile of the features showed in the viewport
+ * Return the percentile of the features showed in the viewport.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @v_percentile: s.viewportPercentile($amount)
+ *   variables: {
+ *      v_percentile: s.viewportPercentile(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_percentile: viewportPercentile($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name viewportPercentile
@@ -123,17 +159,23 @@ export const ViewportCount = generateAggregattion('count');
 export const ViewportPercentile = generatePercentile();
 
 /**
- * Return the average value of all the features
+ * Return the average value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_avg: s.globalAvg($amount)
+ *   variables: {
+ *      g_avg: s.globalAvg(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_avg: globalAvg($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalAvg
@@ -143,17 +185,23 @@ export const ViewportPercentile = generatePercentile();
 export const GlobalAvg = generateAggregattion('avg', true);
 
 /**
- * Return the maximum value of all the features
+ * Return the maximum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_max: s.globalMax($amount)
+ *   variables: {
+ *      g_max: s.globalMax(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_max: globalMax($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMax
@@ -163,17 +211,23 @@ export const GlobalAvg = generateAggregattion('avg', true);
 export const GlobalMax = generateAggregattion('max', true);
 
 /**
- * Return the minimum value of all the features
+ * Return the minimum value of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_min: s.globalMin($amount)
+ *   variables: {
+ *      g_min: s.globalMin(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_min: globalMin($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalMin
@@ -183,17 +237,23 @@ export const GlobalMax = generateAggregattion('max', true);
 export const GlobalMin = generateAggregattion('min', true);
 
 /**
- * Return the sum of the values of all the features
+ * Return the sum of the values of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_sum: s.globalSum($amount)
+ *   variables: {
+ *      g_sum: s.globalSum(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_sum: globalSum($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalSum
@@ -203,17 +263,23 @@ export const GlobalMin = generateAggregattion('min', true);
 export const GlobalSum = generateAggregattion('sum', true);
 
 /**
- * Return the count of all the features
+ * Return the count of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_count: s.globalCount($amount)
+ *   variables: {
+ *      g_count: s.globalCount(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_count: globalCount($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalCount
@@ -223,17 +289,23 @@ export const GlobalSum = generateAggregattion('sum', true);
 export const GlobalCount = generateAggregattion('count', true);
 
 /**
- * Return the percentile of all the features
+ * Return the percentile of all the features.
  *
  * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
  * const viz = new carto.Viz({
- *   @g_percentile: s.globalPercentile($amount)
+ *   variables: {
+ *      g_percentile: s.globalPercentile(s.prop('amount'))
+ *   }
  * });
+ *
+ * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_percentile: globalPercentile($amount)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalPercentile

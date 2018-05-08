@@ -7,18 +7,22 @@ import * as schema from '../../schema';
 let quantilesUID = 0;
 
 /**
- * Generate quantiles of size `n` from the features on the viewport
+ * Generate quantiles of size `n` from the features on the viewport.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
- * const $density = s.prop('density');
  * const viz = new carto.Viz({
- *   color: s.ramp(s.quantiles($density, 5), s.palettes.PRISM)
+ *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
+ *
+ * @example <caption>Use quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(quantiles($density, 5), PRISM)
+ * `);
  *
  * @memberof carto.expressions
  * @name quantiles
@@ -28,18 +32,22 @@ let quantilesUID = 0;
 export const Quantiles = genQuantiles(false);
 
 /**
- * Generate quantiles of size `n` from all the features
+ * Generate quantiles of size `n` from all the features.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example
+ * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
- * const $density = s.prop('density');
  * const viz = new carto.Viz({
- *   color: s.ramp(s.globalQuantiles($density, 5), s.palettes.PRISM)
+ *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
+ *
+ * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalQuantiles($density, 5), PRISM)
+ * `);
  *
  * @memberof carto.expressions
  * @name globalQuantiles

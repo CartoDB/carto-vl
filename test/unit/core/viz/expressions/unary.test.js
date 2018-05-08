@@ -68,8 +68,6 @@ describe('src/core/viz/expressions/unary', () => {
         test('not', s.FALSE, 1);
     });
 
-
-
     // Helper function to test binary expressions
     function test(fn, param1, expected) {
         it(`${fn}(${param1}) should return ${expected}`, () => {
@@ -78,5 +76,3 @@ describe('src/core/viz/expressions/unary', () => {
         });
     }
 });
-
-

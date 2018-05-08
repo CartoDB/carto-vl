@@ -9,11 +9,16 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 * @param {carto.expressions.Base} max - Numeric or date expression pointing to the higher limit
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property. </caption>
+* @example <caption> Display points with a different color depending on the `category` property.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM),
+*   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 * });
+*
+* @example <caption> Display points with a different color depending on the `category` property. (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp(linear($speed, 10, 100), PRISM)
+* `);
 *
 * @memberof carto.expressions
 * @name linear
