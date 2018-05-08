@@ -8,18 +8,18 @@ import { implicitCast, checkInstance, checkType } from './utils';
  * Aggregate using the average value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated
+ * @param {carto.expressions.Base} propertyName - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
  * @example <caption>Use cluster average of the population as width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterAvg(s.prop('population'))
+ *   width: s.clusterAvg('population')
  * });
  *
  * @example <caption>Use cluster average of the population as width. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterAvg($population)
+ *   width: clusterAvg('population')
  * `);
  *
  * @memberof carto.expressions
@@ -33,18 +33,18 @@ export const ClusterAvg = genAggregationOp('avg', 'number');
  * Aggregate using the maximum value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated
+ * @param {carto.expressions.Base} propertyName - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
  * @example <caption>Use cluster maximum of the population as width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterMax(s.prop('population'))
+ *   width: s.clusterMax('population')
  * });
  *
  * @example <caption>Use cluster maximum of the population as width. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterMax($population)
+ *   width: clusterMax('population')
  * `);
  *
  * @memberof carto.expressions
@@ -58,18 +58,18 @@ export const ClusterMax = genAggregationOp('max', 'number');
  * Aggregate using the minimum value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated
+ * @param {carto.expressions.Base} propertyName - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
  * @example <caption>Use cluster minimum of the population as width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterMin(s.prop('population'))
+ *   width: s.clusterMin('population')
  * });
  *
  * @example <caption>Use cluster minimum of the population as width. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterMin($population)
+ *   width: clusterMin('population')
  * `);
  *
  * @memberof carto.expressions
@@ -83,18 +83,18 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * Aggregate using the mode value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated
+ * @param {carto.expressions.Base} propertyName - Column of the table to be aggregated
  * @return {carto.expressions.Property} Aggregated column
  *
  * @example <caption>Use cluster mode of the population as width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterMode(s.prop('population'))
+ *   width: s.clusterMode('population')
  * });
  *
  * @example <caption>Use cluster mode of the population as width. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterMode($population)
+ *   width: clusterMode('population')
  * `);
  *
  * @memberof carto.expressions
@@ -108,18 +108,18 @@ export const ClusterMode = genAggregationOp('mode', 'category');
  * Aggregate using the sum value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated
+ * @param {carto.expressions.Base} propertyName - Column of the table to be aggregated
  * @return {carto.expressions.Base} Aggregated column
  *
  * @example <caption>Use cluster sum of the population as width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterSum(s.prop('population'))
+ *   width: s.clusterSum('population')
  * });
  *
  * @example <caption>Use cluster sum of the population as width. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterSum($population)
+ *   width: clusterSum('population')
  * `);
  *
  * @memberof carto.expressions

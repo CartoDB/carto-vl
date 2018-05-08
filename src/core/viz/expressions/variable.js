@@ -11,14 +11,14 @@ import { checkString } from './utils';
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *     sum_price: s.clusterSum(s.prop('price'))
+ *     sum_price: s.clusterSum('price')
  *   }
  *  filter: s.neq(s.var('sum_price'), 'london'),
  * });
  *
  * @example <caption>(String)</caption
  * const viz = new carto.Viz(`
- *   @sum_price: clusterSum($price)
+ *   @sum_price: clusterSum('price')
  *   filter: @sum_price != 'london'
  * `);
  *
