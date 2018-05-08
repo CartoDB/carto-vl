@@ -5867,6 +5867,11 @@ class Metadata {
         this.columns = columns;
         this.featureCount = featureCount;
         this.sample = sample;
+        this.geomType = '';
+    }
+
+    setGeomType(geomType) {
+        this.geomType = geomType;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Metadata;
@@ -6739,6 +6744,8 @@ class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
@@ -6780,6 +6787,7 @@ class Layer {
     async blendToViz(viz, ms = 400, interpolator = __WEBPACK_IMPORTED_MODULE_8__core_viz_functions__["cubic"]) {
         try {
             this._checkViz(viz);
+            viz.setDefaultsIfRequired(this.metadata.geomType);
             if (this._viz) {
                 viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
                 viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
@@ -7023,25 +7031,25 @@ class Layer {
 
 
 
-const DEFAULT_RESOLUTION = () => 1;
-const DEFAULT_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["rgba"](0, 255, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["rgba"](0, 255, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](0);
+const DEFAULT_COLOR_EXPRESSION = () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["rgb"](0, 0, 0));
+const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1));
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["rgb"](0, 0, 0));
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](0));
 const DEFAULT_ORDER_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["noOrder"]();
 const DEFAULT_FILTER_EXPRESSION = () => __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["constant"](1);
+const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
 const MAX_RESOLUTION = 256;
 
 const SUPPORTED_PROPERTIES = [
-    'resolution',
     'color',
     'width',
     'strokeColor',
     'strokeWidth',
     'order',
     'filter',
+    'resolution',
     'variables'
 ];
 
@@ -7082,10 +7090,7 @@ class Viz {
         this.updated = true;
         this._changeCallback = null;
 
-        this._getRootExpressions().forEach(expr => {
-            expr.parent = this;
-            expr.notify = this._changed.bind(this);
-        });
+        this._updateRootExpressions();
 
         Object.keys(this.variables).map(varName => {
             this['__cartovl_variable_' + varName] = this.variables[varName];
@@ -7105,6 +7110,13 @@ class Viz {
             this.filter,
             ...Object.values(this.variables)
         ];
+    }
+
+    _updateRootExpressions() {
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
     }
 
     /**
@@ -7241,6 +7253,50 @@ class Viz {
         });
     }
 
+    setDefaultsIfRequired(geomType) {
+        let defaults = this._getDefaultGeomStyle(geomType);
+        if (this.color.default) {
+            this.color = defaults.COLOR_EXPRESSION();
+        }
+        if (this.width.default) {
+            this.width = defaults.WIDTH_EXPRESSION();
+        }
+        if (this.strokeColor.default) {
+            this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
+        }
+        if (this.strokeWidth.default) {
+            this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
+        }
+        this._updateRootExpressions();
+    }
+
+    _getDefaultGeomStyle(geomType) {
+        if (geomType === 'point') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#EE4D5A')),
+                WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](7)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1))
+            };
+        }
+        if (geomType === 'line') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#4CC8A3')),
+                WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1.5)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#FFF')), // Not used in lines
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1))  // Not used in lines
+            };
+        }
+        if (geomType === 'polygon') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#826DBA')),
+                WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1)), // Not used in polygons
+                STROKE_COLOR_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["hex"]('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1))
+            };
+        }
+        return {};
+    }
 
     _resolveAliases() {
         [
@@ -7377,7 +7433,6 @@ class Viz {
      * @return {VizSpec}
      */
     _setDefaults(vizSpec) {
-        vizSpec.resolution = __WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
         vizSpec.color = vizSpec.color || DEFAULT_COLOR_EXPRESSION();
         vizSpec.width = vizSpec.width || DEFAULT_WIDTH_EXPRESSION();
         vizSpec.strokeColor = vizSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
@@ -7385,6 +7440,7 @@ class Viz {
         vizSpec.order = vizSpec.order || DEFAULT_ORDER_EXPRESSION();
         vizSpec.filter = vizSpec.filter || DEFAULT_FILTER_EXPRESSION();
         vizSpec.variables = vizSpec.variables || {};
+        vizSpec.resolution = __WEBPACK_IMPORTED_MODULE_0__util__["f" /* isUndefined */](vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
         return vizSpec;
     }
 
@@ -7445,6 +7501,15 @@ class Viz {
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Viz;
 
+
+/**
+ * Mark default expressions to apply the style defaults for each
+ * geometry (point, line, polygon) when available.
+ */
+function _markDefault(expression) {
+    expression.default = true;
+    return expression;
+}
 
 
 /***/ }),
@@ -11489,10 +11554,6 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
     }
 
-    _clone() {
-        return new GeoJSON(this._data);
-    }
-
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._removeDataframe = removeDataframe;
@@ -11526,6 +11587,10 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
+    }
+
+    _clone() {
+        return new GeoJSON(this._data);
     }
 
     _checkData(data) {
@@ -11572,6 +11637,13 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         });
 
         this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](this._categoryIDs, this._columns, featureCount, sample);
+
+        if (featureCount > 0) {
+            // Set the geomType of the first feature to the metadata
+            let geomType = this._getDataframeType(this._features[0].geometry.type);
+            this._metadata.setGeomType(geomType);
+        }
+
         return this._metadata;
     }
 
@@ -13522,6 +13594,7 @@ class Windshaft {
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_4_lru_cache__(lruOptions);
         this.inProgressInstantiations = {};
+        this.geomType = '';
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -13656,6 +13729,8 @@ class Windshaft {
         }
 
         const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+
+        metadata.setGeomType(this.geomType);
 
         return { MNS, resolution, filters, metadata, urlTemplate };
     }
