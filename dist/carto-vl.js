@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 45);
+/******/ 	return __webpack_require__(__webpack_require__.s = 44);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
 
 
 
@@ -186,9 +186,11 @@ class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _getDrawMetadataRequirements() {
-        // Depth First Search => reduce using union
-        return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(__WEBPACK_IMPORTED_MODULE_2__schema__["union"], __WEBPACK_IMPORTED_MODULE_2__schema__["IDENTITY"]);
+    _resetViewportAgg(){
+        this._getChildren().forEach(child => child._resetViewportAgg());
+    }
+    _accumViewportAgg(f){
+        this._getChildren().forEach(child => child._accumViewportAgg(f));
     }
 
     /**
@@ -483,40 +485,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return in_; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "prop", function() { return property; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "var", function() { return variable; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_animate__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_belongs_js__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_between__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_animate__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_belongs_js__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_between__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_blend__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_constant__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hex__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_number__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_property__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_time__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_top__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_torque__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_unary__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_variable__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_xyz__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__expressions_zoom__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_blend__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_constant__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hex__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_number__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_time__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_top__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_torque__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_unary__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_variable__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__expressions_xyz__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__expressions_zoom__ = __webpack_require__(63);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["b"]; });
@@ -584,16 +587,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * @namespace carto.expressions
  * @api
  */
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -960,48 +953,48 @@ const variable = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_vari
 
 
 
-const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["g" /* ViewportAvg */](...args);
+const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["a" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["i" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["j" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["l" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
-const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["h" /* ViewportCount */](...args);
+const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["b" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["k" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
 
-const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["a" /* GlobalAvg */](...args);
+const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
 
-const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* GlobalMax */](...args);
+const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["c" /* GlobalMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMax"] = globalMax;
 
-const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* GlobalMin */](...args);
+const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["d" /* GlobalMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMin"] = globalMin;
 
-const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* GlobalSum */](...args);
+const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["f" /* GlobalSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalSum"] = globalSum;
 
-const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["b" /* GlobalCount */](...args);
+const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["b" /* GlobalCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalCount"] = globalCount;
 
-const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* GlobalPercentile */](...args);
+const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["e" /* GlobalPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalPercentile"] = globalPercentile;
 
 
-const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_xyz__["a" /* default */](...args);
+const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_xyz__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
 
 
-const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_zoom__["a" /* default */](...args);
+const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_34__expressions_zoom__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
 
 
@@ -1574,470 +1567,6 @@ function getReturnTypeFromSignature(signature) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(8);
-
-
-
-
-/**
- * Return the average value of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the average of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_avg: s.viewportAvg(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the average of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_avg: viewportAvg($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportAvg
- * @function
- * @api
- */
-const ViewportAvg = generateAggregattion('avg');
-/* harmony export (immutable) */ __webpack_exports__["g"] = ViewportAvg;
-
-
-/**
- * Return the maximum value of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_max: s.viewportMax(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_max: viewportMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportMax
- * @function
- * @api
- */
-const ViewportMax = generateAggregattion('max');
-/* harmony export (immutable) */ __webpack_exports__["i"] = ViewportMax;
-
-
-/**
- * Return the minimum value of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_min: s.viewportMin(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_min: viewportMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportMin
- * @function
- * @api
- */
-const ViewportMin = generateAggregattion('min');
-/* harmony export (immutable) */ __webpack_exports__["j"] = ViewportMin;
-
-
-/**
- * Return the sum of the values of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the sum of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_sum: s.viewportSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the sum of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_sum: viewportSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportSum
- * @function
- * @api
- */
-const ViewportSum = generateAggregattion('sum');
-/* harmony export (immutable) */ __webpack_exports__["l"] = ViewportSum;
-
-
-/**
- * Return the count of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the count of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_count: s.viewportSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the count of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_count: viewportSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportCount
- * @function
- * @api
- */
-const ViewportCount = generateAggregattion('count');
-/* harmony export (immutable) */ __webpack_exports__["h"] = ViewportCount;
-
-
-/**
- * Return the percentile of the features showed in the viewport.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_percentile: s.viewportPercentile(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_percentile: viewportPercentile($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportPercentile
- * @function
- * @api
- */
-const ViewportPercentile = generatePercentile();
-/* harmony export (immutable) */ __webpack_exports__["k"] = ViewportPercentile;
-
-
-/**
- * Return the average value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_avg: s.globalAvg(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_avg: globalAvg($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalAvg
- * @function
- * @api
- */
-const GlobalAvg = generateAggregattion('avg', true);
-/* harmony export (immutable) */ __webpack_exports__["a"] = GlobalAvg;
-
-
-/**
- * Return the maximum value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_max: s.globalMax(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_max: globalMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMax
- * @function
- * @api
- */
-const GlobalMax = generateAggregattion('max', true);
-/* harmony export (immutable) */ __webpack_exports__["c"] = GlobalMax;
-
-
-/**
- * Return the minimum value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_min: s.globalMin(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_min: globalMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMin
- * @function
- * @api
- */
-const GlobalMin = generateAggregattion('min', true);
-/* harmony export (immutable) */ __webpack_exports__["d"] = GlobalMin;
-
-
-/**
- * Return the sum of the values of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_sum: s.globalSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_sum: globalSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalSum
- * @function
- * @api
- */
-const GlobalSum = generateAggregattion('sum', true);
-/* harmony export (immutable) */ __webpack_exports__["f"] = GlobalSum;
-
-
-/**
- * Return the count of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_count: s.globalCount(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_count: globalCount($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalCount
- * @function
- * @api
- */
-const GlobalCount = generateAggregattion('count', true);
-/* harmony export (immutable) */ __webpack_exports__["b"] = GlobalCount;
-
-
-/**
- * Return the percentile of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_percentile: s.globalPercentile(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_percentile: globalPercentile($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalPercentile
- * @function
- * @api
- */
-const GlobalPercentile = generatePercentile(true);
-/* harmony export (immutable) */ __webpack_exports__["e"] = GlobalPercentile;
-
-
-function generateAggregattion(metadataPropertyName, global) {
-    return class Aggregattion extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-        /**
-         * @param {*} property
-         */
-        constructor(property) {
-            super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) });
-            this.property = property;
-        }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            // TODO improve type check
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _updateDrawMetadata(drawMetadata){
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name === name);
-            if (!global) {
-                this.value.expr = column[metadataPropertyName];
-            }
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
-}
-
-function generatePercentile(global) {
-    return class Percentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-        /**
-         * @param {*} property
-         */
-        constructor(property, percentile) {
-            if (!Number.isFinite(percentile)) {
-                throw new Error('Percentile must be a fixed literal number');
-            }
-            super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) });
-            // TODO improve type check
-            this.property = property;
-            this.percentile = percentile;
-        }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                const copy = metadata.sample.map(s => s[this.property.name]);
-                copy.sort((x, y) => x - y);
-                const p = this.percentile / 100;
-                this.value.expr = copy[Math.floor(p * copy.length)];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _preDraw(program, drawMetadata, gl) {
-            // TODO use _updateDrawMetadata
-            const name = this._getColumnName();
-            if (!global) {
-                const column = drawMetadata.columns.find(c => c.name === name);
-                const total = column.accumHistogram[column.histogramBuckets - 1];
-                // TODO OPT: this could be faster with binary search
-                for (var i = 0; i < column.histogramBuckets; i++) {
-                    if (column.accumHistogram[i] >= this.percentile / 100 * total) {
-                        break;
-                    }
-                }
-                const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
-                this.value.expr = br;
-            }
-            this.value._preDraw(program, drawMetadata, gl);
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
 
@@ -2341,7 +1870,7 @@ function genUnaryOp(name, jsFn, glsl) {
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2390,11 +1919,11 @@ function isObject(value) {
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(74);
 
 
 /**
@@ -2416,7 +1945,7 @@ class CartoValidationError extends __WEBPACK_IMPORTED_MODULE_0__carto_error__["a
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2489,13 +2018,13 @@ const column = {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
 
 
@@ -2681,7 +2210,7 @@ function genAggregationOp(aggName, aggType) {
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2761,7 +2290,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2896,14 +2425,14 @@ class Width extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -2911,8 +2440,6 @@ class Width extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 
-
-const HISTOGRAM_BUCKETS = 1000;
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -3063,37 +2590,26 @@ class Renderer {
             zoom: 1. / this._zoom,
             columns: []
         };
-        const colorRequirements = viz.getColor()._getDrawMetadataRequirements();
-        const widthRequirements = viz.getWidth()._getDrawMetadataRequirements();
-        const strokeColorRequirements = viz.getStrokeColor()._getDrawMetadataRequirements();
-        const strokeWidthRequirements = viz.getStrokeWidth()._getDrawMetadataRequirements();
-        const filterRequirements = viz.getFilter()._getDrawMetadataRequirements();
-        const variables = Object.values(viz.variables);
-        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
-            .reduce(__WEBPACK_IMPORTED_MODULE_1__schema__["union"], __WEBPACK_IMPORTED_MODULE_1__schema__["IDENTITY"]).columns;
-
-        if (requiredColumns.length == 0) {
-            return drawMetadata;
-        }
-
-        requiredColumns.forEach(column => {
-            drawMetadata.columns.push(
-                {
-                    name: column,
-                    min: Number.POSITIVE_INFINITY,
-                    max: Number.NEGATIVE_INFINITY,
-                    avg: undefined,
-                    count: 0,
-                    sum: 0,
-                    histogramBuckets: HISTOGRAM_BUCKETS,
-                    histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                    accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                }
-            );
-        });
 
         const s = 1. / this._zoom;
-        // TODO go feature by feature instead of column by column
+
+        const rootExprs = viz._getRootExpressions();
+        // Performance optimization to avoid doing DFS at each feature iteration
+        const viewportExprs = [];
+        function dfs(expr) {
+            if (expr._isViewport) {
+                viewportExprs.push(expr);
+            } else {
+                expr._getChildren().map(dfs);
+            }
+        }
+        rootExprs.map(dfs);
+        const numViewportExprs = viewportExprs.length;
+        viewportExprs.forEach(expr => expr._resetViewportAgg());
+
+        if (!viewportExprs.length) {
+            return drawMetadata;
+        }
         tiles.forEach(d => {
             d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
             d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
@@ -3102,67 +2618,27 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = viz.getFilter()._getMinimumNeededSchema().columns;
+            const propertyNames = Object.keys(d.properties);
+            const propertyNamesLength = propertyNames.length;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
-                const x = d.geom[2 * i + 0];
-                const y = d.geom[2 * i + 1];
-                if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (viz.getFilter()) {
-                        columnNames.forEach(name => {
-                            f[name] = d.properties[name][i];
-                        });
-                        if (viz.getFilter().eval(f) < 0.5) {
-                            continue;
-                        }
+                if (d.inViewport(i, minx, miny, maxx, maxy)) {
+
+                    for (let j = 0; j < propertyNamesLength; j++) {
+                        const name = propertyNames[j];
+                        f[name] = d.properties[name][i];
                     }
-                    requiredColumns.forEach(column => {
-                        const values = d.properties[column];
-                        const v = values[i];
-                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                        metaColumn.min = Math.min(v, metaColumn.min);
-                        metaColumn.max = Math.max(v, metaColumn.max);
-                        metaColumn.count++;
-                        metaColumn.sum += v;
-                    });
-                }
-            }
-        });
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            metaColumn.avg = metaColumn.sum / metaColumn.count;
-        });
-        tiles.forEach(d => {
-            requiredColumns.forEach(column => {
-                const values = d.properties[column];
-                const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const vmin = metaColumn.min;
-                const vmax = metaColumn.max;
-                const vdiff = vmax - vmin;
-                for (let i = 0; i < d.numFeatures; i++) {
-                    const x = d.geom[2 * i + 0];
-                    const y = d.geom[2 * i + 1];
-                    if (x > minx && x < maxx && y > miny && y < maxy) {
-                        const v = values[i];
-                        if (!Number.isFinite(v)) {
-                            continue;
-                        }
-                        metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
+
+                    if (viz.filter.eval(f) < 0.5) {
+                        continue;
+                    }
+
+                    for (let j = 0; j < numViewportExprs; j++) {
+                        const expr = viewportExprs[j];
+                        expr._accumViewportAgg(f);
                     }
                 }
-            });
-        });
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            for (let i = 1; i < metaColumn.histogramBuckets; i++) {
-                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
             }
         });
         return drawMetadata;
@@ -3394,7 +2870,7 @@ function getOrderingRenderBuckets(renderLayer) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3544,7 +3020,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3609,7 +3085,7 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3724,13 +3200,13 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return palettes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
@@ -3877,7 +3353,7 @@ class Inverse extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */]{
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3906,7 +3382,7 @@ class Base {
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3977,7 +3453,7 @@ function mitt(all                 ) {
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4044,12 +3520,12 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__base__ = __webpack_require__(0);
 
 
@@ -4135,7 +3611,7 @@ function abTypeCheck(a, b) {
 
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4190,7 +3666,7 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4238,7 +3714,7 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4293,7 +3769,7 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4457,7 +3933,7 @@ function genHSL(name, alpha) {
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4620,7 +4096,7 @@ function genHSV(name, alpha) {
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4716,7 +4192,7 @@ function genInterpolator(inlineMaker, preface, jsEval) {
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4787,7 +4263,7 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4849,15 +4325,15 @@ class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(7);
 
 
 
@@ -4961,9 +4437,6 @@ function genQuantiles(global) {
                 });
             }
         }
-        _getDrawMetadataRequirements() {
-            return { columns: [this._getColumnName()] };
-        }
         _applyToShaderSource(getGLSLforProperty) {
             const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
             let childInlines = {};
@@ -5017,7 +4490,7 @@ function genQuantiles(global) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5124,14 +4597,14 @@ function genRGB(name, alpha) {
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
 
 
 
@@ -5287,17 +4760,17 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(68);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(71);
 
 
 
@@ -5462,12 +4935,12 @@ const styler = {
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(12);
 
 
 
@@ -5488,6 +4961,49 @@ class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
+        if (this.type == 'polygon') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(polygon => {
+                    const vertices = polygon.flat;
+                    const numVertices = polygon.holes[0] || polygon.flat.length / 2;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        } else if (this.type == 'line') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(line => {
+                    const vertices = line;
+                    const numVertices = line.length;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        }
     }
 
     bind(renderer) {
@@ -5543,6 +5059,26 @@ class Dataframe {
                 return this._getPolygonAtPosition(pos, viz);
             default:
                 return [];
+        }
+    }
+
+    inViewport(featureIndex, minx, miny, maxx, maxy) {
+        switch (this.type) {
+            case 'point':
+            {
+                const x = this.geom[2 * featureIndex + 0];
+                const y = this.geom[2 * featureIndex + 1];
+                return x > minx && x < maxx && y > miny && y < maxy;
+            }
+            case 'line':
+            case 'polygon':
+            {
+                const aabb = this._aabb[featureIndex];
+                return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
+
+            }
+            default:
+                return false;
         }
     }
 
@@ -5816,7 +5352,7 @@ function pointInCircle(p, center, scale) {
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5879,15 +5415,15 @@ class Metadata {
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(39);
 
 
 
@@ -5951,7 +5487,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -6141,13 +5677,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(38);
+var VectorTileFeature = __webpack_require__(37);
 
 module.exports = VectorTileLayer;
 
@@ -6209,13 +5745,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(90);
+var Point = __webpack_require__(91);
 
 module.exports = VectorTileFeature;
 
@@ -6449,7 +5985,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6457,8 +5993,8 @@ function signedArea(ring) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultAuth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkAuth; });
 /* unused harmony export cleanDefaultAuth */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -6539,7 +6075,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6547,8 +6083,8 @@ function checkUsername(username) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return getDefaultConfig; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return checkConfig; });
 /* unused harmony export cleanDefaultConfig */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -6607,20 +6143,20 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(95);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(95);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(97);
 
 
 
@@ -6789,6 +6325,20 @@ class Layer {
             this._checkViz(viz);
             viz.setDefaultsIfRequired(this.metadata.geomType);
             if (this._viz) {
+                Object.keys(this._viz.variables).map(varName => {
+                    // If an existing variable is not re-declared we add it to the new viz
+                    if (!viz.variables[varName]) {
+                        viz.variables[varName] = this._viz.variables[varName];
+                    }
+                });
+
+                Object.keys(viz.variables).map(varName => {
+                    // If the variable existed, we need to blend it, nothing to do if not
+                    if (this._viz.variables[varName]) {
+                        viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
+                    }
+                });
+
                 viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
                 viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
                 viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
@@ -7008,19 +6558,19 @@ class Layer {
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_shader_compiler__ = __webpack_require__(92);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_shader_compiler__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -7255,19 +6805,21 @@ class Viz {
 
     setDefaultsIfRequired(geomType) {
         let defaults = this._getDefaultGeomStyle(geomType);
-        if (this.color.default) {
-            this.color = defaults.COLOR_EXPRESSION();
+        if (defaults) {
+            if (this.color.default) {
+                this.color = defaults.COLOR_EXPRESSION();
+            }
+            if (this.width.default) {
+                this.width = defaults.WIDTH_EXPRESSION();
+            }
+            if (this.strokeColor.default) {
+                this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
+            }
+            if (this.strokeWidth.default) {
+                this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
+            }
+            this._updateRootExpressions();
         }
-        if (this.width.default) {
-            this.width = defaults.WIDTH_EXPRESSION();
-        }
-        if (this.strokeColor.default) {
-            this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
-        }
-        if (this.strokeWidth.default) {
-            this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
-        }
-        this._updateRootExpressions();
     }
 
     _getDefaultGeomStyle(geomType) {
@@ -7295,7 +6847,6 @@ class Viz {
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(__WEBPACK_IMPORTED_MODULE_1__core_viz_functions__["number"](1))
             };
         }
-        return {};
     }
 
     _resolveAliases() {
@@ -7513,19 +7064,19 @@ function _markDefault(expression) {
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = parseVizExpression;
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseVizDefinition;
 /* unused harmony export cleanComments */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(94);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_hex__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_hex__ = __webpack_require__(22);
 
 
 
@@ -7793,7 +7344,7 @@ function cleanComments(str) {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7934,22 +7485,22 @@ class Map {
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(75);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(98);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "expressions", function() { return __WEBPACK_IMPORTED_MODULE_0__core_viz_functions__; });
@@ -7994,7 +7545,7 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8161,7 +7712,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8273,7 +7824,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8360,7 +7911,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8429,7 +7980,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8486,7 +8037,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8552,14 +8103,14 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(53);
+module.exports = __webpack_require__(52);
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -10412,7 +9963,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(54);
+var colorbrewer = __webpack_require__(53);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -10445,14 +9996,14 @@ if (true) {
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(55);
+module.exports = __webpack_require__(54);
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -10777,13 +10328,13 @@ if (true) {
 
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__colorspaces__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__colorspaces__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__functions__ = __webpack_require__(2);
 
 
@@ -10995,7 +10546,7 @@ function interpolate(low, high, m) {
 
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11118,7 +10669,7 @@ function cielabToXYZ({ l, a, b, alpha }) {
 
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11170,7 +10721,7 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11276,7 +10827,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11350,7 +10901,553 @@ class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
+/* 60 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+
+
+
+
+/**
+ * Return the average value of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_avg: s.viewportAvg(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the average of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_avg: viewportAvg($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportAvg
+ * @function
+ * @api
+ */
+const ViewportAvg = genViewportAgg('avg',
+    self => {
+        self._sum = 0; self._count = 0;
+    },
+    (self, x) => {
+        if (!Number.isNaN(x)) {
+            self._count++;
+            self._sum += x;
+        }
+    },
+    self => self._sum / self._count
+);
+/* harmony export (immutable) */ __webpack_exports__["a"] = ViewportAvg;
+
+
+/**
+ * Return the maximum value of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_max: s.viewportMax(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_max: viewportMax($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportMax
+ * @function
+ * @api
+ */
+const ViewportMax = genViewportAgg('max',
+    self => { self._value = Number.NEGATIVE_INFINITY; },
+    (self, y) => { self._value = Math.max(self._value, y); },
+    self => self._value
+);
+/* harmony export (immutable) */ __webpack_exports__["c"] = ViewportMax;
+
+
+/**
+ * Return the minimum value of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_min: s.viewportMin(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_min: viewportMin($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportMin
+ * @function
+ * @api
+ */
+const ViewportMin = genViewportAgg('min',
+    self => { self._value = Number.POSITIVE_INFINITY; },
+    (self, y) => { self._value = Math.min(self._value, y); },
+    self => self._value);
+/* harmony export (immutable) */ __webpack_exports__["d"] = ViewportMin;
+
+
+/**
+ * Return the sum of the values of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_sum: s.viewportSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the sum of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_sum: viewportSum($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportSum
+ * @function
+ * @api
+ */
+const ViewportSum = genViewportAgg('sum',
+    self => { self._value = 0; },
+    (self, y) => { self._value = self._value + y; },
+    self => self._value);
+/* harmony export (immutable) */ __webpack_exports__["f"] = ViewportSum;
+
+
+/**
+ * Return the count of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_count: s.viewportSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the count of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_count: viewportSum($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportCount
+ * @function
+ * @api
+ */
+const ViewportCount = genViewportAgg('count',
+    self => { self._value = 0; },
+    self => { self._value++; },
+    self => self._value);
+/* harmony export (immutable) */ __webpack_exports__["b"] = ViewportCount;
+
+
+
+
+function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
+    return class ViewportAggregation extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+        /**
+         * @param {*} property
+         */
+        constructor(property) {
+            super({
+                property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(property),
+                value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
+            });
+            this._isViewport = true;
+        }
+        eval() {
+            return resolveFn(this);
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            // TODO improve type check
+            this.property._compile(metadata);
+            this.type = 'number';
+            super.inlineMaker = inline => inline.value;
+        }
+        _getMinimumNeededSchema() {
+            return this.property._getMinimumNeededSchema();
+        }
+        _resetViewportAgg() {
+            zeroFn(this);
+        }
+        _accumViewportAgg(feature) {
+            accumFn(this, this.property.eval(feature));
+        }
+        _preDraw(...args) {
+            this.value.expr = this.eval();
+            super._preDraw(...args);
+        }
+    };
+}
+
+/**
+ * Return the percentile of the features showed in the viewport.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_percentile: s.viewportPercentile(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_percentile: viewportPercentile($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportPercentile
+ * @function
+ * @api
+ */
+class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+    /**
+     * @param {*} property
+     */
+    constructor(property, percentile) {
+        super({
+            property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(property),
+            percentile: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(percentile),
+            impostor: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
+        });
+        this._isViewport = true;
+    }
+    eval(f) {
+        if (this._value == null) {
+            this._array.sort((a, b) => a - b);
+            const index = Object(__WEBPACK_IMPORTED_MODULE_2__utils__["i" /* clamp */])(
+                Math.floor(this.percentile.eval(f) / 100 * this._array.length),
+                0, this._array.length - 1);
+            this._value = this._array[index];
+        }
+        return this._value;
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
+    }
+    _getMinimumNeededSchema() {
+        return this.property._getMinimumNeededSchema();
+    }
+    _resetViewportAgg() {
+        this._value = null;
+        this._array = [];
+    }
+    _accumViewportAgg(feature) {
+        const v = this.property.eval(feature);
+        this._array.push(v);
+    }
+    _preDraw(...args) {
+        this.impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["e"] = ViewportPercentile;
+
+
+
+/***/ }),
 /* 61 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__schema__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
+
+
+
+
+
+
+
+
+/**
+ * Return the average value of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_avg: s.globalAvg(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_avg: globalAvg($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalAvg
+ * @function
+ * @api
+ */
+const GlobalAvg = generateGlobalAggregattion('avg');
+/* harmony export (immutable) */ __webpack_exports__["a"] = GlobalAvg;
+
+
+/**
+ * Return the maximum value of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_max: s.globalMax(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_max: globalMax($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalMax
+ * @function
+ * @api
+ */
+const GlobalMax = generateGlobalAggregattion('max');
+/* harmony export (immutable) */ __webpack_exports__["c"] = GlobalMax;
+
+
+/**
+ * Return the minimum value of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_min: s.globalMin(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_min: globalMin($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalMin
+ * @function
+ * @api
+ */
+const GlobalMin = generateGlobalAggregattion('min');
+/* harmony export (immutable) */ __webpack_exports__["d"] = GlobalMin;
+
+
+/**
+ * Return the sum of the values of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_sum: s.globalSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_sum: globalSum($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalSum
+ * @function
+ * @api
+ */
+const GlobalSum = generateGlobalAggregattion('sum');
+/* harmony export (immutable) */ __webpack_exports__["f"] = GlobalSum;
+
+
+/**
+ * Return the count of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_count: s.globalCount(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_count: globalCount($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalCount
+ * @function
+ * @api
+ */
+const GlobalCount = generateGlobalAggregattion('count');
+/* harmony export (immutable) */ __webpack_exports__["b"] = GlobalCount;
+
+
+
+function generateGlobalAggregattion(metadataPropertyName) {
+    return class GlobalAggregattion extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+        /**
+         * @param {*} property
+         */
+        constructor(property) {
+            super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) });
+            this.property = Object(__WEBPACK_IMPORTED_MODULE_3__utils__["m" /* implicitCast */])(property);
+        }
+        eval() {
+            return this.value.expr;
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            // TODO improve type check
+            this.property._compile(metadata);
+            this.type = 'number';
+            super.inlineMaker = inline => inline.value;
+            this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
+        }
+        _getMinimumNeededSchema() {
+            return this.property._getMinimumNeededSchema();
+        }
+        _getColumnName() {
+            if (this.property.aggName) {
+                // Property has aggregation
+                return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
+            }
+            return this.property.name;
+        }
+    };
+}
+
+
+/**
+ * Return the percentile of all the features.
+ *
+ * @param {carto.expressions.Base} property - Column of the table
+ * @return {carto.expressions.Base} Result of the aggregation
+ *
+ * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_percentile: s.globalPercentile(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @g_percentile: globalPercentile($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalPercentile
+ * @function
+ * @api
+ */
+class GlobalPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+    /**
+     * @param {*} property
+     */
+    constructor(property, percentile) {
+        if (!Number.isFinite(percentile)) {
+            throw new Error('Percentile must be a fixed literal number');
+        }
+        super({ value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) });
+        // TODO improve type check
+        this.property = property;
+        this.percentile = percentile;
+    }
+    eval() {
+        return this.value.expr;
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.value;
+        const copy = metadata.sample.map(s => s[this.property.name]);
+        copy.sort((x, y) => x - y);
+        const p = this.percentile / 100;
+        this.value.expr = copy[Math.floor(p * copy.length)];
+    }
+    _getMinimumNeededSchema() {
+        return this.property._getMinimumNeededSchema();
+    }
+    _getColumnName() {
+        if (this.property.aggName) {
+            // Property has aggregation
+            return __WEBPACK_IMPORTED_MODULE_2__schema__["column"].aggColumn(this.property.name, this.property.aggName);
+        }
+        return this.property.name;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["e"] = GlobalPercentile;
+
+
+
+/***/ }),
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11434,7 +11531,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11486,16 +11583,16 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(33);
 
 
 
@@ -11888,13 +11985,13 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(68);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
@@ -11904,7 +12001,7 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12062,7 +12159,7 @@ void main(void) {
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12132,7 +12229,7 @@ void main(void) {
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12196,7 +12293,7 @@ void main(void) {
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12236,7 +12333,7 @@ void main(void) {
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12274,7 +12371,7 @@ void main(void) {
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12317,12 +12414,12 @@ class ShaderCache {
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export decodeGeom */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(73);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
@@ -12379,14 +12476,15 @@ function decodePolygon(geometry) {
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     // let clipIndex = 0;
-    geometry.map(feature => {
-        feature.map(polygon => {
+    geometry.forEach(feature => {
+        feature.forEach(polygon => {
             const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
-            triangles.map(index => {
+            const trianglesLength = triangles.length;
+            for (let i = 0; i < trianglesLength; i++) {
+                const index = triangles[i];
                 vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
                 normals.push(0, 0);
-            });
-
+            }
             {
                 const lineString = polygon.flat;
                 let ringInit = 0;
@@ -12538,7 +12636,7 @@ function normalize(v) {
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13195,12 +13293,12 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(75);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -13284,7 +13382,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13453,13 +13551,13 @@ const validation = {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -13530,21 +13628,21 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(78);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(33);
 
 
 
@@ -14293,7 +14391,7 @@ function authURL(url, conf) {
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14301,7 +14399,7 @@ function authURL(url, conf) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(78);
+var ieee754 = __webpack_require__(79);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -14918,7 +15016,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -15008,7 +15106,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15018,11 +15116,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(80)
-var util = __webpack_require__(82)
+var Map = __webpack_require__(81)
+var util = __webpack_require__(83)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(86)
+var Yallist = __webpack_require__(87)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -15482,7 +15580,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -15492,13 +15590,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(81)
+  module.exports = __webpack_require__(82)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(36)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(35)))
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -15617,7 +15715,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -16145,7 +16243,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(84);
+exports.isBuffer = __webpack_require__(85);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -16189,7 +16287,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(85);
+exports.inherits = __webpack_require__(86);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -16207,10 +16305,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(83), __webpack_require__(36)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(84), __webpack_require__(35)))
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16237,7 +16335,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -16248,7 +16346,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -16277,7 +16375,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -16653,7 +16751,7 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16661,16 +16759,16 @@ function Node (value, prev, next, list) {
 /* harmony export (immutable) */ __webpack_exports__["c"] = getSQLWhere;
 /* harmony export (immutable) */ __webpack_exports__["a"] = getAggregationFilters;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_viz_expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_viz_expressions_between__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_property__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_expressions_blend__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_expressions_animate__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_viz_expressions_between__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_expressions_blend__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_expressions_animate__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(7);
 
 
 
@@ -17152,22 +17250,22 @@ function getAggregationFilters(filtering) {
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(89);
-module.exports.VectorTileFeature = __webpack_require__(38);
-module.exports.VectorTileLayer = __webpack_require__(37);
+module.exports.VectorTile = __webpack_require__(90);
+module.exports.VectorTileFeature = __webpack_require__(37);
+module.exports.VectorTileLayer = __webpack_require__(36);
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(37);
+var VectorTileLayer = __webpack_require__(36);
 
 module.exports = VectorTile;
 
@@ -17185,7 +17283,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17504,13 +17602,13 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
 
@@ -17592,7 +17690,7 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17619,7 +17717,7 @@ function compileShader(gl, vizRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.4
@@ -18340,12 +18438,12 @@ function compileShader(gl, vizRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
 
 
 let integrator = null;
@@ -18373,14 +18471,14 @@ class CartoMapIntegrator {
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(5);
 
 
 
@@ -18508,12 +18606,12 @@ class MGLIntegrator {
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__viz_parser__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__viz_parser__ = __webpack_require__(42);
 
 
 
@@ -18650,14 +18748,14 @@ class RenderLayer {
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(12);
 
 
 
