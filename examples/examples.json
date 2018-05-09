@@ -1,16 +1,11 @@
 {
     "main": {
-        "file": "expressions/ramp-category.html"
+        "file": "styling/category-ramps.html"
     },
     "categories": [
         {
             "title": "Basics",
             "samples": [
-                {
-                    "title": "Boilerplate",
-                    "desc": "Use this as template for your app",
-                    "file": "basics/boilerplate.html"
-                },
                 {
                     "title": "Add layer",
                     "desc": "Add one CARTO layer to your map",
@@ -39,32 +34,27 @@
                 {
                     "title": "Color expressions",
                     "desc": "The color spaces that we support",
-                    "file": "expressions/color-expressions.html"
+                    "file": "styling/color-expressions.html"
                 },
                 {
                     "title": "Category ramps",
                     "desc": "Options for symbolizing category attributes",
-                    "file": "expressions/category-ramps.html"
+                    "file": "styling/category-ramps.html"
                 },
                 {
                     "title": "Numeric ramps",
                     "desc": "Options for symbolizing numeric attributes",
-                    "file": "expressions/numeric-ramps.html"
-                },
-                {
-                    "title": "Draw order",
-                    "desc": "",
-                    "file": "expressions/draw-order.html"
+                    "file": "styling/numeric-ramps.html"
                 },
                 {
                     "title": "Filter values",
                     "desc": "",
-                    "file": "expressions/filter-values.html"
+                    "file": "styling/filter-values.html"
                 },
                 {
                     "title": "Viewport interactivity",
                     "desc": "",
-                    "file": "expressions/viewport.html"
+                    "file": "styling/viewport.html"
                 },
                 {
                     "title": "Bubble map",
@@ -124,7 +114,7 @@
                 {
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
-                    "file": "misc/pop-ups.html"
+                    "file": "interactivity/pop-ups.html"
                 }
             ]
         },

@@ -79,7 +79,7 @@
   <div id="controls">
     <ul class="actions">
       <li>
-        <input type="radio" name="style" onclick="setPopupsClick()" id="click">
+        <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
         <label for="click">Pop-ups on click</label>
       </li>
       <li>
@@ -127,7 +127,8 @@
     });
 
     layer.addTo(map, 'watername_ocean');
-
+    setPopupsClick();
+    
     function setPopupsClick() {
       interactivity.off('featureHover', updatePopup);
       interactivity.on('featureClick', updatePopup);

@@ -86,29 +86,33 @@
       us_county_points
     `);
     const s = carto.expressions;
-    const viz = new carto.Viz({
-      color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
-    });
+    const viz = new carto.Viz(`
+      color: ramp(quantiles($total_pop, 5), SUNSETDARK)
+      strokeWidth: 0
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRampQuantiles() {
-      layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.quantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
-      }));
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(quantiles($total_pop, 5), SUNSETDARK)
+        strokeWidth: 0
+      `));
     }
 
     function setRampBuckets() {
-      layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.buckets(s.prop('total_pop'), [10000, 25000, 100000, 500000, 1000000]), s.palettes.SUNSETDARK)
-      }));
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), SUNSETDARK)
+        strokeWidth: 0
+      `));
     }
 
     function setRampLinear() {
-      layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.linear(s.prop('total_pop'), 10000, 500000), s.palettes.SUNSETDARK)
-      }));
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(linear($total_pop, 10000, 500000), SUNSETDARK)
+        strokeWidth: 0
+      `));
     }
   </script>
 </body>

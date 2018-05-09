@@ -87,7 +87,8 @@
     `);
     const s = carto.expressions;
     const viz = new carto.Viz({
-      color: s.ramp(s.prop('category'), s.palettes.VIVID)
+      color: s.ramp(s.prop('category'), s.palettes.VIVID),
+      strokeWidth: 0
     });
     const layer = new carto.Layer('layer', source, viz);
 
@@ -95,19 +96,22 @@
 
     function setRampAuto() {
       layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.prop('category'), s.palettes.VIVID)
+        color: s.ramp(s.prop('category'), s.palettes.VIVID),
+        strokeWidth: 0
       }));
     }
 
     function setRampBuckets() {
       layer.blendToViz(new carto.Viz({
-          color: s.ramp(s.buckets(s.prop('category'), ['Moda y calzado']), s.palettes.VIVID)
+          color: s.ramp(s.buckets(s.prop('category'), ['Moda y calzado']), s.palettes.VIVID),
+          strokeWidth: 0
       }));
     }
 
     function setRampTop() {
       layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
+        color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID),
+        strokeWidth: 0
       }));
     }
   </script>
