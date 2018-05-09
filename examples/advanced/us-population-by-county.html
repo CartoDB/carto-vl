@@ -9,7 +9,7 @@
   <!-- Include Mapbox GL JS -->
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css' rel='stylesheet' />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -25,7 +25,29 @@
 <body>
   <div id="map"></div>
   <script>
-    // TODO: add your code here
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-99.6404893, 38.5480718],
+      zoom: 4,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'mamataakella',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('county_points_with_population');
+    const viz = new carto.Viz(`
+      width:   75*sqrt($estimate_total)/sqrt(viewportMax($estimate_total))
+      color: opacity(ramp(linear($estimate_total,viewportMAX($estimate_total),viewportMIN($estimate_total)),purpor),0.7)
+      strokeWidth: 0.05*sqrt($estimate_total/sqrt(viewportMAX($estimate_total)))
+      strokeColor: opacity(ramp(linear($estimate_total,viewportMAX($estimate_total),viewportMIN($estimate_total)),purpor),0.8)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map);
   </script>
 </body>
 </html>
