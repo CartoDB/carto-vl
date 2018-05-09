@@ -265,3 +265,35 @@ export class ViewportPercentile extends BaseExpression {
         super._preDraw(...args);
     }
 }
+
+export class ViewportHistogram extends BaseExpression {
+    constructor(x, weight = 1) {
+        super({
+            x: implicitCast(x),
+            weight: implicitCast(weight),
+        });
+        this._isViewport = true;
+    }
+    _resetViewportAgg() {
+        this._cached = null;
+        this._histogram = new Map();
+    }
+    _accumViewportAgg(feature) {
+        const x = this.x.eval(feature);
+        const weight = this.weight.eval(feature);
+        const count = this._histogram.get(x) || 0;
+        this._histogram.set(x, count + weight);
+    }
+    eval() {
+        if (this._cached == null) {
+            this._cached = [...this._histogram].map(([x, y]) => {
+                return { x: this._metatada.categoryIDsToName[x], y };
+            });
+        }
+        return this._cached;
+    }
+    _compile(metadata) {
+        this._metatada = metadata;
+    }
+}
+
