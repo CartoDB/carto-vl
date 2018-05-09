@@ -56,15 +56,15 @@
     <ul>
       <li>
         <input type="radio" name="style" onclick="setRed()" id="red" checked>
-        <label for="red">Size 7px - Red</label>
+        <label for="red">Size 5px - Red</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setGreen()" id="green">
-        <label for="green">Size 9px - Green</label>
+        <label for="green">Size 10px - Purple</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setBlue()" id="blue">
-        <label for="blue">Size 11px - Blue</label>
+        <label for="blue">Size 20px - Blue</label>
       </li>
     </ul>
   </div>
@@ -86,22 +86,22 @@
       ne_10m_populated_places_simple
     `);
     const vizRed = new carto.Viz(`
-      width: 6
+      width: 5
       color: rgb(237, 76, 89)
       strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
     `);
     const vizGreen = new carto.Viz(`
-      width: 8
-      color: rgb(156, 199, 59)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+      width: 10
+      color: SlateBlue
+      strokeWidth: 0.5
+      strokeColor: MidnightBlue
     `);
     const vizBlue = new carto.Viz(`
-      width: 10
-      color: rgb(23, 133, 250)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+      width: 20
+      color: #3390C8
+      strokeWidth: 2
+      strokeColor: #73C1EF
     `);
     const layer = new carto.Layer('layer', source, vizRed);
 

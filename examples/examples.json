@@ -52,9 +52,9 @@
                     "file": "styling/filter-values.html"
                 },
                 {
-                    "title": "Viewport interactivity",
+                    "title": "Style by zoom",
                     "desc": "",
-                    "file": "styling/viewport.html"
+                    "file": "styling/style-by-zoom.html"
                 },
                 {
                     "title": "Bubble map",
@@ -121,6 +121,16 @@
         {
             "title": "Advanced",
             "samples": [
+                {
+                    "title": "Viewport interactivity",
+                    "desc": "",
+                    "file": "advanced/viewport.html"
+                },
+                {
+                    "title": "Denver trees",
+                    "desc": "",
+                    "file": "advanced/denver-trees.html"
+                },
                 {
                     "title": "Barcelona Spending",
                     "desc": "Multi-scale animation with color interpolation through time of day and sized by amount spent.",

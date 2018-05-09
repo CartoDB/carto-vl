@@ -73,7 +73,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [-0.127, 51.507],
-      zoom: 9,
+      zoom: 10,
       dragRotate: false
     });
 
@@ -87,9 +87,6 @@
     `);
     const viz = new carto.Viz(`
       @neighbourhood: $neighbourhood
-      color: ramp($neighbourhood, bold)
-      strokeColor: 0.5*ramp($neighbourhood, bold)
-      strokeWidth: 2
     `);
     const layer = new carto.Layer('layer', source, viz);
 

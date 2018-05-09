@@ -68,7 +68,7 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
+      center: [0, 25],
       zoom: 2,
       dragRotate: false
     });
@@ -83,8 +83,7 @@
     `);
     const viz = new carto.Viz(`
       @name: $name
-      width: zoom()
-      color: ramp($name, bold)
+      width: 3
       filter: in($featurecla, ['River'])
     `);
     const layer = new carto.Layer('layer', source, viz);
@@ -120,5 +119,4 @@
     }
   </script>
 </body>
-
 </html>

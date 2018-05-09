@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Style features on hover/click | CARTO</title>
+  <title>Denver trees | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -16,12 +17,14 @@
       padding: 0;
       box-sizing: border-box;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
       z-index: 0;
     }
+
     #controls {
       position: absolute;
       top: 12px;
@@ -29,6 +32,7 @@
       width: 200px;
       z-index: 2;
     }
+
     #controls h2 {
       font: 300 12px/16px 'Open Sans';
       background: rgba(0, 0, 0, 0.64);
@@ -36,19 +40,40 @@
       padding: 8px 12px;
       color: #fff;
     }
+
+    .container {
+      padding: 8px 12px;
+      background: white;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+      border-radius: 4px;
+      color: #2E3C43;
+      margin-top: 12px;
+    }
+
+    #content h3 {
+      font: 400 16px/22px 'Open Sans';
+      margin-bottom: 4px;
+    }
+
+    #content p {
+      font: 400 12px/14px 'Open Sans';
+    }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="controls">
     <h2></h2>
+    <div id="content">
+    </div>
   </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      center: [-105.048, 39.749],
+      zoom: 15,
       dragRotate: false
     });
 
@@ -58,65 +83,23 @@
     });
 
     const source = new carto.source.Dataset(`
-      world_population_2015
+      tree_inventory_sloans
     `);
     const viz = new carto.Viz(`
-      width: 50 * sqrt($pop_2015) / sqrt(globalMax($pop_2015)) * zoom()
-      color: hsva(0.73,0.69,0.89,0.4)
-      strokeColor: hsva(0.73,0.69,0.89,0.5)
+      @type: $type
+      @diameter_number: $diameter_number
+      width: $diameter_number * 4
+      color: opacity(ramp($type, bold), 0.7)
+      strokeColor: ramp($type, bold)
       strokeWidth: 1
-      order: asc(width())
     `);
     const layer = new carto.Layer('layer', source, viz);
 
     const interactivity = new carto.Interactivity(layer);
-    const delay = 100;
-
-    let clickedFeatureId = null;
-
-    interactivity.on('featureEnter', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
-        if (feature.id !== clickedFeatureId) {
-          feature.color.blendTo('rgba(255,20,255,0.7)', delay)
-          feature.strokeWidth.blendTo('4', delay);
-          feature.strokeColor.blendTo('rgb(255,20,138)', delay);
-        }
-      }
-    });
-
-    interactivity.on('featureLeave', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
-        if (feature.id !== clickedFeatureId) {
-          feature.color.reset(delay);
-          feature.strokeWidth.reset(delay);
-          feature.strokeColor.reset(delay);
-        }
-      }
-    });
-
-    interactivity.on('featureClick', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
-        clickedFeatureId = feature.id;
-        feature.color.blendTo('rgba(95,204,121,1)', delay)
-        feature.strokeWidth.blendTo('7', delay);
-        feature.strokeColor.blendTo('rgb(46,180,78)', delay);
-      }
-    });
-
-    interactivity.on('featureClickOut', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
-        feature.color.reset(delay);
-        feature.strokeWidth.reset(delay);
-        feature.strokeColor.reset(delay);
-      }
-    });
+    interactivity.on('featureClick', updateTree);
 
     layer.on('loaded', () => {
-      updateTitle('Hover or Click on a country');
+      updateTitle('Click on the trees');
     });
 
     layer.addTo(map, 'watername_ocean');
@@ -124,6 +107,22 @@
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
+
+    function updateTree(event) {
+      let content = '';
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3>${feature.variables.type.value}</h3>
+            <p>Diameter <b>${feature.variables.diameter_number.value}</b></p>
+            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+          </div>
+        `;
+      }
+      document.getElementById('content').innerHTML = content;
+    }
   </script>
 </body>
+
 </html>

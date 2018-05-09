@@ -72,8 +72,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-105.048, 39.749],
-      zoom: 15,
+      center: [-105.047, 39.752],
+      zoom: 16,
       dragRotate: false
     });
 
@@ -88,10 +88,7 @@
     const viz = new carto.Viz(`
       @type: $type
       @diameter_number: $diameter_number
-      width: $diameter_number * 4
-      color: opacity(ramp($type, bold), 0.7)
-      strokeColor: ramp($type, bold)
-      strokeWidth: 1
+      width: 15
     `);
     const layer = new carto.Layer('layer', source, viz);
 
