@@ -5,10 +5,10 @@ import BaseExpression from './base';
 /**
  * Linearly interpolate from *a* to *b* based on *mix*.
  *
- * @param {carto.expressions.Base|number} a - Numeric or color expression
- * @param {carto.expressions.Base|number} b - Numeric or color expression
- * @param {carto.expressions.Base|number} mix - Numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.expressions.Base} Numeric expression
+ * @param {Number|Color|number} a - Numeric or color expression
+ * @param {Number|Color|number} b - Numeric or color expression
+ * @param {Number} mix - Numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {Number|Color} Numeric expression
  *
  * @memberof carto.expressions
  * @name blend

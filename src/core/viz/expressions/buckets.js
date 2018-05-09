@@ -57,9 +57,9 @@ let bucketUID = 0;
  * `);
  * ```
  *
- * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {carto.expressions.Base[]} breakpoints - Numeric expression containing the different breakpoints.
- * @return {carto.expressions.Base}
+ * @param {Number|String|Property} property - The property to be evaluated and interpolated
+ * @param {Number[]|String[]} breakpoints - Numeric expression containing the different breakpoints.
+ * @return {Category}
  *
  * @memberof carto.expressions
  * @name buckets

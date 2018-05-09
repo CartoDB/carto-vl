@@ -5,7 +5,7 @@ import { checkString } from './utils';
  * Wrapper around category names.
  *
  * @param {string} categoryName
- * @returns {carto.expressions.Base} category expression with the category name provided
+ * @returns {String} category expression with the category name provided
  *
  * @memberof carto.expressions
  * @name category

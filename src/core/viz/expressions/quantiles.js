@@ -9,9 +9,9 @@ let quantilesUID = 0;
 /**
  * Generate quantiles of size `n` from the features on the viewport.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number|Property|number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -34,9 +34,9 @@ export const Quantiles = genQuantiles(false);
 /**
  * Generate quantiles of size `n` from all the features.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number|Property|number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;

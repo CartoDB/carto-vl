@@ -3,9 +3,9 @@ import BaseExpression from './base';
 /**
  * Get the top `n` properties.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {Number|String|Property} property - Column of the table
  * @param {number} n - Number of top properties to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;

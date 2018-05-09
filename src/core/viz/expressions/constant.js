@@ -5,7 +5,7 @@ import { checkNumber } from './utils';
  * Wraps a constant number. Implies a GPU optimization vs {@link carto.expressions.number|number expression}.
  *
  * @param {number} x - A number to be warped in a constant numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @return {Number} Numeric expression
  *
  * @example <caption>Creating a constant number expression.</caption>
  * const s = carto.expressions;

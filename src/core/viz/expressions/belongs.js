@@ -4,9 +4,9 @@ import BaseExpression from './base';
 /**
  * Check if a categorical value belongs to a list of categories.
  *
- * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical whitelist
- * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
- * @return {carto.expressions.Base} Numeric expression with the result of the check
+ * @param {String|Property|string} value - Categorical expression to be tested against the categorical whitelist
+ * @param {String[]|Property[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
@@ -30,9 +30,9 @@ export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => 
 /**
  * Check if value does not belong to the categories list given by the categories parameters.
  *
- * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical blacklist
- * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the blacklist
- * @return {carto.expressions.Base} Numeric expression with the result of the check
+ * @param {String|Property|string} value - Categorical expression to be tested against the categorical blacklist
+ * @param {String[]|Property[]|string[]} categories - Multiple categorical expression parameters that will form the blacklist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;

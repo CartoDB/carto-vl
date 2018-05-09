@@ -7,11 +7,11 @@ import { implicitCast, clamp } from './utils';
  *       _____
  * _____/     \_____
  *
- * @param {carto.expressions.Base} input
- * @param {carto.expressions.Base|number} center
- * @param {carto.expressions.Base|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
- * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
- * @return {carto.expressions.Base}
+ * @param {Number|Property|number} input
+ * @param {Number|Property|number} center
+ * @param {Number|Property|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {Number|Property|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @return {Number}
  *
  * @example <caption></caption>
  * const s = carto.expressions;
@@ -23,7 +23,7 @@ import { implicitCast, clamp } from './utils';
  * const viz = new carto.Viz(`
  *   width: near($day, (25 * now()) % 10000, 0, 10)
  * `);
- * 
+ *
  * @memberof carto.expressions
  * @name near
  * @function

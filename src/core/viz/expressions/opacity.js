@@ -5,8 +5,8 @@ import { checkLooseType, checkType } from './utils';
 /**
  * Override the input color opacity.
  *
- * @param {carto.expressions.Base|number} x - A number to be warped in a numeric expression
- * @return {carto.expressions.Base}
+ * @param {Number|Property|number} x - A number to be warped in a numeric expression
+ * @return {Color}
  *
  * @example <caption>Display blue points with opacity.</caption>
  * const s = carto.expressions;

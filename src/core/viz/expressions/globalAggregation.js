@@ -3,14 +3,11 @@ import { number } from '../functions';
 import * as schema from '../../schema';
 import { implicitCast } from './utils';
 
-
-
-
 /**
  * Return the average value of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
@@ -35,8 +32,8 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
 /**
  * Return the maximum value of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
@@ -61,8 +58,8 @@ export const GlobalMax = generateGlobalAggregattion('max');
 /**
  * Return the minimum value of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
@@ -87,8 +84,8 @@ export const GlobalMin = generateGlobalAggregattion('min');
 /**
  * Return the sum of the values of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
@@ -113,8 +110,8 @@ export const GlobalSum = generateGlobalAggregattion('sum');
 /**
  * Return the count of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
  * const s = carto.expressions;
@@ -174,8 +171,8 @@ function generateGlobalAggregattion(metadataPropertyName) {
 /**
  * Return the percentile of all the features.
  *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Property} property - Column of the table
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
  * const s = carto.expressions;

@@ -4,10 +4,10 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
 /**
  * Evaluates to a hsl color.
  *
- * @param {carto.expressions.Base|number} h - The hue of the color
- * @param {carto.expressions.Base|number} s - The saturation of the color
- * @param {carto.expressions.Base|number} l - The lightness of the color
- * @return {carto.expressions.Base}
+ * @param {Number|Property|number} h - The hue of the color
+ * @param {Number|Property|number} s - The saturation of the color
+ * @param {Number|Property|number} l - The lightness of the color
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -30,11 +30,11 @@ export const HSL = genHSL('hsl', false);
 /**
  * Evaluates to a hsla color.
  *
- * @param {carto.expressions.Base|number} h - The hue of the color
- * @param {carto.expressions.Base|number} s - The saturation of the color
- * @param {carto.expressions.Base|number} l - The lightness of the color
- * @param {carto.expressions.Base|number} a - The alpha value of the color
- * @return {carto.expressions.Base}
+ * @param {Number|Property|number} h - The hue of the color
+ * @param {Number|Property|number} s - The saturation of the color
+ * @param {Number|Property|number} l - The lightness of the color
+ * @param {Number|Property|number} a - The alpha value of the color
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;

@@ -5,7 +5,7 @@ import { checkNumber } from './utils';
  * Wraps a number.
  *
  * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @return {Number} Numeric expression
  *
  * @example <caption>Creating a number expression.</caption>
  * const s = carto.expressions;
@@ -21,7 +21,6 @@ import { checkNumber } from './utils';
  * @memberof carto.expressions
  * @name number
  * @function
- * @api
  */
 export default class Number extends BaseExpression {
     constructor(x) {

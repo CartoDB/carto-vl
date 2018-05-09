@@ -7,7 +7,7 @@ export const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine
  * Create a color from its name.
  *
  * @param {string} name - The name of the color
- * @return {carto.expressions.Base}
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;

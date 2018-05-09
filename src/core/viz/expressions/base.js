@@ -15,7 +15,6 @@ let uid = 0;
  * @memberof carto.expressions
  * @name Base
  * @abstract
- * @api
  */
 export default class Base {
     /**

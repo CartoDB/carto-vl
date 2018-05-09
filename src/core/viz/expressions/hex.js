@@ -5,7 +5,7 @@ import { checkString, hexToRgb, getStringErrorPreface } from './utils';
  * Create a color from its hexadecimal description.
  *
  * @param {string} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
- * @return {carto.expressions.Base}
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
