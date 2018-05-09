@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Populated places | CARTO</title>
+  <title>Select layer by source | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,16 +55,16 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="pop" onclick="setAll()" id="all" checked>
-        <label for="all">All places<label>
+        <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
+        <label for="all">All cities</label>
       </li>
       <li>
-        <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
-        <label for="most">Very populated places</label>
+        <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
+        <label for="europe">European cities</label>
       </li>
       <li>
-        <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
-        <label for="less">Less populated places</label>
+        <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
+        <label for="spain">Spanish cities</label>
       </li>
     </ul>
   </div>
@@ -82,45 +82,40 @@
       apiKey: 'default_public'
     });
 
-    const populatedPlacesSource = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+    const allCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
     `);
-    const allPlacesViz = new carto.Viz(`
+    const europeanCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
+    `);
+    const spanishCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name = \'Spain\'
+    `);
+    const citiesViz = new carto.Viz(`
       width: 6
       color: rgb(237, 76, 89)
       strokeWidth: 1
-      strokeColor: rgb(255, 255,255)
-      filter: $pop_max >= 0
-    `);
-    const veryPopulatedViz = new carto.Viz(`
-      width: 11
-      color: rgb(105, 181, 158)
-      strokeWidth: 1
       strokeColor: rgb(255, 255, 255)
-      filter: $pop_max > 5000000
     `);
-    const lessPopulatedViz = new carto.Viz(`
-      width: 11
-      color: rgb(242, 87, 66)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-      filter: $pop_max < 100
-    `);
+    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
-    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesViz);
+    citiesLayer.addTo(map, 'watername_ocean');
 
-    populatedPlacesLayer.addTo(map, 'watername_ocean');
-
-    function setAll() {
-      populatedPlacesLayer.blendToViz(allPlacesViz);
+    function setAllCities() {
+      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
     }
 
-    function setVeryPopulated() {
-      populatedPlacesLayer.blendToViz(veryPopulatedViz);
+    function setEuropeanCities() {
+      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
     }
 
-    function setLessPopulated() {
-      populatedPlacesLayer.blendToViz(lessPopulatedViz);
+    function setSpanishCities() {
+      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
     }
   </script>
 </body>

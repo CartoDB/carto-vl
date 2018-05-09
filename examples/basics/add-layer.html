@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Default | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -38,10 +38,16 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+    const source = new carto.source.Dataset('tx_0125_copy_copy');
+    const viz = new carto.Viz(`
+      width: blend(3,
+            blend(3, 20*linear($amount,10,100), linear(zoom(), 2^10,
+            2^16)),
+            linear(zoom(), 2^8, 2^10)
+)
+color: ramp(linear($hour,5,20),[deeppink,gold,turquoise,darkslateblue])
+filter: torque(linear($tx_date_proc,time('2012-03-01T00:00:07Z'),time('2012-03-02T23:59:57Z')),24,fade(0,0.5))
     `);
-    const viz = new carto.Viz();
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');

@@ -7,59 +7,59 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add a layer",
+                    "title": "Boilerplate",
+                    "desc": "Use this as template for your app",
+                    "file": "basics/boilerplate.html"
+                },
+                {
+                    "title": "Add layer",
                     "desc": "Add one CARTO layer to your map",
-                    "file": "basics/single-layer.html"
+                    "file": "basics/add-layer.html"
                 },
                 {
                     "title": "Add multiple layers",
                     "desc": "Add multiple CARTO layers to your map",
-                    "file": "basics/multi-layer.html"
+                    "file": "basics/multiple-layers.html"
                 },
                 {
-                    "title": "Change the style",
-                    "desc": "Update the style of your layers",
-                    "file": "basics/change-style.html"
+                    "title": "Style layer",
+                    "desc": "Basic styling of a layer",
+                    "file": "basics/style-layer.html"
                 },
                 {
-                    "title": "Change the source",
+                    "title": "Select layer by source",
                     "desc": "Update the source of your layers",
-                    "file": "basics/change-source.html"
+                    "file": "basics/select-layer-by-source.html"
                 }
             ]
         },
         {
-            "title": "Expressions",
+            "title": "Styling",
             "samples": [
                 {
-                    "title": "Default style",
-                    "desc": "",
-                    "file": "expressions/default.html"
+                    "title": "Color expressions",
+                    "desc": "The color spaces that we support",
+                    "file": "expressions/color-expressions.html"
                 },
                 {
-                    "title": "Use color expressions",
-                    "desc": "",
-                    "file": "expressions/color.html"
+                    "title": "Category ramps",
+                    "desc": "Options for symbolizing category attributes",
+                    "file": "expressions/category-ramps.html"
                 },
                 {
-                    "title": "Use category ramp",
-                    "desc": "",
-                    "file": "expressions/ramp-category.html"
+                    "title": "Numeric ramps",
+                    "desc": "Options for symbolizing numeric attributes",
+                    "file": "expressions/numeric-ramps.html"
                 },
                 {
-                    "title": "Use numeric ramp",
+                    "title": "Draw order",
                     "desc": "",
-                    "file": "expressions/ramp-numeric.html"
+                    "file": "expressions/draw-order.html"
                 },
                 {
-                    "title": "Setup ordering",
+                    "title": "Filter values",
                     "desc": "",
-                    "file": "expressions/order.html"
-                },
-                {
-                    "title": "Filter metadata",
-                    "desc": "",
-                    "file": "expressions/filter.html"
+                    "file": "expressions/filter-values.html"
                 },
                 {
                     "title": "Viewport interactivity",
@@ -67,14 +67,29 @@
                     "file": "expressions/viewport.html"
                 },
                 {
-                    "title": "Animated dataset",
+                    "title": "Bubble map",
                     "desc": "",
-                    "file": "expressions/animation.html"
+                    "file": "expressions/bubble-map.html"
+                }
+            ]
+        },
+        {
+            "title": "Animation",
+            "samples": [
+                {
+                    "title": "Points animation",
+                    "desc": "Animated points",
+                    "file": "animation/points-animation.html"
                 },
                 {
-                    "title": "Torque",
-                    "desc": "",
-                    "file": "expressions/torque.html"
+                    "title": "Lines animation",
+                    "desc": "Animated lines",
+                    "file": "animation/lines-animation.html"
+                },
+                {
+                    "title": "Polygons animation",
+                    "desc": "Animated polygons",
+                    "file": "animation/polygons-animation.html"
                 }
             ]
         },
@@ -97,54 +112,49 @@
                     "file": "interactivity/feature-enter-leave.html"
                 },
                 {
-                    "title": "Muliple features",
+                    "title": "Multi-layer interactivity",
                     "desc": "Detect multiple features from different layers",
                     "file": "interactivity/multi-feature.html"
                 },
                 {
-                    "title": "Style a feature",
-                    "desc": "Style a detected feature",
-                    "file": "interactivity/style-feature.html"
-                }
-            ]
-        },
-        {
-            "title": "Misc",
-            "samples": [
-                {
-                    "title": "Guide",
-                    "desc": "Full reference guide example",
-                    "xfile": "misc/guide.html"
+                    "title": "Style features on hover/click",
+                    "desc": "Style a feature based on type of interactivity",
+                    "file": "interactivity/style-features-on-hover-click.html"
                 },
                 {
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
-                    "file": "misc/popups.html"
+                    "file": "misc/pop-ups.html"
+                }
+            ]
+        },
+        {
+            "title": "Advanced",
+            "samples": [
+                {
+                    "title": "Barcelona Spending",
+                    "desc": "Multi-scale animation with color interpolation through time of day and sized by amount spent.",
+                    "file": "advanced/barcelona-spending.html"
                 },
                 {
-                    "title": "Legends",
-                    "desc": "Create dynamic legends",
-                    "xfile": "misc/legends.html"
+                    "title": "US Population by County",
+                    "desc": "This map uses viewportMAX to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport",
+                    "file": "advanced/us-population-by-county.html"
                 },
                 {
-                    "title": "Most/less populated places",
-                    "desc": "Filter the 20 most/less populated places in the world",
-                    "file": "misc/populated-places.html"
+                    "title": "Taxi pickups",
+                    "desc": "Multi-variate styling",
+                    "file": "advanced/taxi-pickups.html"
                 },
                 {
-                    "title": "GeoJSON viewer",
-                    "desc": "Load and view GeoJSON files",
-                    "file": "misc/geojson-viewer.html"
+                    "title": "Ocean bathymetry",
+                    "desc": "This map symbolizes ocean bathymetery. Since the ocean is forever active, and moving, we wanted to demonstrate how we could animate the points to give that sense of movement.",
+                    "file": "advanced/ocean-bathymetry.html"
                 },
                 {
-                    "title": "Error handling",
-                    "desc": "Handle common errors in maps",
-                    "xfile": "misc/error-handling.html"
-                },
-                {
-                    "title": "Edit SQL & Expressions",
-                    "desc": "Manually edit the SQL query and the Expressions viz",
-                    "file": "misc/edit-sql-expressions.html"
+                    "title": "Hurricane Harvey",
+                    "desc": "Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall (would be better with day). Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.",
+                    "file": "advanced/hurricane-harvey.html"
                 }
             ]
         }

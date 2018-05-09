@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Single layer | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -27,27 +27,27 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [20, 20],
       zoom: 2,
       dragRotate: false
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'mamataakella',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const source = new carto.source.Dataset('bathy_points');
     const viz = new carto.Viz(`
-      width: 6
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+      @speed : 3*now()+$dn
+      width: 5
+      color: ramp(linear($dn,0,255),teal)
+      filter: sin(@speed)*0.5+0.5
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
+    layer.addTo(map);
   </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Filter | CARTO</title>
+  <title>Points animation | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -29,7 +29,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
       center: [0, 30],
-      zoom: 2,
+      zoom: 1,
       dragRotate: false
     });
 
@@ -39,12 +39,13 @@
     });
 
     const source = new carto.source.Dataset(`
-      pop_density_points
+      wwi
     `);
     const s = carto.expressions;
     const viz = new carto.Viz({
-        color: s.ramp(s.quantiles(s.prop('dn'), 5), s.palettes.REDOR),
-        filter: s.between(s.prop('dn'), 100, 150)
+        width: s.mul(s.blend(1, 2, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
+        color: s.ramp(s.linear(s.clusterAvg(s.prop('temp')), 0, 30), s.palettes.TEALROSE),
+        filter: s.blend(0.005, 1, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic)
     });
     const layer = new carto.Layer('layer', source, viz);
 

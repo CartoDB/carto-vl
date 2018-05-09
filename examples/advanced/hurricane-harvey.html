@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Animation | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -28,8 +28,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [0, 30],
-      zoom: 1,
+      center: [-96, 30],
+      zoom: 7,
       dragRotate: false
     });
 
@@ -38,18 +38,15 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      wwi
+    const source = new carto.source.Dataset('table_30');
+    const viz = new carto.Viz(`
+      color: opacity(ramp(linear($sum_qpf,1,120),temps),($e_totpop/$area_sqmi)/500)
+      filter: torque(linear($sum_qpf,144.5, 1.5),5,fade(0,100))+0.1
+      strokeWidth: 0
     `);
-    const s = carto.expressions;
-    const viz = new carto.Viz({
-        width: s.mul(s.blend(1, 2, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
-        color: s.ramp(s.linear(s.clusterAvg(s.prop('temp')), 0, 30), s.palettes.TEALROSE),
-        filter: s.blend(0.005, 1, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic)
-    });
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
+    layer.addTo(map);
   </script>
 </body>
 </html>

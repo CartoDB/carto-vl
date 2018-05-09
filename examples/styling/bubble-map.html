@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Multi layer | CARTO</title>
+  <title>Bubble map | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -28,8 +28,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 40],
-      zoom: 4,
+      center: [0, 30],
+      zoom: 2,
       dragRotate: false
     });
 
@@ -38,29 +38,14 @@
       apiKey: 'default_public'
     });
 
-    const spainCitiesSource = new carto.source.SQL(`
-      SELECT *
-      FROM ne_10m_populated_places_simple
-      WHERE adm0name = \'Spain\'
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const viz = new carto.Viz(`
+    width: ramp(buckets($pop_max, 100000, 1000000), [1, 2, 4]) * zoom()
+    color: ramp(buckets($pop_max, 100000, 1000000), teal)
     `);
-    const spainCitiesViz = new carto.Viz(`
-      width: 6
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
-    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesViz);
+    const layer = new carto.Layer('layer', source, viz);
 
-    const europeCountriesSource = new carto.source.Dataset(`
-      ne_adm0_europe
-    `);
-    const europeCountriesViz = new carto.Viz(`
-      color: rgba(127, 110, 186, 0.8)
-    `);
-    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesViz);
-
-    spainCitiesLayer.addTo(map, 'watername_ocean');
-    europeCountriesLayer.addTo(map, 'spainCitiesLayer');
+    layer.addTo(map, 'watername_ocean');
   </script>
 </body>
 </html>

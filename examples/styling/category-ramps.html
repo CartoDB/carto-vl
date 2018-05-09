@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Change source | CARTO</title>
+  <title>Category ramps | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,25 +55,25 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
-        <label for="all">All cities</label>
+        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
+        <label for="auto">Ramp auto</label>
       </li>
       <li>
-        <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
-        <label for="europe">European cities</label>
+        <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+        <label for="buckets">Ramp buckets</label>
       </li>
       <li>
-        <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
-        <label for="spain">Spanish cities</label>
+        <input type="radio" name="style" onclick="setRampTop()" id="top">
+        <label for="top">Ramp top</label>
       </li>
     </ul>
   </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [2.1734, 41.3851],
+      zoom: 12,
       dragRotate: false
     });
 
@@ -82,40 +82,33 @@
       apiKey: 'default_public'
     });
 
-    const allCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
+    const source = new carto.source.Dataset(`
+      tx_0125_copy_copy
     `);
-    const europeanCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-        WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
-    `);
-    const spanishCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-        WHERE adm0name = \'Spain\'
-    `);
-    const citiesViz = new carto.Viz(`
-      width: 6
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
-    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
+    const s = carto.expressions;
+    const viz = new carto.Viz({
+      color: s.ramp(s.prop('category'), s.palettes.VIVID)
+    });
+    const layer = new carto.Layer('layer', source, viz);
 
-    citiesLayer.addTo(map, 'watername_ocean');
+    layer.addTo(map, 'watername_ocean');
 
-    function setAllCities() {
-      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
+    function setRampAuto() {
+      layer.blendToViz(new carto.Viz({
+        color: s.ramp(s.prop('category'), s.palettes.VIVID)
+      }));
     }
 
-    function setEuropeanCities() {
-      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
+    function setRampBuckets() {
+      layer.blendToViz(new carto.Viz({
+          color: s.ramp(s.buckets(s.prop('category'), ['Moda y calzado']), s.palettes.VIVID)
+      }));
     }
 
-    function setSpanishCities() {
-      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
+    function setRampTop() {
+      layer.blendToViz(new carto.Viz({
+        color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
+      }));
     }
   </script>
 </body>
