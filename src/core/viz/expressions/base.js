@@ -98,9 +98,11 @@ export default class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _getDrawMetadataRequirements() {
-        // Depth First Search => reduce using union
-        return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(schema.union, schema.IDENTITY);
+    _resetViewportAgg(){
+        this._getChildren().forEach(child => child._resetViewportAgg());
+    }
+    _accumViewportAgg(f){
+        this._getChildren().forEach(child => child._accumViewportAgg(f));
     }
 
     /**

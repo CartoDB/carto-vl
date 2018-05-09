@@ -163,18 +163,8 @@ import { Ceil } from './expressions/unary';
 
 import Variable from './expressions/variable';
 
-import { ViewportAvg } from './expressions/viewportAggregation';
-import { ViewportMax } from './expressions/viewportAggregation';
-import { ViewportMin } from './expressions/viewportAggregation';
-import { ViewportSum } from './expressions/viewportAggregation';
-import { ViewportCount } from './expressions/viewportAggregation';
-import { ViewportPercentile } from './expressions/viewportAggregation';
-import { GlobalAvg } from './expressions/viewportAggregation';
-import { GlobalMax } from './expressions/viewportAggregation';
-import { GlobalMin } from './expressions/viewportAggregation';
-import { GlobalSum } from './expressions/viewportAggregation';
-import { GlobalCount } from './expressions/viewportAggregation';
-import { GlobalPercentile } from './expressions/viewportAggregation';
+import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile } from './expressions/viewportAggregation';
+import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/globalAggregation';
 
 import XYZ from './expressions/xyz';
 

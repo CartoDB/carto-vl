@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { number } from '../functions';
-import * as schema from '../../schema';
+import { implicitCast, clamp } from './utils';
 
 /**
  * Return the average value of the features showed in the viewport.
@@ -26,7 +26,18 @@ import * as schema from '../../schema';
  * @function
  * @api
  */
-export const ViewportAvg = generateAggregattion('avg');
+export const ViewportAvg = genViewportAgg('avg',
+    self => {
+        self._sum = 0; self._count = 0;
+    },
+    (self, x) => {
+        if (!Number.isNaN(x)) {
+            self._count++;
+            self._sum += x;
+        }
+    },
+    self => self._sum / self._count
+);
 
 /**
  * Return the maximum value of the features showed in the viewport.
@@ -52,7 +63,11 @@ export const ViewportAvg = generateAggregattion('avg');
  * @function
  * @api
  */
-export const ViewportMax = generateAggregattion('max');
+export const ViewportMax = genViewportAgg('max',
+    self => { self._value = Number.NEGATIVE_INFINITY; },
+    (self, y) => { self._value = Math.max(self._value, y); },
+    self => self._value
+);
 
 /**
  * Return the minimum value of the features showed in the viewport.
@@ -78,7 +93,10 @@ export const ViewportMax = generateAggregattion('max');
  * @function
  * @api
  */
-export const ViewportMin = generateAggregattion('min');
+export const ViewportMin = genViewportAgg('min',
+    self => { self._value = Number.POSITIVE_INFINITY; },
+    (self, y) => { self._value = Math.min(self._value, y); },
+    self => self._value);
 
 /**
  * Return the sum of the values of the features showed in the viewport.
@@ -104,7 +122,10 @@ export const ViewportMin = generateAggregattion('min');
  * @function
  * @api
  */
-export const ViewportSum = generateAggregattion('sum');
+export const ViewportSum = genViewportAgg('sum',
+    self => { self._value = 0; },
+    (self, y) => { self._value = self._value + y; },
+    self => self._value);
 
 /**
  * Return the count of the features showed in the viewport.
@@ -130,7 +151,50 @@ export const ViewportSum = generateAggregattion('sum');
  * @function
  * @api
  */
-export const ViewportCount = generateAggregattion('count');
+export const ViewportCount = genViewportAgg('count',
+    self => { self._value = 0; },
+    self => { self._value++; },
+    self => self._value);
+
+
+
+function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
+    return class ViewportAggregation extends BaseExpression {
+        /**
+         * @param {*} property
+         */
+        constructor(property) {
+            super({
+                property: implicitCast(property),
+                value: number(0)
+            });
+            this._isViewport = true;
+        }
+        eval() {
+            return resolveFn(this);
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            // TODO improve type check
+            this.property._compile(metadata);
+            this.type = 'number';
+            super.inlineMaker = inline => inline.value;
+        }
+        _getMinimumNeededSchema() {
+            return this.property._getMinimumNeededSchema();
+        }
+        _resetViewportAgg() {
+            zeroFn(this);
+        }
+        _accumViewportAgg(feature) {
+            accumFn(this, this.property.eval(feature));
+        }
+        _preDraw(...args) {
+            this.value.expr = this.eval();
+            super._preDraw(...args);
+        }
+    };
+}
 
 /**
  * Return the percentile of the features showed in the viewport.
@@ -156,275 +220,48 @@ export const ViewportCount = generateAggregattion('count');
  * @function
  * @api
  */
-export const ViewportPercentile = generatePercentile();
-
-/**
- * Return the average value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_avg: s.globalAvg(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_avg: globalAvg($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalAvg
- * @function
- * @api
- */
-export const GlobalAvg = generateAggregattion('avg', true);
-
-/**
- * Return the maximum value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_max: s.globalMax(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_max: globalMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMax
- * @function
- * @api
- */
-export const GlobalMax = generateAggregattion('max', true);
-
-/**
- * Return the minimum value of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_min: s.globalMin(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_min: globalMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMin
- * @function
- * @api
- */
-export const GlobalMin = generateAggregattion('min', true);
-
-/**
- * Return the sum of the values of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_sum: s.globalSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_sum: globalSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalSum
- * @function
- * @api
- */
-export const GlobalSum = generateAggregattion('sum', true);
-
-/**
- * Return the count of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_count: s.globalCount(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_count: globalCount($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalCount
- * @function
- * @api
- */
-export const GlobalCount = generateAggregattion('count', true);
-
-/**
- * Return the percentile of all the features.
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_percentile: s.globalPercentile(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @g_percentile: globalPercentile($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalPercentile
- * @function
- * @api
- */
-export const GlobalPercentile = generatePercentile(true);
-
-function generateAggregattion(metadataPropertyName, global) {
-    return class Aggregattion extends BaseExpression {
-        /**
-         * @param {*} property
-         */
-        constructor(property) {
-            super({ value: number(0) });
-            this.property = property;
+export class ViewportPercentile extends BaseExpression {
+    /**
+     * @param {*} property
+     */
+    constructor(property, percentile) {
+        super({
+            property: implicitCast(property),
+            percentile: implicitCast(percentile),
+            impostor: number(0)
+        });
+        this._isViewport = true;
+    }
+    eval(f) {
+        if (this._value == null) {
+            this._array.sort((a, b) => a - b);
+            const index = clamp(
+                Math.floor(this.percentile.eval(f) / 100 * this._array.length),
+                0, this._array.length - 1);
+            this._value = this._array[index];
         }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            // TODO improve type check
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _updateDrawMetadata(drawMetadata){
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name === name);
-            if (!global) {
-                this.value.expr = column[metadataPropertyName];
-            }
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
-}
-
-function generatePercentile(global) {
-    return class Percentile extends BaseExpression {
-        /**
-         * @param {*} property
-         */
-        constructor(property, percentile) {
-            if (!Number.isFinite(percentile)) {
-                throw new Error('Percentile must be a fixed literal number');
-            }
-            super({ value: number(0) });
-            // TODO improve type check
-            this.property = property;
-            this.percentile = percentile;
-        }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                const copy = metadata.sample.map(s => s[this.property.name]);
-                copy.sort((x, y) => x - y);
-                const p = this.percentile / 100;
-                this.value.expr = copy[Math.floor(p * copy.length)];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _preDraw(program, drawMetadata, gl) {
-            // TODO use _updateDrawMetadata
-            const name = this._getColumnName();
-            if (!global) {
-                const column = drawMetadata.columns.find(c => c.name === name);
-                const total = column.accumHistogram[column.histogramBuckets - 1];
-                // TODO OPT: this could be faster with binary search
-                for (var i = 0; i < column.histogramBuckets; i++) {
-                    if (column.accumHistogram[i] >= this.percentile / 100 * total) {
-                        break;
-                    }
-                }
-                const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
-                this.value.expr = br;
-            }
-            this.value._preDraw(program, drawMetadata, gl);
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
+        return this._value;
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
+    }
+    _getMinimumNeededSchema() {
+        return this.property._getMinimumNeededSchema();
+    }
+    _resetViewportAgg() {
+        this._value = null;
+        this._array = [];
+    }
+    _accumViewportAgg(feature) {
+        const v = this.property.eval(feature);
+        this._array.push(v);
+    }
+    _preDraw(...args) {
+        this.impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
 }

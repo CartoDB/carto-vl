@@ -232,19 +232,21 @@ export default class Viz {
 
     setDefaultsIfRequired(geomType) {
         let defaults = this._getDefaultGeomStyle(geomType);
-        if (this.color.default) {
-            this.color = defaults.COLOR_EXPRESSION();
+        if (defaults) {
+            if (this.color.default) {
+                this.color = defaults.COLOR_EXPRESSION();
+            }
+            if (this.width.default) {
+                this.width = defaults.WIDTH_EXPRESSION();
+            }
+            if (this.strokeColor.default) {
+                this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
+            }
+            if (this.strokeWidth.default) {
+                this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
+            }
+            this._updateRootExpressions();
         }
-        if (this.width.default) {
-            this.width = defaults.WIDTH_EXPRESSION();
-        }
-        if (this.strokeColor.default) {
-            this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
-        }
-        if (this.strokeWidth.default) {
-            this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
-        }
-        this._updateRootExpressions();
     }
 
     _getDefaultGeomStyle(geomType) {
@@ -272,7 +274,6 @@ export default class Viz {
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
         }
-        return {};
     }
 
     _resolveAliases() {

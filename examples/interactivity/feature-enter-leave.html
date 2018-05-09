@@ -85,7 +85,7 @@
       @name: $name
       width: zoom()
       color: ramp($name, bold)
-      filter: in($featurecla, 'River')
+      filter: in($featurecla, ['River'])
     `);
     const layer = new carto.Layer('layer', source, viz);
 
