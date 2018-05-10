@@ -123,7 +123,7 @@ export default class MVT extends Base {
                     const type = c.type;
                     if (type == 'json') {
                         jsonFields.push(c.name);
-                    } else if (type == 'float') {
+                    } else if (type == 'number') {
                         numFields.push(c.name);
                     } else if (type == 'string') {
                         stringFields.push(c.name);
@@ -180,17 +180,41 @@ export default class MVT extends Base {
                 }
                 polygon = {
                     flat: [],
-                    holes: []
+                    holes: [],
+                    clipped: [],
+                    clippedType: [], // Store a bitmask of the clipped half-planes
                 };
             } else {
                 if (j == 0) {
-                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+                    console.log('Invalid MVT tile: first polygon ring MUST be external');
+                    continue;
+                    //throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
                 polygon.holes.push(polygon.flat.length / 2);
             }
             for (let k = 0; k < geom[j].length; k++) {
-                polygon.flat.push(2 * geom[j][k].x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - geom[j][k].y / mvt_extent) - 1.);
+                // TODO should additional clipping be done here?
+                let clipping = 0;
+                let x = geom[j][k].x;
+                let y = geom[j][k].y;
+
+                if (x > mvt_extent) {
+                    clipping = clipping | 1;
+                } else if (x < 0) {
+                    clipping = clipping | 2;
+
+                }
+                if (y > mvt_extent) {
+                    clipping = clipping | 4;
+                } else if (y < 0) {
+                    clipping = clipping | 8;
+                }
+                if (clipping) {
+                    polygon.clipped.push(polygon.flat.length);
+                    polygon.clippedType.push(clipping);
+                }
+                polygon.flat.push(2 * x / mvt_extent - 1.);
+                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
             }
         }
         //if current polygon is not empty=> push it
@@ -216,7 +240,7 @@ export default class MVT extends Base {
         const properties = [];
         this.metadata.columns.map(c => {
             var e = null;
-            if (c.type == 'float') {
+            if (c.type == 'number') {
                 e = new Float32Array(mvtLayer.length + 1024);
             } else if (c.type == 'json') {
                 e = {};
@@ -249,7 +273,7 @@ export default class MVT extends Base {
             // properties are being received
             this.metadata.columns.map(c => {
                 var e = null;
-                if (c.type == 'float') {
+                if (c.type === 'number') {
                     e = Number(f.properties[c.name]);
                 } else if (c.type == 'json') {
                     e = JSON.parse(f.properties[c.name]);
