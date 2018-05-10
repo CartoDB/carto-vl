@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Single layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            center: [0, 30],
+            zoom: 2,
+            dragRotate: false
+        });
+
+        carto.setDefaultAuth({
+            user: 'cartogl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset('crop_loss_usda');
+        const s = carto.expressions;
+
+        const viz = new carto.Viz(`
+        // Styling properties
+        width: clusterSum($loss_amount) / 100000
+        strokeWidth: 0.25
+        order: asc(width())
+        color: @staticColor
+        strokeColor: @staticStrokeColor
+        filter: @staticFilter and between(clusterSum($loss_amount), @minLoss, @maxLoss)
+
+        // Static styling
+        @staticColor: opacity(ramp(top($crop_type, @numColors), vivid), 0.6)
+        @staticStrokeColor:   ramp(top($crop_type, @numColors), vivid)
+        @staticFilter: true
+
+        // Animated styling
+        @animatedColor: opacity(ramp(top($loss_cause, @numColors),vivid),0.7)
+        @animatedStrokeColor:   ramp(top($loss_cause, @numColors),vivid)
+        @animatedFilter: torque(linear($loss_month,1,12), 12, fade(1,1))
+
+        //Misc
+        @numColors: 5
+        @minLoss: 0
+        @maxLoss: 10000000000000
+
+        // Widgets
+        @totalLoss:           globalSum(clusterSum($loss_amount))
+        @totalViewportLoss: viewportSum(clusterSum($loss_amount))
+        @cropTypeHistogram: viewportHistogram($crop_type,  clusterSum($loss_amount))      
+        @lossCauseHistogram: viewportHistogram(clusterSum($loss_amount), 1, 20)
+
+        // Interactivity
+        @crop_type:  $crop_type
+        @loss_cause: $loss_cause
+    `);
+        const cropLayer = new carto.Layer('cropLayer', source, viz);
+
+        // TODO CHANGE RESOLUTION, TO BE FIXED IN CARTOVL
+        function setResolution(x){
+            viz.resolution = x;
+        }
+        // TODO LEGEND, we need to discuss this, particularly, what do we want to show (from a design point of view), and see if we can
+        // TODO STACKED HISTOGRAM WIDGET, TO BE ADDED IN CARTOVL
+
+        // Formula widget
+
+        // Returns the total loss of the entire dataset
+        function getTotalLoss() {
+            return viz.variables.totalLoss.eval();
+        }
+        // Returns the total loss with viewport and torque filters applied
+        function getTotalFilteredLoss() {
+            return viz.variables.totalViewportLoss.eval();
+        }
+
+        // Returns the weighted histogram, each feature will count as `loss_amount`, not just as one
+        function getCropTypeWeightedHistogram(){
+            return viz.variables.cropTypeHistogram.eval();
+        }
+        function getLossCauseWeightedHistogram(){
+            return viz.variables.lossCauseHistogram.eval();
+        }
+
+        const d = Date.now();
+        cropLayer.on('update', ()=>{
+            console.log(Date.now()-d, getCropTypeWeightedHistogram());
+        });
+
+        // TODO Select the upper and lower bounds of the amount of loss and recalculate symbol sizes: we need to discuss this, what exactly do we want to show
+        
+        // Select the number of crop types to symbolize from the opening map default of 5
+        function setNumColors(n) {
+            viz.variables.numColors.blendTo(n);
+        }
+
+        // A radio button or other element to activate an animation of crop loss by month
+        function switchToStatic() {
+            viz.color.blendTo(s.var('staticColor'));
+            viz.strokeColor.blendTo(s.var('staticStrokeColor'));
+            viz.filter.blendTo(s.var('staticFilter'));
+        }
+
+        function switchToAnimated() {
+            viz.color.blendTo(s.var('animatedColor'));
+            viz.strokeColor.blendTo(s.var('animatedStrokeColor'));
+            viz.filter.blendTo(s.var('animatedFilter'));
+        }
+
+
+        function setLossFilter(min, max) {
+            viz.variables.minLoss.blendTo(min);
+            viz.variables.maxLoss.blendTo(max);
+        }
+
+
+        // Dynamic Interactivity. In the doc more than one layer is referenced, I think a dataset with the US states is required, can you confirm?
+        // Something like:
+        const interactivity = new carto.Interactivity(cropLayer);
+        interactivity.on('featureClick', event => {
+            const feature = event.features[0];
+            // This will only manage the first crop under the cursor, but we could change this to manage all crop features under the cursor            
+            if (feature) {
+                if (feature.layerId == 'cropLayer') {
+                    const cropType = feature.variables.crop_type.value;
+                    const lossCause = feature.variables.loss_cause.value;
+                    // show a popup?
+                    console.log({ cropType, lossCause });
+                } else {
+                    let state = 'No state';
+                    state = feature.variables.stateName.value;
+                    // Do something with the state name like:
+                    viz.variables.highlight.blendTo(s.equal(s.prop('state'), state));
+                }
+            }
+        });
+
+        cropLayer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>
