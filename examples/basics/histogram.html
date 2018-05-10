@@ -45,14 +45,16 @@
         const viz = new carto.Viz(`
       width: 6
       color: ramp($category, vivid)
-      @h: viewportHistogram($category)
+      @categoryHistogram: viewportHistogram($category)
+      @numericHistogram: viewportHistogram($amount, 1, 10)
     `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
 
         setInterval(() => {
-            console.log(viz.variables.h.eval());
+            console.log(viz.variables.categoryHistogram.eval());
+            console.log(viz.variables.numericHistogram.eval());
         }, 500);
     </script>
 </body>

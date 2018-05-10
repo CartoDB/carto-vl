@@ -326,6 +326,9 @@ export class ViewportHistogram extends BaseExpression {
     }
     eval() {
         if (this._cached == null) {
+            if (!this._histogram){
+                return null;
+            }
             if (this.x.type == 'number') {
                 const array = [...this._histogram];
                 let min = Number.POSITIVE_INFINITY;
@@ -360,6 +363,7 @@ export class ViewportHistogram extends BaseExpression {
     }
     _compile(metadata) {
         this._metatada = metadata;
+        super._compile(metadata);
     }
 }
 
