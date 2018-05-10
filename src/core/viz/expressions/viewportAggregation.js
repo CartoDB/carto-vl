@@ -267,11 +267,12 @@ export class ViewportPercentile extends BaseExpression {
 }
 
 export class ViewportHistogram extends BaseExpression {
-    constructor(x, weight = 1) {
+    constructor(x, weight = 1, size = 1000) {
         super({
             x: implicitCast(x),
             weight: implicitCast(weight),
         });
+        this._size = size;
         this._isViewport = true;
     }
     _resetViewportAgg() {
@@ -286,9 +287,35 @@ export class ViewportHistogram extends BaseExpression {
     }
     eval() {
         if (this._cached == null) {
-            this._cached = [...this._histogram].map(([x, y]) => {
-                return { x: this._metatada.categoryIDsToName[x], y };
-            });
+            if (this.x.type == 'number') {
+                const array = [...this._histogram];
+                let min = Number.POSITIVE_INFINITY;
+                let max = Number.NEGATIVE_INFINITY;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    min = Math.min(min, x);
+                    max = Math.max(max, x);
+                }
+                const hist = Array(this._size).fill(0);
+                const range = max - min;
+                const sizeMinusOne = this._size - 1;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    const y = array[i][1];
+                    const index = Math.round(sizeMinusOne * (x - min) / range);
+                    hist[index] += y;
+                }
+                this._cached = hist.map((count, index) => {
+                    return {
+                        x: [min + index / this._size * range, min + (index + 1) / this._size * range],
+                        y: count,
+                    };
+                });
+            } else {
+                this._cached = [...this._histogram].map(([x, y]) => {
+                    return { x: this._metatada.categoryIDsToName[x], y };
+                });
+            }
         }
         return this._cached;
     }
