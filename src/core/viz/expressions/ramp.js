@@ -54,6 +54,7 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type != 'customPaletteNumber') {
             super.eval(o);
         }
+        this._computeTextureIfNeeded();
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
@@ -115,7 +116,7 @@ export default class Ramp extends BaseExpression {
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
-    _preDraw(program, drawMetadata, gl) {
+    _computeTextureIfNeeded() {
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
@@ -150,7 +151,14 @@ export default class Ramp extends BaseExpression {
                 }
                 this.pixel = pixel;
             }
+        }
+    }
+    _computeGLTextureIfNeeded(gl) {
+        this._computeTextureIfNeeded();
+        if (this._GLtexCategories !== this.input.numCategories) {
+            this._GLtexCategories = this.input.numCategories;
 
+            const width = 256;            
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const pixel = this.pixel;
@@ -172,7 +180,9 @@ export default class Ramp extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
-
+    }
+    _preDraw(program, drawMetadata, gl) {
+        this._computeGLTextureIfNeeded(gl);
         this.input._preDraw(program, drawMetadata, gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
