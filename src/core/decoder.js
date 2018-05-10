@@ -52,7 +52,6 @@ function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    // let clipIndex = 0;
     geometry.forEach(feature => {
         feature.forEach(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
@@ -62,68 +61,71 @@ function decodePolygon(geometry) {
                 vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
                 normals.push(0, 0);
             }
-            {
-                const lineString = polygon.flat;
-                let ringInit = 0;
-                polygon.clipped = polygon.clipped || [];
-                for (let i = 0; i < lineString.length - 2; i += 2) {
-                    // TODO performance
-                    if (polygon.clipped.includes(i) &&
+
+            const lineString = polygon.flat;
+            let ringInit = 0;
+            polygon.clipped = polygon.clipped || [];
+            for (let i = 0; i < lineString.length - 2; i += 2) {
+                // TODO performance
+                if (polygon.clipped.includes(i) &&
+                    (polygon.holes.includes((i + 2) / 2) ?
+                        polygon.clipped.includes(ringInit)
+                        :
+                        polygon.clipped.includes(i + 2)
+                    )
+                ) {
+                    const a = polygon.clippedType[polygon.clipped.indexOf(i)];
+                    const b = polygon.clippedType[
                         (polygon.holes.includes((i + 2) / 2) ?
-                            polygon.clipped.includes(ringInit / 2)
+                            polygon.clipped.indexOf(ringInit)
                             :
-                            polygon.clipped.includes(i + 2)
+                            polygon.clipped.indexOf(i + 2)
                         )
-                    ) {
-                        const a = polygon.clippedType[polygon.clipped.indexOf(i)];
-                        const b = polygon.clippedType[
-                            (polygon.holes.includes((i + 2) / 2) ?
-                                polygon.clipped.indexOf(ringInit / 2)
-                                :
-                                polygon.clipped.indexOf(i + 2)
-                            )
 
-                        ];
+                    ];
 
-                        // Clipping must be on the same half-plane to skip the line segment
-                        if (a & b) {
-                            if (polygon.holes.includes((i + 2) / 2)) {
-                                ringInit = i + 2;
-                            }
-                            continue;
+                    // Clipping must be on the same half-plane to skip the line segment
+                    if (a & b) {
+                        if (polygon.holes.includes((i + 2) / 2)) {
+                            ringInit = i + 2;
                         }
+                        continue;
                     }
-                    const a = [lineString[i + 0], lineString[i + 1]];
-                    let b = [lineString[i + 2], lineString[i + 3]];
-                    if (polygon.holes.includes((i + 2) / 2)) {
-                        b = [lineString[ringInit], lineString[ringInit + 1]];
-                        ringInit = i + 2;
-                    }
-                    let normal = getLineNormal(b, a);
-
-                    let na = normal;
-                    let nb = normal;
-
-                    // First triangle
-
-                    normals.push(-na[0], -na[1]);
-                    normals.push(na[0], na[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    vertices.push(a[0], a[1]);
-                    vertices.push(a[0], a[1]);
-                    vertices.push(b[0], b[1]);
-
-                    // Second triangle
-
-                    normals.push(na[0], na[1]);
-                    normals.push(nb[0], nb[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    vertices.push(a[0], a[1]);
-                    vertices.push(b[0], b[1]);
-                    vertices.push(b[0], b[1]);
                 }
+
+                if (polygon.holes.includes((i + 2) / 2)) {
+                    ringInit = i + 2;
+                    // Skip adding the line which connects two rings
+                    continue;
+                }
+
+                const a = [lineString[i + 0], lineString[i + 1]];
+                const b = [lineString[i + 2], lineString[i + 3]];
+
+                let normal = getLineNormal(b, a);
+
+                let na = normal;
+                let nb = normal;
+
+                // First triangle
+
+                normals.push(-na[0], -na[1]);
+                normals.push(na[0], na[1]);
+                normals.push(-nb[0], -nb[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+
+                // Second triangle
+
+                normals.push(na[0], na[1]);
+                normals.push(nb[0], nb[1]);
+                normals.push(-nb[0], -nb[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+                vertices.push(b[0], b[1]);
             }
         });
         breakpoints.push(vertices.length);
