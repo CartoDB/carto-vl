@@ -81,8 +81,8 @@ describe('Interactivity', () => {
                     done();
                 });
 
-                layer2.on('loaded', () => {
-                    // Click inside the feature 1
+                onLoaded(() => {
+                    // Click on the feature 1
                     util.simulateClick({ lng: 5, lat: 5 });
                 });
             });
@@ -95,12 +95,25 @@ describe('Interactivity', () => {
                     done();
                 });
 
-                layer2.on('loaded', () => {
-                    // Click inside the feature 2 (over a feature 1 hole)
-                    util.simulateClick({ lng: 25, lat: 25 });
+                onLoaded(() => {
+                    // Click on the feature 2
+                    util.simulateClick({ lng: 50, lat: 50 });
                 });
             });
 
+            it('should fire a featureClick event with the feature 2 when it is clicked over a feature 1 hole', done => {
+                interactivity.on('featureClick', event => {
+                    expect(event.features.length).toBe(1);
+                    expect(event.features[0].id).toEqual(-0);
+                    expect(event.features[0].layerId).toEqual('layer2');
+                    done();
+                });
+
+                onLoaded(() => {
+                    // Click on the feature 2 (over a feature 1 hole)
+                    util.simulateClick({ lng: 25, lat: 25 });
+                });
+            });
 
             it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
                 const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
@@ -109,12 +122,12 @@ describe('Interactivity', () => {
                     done();
                 });
                 interactivity.on('featureClickOut', featureClickOutSpy);
-                layer2.on('loaded', () => {
-                    // Click inside the feature 1
+                onLoaded(() => {
+                    // Click on the feature 1
                     util.simulateClick({ lng: 5, lat: 5 });
                     // Move the mouse
                     util.simulateMove({ lng: 5, lat: 10 });
-                    // Click inside the same feature 1
+                    // Click on the same feature 1
                     util.simulateClick({ lng: 5, lat: 15 });
                 });
             });
@@ -128,8 +141,8 @@ describe('Interactivity', () => {
                     done();
                 });
 
-                layer2.on('loaded', () => {
-                    // Click inside the feature 1
+                onLoaded(() => {
+                    // Click on the feature 1
                     util.simulateClick({ lng: 5, lat: 5 });
                 });
             });
@@ -137,14 +150,15 @@ describe('Interactivity', () => {
             describe('and multiple features are clicked', () => {
                 it('should return the right features id and layerId', done => {
                     interactivity.on('featureClick', event => {
+                        expect(event.features.length).toBe(2);
                         expect(event.features[0].id).toEqual(-0);
                         expect(event.features[0].layerId).toEqual('layer1');
                         expect(event.features[1].id).toEqual(-0);
                         expect(event.features[1].layerId).toEqual('layer2');
                         done();
                     });
-                    layer2.on('loaded', () => {
-                        // Click inside the features 1 and 2
+                    onLoaded(() => {
+                        // Click on the features 1 and 2
                         util.simulateClick({ lng: 35, lat: 35 });
                     });
                 });
@@ -156,10 +170,10 @@ describe('Interactivity', () => {
                         expect(event.features.length).toEqual(0);
                         done();
                     });
-                    layer2.on('loaded', () => {
-                        // Click outside the features
+                    onLoaded(() => {
+                        // Click on the features
                         util.simulateClick({ lng: -5, lat: -5 });
-                        // (in a feature 1 hole)
+                        // (over a feature 1 hole)
                         util.simulateClick({ lng: 15, lat: 15 });
                     });
                 });
@@ -171,12 +185,12 @@ describe('Interactivity', () => {
                             expect(event.features[0].layerId).toEqual('layer1');
                             done();
                         });
-                        layer2.on('loaded', () => {
-                            // Click inside the feature 1
+                        onLoaded(() => {
+                            // Click on the feature 1
                             util.simulateClick({ lng: 5, lat: 5 });
                             // Move the mouse
                             util.simulateMove({ lng: 0, lat: 0 });
-                            // Click outside the feature 1
+                            // Click on the feature 1
                             util.simulateClick({ lng: -5, lat: -5 });
                         });
                     });
@@ -192,7 +206,7 @@ describe('Interactivity', () => {
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
                     });
-                    layer2.on('loaded', () => {
+                    onLoaded(() => {
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                     });
@@ -204,7 +218,7 @@ describe('Interactivity', () => {
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
                     });
-                    layer2.on('loaded', () => {
+                    onLoaded(() => {
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                     });
@@ -212,7 +226,7 @@ describe('Interactivity', () => {
 
                 it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
                     const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
-                    layer2.on('loaded', () => {
+                    onLoaded(() => {
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                         interactivity.on('featureEnter', featureClickOutSpy);
@@ -228,20 +242,20 @@ describe('Interactivity', () => {
 
             describe('and the mouse leaves a feature', () => {
                 it('should fire a featureHover event with an empty features list', done => {
-                    layer2.on('loaded', () => {
+                    onLoaded(() => {
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                         interactivity.on('featureHover', event => {
                             expect(event.features.length).toEqual(0);
                             done();
                         });
-                        // Move mouse outside any feature (in a feature 1 hole)
+                        // Move mouse outside any feature (over a feature 1 hole)
                         util.simulateMove({ lng: 15, lat: 15 });
                     });
                 });
 
                 it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
-                    layer2.on('loaded', () => {
+                    onLoaded(() => {
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                         interactivity.on('featureLeave', event => {
@@ -317,6 +331,18 @@ describe('Interactivity', () => {
             layerB.addTo(setupB.map);
         });
     });
+
+    function onLoaded(callback) {
+        var allLoaded = 0;
+        function loaded() {
+            allLoaded++;
+            if (allLoaded == 2) {
+                callback();
+            }
+        }
+        layer1.on('loaded', loaded);
+        layer2.on('loaded', loaded);
+    }
 
     afterEach(() => {
         document.body.removeChild(div);
