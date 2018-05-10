@@ -69,6 +69,7 @@ export default class Ramp extends BaseExpression {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
         this._texCategories = null;
+        this._GLtexCategories = null;
     }
     _free(gl) {
         gl.deleteTexture(this.texture);
