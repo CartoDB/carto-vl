@@ -72,14 +72,10 @@ describe('Interactivity', () => {
     });
 
     describe('when the user clicks on the map', () => {
-
         describe('and the click is in a feature', () => {
-            it('should fire a featureClick event with a features list containing the clicked feature', done => {
+            it('should fire a featureClick event with the feature 1 when it is clicked', done => {
                 interactivity.on('featureClick', event => {
-                    expect(event.features[0].color.blendTo).toBeDefined();
-                    expect(event.features[0].color.reset).toBeDefined();
-                    expect(event.features[0].reset).toBeDefined();
-                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    expect(event.features.length).toBe(1);
                     expect(event.features[0].id).toEqual(-0);
                     expect(event.features[0].layerId).toEqual('layer1');
                     done();
@@ -90,6 +86,21 @@ describe('Interactivity', () => {
                     util.simulateClick({ lng: 5, lat: 5 });
                 });
             });
+
+            it('should fire a featureClick event with the feature 2 when it is clicked', done => {
+                interactivity.on('featureClick', event => {
+                    expect(event.features.length).toBe(1);
+                    expect(event.features[0].id).toEqual(-0);
+                    expect(event.features[0].layerId).toEqual('layer2');
+                    done();
+                });
+
+                layer2.on('loaded', () => {
+                    // Click inside the feature 2 (over a feature 1 hole)
+                    util.simulateClick({ lng: 25, lat: 25 });
+                });
+            });
+
 
             it('should not fire a featureClickOut event when the same feature is clicked twice', done => {
                 const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
@@ -108,13 +119,28 @@ describe('Interactivity', () => {
                 });
             });
 
+            it('should fire a featureClick event with the proper feature attributes', done => {
+                interactivity.on('featureClick', event => {
+                    expect(event.features[0].reset).toBeDefined();
+                    expect(event.features[0].color.blendTo).toBeDefined();
+                    expect(event.features[0].color.reset).toBeDefined();
+                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    done();
+                });
+
+                layer2.on('loaded', () => {
+                    // Click inside the feature 1
+                    util.simulateClick({ lng: 5, lat: 5 });
+                });
+            });
+
             describe('and multiple features are clicked', () => {
-                xit('should return the right feature.id', done => {
+                it('should return the right features id and layerId', done => {
                     interactivity.on('featureClick', event => {
                         expect(event.features[0].id).toEqual(-0);
-                        expect(event.features[0].layerId).toEqual('layer2');
+                        expect(event.features[0].layerId).toEqual('layer1');
                         expect(event.features[1].id).toEqual(-0);
-                        expect(event.features[1].layerId).toEqual('layer1');
+                        expect(event.features[1].layerId).toEqual('layer2');
                         done();
                     });
                     layer2.on('loaded', () => {
@@ -124,7 +150,7 @@ describe('Interactivity', () => {
                 });
             });
 
-            xdescribe('and the click is not in a feature', () => {
+            describe('and the click is not in a feature', () => {
                 it('should fire a featureClick event with an empty features list', done => {
                     interactivity.on('featureClick', event => {
                         expect(event.features.length).toEqual(0);
@@ -133,6 +159,7 @@ describe('Interactivity', () => {
                     layer2.on('loaded', () => {
                         // Click outside the features
                         util.simulateClick({ lng: -5, lat: -5 });
+                        // (in a feature 1 hole)
                         util.simulateClick({ lng: 15, lat: 15 });
                     });
                 });
@@ -158,7 +185,6 @@ describe('Interactivity', () => {
         });
 
         describe('when the user move the mouse on the map', () => {
-
             describe('and the mouse enters in a feature', () => {
                 it('should fire a featureHover event with a features list containing the entered feature', done => {
                     interactivity.on('featureHover', event => {
@@ -200,7 +226,7 @@ describe('Interactivity', () => {
                 });
             });
 
-            xdescribe('and the mouse leaves a feature', () => {
+            describe('and the mouse leaves a feature', () => {
                 it('should fire a featureHover event with an empty features list', done => {
                     layer2.on('loaded', () => {
                         // Move mouse inside a feature 1
@@ -209,8 +235,8 @@ describe('Interactivity', () => {
                             expect(event.features.length).toEqual(0);
                             done();
                         });
-                        // Move mouse outside any feature
-                        util.simulateMove({ lng: -5, lat: -5 });
+                        // Move mouse outside any feature (in a feature 1 hole)
+                        util.simulateMove({ lng: 15, lat: 15 });
                     });
                 });
 
@@ -223,7 +249,7 @@ describe('Interactivity', () => {
                             expect(event.features[0].layerId).toEqual('layer1');
                             done();
                         });
-                        // Move mouse outside the feature 1
+                        // Move mouse outside any feature
                         util.simulateMove({ lng: -5, lat: -5 });
                     });
                 });
@@ -231,7 +257,7 @@ describe('Interactivity', () => {
                 it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
                     layer2.on('loaded', () => {
                         const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
-                        // Move mouse outside any feature 1
+                        // Move mouse outside any feature
                         util.simulateMove({ lng: -5, lat: -5 });
                         interactivity.on('featureLeave', featureLeaveSpy);
                         interactivity.on('featureHover', () => {
@@ -239,7 +265,7 @@ describe('Interactivity', () => {
                             done();
                         });
                         // Move mouse outside any feature
-                        util.simulateMove({ lng: -5, lat: -5 });
+                        util.simulateMove({ lng: -10, lat: -10 });
                     });
                 });
             });
@@ -258,7 +284,7 @@ describe('Interactivity', () => {
         });
     });
 
-    describe('when the user creates a new Interactivity object', () => {
+    xdescribe('when the user creates a new Interactivity object', () => {
         it('should throw an error when layers belong to different maps', done => {
             const setupA = util.createMap('mapA');
             const setupB = util.createMap('mapB');
