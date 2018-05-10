@@ -72,28 +72,31 @@ describe('Interactivity', () => {
     });
 
     describe('When the user creates a new Interactivity object', () => {
-        xit('should throw an error when layers belong to different maps', done => {
-            let loadedLayers = 0;
-            const setup = util.createMap('map1');
-            const div2 = setup.div;
-            const map2 = setup.map;
+        it('should throw an error when layers belong to different maps', done => {
+            const setup = util.createMap('map3');
+            const div3 = setup.div;
+            const map3 = setup.map;
+            const source3 = new carto.source.GeoJSON({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [0, 0]
+                },
+                properties: {}
+            });
+            const viz3 = new carto.Viz();
+            const layer3 = new carto.Layer('layer3', source3, viz3);
 
-            layer1.on('loaded', _testHelper);
-            layer2.on('loaded', _testHelper);
-
-            layer2.addTo(map);
-            layer2.addTo(map2);
-
-            // Create the interactivity object when both layers were added to a map.
-            // this only happens when loadedLayers equals to 2.
-            function _testHelper() {
-                loadedLayers++;
-                if (loadedLayers === 2) {
-                    expect(() => new carto.Interactivity([layer1, layer2])).toThrowError(/all layers must belong to the same map/);
-                    document.body.removeChild(div2);
+            layer3.on('loaded', () => {
+                const int = new carto.Interactivity([layer1, layer3]);
+                int._init([layer1, layer3]).catch((err) => {
+                    expect(err).toEqual(new Error('Invalid argument, all layers must belong to the same map'));
+                    document.body.removeChild(div3);
                     done();
-                }
-            }
+                });
+            });
+
+            layer3.addTo(map3);
         });
     });
 
