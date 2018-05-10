@@ -1,4 +1,4 @@
-import { Dataframe, pointInTriangle } from '../../../src/core/dataframe';
+import Dataframe, { pointInTriangle } from '../../../src/core/dataframe';
 
 describe('src/core/dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
@@ -8,7 +8,7 @@ describe('src/core/dataframe', () => {
                 scale: 1,
                 geom: [
                     0, 0,
-                    1, 1,
+                    1, 1
                 ],
                 properties: {
                     id: [1, 2],
@@ -108,6 +108,7 @@ describe('src/core/dataframe', () => {
                     1, 0
                 ],
                 holes: [],
+                clipped: []
             };
             const dataframe = new Dataframe({
                 center: { x: 0, y: 0 },
