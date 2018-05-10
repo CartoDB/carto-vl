@@ -63,38 +63,16 @@ function decodePolygon(geometry) {
             }
 
             const lineString = polygon.flat;
-            let ringInit = 0;
-            polygon.clipped = polygon.clipped || [];
             for (let i = 0; i < lineString.length - 2; i += 2) {
-                // TODO performance
-                if (polygon.clipped.includes(i) &&
-                    (polygon.holes.includes((i + 2) / 2) ?
-                        polygon.clipped.includes(ringInit)
-                        :
-                        polygon.clipped.includes(i + 2)
-                    )
-                ) {
-                    const a = polygon.clippedType[polygon.clipped.indexOf(i)];
-                    const b = polygon.clippedType[
-                        (polygon.holes.includes((i + 2) / 2) ?
-                            polygon.clipped.indexOf(ringInit)
-                            :
-                            polygon.clipped.indexOf(i + 2)
-                        )
-
-                    ];
-
-                    // Clipping must be on the same half-plane to skip the line segment
-                    if (a & b) {
-                        if (polygon.holes.includes((i + 2) / 2)) {
-                            ringInit = i + 2;
-                        }
+                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
+                    if (polygon.clippedType[polygon.clipped.indexOf(i)] &
+                        polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {
+                        // Skip tile border lines which don't intersect the tile
                         continue;
                     }
                 }
 
                 if (polygon.holes.includes((i + 2) / 2)) {
-                    ringInit = i + 2;
                     // Skip adding the line which connects two rings
                     continue;
                 }

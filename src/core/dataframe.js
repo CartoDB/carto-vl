@@ -232,7 +232,7 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.strokeWidth;
+        const vizStrokeWidth = viz.strokeWidth;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -245,7 +245,7 @@ export default class Dataframe {
                 f[name] = this.properties[name][featureIndex];
             });
             // Line with is saturated at 336px
-            const lineWidth = Math.min(vizWidth.eval(f), 336);
+            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
             const scale = lineWidth / 2 * widthScale;
             const v1 = {
