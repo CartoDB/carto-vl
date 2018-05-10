@@ -114,14 +114,15 @@ export class Torque extends BaseExpression {
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     getSimTime() {
-        if (!(this.input.min.eval() instanceof Date)){
-            return null;
-        }
-
         const c = this._cycle.eval(); //from 0 to 1
 
-        const min = this.input.min.eval(); //Date
+        const min = this.input.min.eval();
         const max = this.input.max.eval();
+
+        if (!(this.input.min.eval() instanceof Date)) {
+            return min + c * (max - min);
+        }
+
 
         const tmin = min.getTime();
         const tmax = max.getTime();
