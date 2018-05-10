@@ -1,4 +1,4 @@
-import Dataframe from '../../../src/core/dataframe';
+import { Dataframe, pointInTriangle } from '../../../src/core/dataframe';
 
 describe('src/core/dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
@@ -160,5 +160,19 @@ describe('src/core/dataframe', () => {
             });
         });
 
+    });
+
+    describe('.pointInTriangle', () => {
+        it('should return true if the point is contained in the triangle', () => {
+            expect(pointInTriangle({x:0, y:0}, {x:0, y:1}, {x:1, y:-1}, {x:-1, y:-1})).toBe(true);
+        });
+
+        it('should return false if the point is not contained in the triangle', () => {
+            expect(pointInTriangle({x:1, y:1}, {x:0, y:1}, {x:1, y:-1}, {x:-1, y:-1})).toBe(false);
+        });
+
+        it('should return false if the triangle has zero area', () => {
+            expect(pointInTriangle({x:0, y:1}, {x:0, y:1}, {x:0, y:-1}, {x:0, y:-1})).toBe(false);
+        });
     });
 });
