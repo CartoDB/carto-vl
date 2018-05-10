@@ -302,7 +302,7 @@ export class ViewportHistogram extends BaseExpression {
                 for (let i = 0; i < array.length; i++) {
                     const x = array[i][0];
                     const y = array[i][1];
-                    const index = Math.round(sizeMinusOne * (x - min) / range);
+                    const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
                     hist[index] += y;
                 }
                 this._cached = hist.map((count, index) => {
