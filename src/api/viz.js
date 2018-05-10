@@ -380,8 +380,6 @@ export default class Viz {
         }
     }
 
-    // ^^
-
     /**
      * This function checks the input parameter `definition` returning always an object.
      * If the `definition` is an object it returns the same object.
@@ -411,14 +409,28 @@ export default class Viz {
      * @return {VizSpec}
      */
     _setDefaults(vizSpec) {
-        vizSpec.color = vizSpec.color || DEFAULT_COLOR_EXPRESSION();
-        vizSpec.width = vizSpec.width || DEFAULT_WIDTH_EXPRESSION();
-        vizSpec.strokeColor = vizSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
-        vizSpec.strokeWidth = vizSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
-        vizSpec.order = vizSpec.order || DEFAULT_ORDER_EXPRESSION();
-        vizSpec.filter = vizSpec.filter || DEFAULT_FILTER_EXPRESSION();
+        if (util.isUndefined(vizSpec.color)) {
+            vizSpec.color = DEFAULT_COLOR_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.width)) {
+            vizSpec.width = DEFAULT_WIDTH_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.strokeColor)) {
+            vizSpec.strokeColor = DEFAULT_STROKE_COLOR_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.strokeWidth)) {
+            vizSpec.strokeWidth = DEFAULT_STROKE_WIDTH_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.order)) {
+            vizSpec.order = DEFAULT_ORDER_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.filter)) {
+            vizSpec.filter = DEFAULT_FILTER_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.resolution)) {
+            vizSpec.resolution = DEFAULT_RESOLUTION();
+        }
         vizSpec.variables = vizSpec.variables || {};
-        vizSpec.resolution = util.isUndefined(vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
         return vizSpec;
     }
 

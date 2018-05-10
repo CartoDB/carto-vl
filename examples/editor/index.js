@@ -111,11 +111,17 @@ setInterval(() => {
     }
 }, 500);
 
-map.on('zoom', () => document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`);
+map.on('zoom', updateMapInfo);
+map.on('move', updateMapInfo);
+
+function updateMapInfo() {
+    let center = map.getCenter();
+    document.querySelector('.map-info').innerText = `center: [${center.lng.toFixed(6)}, ${center.lat.toFixed(6)}],zoom: ${map.getZoom().toFixed(6)}`;
+}
 
 map.on('load', () => {
-    document.querySelector('.map-info').innerText = `zoom: ${map.getZoom()}`;
     let index = 0; //vizs.length - 1;
+    updateMapInfo();
 
     function updateViz(v) {
         v = v || document.getElementById('styleEntry').value;
