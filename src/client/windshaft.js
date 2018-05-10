@@ -16,8 +16,6 @@ const MIN_FILTERING = 2000000;
 // Requrest SQL API (temp)
 // Cache dataframe
 
-
-
 export default class Windshaft {
 
     constructor(source) {
@@ -47,7 +45,6 @@ export default class Windshaft {
         };
         this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
-        this.geomType = '';
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -80,7 +77,7 @@ export default class Windshaft {
             MNS.columns.push('cartodb_id');
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            const instantiationData = await this._instantiate(MNS, resolution, filtering);
+            const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
@@ -132,6 +129,9 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
+        if (!this.metadata) {
+            return true;
+        }
         return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
     }
 
@@ -155,21 +155,32 @@ export default class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
+    _intantiationChoices(metadata) {
+        let choices = {
+            // default choices
+            backendFilters: true,
+            castColumns: []
+        };
+        if (metadata) {
+            if (metadata.featureCount >= 0) {
+                choices.backendFilters = metadata.featureCount > MIN_FILTERING;
+            }
+            if (metadata.columns) {
+                choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
+            }
+        }
+        return choices;
+    }
 
-    async _instantiateUncached(MNS, resolution, filters) {
+    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        let select = this._buildSelectClause(MNS);
+        let select = this._buildSelectClause(MNS, choices.castColumns);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this._getMetadata(query, MNS, conf);
 
-        select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
-        aggSQL = this._buildQuery(select);
-
-        // If the number of features is higher than the minimun, enable server filtering.
-        let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
+        let backendFilters = choices.backendFilters ? filters : null;
 
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
@@ -181,9 +192,8 @@ export default class Windshaft {
             aggSQL = this._buildQuery(select, backendFilters);
         }
 
-        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
 
-        metadata.setGeomType(this.geomType);
+        const { urlTemplate, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
 
         return { MNS, resolution, filters, metadata, urlTemplate };
     }
@@ -199,13 +209,19 @@ export default class Windshaft {
         this.resolution = resolution;
     }
 
-    async _instantiate(MNS, resolution, filters) {
+    async _instantiate(MNS, resolution, filters, choices) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
         }
-        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters);
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices);
         this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
         return instantiationPromise;
+    }
+
+    async _repeatableInstantiate(MNS, resultuion, filters) {
+        const initialChoices = this._intantiationChoices(this.metadata);
+        const finalChoices = instantiation => this._intantiationChoices(instantiation.metadata);
+        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, this.resolution, filters, choices));
     }
 
     _checkLayerMeta(MNS) {
@@ -217,7 +233,7 @@ export default class Windshaft {
     }
 
     _isAggregated() {
-        return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
+        return this.metadata.isAggregated;
     }
 
     _requiresAggregation(MNS) {
@@ -294,13 +310,12 @@ export default class Windshaft {
         return dataframe;
     }
 
-    async _getUrlPromise(query, conf, agg, aggSQL) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL) {
         const LAYER_INDEX = 0;
-        this.geomType = await this.getGeometryType(query, conf);
 
-        if (this.geomType != 'point') {
-            agg = false;
-        }
+        // if (this.geomType != 'point') {
+        //     agg = false;
+        // }
 
         const mapConfigAgg = {
             buffersize: {
@@ -311,22 +326,31 @@ export default class Windshaft {
                     type: 'mapnik',
                     options: {
                         sql: aggSQL,
-                        aggregation: agg
+                        aggregation: agg,
+                        metadata: {
+                            featureCount: true,
+                            geometryType: true,
+                            columnStats: true,
+                            sample: SAMPLE_ROWS
+                        }
                     }
                 }
             ]
         };
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
-        this._layerMeta = layergroup.metadata.layers[0].meta;
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
-        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+        return {
+            url: getLayerUrl(layergroup, LAYER_INDEX, conf),
+            metadata: this._adaptMetadata(layergroup.metadata.layers[0].meta.stats)
+        };
     }
 
     _getRequestConfig(mapConfigAgg) {
         return {
             method: 'POST',
             headers: {
+
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
@@ -387,8 +411,8 @@ export default class Windshaft {
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
                 });
-                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                let dataFrameGeometry = this.metadata.geomType == 'point' ? points : featureGeometries;
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
             });
@@ -482,22 +506,22 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
-        if (this.geomType == 'point') {
+        if (this.metadata.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (this.geomType == 'point') {
+            if (this.metadata.geomType == 'point') {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (this.geomType == 'polygon') {
+            } else if (this.metadata.geomType == 'polygon') {
                 this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (this.geomType == 'line') {
+            } else if (this.metadata.geomType == 'line') {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
-                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
+                throw new Error(`Unimplemented geometry type: '${this.metadata.geomType}'`);
             }
 
             catFields.map((name, index) => {
@@ -522,178 +546,22 @@ export default class Windshaft {
         return { properties, points, featureGeometries };
     }
 
-    async _getMetadata(query, proto, conf) {
-        //Get column names and types with a limit 0
-        //Get min,max,sum and count of numerics
-        //for each category type
-        //Get category names and counts by grouping by
-        //Assign ids
-
-        const [{ numerics, categories, dates }, featureCount] = await Promise.all([
-            this._getColumnTypes(query, conf),
-            this.getFeatureCount(query, conf)]);
-
-        const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
-
-        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
-            this.getSample(conf, sampling),
-            this.getNumericTypes(numerics, query, conf),
-            this.getDatesTypes(dates, query, conf),
-            this.getCategoryTypes(categories, query, conf)]);
-
-        let columns = [];
-        numerics.forEach((name, index) => columns.push(numericsTypes[index]));
-        dates.forEach((name, index) => columns.push(datesTypes[index]));
-
+    _adaptMetadata(layerMeta) {
+        const featureCount = layerMeta.hasOwnProperty('featureCount') ? layerMeta.featureCount : layerMeta.estimatedFeatureCount;
+        const geomType = adaptGeometryType(layerMeta.geometryType);
+        // FIXME: columns is not an array [col1,...] but an object { col1name: ..., }
+        const columns = layerMeta.columns.filter(col => ['number', 'date', 'string'].includes(col.type));
         const categoryIDs = {};
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
-            columns.push(t);
-        });
-        return new Metadata(categoryIDs, columns, featureCount, sample);
-    }
-
-    /**
-     * Return an object with the names of the columns clasified by type.
-     */
-    async _getColumnTypes(query, conf) {
-        const fields = await this.getColumnTypes(query, conf);
-        let numerics = [];
-        let categories = [];
-        let dates = [];
-        Object.keys(fields).map(name => {
-            const type = fields[name].type;
-            if (type == 'number') {
-                numerics.push(name);
-            } else if (type == 'string') {
-                categories.push(name);
-            } else if (type == 'date') {
-                dates.push(name);
-            } else if (type != 'geometry') {
-                throw new Error(`Unsuportted type ${type}`);
+        layerMeta.columns.forEach(column => {
+            if (column.type === 'string' && column.categories) {
+                column.categories.forEach(category => {
+                    categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
+                });
             }
         });
-
-        return { numerics, categories, dates };
+        return Metadata(categoryIDs, columns, featureCount, layerMeta.sample, geomType, layerMeta.aggregation.mvt);
     }
 
-    async getSample(conf, sampling) {
-        let q;
-        if (this._source._tableName) {
-            q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
-        } else {
-            // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
-            q = `WITH _rndseed as (SELECT setseed(0.5))
-                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
-        }
-
-        const response = await getSQL(q, conf);
-        const json = await response.json();
-        return json.rows;
-    }
-
-    // Returns the total feature count, including possibly filtered features
-    async getFeatureCount(query, conf) {
-        const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await getSQL(q, conf);
-        const json = await response.json();
-        return json.rows[0].count;
-    }
-
-    async getColumnTypes(query, conf) {
-        const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await getSQL(columnListQuery, conf);
-        const json = await response.json();
-        return json.fields;
-    }
-
-    async getGeometryType(query, conf) {
-        const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await getSQL(columnListQuery, conf);
-        const json = await response.json();
-        const type = json.rows[0].type;
-        switch (type) {
-            case 'ST_MultiPolygon':
-                return 'polygon';
-            case 'ST_Point':
-                return 'point';
-            case 'ST_MultiLineString':
-                return 'line';
-            default:
-                throw new Error(`Unimplemented geometry type ''${type}'`);
-        }
-    }
-
-    async getNumericTypes(names, query, conf) {
-        const aggFns = ['min', 'max', 'sum', 'avg'];
-        const numericsSelect = names.map(name =>
-            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-        ).concat(['COUNT(*)']).join();
-        const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await getSQL(numericsQuery, conf);
-        const json = await response.json();
-        return names.map(name => {
-            return {
-                name,
-                type: 'number',
-                min: json.rows[0][`${name}_min`],
-                max: json.rows[0][`${name}_max`],
-                avg: json.rows[0][`${name}_avg`],
-                sum: json.rows[0][`${name}_sum`],
-            };
-        }
-        );
-    }
-
-    _getDateFromStr(str) {
-        if (Number.isNaN(Date.parse(str))) {
-            throw new Error(`Invalid date: '${str}'`);
-        }
-        return new Date(str);
-    }
-
-    async getDatesTypes(names, query, conf) {
-        if (names.length == 0) {
-            return [];
-        }
-        const aggFns = ['min', 'max'];
-        const datesSelect = names.map(name =>
-            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-        ).join();
-        const numericsQuery = `SELECT ${datesSelect} FROM ${query};`;
-        const response = await getSQL(numericsQuery, conf);
-        const json = await response.json();
-        return names.map(name => {
-            return {
-                name,
-                type: 'date',
-                min: this._getDateFromStr(json.rows[0][`${name}_min`]),
-                max: this._getDateFromStr(json.rows[0][`${name}_max`]),
-            };
-        }
-        );
-    }
-
-    async getCategoryTypes(names, query, conf) {
-        return Promise.all(names.map(async name => {
-            const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await getSQL(catQuery, conf);
-            const json = await response.json();
-            let counts = [];
-            let names = [];
-            json.rows.map(row => {
-                counts.push(row.count);
-                names.push(row.name);
-            });
-            return {
-                name,
-                type: 'category',
-                categoryNames: names,
-                categoryCounts: counts
-            };
-        }));
-    }
 }
 
 
@@ -724,18 +592,39 @@ function getLayerUrl(layergroup, layerIndex, conf) {
     return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
 }
 
-function getSQL(query, conf) {
-    let url = `${conf.sqlServerURL}/api/v2/sql?q=` + encodeURIComponent(query);
-    url = authURL(url, conf);
-    return fetch(url);
-}
-
 function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
     }
     return url;
+}
+
+function adaptGeometryType(type) {
+    switch (type) {
+        case 'ST_MultiPolygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
+    }
+}
+
+// generate a promise under certain assumptions/choices; then if the result changes the assumptions,
+// repeat the generation with the new information
+async function repeatablePromise(initialAssumptions, assumptionsFromResult, promiseGenerator) {
+    let promise = promiseGenerator(initialAssumptions);
+    let result = await promise;
+    let finalAssumptions = assumptionsFromResult(result);
+    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+        return promise;
+    }
+    else {
+        return promiseGenerator(finalAssumptions);
+    }
 }
 
 /**
