@@ -220,6 +220,7 @@ export default class Layer {
             return;
         }
         this._source.requestData(this._getViewport());
+        this._needUpdate = true;
     }
 
     hasDataframes() {
@@ -254,6 +255,10 @@ export default class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
+            if (this._viz.isAnimated() || this._needUpdate) {
+                this._needUpdate = false;
+                this._fire('update');
+            }
         }
         if (!this.isLoaded && this.state == 'dataLoaded') {
             this._fire('loaded');
@@ -273,6 +278,7 @@ export default class Layer {
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         this._integrator.needRefresh();
+        this._needUpdate = true;
     }
 
     /**
@@ -343,6 +349,7 @@ export default class Layer {
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
+        this._needUpdate = true;
         this._integrator.needRefresh();
         return this.requestData();
     }
