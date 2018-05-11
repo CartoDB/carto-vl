@@ -193,9 +193,9 @@ export default class Windshaft {
         }
 
 
-        const { urlTemplate, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
+        const { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
 
-        return { MNS, resolution, filters, metadata, urlTemplate };
+        return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
@@ -233,7 +233,7 @@ export default class Windshaft {
     }
 
     _isAggregated() {
-        return this.metadata.isAggregated;
+        return this.metadata && this.metadata.isAggregated;
     }
 
     _requiresAggregation(MNS) {
@@ -331,7 +331,7 @@ export default class Windshaft {
                             featureCount: true,
                             geometryType: true,
                             columnStats: true,
-                            sample: SAMPLE_ROWS
+                            sample: SAMPLE_ROWS // TDDO: sample without geometry
                         }
                     }
                 }
@@ -342,7 +342,7 @@ export default class Windshaft {
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
-            metadata: this._adaptMetadata(layergroup.metadata.layers[0].meta.stats)
+            metadata: this._adaptMetadata(layergroup.metadata.layers[0].meta)
         };
     }
 
@@ -546,20 +546,21 @@ export default class Windshaft {
         return { properties, points, featureGeometries };
     }
 
-    _adaptMetadata(layerMeta) {
-        const featureCount = layerMeta.hasOwnProperty('featureCount') ? layerMeta.featureCount : layerMeta.estimatedFeatureCount;
-        const geomType = adaptGeometryType(layerMeta.geometryType);
-        // FIXME: columns is not an array [col1,...] but an object { col1name: ..., }
-        const columns = layerMeta.columns.filter(col => ['number', 'date', 'string'].includes(col.type));
+    _adaptMetadata(meta) {
+        const { stats, aggregation } = meta;
+        const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
+        const geomType = adaptGeometryType(stats.geometryType);
+        const columns = Object.keys(stats.columns).map(name => Object.assign({ name }, stats.columns[name]))
+            .filter(col => ['number', 'date', 'string'].includes(col.type));
         const categoryIDs = {};
-        layerMeta.columns.forEach(column => {
+        columns.forEach(column => {
             if (column.type === 'string' && column.categories) {
                 column.categories.forEach(category => {
                     categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
                 });
             }
         });
-        return Metadata(categoryIDs, columns, featureCount, layerMeta.sample, geomType, layerMeta.aggregation.mvt);
+        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
 
 }
