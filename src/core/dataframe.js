@@ -232,7 +232,7 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.strokeWidth;
+        const vizStrokeWidth = viz.strokeWidth;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -245,7 +245,7 @@ export default class Dataframe {
                 f[name] = this.properties[name][featureIndex];
             });
             // Line with is saturated at 336px
-            const lineWidth = Math.min(vizWidth.eval(f), 336);
+            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
             const scale = lineWidth / 2 * widthScale;
             const v1 = {
@@ -372,10 +372,15 @@ export default class Dataframe {
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
 // Parameters in {x: 0, y:0} form
-function pointInTriangle(p, v1, v2, v3) {
+export function pointInTriangle(p, v1, v2, v3) {
     // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
     // contains an explanation of both this algorithm and one based on barycentric coordinates,
     // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    if (equal(v1, v2) || equal(v2, v3) || equal(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
 
     // A point is inside a triangle or in one of the triangles edges
     // if the point is in the three half-plane defined by the 3 edges
@@ -394,6 +399,10 @@ function halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function equal(a, b) {
+    return (a.x == b.x) && (a.y == b.y);
 }
 
 function pointInCircle(p, center, scale) {

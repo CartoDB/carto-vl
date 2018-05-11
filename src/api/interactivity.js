@@ -162,7 +162,7 @@ export default class Interactivity {
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
-        Promise.all(layerList.map(layer => layer._context)).then(() => {
+        return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         });

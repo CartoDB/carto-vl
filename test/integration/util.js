@@ -6,9 +6,11 @@ const mapSize = 600;
 export function createMap(name) {
     const div = document.createElement('div');
     div.id = name;
-    div.style.margin = '0';
     div.style.width = `${mapSize}px`;
     div.style.height = `${mapSize}px`;
+    div.style.position = 'absolute';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
     document.body.appendChild(div);
 
     const map = new mapboxgl.Map({
@@ -53,6 +55,6 @@ function project(coordinates) {
     const wm = projectToWebMercator(coordinates);
     return {
         x: mapSize * (0.5 + wm.x / WM_2R),
-        y: mapSize * (0.5 - wm.y / WM_2R)
+        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /*offset*/ )
     };
 }
