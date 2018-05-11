@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { number } from '../functions';
+import { number, viewportHistogram } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
 import * as schema from '../../schema';
@@ -65,6 +65,9 @@ function genQuantiles(global) {
             let children = {
                 input
             };
+            if (!global) {
+                children._histogram = viewportHistogram(input);
+            }
             let breakpoints = [];
             for (let i = 0; i < buckets - 1; i++) {
                 children[`arg${i}`] = number(i * 10);
@@ -83,6 +86,7 @@ function genQuantiles(global) {
             return q;
         }
         getBreakpointList() {
+            this._genBreakpoints();
             return this.breakpoints.map(br => br.expr);
         }
         _compile(metadata) {
@@ -116,26 +120,39 @@ function genQuantiles(global) {
                 inline: `${funcName}(${childInlines.input})`
             };
         }
-        _preDraw(program, drawMetadata, gl) {
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name == name);
-            let i = 0;
-            const total = column.accumHistogram[column.histogramBuckets - 1];
-            let brs = [];
-
-            // TODO OPT: this could be faster with binary search
+        _genBreakpoints() {
             if (!global) {
+                const hist = this._histogram.eval();
+
+                const histogramBuckets = hist.length;
+                const min = hist[0].x[0];
+                const max = hist[histogramBuckets - 1].x[1];
+
+                let prev = 0;
+                const accumHistogram = hist.map(({ y }) => {
+                    prev += y;
+                    return prev;
+                });
+
+
+                let i = 0;
+                const total = accumHistogram[histogramBuckets - 1];
+                let brs = [];
+                // TODO OPT: this could be faster with binary search
                 this.breakpoints.map((breakpoint, index) => {
-                    for (i; i < column.histogramBuckets; i++) {
-                        if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
+                    for (i; i < histogramBuckets; i++) {
+                        if (accumHistogram[i] > (index + 1) / this.buckets * total) {
                             break;
                         }
                     }
-                    const percentileValue = i / column.histogramBuckets * (column.max - column.min) + column.min;
+                    const percentileValue = i / histogramBuckets * (max - min) + min;
                     brs.push(percentileValue);
                     breakpoint.expr = percentileValue;
                 });
             }
+        }
+        _preDraw(program, drawMetadata, gl) {
+            this._genBreakpoints();
             super._preDraw(program, drawMetadata, gl);
         }
         _getColumnName() {

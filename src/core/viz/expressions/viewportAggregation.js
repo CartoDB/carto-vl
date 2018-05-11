@@ -268,13 +268,13 @@ export class ViewportPercentile extends BaseExpression {
 
 /**
  * Generates an histogram.
- * 
+ *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  * The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
  * at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the `size` parameter.
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
- * 
+ *
  * @param {carto.expressions.Base} x - expression to base the histogram
  * @param {carto.expressions.Base} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
@@ -288,9 +288,9 @@ export class ViewportPercentile extends BaseExpression {
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
- * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}] 
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
  * // There are 10 features of type A and 20 of type B
- * 
+ *
  * console.log(viz.variables.numericHistogram.eval());
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
@@ -313,6 +313,7 @@ export class ViewportHistogram extends BaseExpression {
         });
         this._size = size;
         this._isViewport = true;
+        this.inlineMaker = () => null;
     }
     _resetViewportAgg() {
         this._cached = null;
@@ -326,7 +327,7 @@ export class ViewportHistogram extends BaseExpression {
     }
     eval() {
         if (this._cached == null) {
-            if (!this._histogram){
+            if (!this._histogram) {
                 return null;
             }
             if (this.x.type == 'number') {
