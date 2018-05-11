@@ -41,7 +41,6 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', () => {
                 expect(update).toHaveBeenCalledTimes(1);
-                expect(update).not.toHaveBeenCalledTimes(2);
                 done();
             });
         });
