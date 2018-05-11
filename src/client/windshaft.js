@@ -314,11 +314,6 @@ export default class Windshaft {
 
     async _getInstantiationPromise(query, conf, agg, aggSQL) {
         const LAYER_INDEX = 0;
-
-        // if (this.geomType != 'point') {
-        //     agg = false;
-        // }
-
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 1
