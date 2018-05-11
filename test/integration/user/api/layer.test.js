@@ -1,15 +1,24 @@
 import * as carto from '../../../../src/';
 import * as util from '../../util';
 
+const featureData = {
+    type: 'Feature',
+    geometry: {
+        type: 'Point',
+        coordinates: [0, 0]
+    },
+    properties: {}
+};
+
 describe('Layer', () => {
-    let source, div, viz, viz2, layer, map;
+    let div, map, source, viz, viz2, layer;
 
     beforeEach(() => {
         const setup = util.createMap('map');
         div = setup.div;
         map = setup.map;
 
-        source = new carto.source.GeoJSON(featureJSON);
+        source = new carto.source.GeoJSON(featureData);
         viz = new carto.Viz(`
             @myColor: red
             color: @myColor
@@ -32,13 +41,4 @@ describe('Layer', () => {
     afterEach(() => {
         document.body.removeChild(div);
     });
-
-    const featureJSON = {
-        type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [0, 0]
-        },
-        properties: {}
-    };
 });
