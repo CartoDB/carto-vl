@@ -64,6 +64,7 @@ function decodePolygon(geometry) {
 
             const lineString = polygon.flat;
             for (let i = 0; i < lineString.length - 2; i += 2) {
+                // TODO performance
                 if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
                     if (polygon.clippedType[polygon.clipped.indexOf(i)] &
                         polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {

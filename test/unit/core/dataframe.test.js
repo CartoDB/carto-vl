@@ -174,6 +174,7 @@ describe('src/core/dataframe', () => {
 
         it('should return false if the triangle has zero area', () => {
             expect(pointInTriangle({x:0, y:1}, {x:0, y:1}, {x:0, y:-1}, {x:0, y:-1})).toBe(false);
+            expect(pointInTriangle({x:0, y:1}, {x:0, y:1}, {x:NaN, y:NaN}, {x:NaN, y:NaN})).toBe(false);
         });
     });
 });
