@@ -53,11 +53,12 @@ export default class Windshaft {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    _getInstantiationID(MNS, resolution, filtering) {
+    _getInstantiationID(MNS, resolution, filtering, choices) {
         return JSON.stringify({
             MNS,
             resolution,
-            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+            filtering: choices.backendFilters ? filtering : null,
+            choices: choices
         });
     }
 
@@ -192,7 +193,6 @@ export default class Windshaft {
             aggSQL = this._buildQuery(select, backendFilters);
         }
 
-
         const { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
@@ -210,18 +210,20 @@ export default class Windshaft {
     }
 
     async _instantiate(MNS, resolution, filters, choices) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
         }
         const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)] = instantiationPromise;
         return instantiationPromise;
     }
 
-    async _repeatableInstantiate(MNS, resultuion, filters) {
+    async _repeatableInstantiate(MNS, resolution, filters) {
+        // TODO: we shouldn't reinstantiate just to not apply backend filters
+        // (we'd need to add a choice comparison function argument to repeatablePromise)
         const initialChoices = this._intantiationChoices(this.metadata);
         const finalChoices = instantiation => this._intantiationChoices(instantiation.metadata);
-        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, this.resolution, filters, choices));
+        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices));
     }
 
     _checkLayerMeta(MNS) {
@@ -549,14 +551,17 @@ export default class Windshaft {
         const { stats, aggregation } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
-        const columns = Object.keys(stats.columns).map(name => Object.assign({ name }, stats.columns[name]))
-            .filter(col => ['number', 'date', 'string'].includes(col.type));
+        const columns = Object.keys(stats.columns)
+            .map(name => Object.assign({ name }, stats.columns[name]))
+            .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
+            .filter(col => ['number', 'date', 'category'].includes(col.type));
         const categoryIDs = {};
         columns.forEach(column => {
-            if (column.type === 'string' && column.categories) {
+            if (column.type === 'category' && column.categories) {
                 column.categories.forEach(category => {
                     categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
                 });
+                column.categoryNames = column.categories.map(cat => cat.category);
             }
         });
         return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
@@ -611,6 +616,13 @@ function adaptGeometryType(type) {
         default:
             throw new Error(`Unimplemented geometry type ''${type}'`);
     }
+}
+
+function adaptColumnType(type) {
+    if (type === 'string') {
+        return 'category';
+    }
+    return type;
 }
 
 // generate a promise under certain assumptions/choices; then if the result changes the assumptions,
