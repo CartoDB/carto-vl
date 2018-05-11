@@ -328,7 +328,6 @@ export default class Windshaft {
                         sql: aggSQL,
                         aggregation: agg,
                         metadata: {
-                            featureCount: true,
                             geometryType: true,
                             columnStats: true,
                             sample: SAMPLE_ROWS // TDDO: sample without geometry
