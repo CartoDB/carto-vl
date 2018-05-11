@@ -1,5 +1,5 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { globalQuantiles, property, quantiles } from '../../../../../src/core/viz/functions';
+import { globalQuantiles, property, quantiles, globalEqIntervals } from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/quantiles', () => {
     describe('error control', () => {
@@ -20,16 +20,16 @@ describe('src/core/viz/expressions/quantiles', () => {
         function prepare(expr) {
             expr._compile({
                 columns: [
-                    { name: 'price', type: 'number' },
+                    { name: 'price', type: 'number', min: 0, max: 6 },
                 ],
                 sample: [
-                    {price: 0},
-                    {price: 1},
-                    {price: 2},
-                    {price: 3},
-                    {price: 4},
-                    {price: 5},
-                    {price: 6},
+                    { price: 0 },
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                    { price: 6 },
                 ]
             });
             expr._resetViewportAgg();
@@ -52,6 +52,11 @@ describe('src/core/viz/expressions/quantiles', () => {
             prepare(q);
             expect(q.getBreakpointList()).toEqual([3]);
         });
+        it('globalEqIntervals($price, 2)', () => {
+            const q = globalEqIntervals($price, 2);
+            prepare(q);
+            expect(q.getBreakpointList()).toEqual([3]);
+        });
 
         it('globalQuantiles($price, 3)', () => {
             const q = globalQuantiles($price, 3);
@@ -60,6 +65,11 @@ describe('src/core/viz/expressions/quantiles', () => {
         });
         it('viewportQuantiles($price, 3)', () => {
             const q = quantiles($price, 3);
+            prepare(q);
+            expect(q.getBreakpointList()).toEqual([2, 4]);
+        });
+        it('globalEqIntervals($price, 3)', () => {
+            const q = globalEqIntervals($price, 3);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2, 4]);
         });
