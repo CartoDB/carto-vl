@@ -10,8 +10,8 @@ const featureData = {
     properties: {}
 };
 
-fdescribe('Layer', () => {
-    let div, map, source, viz, viz2, layer;
+describe('Layer', () => {
+    let div, map, source, viz, layer;
 
     beforeEach(() => {
         const setup = util.createMap('map');
@@ -22,9 +22,6 @@ fdescribe('Layer', () => {
         viz = new carto.Viz(`
             @myColor: red
             color: @myColor
-        `);
-        viz2 = new carto.Viz(`
-            color: blue
         `);
         layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
@@ -64,7 +61,7 @@ fdescribe('Layer', () => {
             var update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
-                await layer.update(source, viz2);
+                await layer.update(source, new carto.Viz('color: blue'));
                 layer.$paintCallback();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
@@ -81,12 +78,25 @@ fdescribe('Layer', () => {
                 done();
             });
         });
+
+        it('should fire a "updated" event when the viz is animated', async (done) => {
+            var update = jasmine.createSpy('update');
+            await layer.update(source, new carto.Viz('width: now()'));
+            layer.on('updated', update);
+            layer.on('loaded', () => {
+                layer.$paintCallback();
+                expect(update).toHaveBeenCalledTimes(2);
+                layer.$paintCallback();
+                expect(update).toHaveBeenCalledTimes(3);
+                done();
+            });
+        });
     });
 
     describe('.blendToViz', () => {
         it('should resolve the Promise with a valid viz', (done) => {
             layer.on('loaded', () => {
-                layer.blendToViz(viz2).then(done);
+                layer.blendToViz(new carto.Viz('color: blue')).then(done);
             });
         });
     });
