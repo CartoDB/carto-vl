@@ -245,7 +245,6 @@ class Base {
         final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
         return final;
@@ -255,7 +254,6 @@ class Base {
         final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
     }
@@ -956,20 +954,23 @@ const variable = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_vari
 const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["a" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["g" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
 const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["b" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
+
+const viewportHistogram = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* ViewportHistogram */](...args);
+/* harmony export (immutable) */ __webpack_exports__["viewportHistogram"] = viewportHistogram;
 
 const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
@@ -4405,6 +4406,9 @@ function genQuantiles(global) {
             let children = {
                 input
             };
+            if (!global) {
+                children._histogram = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["viewportHistogram"])(input);
+            }
             let breakpoints = [];
             for (let i = 0; i < buckets - 1; i++) {
                 children[`arg${i}`] = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(i * 10);
@@ -4423,6 +4427,7 @@ function genQuantiles(global) {
             return q;
         }
         getBreakpointList() {
+            this._genBreakpoints();
             return this.breakpoints.map(br => br.expr);
         }
         _compile(metadata) {
@@ -4456,26 +4461,39 @@ function genQuantiles(global) {
                 inline: `${funcName}(${childInlines.input})`
             };
         }
-        _preDraw(program, drawMetadata, gl) {
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name == name);
-            let i = 0;
-            const total = column.accumHistogram[column.histogramBuckets - 1];
-            let brs = [];
-
-            // TODO OPT: this could be faster with binary search
+        _genBreakpoints() {
             if (!global) {
+                const hist = this._histogram.eval();
+
+                const histogramBuckets = hist.length;
+                const min = hist[0].x[0];
+                const max = hist[histogramBuckets - 1].x[1];
+
+                let prev = 0;
+                const accumHistogram = hist.map(({ y }) => {
+                    prev += y;
+                    return prev;
+                });
+
+
+                let i = 0;
+                const total = accumHistogram[histogramBuckets - 1];
+                let brs = [];
+                // TODO OPT: this could be faster with binary search
                 this.breakpoints.map((breakpoint, index) => {
-                    for (i; i < column.histogramBuckets; i++) {
-                        if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
+                    for (i; i < histogramBuckets; i++) {
+                        if (accumHistogram[i] > (index + 1) / this.buckets * total) {
                             break;
                         }
                     }
-                    const percentileValue = i / column.histogramBuckets * (column.max - column.min) + column.min;
+                    const percentileValue = i / histogramBuckets * (max - min) + min;
                     brs.push(percentileValue);
                     breakpoint.expr = percentileValue;
                 });
             }
+        }
+        _preDraw(program, drawMetadata, gl) {
+            this._genBreakpoints();
             super._preDraw(program, drawMetadata, gl);
         }
         _getColumnName() {
@@ -4723,14 +4741,15 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     getSimTime() {
-        if (!(this.input.min.eval() instanceof Date)){
-            return null;
-        }
-
         const c = this._cycle.eval(); //from 0 to 1
 
-        const min = this.input.min.eval(); //Date
+        const min = this.input.min.eval();
         const max = this.input.max.eval();
+
+        if (!(this.input.min.eval() instanceof Date)) {
+            return min + c * (max - min);
+        }
+
 
         const tmin = min.getTime();
         const tmax = max.getTime();
@@ -4939,6 +4958,7 @@ const styler = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export pointInTriangle */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(72);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(12);
 
@@ -5175,7 +5195,7 @@ class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.strokeWidth;
+        const vizStrokeWidth = viz.strokeWidth;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -5188,7 +5208,7 @@ class Dataframe {
                 f[name] = this.properties[name][featureIndex];
             });
             // Line with is saturated at 336px
-            const lineWidth = Math.min(vizWidth.eval(f), 336);
+            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
             const scale = lineWidth / 2 * widthScale;
             const v1 = {
@@ -5322,6 +5342,11 @@ function pointInTriangle(p, v1, v2, v3) {
     // contains an explanation of both this algorithm and one based on barycentric coordinates,
     // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
 
+    if (equal(v1, v2) || equal(v2, v3) || equal(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
+
     // A point is inside a triangle or in one of the triangles edges
     // if the point is in the three half-plane defined by the 3 edges
     const b1 = halfPlaneTest(p, v1, v2) < 0;
@@ -5339,6 +5364,10 @@ function halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function equal(a, b) {
+    return (a.x == b.x) && (a.y == b.y);
 }
 
 function pointInCircle(p, center, scale) {
@@ -6215,7 +6244,8 @@ class Layer {
         this.metadata = null;
         this._renderLayer = new __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__["a" /* default */]();
         this.state = 'init';
-        this.isLoaded = false;
+        this._isLoaded = false;
+        this._isUpdated = false;
 
         this.update(source, viz);
     }
@@ -6379,6 +6409,7 @@ class Layer {
             return;
         }
         this._source.requestData(this._getViewport());
+        this._isUpdated = true;
     }
 
     hasDataframes() {
@@ -6413,10 +6444,14 @@ class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
+            if (this._viz.isAnimated() || this._isUpdated) {
+                this._isUpdated = false;
+                this._fire('updated');
+            }
         }
-        if (!this.isLoaded && this.state == 'dataLoaded') {
+        if (!this._isLoaded && this.state == 'dataLoaded') {
+            this._isLoaded = true;
             this._fire('loaded');
-            this.isLoaded = true;
         }
     }
 
@@ -6432,6 +6467,7 @@ class Layer {
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         this._integrator.needRefresh();
+        this._isUpdated = true;
     }
 
     /**
@@ -6632,7 +6668,9 @@ class Viz {
         this._checkVizSpec(vizSpec);
 
         Object.keys(vizSpec).forEach(property => {
-            if (SUPPORTED_PROPERTIES.includes(property)) {
+            if (property == 'resolution') {
+                this._resolution = vizSpec[property];
+            } else if (SUPPORTED_PROPERTIES.includes(property)) {
                 this[property] = vizSpec[property];
             }
         });
@@ -6648,6 +6686,14 @@ class Viz {
 
         this._resolveAliases();
         this._validateAliasDAG();
+    }
+
+    get resolution(){
+        return this._resolution;
+    }
+    set resolution(x){
+        this._resolution = x;
+        this._changed();
     }
 
     _getRootExpressions() {
@@ -10404,6 +10450,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (this.palette.type != 'customPaletteNumber') {
             super.eval(o);
         }
+        this._computeTextureIfNeeded();
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
@@ -10417,37 +10464,8 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _compile(meta) {
         super._compile(meta);
         Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
-        if (this.input.type == 'category') {
-            this.maxKey = this.input.numCategories - 1;
-        }
-        const width = 256;
-        if (this.type == 'color') {
-            const pixel = new Uint8Array(4 * width);
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            for (let i = 0; i < width; i++) {
-                const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
-                const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
-                const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
-                const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                pixel[4 * i + 0] = v.r * 255;
-                pixel[4 * i + 1] = v.g * 255;
-                pixel[4 * i + 2] = v.b * 255;
-                pixel[4 * i + 3] = v.a * 255;
-            }
-            this.pixel = pixel;
-        } else {
-            const pixel = new Float32Array(width);
-            const floats = this.palette.floats;
-            for (let i = 0; i < width; i++) {
-                const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
-                const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
-                const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
-                pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-            }
-            this.pixel = pixel;
-        }
+        this._texCategories = null;
+        this._GLtexCategories = null;
     }
     _free(gl) {
         gl.deleteTexture(this.texture);
@@ -10490,11 +10508,56 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         }
     }
     _postShaderCompile(program, gl) {
-        if (!this.init) {
-            this.init = true;
+        this.input._postShaderCompile(program, gl);
+        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
+        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
+    }
+    _computeTextureIfNeeded() {
+        if (this._texCategories !== this.input.numCategories) {
+            this._texCategories = this.input.numCategories;
+
+            if (this.input.type == 'category') {
+                this.maxKey = this.input.numCategories - 1;
+            }
+            const width = 256;
+            if (this.type == 'color') {
+                const pixel = new Uint8Array(4 * width);
+                const colors = this._getColorsFromPalette(this.input, this.palette);
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
+                    const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
+                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
+                    const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
+                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+                    pixel[4 * i + 0] = v.r * 255;
+                    pixel[4 * i + 1] = v.g * 255;
+                    pixel[4 * i + 2] = v.b * 255;
+                    pixel[4 * i + 3] = v.a * 255;
+                }
+                this.pixel = pixel;
+            } else {
+                const pixel = new Float32Array(width);
+                const floats = this.palette.floats;
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
+                    const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
+                    const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+                }
+                this.pixel = pixel;
+            }
+        }
+    }
+    _computeGLTextureIfNeeded(gl) {
+        this._computeTextureIfNeeded();
+        if (this._GLtexCategories !== this.input.numCategories) {
+            this._GLtexCategories = this.input.numCategories;
+
+            const width = 256;            
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const width = 256;
             const pixel = this.pixel;
             if (this.type == 'color') {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -10514,12 +10577,9 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
-        this.input._postShaderCompile(program, gl);
-        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
-        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
-        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
+        this._computeGLTextureIfNeeded(gl);
         this.input._preDraw(program, drawMetadata, gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -10766,17 +10826,17 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(property, buckets) {
         // TODO 'cat'
-        super({ property: property });
+        super({ property, buckets });
         // TODO improve type check
-        this.buckets = buckets; //TODO force fixed literal
     }
     eval(feature) {
         const p = this.property.eval(feature);
+        const buckets = Math.round(this.buckets.eval());
         const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
         let ret;
         metaColumn.categoryNames.map((name, i) => {
-            if (i==p){
-                ret = i < this.buckets? i+1:0;
+            if (i == p) {
+                ret = i < buckets ? i + 1 : 0;
             }
         });
         return ret;
@@ -10787,9 +10847,12 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
         this.type = 'category';
-        this.numCategories = this.buckets + 1;
         this.othersBucket = true;
         this._meta = metadata;
+        this._textureBuckets = null;
+    }
+    get numCategories() {
+        return Math.round(this.buckets.eval()) + 1;
     }
     _applyToShaderSource(getGLSLforProperty) {
         const property = this.property._applyToShaderSource(getGLSLforProperty);
@@ -10799,21 +10862,28 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         };
     }
     _postShaderCompile(program, gl) {
-        if (!this.init) {
-            if (this.buckets > this.property.numCategories) {
-                this.buckets = this.property.numCategories;
-            }
-            this.init = true;
-            this.texture = gl.createTexture();
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        this.property._postShaderCompile(program);
+        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
+    }
+    _preDraw(program, drawMetadata, gl) {
+        let buckets = Math.round(this.buckets.eval());
+        if (buckets > this.property.numCategories) {
+            buckets = this.property.numCategories;
+        }
+        if (this._textureBuckets !== buckets) {
+            this._textureBuckets = buckets;
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
             const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
             metaColumn.categoryNames.map((name, i) => {
-                if (i < this.buckets) {
+                if (i < buckets) {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
             });
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);            
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);
@@ -10822,10 +10892,6 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
-        this.property._postShaderCompile(program);
-        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
-    }
-    _preDraw(program, drawMetadata, gl) {
         this.property._preDraw(program, drawMetadata);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -10992,7 +11058,7 @@ const ViewportMax = genViewportAgg('max',
     (self, y) => { self._value = Math.max(self._value, y); },
     self => self._value
 );
-/* harmony export (immutable) */ __webpack_exports__["c"] = ViewportMax;
+/* harmony export (immutable) */ __webpack_exports__["d"] = ViewportMax;
 
 
 /**
@@ -11023,7 +11089,7 @@ const ViewportMin = genViewportAgg('min',
     self => { self._value = Number.POSITIVE_INFINITY; },
     (self, y) => { self._value = Math.min(self._value, y); },
     self => self._value);
-/* harmony export (immutable) */ __webpack_exports__["d"] = ViewportMin;
+/* harmony export (immutable) */ __webpack_exports__["e"] = ViewportMin;
 
 
 /**
@@ -11054,7 +11120,7 @@ const ViewportSum = genViewportAgg('sum',
     self => { self._value = 0; },
     (self, y) => { self._value = self._value + y; },
     self => self._value);
-/* harmony export (immutable) */ __webpack_exports__["f"] = ViewportSum;
+/* harmony export (immutable) */ __webpack_exports__["g"] = ViewportSum;
 
 
 /**
@@ -11197,7 +11263,112 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defa
         super._preDraw(...args);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["e"] = ViewportPercentile;
+/* harmony export (immutable) */ __webpack_exports__["f"] = ViewportPercentile;
+
+
+/**
+ * Generates an histogram.
+ *
+ * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
+ * The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
+ * at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the `size` parameter.
+ *
+ * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
+ *
+ * @param {carto.expressions.Base} x - expression to base the histogram
+ * @param {carto.expressions.Base} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
+ * @return {carto.expressions.Base} Histogram
+ *
+ * @example <caption>Create and use an histogram</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *          @categoryHistogram: viewportHistogram($type)
+ *          @numericHistogram:  viewportHistogram($amount, 1, 3)
+ * `);
+ * ...
+ * console.log(viz.variables.categoryHistogram.eval());
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+ * // There are 10 features of type A and 20 of type B
+ *
+ * console.log(viz.variables.numericHistogram.eval());
+ * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+ * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
+ *
+ * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   @v_percentile: viewportPercentile($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportPercentile
+ * @function
+ * @api
+ */
+class ViewportHistogram extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+    constructor(x, weight = 1, size = 1000) {
+        super({
+            x: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(x),
+            weight: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(weight),
+        });
+        this._size = size;
+        this._isViewport = true;
+        this.inlineMaker = () => null;
+    }
+    _resetViewportAgg() {
+        this._cached = null;
+        this._histogram = new Map();
+    }
+    _accumViewportAgg(feature) {
+        const x = this.x.eval(feature);
+        const weight = this.weight.eval(feature);
+        const count = this._histogram.get(x) || 0;
+        this._histogram.set(x, count + weight);
+    }
+    eval() {
+        if (this._cached == null) {
+            if (!this._histogram) {
+                return null;
+            }
+            if (this.x.type == 'number') {
+                const array = [...this._histogram];
+                let min = Number.POSITIVE_INFINITY;
+                let max = Number.NEGATIVE_INFINITY;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    min = Math.min(min, x);
+                    max = Math.max(max, x);
+                }
+                const hist = Array(this._size).fill(0);
+                const range = max - min;
+                const sizeMinusOne = this._size - 1;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    const y = array[i][1];
+                    const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
+                    hist[index] += y;
+                }
+                this._cached = hist.map((count, index) => {
+                    return {
+                        x: [min + index / this._size * range, min + (index + 1) / this._size * range],
+                        y: count,
+                    };
+                });
+            } else {
+                this._cached = [...this._histogram].map(([x, y]) => {
+                    return { x: this._metatada.categoryIDsToName[x], y };
+                });
+            }
+        }
+        return this._cached;
+    }
+    _compile(metadata) {
+        this._metatada = metadata;
+        super._compile(metadata);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["c"] = ViewportHistogram;
+
 
 
 
@@ -11947,7 +12118,8 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _computePolygonGeometry(data) {
         let polygon = {
             flat: [],
-            holes: []
+            holes: [],
+            clipped: []
         };
         let holeIndex = 0;
         for (let i = 0; i < data.length; i++) {
@@ -12487,7 +12659,6 @@ function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    // let clipIndex = 0;
     geometry.forEach(feature => {
         feature.forEach(polygon => {
             const triangles = __WEBPACK_IMPORTED_MODULE_0_earcut__(polygon.flat, polygon.holes);
@@ -12497,68 +12668,55 @@ function decodePolygon(geometry) {
                 vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
                 normals.push(0, 0);
             }
-            {
-                const lineString = polygon.flat;
-                let ringInit = 0;
-                polygon.clipped = polygon.clipped || [];
-                for (let i = 0; i < lineString.length - 2; i += 2) {
-                    // TODO performance
-                    if (polygon.clipped.includes(i) &&
-                        (polygon.holes.includes((i + 2) / 2) ?
-                            polygon.clipped.includes(ringInit / 2)
-                            :
-                            polygon.clipped.includes(i + 2)
-                        )
-                    ) {
-                        const a = polygon.clippedType[polygon.clipped.indexOf(i)];
-                        const b = polygon.clippedType[
-                            (polygon.holes.includes((i + 2) / 2) ?
-                                polygon.clipped.indexOf(ringInit / 2)
-                                :
-                                polygon.clipped.indexOf(i + 2)
-                            )
 
-                        ];
-
-                        // Clipping must be on the same half-plane to skip the line segment
-                        if (a & b) {
-                            if (polygon.holes.includes((i + 2) / 2)) {
-                                ringInit = i + 2;
-                            }
-                            continue;
-                        }
+            const lineString = polygon.flat;
+            for (let i = 0; i < lineString.length - 2; i += 2) {
+                // TODO performance
+                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
+                    if (polygon.clippedType[polygon.clipped.indexOf(i)] &
+                        polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {
+                        // Skip tile border lines which don't intersect the tile
+                        continue;
                     }
-                    const a = [lineString[i + 0], lineString[i + 1]];
-                    let b = [lineString[i + 2], lineString[i + 3]];
-                    if (polygon.holes.includes((i + 2) / 2)) {
-                        b = [lineString[ringInit], lineString[ringInit + 1]];
-                        ringInit = i + 2;
-                    }
-                    let normal = getLineNormal(b, a);
-
-                    let na = normal;
-                    let nb = normal;
-
-                    // First triangle
-
-                    normals.push(-na[0], -na[1]);
-                    normals.push(na[0], na[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    vertices.push(a[0], a[1]);
-                    vertices.push(a[0], a[1]);
-                    vertices.push(b[0], b[1]);
-
-                    // Second triangle
-
-                    normals.push(na[0], na[1]);
-                    normals.push(nb[0], nb[1]);
-                    normals.push(-nb[0], -nb[1]);
-
-                    vertices.push(a[0], a[1]);
-                    vertices.push(b[0], b[1]);
-                    vertices.push(b[0], b[1]);
                 }
+
+                if (polygon.holes.includes((i + 2) / 2)) {
+                    // Skip adding the line which connects two rings
+                    continue;
+                }
+
+                const a = [lineString[i + 0], lineString[i + 1]];
+                const b = [lineString[i + 2], lineString[i + 3]];
+
+                let normal = getLineNormal(b, a);
+
+                if (isNaN(normal[0]) || isNaN(normal[1])) {
+                    // Skip when there is no normal vector
+                    continue;
+                }
+
+                let na = normal;
+                let nb = normal;
+
+                // First triangle
+
+                normals.push(-na[0], -na[1]);
+                normals.push(na[0], na[1]);
+                normals.push(-nb[0], -nb[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+
+                // Second triangle
+
+                normals.push(na[0], na[1]);
+                normals.push(nb[0], nb[1]);
+                normals.push(-nb[0], -nb[1]);
+
+                vertices.push(a[0], a[1]);
+                vertices.push(b[0], b[1]);
+                vertices.push(b[0], b[1]);
             }
         });
         breakpoints.push(vertices.length);
@@ -14100,7 +14258,6 @@ class Windshaft {
                     clipping = clipping | 1;
                 } else if (x < 0) {
                     clipping = clipping | 2;
-
                 }
                 if (y > mvt_extent) {
                     clipping = clipping | 4;
@@ -14111,8 +14268,8 @@ class Windshaft {
                     polygon.clipped.push(polygon.flat.length);
                     polygon.clippedType.push(clipping);
                 }
-                polygon.flat.push(2 * x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
+                polygon.flat.push(2 * x / mvt_extent - 1);
+                polygon.flat.push(2 * (1 - y / mvt_extent) - 1);
             }
         }
         //if current polygon is not empty=> push it
@@ -18932,7 +19089,7 @@ class Interactivity {
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
-        Promise.all(layerList.map(layer => layer._context)).then(() => {
+        return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         });
