@@ -117,14 +117,13 @@ function genQuantiles(global) {
             };
         }
         _preDraw(program, drawMetadata, gl) {
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name == name);
-            let i = 0;
-            const total = column.accumHistogram[column.histogramBuckets - 1];
-            let brs = [];
-
-            // TODO OPT: this could be faster with binary search
             if (!global) {
+                // TODO OPT: this could be faster with binary search
+                const name = this._getColumnName();
+                const column = drawMetadata.columns.find(c => c.name == name);
+                let i = 0;
+                const total = column.accumHistogram[column.histogramBuckets - 1];
+                let brs = [];
                 this.breakpoints.map((breakpoint, index) => {
                     for (i; i < column.histogramBuckets; i++) {
                         if (column.accumHistogram[i] >= (index + 1) / this.buckets * total) {
