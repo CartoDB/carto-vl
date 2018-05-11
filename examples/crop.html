@@ -71,8 +71,10 @@
         // Widgets
         @totalLoss:           globalSum(clusterSum($loss_amount))
         @totalViewportLoss: viewportSum(clusterSum($loss_amount))
-        @cropTypeHistogram: viewportHistogram($crop_type,  clusterSum($loss_amount))      
+        @cropTypeHistogram: viewportHistogram($crop_type,  clusterSum($loss_amount))
         @lossCauseHistogram: viewportHistogram(clusterSum($loss_amount), 1, 20)
+        @minLoss: globalMin(clusterSum($loss_amount))
+        @maxLoss: globalMax(clusterSum($loss_amount))
 
         // Interactivity
         @crop_type:  $crop_type
@@ -88,6 +90,13 @@
         // TODO STACKED HISTOGRAM WIDGET, TO BE ADDED IN CARTOVL
 
         // Formula widget
+
+        function getLossRange(){
+            return {
+                min: viz.variables.minLoss.eval(),
+                max: viz.variables.maxLoss.eval(),
+            };
+        }
 
         // Returns the total loss of the entire dataset
         function getTotalLoss() {
@@ -112,7 +121,7 @@
         });
 
         // TODO Select the upper and lower bounds of the amount of loss and recalculate symbol sizes: we need to discuss this, what exactly do we want to show
-        
+
         // Select the number of crop types to symbolize from the opening map default of 5
         function setNumColors(n) {
             viz.variables.numColors.blendTo(n);
@@ -143,7 +152,7 @@
         const interactivity = new carto.Interactivity(cropLayer);
         interactivity.on('featureClick', event => {
             const feature = event.features[0];
-            // This will only manage the first crop under the cursor, but we could change this to manage all crop features under the cursor            
+            // This will only manage the first crop under the cursor, but we could change this to manage all crop features under the cursor
             if (feature) {
                 if (feature.layerId == 'cropLayer') {
                     const cropType = feature.variables.crop_type.value;
