@@ -54,6 +54,7 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type != 'customPaletteNumber') {
             super.eval(o);
         }
+        this._computeTextureIfNeeded();
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
@@ -67,37 +68,8 @@ export default class Ramp extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
-        if (this.input.type == 'category') {
-            this.maxKey = this.input.numCategories - 1;
-        }
-        const width = 256;
-        if (this.type == 'color') {
-            const pixel = new Uint8Array(4 * width);
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            for (let i = 0; i < width; i++) {
-                const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
-                const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
-                const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
-                const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                pixel[4 * i + 0] = v.r * 255;
-                pixel[4 * i + 1] = v.g * 255;
-                pixel[4 * i + 2] = v.b * 255;
-                pixel[4 * i + 3] = v.a * 255;
-            }
-            this.pixel = pixel;
-        } else {
-            const pixel = new Float32Array(width);
-            const floats = this.palette.floats;
-            for (let i = 0; i < width; i++) {
-                const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
-                const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
-                const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
-                pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-            }
-            this.pixel = pixel;
-        }
+        this._texCategories = null;
+        this._GLtexCategories = null;
     }
     _free(gl) {
         gl.deleteTexture(this.texture);
@@ -140,11 +112,56 @@ export default class Ramp extends BaseExpression {
         }
     }
     _postShaderCompile(program, gl) {
-        if (!this.init) {
-            this.init = true;
+        this.input._postShaderCompile(program, gl);
+        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
+        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
+    }
+    _computeTextureIfNeeded() {
+        if (this._texCategories !== this.input.numCategories) {
+            this._texCategories = this.input.numCategories;
+
+            if (this.input.type == 'category') {
+                this.maxKey = this.input.numCategories - 1;
+            }
+            const width = 256;
+            if (this.type == 'color') {
+                const pixel = new Uint8Array(4 * width);
+                const colors = this._getColorsFromPalette(this.input, this.palette);
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
+                    const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
+                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
+                    const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
+                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+                    pixel[4 * i + 0] = v.r * 255;
+                    pixel[4 * i + 1] = v.g * 255;
+                    pixel[4 * i + 2] = v.b * 255;
+                    pixel[4 * i + 3] = v.a * 255;
+                }
+                this.pixel = pixel;
+            } else {
+                const pixel = new Float32Array(width);
+                const floats = this.palette.floats;
+                for (let i = 0; i < width; i++) {
+                    const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
+                    const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
+                    const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+                }
+                this.pixel = pixel;
+            }
+        }
+    }
+    _computeGLTextureIfNeeded(gl) {
+        this._computeTextureIfNeeded();
+        if (this._GLtexCategories !== this.input.numCategories) {
+            this._GLtexCategories = this.input.numCategories;
+
+            const width = 256;            
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const width = 256;
             const pixel = this.pixel;
             if (this.type == 'color') {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -164,12 +181,9 @@ export default class Ramp extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
-        this.input._postShaderCompile(program, gl);
-        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
-        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
-        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
+        this._computeGLTextureIfNeeded(gl);
         this.input._preDraw(program, drawMetadata, gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);

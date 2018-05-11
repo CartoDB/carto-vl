@@ -163,7 +163,7 @@ import { Ceil } from './expressions/unary';
 
 import Variable from './expressions/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile } from './expressions/viewportAggregation';
+import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/globalAggregation';
 
 import XYZ from './expressions/xyz';
@@ -288,6 +288,7 @@ export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const viewportHistogram = (...args) => new ViewportHistogram(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
