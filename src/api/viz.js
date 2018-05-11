@@ -59,7 +59,9 @@ export default class Viz {
         this._checkVizSpec(vizSpec);
 
         Object.keys(vizSpec).forEach(property => {
-            if (SUPPORTED_PROPERTIES.includes(property)) {
+            if (property == 'resolution') {
+                this._resolution = vizSpec[property];
+            } else if (SUPPORTED_PROPERTIES.includes(property)) {
                 this[property] = vizSpec[property];
             }
         });
@@ -75,6 +77,14 @@ export default class Viz {
 
         this._resolveAliases();
         this._validateAliasDAG();
+    }
+
+    get resolution(){
+        return this._resolution;
+    }
+    set resolution(x){
+        this._resolution = x;
+        this._changed();
     }
 
     _getRootExpressions() {
