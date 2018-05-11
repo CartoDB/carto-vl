@@ -402,8 +402,7 @@ function halfPlaneTest(p, a, b) {
 }
 
 function equal(a, b) {
-    return (a.x == b.x || (isNaN(a.x) && isNaN(b.x))) &&
-           (a.y == b.y || (isNaN(a.y) && isNaN(b.y)));
+    return (a.x == b.x) && (a.y == b.y);
 }
 
 function pointInCircle(p, center, scale) {
