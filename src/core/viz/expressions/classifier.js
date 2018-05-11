@@ -196,7 +196,7 @@ export class GlobalQuantiles extends Classifier {
  * `);
  *
  * @memberof carto.expressions
- * @name globalQuantiles
+ * @name globalEqIntervals
  * @function
  * @api
  */
@@ -239,7 +239,7 @@ export class GlobalEqIntervals extends Classifier {
  * `);
  *
  * @memberof carto.expressions
- * @name globalQuantiles
+ * @name viewportEqIntervals
  * @function
  * @api
  */
