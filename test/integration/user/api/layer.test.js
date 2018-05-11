@@ -10,7 +10,7 @@ const featureData = {
     properties: {}
 };
 
-describe('Layer', () => {
+fdescribe('Layer', () => {
     let div, map, source, viz, viz2, layer;
 
     beforeEach(() => {
@@ -28,6 +28,37 @@ describe('Layer', () => {
         `);
         layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
+    });
+
+    describe('.on', () => {
+        it('should fire a "loaded" event when ready', (done) => {
+            layer.on('loaded', done);
+        });
+
+        it('should fire a "update" event when ready', (done) => {
+            layer.on('updated', done);
+        });
+
+        it('should fire a "update" event only once when ready', (done) => {
+            var update = jasmine.createSpy('update');
+            layer.on('updated', update);
+            layer.on('loaded', () => {
+                expect(update).toHaveBeenCalledTimes(1);
+                expect(update).not.toHaveBeenCalledTimes(2);
+                done();
+            });
+        });
+
+        it('should fire a "update" event when data is requested', (done) => {
+            var update = jasmine.createSpy('update');
+            layer.on('updated', update);
+            layer.on('loaded', async () => {
+                await layer.requestData();
+                layer.$paintCallback();
+                expect(update).toHaveBeenCalledTimes(2);
+                done();
+            });
+        });
     });
 
     describe('.blendToViz', () => {
