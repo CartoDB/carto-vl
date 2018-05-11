@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { number, viewportHistogram } from '../functions';
+import { number, viewportHistogram, viewportMax, viewportMin } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
 import * as schema from '../../schema';
@@ -133,6 +133,7 @@ export class Quantiles extends Classifier {
         });
     }
 }
+
 /**
  * Generate quantiles of size `n` from all the features.
  *
@@ -170,6 +171,100 @@ export class GlobalQuantiles extends Classifier {
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
             breakpoint.expr = copy[Math.floor(p * copy.length)];
+        });
+    }
+}
+
+/**
+ * Classify input in `n` buckets using global equal intervals.
+ *
+ * Global classifiers will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ *
+ * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use global equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use global equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalQuantiles
+ * @function
+ * @api
+ */
+export class GlobalEqIntervals extends Classifier {
+    constructor(input, buckets) {
+        checkInstance('globalEqIntervals', 'input', 0, Property, input && (input.property || input));
+        checkNumber('globalEqIntervals', 'buckets', 1, buckets);
+        super({ input }, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        checkType('globalEqIntervals', 'input', 0, 'number', this.input);
+        const { min, max } = metadata.columns.find(c => c.name == this.input.name);
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
+        });
+    }
+}
+
+/**
+ * Classify input in `n` buckets using viewport equal intervals.
+ *
+ * Viewport classifiers will classify the input based on the filtered dataset filtering by viewport and by `filter`.
+ *
+ * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.viewportEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(viewportEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalQuantiles
+ * @function
+ * @api
+ */
+export class ViewportEqIntervals extends Classifier {
+    constructor(input, buckets) {
+        checkInstance('viewportEqIntervals', 'input', 0, Property, input && (input.property || input));
+        checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
+        let children = {
+            input
+        };
+        children._min = viewportMin(input);
+        children._max = viewportMax(input);
+        super(children, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
+    }
+    _genBreakpoints() {
+        const min = this._min.eval();
+        const max = this._max.eval();
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
         });
     }
 }
