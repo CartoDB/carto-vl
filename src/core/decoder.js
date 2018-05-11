@@ -83,6 +83,11 @@ function decodePolygon(geometry) {
 
                 let normal = getLineNormal(b, a);
 
+                if (isNaN(normal[0]) || isNaN(normal[1])) {
+                    // Skip when there is no normal vector
+                    continue;
+                }
+
                 let na = normal;
                 let nb = normal;
 
