@@ -4,7 +4,7 @@ import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './property';
 import * as schema from '../../schema';
 
-let quantilesUID = 0;
+let classifierUID = 0;
 
 
 class Classifier extends BaseExpression {
@@ -15,7 +15,7 @@ class Classifier extends BaseExpression {
             breakpoints.push(children[`arg${i}`]);
         }
         super(children);
-        this.quantilesUID = quantilesUID++;
+        this.classifierUID = classifierUID++;
         this.numCategories = buckets;
         this.buckets = buckets;
         this.breakpoints = breakpoints;
@@ -36,7 +36,7 @@ class Classifier extends BaseExpression {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-        const funcName = `quantiles${this.quantilesUID}`;
+        const funcName = `classifier${this.classifierUID}`;
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
         return ${index.toFixed(2)};

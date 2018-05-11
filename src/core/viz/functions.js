@@ -135,8 +135,7 @@ import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
 
-import { Quantiles } from './expressions/quantiles';
-import { GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/quantiles';
+import { Quantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
 
 import Ramp from './expressions/ramp';
 

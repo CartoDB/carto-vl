@@ -1,7 +1,7 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 import { globalQuantiles, property, quantiles, globalEqIntervals } from '../../../../../src/core/viz/functions';
 
-describe('src/core/viz/expressions/quantiles', () => {
+describe('src/core/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateStaticTypeErrors('quantiles', []);
         validateStaticTypeErrors('quantiles', ['number']);
