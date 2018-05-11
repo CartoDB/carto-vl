@@ -245,9 +245,18 @@ describe('api/viz', () => {
         });
     });
 
+    describe('resolution changes', () => {
+        it('should be effective and notify observers', done => {
+            const viz = new Viz();
+            viz.onChange(done);
+            viz.resolution = 8;
+            expect(viz.resolution).toEqual(8);
+        });
+    });
+
     describe('aliases', () => {
         it('should throw an error when the graph is not a DAG', () => {
-            expect(()=>new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
+            expect(() => new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
                 __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
                 __cartovl_variable_ten: __cartovl_variable_oneHundred / 10
             `)).toThrowError('Viz contains a circular dependency');
