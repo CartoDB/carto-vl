@@ -35,11 +35,11 @@ fdescribe('Layer', () => {
             layer.on('loaded', done);
         });
 
-        it('should fire a "update" event when ready', (done) => {
+        it('should fire a "updated" event when ready', (done) => {
             layer.on('updated', done);
         });
 
-        it('should fire a "update" event only once when ready', (done) => {
+        it('should fire a "updated" event only once when ready', (done) => {
             var update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
@@ -49,11 +49,33 @@ fdescribe('Layer', () => {
             });
         });
 
-        it('should fire a "update" event when data is requested', (done) => {
+        it('should fire a "updated" event when the source is updated', (done) => {
             var update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
-                await layer.requestData();
+                await layer.update(new carto.source.GeoJSON(featureData), viz);
+                layer.$paintCallback();
+                expect(update).toHaveBeenCalledTimes(2);
+                done();
+            });
+        });
+
+        it('should fire a "updated" event when the viz is updated', (done) => {
+            var update = jasmine.createSpy('update');
+            layer.on('updated', update);
+            layer.on('loaded', async () => {
+                await layer.update(source, viz2);
+                layer.$paintCallback();
+                expect(update).toHaveBeenCalledTimes(2);
+                done();
+            });
+        });
+
+        it('should fire a "updated" event when the _onDataframeAdded is called', (done) => {
+            var update = jasmine.createSpy('update');
+            layer.on('updated', update);
+            layer.on('loaded', () => {
+                layer._onDataframeAdded(layer._source._dataframe);
                 layer.$paintCallback();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();

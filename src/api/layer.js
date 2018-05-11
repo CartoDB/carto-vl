@@ -350,7 +350,6 @@ export default class Layer {
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
-        this._fireUpdate = true;
         this._integrator.needRefresh();
         return this.requestData();
     }
