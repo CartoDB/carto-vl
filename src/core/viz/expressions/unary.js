@@ -172,6 +172,21 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 
 /**
+ * Check if a numeric expression is NaN.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.expressions.Base|number} x - Numeric expression to check
+ * @return {carto.expressions.Base}
+ *
+ * @memberof carto.expressions
+ * @name isNaN
+ * @function
+ * @api
+ */
+export const IsNaN = genUnaryOp('isNaN', x => Number.isNaN(x), x => `(isnan(${x})? 1.: 0.)`);
+
+/**
  * Compute the logical negation of the given expression.
  * This is internally computed as 1 - x preserving boolean behavior and allowing fuzzy logic.
  *
