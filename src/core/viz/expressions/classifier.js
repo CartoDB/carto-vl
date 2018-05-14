@@ -67,7 +67,9 @@ class Classifier extends BaseExpression {
 
 
 /**
- * Generate quantiles of size `n` from the features on the viewport.
+ * Classify `input` by using the quantiles method with `n` buckets.
+ *
+ * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
@@ -135,7 +137,9 @@ export class Quantiles extends Classifier {
 }
 
 /**
- * Generate quantiles of size `n` from all the features.
+ * Classify `input` by using the quantiles method with `n` buckets.
+ *
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
@@ -176,9 +180,9 @@ export class GlobalQuantiles extends Classifier {
 }
 
 /**
- * Classify input in `n` buckets using global equal intervals.
+ * Classify `input` by using the equal intervals method with `n` buckets.
  *
- * Global classifiers will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression to classify
  * @param {number} n - Number of buckets
@@ -219,9 +223,9 @@ export class GlobalEqIntervals extends Classifier {
 }
 
 /**
- * Classify input in `n` buckets using viewport equal intervals.
+ * Classify `input` by using the equal intervals method with `n` buckets.
  *
- * Viewport classifiers will classify the input based on the filtered dataset filtering by viewport and by `filter`.
+ * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression to classify
  * @param {number} n - Number of buckets

@@ -6,7 +6,7 @@ import Property from './property';
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create an animated FadeIn/FadeOut configuration.
+ * Create a FadeIn/FadeOut configuration. See `torque` for more details.
  *
  * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
  * @param {carto.expressions.Base|number} param2 - Expression of type number or Number

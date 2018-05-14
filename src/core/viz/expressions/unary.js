@@ -79,7 +79,7 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the cosine in radians
  * @return {carto.expressions.Base}
  *
- * @example <caption>Cos</caption>
+ * @example <caption>Cos.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.cos(0)  // 1
@@ -156,12 +156,12 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
  * @example <caption>Abs.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.abs(100)  // 100
+ *   width: s.abs(-100)  // 100
  * });
  *
  * @example <caption>Abs. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: abs(100)
+ *   width: abs(-100) // 100
  * `);
  *
  * @memberof carto.expressions

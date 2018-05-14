@@ -7,12 +7,12 @@ import { implicitCast } from './utils';
 
 
 /**
- * Return the average value of all the features.
+ * Return the average of the feature property for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global average of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global average of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -20,9 +20,9 @@ import { implicitCast } from './utils';
  *   }
  * });
  *
- * @example <caption>Assign the global average of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global average of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_avg: globalAvg($amount)
+ *   \@g_avg: globalAvg($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -33,12 +33,12 @@ import { implicitCast } from './utils';
 export const GlobalAvg = generateGlobalAggregattion('avg');
 
 /**
- * Return the maximum value of all the features.
+ * Return the maximum of the feature property for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global maximum of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global maximum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -46,7 +46,7 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
  *   }
  * });
  *
- * @example <caption>Assign the global maximum of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global maximum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @g_max: globalMax($amount)
  * `);
@@ -59,12 +59,12 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
 export const GlobalMax = generateGlobalAggregattion('max');
 
 /**
- * Return the minimum value of all the features.
+ * Return the minimum of the feature property for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global minimum of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global minimum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -72,7 +72,7 @@ export const GlobalMax = generateGlobalAggregattion('max');
  *   }
  * });
  *
- * @example <caption>Assign the global minimum of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global minimum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @g_min: globalMin($amount)
  * `);
@@ -85,12 +85,12 @@ export const GlobalMax = generateGlobalAggregattion('max');
 export const GlobalMin = generateGlobalAggregattion('min');
 
 /**
- * Return the sum of the values of all the features.
+ * Return the sum of the feature property for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global sum of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global sum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -98,7 +98,7 @@ export const GlobalMin = generateGlobalAggregattion('min');
  *   }
  * });
  *
- * @example <caption>Assign the global sum of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global sum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @g_sum: globalSum($amount)
  * `);
@@ -111,12 +111,11 @@ export const GlobalMin = generateGlobalAggregattion('min');
 export const GlobalSum = generateGlobalAggregattion('sum');
 
 /**
- * Return the count of all the features.
+ * Return the feature count for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global count of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global count of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -124,7 +123,7 @@ export const GlobalSum = generateGlobalAggregattion('sum');
  *   }
  * });
  *
- * @example <caption>Assign the global count of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global count of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @g_count: globalCount($amount)
  * `);
@@ -172,12 +171,12 @@ function generateGlobalAggregattion(metadataPropertyName) {
 
 
 /**
- * Return the percentile of all the features.
+ * Return the Nth percentile of the feature property for the entire source.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the global percentile of the `amout` property to a variable.</caption>
+ * @example <caption>Assign the global percentile of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -185,7 +184,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
  *   }
  * });
  *
- * @example <caption>Assign the global percentile of the `amout` property to a variable. (String)</caption>
+ * @example <caption>Assign the global percentile of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @g_percentile: globalPercentile($amount)
  * `);

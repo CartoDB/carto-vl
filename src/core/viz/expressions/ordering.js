@@ -4,7 +4,7 @@ import { checkInstance } from './utils';
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
+ * @param {carto.expressions.Base} by - must be `width()`
  * @return {carto.expressions.Base}
  *
  * @example <caption>Ascending order based on width.</caption>
@@ -34,7 +34,7 @@ export class Asc extends BaseExpression {
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
+ * @param {carto.expressions.Base} by - must be `width()`
  * @return {carto.expressions.Base}
  *
  * @example <caption>Descending order based on width.</caption>
