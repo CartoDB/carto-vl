@@ -90,7 +90,7 @@ export class NoOrder extends BaseExpression {
 }
 
 /**
- * Return the expression assigned in the `width` property
+ * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
  *
  * @return {carto.expressions.Base}
  *
