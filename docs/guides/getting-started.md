@@ -18,6 +18,7 @@
   <!-- Make the map visible -->
   <style>
     #map {
+      position: absolute;  
       height: 100%;
       width: 100%;
     }
@@ -66,6 +67,7 @@ Remember to style this div to ensure it will be displayed
 
 ```css
 #map {
+    position: absolute;
     height: 100%;
     width: 100%;
 }
@@ -115,6 +117,7 @@ Once we get to this point we should see a basic map.
   <!-- Make the map visible -->
   <style>
     #map {
+      position: absolute;
       height: 100%;
       width: 100%;
     }
@@ -198,6 +201,7 @@ layer.addTo(map);
   <!-- Make the map visible -->
   <style>
     #map {
+      position: absolute;  
       height: 100%;
       width: 100%;
     }
