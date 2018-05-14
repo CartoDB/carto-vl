@@ -1,7 +1,7 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { globalQuantiles, property, quantiles } from '../../../../../src/core/viz/functions';
+import { globalQuantiles, property, quantiles, globalEqIntervals, viewportEqIntervals } from '../../../../../src/core/viz/functions';
 
-describe('src/core/viz/expressions/quantiles', () => {
+describe('src/core/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateStaticTypeErrors('quantiles', []);
         validateStaticTypeErrors('quantiles', ['number']);
@@ -20,16 +20,15 @@ describe('src/core/viz/expressions/quantiles', () => {
         function prepare(expr) {
             expr._compile({
                 columns: [
-                    { name: 'price', type: 'number' },
+                    { name: 'price', type: 'number', min: 0, max: 5 },
                 ],
                 sample: [
-                    {price: 0},
-                    {price: 1},
-                    {price: 2},
-                    {price: 3},
-                    {price: 4},
-                    {price: 5},
-                    {price: 6},
+                    { price: 0 },
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
                 ]
             });
             expr._resetViewportAgg();
@@ -52,6 +51,16 @@ describe('src/core/viz/expressions/quantiles', () => {
             prepare(q);
             expect(q.getBreakpointList()).toEqual([3]);
         });
+        it('globalEqIntervals($price, 2)', () => {
+            const q = globalEqIntervals($price, 2);
+            prepare(q);
+            expect(q.getBreakpointList()).toEqual([2.5]);
+        });
+        it('viewportEqIntervals($price, 2)', () => {
+            const q = viewportEqIntervals($price, 2);
+            prepare(q);
+            expect(q.getBreakpointList()).toEqual([2.5]);
+        });
 
         it('globalQuantiles($price, 3)', () => {
             const q = globalQuantiles($price, 3);
@@ -62,6 +71,12 @@ describe('src/core/viz/expressions/quantiles', () => {
             const q = quantiles($price, 3);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2, 4]);
+        });
+        it('viewportEqIntervals($price, 3)', () => {
+            const q = viewportEqIntervals($price, 3);
+            prepare(q);
+            expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
+            expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
         });
     });
 });

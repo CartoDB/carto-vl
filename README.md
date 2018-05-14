@@ -6,9 +6,9 @@ CARTO VL is a JavaScript library to create custom location intelligence applicat
 
 It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful **Vector maps**.
 
-| ![](./docs/images/points.png) | ![](./docs/images/lines.png) |
+| ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/points.png) | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/lines.png) |
 |---|---|
-| ![](./docs/images/aggregation.png) | ![](./docs/images/polygons.png) |
+| ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/aggregation.png) | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/polygons.png) |
 
 
 ## Documentation and examples
@@ -91,9 +91,9 @@ yarn release
 
 ### Run the tests
 
-- [Unit tests](./test/unit/README.md)
-- [Integration tests](./test/integration/README.md)
-- [Acceptance tests](./test/acceptance/README.md)
+- [Unit tests](https://github.com/CartoDB/carto-vl/blob/master/test/unit/README.md)
+- [Integration tests](https://github.com/CartoDB/carto-vl/blob/master/test/integration/README.md)
+- [Acceptance tests](https://github.com/CartoDB/carto-vl/blob/master/test/acceptance/README.md)
 
 ### Submitting Contributions
 
