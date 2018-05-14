@@ -14,6 +14,7 @@ let uid = 0;
  *
  * @memberof carto.expressions
  * @name Base
+ * @hideconstructor
  * @abstract
  * @class
  * @api
@@ -154,6 +155,7 @@ export default class Base {
      * @param {Expression} blendFunc
      * @memberof carto.expressions.Base
      * @instance
+     * @name blendTo
      */
     blendTo(final, duration = 500) {
         //TODO blendFunc = 'linear'
