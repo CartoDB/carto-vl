@@ -156,7 +156,6 @@ export default class Base {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
         return final;
@@ -166,7 +165,6 @@ export default class Base {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
     }

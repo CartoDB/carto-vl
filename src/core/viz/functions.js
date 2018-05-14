@@ -135,8 +135,7 @@ import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
 
-import { Quantiles } from './expressions/quantiles';
-import { GlobalQuantiles } from './expressions/quantiles';
+import { Quantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
 
 import Ramp from './expressions/ramp';
 
@@ -163,7 +162,7 @@ import { Ceil } from './expressions/unary';
 
 import Variable from './expressions/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile } from './expressions/viewportAggregation';
+import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/globalAggregation';
 
 import XYZ from './expressions/xyz';
@@ -255,6 +254,8 @@ export { property as prop };
 
 export const quantiles = (...args) => new Quantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
+export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 
@@ -288,6 +289,7 @@ export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const viewportHistogram = (...args) => new ViewportHistogram(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);

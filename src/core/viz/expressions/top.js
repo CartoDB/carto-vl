@@ -26,17 +26,17 @@ import BaseExpression from './base';
 export default class Top extends BaseExpression {
     constructor(property, buckets) {
         // TODO 'cat'
-        super({ property: property });
+        super({ property, buckets });
         // TODO improve type check
-        this.buckets = buckets; //TODO force fixed literal
     }
     eval(feature) {
         const p = this.property.eval(feature);
+        const buckets = Math.round(this.buckets.eval());
         const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
         let ret;
         metaColumn.categoryNames.map((name, i) => {
-            if (i==p){
-                ret = i < this.buckets? i+1:0;
+            if (i == p) {
+                ret = i < buckets ? i + 1 : 0;
             }
         });
         return ret;
@@ -47,9 +47,12 @@ export default class Top extends BaseExpression {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
         this.type = 'category';
-        this.numCategories = this.buckets + 1;
         this.othersBucket = true;
         this._meta = metadata;
+        this._textureBuckets = null;
+    }
+    get numCategories() {
+        return Math.round(this.buckets.eval()) + 1;
     }
     _applyToShaderSource(getGLSLforProperty) {
         const property = this.property._applyToShaderSource(getGLSLforProperty);
@@ -59,21 +62,28 @@ export default class Top extends BaseExpression {
         };
     }
     _postShaderCompile(program, gl) {
-        if (!this.init) {
-            if (this.buckets > this.property.numCategories) {
-                this.buckets = this.property.numCategories;
-            }
-            this.init = true;
-            this.texture = gl.createTexture();
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        this.property._postShaderCompile(program);
+        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
+    }
+    _preDraw(program, drawMetadata, gl) {
+        let buckets = Math.round(this.buckets.eval());
+        if (buckets > this.property.numCategories) {
+            buckets = this.property.numCategories;
+        }
+        if (this._textureBuckets !== buckets) {
+            this._textureBuckets = buckets;
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
             const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
             metaColumn.categoryNames.map((name, i) => {
-                if (i < this.buckets) {
+                if (i < buckets) {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
             });
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);            
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);
@@ -82,10 +92,6 @@ export default class Top extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
-        this.property._postShaderCompile(program);
-        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
-    }
-    _preDraw(program, drawMetadata, gl) {
         this.property._preDraw(program, drawMetadata);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);

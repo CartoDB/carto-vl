@@ -7,9 +7,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -42,11 +42,12 @@
       wwi
     `);
     const s = carto.expressions;
-    const viz = new carto.Viz({
-        width: s.mul(s.blend(1, 2, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
-        color: s.ramp(s.linear(s.clusterAvg(s.prop('temp')), 0, 30), s.palettes.TEALROSE),
-        filter: s.blend(0.005, 1, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic)
-    });
+    const viz = new carto.Viz(`
+      width: zoom() * (torque($day, 140, fade(0.05, 0.2)) + 0.5)
+      color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
+      strokeWidth: 0
+      filter: torque($day, 140, fade(0.05, 0.2)) + 0.05
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
