@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 44);
+/******/ 	return __webpack_require__(__webpack_require__.s = 43);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -488,30 +488,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_between__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_binary__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_blend__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(45);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_constant__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hex__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(46);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(48);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_number__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_property__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__ = __webpack_require__(54);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_time__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_top__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_torque__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_torque__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_unary__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_variable__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(60);
@@ -585,7 +585,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * @namespace carto.expressions
  * @api
  */
-
 
 
 
@@ -882,11 +881,17 @@ const property = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_prop
 
 
 
-const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["b" /* Quantiles */](...args);
+const quantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["c" /* Quantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["quantiles"] = quantiles;
 
-const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_quantiles__["a" /* GlobalQuantiles */](...args);
+const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["b" /* GlobalQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalQuantiles"] = globalQuantiles;
+
+const globalEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["a" /* GlobalEqIntervals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["globalEqIntervals"] = globalEqIntervals;
+
+const viewportEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["d" /* ViewportEqIntervals */](...args);
+/* harmony export (immutable) */ __webpack_exports__["viewportEqIntervals"] = viewportEqIntervals;
 
 
 const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__["a" /* default */](...args);
@@ -2431,9 +2436,9 @@ class Width extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -3207,7 +3212,7 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return palettes; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(50);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
@@ -4331,188 +4336,6 @@ class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(7);
-
-
-
-
-
-
-let quantilesUID = 0;
-
-/**
- * Generate quantiles of size `n` from the features on the viewport.
- *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
- * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
- *
- * @example <caption>Use quantiles to define a color ramp.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
- * });
- *
- * @example <caption>Use quantiles to define a color ramp. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp(quantiles($density, 5), PRISM)
- * `);
- *
- * @memberof carto.expressions
- * @name quantiles
- * @function
- * @api
- */
-const Quantiles = genQuantiles(false);
-/* harmony export (immutable) */ __webpack_exports__["b"] = Quantiles;
-
-
-/**
- * Generate quantiles of size `n` from all the features.
- *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
- * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
- *
- * @example <caption>Use global quantiles to define a color ramp.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
- * });
- *
- * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp(globalQuantiles($density, 5), PRISM)
- * `);
- *
- * @memberof carto.expressions
- * @name globalQuantiles
- * @function
- * @api
- */
-const GlobalQuantiles = genQuantiles(true);
-/* harmony export (immutable) */ __webpack_exports__["a"] = GlobalQuantiles;
-
-
-function genQuantiles(global) {
-    return class Quantiles extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-        constructor(input, buckets) {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
-
-            let children = {
-                input
-            };
-            if (!global) {
-                children._histogram = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["viewportHistogram"])(input);
-            }
-            let breakpoints = [];
-            for (let i = 0; i < buckets - 1; i++) {
-                children[`arg${i}`] = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(i * 10);
-                breakpoints.push(children[`arg${i}`]);
-            }
-            super(children);
-            this.quantilesUID = quantilesUID++;
-            this.numCategories = buckets;
-            this.buckets = buckets;
-            this.breakpoints = breakpoints;
-            this.type = 'category';
-        }
-        eval(feature) {
-            const input = this.input.eval(feature);
-            const q = this.breakpoints.findIndex(br => input <= br);
-            return q;
-        }
-        getBreakpointList() {
-            this._genBreakpoints();
-            return this.breakpoints.map(br => br.expr);
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('quantiles', 'input', 0, 'number', this.input);
-            if (global) {
-                const copy = metadata.sample.map(s => s[this.input.name]);
-                copy.sort((x, y) => x - y);
-                this.breakpoints.map((breakpoint, index) => {
-                    const p = (index + 1) / this.buckets;
-                    breakpoint.expr = copy[Math.floor(p * copy.length)];
-                });
-            }
-        }
-        _applyToShaderSource(getGLSLforProperty) {
-            const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-            let childInlines = {};
-            childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-            const funcName = `quantiles${this.quantilesUID}`;
-            const elif = (_, index) =>
-                `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-            return ${index.toFixed(2)};
-        }`;
-            const funcBody = this.breakpoints.map(elif).join('');
-            const preface = `float ${funcName}(float x){
-        ${funcBody}
-        return ${this.breakpoints.length.toFixed(1)};
-    }`;
-            return {
-                preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
-                inline: `${funcName}(${childInlines.input})`
-            };
-        }
-        _genBreakpoints() {
-            if (!global) {
-                const hist = this._histogram.eval();
-
-                const histogramBuckets = hist.length;
-                const min = hist[0].x[0];
-                const max = hist[histogramBuckets - 1].x[1];
-
-                let prev = 0;
-                const accumHistogram = hist.map(({ y }) => {
-                    prev += y;
-                    return prev;
-                });
-
-
-                let i = 0;
-                const total = accumHistogram[histogramBuckets - 1];
-                let brs = [];
-                // TODO OPT: this could be faster with binary search
-                this.breakpoints.map((breakpoint, index) => {
-                    for (i; i < histogramBuckets; i++) {
-                        if (accumHistogram[i] > (index + 1) / this.buckets * total) {
-                            break;
-                        }
-                    }
-                    const percentileValue = i / histogramBuckets * (max - min) + min;
-                    brs.push(percentileValue);
-                    breakpoint.expr = percentileValue;
-                });
-            }
-        }
-        _preDraw(program, drawMetadata, gl) {
-            this._genBreakpoints();
-            super._preDraw(program, drawMetadata, gl);
-        }
-        _getColumnName() {
-            if (this.input.aggName) {
-                // Property has aggregation
-                return __WEBPACK_IMPORTED_MODULE_4__schema__["column"].aggColumn(this.input.name, this.input.aggName);
-            }
-            return this.input.name;
-        }
-    };
-}
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
 
@@ -4615,7 +4438,7 @@ function genRGB(name, alpha) {
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4779,7 +4602,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4954,7 +4777,7 @@ const styler = {
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5381,7 +5204,7 @@ function pointInCircle(p, center, scale) {
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5444,15 +5267,15 @@ class Metadata {
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(77);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(38);
 
 
 
@@ -5516,7 +5339,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -5706,13 +5529,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(37);
+var VectorTileFeature = __webpack_require__(36);
 
 module.exports = VectorTileLayer;
 
@@ -5774,7 +5597,7 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6014,7 +5837,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6104,7 +5927,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6172,15 +5995,15 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(95);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(96);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
@@ -6594,16 +6417,16 @@ class Layer {
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_shader_compiler__ = __webpack_require__(93);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
@@ -7122,7 +6945,7 @@ function _markDefault(expression) {
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7402,7 +7225,7 @@ function cleanComments(str) {
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7543,7 +7366,7 @@ class Map {
 
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7553,11 +7376,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(64);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(76);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(92);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(98);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
@@ -7603,7 +7426,7 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7770,7 +7593,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7882,7 +7705,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7969,7 +7792,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8038,7 +7861,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8095,7 +7918,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8161,14 +7984,14 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(52);
+module.exports = __webpack_require__(51);
 
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -10021,7 +9844,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(53);
+var colorbrewer = __webpack_require__(52);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -10054,14 +9877,14 @@ if (true) {
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(54);
+module.exports = __webpack_require__(53);
 
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -10383,6 +10206,296 @@ if (true) {
 }
 
 }();
+
+
+/***/ }),
+/* 54 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(7);
+
+
+
+
+
+
+let classifierUID = 0;
+
+
+class Classifier extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+    constructor(children, buckets) {
+        let breakpoints = [];
+        for (let i = 0; i < buckets - 1; i++) {
+            children[`arg${i}`] = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0);
+            breakpoints.push(children[`arg${i}`]);
+        }
+        super(children);
+        this.classifierUID = classifierUID++;
+        this.numCategories = buckets;
+        this.buckets = buckets;
+        this.breakpoints = breakpoints;
+        this.type = 'category';
+    }
+    eval(feature) {
+        const input = this.input.eval(feature);
+        const q = this.breakpoints.findIndex(br => input <= br);
+        return q;
+    }
+    _genBreakpoints() {
+    }
+    getBreakpointList() {
+        this._genBreakpoints();
+        return this.breakpoints.map(br => br.expr);
+    }
+    _applyToShaderSource(getGLSLforProperty) {
+        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
+        let childInlines = {};
+        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        const funcName = `classifier${this.classifierUID}`;
+        const elif = (_, index) =>
+            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
+        return ${index.toFixed(2)};
+    }`;
+        const funcBody = this.breakpoints.map(elif).join('');
+        const preface = `float ${funcName}(float x){
+    ${funcBody}
+    return ${this.breakpoints.length.toFixed(1)};
+}`;
+        return {
+            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
+            inline: `${funcName}(${childInlines.input})`
+        };
+    }
+    _preDraw(program, drawMetadata, gl) {
+        this._genBreakpoints();
+        // TODO
+        super._preDraw(program, drawMetadata, gl);
+    }
+    _getColumnName() {
+        if (this.input.aggName) {
+            // Property has aggregation
+            return __WEBPACK_IMPORTED_MODULE_4__schema__["column"].aggColumn(this.input.name, this.input.aggName);
+        }
+        return this.input.name;
+    }
+}
+
+
+/**
+ * Generate quantiles of size `n` from the features on the viewport.
+ *
+ * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {number} n - Number of buckets to be returned
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use quantiles to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(quantiles($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name quantiles
+ * @function
+ * @api
+ */
+class Quantiles extends Classifier {
+    constructor(input, buckets) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('quantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('quantiles', 'buckets', 1, buckets);
+
+        let children = {
+            input
+        };
+        children._histogram = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["viewportHistogram"])(input);
+        super(children, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('quantiles', 'input', 0, 'number', this.input);
+    }
+    _genBreakpoints() {
+        const hist = this._histogram.eval();
+
+        const histogramBuckets = hist.length;
+        const min = hist[0].x[0];
+        const max = hist[histogramBuckets - 1].x[1];
+
+        let prev = 0;
+        const accumHistogram = hist.map(({ y }) => {
+            prev += y;
+            return prev;
+        });
+
+        let i = 0;
+        const total = accumHistogram[histogramBuckets - 1];
+        let brs = [];
+        // TODO OPT: this could be faster with binary search
+        this.breakpoints.map((breakpoint, index) => {
+            for (i; i < histogramBuckets; i++) {
+                if (accumHistogram[i] > (index + 1) / this.buckets * total) {
+                    break;
+                }
+            }
+            const percentileValue = i / histogramBuckets * (max - min) + min;
+            brs.push(percentileValue);
+            breakpoint.expr = percentileValue;
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["c"] = Quantiles;
+
+
+/**
+ * Generate quantiles of size `n` from all the features.
+ *
+ * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {number} n - Number of buckets to be returned
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use global quantiles to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalQuantiles($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalQuantiles
+ * @function
+ * @api
+ */
+class GlobalQuantiles extends Classifier {
+    constructor(input, buckets) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('globalQuantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('globalQuantiles', 'buckets', 1, buckets);
+        super({ input }, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('globalQuantiles', 'input', 0, 'number', this.input);
+        const copy = metadata.sample.map(s => s[this.input.name]);
+        copy.sort((x, y) => x - y);
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = copy[Math.floor(p * copy.length)];
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = GlobalQuantiles;
+
+
+/**
+ * Classify input in `n` buckets using global equal intervals.
+ *
+ * Global classifiers will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ *
+ * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use global equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use global equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalEqIntervals
+ * @function
+ * @api
+ */
+class GlobalEqIntervals extends Classifier {
+    constructor(input, buckets) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('globalEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('globalEqIntervals', 'buckets', 1, buckets);
+        super({ input }, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('globalEqIntervals', 'input', 0, 'number', this.input);
+        const { min, max } = metadata.columns.find(c => c.name == this.input.name);
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = GlobalEqIntervals;
+
+
+/**
+ * Classify input in `n` buckets using viewport equal intervals.
+ *
+ * Viewport classifiers will classify the input based on the filtered dataset filtering by viewport and by `filter`.
+ *
+ * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {carto.expressions.Base}
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.viewportEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(viewportEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportEqIntervals
+ * @function
+ * @api
+ */
+class ViewportEqIntervals extends Classifier {
+    constructor(input, buckets) {
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('viewportEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('viewportEqIntervals', 'buckets', 1, buckets);
+        let children = {
+            input
+        };
+        children._min = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["viewportMin"])(input);
+        children._max = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["viewportMax"])(input);
+        super(children, buckets);
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('viewportEqIntervals', 'input', 0, 'number', this.input);
+    }
+    _genBreakpoints() {
+        const min = this._min.eval();
+        const max = this._max.eval();
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["d"] = ViewportEqIntervals;
+
 
 
 /***/ }),
@@ -11775,7 +11888,7 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(32);
 
 
 
@@ -13726,7 +13839,7 @@ const validation = {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -13804,7 +13917,7 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(78);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(80);
@@ -13812,7 +13925,7 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(32);
 
 
 
@@ -15762,7 +15875,7 @@ if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = __webpack_require__(82)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(35)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)))
 
 /***/ }),
 /* 82 */
@@ -16474,7 +16587,7 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(84), __webpack_require__(35)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(84), __webpack_require__(34)))
 
 /***/ }),
 /* 84 */
@@ -17423,8 +17536,8 @@ function getAggregationFilters(filtering) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports.VectorTile = __webpack_require__(90);
-module.exports.VectorTileFeature = __webpack_require__(37);
-module.exports.VectorTileLayer = __webpack_require__(36);
+module.exports.VectorTileFeature = __webpack_require__(36);
+module.exports.VectorTileLayer = __webpack_require__(35);
 
 
 /***/ }),
@@ -17434,7 +17547,7 @@ module.exports.VectorTileLayer = __webpack_require__(36);
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(36);
+var VectorTileLayer = __webpack_require__(35);
 
 module.exports = VectorTile;
 
@@ -17776,7 +17889,7 @@ Point.convert = function (a) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -18780,7 +18893,7 @@ class MGLIntegrator {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__viz_parser__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__viz_parser__ = __webpack_require__(41);
 
 
 
@@ -18922,7 +19035,7 @@ class RenderLayer {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(12);
 

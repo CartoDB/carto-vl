@@ -4793,6 +4793,194 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".globalEqIntervals"><span class="type-signature">(static) </span>globalEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Classify input in <code>n</code> buckets using global equal intervals.</p>
+<p>Global classifiers will classify the input based on the entire dataset without filtering by viewport or by <code>filter</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The input expression to classify</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number of buckets</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use global equal intervals to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.globalEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+});</code></pre>
+
+        <p class="code-caption">Use global equal intervals to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(globalEqIntervals($density, 5), PRISM)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".globalMax"><span class="type-signature">(static) </span>globalMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
@@ -13400,6 +13588,194 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".viewportEqIntervals"><span class="type-signature">(static) </span>viewportEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Classify input in <code>n</code> buckets using viewport equal intervals.</p>
+<p>Viewport classifiers will classify the input based on the filtered dataset filtering by viewport and by <code>filter</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The input expression to classify</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number of buckets</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use viewport equal intervals to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.viewportEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+});</code></pre>
+
+        <p class="code-caption">Use viewport equal intervals to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(viewportEqIntervals($density, 5), PRISM)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".viewportMax"><span class="type-signature">(static) </span>viewportMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
     
 
@@ -14538,7 +14914,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 11 2018 16:14:04 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 10:57:52 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
