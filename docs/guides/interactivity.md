@@ -224,7 +224,7 @@ interactivity.on('featureClick', featureEvent => {
 ## Popups
 
 <details>
-  <summary>Full code</summary>
+  > <summary>Full code</summary>
 
 ```html
 <!DOCTYPE html>
@@ -294,6 +294,18 @@ interactivity.on('featureClick', featureEvent => {
 ```
 </details>
 
+Following the previous example, we create a layer to show the `populated_places` dataset with a variable for the `name`.
+
+```js
+const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+const viz = new carto.Viz(`
+    @name: $name
+    width: 20
+`);
+const layer = new carto.Layer('layer', source, viz);
+```
+
+
 Since we are using `mapbox.gl` to draw the basemap, we can use the [popup](https://www.mapbox.com/mapbox-gl-js/api#popup) object with our interactivity API.
 
 All we need is to create a `popup` element in the callback of the `featureClick` event in our Interactivity object extracting the desired
@@ -301,20 +313,10 @@ fields from the `featureEvent`.
 
 
 ```js
-// Create layer as usual
-const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-const viz = new carto.Viz(`
-    @name: $name
-    width: 20
-`);
-const layer = new carto.Layer('layer', source, viz);
-// Create an interactivity object for the layer
 const interactivity = new carto.Interactivity(layer);
-// Setup a callback for the featureClick event
 interactivity.on('featureClick', featureEvent => {
     const coords = featureEvent.coordinates;
     const feature = featureEvent.features[0];
-    // Create a mapbox.gl popup and add it to the map
     new mapboxgl.Popup()
         .setLngLat([coords.lng, coords.lat])
         .setHTML(`<h1>${feature.variables.name.value}</h1>`)
