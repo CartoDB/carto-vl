@@ -128,8 +128,8 @@ interactivity.on('featureLeave', featureEvent => {
 
 ## Variables
 
-The [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent) object has a special field called `variables`. This field
-is used to get the values from the dataset.
+The [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent) object has a special field called `variables`, this field
+is used to get the values of the properties.
 
 Initially this field will be empty and only variables present in the [Viz object](https://carto.com/developers/carto-vl/reference/#vizspec) will appear.
 
@@ -199,6 +199,8 @@ Initially this field will be empty and only variables present in the [Viz object
 
 We want to display the city name when the user clicks on a feature, as usual we create a layer but this time we declare the `@name` variable
 in the `Viz` object.
+
+> The `ne_10m_populated_places_simple` dataset has a column called `name`. We reference this column using the dolar sign.
 
 ```js
 const source = new carto.source.Dataset('ne_10m_populated_places_simple');
