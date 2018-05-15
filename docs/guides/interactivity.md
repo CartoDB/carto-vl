@@ -224,7 +224,7 @@ interactivity.on('featureClick', featureEvent => {
 ## Popups
 
 <details>
-  > <summary>Full code</summary>
+  <summary>Full code</summary>
 
 ```html
 <!DOCTYPE html>
