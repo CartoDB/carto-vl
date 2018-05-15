@@ -1,5 +1,5 @@
 # Interactivity
-With CARTO VL users can interact with the map in multiple ways. Thanks to vector technology, animations can be created when the user clicks, moves or interacts in different ways with the map.
+With CARTO VL users can interact with the map in multiple ways. Thanks to vector technology animations can be created when the user clicks, moves or interacts with the map in multiple ways.
 
 In this guide we will cover the basic aspects of user interaction.
 
@@ -14,10 +14,10 @@ The following events are availiable:
 - `featureClick`: Fired when the user clicks on features.
 - `featureClickOut`: Fired when the user clicks outside a feature that was clicked in the last featureClick event.
 - `featureHover`: Fired when the user moves the cursor over a feature.
-- `featureEnter`: Fired the first time the user moves the cursor over a feature.
+- `featureEnter`: Fired the first time the user moves the cursor inside a feature.
 - `featureLeave`: Fired the first time the user moves the cursor outside a feature.
 
-For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interacitivty in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer).
+For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interacitivty in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer). And setup a callback for the `featureClick` event.
 
 
 ```js
@@ -25,7 +25,7 @@ const interactivity = new carto.Interactivity(layer);
 interactivity.on('featureClick', featureEvent => alert('Feature clicked'));
 ```
 
-The [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent) is an object that has the `position` and `coordinates` where the 
+This callback will be called with a single parameter of type [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent). This object will have the `position` and `coordinates` where the 
 event happened and the list of [Features](https://carto.com/developers/carto-vl/reference/#feature) that have been interacted.
 
 ## Example: change the color on feature enter
