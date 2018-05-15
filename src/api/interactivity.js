@@ -30,18 +30,6 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- *
- * FeatureVizProperty objects can be accessed through {@link Feature} objects.
- *
- * @typedef {object} FeatureVizProperty
- * @property {function} blendTo - Change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
- * @property {function} reset - Reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
- * @property {function} value - Getter that evaluates the property and returns the computed value
- * @api
- */
-
-
-/**
  * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
  *
  * @event featureClick

@@ -1,6 +1,4 @@
-import { blend, property, animate, notEquals } from './viz/functions';
-import { parseVizExpression } from './viz/parser';
-
+import { generateResetFunction, VizProperty } from './vizProperty';
 export default class RenderLayer {
     constructor() {
         this.dataframes = [];
@@ -48,79 +46,34 @@ export default class RenderLayer {
             return [];
         }
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(feature => {
-
-            const genReset = vizProperty =>
-                (duration = 500) => {
-                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
-                        this.customizedFeatures[feature.id][vizProperty].replaceChild(
-                            this.customizedFeatures[feature.id][vizProperty].mix,
-                            // animate(0) is used to ensure that blend._predraw() "GC" collects it
-                            blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
-                        );
-                        this.viz[vizProperty].notify();
-                        this.customizedFeatures[feature.id][vizProperty] = undefined;
-                    }
-                };
-
-            const genVizProperty = vizProperty => {
-                const blender = (newExpression, duration = 500) => {
-                    if (typeof newExpression == 'string') {
-                        newExpression = parseVizExpression(newExpression);
-                    }
-                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
-                        this.customizedFeatures[feature.id][vizProperty].a.blendTo(newExpression, duration);
-                        return;
-                    }
-                    const blendExpr = blend(
-                        newExpression,
-                        this.viz[vizProperty],
-                        blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
-                    );
-                    this.trackFeatureViz(feature.id, vizProperty, blendExpr);
-                    this.viz.replaceChild(
-                        this.viz[vizProperty],
-                        blendExpr,
-                    );
-                    this.viz[vizProperty].notify();
-                };
-                const self = this;
-                const properties = feature.properties;
-                return {
-                    get value() {
-                        return self.viz[vizProperty].eval(properties);
-                    },
-                    blendTo: blender,
-                    reset: genReset(vizProperty)
-                };
-            };
             const variables = {};
             Object.keys(this.viz.variables).map(varName => {
-                variables[varName] = genVizProperty('__cartovl_variable_' + varName);
+                variables[varName] = new VizProperty(`__cartovl_variable_${varName}`, feature, this.viz, this.customizedFeatures, this.trackFeatureViz);
             });
 
             return {
                 id: feature.id,
-                color: genVizProperty('color'),
-                width: genVizProperty('width'),
-                strokeColor: genVizProperty('strokeColor'),
-                strokeWidth: genVizProperty('strokeWidth'),
+                color: new VizProperty('color', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
+                width: new VizProperty('width', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
+                strokeColor: new VizProperty('strokeColor', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
+                strokeWidth: new VizProperty('strokeWidth', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
                 variables,
                 reset: (duration = 500) => {
-                    genReset('color')(duration);
-                    genReset('width')(duration);
-                    genReset('strokeColor')(duration);
-                    genReset('strokeWidth')(duration);
+                    generateResetFunction('color', feature, this.customizedFeatures, this.viz)(duration);
+                    generateResetFunction('width', feature, this.customizedFeatures, this.viz)(duration);
+                    generateResetFunction('strokeColor', feature, this.customizedFeatures, this.viz)(duration);
+                    generateResetFunction('strokeWidth', feature, this.customizedFeatures, this.viz)(duration);
                     Object.keys(this.viz.variables).map(varName => {
-                        variables[varName] = genReset('__cartovl_variable_' + varName)(duration);
+                        variables[varName] = generateResetFunction(`__cartovl_variable_${varName}`, feature, this.customizedFeatures, this.viz)(duration);
                     });
                 }
             };
         });
     }
 
-    trackFeatureViz(featureID, vizProperty, newViz) {
-        this.customizedFeatures[featureID] = this.customizedFeatures[featureID] || {};
-        this.customizedFeatures[featureID][vizProperty] = newViz;
+    trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {
+        customizedFeatures[featureID] = customizedFeatures[featureID] || {};
+        customizedFeatures[featureID][vizProperty] = newViz;
     }
 
     freeDataframes() {
