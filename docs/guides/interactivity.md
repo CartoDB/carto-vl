@@ -38,7 +38,7 @@ event happened and the list of [Features](https://carto.com/developers/carto-vl/
 <html>
 
 <head>
-    <title>Single layer | CARTO</title>
+    <title>Change color on feature enter | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
@@ -143,7 +143,7 @@ Initially this field will be empty and only variables present in the [Viz object
 <html>
 
 <head>
-    <title>Single layer | CARTO</title>
+    <title>Variables | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
@@ -217,5 +217,107 @@ to show the name of the clicked city.
 const interactivity = new carto.Interactivity(layer);
 interactivity.on('featureClick', featureEvent => {
     alert(featureEvent.features[0].variables.name.value)
+});
+```
+
+
+## Popups
+
+<details>
+  <summary>Full code</summary>
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Popups | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            center: [-2, 40],
+            zoom: 5,
+            dragRotate: false
+        });
+
+        carto.setDefaultAuth({
+            user: 'cartogl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+        const viz = new carto.Viz(`
+            @name: $name
+            width: 20
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        const interactivity = new carto.Interactivity(layer);
+        interactivity.on('featureClick', featureEvent => {
+            const coords = featureEvent.coordinates;
+            const feature = featureEvent.features[0];
+            if (!feature) {
+                return;
+            }
+            new mapboxgl.Popup()
+                .setLngLat([coords.lng, coords.lat])
+                .setHTML(`<h1>${feature.variables.name.value}</h1>`)
+                .addTo(map);
+        });
+
+        layer.addTo(map);
+    </script>
+</body>
+
+</html>
+
+```
+</details>
+
+Since we are using `mapbox.gl` to draw the basemap, we can use the [popup](https://www.mapbox.com/mapbox-gl-js/api#popup) object with our interactivity API.
+
+All we need is to create a `popup` element in the callback of the `featureClick` event in our Interactivity object extracting the desired
+fields from the `featureEvent`.
+
+
+```js
+// Create layer as usual
+const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+const viz = new carto.Viz(`
+    @name: $name
+    width: 20
+`);
+const layer = new carto.Layer('layer', source, viz);
+// Create an interactivity object for the layer
+const interactivity = new carto.Interactivity(layer);
+// Setup a callback for the featureClick event
+interactivity.on('featureClick', featureEvent => {
+    const coords = featureEvent.coordinates;
+    const feature = featureEvent.features[0];
+    // Create a mapbox.gl popup and add it to the map
+    new mapboxgl.Popup()
+        .setLngLat([coords.lng, coords.lat])
+        .setHTML(`<h1>${feature.variables.name.value}</h1>`)
+        .addTo(map);
 });
 ```
