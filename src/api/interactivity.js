@@ -15,21 +15,6 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- *
- * Feature objects are provided by {@link FeatureEvent} events.
- *
- * @typedef {object} Feature
- * @property {number} id - Unique identification code
- * @property {FeatureVizProperty} color
- * @property {FeatureVizProperty} width
- * @property {FeatureVizProperty} colorStroke
- * @property {FeatureVizProperty} widthStroke
- * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
- * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
- * @api
- */
-
-/**
  * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
  *
  * @event featureClick

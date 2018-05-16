@@ -1,4 +1,5 @@
-import { generateResetFunction, VizProperty } from './vizProperty';
+import Feature from '../api/feature';
+
 export default class RenderLayer {
     constructor() {
         this.dataframes = [];
@@ -45,30 +46,14 @@ export default class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(feature => {
-            const variables = {};
-            Object.keys(this.viz.variables).map(varName => {
-                variables[varName] = new VizProperty(`__cartovl_variable_${varName}`, feature, this.viz, this.customizedFeatures, this.trackFeatureViz);
-            });
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
+    }
 
-            return {
-                id: feature.id,
-                color: new VizProperty('color', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
-                width: new VizProperty('width', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
-                strokeColor: new VizProperty('strokeColor', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
-                strokeWidth: new VizProperty('strokeWidth', feature, this.viz, this.customizedFeatures, this.trackFeatureViz),
-                variables,
-                reset: (duration = 500) => {
-                    generateResetFunction('color', feature, this.customizedFeatures, this.viz)(duration);
-                    generateResetFunction('width', feature, this.customizedFeatures, this.viz)(duration);
-                    generateResetFunction('strokeColor', feature, this.customizedFeatures, this.viz)(duration);
-                    generateResetFunction('strokeWidth', feature, this.customizedFeatures, this.viz)(duration);
-                    Object.keys(this.viz.variables).map(varName => {
-                        variables[varName] = generateResetFunction(`__cartovl_variable_${varName}`, feature, this.customizedFeatures, this.viz)(duration);
-                    });
-                }
-            };
-        });
+    /**
+     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
+     */
+    _generateApiFeature(rawFeature) {
+        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz);
     }
 
     trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {

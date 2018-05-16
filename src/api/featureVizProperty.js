@@ -1,5 +1,5 @@
-import { blend, property, animate, notEquals } from './viz/functions';
-import { parseVizExpression } from './viz/parser';
+import { blend, property, animate, notEquals } from '../core/viz/functions';
+import { parseVizExpression } from '../core/viz/parser';
 
 /**
  *
@@ -11,7 +11,7 @@ import { parseVizExpression } from './viz/parser';
  * @property {function} value - Getter that evaluates the property and returns the computed value
  * @api
  */
-export class VizProperty {
+export default class FeatureVizProperty {
     get value() {
         return this._viz[this._propertyName].eval(this._properties);
     }
@@ -22,12 +22,12 @@ export class VizProperty {
         this._viz = viz;
         this._properties = this._feature.properties;
 
-        this.blendTo = generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz);
-        this.reset = generateResetFunction(propertyName, feature, customizedFeatures, viz);
+        this.blendTo = _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz);
+        this.reset = _generateResetFunction(propertyName, feature, customizedFeatures, viz);
     }
 }
 
-export function generateResetFunction(propertyName, feature, customizedFeatures, viz) {
+function _generateResetFunction(propertyName, feature, customizedFeatures, viz) {
     return function reset(duration = 500) {
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
             customizedFeatures[feature.id][propertyName].replaceChild(
@@ -42,7 +42,7 @@ export function generateResetFunction(propertyName, feature, customizedFeatures,
 }
 
 
-function generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz) {
+function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz) {
     return function generatedBlendTo(newExpression, duration = 500) {
         if (typeof newExpression == 'string') {
             newExpression = parseVizExpression(newExpression);
