@@ -48,7 +48,7 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
  *
  * @example <caption>Assign the global maximum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_max: globalMax($amount)
+ *   \@g_max: globalMax($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -74,7 +74,7 @@ export const GlobalMax = generateGlobalAggregattion('max');
  *
  * @example <caption>Assign the global minimum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_min: globalMin($amount)
+ *   \@g_min: globalMin($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -100,7 +100,7 @@ export const GlobalMin = generateGlobalAggregattion('min');
  *
  * @example <caption>Assign the global sum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_sum: globalSum($amount)
+ *   \@g_sum: globalSum($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -125,7 +125,7 @@ export const GlobalSum = generateGlobalAggregattion('sum');
  *
  * @example <caption>Assign the global count of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_count: globalCount($amount)
+ *   \@g_count: globalCount($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -186,7 +186,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
  *
  * @example <caption>Assign the global percentile of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @g_percentile: globalPercentile($amount)
+ *   \@g_percentile: globalPercentile($amount)
  * `);
  *
  * @memberof carto.expressions
