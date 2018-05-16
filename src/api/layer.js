@@ -9,6 +9,29 @@ import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
+/**
+ *
+ * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
+ *
+ * @typedef {object} LayerEvent
+ * @api
+ */
+/**
+ * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
+ *
+ * @event loaded
+ * @type {LayerEvent}
+ * @api
+ */
+/**
+ * updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+ * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
+ *
+ * @event updated
+ * @type {LayerEvent}
+ * @api
+ */
+
 export default class Layer {
     /**
     *
@@ -63,7 +86,7 @@ export default class Layer {
     }
 
     /**
-     * Register an event handler for the given type.
+     * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
      *
      * @param {string} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event
