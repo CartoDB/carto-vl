@@ -2,7 +2,7 @@ import * as s from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
-    fdescribe('global filtering', () => {
+    describe('global filtering', () => {
         const fakeMetadata = {
             columns: [{
                 type: 'number',
