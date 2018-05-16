@@ -53,38 +53,72 @@ export default class Viz {
     * @constructor Viz
     * @memberof carto
     * @api
+    *
+    * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
+    * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
+    * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
+    * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
+    * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+    * @property {object} variables - An object describing the variables used.
+    *
     */
     constructor(definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
+
         Object.keys(vizSpec).forEach(property => {
-            if (property == 'resolution') {
-                this._resolution = vizSpec[property];
-            } else if (SUPPORTED_PROPERTIES.includes(property)) {
-                this[property] = vizSpec[property];
-            }
+            this._defineProperty(property, vizSpec[property]);
         });
+        if (!Object.keys(vizSpec).includes('variables')) {
+            this._defineProperty('variables', {});
+        }
 
         this.updated = true;
         this._changeCallback = null;
 
         this._updateRootExpressions();
 
-        Object.keys(this.variables).map(varName => {
-            this['__cartovl_variable_' + varName] = this.variables[varName];
-        });
 
         this._resolveAliases();
         this._validateAliasDAG();
     }
+    _defineProperty(propertyName, propertyValue) {
+        if (SUPPORTED_PROPERTIES.includes(propertyName)) {
+            Object.defineProperty(this, propertyName, {
+                get: () => this['__' + propertyName],
+                set: expr => {
+                    this['__' + propertyName] = expr;
+                    this._changed();
+                },
+            });
 
-    get resolution(){
-        return this._resolution;
-    }
-    set resolution(x){
-        this._resolution = x;
-        this._changed();
+            let p = propertyValue;
+            if (propertyName == 'variables') {
+                let init = false;
+                const handler = {
+                    get: function (obj, prop) {
+                        return obj[prop];
+                    },
+                    set: function (obj, prop, value) {
+                        obj[prop] = value;
+                        this['__cartovl_variable_' + prop] = value;
+                        if (init) {
+                            this._changed();
+                        }
+                        return true;
+                    }
+                };
+                p = new Proxy({}, handler);
+                Object.keys(propertyValue).map(varName => {
+                    p[varName] = propertyValue[varName];
+                });
+                init = true;
+            }
+            this['__' + propertyName] = propertyValue;
+        }
     }
 
     _getRootExpressions() {
@@ -358,14 +392,14 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution - Control the aggregation level
+         * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
+         * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
+         * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
+         * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
+         * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
-         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
-         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
-         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
-         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
-         * @property {carto.expressions.Base} order - Define how the elements will be stacked
-         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 
