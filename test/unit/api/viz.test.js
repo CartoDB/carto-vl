@@ -262,4 +262,31 @@ describe('api/viz', () => {
             `)).toThrowError('Viz contains a circular dependency');
         });
     });
+
+    fdescribe('variables', () => {
+        it('should work with numbers', () => {
+            const viz = new Viz('@a: 1');
+            expect(viz.variables.a.eval()).toEqual(1);
+        });
+
+        it('should work with numeric expressions', () => {
+            const viz = new Viz('@a: sin(PI / (1 + log(E)))');
+            expect(viz.variables.a.eval()).toEqual(1);
+        });
+
+        it('should work with strings', () => {
+            const viz = new Viz('@a: "Hello"');
+            expect(viz.variables.a.eval()).toEqual('Hello');
+        });
+
+        it('should work with colors', () => {
+            const viz = new Viz('@a: red');
+            expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
+        });
+
+        it('should work with dates', () => {
+            const viz = new Viz('@a: date("2022-03-09T00:00:00Z")');
+            expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
+        });
+    });
 });
