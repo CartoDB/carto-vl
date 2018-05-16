@@ -14,3 +14,4 @@ const layer = new carto.Layer('layer', source, viz);
 layer.addTo(map);
 
 viz.variables.oneHundred = 100;
+
