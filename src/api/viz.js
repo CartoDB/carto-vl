@@ -106,103 +106,12 @@ export default class Viz {
         });
     }
 
-    /**
-     * Return the resolution.
-     *
-     * @return {number}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getResolution() {
-        return this.resolution;
-    }
-
-    /**
-     * Return the color expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getColor() {
-        return this.color;
-    }
-
-    /**
-     * Return the width expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getWidth() {
-        return this.width;
-    }
-
-    /**
-     * Return the strokeColor expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeColor() {
-        return this.strokeColor;
-    }
-
-    /**
-     * Return the strokeWidth expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeWidth() {
-        return this.strokeWidth;
-    }
-
-    /**
-     * Return the order expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getOrder() {
-        return this.order;
-    }
-
-    /**
-     * Return the filter expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getFilter() {
-        return this.filter;
-    }
-
     isAnimated() {
-        return this.getColor().isAnimated() ||
-            this.getWidth().isAnimated() ||
-            this.getStrokeColor().isAnimated() ||
-            this.getStrokeWidth().isAnimated() ||
-            this.getFilter().isAnimated();
+        return this.color.isAnimated() ||
+            this.width.isAnimated() ||
+            this.strokeColor.isAnimated() ||
+            this.strokeWidth.isAnimated() ||
+            this.filter.isAnimated();
     }
 
     onChange(callback) {
