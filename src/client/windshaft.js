@@ -173,7 +173,7 @@ export default class Windshaft {
         return choices;
     }
 
-    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }) {
+    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }, overrideMetadata = null) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
         let select = this._buildSelectClause(MNS, choices.castColumns);
@@ -193,7 +193,8 @@ export default class Windshaft {
             aggSQL = this._buildQuery(select, backendFilters);
         }
 
-        const { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
+        metadata = overrideMetadata || metadata;
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
@@ -209,11 +210,11 @@ export default class Windshaft {
         this.resolution = resolution;
     }
 
-    async _instantiate(MNS, resolution, filters, choices) {
+    async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
         }
-        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices);
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices, metadata);
         this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)] = instantiationPromise;
         return instantiationPromise;
     }
@@ -221,9 +222,14 @@ export default class Windshaft {
     async _repeatableInstantiate(MNS, resolution, filters) {
         // TODO: we shouldn't reinstantiate just to not apply backend filters
         // (we'd need to add a choice comparison function argument to repeatablePromise)
+        let finalMetadata = null;
         const initialChoices = this._intantiationChoices(this.metadata);
-        const finalChoices = instantiation => this._intantiationChoices(instantiation.metadata);
-        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices));
+        const finalChoices = instantiation => {
+            // first instantiation metadata is kept
+            finalMetadata = instantiation.metadata;
+            return this._intantiationChoices(instantiation.metadata);
+        };
+        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices, finalMetadata));
     }
 
     _checkLayerMeta(MNS) {
