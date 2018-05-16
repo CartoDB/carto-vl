@@ -6,7 +6,7 @@ import { hexToRgb, checkType, implicitCast, checkExpression } from './utils';
 /**
  * Color palettes.
  *
- * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|cartocolors} easily.
+ * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|CARTOColors} and {@link https://github.com/axismaps/colorbrewer/|ColorBrewer} palettes easily.
  * Use them with a {@link carto.expressions.ramp|ramp}
  *
  * The following palettes are availiable in the namespace {@link carto.expressions.palettes|carto.expressions.palettes}.

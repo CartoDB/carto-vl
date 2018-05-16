@@ -4,10 +4,10 @@ import CartoValidationError from '../error-handling/carto-validation-error';
 let defaultConfig = undefined;
 
 /**
- * Set default configuration parameters: serverURL.
+ * Set default configuration parameters
  *
- * @param {object} options
- * @param {string} [options.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+ * @param {object} config
+ * @param {string} config.serverURL='https://{user}.carto.com' - Template URL of the CARTO Maps API server
  *
  * @memberof carto
  * @api

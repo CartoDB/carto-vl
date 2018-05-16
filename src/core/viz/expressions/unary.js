@@ -4,7 +4,7 @@ import BaseExpression from './base';
 /**
  * Compute the natural logarithm (base e) of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the natural logarithm
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the natural logarithm
  * @return {carto.expressions.Base}
  *
  * @example <caption>Natural Logarithm.</caption>
@@ -28,7 +28,7 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 /**
  * Compute the square root of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the square root
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the square root
  * @return {carto.expressions.Base}
  *
  * @example <caption>Square root.</caption>
@@ -52,7 +52,7 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 /**
  * Compute the sine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the sine in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the sine in radians
  * @return {carto.expressions.Base}
  *
  * @example <caption>Sin.</caption>
@@ -76,10 +76,10 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 /**
  * Compute the cosine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the cosine in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the cosine in radians
  * @return {carto.expressions.Base}
  *
- * @example <caption>Cos</caption>
+ * @example <caption>Cos.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.cos(0)  // 1
@@ -100,7 +100,7 @@ export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 /**
  * Compute the tangent of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the tangent in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the tangent in radians
  * @return {carto.expressions.Base}
  *
  * @example <caption>Tan</caption>
@@ -126,7 +126,7 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
  * This means this function will return 1 if the number is positive, -1 if the number is negative
  * 0 if the number is 0 and -0 if the number is -0.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the sign
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the sign
  * @return {carto.expressions.Base}
  *
  * @example <caption>Sign.</caption>
@@ -150,18 +150,18 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 /**
  * Compute the absolute value of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the absolute value
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the absolute value
  * @return {carto.expressions.Base}
  *
  * @example <caption>Abs.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.abs(100)  // 100
+ *   width: s.abs(-100)  // 100
  * });
  *
  * @example <caption>Abs. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: abs(100)
+ *   width: abs(-100) // 100
  * `);
  *
  * @memberof carto.expressions

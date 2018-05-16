@@ -8,15 +8,15 @@ import { checkLooseType, checkType } from './utils';
  * @param {carto.expressions.Base|number} x - A number to be warped in a numeric expression
  * @return {carto.expressions.Base}
  *
- * @example <caption>Display blue points with opacity.</caption>
+ * @example <caption>Display blue points with 50% opacity.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.opacity(s.rgb(0,0,255), 0.5)  // Equivalent to `s.rgba(0,0,255,0.5)`
  * });
  *
- * @example <caption>Display blue points with opacity. (String)</caption>
+ * @example <caption>Display blue points with 50% opacity. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: opacity(rgb(0,0,255), 0.5)
+ *   color: opacity(rgb(0,0,255), 0.5) // Equivalent to `rgba(0,0,255,0.5)`
  * `);
  *
  * @memberof carto.expressions
