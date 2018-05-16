@@ -554,6 +554,7 @@ export default class Windshaft {
         const columns = Object.keys(stats.columns)
             .map(name => Object.assign({ name }, stats.columns[name]))
             .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
+            .map(col => Object.assign(col, adaptColumnValues(col)))
             .filter(col => ['number', 'date', 'category'].includes(col.type));
         const categoryIDs = {};
         columns.forEach(column => {
@@ -623,6 +624,28 @@ function adaptColumnType(type) {
         return 'category';
     }
     return type;
+}
+
+function adaptColumnValues(column) {
+    let adaptedColumn = { name: column.name, type: column.type };
+    Object.keys(column).forEach(key => {
+        if (!['name', 'type'].includes(key)) {
+            adaptedColumn[key] = adaptColumnValue(column[key], column.type);
+        }
+    });
+    return adaptedColumn;
+}
+
+function adaptColumnValue(value, type) {
+    switch (type) {
+        case 'date':
+            if (Number.isNaN(Date.parse(value))) {
+                throw new Error(`Invalid date: '${value}'`);
+            }
+            return new Date(value);
+        default:
+            return value;
+    }
 }
 
 // generate a promise under certain assumptions/choices; then if the result changes the assumptions,
