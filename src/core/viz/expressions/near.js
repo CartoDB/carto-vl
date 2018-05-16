@@ -23,11 +23,10 @@ import { implicitCast, clamp } from './utils';
  * const viz = new carto.Viz(`
  *   width: near($day, (25 * now()) % 10000, 0, 10)
  * `);
- * 
+ *
  * @memberof carto.expressions
  * @name near
  * @function
- * @api
  */
 // TODO type checking
 export default class Near extends BaseExpression {

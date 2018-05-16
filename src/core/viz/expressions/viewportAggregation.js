@@ -3,12 +3,12 @@ import { number } from '../functions';
 import { implicitCast, clamp } from './utils';
 
 /**
- * Return the average value of the features showed in the viewport.
+ * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the average of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the average of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -16,7 +16,7 @@ import { implicitCast, clamp } from './utils';
  *   }
  * });
  *
- * @example <caption>Assign the average of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the average of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_avg: viewportAvg($amount)
  * `);
@@ -40,12 +40,12 @@ export const ViewportAvg = genViewportAgg('avg',
 );
 
 /**
- * Return the maximum value of the features showed in the viewport.
+ * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -53,7 +53,7 @@ export const ViewportAvg = genViewportAgg('avg',
  *   }
  * });
  *
- * @example <caption>Assign the maximum of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_max: viewportMax($amount)
  * `);
@@ -70,12 +70,12 @@ export const ViewportMax = genViewportAgg('max',
 );
 
 /**
- * Return the minimum value of the features showed in the viewport.
+ * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -83,7 +83,7 @@ export const ViewportMax = genViewportAgg('max',
  *   }
  * });
  *
- * @example <caption>Assign the minimum of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_min: viewportMin($amount)
  * `);
@@ -99,12 +99,12 @@ export const ViewportMin = genViewportAgg('min',
     self => self._value);
 
 /**
- * Return the sum of the values of the features showed in the viewport.
+ * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the sum of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -112,7 +112,7 @@ export const ViewportMin = genViewportAgg('min',
  *   }
  * });
  *
- * @example <caption>Assign the sum of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_sum: viewportSum($amount)
  * `);
@@ -128,12 +128,11 @@ export const ViewportSum = genViewportAgg('sum',
     self => self._value);
 
 /**
- * Return the count of the features showed in the viewport.
+ * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the count of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the feature count in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -141,7 +140,7 @@ export const ViewportSum = genViewportAgg('sum',
  *   }
  * });
  *
- * @example <caption>Assign the count of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the feature count in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_count: viewportSum($amount)
  * `);
@@ -165,7 +164,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
          */
         constructor(property) {
             super({
-                property: implicitCast(property),
+                property: implicitCast(metadataPropertyName == 'count' ? number(0): property),
                 value: number(0)
             });
             this._isViewport = true;
@@ -197,12 +196,12 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
 }
 
 /**
- * Return the percentile of the features showed in the viewport.
+ * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable.</caption>
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -210,7 +209,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
  *   }
  * });
  *
- * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_percentile: viewportPercentile($amount)
  * `);
@@ -295,7 +294,7 @@ export class ViewportPercentile extends BaseExpression {
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
- * @example <caption>Assign the percentile of the `amout` property in the viewport to a variable. (String)</caption>
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
  *   @v_percentile: viewportPercentile($amount)
  * `);
