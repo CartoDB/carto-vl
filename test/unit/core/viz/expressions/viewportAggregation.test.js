@@ -1,6 +1,6 @@
 import * as s from '../../../../../src/core/viz/functions';
 
-fdescribe('src/core/viz/expressions/viewportAggregation', () => {
+describe('src/core/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
     const $cat = s.property('cat');
     describe('viewport filtering', () => {
