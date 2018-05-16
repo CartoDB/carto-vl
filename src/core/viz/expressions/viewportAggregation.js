@@ -164,11 +164,16 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
          */
         constructor(property) {
             super({
-                property: implicitCast(metadataPropertyName == 'count' ? number(0): property),
-                value: number(0)
+                property: implicitCast(metadataPropertyName == 'count' ? number(0) : property),
+                _value: number(0)
             });
             this._isViewport = true;
         }
+
+        get value() {
+            return resolveFn(this);
+        }
+
         eval() {
             return resolveFn(this);
         }
@@ -189,7 +194,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             accumFn(this, this.property.eval(feature));
         }
         _preDraw(...args) {
-            this.value.expr = this.eval();
+            this._value.expr = this.eval();
             super._preDraw(...args);
         }
     };
@@ -231,6 +236,11 @@ export class ViewportPercentile extends BaseExpression {
         });
         this._isViewport = true;
     }
+
+    get value() {
+        return this.eval();
+    }
+
     eval(f) {
         if (this._value == null) {
             this._array.sort((a, b) => a - b);
@@ -241,6 +251,7 @@ export class ViewportPercentile extends BaseExpression {
         }
         return this._value;
     }
+    
     _compile(metadata) {
         super._compile(metadata);
         // TODO improve type check
@@ -319,7 +330,7 @@ export class ViewportHistogram extends BaseExpression {
         const count = this._histogram.get(x) || 0;
         this._histogram.set(x, count + weight);
     }
-    eval() {
+    get value() {
         if (this._cached == null) {
             if (!this._histogram) {
                 return null;
