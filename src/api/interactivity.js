@@ -15,33 +15,6 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- *
- * Feature objects are provided by {@link FeatureEvent} events.
- *
- * @typedef {object} Feature
- * @property {number} id - Unique identification code
- * @property {FeatureVizProperty} color
- * @property {FeatureVizProperty} width
- * @property {FeatureVizProperty} colorStroke
- * @property {FeatureVizProperty} widthStroke
- * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
- * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
- * @api
- */
-
-/**
- *
- * FeatureVizProperty objects can be accessed through {@link Feature} objects.
- *
- * @typedef {object} FeatureVizProperty
- * @property {function} blendTo - Change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
- * @property {function} reset - Reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
- * @property {function} value - Getter that evaluates the property and returns the computed value
- * @api
- */
-
-
-/**
  * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
  *
  * @event featureClick
@@ -99,6 +72,7 @@ export default class Interactivity {
     *
     * To create a Interactivity object an array of {@link carto.Layer} is required.
     * Events fired from interactivity objects will refer to the features of these layers and only these layers.
+    * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     *
@@ -162,7 +136,7 @@ export default class Interactivity {
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
-        Promise.all(layerList.map(layer => layer._context)).then(() => {
+        return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         });

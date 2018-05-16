@@ -463,7 +463,6 @@ export default class Windshaft {
                     clipping = clipping | 1;
                 } else if (x < 0) {
                     clipping = clipping | 2;
-
                 }
                 if (y > mvt_extent) {
                     clipping = clipping | 4;
@@ -474,8 +473,8 @@ export default class Windshaft {
                     polygon.clipped.push(polygon.flat.length);
                     polygon.clippedType.push(clipping);
                 }
-                polygon.flat.push(2 * x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
+                polygon.flat.push(2 * x / mvt_extent - 1);
+                polygon.flat.push(2 * (1 - y / mvt_extent) - 1);
             }
         }
         //if current polygon is not empty=> push it

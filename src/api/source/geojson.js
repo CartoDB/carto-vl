@@ -340,7 +340,8 @@ export default class GeoJSON extends Base {
     _computePolygonGeometry(data) {
         let polygon = {
             flat: [],
-            holes: []
+            holes: [],
+            clipped: []
         };
         let holeIndex = 0;
         for (let i = 0; i < data.length; i++) {

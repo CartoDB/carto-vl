@@ -5,8 +5,8 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from './util
  * Evaluates to a CIELab color.
  *
  * @param {carto.expressions.Base|number} l - The lightness of the color
- * @param {carto.expressions.Base|number} a - The color component green–red
- * @param {carto.expressions.Base|number} b - The color component blue–yellow
+ * @param {carto.expressions.Base|number} a - The green–red color component
+ * @param {carto.expressions.Base|number} b - The blue–yellow color component
  * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
