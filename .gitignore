@@ -10,7 +10,3 @@ dist/
 docs/all
 docs/public
 node_modules/
-
-examples/misc/geojson-viewer.html
-
-examples/misc/populated-places.html
