@@ -142,5 +142,11 @@ void main(void) {
 
     c=s+(1.-s.a)*c;
 
+    float size = 1.0/dp;
+    float l = length(p);
+    if (size > 126. && c.a==0.0){
+        c = vec4(mod(l, 0.1)>0.05? 1.:0., 0.,0., 0.05/(l-1.));
+    }
+
     gl_FragColor = c;
 }`;
