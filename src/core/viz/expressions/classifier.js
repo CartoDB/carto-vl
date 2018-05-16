@@ -75,15 +75,15 @@ class Classifier extends BaseExpression {
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example <caption>Use quantiles to define a color ramp.</caption>
+ * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
+ *   color: s.ramp(s.viewportQuantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
  *
- * @example <caption>Use quantiles to define a color ramp. (String)</caption>
+ * @example <caption>Use viewportQuantiles to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(quantiles($density, 5), PRISM)
+ *   color: ramp(viewportQuantiles($density, 5), PRISM)
  * `);
  *
  * @memberof carto.expressions
@@ -91,10 +91,10 @@ class Classifier extends BaseExpression {
  * @function
  * @api
  */
-export class Quantiles extends Classifier {
+export class ViewportQuantiles extends Classifier {
     constructor(input, buckets) {
-        checkInstance('quantiles', 'input', 0, Property, input && (input.property || input));
-        checkNumber('quantiles', 'buckets', 1, buckets);
+        checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
+        checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
         let children = {
             input
@@ -104,7 +104,7 @@ export class Quantiles extends Classifier {
     }
     _compile(metadata) {
         super._compile(metadata);
-        checkType('quantiles', 'input', 0, 'number', this.input);
+        checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
         const hist = this._histogram.eval();
