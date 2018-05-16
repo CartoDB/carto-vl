@@ -313,8 +313,8 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
+ * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
  * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
@@ -344,8 +344,8 @@ export const Equals = genBinaryOp('equals',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
+ * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
  * @return {carto.expressions.Base} Numeric expression
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>

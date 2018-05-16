@@ -6,7 +6,7 @@ import Property from './property';
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create an animated FadeIn/FadeOut configuration.
+ * Create a FadeIn/FadeOut configuration. See `torque` for more details.
  *
  * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
  * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
@@ -71,7 +71,7 @@ export class Fade extends BaseExpression {
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
  * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
- * @return {carto.expressions.Base}
+ * @return {carto.expressions.Torque}
  *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
@@ -87,11 +87,36 @@ export class Fade extends BaseExpression {
  *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
  *
+ * @example <caption>Using the `getSimTime` method to get the simulated time.</caption>
+ * const s = carto.expressions;
+ * let torqueExpr = s.torque(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+ * const torqueStyle = {
+ *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
+ *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
+ *   filter: torqueExpr
+ * };
+ * layer.on('updated', () => {
+ *   let currTime = Math.floor(torqueExpr.getSimTime());
+ *   document.getElementById('timestamp').innerHTML = currTime;
+ * });
+ *
  * @memberof carto.expressions
  * @name torque
  * @function
  * @api
 */
+/**
+ * Torque class
+ *
+ * This class is instanced automatically by using the `torque` function. It is documented for its methods.
+ *
+ * @memberof carto.expressions
+ * @name Torque
+ * @abstract
+ * @hideconstructor
+ * @class
+ * @api
+ */
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         if (!Number.isFinite(duration)) {
@@ -113,15 +138,25 @@ export class Torque extends BaseExpression {
         const fadeOut = this.fade.fadeOut.eval(feature);
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
+    /**
+     * Get the current time stamp of the simulation
+     *
+     * @api
+     * @returns {Number|Date} Current time stamp of the simulation, if the simulation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name getSimTime
+     */
     getSimTime() {
-        if (!(this.input.min.eval() instanceof Date)){
-            return null;
-        }
-
         const c = this._cycle.eval(); //from 0 to 1
 
-        const min = this.input.min.eval(); //Date
+        const min = this.input.min.eval();
         const max = this.input.max.eval();
+
+        if (!(this.input.min.eval() instanceof Date)) {
+            return min + c * (max - min);
+        }
+
 
         const tmin = min.getTime();
         const tmax = max.getTime();

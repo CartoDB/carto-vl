@@ -69,7 +69,7 @@ order: desc(width())
 + Most Common
 + Attribute
 
-### Unique Values  
+### Unique Values
 The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together.
 
 ```
@@ -128,7 +128,7 @@ Use an [available classification method](LINK), to group features into a defined
 
 ```
 width:  3
-color: ramp(quantiles($total_pop,5),Emrld)
+color: ramp(globalQuantiles($total_pop,5),Emrld)
 ```
 ![screen shot 2018-02-15 at 2 59 39 pm](https://user-images.githubusercontent.com/1566273/36283177-e2bb2aee-1260-11e8-9a48-147b2a193a0a.png)
 

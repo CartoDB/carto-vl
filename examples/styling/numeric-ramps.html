@@ -7,9 +7,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -86,19 +86,17 @@
       us_county_points
     `);
     const s = carto.expressions;
-    const viz = new carto.Viz(`
-      color: ramp(quantiles($total_pop, 5), SUNSETDARK)
-      strokeWidth: 0
-    `);
+    const viz = new carto.Viz({
+      color: s.ramp(s.viewportQuantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
+    });
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
     function setRampQuantiles() {
-      layer.blendToViz(new carto.Viz(`
-        color: ramp(quantiles($total_pop, 5), SUNSETDARK)
-        strokeWidth: 0
-      `));
+      layer.blendToViz(new carto.Viz({
+        color: s.ramp(s.viewportQuantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
+      }));
     }
 
     function setRampBuckets() {

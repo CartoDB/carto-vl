@@ -115,6 +115,11 @@
                     "title": "Pop-Ups",
                     "desc": "Create pop-up information windows and interact with your map",
                     "file": "interactivity/pop-ups.html"
+                },
+                {
+                    "title": "Histograms",
+                    "desc": "",
+                    "file": "interactivity/histogram.html"
                 }
             ]
         },
