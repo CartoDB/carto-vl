@@ -85,44 +85,48 @@ export default class Viz {
         this._resolveAliases();
         this._validateAliasDAG();
     }
-    _defineProperty(propertyName, propertyValue) {
-        if (SUPPORTED_PROPERTIES.includes(propertyName)) {
-            Object.defineProperty(this, propertyName, {
-                get: () => this['__' + propertyName],
-                set: expr => {
-                    if (propertyName != 'resolution') {
-                        expr = implicitCast(expr);
-                    }
-                    this['__' + propertyName] = expr;
-                    this._changed();
-                },
-            });
 
-            let property = propertyValue;
-            if (propertyName == 'variables') {
-                let init = false;
-                const handler = {
-                    get: (obj, prop) => {
-                        return obj[prop];
-                    },
-                    set: (obj, prop, value) => {
-                        value = implicitCast(value);
-                        obj[prop] = value;
-                        this['__cartovl_variable_' + prop] = value;
-                        if (init) {
-                            this._changed();
-                        }
-                        return true;
-                    }
-                };
-                property = new Proxy({}, handler);
-                Object.keys(propertyValue).map(varName => {
-                    property[varName] = propertyValue[varName];
-                });
-                init = true;
-            }
-            this['__' + propertyName] = property;
+    // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
+    // These setters and the proxy allow us to re-render without requiring further action from the user
+    _defineProperty(propertyName, propertyValue) {
+        if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
+            return;
         }
+        Object.defineProperty(this, propertyName, {
+            get: () => this['_' + propertyName],
+            set: expr => {
+                if (propertyName != 'resolution') {
+                    expr = implicitCast(expr);
+                }
+                this['_' + propertyName] = expr;
+                this._changed();
+            },
+        });
+
+        let property = propertyValue;
+        if (propertyName == 'variables') {
+            let init = false;
+            const handler = {
+                get: (obj, prop) => {
+                    return obj[prop];
+                },
+                set: (obj, prop, value) => {
+                    value = implicitCast(value);
+                    obj[prop] = value;
+                    this['__cartovl_variable_' + prop] = value;
+                    if (init) {
+                        this._changed();
+                    }
+                    return true;
+                }
+            };
+            property = new Proxy({}, handler);
+            Object.keys(propertyValue).map(varName => {
+                property[varName] = propertyValue[varName];
+            });
+            init = true;
+        }
+        this['_' + propertyName] = property;
     }
 
     _getRootExpressions() {
