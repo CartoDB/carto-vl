@@ -106,6 +106,7 @@ export default class Viz {
                         return obj[prop];
                     },
                     set: (obj, prop, value) => {
+                        value = implicitCast(value);
                         obj[prop] = value;
                         this['__cartovl_variable_' + prop] = value;
                         if (init) {
