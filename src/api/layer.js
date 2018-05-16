@@ -16,6 +16,7 @@ import RenderLayer from '../core/renderLayer';
  * @typedef {object} LayerEvent
  * @api
  */
+
 /**
  * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
  *
@@ -23,8 +24,9 @@ import RenderLayer from '../core/renderLayer';
  * @type {LayerEvent}
  * @api
  */
+
 /**
- * updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+ * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
  * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
  *
  * @event updated
