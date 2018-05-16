@@ -16,6 +16,7 @@ Object.keys(functions)
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 lowerCaseFunctions.pi = functions.PI;
+lowerCaseFunctions.e = functions.E;
 
 export function parseVizExpression(str) {
     prepareJsep();
