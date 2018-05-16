@@ -267,6 +267,7 @@ export const rgba = (...args) => new RGBA(...args);
 export const string = (...args) => new String(...args);
 
 export const time = (...args) => new Time(...args);
+export { time as date };
 
 export const top = (...args) => new Top(...args);
 
