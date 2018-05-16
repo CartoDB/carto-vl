@@ -608,11 +608,11 @@ function authURL(url, conf) {
 
 function adaptGeometryType(type) {
     switch (type) {
-        case 'ST_MultiPolygon':
+        case 'ST_MultiPolygon', 'ST_Polygon':
             return 'polygon';
         case 'ST_Point':
             return 'point';
-        case 'ST_MultiLineString':
+        case 'ST_MultiLineString', 'ST_LineString':
             return 'line';
         default:
             throw new Error(`Unimplemented geometry type ''${type}'`);
