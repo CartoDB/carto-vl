@@ -135,7 +135,7 @@ import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
 
-import { Quantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
+import { ViewportQuantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
 
 import Ramp from './expressions/ramp';
 
@@ -252,7 +252,7 @@ export const customPalette = (...args) => new CustomPalette(...args);
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const quantiles = (...args) => new Quantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
