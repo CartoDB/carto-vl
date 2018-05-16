@@ -507,22 +507,22 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
-        if (this.metadata.geomType == 'point') {
+        if (metadata.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (this.metadata.geomType == 'point') {
+            if (metadata.geomType == 'point') {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (this.metadata.geomType == 'polygon') {
+            } else if (metadata.geomType == 'polygon') {
                 this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (this.metadata.geomType == 'line') {
+            } else if (metadata.geomType == 'line') {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
-                throw new Error(`Unimplemented geometry type: '${this.metadata.geomType}'`);
+                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }
 
             catFields.map((name, index) => {
