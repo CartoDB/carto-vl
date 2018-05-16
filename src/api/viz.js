@@ -90,7 +90,9 @@ export default class Viz {
             Object.defineProperty(this, propertyName, {
                 get: () => this['__' + propertyName],
                 set: expr => {
-                    expr = implicitCast(expr);
+                    if (propertyName != 'resolution') {
+                        expr = implicitCast(expr);
+                    }
                     this['__' + propertyName] = expr;
                     this._changed();
                 },
@@ -104,7 +106,6 @@ export default class Viz {
                         return obj[prop];
                     },
                     set: (obj, prop, value) => {
-                        value = implicitCast(value);
                         obj[prop] = value;
                         this['__cartovl_variable_' + prop] = value;
                         if (init) {
