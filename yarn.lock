@@ -2964,6 +2964,10 @@ jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
+jsdoc-escape-at@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jsdoc-escape-at/-/jsdoc-escape-at-1.0.1.tgz#a1264683a32f3e03a589c85d6e92769718c7ab90"
+
 jsdoc@^3.5.5:
   version "3.5.5"
   resolved "https://registry.yarnpkg.com/jsdoc/-/jsdoc-3.5.5.tgz#484521b126e81904d632ff83ec9aaa096708fa4d"
