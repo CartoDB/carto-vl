@@ -18,7 +18,7 @@ import { implicitCast, clamp } from './utils';
  *
  * @example <caption>Assign the average of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_avg: viewportAvg($amount)
+ *   \@v_avg: viewportAvg($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -55,7 +55,7 @@ export const ViewportAvg = genViewportAgg('avg',
  *
  * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_max: viewportMax($amount)
+ *   \@v_max: viewportMax($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -85,7 +85,7 @@ export const ViewportMax = genViewportAgg('max',
  *
  * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_min: viewportMin($amount)
+ *   \@v_min: viewportMin($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -114,7 +114,7 @@ export const ViewportMin = genViewportAgg('min',
  *
  * @example <caption>Assign the sum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_sum: viewportSum($amount)
+ *   \@v_sum: viewportSum($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -136,13 +136,13 @@ export const ViewportSum = genViewportAgg('sum',
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *      v_count: s.viewportSum(s.prop('amount'))
+ *      v_count: s.viewportCount(s.prop('amount'))
  *   }
  * });
  *
  * @example <caption>Assign the feature count in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_count: viewportSum($amount)
+ *   \@v_count: viewportCount($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -205,13 +205,13 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *      v_percentile: s.viewportPercentile(s.prop('amount'))
+ *      v_percentile: s.viewportPercentile(s.prop('amount'), 90)
  *   }
  * });
  *
  * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_percentile: viewportPercentile($amount)
+ *   \@v_percentile: viewportPercentile($amount, 90)
  * `);
  *
  * @memberof carto.expressions
@@ -279,11 +279,11 @@ export class ViewportPercentile extends BaseExpression {
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
  * @return {carto.expressions.Base} Histogram
  *
- * @example <caption>Create and use an histogram</caption>
+ * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz(`
- *          @categoryHistogram: viewportHistogram($type)
- *          @numericHistogram:  viewportHistogram($amount, 1, 3)
+ *          \@categoryHistogram: viewportHistogram($type)
+ *          \@numericHistogram:  viewportHistogram($amount, 1, 3)
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
@@ -293,11 +293,6 @@ export class ViewportPercentile extends BaseExpression {
  * console.log(viz.variables.numericHistogram.eval());
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
- *
- * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   @v_percentile: viewportPercentile($amount)
- * `);
  *
  * @memberof carto.expressions
  * @name viewportPercentile
