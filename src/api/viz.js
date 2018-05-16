@@ -90,19 +90,21 @@ export default class Viz {
             Object.defineProperty(this, propertyName, {
                 get: () => this['__' + propertyName],
                 set: expr => {
+                    expr = implicitCast(expr);
                     this['__' + propertyName] = expr;
                     this._changed();
                 },
             });
 
-            let p = propertyValue;
+            let property = propertyValue;
             if (propertyName == 'variables') {
                 let init = false;
                 const handler = {
-                    get: function (obj, prop) {
+                    get: (obj, prop) => {
                         return obj[prop];
                     },
-                    set: function (obj, prop, value) {
+                    set: (obj, prop, value) => {
+                        value = implicitCast(value);
                         obj[prop] = value;
                         this['__cartovl_variable_' + prop] = value;
                         if (init) {
@@ -111,13 +113,13 @@ export default class Viz {
                         return true;
                     }
                 };
-                p = new Proxy({}, handler);
+                property = new Proxy({}, handler);
                 Object.keys(propertyValue).map(varName => {
-                    p[varName] = propertyValue[varName];
+                    property[varName] = propertyValue[varName];
                 });
                 init = true;
             }
-            this['__' + propertyName] = propertyValue;
+            this['__' + propertyName] = property;
         }
     }
 
