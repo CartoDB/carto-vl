@@ -7,7 +7,7 @@ import { implicitCast } from './utils';
 
 
 /**
- * Return the average of the feature property for the entire source.
+ * Return the average of the feature property for the entire source data.
  *
  * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
@@ -33,7 +33,7 @@ import { implicitCast } from './utils';
 export const GlobalAvg = generateGlobalAggregattion('avg');
 
 /**
- * Return the maximum of the feature property for the entire source.
+ * Return the maximum of the feature property for the entire source data.
  *
  * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
@@ -59,7 +59,7 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
 export const GlobalMax = generateGlobalAggregattion('max');
 
 /**
- * Return the minimum of the feature property for the entire source.
+ * Return the minimum of the feature property for the entire source data.
  *
  * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
@@ -85,7 +85,7 @@ export const GlobalMax = generateGlobalAggregattion('max');
 export const GlobalMin = generateGlobalAggregattion('min');
 
 /**
- * Return the sum of the feature property for the entire source.
+ * Return the sum of the feature property for the entire source data.
  *
  * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
@@ -111,7 +111,7 @@ export const GlobalMin = generateGlobalAggregattion('min');
 export const GlobalSum = generateGlobalAggregattion('sum');
 
 /**
- * Return the feature count for the entire source.
+ * Return the feature count for the entire source data.
  *
  * @return {carto.expressions.Base} Result of the aggregation
  *
@@ -171,7 +171,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
 
 
 /**
- * Return the Nth percentile of the feature property for the entire source.
+ * Return the Nth percentile of the feature property for the entire source data.
  *
  * @param {carto.expressions.Base} property - property expression of date or number type
  * @return {carto.expressions.Base} Result of the aggregation
