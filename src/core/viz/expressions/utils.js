@@ -1,4 +1,4 @@
-import { number, category } from '../functions';
+import { number, string } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -8,7 +8,7 @@ export function implicitCast(value) {
     if (Number.isFinite(value)) {
         return number(value);
     } else if (typeof value == 'string') {
-        return category(value);
+        return string(value);
     }
     return value;
 }

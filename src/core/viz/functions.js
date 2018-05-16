@@ -142,6 +142,8 @@ import Ramp from './expressions/ramp';
 import { RGB } from './expressions/rgb';
 import { RGBA } from './expressions/rgb';
 
+import String from './expressions/string';
+
 import Time from './expressions/time';
 
 import Top from './expressions/top';
@@ -261,6 +263,8 @@ export const ramp = (...args) => new Ramp(...args);
 
 export const rgb = (...args) => new RGB(...args);
 export const rgba = (...args) => new RGBA(...args);
+
+export const string = (...args) => new String(...args);
 
 export const time = (...args) => new Time(...args);
 
