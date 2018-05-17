@@ -150,7 +150,7 @@ map.on('load', () => {
         $('#tutorial').text(texts[index]);
 
         $('#dataset').val('tx_0125_copy_copy');
-        $('#user').val('cartogl');
+        $('#user').val('cartovl');
         $('#serverURL').val('https://{user}.carto.com');
 
         document.getElementById('styleEntry').value = vizs[index];
@@ -246,7 +246,7 @@ function getConfig() {
 function setConfig(input) {
     let c = JSON.parse(atob(input));
     if (c.c == 'dmanzanares-ded13') {
-        c.c = 'cartogl';
+        c.c = 'cartovl';
         c.d = 'https://{user}.carto.com';
     }
     if (c.d == 'carto.com') {

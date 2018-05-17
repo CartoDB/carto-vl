@@ -40,8 +40,8 @@ https://github.com/CartoDB/carto-vl-webpack-demo
 
     // Login into your CARTO account
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY_HERE'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
     // Set the source of your data
