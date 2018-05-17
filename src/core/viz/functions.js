@@ -14,7 +14,7 @@
  *
  * ```javascript
  * const viz = new carto.Viz({
- *   width: carto.expressions.number(10)  // Equivalent to `width: 10`
+ *   width: 10
  * });
  * ```
  *
@@ -31,10 +31,10 @@
  * for example lets divide the population between a number using the `div` expression to make points smaller:
  *
  * ```javascript
- * const s = carto.expressions; // We use this alias along documentation.
+ * const e = carto.expressions; // We use this alias along documentation.
  * const viz = new carto.Viz({
- *   width: s.div(
- *     s.prop('population'),
+ *   width: e.div(
+ *     e.prop('population'),
  *     10000
  *  )
  * });
@@ -56,7 +56,7 @@
  *
  * The most important types are:
  *  - **Numeric** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
- *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
+ *  - **String** expression. Expressions that contains strings. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
  * @namespace carto.expressions
@@ -90,8 +90,6 @@ import { And } from './expressions/binary';
 import Blend from './expressions/blend';
 
 import Buckets from './expressions/buckets';
-
-import Category from './expressions/category';
 
 import CIELab from './expressions/CIELab';
 
@@ -210,8 +208,6 @@ export const neq = notEquals;
 export const blend = (...args) => new Blend(...args);
 
 export const buckets = (...args) => new Buckets(...args);
-
-export const category = (...args) => new Category(...args);
 
 export const cielab = (...args) => new CIELab(...args);
 

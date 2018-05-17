@@ -1,12 +1,12 @@
-import { implicitCast, checkType, checkLooseType, checkExpression, checkArray } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
 import BaseExpression from './base';
 
 /**
  * Check if a categorical value belongs to a list of categories.
  *
- * @param {String|Property|string} value - Categorical expression to be tested against the categorical whitelist
- * @param {String[]|Property[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
- * @return {Number} Numeric expression with the result of the check
+ * @param {BaseString|string} value - Expression to be tested against the whitelist
+ * @param {BaseString[]|string[]} categories - Multiple expression parameters that will form the whitelist
+ * @return {BaseNumber} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
@@ -69,34 +69,30 @@ function NIN_INLINE_MAKER(categories) {
 
 function generateBelongsExpression(name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
-        constructor(value, categories) {
+        constructor(value, list) {
             value = implicitCast(value);
-            categories = categories || [];
+            list = implicitCast(list);
 
             checkExpression(name, 'value', 0, value);
-            checkArray(name, 'categories', 1, categories);
-
-            categories = categories.map(implicitCast);
+            checkExpression(name, 'list', 1, list);
 
             checkLooseType(name, 'value', 0, 'category', value);
-            categories.map((cat, index) => checkLooseType(name, '', index + 1, 'category', cat));
+            list.map((item, index) => checkLooseType(name, '', index + 1, 'string', item));
 
-            let children = {
-                value
-            };
-            categories.map((arg, index) => children[`arg${index}`] = arg);
+            let children = { value };
+            list.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
-            this.categories = categories;
-            this.inlineMaker = inlineMaker(this.categories);
+            this.list = list;
+            this.inlineMaker = inlineMaker(this.list);
             this.type = 'number';
         }
         eval(feature) {
-            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
+            return jsEval(this.value.eval(feature), this.list.map(category => category.eval(feature)));
         }
         _compile(meta) {
             super._compile(meta);
             checkType(name, 'value', 0, 'category', this.value);
-            this.categories.map((cat, index) => checkType(name, '', index + 1, 'category', cat));
+            this.list.map((cat, index) => checkType(name, '', index + 1, 'category', cat));
         }
     };
 }

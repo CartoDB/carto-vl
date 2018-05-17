@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/category', () => {
+describe('src/core/viz/expressions/string', () => {
     describe('error control', () => {
         validateStaticTypeErrors('category', []);
         validateStaticTypeErrors('category', [undefined]);
@@ -28,7 +28,7 @@ describe('src/core/viz/expressions/category', () => {
             }
         };
         it('should return the value from the metadata', () => {
-            const categoryExpresion = s.category('cat0');
+            const categoryExpresion = s.string('cat0');
             categoryExpresion._compile(fakeMetadata);
             const actual = categoryExpresion.eval();
 
@@ -36,5 +36,3 @@ describe('src/core/viz/expressions/category', () => {
         });
     });
 });
-
-

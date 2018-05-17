@@ -1,4 +1,4 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as e from '../../../../../src/core/viz/functions';
 
 const metadata = {
     columns: [
@@ -40,13 +40,13 @@ function equalArgs(argsA, argsB) {
 function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
-            s[expressionName](...args.map(arg => arg[0]))
+            e[expressionName](...args.map(arg => arg[0]))
         ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
     });
 }
 function validateCompileTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
-        const expression = s[expressionName](...args.map(arg => arg[0]));
+        const expression = e[expressionName](...args.map(arg => arg[0]));
         expect(() =>
             expression._compile(metadata)
         ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
@@ -75,14 +75,14 @@ export function validateDynamicType(expressionName, argTypes, expectedType) {
 function validateConstructorTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
-            s[expressionName](...args.map(arg => arg[0])).type
+            e[expressionName](...args.map(arg => arg[0])).type
         ).toEqual(expectedType);
     });
 }
 function validateCompileTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
-            compile(s[expressionName](...args.map(arg => arg[0]))).type
+            compile(e[expressionName](...args.map(arg => arg[0]))).type
         ).toEqual(expectedType);
     });
 }
@@ -90,23 +90,23 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 function getSimpleArg(type) {
     switch (type) {
         case 'number-property':
-            return [s.property('price'), '$price'];
+            return [e.property('price'), '$price'];
         case 'category-property':
-            return [s.property('cat'), '$cat'];
+            return [e.property('cat'), '$cat'];
         case 'number':
-            return [s.number(0), '0'];
+            return [e.number(0), '0'];
         case 'number-array':
-            return [[s.number(0)], '[0]'];
-        case 'category':
-            return [s.category('red'), '\'red\''];
-        case 'category-array':
-            return [[s.category('red')], '[\'red\']'];
+            return [[e.number(0)], '[0]'];
+        case 'string':
+            return [e.string('red'), '\'red\''];
+        case 'string-array':
+            return [[e.string('red')], '[\'red\']'];
         case 'color':
-            return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
+            return [e.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'palette':
-            return [s.palettes.PRISM, 'PRISM'];
+            return [e.palettes.PRISM, 'PRISM'];
         case 'customPalette':
-            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
+            return [[e.rgb(0, 0, 0), e.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
         case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
@@ -115,22 +115,22 @@ function getSimpleArg(type) {
 }
 function getPropertyArg(type) {
     switch (type) {
-        case 'number-property':
         case 'number':
-            return [s.property('price'), '$price'];
-        case 'number-array':
-            return [[s.property('price')], '[$price]'];
-        case 'category-property':
-        case 'category':
-            return [s.property('cat'), '$cat'];
-        case 'category-array':
-            return [[s.category('cat')], '[$cat]'];
+        case 'number-property':
+            return [e.property('price'), '$price'];
+        case 'number-property-array':
+            return [[e.property('price')], '[$price]'];
+        case 'string':
+        case 'string-property':
+            return [e.property('cat'), '$cat'];
+        case 'string-property-array':
+            return [[e.property('cat')], '[$cat]'];
         case 'color':
-            return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
+            return [e.hsv(e.property('price'), 0, 0), 'hsv($price, 0, 0)'];
         case 'palette':
-            return [s.palettes.PRISM, 'PRISM'];
+            return [e.palettes.PRISM, 'PRISM'];
         case 'customPalette':
-            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
+            return [[e.rgb(0, 0, 0), e.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
         case 'customPaletteNumber':
             return [[10, 20], '[10, 20]'];
         default:
