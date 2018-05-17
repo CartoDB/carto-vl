@@ -7,8 +7,8 @@ import { checkInstance, checkType } from './utils';
  * Aggregate using the average value. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {Property} property - Column of the table to be aggregated
- * @return {Number} Aggregated column
+ * @param {carto.expressions.Property} property - Column of the table to be aggregated
+ * @return {carto.expressions.Number} Aggregated column
  *
  * @example <caption>Use cluster average of the population as width.</caption>
  * const s = carto.expressions;

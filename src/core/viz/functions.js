@@ -63,6 +63,43 @@
  * @api
  */
 
+
+/**
+ * Type of Numeric Expressions.
+ *
+ * @typedef {} Number
+ * @api
+ */
+
+/**
+ * Type of String Expressions.
+ *
+ * @typedef {} String
+ * @api
+ */
+
+/**
+ * Type of Color Expressions.
+ *
+ * @typedef {} Color
+ * @api
+ */
+
+/**
+ * Type of Date Expressions.
+ *
+ * @typedef {} Date
+ * @api
+ */
+
+/**
+ * Type of Property Expressions.
+ *
+ * @typedef {} Property
+ * @api
+ */
+
+
 import Animate from './expressions/animate';
 
 import BaseArray from './expressions/array';

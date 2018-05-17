@@ -4,9 +4,9 @@ import BaseExpression from './base';
 /**
  * Check if a value belongs to a list of elements.
  *
- * @param {Property} value - Expression to be tested against the whitelist
- * @param {String[]} list - Multiple expression parameters that will form the whitelist
- * @return {carto.expressions.Number} Numeric expression with the result of the check
+ * @param {string} value - Expression to be tested against the whitelist
+ * @param {string[]} list - Multiple expression parameters that will form the whitelist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const e = carto.expressions;
@@ -36,7 +36,7 @@ function IN_INLINE_MAKER(list) {
 /**
  * Check if value does not belong to the list of elements.
  *
- * @param {Property} value - Expression to be tested against the blacklist
+ * @param {carto.expressions.Property} value - Expression to be tested against the blacklist
  * @param {String[]} list - Multiple expression parameters that will form the blacklist
  * @return {carto.expressions.Number} Numeric expression with the result of the check
  *

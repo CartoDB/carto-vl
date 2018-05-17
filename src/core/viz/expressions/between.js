@@ -4,15 +4,15 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 /**
  * Check if a given value is contained within an inclusive range (including the limits).
  *
- * @param {Number|Property|number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {Number|Property|number} lowerLimit - Numeric expression with the lower limit of the range
- * @param {Number|Property|number} upperLimit -  Numeric expression with the upper limit of the range
+ * @param {Number|number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {Number|number} lowerLimit - Numeric expression with the lower limit of the range
+ * @param {Number|number} upperLimit -  Numeric expression with the upper limit of the range
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
- * const s = carto.expressions;
+ * const e = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.between(s.prop('dn'), 50, 100);
+ *   filter: e.between(e.prop('dn'), 50, 100);
  * });
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range. (String)</caption>
