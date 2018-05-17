@@ -283,6 +283,13 @@ describe('api/viz', () => {
             expect(viz.variables.a.eval()).toEqual('Hello');
         });
 
+        it('should work with arrays of strings', () => {
+            let viz = new Viz('@a: ["a","b","c"]');
+            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+            viz = new Viz({ variables: { a: e.array(['a','b','c']) } });
+            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+        });
+
         it('should work with colors', () => {
             let viz = new Viz('@a: red');
             expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
@@ -290,11 +297,34 @@ describe('api/viz', () => {
             expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
         });
 
+        it('should work with arrays of colors', () => {
+            let viz = new Viz('@a: [red, lime, blue]');
+            expect(viz.variables.a.eval()).toEqual([
+                {r: 255, g: 0, b: 0, a: 1},
+                {r: 0, g: 255, b: 0, a: 1},
+                {r: 0, g: 0, b: 255, a: 1}]);
+            viz = new Viz({ variables: { a: e.array([
+                e.namedColor('red'),
+                e.namedColor('lime'),
+                e.namedColor('blue')]) } });
+            expect(viz.variables.a.eval()).toEqual([
+                {r: 255, g: 0, b: 0, a: 1},
+                {r: 0, g: 255, b: 0, a: 1},
+                {r: 0, g: 0, b: 255, a: 1}]);
+        });
+
         it('should work with dates', () => {
             let viz = new Viz('@a: date("2022-03-09T00:00:00Z")');
             expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
             viz = new Viz({ variables: { a: e.date('2022-03-09T00:00:00Z') } });
             expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
+        });
+
+        it('should work with arrays of dates', () => {
+            let viz = new Viz('@a: [date("2022-03-09T00:00:00Z")]');
+            expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
+            viz = new Viz({ variables: { a: e.array(e.date('2022-03-09T00:00:00Z')) } });
+            expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });
 
         it('should throw an error when the array is empty ', () => {

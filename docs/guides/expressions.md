@@ -51,6 +51,16 @@ e.g. red, #AAA, hsv(0.67, 1.0, 1.0)
 
 e.g. date('2022-03-09T00:00:00Z')
 
+## Arrays
+
+e.g. [1, 2, 3]
+
+e.g. ['a', 'b', 'c']
+
+e.g. [red, green, blue]
+
+e.g. [date('2022-03-09T00:00:00Z')]
+
 ## Properties
 
 **Properties** are a way to access your data. For **Windshaft** sources (*carto.Dataset*, *carto.SQL*) the properties represent the columns of the tables in the database. For **GeoJSON** sources (*carto.GeoJSON*) the properties are exactly the ones defined in the `properties` object for each feature.

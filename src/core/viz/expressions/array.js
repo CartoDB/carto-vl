@@ -26,7 +26,7 @@ export default class BaseArray extends BaseExpression {
         if (type == undefined) {
             throw new Error('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
         }
-        checkType('array', 'colors[0]', 0, ['color', 'string', 'number'], elems[0]);
+        checkType('array', 'colors[0]', 0, ['color', 'string', 'number', 'time'], elems[0]);
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type == undefined) {
