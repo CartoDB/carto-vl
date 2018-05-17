@@ -260,12 +260,16 @@ describe('api/viz', () => {
             expect(viz.variables.a.eval()).toEqual(1);
             viz = new Viz({ variables: { a: e.number(1) } });
             expect(viz.variables.a.eval()).toEqual(1);
+            viz = new Viz({ variables: { a: 1 } }); // Implicit cast
+            expect(viz.variables.a.eval()).toEqual(1);
         });
 
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
             expect(viz.variables.a.eval()).toEqual([1,2,3]);
             viz = new Viz({ variables: { a: e.array([1,2,3]) } });
+            expect(viz.variables.a.eval()).toEqual([1,2,3]);
+            viz = new Viz({ variables: { a: [1,2,3] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual([1,2,3]);
         });
 
@@ -281,12 +285,16 @@ describe('api/viz', () => {
             expect(viz.variables.a.eval()).toEqual('Hello');
             viz = new Viz({ variables: { a: e.string('Hello') } });
             expect(viz.variables.a.eval()).toEqual('Hello');
+            viz = new Viz({ variables: { a: 'Hello' } }); // Implicit cast
+            expect(viz.variables.a.eval()).toEqual('Hello');
         });
 
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
             expect(viz.variables.a.eval()).toEqual(['a','b','c']);
             viz = new Viz({ variables: { a: e.array(['a','b','c']) } });
+            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+            viz = new Viz({ variables: { a: ['a','b','c'] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual(['a','b','c']);
         });
 
@@ -307,6 +315,14 @@ describe('api/viz', () => {
                 e.namedColor('red'),
                 e.namedColor('lime'),
                 e.namedColor('blue')]) } });
+            expect(viz.variables.a.eval()).toEqual([
+                {r: 255, g: 0, b: 0, a: 1},
+                {r: 0, g: 255, b: 0, a: 1},
+                {r: 0, g: 0, b: 255, a: 1}]);
+            viz = new Viz({ variables: { a: [
+                e.namedColor('red'),
+                e.namedColor('lime'),
+                e.namedColor('blue')] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},

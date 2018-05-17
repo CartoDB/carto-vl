@@ -69,6 +69,10 @@ export default class Viz {
         this.updated = true;
         this._changeCallback = null;
 
+        Object.keys(this.variables).map(varName => {
+            this.variables[varName] = implicitCast(this.variables[varName]);
+        });
+
         this._updateRootExpressions();
 
         Object.keys(this.variables).map(varName => {
@@ -462,8 +466,10 @@ export default class Viz {
 
         // TODO: Check expression types ie: color is not a number expression!
 
+        // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
+        vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
             throw new CartoValidationError('viz', 'resolutionNumberRequired');
