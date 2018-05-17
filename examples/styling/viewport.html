@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Viewport | CARTO</title>
+  <title>Viewport based styling | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -33,19 +33,20 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      spend_data
-    `);
+    // Define layer
+    const source = new carto.source.Dataset(`spend_data`);
+
+    // Define style
     const viz = new carto.Viz(`
         width: sqrt($amount)/2
         color: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),bluyl)
         strokeColor: rgba(51,51,51,0.3)
-        strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, viz);
 

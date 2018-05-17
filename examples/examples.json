@@ -72,6 +72,11 @@
                     "file": "styling/filter.html"
                 },
                 {
+                    "title": "Viewport based styling",
+                    "desc": "Vary symbol color based on data in current viewport",
+                    "file": "styling/viewport.html"
+                },
+                {
                     "title": "Zoom based styling",
                     "desc": "Set symbol size proportionate to zoom",
                     "file": "styling/zoom.html"
@@ -111,11 +116,6 @@
         {
             "title": "Advanced",
             "samples": [
-                {
-                    "title": "Viewport interactivity",
-                    "desc": "",
-                    "file": "advanced/viewport.html"
-                },
                 {
                     "title": "Denver trees",
                     "desc": "",
