@@ -65,9 +65,9 @@ function decodePolygon(geometry) {
             const lineString = polygon.flat;
             for (let i = 0; i < lineString.length - 2; i += 2) {
                 // TODO performance
-                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
+                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 4)) {
                     if (polygon.clippedType[polygon.clipped.indexOf(i)] &
-                        polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {
+                        polygon.clippedType[polygon.clipped.indexOf(i + 4)]) {
                         // Skip tile border lines which don't intersect the tile
                         continue;
                     }

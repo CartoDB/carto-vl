@@ -304,7 +304,7 @@ export default class Windshaft {
 
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 1
+                'mvt': 8
             },
             layers: [
                 {
@@ -449,12 +449,26 @@ export default class Windshaft {
                 } else if (y < 0) {
                     clipping = clipping | 8;
                 }
+
                 if (clipping) {
                     polygon.clipped.push(polygon.flat.length);
                     polygon.clippedType.push(clipping);
+                    polygon.clipped.push(polygon.flat.length + 2);
+                    polygon.clippedType.push(clipping);
+
+                    const current = [2 * x / mvt_extent - 1, 2 * (1 - y / mvt_extent) - 1];
+                    const prevIndex = k - 1 >= 0 ? k - 1 : geom[j].length - 1;
+                    const nextIndex = k + 1 < geom[j].length ? k : 0;
+                    const prev = [2 * geom[j][prevIndex].x / mvt_extent - 1, 2 * (1 - geom[j][prevIndex].y / mvt_extent) - 1];
+                    const next = [2 * geom[j][nextIndex].x / mvt_extent - 1, 2 * (1 - geom[j][nextIndex].y / mvt_extent) - 1];
+                    this._clipVertex(prev, current, next).forEach(vertex =>
+                        polygon.flat.push(vertex[0], vertex[1])
+                    );
+                } else {
+                    x = 2 * x / mvt_extent - 1;
+                    y = 2 * (1 - y / mvt_extent) - 1;
+                    polygon.flat.push(x, y);
                 }
-                polygon.flat.push(2 * x / mvt_extent - 1);
-                polygon.flat.push(2 * (1 - y / mvt_extent) - 1);
             }
         }
         //if current polygon is not empty=> push it
@@ -462,6 +476,44 @@ export default class Windshaft {
             geometry.push(polygon);
         }
         featureGeometries.push(geometry);
+    }
+    _clipVertex(prev, current, next) {
+        const c1 = this._clipSegment(prev, current);
+        let c2 = this._clipSegment(next, current);
+        if (c1[0] == current[0] && c1[1] == current[1]) {
+            // c2 = c1;
+            // return [];
+        }
+        return [c1, c2];//.filter(c1 => !(c1[0] == current[0] && c1[1] == current[1]));
+    }
+    _clipSegment(a, b) {
+        b = this._intersect(a, b, [-1, -1], [1, -1]) || b;
+        b = this._intersect(a, b, [-1, -1], [-1, 1]) || b;
+        b = this._intersect(a, b, [-1, 1], [1, 1]) || b;
+        b = this._intersect(a, b, [1, -1], [1, 1]) || b;
+        return b;
+    }
+    _intersect(a, b, c, d) {
+        //If AB intersects CD => return intersection point
+        // Intersection method from Real Time Rendering, Third Edition, page 780
+        const sub = ([ax, ay], [bx, by]) => ([ax - bx, ay - by]);
+        const dot = ([ax, ay], [bx, by]) => (ax * bx + ay * by);
+        const perpendicular = ([x, y]) => [-y, x];
+        const o1 = a;
+        const o2 = c;
+        const d1 = sub(b, a);
+        const d2 = sub(d, c);
+        const d1t = perpendicular(d1);
+        const d2t = perpendicular(d2);
+
+        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
+        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Intersects!
+            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
+        }
+        // Doesn't intersects
     }
 
     _decodeLines(geom, featureGeometries, mvt_extent) {
