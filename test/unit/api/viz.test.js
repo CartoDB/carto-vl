@@ -254,7 +254,7 @@ describe('api/viz', () => {
         });
     });
 
-    fdescribe('variables', () => {
+    describe('variables', () => {
         it('should work with numbers', () => {
             let viz = new Viz('@a: 1');
             expect(viz.variables.a.eval()).toEqual(1);

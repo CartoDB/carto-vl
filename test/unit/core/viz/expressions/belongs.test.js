@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/belongs', () => {
+fdescribe('src/core/viz/expressions/belongs', () => {
     const fakeMetadata = {
         columns: [{
             type: 'category',
@@ -30,8 +30,8 @@ describe('src/core/viz/expressions/belongs', () => {
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
         validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'category-array']);
-        validateDynamicTypeErrors('in', ['category', 'number-array']);
+        validateDynamicTypeErrors('in', ['number', 'string-array']);
+        validateDynamicTypeErrors('in', ['string', 'number-array']);
 
         it('should throw an error when the wrong parameters are passed', () => {
             expect(() => s.in($category, '0')).toThrowError(/is not an array/g);
@@ -39,7 +39,7 @@ describe('src/core/viz/expressions/belongs', () => {
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category-array'], 'number');
+        validateStaticType('in', ['string', 'string-array'], 'number');
     });
 
     describe('eval', () => {
