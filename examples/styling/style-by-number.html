@@ -56,15 +56,15 @@
     <ul>
       <li>
         <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
-        <label for="auto">Ramp quantiles</label>
+        <label for="auto">Quantiles</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-        <label for="buckets">Ramp buckets</label>
+        <label for="buckets">Manual</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampLinear()" id="linear">
-        <label for="linear">Ramp linear</label>
+        <label for="linear">Interpolate</label>
       </li>
     </ul>
   </div>
@@ -77,38 +77,41 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      us_county_points
-    `);
+    // Define layer
+    const source = new carto.source.Dataset(`us_county_points`);
     const s = carto.expressions;
-    const viz = new carto.Viz({
-      color: s.ramp(s.viewportQuantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
-    });
+
+    // Define style
+    const viz = new carto.Viz(`
+      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
+      strokeWidth: 0
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
+    // Define functions
     function setRampQuantiles() {
-      layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.viewportQuantiles(s.prop('total_pop'), 5), s.palettes.SUNSETDARK)
-      }));
-    }
-
-    function setRampBuckets() {
       layer.blendToViz(new carto.Viz(`
-        color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), SUNSETDARK)
+        color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
         strokeWidth: 0
       `));
     }
-
+    function setRampBuckets() {
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), sunsetdark)
+        strokeWidth: 0
+      `));
+    }
     function setRampLinear() {
       layer.blendToViz(new carto.Viz(`
-        color: ramp(linear($total_pop, 10000, 500000), SUNSETDARK)
+        color: ramp(linear($total_pop, 10000, 500000), sunsetdark)
         strokeWidth: 0
       `));
     }

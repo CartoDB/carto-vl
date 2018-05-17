@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Select layer by source | CARTO</title>
+  <title>Color schemes | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,62 +55,67 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
-        <label for="all">All cities</label>
+        <input type="radio" name="style" onclick="setCartocolor()" id="Cartocolor" checked>
+        <label for="Cartocolor">CARTOcolor (default)</label>
       </li>
       <li>
-        <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
-        <label for="europe">European cities</label>
+        <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
+        <label for="CartocolorInverse">CARTOcolor (inverse)</label>
       </li>
       <li>
-        <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
-        <label for="spain">Spanish cities</label>
+        <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
+        <label for="CustomColors">Custom colors</label>
       </li>
     </ul>
   </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-100.3710, 38.4793],
+      zoom: 4,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const allCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-    `);
-    const europeanCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-        WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
-    `);
-    const spanishCitiesSource = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-        WHERE adm0name = \'Spain\'
-    `);
-    const citiesViz = new carto.Viz();
-    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
+    // Define layer
+    const source = new carto.source.Dataset(`us_county_points`);
+    const s = carto.expressions;
 
-    citiesLayer.addTo(map, 'watername_ocean');
+    // Define style
+    const viz = new carto.Viz(`
+      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
+      strokeWidth: 0
+    `);
+    const layer = new carto.Layer('layer', source, viz);
 
-    function setAllCities() {
-      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
+    layer.addTo(map, 'watername_ocean');
+
+    // Define functions
+    function setCartocolor() {
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
+        strokeWidth: 0
+      `));
     }
 
-    function setEuropeanCities() {
-      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
+    function setCartocolorInverse() {
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(viewportQuantiles($total_pop, 5), inverse(sunsetdark))
+        strokeWidth: 0
+      `));
     }
 
-    function setSpanishCities() {
-      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
+    function setCustomColors() {
+      layer.blendToViz(new carto.Viz(`
+        color: ramp(linear($total_pop, 10000, 500000), [#0a3e39,#84ebe1])
+        strokeWidth: 0
+      `));
     }
   </script>
 </body>

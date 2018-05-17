@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Color expressions | CARTO</title>
+  <title>Style layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,32 +55,16 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="viz" onclick="setRGBARed()" id="red" checked>
-        <label for="red">RGBA - Red</label>
+        <input type="radio" name="style" onclick="setRed()" id="red" checked>
+        <label for="red">Size 5px - Red</label>
       </li>
       <li>
-        <input type="radio" name="viz" onclick="setHEXGray()" id="gray">
-        <label for="gray">HEX - Gray</label>
+        <input type="radio" name="style" onclick="setGreen()" id="green">
+        <label for="green">Size 10px - Purple</label>
       </li>
       <li>
-        <input type="radio" name="viz" onclick="setCIELABYellow()" id="yellow">
-        <label for="yellow">CIELAB - Yellow</label>
-      </li>
-      <li>
-        <input type="radio" name="viz" onclick="setHSVBlue()" id="blue">
-        <label for="blue">HSV - Blue</label>
-      </li>
-      <li>
-        <input type="radio" name="viz" onclick="setHSLPurple()" id="purple">
-        <label for="purple">HSL - Purple</label>
-      </li>
-      <li>
-        <input type="radio" name="viz" onclick="setOpacityGreen()" id="green">
-        <label for="green">Opacity - Green</label>
-      </li>
-      <li>
-        <input type="radio" name="viz" onclick="setNamedColorOrange()" id="orange">
-        <label for="orange">Named Color - Orange</label>
+        <input type="radio" name="style" onclick="setBlue()" id="blue">
+        <label for="blue">Size 20px - Blue</label>
       </li>
     </ul>
   </div>
@@ -93,66 +77,49 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
-    `);
+    // Define layer
+    const source = new carto.source.Dataset(`ne_10m_populated_places_simple`);
+
+    // Define style
     const vizRed = new carto.Viz(`
-      color: rgb(255, 0, 0)
-    `);
-    const vizGray = new carto.Viz(`
-      color: hex('#AAA')
-    `);
-    const vizYellow = new carto.Viz(`
-      color: cielab(90, 10, 60)
-    `);
-    const vizBlue = new carto.Viz(`
-      color: hsva(0.59, 0.89, 1.0, 1.0)
-    `);
-    const vizPurple = new carto.Viz(`
-      color: hsla(0.7, 0.7, 0.5, 1.0)
+      width: 5
+      color: rgb(237, 76, 89)
+      strokeWidth: 1
+      strokeColor: rgb(255, 255, 255)
     `);
     const vizGreen = new carto.Viz(`
-      color: opacity(cielab(87.73, -86.18, 83.18), 0.2)
+      width: 10
+      color: #6A5ACD
+      strokeWidth: 0.5
+      strokeColor: #191970
     `);
-    const vizOrange = new carto.Viz(`
-      color: orange
+    const vizBlue = new carto.Viz(`
+      width: 20
+      color: #3390C8
+      strokeWidth: 2
+      strokeColor: #73C1EF
     `);
-
     const layer = new carto.Layer('layer', source, vizRed);
 
     layer.addTo(map, 'watername_ocean');
 
-    function setRGBARed() {
+    // Define functions
+    function setRed() {
       layer.blendToViz(vizRed);
     }
 
-    function setHEXGray() {
-      layer.blendToViz(vizGray);
-    }
-
-    function setCIELABYellow() {
-      layer.blendToViz(vizYellow);
-    }
-
-    function setHSVBlue() {
-      layer.blendToViz(vizBlue);
-    }
-
-    function setHSLPurple() {
-      layer.blendToViz(vizPurple);
-    }
-
-    function setOpacityGreen() {
+    function setGreen() {
       layer.blendToViz(vizGreen);
     }
 
-    function setNamedColorOrange() {
-      layer.blendToViz(vizOrange);
+    function setBlue() {
+      layer.blendToViz(vizBlue);
     }
   </script>
 </body>

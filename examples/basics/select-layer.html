@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Style layer | CARTO</title>
+  <title>Select layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,16 +55,16 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="style" onclick="setRed()" id="red" checked>
-        <label for="red">Size 5px - Red</label>
+        <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
+        <label for="all">All cities</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setGreen()" id="green">
-        <label for="green">Size 10px - Purple</label>
+        <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
+        <label for="europe">European cities</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setBlue()" id="blue">
-        <label for="blue">Size 20px - Blue</label>
+        <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
+        <label for="spain">Spanish cities</label>
       </li>
     </ul>
   </div>
@@ -77,46 +77,49 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+    // Define layers
+    const allCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
     `);
-    const vizRed = new carto.Viz(`
-      width: 5
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
+    const europeanCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
     `);
-    const vizGreen = new carto.Viz(`
-      width: 10
-      color: SlateBlue
+    const spanishCitiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name = \'Spain\'
+    `);
+
+    // Define style
+    const citiesViz = new carto.Viz(`
+      width: 8
+      color: #6A5ACD
       strokeWidth: 0.5
-      strokeColor: MidnightBlue
+      strokeColor: #191970
     `);
-    const vizBlue = new carto.Viz(`
-      width: 20
-      color: #3390C8
-      strokeWidth: 2
-      strokeColor: #73C1EF
-    `);
-    const layer = new carto.Layer('layer', source, vizRed);
+    const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
-    layer.addTo(map, 'watername_ocean');
+    citiesLayer.addTo(map, 'watername_ocean');
 
-    function setRed() {
-      layer.blendToViz(vizRed);
+    function setAllCities() {
+      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
     }
 
-    function setGreen() {
-      layer.blendToViz(vizGreen);
+    function setEuropeanCities() {
+      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
     }
 
-    function setBlue() {
-      layer.blendToViz(vizBlue);
+    function setSpanishCities() {
+      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
     }
   </script>
 </body>

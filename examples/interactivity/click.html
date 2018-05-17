@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Feature click | CARTO</title>
+  <title>Click | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -72,46 +72,49 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-105.047, 39.752],
-      zoom: 16,
+      center: [-0.127, 51.507],
+      zoom: 10,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
+    // Define layer
     const source = new carto.source.Dataset(`
-      tree_inventory_sloans
+      london_neighbourhoods
     `);
+
+    // Define variables for interactivity
     const viz = new carto.Viz(`
-      @type: $type
-      @diameter_number: $diameter_number
-      width: 15
+      @neighbourhood: $neighbourhood
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Define interactivity
     const interactivity = new carto.Interactivity(layer);
-    interactivity.on('featureClick', updateTree);
+    interactivity.on('featureClick', updateNeighbourhood);
 
     layer.on('loaded', () => {
-      updateTitle('Click on the trees');
+      updateTitle('Click each neighbourhood');
     });
 
     layer.addTo(map, 'watername_ocean');
 
+    // Define functions
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateTree(event) {
+    function updateNeighbourhood(event) {
       let content = '';
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.variables.type.value}</h3>
-            <p>Diameter <b>${feature.variables.diameter_number.value}</b></p>
+            <h3>${feature.variables.neighbourhood.value}</h3>
             <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

@@ -28,32 +28,36 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 40],
+      center: [0, 43],
       zoom: 4,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const spainCitiesSource = new carto.source.SQL(`
+    // Define layers
+    const CitiesSource = new carto.source.SQL(`
       SELECT *
-      FROM ne_10m_populated_places_simple
-      WHERE adm0name = \'Spain\'
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
     `);
-    const spainCitiesViz = new carto.Viz();
-    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesViz);
+    const CitiesViz = new carto.Viz();
+    const CitiesLayer = new carto.Layer('CitiesLayer', CitiesSource, CitiesViz);
 
-    const europeCountriesSource = new carto.source.Dataset(`
-      ne_adm0_europe
+    const CountriesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_adm0_europe
+        WHERE admin IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
     `);
-    const europeCountriesViz = new carto.Viz();
-    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesViz);
+    const CountriesViz = new carto.Viz();
+    const CountriesLayer = new carto.Layer('CountriesLayer', CountriesSource, CountriesViz);
 
-    spainCitiesLayer.addTo(map, 'watername_ocean');
-    europeCountriesLayer.addTo(map, 'spainCitiesLayer');
+    CitiesLayer.addTo(map, 'watername_ocean');
+    CountriesLayer.addTo(map, 'CitiesLayer');
   </script>
 </body>
 </html>

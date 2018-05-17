@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Style by zoom | CARTO</title>
+  <title>Style with variables | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -28,22 +28,28 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.174482, 41.401641],
-      zoom: 14.188919,
+      center: [0, 30],
+      zoom: 2,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      tx_0125_copy_copy
-    `);
-    const s = carto.expressions;
+    // Define layer
+    const source = new carto.source.Dataset('world_population_2015');
+
+    // Define style
     const viz = new carto.Viz(`
-        width: 0.001*zoom()
+      @pop: sqrt($pop_2015)/200
+      @style: ramp($country_name,bold)
+      width: @pop
+      color: @style
+      strokeColor: @style
+      strokeWidth: 1.5
     `);
     const layer = new carto.Layer('layer', source, viz);
 

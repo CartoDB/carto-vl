@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Category ramps | CARTO</title>
+  <title>Style by category | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -10,45 +10,45 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-    #controls {
-      position: absolute;
-      padding: 20px;
-      background: white;
-      top: 12px;
-      right: 12px;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-      border-radius: 4px;
-      width: 200px;
-      color: #2E3C43;
-    }
-    #controls li {
-      list-style-type: none;
-      margin: 0 0 8px 0;
-      display: flex;
-      vertical-align: middle;
-    }
-    #controls li input {
-      margin: 0 8px 0 0;
-    }
-    #controls li label {
-      font: 12px/16px 'Open Sans';
-      cursor: pointer;
-    }
-    #controls li:last-child {
-      margin-bottom: 0;
-    }
-  </style>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  #map {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+  #controls {
+    position: absolute;
+    padding: 20px;
+    background: white;
+    top: 12px;
+    right: 12px;
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    width: 200px;
+    color: #2E3C43;
+  }
+  #controls li {
+    list-style-type: none;
+    margin: 0 0 8px 0;
+    display: flex;
+    vertical-align: middle;
+  }
+  #controls li input {
+    margin: 0 8px 0 0;
+  }
+  #controls li label {
+    font: 12px/16px 'Open Sans';
+    cursor: pointer;
+  }
+  #controls li:last-child {
+    margin-bottom: 0;
+  }
+</style>
 </head>
 <body>
   <div id="map"></div>
@@ -56,15 +56,15 @@
     <ul>
       <li>
         <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-        <label for="auto">Ramp auto</label>
+        <label for="auto">All categories</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-        <label for="buckets">Ramp buckets</label>
+        <label for="buckets">Custom categories</label>
       </li>
       <li>
         <input type="radio" name="style" onclick="setRampTop()" id="top">
-        <label for="top">Ramp top</label>
+        <label for="top">Top categories</label>
       </li>
     </ul>
   </div>
@@ -77,43 +77,46 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      tx_0125_copy_copy
-    `);
-    const s = carto.expressions;
-    const viz = new carto.Viz({`
-      color: ramp($category, VIVID)
+    // Define layer
+    const source = new carto.source.Dataset('spend_data');
+
+    // Define style
+    const viz = new carto.Viz(`
+      color: ramp($category, vivid)
       strokeWidth: 0
     `);
-    const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
-
+    // Define functions
     function setRampAuto() {
       layer.blendToViz(new carto.Viz(`
-        color: ramp($category, VIVID)
+        color: ramp($category, vivid)
         strokeWidth: 0
       `));
     }
 
     function setRampBuckets() {
       layer.blendToViz(new carto.Viz(`
-        color: ramp(buckets($category, ['Moda y calzado']), VIVID)
+        color: ramp(buckets($category, ['Moda y calzado']), vivid)
         strokeWidth: 0
       `));
     }
 
     function setRampTop() {
       layer.blendToViz(new carto.Viz(`
-        color: ramp(top($category, 3), VIVID)
+        color: ramp(top($category, 3), vivid)
         strokeWidth: 0
       `));
     }
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
   </script>
 </body>
 </html>

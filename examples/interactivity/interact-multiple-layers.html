@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Multi-layer interactivity | CARTO</title>
+  <title>Interact with multiple layers | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -72,51 +72,57 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 40],
+      center: [0, 43],
       zoom: 4,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const spainCitiesSource = new carto.source.SQL(`
+    // Define first layer
+    const CitiesSource = new carto.source.SQL(`
       SELECT *
-      FROM ne_10m_populated_places_simple
-      WHERE adm0name = \'Spain\'
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
     `);
-    const spainCitiesViz = new carto.Viz(`
+
+    // Define first layer style and variables for interactivity
+    const CitiesViz = new carto.Viz(`
       @name: $name
-      @pop_max: $pop_max
+      @pop: $pop_max
       width: sqrt($pop_max/2000)
-      color: opacity(ramp($name, bold), 0.8)
-      strokeColor: rgb(255, 255, 255)
-      order: asc(width())
     `);
-    const spainCitiesLayer = new carto.Layer('spainCitiesLayer', spainCitiesSource, spainCitiesViz);
+    const CitiesLayer = new carto.Layer('CitiesLayer', CitiesSource, CitiesViz);
 
-    const europeCountriesSource = new carto.source.Dataset(`
-      ne_adm0_europe
+    // Define second layer
+    const CountriesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_adm0_europe
+        WHERE admin IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
     `);
-    const europeCountriesViz = new carto.Viz(`
-      @admin: $admin
-      color: opacity(ramp($admin, bold),0.4)
-    `);
-    const europeCountriesLayer = new carto.Layer('europeCountriesLayer', europeCountriesSource, europeCountriesViz);
 
-    // Detect first `europeCountriesLayer` features, then `spainCitiesLayer` features
-    const interactivity = new carto.Interactivity([europeCountriesLayer, spainCitiesLayer]);
+    // Define second layer style and variables for interactivity
+    const CountriesViz = new carto.Viz(`
+      @country: $admin
+    `);
+    const CountriesLayer = new carto.Layer('CountriesLayer', CountriesSource, CountriesViz);
+
+    // Define interactivity
+    const interactivity = new carto.Interactivity([CountriesLayer,CitiesLayer]);
     interactivity.on('featureClick', updateInfo);
 
-    europeCountriesLayer.on('loaded', () => {
-      updateTitle('Click on the cities / countries');
+    CountriesLayer.on('loaded', () => {
+      updateTitle('Click on a city or country');
     });
 
-    spainCitiesLayer.addTo(map, 'watername_ocean');
-    europeCountriesLayer.addTo(map, 'spainCitiesLayer');
+    CitiesLayer.addTo(map, 'watername_ocean');
+    CountriesLayer.addTo(map, 'CitiesLayer');
 
+    // Define functions
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
@@ -124,15 +130,15 @@
     function updateInfo(event) {
       let content = '<div class="container">';
       for (let feature of event.features) {
-        if (feature.layerId === 'europeCountriesLayer') {
+        if (feature.layerId === 'CountriesLayer') {
           content += `
-            <h3><b>${feature.variables.admin.value}</b></h3>
+            <h3>${feature.variables.country.value}</h3>
           `;
         }
-        if (feature.layerId === 'spainCitiesLayer') {
+        if (feature.layerId === 'CitiesLayer') {
           content += `
-            <h3>${feature.variables.name.value}</h3>
-            <p>Population <b>${feature.variables.pop_max.value}</b></p><br>
+            <p><b>${feature.variables.name.value}</b></p>
+            <p>Population: ${feature.variables.pop.value}</p>
           `;
         }
       }

@@ -12,19 +12,24 @@
                     "file": "basics/add-layer.html"
                 },
                 {
+                    "title": "Style layer",
+                    "desc": "Basic styling of a layer",
+                    "file": "basics/basic-style.html"
+                },
+                {
+                    "title": "Query layer",
+                    "desc": "Use SQL to query features",
+                    "file": "basics/query-layer.html"
+                },
+                {
                     "title": "Add multiple layers",
                     "desc": "Add multiple CARTO layers to your map",
                     "file": "basics/multiple-layers.html"
                 },
                 {
-                    "title": "Style layer",
-                    "desc": "Basic styling of a layer",
-                    "file": "basics/style-layer.html"
-                },
-                {
-                    "title": "Select layer by source",
+                    "title": "Select layer",
                     "desc": "Update the source of your layers",
-                    "file": "basics/select-layer-by-source.html"
+                    "file": "basics/select-layer.html"
                 }
             ]
         },
@@ -32,54 +37,44 @@
             "title": "Styling",
             "samples": [
                 {
-                    "title": "Color expressions",
+                    "title": "Color spaces",
                     "desc": "The color spaces that we support",
-                    "file": "styling/color-expressions.html"
+                    "file": "styling/color-spaces.html"
                 },
                 {
-                    "title": "Category ramps",
+                    "title": "Color schemes",
+                    "desc": "How to use CARTOcolors and custom color schemes",
+                    "file": "styling/color-schemes.html"
+                },
+                {
+                    "title": "Style by category",
                     "desc": "Options for symbolizing category attributes",
-                    "file": "styling/category-ramps.html"
+                    "file": "styling/style-by-category.html"
                 },
                 {
-                    "title": "Numeric ramps",
+                    "title": "Style by number",
                     "desc": "Options for symbolizing numeric attributes",
-                    "file": "styling/numeric-ramps.html"
+                    "file": "styling/style-by-number.html"
                 },
                 {
-                    "title": "Filter values",
-                    "desc": "",
-                    "file": "styling/filter-values.html"
+                    "title": "Style with variables",
+                    "desc": "How to define styling properties using variables",
+                    "file": "styling/style-with-variables.html"
                 },
                 {
-                    "title": "Style by zoom",
-                    "desc": "",
-                    "file": "styling/style-by-zoom.html"
+                    "title": "Animate by date/time",
+                    "desc": "How to animate features by date/time",
+                    "file": "animation/animation.html"
                 },
                 {
-                    "title": "Bubble map",
-                    "desc": "",
-                    "file": "expressions/bubble-map.html"
-                }
-            ]
-        },
-        {
-            "title": "Animation",
-            "samples": [
-                {
-                    "title": "Points animation",
-                    "desc": "Animated points",
-                    "file": "animation/points-animation.html"
+                    "title": "Filter based styling",
+                    "desc": "Filter data in the browser",
+                    "file": "styling/filter.html"
                 },
                 {
-                    "title": "Lines animation",
-                    "desc": "Animated lines",
-                    "file": "animation/lines-animation.html"
-                },
-                {
-                    "title": "Polygons animation",
-                    "desc": "Animated polygons",
-                    "file": "animation/polygons-animation.html"
+                    "title": "Zoom based styling",
+                    "desc": "Set symbol size proportionate to zoom",
+                    "file": "styling/zoom.html"
                 }
             ]
         },
@@ -87,39 +82,29 @@
             "title": "Interactivity",
             "samples": [
                 {
-                    "title": "Feature click",
+                    "title": "Hover",
+                    "desc": "Detect a feature hover events",
+                    "file": "interactivity/hover.html"
+                },
+                {
+                    "title": "Click",
                     "desc": "Detect a feature click event",
-                    "file": "interactivity/feature-click.html"
+                    "file": "interactivity/click.html"
                 },
                 {
-                    "title": "Feature hover",
-                    "desc": "Detect a feature hover events ",
-                    "file": "interactivity/feature-hover.html"
-                },
-                {
-                    "title": "Feature enter/leave",
-                    "desc": "Detect feature enter/leave events",
-                    "file": "interactivity/feature-enter-leave.html"
-                },
-                {
-                    "title": "Multi-layer interactivity",
+                    "title": "Interact with multiple layers",
                     "desc": "Detect multiple features from different layers",
-                    "file": "interactivity/multi-feature.html"
+                    "file": "interactivity/interact-multiple-layers.html"
                 },
                 {
-                    "title": "Style features on hover/click",
+                    "title": "Interactive based styling",
                     "desc": "Style a feature based on type of interactivity",
-                    "file": "interactivity/style-features-on-hover-click.html"
+                    "file": "interactivity/interactive-based-styling.html"
                 },
                 {
-                    "title": "Pop-Ups",
+                    "title": "Add pop-ups",
                     "desc": "Create pop-up information windows and interact with your map",
                     "file": "interactivity/pop-ups.html"
-                },
-                {
-                    "title": "Histograms",
-                    "desc": "",
-                    "file": "interactivity/histogram.html"
                 }
             ]
         },
@@ -137,9 +122,9 @@
                     "file": "advanced/denver-trees.html"
                 },
                 {
-                    "title": "Barcelona Spending",
+                    "title": "Spend data",
                     "desc": "Multi-scale animation with color interpolation through time of day and sized by amount spent.",
-                    "file": "advanced/barcelona-spending.html"
+                    "file": "advanced/spend-data.html"
                 },
                 {
                     "title": "US Population by County",

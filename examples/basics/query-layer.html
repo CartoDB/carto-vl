@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add layer | CARTO</title>
+  <title>Query layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -11,9 +11,10 @@
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
     #map {
       position: absolute;
@@ -27,30 +28,35 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [2.17, 41.38],
-      zoom: 13,
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 3,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('tx_0125_copy_copy');
-    const viz = new carto.Viz(`
-      width: blend(3,
-            blend(3, 20*linear($amount,10,100), linear(zoom(), 2^10,
-            2^16)),
-            linear(zoom(), 2^8, 2^10)
-)
-color: ramp(linear($hour,5,20),[deeppink,gold,turquoise,darkslateblue])
-filter: torque(linear($tx_date_proc,time('2012-03-01T00:00:07Z'),time('2012-03-02T23:59:57Z')),24,fade(0,0.5))
+    // Define layer
+    const Source = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name = \'Spain\'
     `);
-    const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map);
+    // Define style
+    const Viz = new carto.Viz(`
+      width: 8
+      color: #6A5ACD
+      strokeWidth: 0.5
+      strokeColor: #191970
+    `);
+    const Layer = new carto.Layer('Layer', Source, Viz);
+
+    Layer.addTo(map, 'watername_ocean');
   </script>
 </body>
 </html>

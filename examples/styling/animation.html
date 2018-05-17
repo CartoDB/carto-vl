@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Filter values | CARTO</title>
+  <title>Animate by date/time | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -28,24 +28,25 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      center: [-73.96, 40.75],
+      zoom: 11,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      pop_density_points
-    `);
+    // Define layer
+    const source = new carto.source.Dataset(`taxi_50k`);
     const s = carto.expressions;
-    const viz = new carto.Viz({
-        color: s.ramp(s.viewportQuantiles(s.prop('dn'), 5), s.palettes.REDOR),
-        filter: s.between(s.prop('dn'), 100, 150)
-    });
+
+    // Define style
+    const viz = new carto.Viz(`
+      filter: torque(linear($tpep_pickup_datetime,time('2016-05-01T00:00:07Z'),time('2016-05-06T10:40:59Z')),30,fade(0.1,0.5))
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
