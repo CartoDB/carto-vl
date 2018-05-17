@@ -55,13 +55,13 @@ e.g. date('2022-03-09T00:00:00Z')
 
 **Properties** are a way to access your data. For **Windshaft** sources (*carto.Dataset*, *carto.SQL*) the properties represent the columns of the tables in the database. For **GeoJSON** sources (*carto.GeoJSON*) the properties are exactly the ones defined in the `properties` object for each feature.
 
-We use the `$name` notation followed by the column/property name to refer the property in the *String API*. The expression `e.prop('name')` can also be used to refer to properties in the *JavaScript API*.
+We use the `$` notation followed by the column/property name (`$name`) to refer the property in the *String API*. The expression `e.prop('name')` can also be used to refer to properties in the *JavaScript API*.
 
 These properties cannot be immediately evaluated, they have no global meaning, but they are evaluated for each feature. Therefore, expressions containing properties should be treated as declarations or templates that will be executed and evaluated for each feature with the specific feature data.
 
 ### Example
 
-Suppose that you have a Dataset that contains all the `world_cities` as points. The table has a numeric column called `density` and you want to create a *Bubble map* in which the size of each city is its density value. The following code implements that for both APIs:
+Suppose you have a Dataset that contains all the `world_cities` as points. The table has a numeric column called `density` and you want to create a *Bubble map* in which the size of each city is its density value. The following code implements that behavior for both APIs:
 
 **String API**
 
@@ -90,7 +90,7 @@ If the string column `city_name` is used instead of `density` an Error will be t
 
 **Variables** are a way to store and reuse expressions.
 
-We use the `@name` notation followed by the name to declare and use the variable in the *String API*. The expression `e.var('name')` can also be used to refer to variables in the *JavaScript API*, that should be declared inside the `variables` scope.
+We use the `@` notation followed by the name (`@name`) to declare and use the variable in the *String API*. The expression `e.var('name')` can also be used to refer to variables in the *JavaScript API*, that should be declared inside the `variables` scope.
 
 **String API**
 
@@ -148,6 +148,13 @@ interactivity.on('featureClick', event => {
 
 ## Functions
 
+### Numeric functions
+
+### String functions
+
+### Color functions
+
+### Date functions
 
 ## Eval
 

@@ -65,6 +65,8 @@
 
 import Animate from './expressions/animate';
 
+import BaseArray from './expressions/array';
+
 import { In } from './expressions/belongs.js';
 import { Nin } from './expressions/belongs.js';
 
@@ -120,7 +122,7 @@ import Near from './expressions/near';
 
 import Now from './expressions/now';
 
-import Number from './expressions/number';
+import BaseNumber from './expressions/number';
 
 import Opacity from './expressions/opacity';
 
@@ -142,7 +144,7 @@ import Ramp from './expressions/ramp';
 import { RGB } from './expressions/rgb';
 import { RGBA } from './expressions/rgb';
 
-import String from './expressions/string';
+import BaseString from './expressions/string';
 
 import Time from './expressions/time';
 
@@ -175,6 +177,8 @@ import Zoom from './expressions/zoom';
 /* Expose classes as constructor functions */
 
 export const animate = (...args) => new Animate(...args);
+
+export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -238,7 +242,7 @@ export const near = (...args) => new Near(...args);
 
 export const now = (...args) => new Now(...args);
 
-export const number = (...args) => new Number(...args);
+export const number = (...args) => new BaseNumber(...args);
 
 export const opacity = (...args) => new Opacity(...args);
 
@@ -264,7 +268,7 @@ export const ramp = (...args) => new Ramp(...args);
 export const rgb = (...args) => new RGB(...args);
 export const rgba = (...args) => new RGBA(...args);
 
-export const string = (...args) => new String(...args);
+export const string = (...args) => new BaseString(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };

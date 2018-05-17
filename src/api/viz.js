@@ -293,9 +293,9 @@ export default class Viz {
             this.strokeColor,
             this.strokeWidth,
             this.filter,
-        ].concat(Object.values(this.variables)).forEach(expr =>
-            expr._resolveAliases(this.variables)
-        );
+        ].concat(Object.values(this.variables)).forEach(expr => {
+            expr._resolveAliases(this.variables);
+        });
     }
 
     _validateAliasDAG() {

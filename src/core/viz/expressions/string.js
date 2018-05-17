@@ -12,7 +12,7 @@ import { checkString } from './utils';
  * @function
  * @api
  */
-export default class String extends BaseExpression {
+export default class BaseString extends BaseExpression {
     constructor(input) {
         checkString('string', 'input', 0, input);
         super({});
@@ -22,23 +22,4 @@ export default class String extends BaseExpression {
     eval() {
         return this.expr;
     }
-    isAnimated() {
-        return false;
-    }
-    _compile(metadata) {
-        this._metadata = metadata;
-    }
-    _applyToShaderSource() {
-        // return {
-        //     preface: this._prefaceCode(`uniform float cat${this._uid};\n`),
-        //     inline: `cat${this._uid}`
-        // };
-    }
-    // _postShaderCompile(program, gl) {
-    //     // this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
-    // }
-    // _preDraw(program, drawMetadata, gl) {
-    //     // const id = this._metadata.categoryIDs[this.expr];
-    //     // gl.uniform1f(this._getBinding(program).uniformLocation, id);
-    // }
 }

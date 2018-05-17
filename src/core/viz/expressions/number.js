@@ -22,7 +22,7 @@ import { checkNumber } from './utils';
  * @name number
  * @function
  */
-export default class Number extends BaseExpression {
+export default class BaseNumber extends BaseExpression {
     constructor(x) {
         checkNumber('number', 'x', 0, x);
         super({});
