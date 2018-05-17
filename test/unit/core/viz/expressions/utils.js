@@ -3,13 +3,13 @@ import * as e from '../../../../../src/core/viz/functions';
 const metadata = {
     columns: [
         {
-            name: 'price',
+            name: 'number',
             type: 'number'
         },
         {
-            name: 'cat',
-            type: 'category',
-            categoryNames: ['red', 'blue']
+            name: 'string',
+            type: 'string',
+            categoryNames: ['string0', 'string1', 'string2']
         }
     ],
 };
@@ -46,14 +46,12 @@ function validateConstructorTimeTypeError(expressionName, args) {
 }
 function validateCompileTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
-        const expression = e[expressionName](...args.map(arg => arg[0]));
-        expect(() =>
-            expression._compile(metadata)
-        ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        expect(() => {
+            const expression = e[expressionName](...args.map(arg => arg[0]));
+            expression._compile(metadata);
+        }).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
     });
 }
-
-
 
 export function validateStaticType(expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
@@ -89,18 +87,18 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 
 function getSimpleArg(type) {
     switch (type) {
-        case 'number-property':
-            return [e.property('price'), '$price'];
-        case 'category-property':
-            return [e.property('cat'), '$cat'];
         case 'number':
             return [e.number(0), '0'];
         case 'number-array':
-            return [[e.number(0)], '[0]'];
+            return [e.array([e.number(0)]), '[0]'];
+        case 'number-property':
+            return [e.property('number'), '$number'];
         case 'string':
-            return [e.string('red'), '\'red\''];
+            return [e.string('string'), '\'string\''];
         case 'string-array':
-            return [[e.string('red')], '[\'red\']'];
+            return [e.array([e.string('string')]), '[\'string\']'];
+        case 'string-property':
+            return [e.property('string'), '$string'];
         case 'color':
             return [e.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'palette':
@@ -117,16 +115,16 @@ function getPropertyArg(type) {
     switch (type) {
         case 'number':
         case 'number-property':
-            return [e.property('price'), '$price'];
-        case 'number-property-array':
-            return [[e.property('price')], '[$price]'];
+            return [e.property('number'), '$number'];
+        case 'number-array':
+            return [e.array([e.number(0)]), '[0]'];
         case 'string':
         case 'string-property':
-            return [e.property('cat'), '$cat'];
-        case 'string-property-array':
-            return [[e.property('cat')], '[$cat]'];
+            return [e.property('string'), '$string'];
+        case 'string-array':
+            return [e.array([e.string('string')]), '[\'string\']'];
         case 'color':
-            return [e.hsv(e.property('price'), 0, 0), 'hsv($price, 0, 0)'];
+            return [e.hsv(e.property('number'), 0, 0), 'hsv($number, 0, 0)'];
         case 'palette':
             return [e.palettes.PRISM, 'PRISM'];
         case 'customPalette':

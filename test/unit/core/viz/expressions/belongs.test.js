@@ -1,22 +1,17 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as e from '../../../../../src/core/viz/functions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
-fdescribe('src/core/viz/expressions/belongs', () => {
+describe('src/core/viz/expressions/belongs', () => {
     const fakeMetadata = {
         columns: [{
-            type: 'category',
+            type: 'string',
             name: 'category',
-            categoryNames: ['cat0', 'cat1', 'cat2']
-        },
-        {
-            name: 'price',
-            type: 'number',
-        }
-        ],
+            categoryNames: ['string0', 'string1', 'string2']
+        }],
         categoryIDs: {
-            'cat0': 0,
-            'cat1': 1,
-            'cat2': 2,
+            'category0': 0,
+            'category1': 1,
+            'category2': 2
         }
     };
 
@@ -24,18 +19,16 @@ fdescribe('src/core/viz/expressions/belongs', () => {
 
     beforeEach(() => {
         // Needed a beforeEach to avoid testing against already compiled properties
-        $category = s.property('category');
+        $category = e.property('category');
     });
 
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
+        validateStaticTypeErrors('in', ['string']);
+        validateStaticTypeErrors('in', ['number']);
         validateStaticTypeErrors('in', ['color']);
         validateDynamicTypeErrors('in', ['number', 'string-array']);
         validateDynamicTypeErrors('in', ['string', 'number-array']);
-
-        it('should throw an error when the wrong parameters are passed', () => {
-            expect(() => s.in($category, '0')).toThrowError(/is not an array/g);
-        });
     });
 
     describe('type', () => {
@@ -44,53 +37,38 @@ fdescribe('src/core/viz/expressions/belongs', () => {
 
     describe('eval', () => {
         describe('in', () => {
-            it('in($category, ["cat1", "cat2"]) should return 0', () => {
+            it('in($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 0 };
-                const sIn = s.in($category, ['cat1', 'cat2']);
+                const sIn = e.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
 
-            it('in($category, ["cat1", "cat2"]) should return 1', () => {
+            it('in($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 1 };
-                const sIn = s.in($category, ['cat1', 'cat2']);
+                const sIn = e.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(1);
-            });
-            it('in($category) should return 0', () => {
-                const fakeFeature = { category: 0 };
-                const sIn = s.in($category);
-                sIn._compile(fakeMetadata);
-                const actual = sIn.eval(fakeFeature);
-                expect(actual).toEqual(0);
             });
         });
 
         describe('nin', () => {
-            it('nin($category, ["cat1", "cat2"]) should return 1', () => {
+            it('nin($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 0 };
-                const nin = s.nin($category, ['cat1', 'cat2']);
+                const nin = e.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
 
-            it('nin($category, ["cat1", "cat2"]) should return 0', () => {
+            it('nin($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 1 };
-                const nin = s.nin($category, ['cat1', 'cat2']);
+                const nin = e.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(0);
-            });
-
-            it('nin($category) should return 1', () => {
-                const fakeFeature = { category: 1 };
-                const nin = s.nin($category);
-                nin._compile(fakeMetadata);
-                const actual = nin.eval(fakeFeature);
-                expect(actual).toEqual(1);
             });
         });
     });
