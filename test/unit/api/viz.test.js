@@ -297,6 +297,25 @@ describe('api/viz', () => {
             expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
         });
 
+        it('should throw an error when the array is empty ', () => {
+            expect(() => e.array()
+            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+            expect(() => e.array([])
+            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+        });
+
+        it('should throw an error when the array constains different types ', () => {
+            expect(() => e.array([e.prop('p')])
+            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+            expect(() => e.array([1, e.prop('p')])
+            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+        });
+
+        it('should throw an error when the array constains different types ', () => {
+            expect(() => e.array([1, 'a'])
+            ).toThrowError('array(): invalid parameters, invalid argument type combination');
+        });
+
         it('should throw an error when the graph is not a DAG', () => {
             expect(() => new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
                 __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
