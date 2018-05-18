@@ -11,37 +11,25 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      z-index: 0;
-    }
-    #controls {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 200px;
-      z-index: 2;
-    }
-    #controls h2 {
-      font: 300 12px/16px 'Open Sans';
-      background: rgba(0, 0, 0, 0.64);
-      border-radius: 4px;
-      padding: 8px 12px;
-      color: #fff;
-    }
-  </style>
+  
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
+
 </head>
 
 <body>
   <div id="map"></div>
+   <!-- Description -->
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Interact based on styling</h1>
+          <button class="github-logo js-source-link"></button>
+        </header>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',

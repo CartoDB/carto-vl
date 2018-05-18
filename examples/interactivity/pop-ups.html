@@ -11,85 +11,46 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-    #controls {
-      position: absolute;
-      padding: 20px;
-      background: white;
-      top: 12px;
-      right: 12px;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-      border-radius: 4px;
-      width: 200px;
-      color: #2E3C43;
-      pointer-events: none;
-    }
-    #controls li {
-      list-style-type: none;
-      margin: 0 0 8px 0;
-      display: flex;
-      vertical-align: middle;
-    }
-    #controls li input {
-      margin: 0 8px 0 0;
-    }
-    #controls li label {
-      font: 12px/16px 'Open Sans';
-      cursor: pointer;
-    }
-    #controls li:last-child {
-      margin-bottom: 0;
-    }
-    .popup-container {
-      padding: 12px;
-      width: 180px;
-    }
-    .popup-container li {
-      list-style-type: none;
-      margin-bottom: 8px;
-    }
-    .popup-container li:last-child {
-      margin-bottom: 0;
-    }
-    .popup-container h2 {
-      font: 600 16px/22px 'Open Sans';
-      margin-bottom: 12px
-    }
-    .popup-container h3{
-      font: 400 10px/14px 'Open Sans';
-      color: #747D82;
-      text-transform: uppercase;
-    }
-    .popup-container h4{
-      font: 600 12px/16px 'Open Sans';
-    }
-  </style>
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
 </head>
 
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <ul class="actions">
-      <li>
-        <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
-        <label for="click">Pop-ups on click</label>
-      </li>
-      <li>
-        <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
-        <label for="hover">Pop-ups on hover</label>
-      </li>
-    </ul>
-  </div>
+
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Pop-Ups</h1>
+          <button class="github-logo js-source-link"></button>
+        </header>
+        <section>
+          <p class="description open-sans">Create pop-up information windows and interact with your map.</p>
+          <div class="separator"></div>
+          <section class="usage">
+            <header>USAGE</header>
+            <p class="open-sans">Select your preferred kind of pop-ups</p>
+          </section>
+
+          <div id="controls">
+              <ul class="actions">
+                <li>
+                  <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
+                  <label for="click">Pop-ups on click</label>
+                </li>
+                <li>
+                  <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
+                  <label for="hover">Pop-ups on hover</label>
+                </li>
+              </ul>
+          </div>
+
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
