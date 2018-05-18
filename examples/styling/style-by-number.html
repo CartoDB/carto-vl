@@ -10,53 +10,44 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
-
-
-    <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Style by number</h1>
-          
-        </header>
-        <section>
-          <p class="description open-sans">Change the agregation method.</p>
-          <div id="controls">
-            <ul>
-              <li>
-                <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
-                <label for="auto">Quantiles</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-                <label for="buckets">Manual</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setRampLinear()" id="linear">
-                <label for="linear">Interpolate</label>
-              </li>
-            </ul>
-          </div>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-
-  <div id="loading">
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Style by number</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Change the agregation method.</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
+              <label for="auto">Quantiles</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+              <label for="buckets">Manual</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampLinear()" id="linear">
+              <label for="linear">Interpolate</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
       </svg>
     </div>
   </div>
-
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -72,41 +63,39 @@
       apiKey: 'default_public'
     });
 
-    // Define layer
-    const source = new carto.source.Dataset(`us_county_points`);
-    const s = carto.expressions;
-
-    // Define style
-    const viz = new carto.Viz(`
+    // Define viz
+    const rampQuantilesViz = new carto.Viz(`
       color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
-    const layer = new carto.Layer('layer', source, viz);
+    const rampBucketsViz = new carto.Viz(`
+      color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), sunsetdark)
+      strokeWidth: 0
+    `);
+    const rampLinearViz = new carto.Viz(`
+      color: ramp(linear($total_pop, 10000, 500000), sunsetdark)
+      strokeWidth: 0
+    `);
 
+    // Define layer
+    const source = new carto.source.Dataset('us_county_points');
+    const layer = new carto.Layer('layer', source, rampQuantilesViz);
+
+    // Add layer to map
     layer.addTo(map, 'watername_ocean');
 
-    // Define functions
     function setRampQuantiles() {
-      layer.blendToViz(new carto.Viz(`
-        color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
-        strokeWidth: 0
-      `));
+      layer.blendToViz(rampQuantilesViz);
     }
     function setRampBuckets() {
-      layer.blendToViz(new carto.Viz(`
-        color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), sunsetdark)
-        strokeWidth: 0
-      `));
+      layer.blendToViz(rampBucketsViz);
     }
     function setRampLinear() {
-      layer.blendToViz(new carto.Viz(`
-        color: ramp(linear($total_pop, 10000, 500000), sunsetdark)
-        strokeWidth: 0
-      `));
+      layer.blendToViz(rampLinearViz);
     }
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
-
-    
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
 </html>

@@ -42,7 +42,7 @@
       <footer class="js-footer"></footer>
     </div>
   </aside>
-  <div id="loading">
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
@@ -79,12 +79,12 @@
     `);
 
     // Define layer
-    const source = new carto.source.Dataset(`us_county_points`);
+    const source = new carto.source.Dataset('us_county_points');
     const layer = new carto.Layer('layer', source, cartoColorViz);
 
     // Add layer to map
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0');
+    layer.on('loaded', hideLoader);
 
     function setCartocolor() {
       layer.blendToViz(cartoColorViz);
@@ -94,6 +94,9 @@
     }
     function setCustomColors() {
       layer.blendToViz(customColorViz);
+    }
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
