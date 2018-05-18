@@ -117,6 +117,219 @@
 
 
 
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fill color of points and polygons and color of lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fill diameter of points, thickness of lines, not applicable to polygons</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strokeColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>stroke/border color of points and polygons, not applicable to lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strokeWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>stroke width of points and polygons, not applicable to lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>filter features by removing from rendering and interactivity all the features that don't pass the test</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>rendering order of the features, only applicable to points</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>variables</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>An object describing the variables used.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
 <dl class="details">
 
     
@@ -207,703 +420,6 @@
     
 
     
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getColor"><span class="type-signature"></span>getColor<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the color expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getFilter"><span class="type-signature"></span>getFilter<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the filter expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getOrder"><span class="type-signature"></span>getOrder<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the order expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getResolution"><span class="type-signature"></span>getResolution<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the resolution.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">number</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getStrokeColor"><span class="type-signature"></span>getStrokeColor<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the strokeColor expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getStrokeWidth"><span class="type-signature"></span>getStrokeWidth<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the strokeWidth expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getWidth"><span class="type-signature"></span>getWidth<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.Base">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the width expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-    
 
     
 
@@ -918,13 +434,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 10:57:52 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 18 2018 15:22:48 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

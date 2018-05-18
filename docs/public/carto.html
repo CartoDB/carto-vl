@@ -145,7 +145,7 @@
 
 
 <div class="description">
-    <p>Set default authentication parameters: apiKey and user.</p>
+    <p>Set default authentication parameters: user and apiKey.</p>
 </div>
 
 
@@ -223,29 +223,6 @@
 
         <tr>
             
-                <td class="name"><code>apiKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>API key used to authenticate against CARTO</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>user</code></td>
             
 
@@ -263,6 +240,29 @@
             
 
             <td class="description last"><p>Name of the user</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>apiKey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>API key used to authenticate against CARTO</p></td>
         </tr>
 
     
@@ -339,7 +339,7 @@
     
 
     
-    <h4 class="name" id=".setDefaultConfig"><span class="type-signature">(static) </span>setDefaultConfig<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".setDefaultConfig"><span class="type-signature">(static) </span>setDefaultConfig<span class="signature">(config)</span><span class="type-signature"></span></h4>
     
 
     
@@ -347,7 +347,7 @@
 
 
 <div class="description">
-    <p>Set default configuration parameters: serverURL.</p>
+    <p>Set default configuration parameters</p>
 </div>
 
 
@@ -383,7 +383,7 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>config</code></td>
             
 
             <td class="type">
@@ -413,8 +413,6 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
         <th>Default</th>
@@ -442,16 +440,6 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
                 <td class="default">
@@ -461,7 +449,7 @@
                 </td>
             
 
-            <td class="description last"><p>URL of the CARTO Maps API server</p></td>
+            <td class="description last"><p>Template URL of the CARTO Maps API server</p></td>
         </tr>
 
     
@@ -548,13 +536,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 10:57:52 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 18 2018 15:22:48 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

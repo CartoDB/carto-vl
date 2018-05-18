@@ -689,6 +689,73 @@
 
             
                 
+<h4 class="name" id="LayerEvent">LayerEvent</h4>
+
+
+
+
+<div class="description">
+    <p>LayerEvent objects are fired by <a href="carto.Layer.html">Layer</a> objects.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
 <h4 class="name" id="VizSpec">VizSpec</h4>
 
 
@@ -741,6 +808,144 @@ For a better understanding we recommend reading the VIZ guide</p>
 
         <tr>
             
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fill color of points and polygons and color of lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fill diameter of points, thickness of lines, not applicable to polygons</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strokeColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>stroke/border color of points and polygons, not applicable to lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>strokeWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>stroke width of points and polygons, not applicable to lines</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>filter features by removing from rendering and interactivity all the features that don't pass the test</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>order</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>rendering order of the features, only applicable to points</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>resolution</code></td>
             
 
@@ -757,7 +962,7 @@ For a better understanding we recommend reading the VIZ guide</p>
 
             
 
-            <td class="description last"><p>Control the aggregation level</p></td>
+            <td class="description last"><p>resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points</p></td>
         </tr>
 
     
@@ -781,144 +986,6 @@ For a better understanding we recommend reading the VIZ guide</p>
             
 
             <td class="description last"><p>An object describing the variables used.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A <code>color</code> expression that controls the color of the elements.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A  <code>numeric</code> expression that controls the width of the elements.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>strokeColor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A <code>color</code> expression that controls the stroke color of the elements.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>strokeWidth</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A <code>numeric</code> expression that controls the with of the stroke of the elements.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>order</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Define how the elements will be stacked</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>filter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.html#.Base">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A <code>boolean</code> expression that controlls which elements will be shown.</p></td>
         </tr>
 
     
@@ -1692,6 +1759,189 @@ The list of features that are no longer behind the cursor and that were before i
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="event:loaded">loaded</h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.</p>
+</div>
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="global.html#LayerEvent">LayerEvent</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="event:updated">updated</h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.</p>
+</div>
+
+
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="global.html#LayerEvent">LayerEvent</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 </article>
 
@@ -1703,13 +1953,13 @@ The list of features that are no longer behind the cursor and that were before i
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 14 2018 10:57:52 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 18 2018 15:22:48 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
