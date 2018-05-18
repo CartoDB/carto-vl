@@ -165,14 +165,14 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
         constructor(property) {
             super({
                 property: implicitCast(metadataPropertyName == 'count' ? number(0) : property),
-                value: number(0)
+                _impostor: number(0)
             });
             this._isViewport = true;
         }
 
-        // get value() {
-        //     return resolveFn(this);
-        // }
+        get value() {
+            return resolveFn(this);
+        }
 
         eval() {
             return resolveFn(this);
@@ -182,7 +182,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
-            super.inlineMaker = inline => inline.value;
+            super.inlineMaker = inline => inline._impostor;
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
@@ -194,7 +194,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             accumFn(this, this.property.eval(feature));
         }
         _preDraw(...args) {
-            this.value.expr = this.eval();
+            this._impostor.expr = this.eval();
             super._preDraw(...args);
         }
     };
