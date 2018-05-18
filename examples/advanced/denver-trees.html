@@ -55,6 +55,7 @@
     const viz = new carto.Viz(`
       @type: $type
       @diameter_number: $diameter_number
+
       width: $diameter_number * 4
       color: opacity(ramp($type, bold), 0.7)
       strokeColor: ramp($type, bold)
@@ -84,7 +85,6 @@
       }
       document.getElementById('content').innerHTML = content;
     }
-
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }

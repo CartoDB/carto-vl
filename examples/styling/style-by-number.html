@@ -14,40 +14,40 @@
 </head>
 <body>
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Style by number</h1>
-        </header>
-        <section>
-          <p class="description open-sans">Options for symbolizing numeric attributes</p>
-          <div id="controls">
-            <ul>
-              <li>
-                <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
-                <label for="auto">Quantiles</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-                <label for="buckets">Manual</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setRampLinear()" id="linear">
-                <label for="linear">Interpolate</label>
-              </li>
-            </ul>
-          </div>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Style by number</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Options for symbolizing numeric attributes</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
+              <label for="auto">Quantiles</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+              <label for="buckets">Manual</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampLinear()" id="linear">
+              <label for="linear">Interpolate</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
     </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
