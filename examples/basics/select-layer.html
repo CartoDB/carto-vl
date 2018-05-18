@@ -97,7 +97,7 @@
 
     // Add layer to map
     citiesLayer.addTo(map, 'watername_ocean');
-    citiesLayer.on('loaded', () => document.getElementById('loading').style.display = 'none')
+    citiesLayer.on('loaded', () => document.getElementById('loading').style.display = 'none');
 
     function setAllCities() {
       citiesLayer.update(allCitiesSource, citiesViz);

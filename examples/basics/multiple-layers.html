@@ -57,17 +57,18 @@
     const citiesViz = new carto.Viz();
     const citiesLayer = new carto.Layer('citiesLayer', citiesSource, citiesViz);
 
-    const CountriesSource = new carto.source.SQL(`
+    const countriesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_adm0_europe
         WHERE admin IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
-    const CountriesViz = new carto.Viz();
-    const CountriesLayer = new carto.Layer('countriesLayer', CountriesSource, CountriesViz);
+    const countriesViz = new carto.Viz();
+    const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
 
     // Add layers to map
     citiesLayer.addTo(map, 'watername_ocean');
     countriesLayer.addTo(map, 'citiesLayer');
+    countriesLayer.on('loaded', () => document.getElementById('loading').style.display = 'none');
   </script>
 </body>
 </html>
