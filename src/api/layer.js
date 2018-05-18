@@ -206,11 +206,11 @@ export default class Layer {
                     }
                 });
 
-                viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
-                viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
-                viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
-                viz.getStrokeWidth()._blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
-                viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
+                viz.color._blendFrom(this._viz.color, ms, interpolator);
+                viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
+                viz.width._blendFrom(this._viz.width, ms, interpolator);
+                viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
+                viz.filter._blendFrom(this._viz.filter, ms, interpolator);
             }
 
             return this._vizChanged(viz).then(() => {
