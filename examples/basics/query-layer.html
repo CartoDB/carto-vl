@@ -10,14 +10,10 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
-
 </head>
 <body>
   <div id="map"></div>
-
   <aside class="toolbox">
     <div class="box">
       <header>
@@ -29,7 +25,6 @@
       <footer class="js-footer"></footer>
     </div>
   </aside>
-
   <div id="loading">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -37,7 +32,6 @@
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -54,25 +48,22 @@
     });
 
     // Define layer
-    const Source = new carto.source.SQL(`
+    const source = new carto.source.SQL(`
       SELECT *
         FROM ne_10m_populated_places_simple
         WHERE adm0name = \'Spain\'
     `);
-
-    // Define style
-    const Viz = new carto.Viz(`
+    const viz = new carto.Viz(`
       width: 8
       color: #6A5ACD
       strokeWidth: 0.5
       strokeColor: #191970
     `);
-    const Layer = new carto.Layer('Layer', Source, Viz);
+    const layer = new carto.Layer('Layer', source, viz);
 
-    Layer.addTo(map, 'watername_ocean');
-
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
-
+    // Add layer to map
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', () => document.getElementById('loading').style.opacity = 0);
   </script>
 </body>
 </html>

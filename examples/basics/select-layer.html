@@ -10,41 +10,44 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
-    <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Select layer</h1>
-        </header>
-        <section>
-          <p class="description open-sans">Update the source of your layers</p>
-          <div id="controls">
-            <ul class="actions">
-              <li>
-                <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
-                <label for="all">All cities</label>
-              </li>
-              <li>
-                <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
-                <label for="europe">European cities</label>
-              </li>
-              <li>
-                <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
-                <label for="spain">Spanish cities</label>
-              </li>
-            </ul>
-            <div id="info"></div>
-          </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Change the feature columns</h1>
+        <button class="github-logo js-source-link"></button>
+      </header>
+      <section>
+        <p class="description open-sans">Change the columns returned in the feature event.</p>
+        <div class="separator"></div>
+        <section class="usage">
+          <header>USAGE</header>
+          <p class="open-sans">Click on the markers</p>
         </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
+        <div id="controls">
+          <ul class="actions">
+            <li>
+              <input type="radio" name="source" onclick="setAllCities()" id="all" checked>
+              <label for="all">All cities</label>
+            </li>
+            <li>
+              <input type="radio" name="source" onclick="setEuropeanCities()" id="europe">
+              <label for="europe">European cities</label>
+            </li>
+            <li>
+              <input type="radio" name="source" onclick="setSpanishCities()" id="spain">
+              <label for="spain">Spanish cities</label>
+            </li>
+          </ul>
+          <div id="info"></div>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
   <div id="loading">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -67,7 +70,7 @@
       apiKey: 'default_public'
     });
 
-    // Define layers
+    // Define sources
     const allCitiesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_10m_populated_places_simple
@@ -83,7 +86,7 @@
         WHERE adm0name = \'Spain\'
     `);
 
-    // Define style
+    // Define layer
     const citiesViz = new carto.Viz(`
       width: 8
       color: #6A5ACD
@@ -92,23 +95,19 @@
     `);
     const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
+    // Add layer to map
     citiesLayer.addTo(map, 'watername_ocean');
+    citiesLayer.on('loaded', () => document.getElementById('loading').style.opacity = '0');
 
     function setAllCities() {
-      citiesLayer.update(allCitiesSource, citiesLayer.getViz());
+      citiesLayer.update(allCitiesSource, citiesViz);
     }
-
     function setEuropeanCities() {
-      citiesLayer.update(europeanCitiesSource, citiesLayer.getViz());
+      citiesLayer.update(europeanCitiesSource, citiesViz);
     }
-
     function setSpanishCities() {
-      citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
+      citiesLayer.update(spanishCitiesSource, citiesViz);
     }
-
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
-
-
   </script>
 </body>
 </html>

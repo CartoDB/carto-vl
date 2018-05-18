@@ -10,20 +10,15 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
-
 </head>
 <body>
   <div id="map"></div>
-
-  <!-- Description -->
   <aside class="toolbox">
     <div class="box">
       <header>
         <h1>Animated map</h1>
-        
+        <button class="github-logo js-source-link"></button>
       </header>
       <section>
         <p class="description open-sans">Animate by date/time.</p>
@@ -31,7 +26,6 @@
       <footer class="js-footer"></footer>
     </div>
   </aside>
-    
   <div id="loading">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -39,8 +33,6 @@
       </svg>
     </div>
   </div>
-
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -57,20 +49,15 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset(`taxi_50k`);
-    const s = carto.expressions;
-
-    // Define style
+    const source = new carto.source.Dataset('taxi_50k');
     const viz = new carto.Viz(`
       filter: torque(linear($tpep_pickup_datetime,time('2016-05-01T00:00:07Z'),time('2016-05-06T10:40:59Z')),30,fade(0.1,0.5))
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Add layer to map
     layer.addTo(map, 'watername_ocean');
-
     layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
-
-
   </script>
 </body>
 </html>
