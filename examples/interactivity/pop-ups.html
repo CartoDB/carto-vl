@@ -17,15 +17,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Pop-Ups</h1>
+        <h1>Add pop-ups</h1>
       </header>
       <section>
-        <p class="description open-sans">Create pop-up information windows and interact with your map.</p>
-        <div class="separator"></div>
-        <section class="usage">
-          <header>USAGE</header>
-          <p class="open-sans">Select your preferred kind of pop-ups</p>
-        </section>
+        <p class="description open-sans">Create pop-up information windows and interact with your map</p>
         <div id="controls">
             <ul class="actions">
               <li>
@@ -141,12 +136,9 @@
       if (event.features.length > 0) {
         const vars = event.features[0].variables;
         popup.setHTML(`
-        <div class="popup-container">
-          <h2>${vars.country_name.value}</h2>
-          <ul>
-            <h3>Population:</h3>
-            <h4>${vars.pop_2015.value}</h4>
-          </ul>
+        <div>
+          <h3 class ="h3">${vars.country_name.value}</h3>
+          <p class="description open-sans">Population: ${vars.pop_2015.value}</h3>
         </div>
         `);
         popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
@@ -162,5 +154,4 @@
     }
   </script>
 </body>
-
 </html>

@@ -19,6 +19,9 @@
       <header>
         <h1>Spend data</h1>
       </header>
+      <section>
+        <p class="description open-sans">Multi-scale animation with color interpolation through time of day and sized by amount spent</p>
+      </section>
       <footer class="js-footer"></footer>
     </div>
   </aside>
@@ -50,6 +53,7 @@
       width: blend(3,blend(3, 20*linear($amount,10,100), linear(zoom(), 2^10,2^16)),linear(zoom(), 2^8, 2^10))
       color: ramp(linear($hour,5,20),[deeppink,gold,turquoise,darkmagenta,black])
       filter: torque(linear($tx_date_proc,time('2012-03-01T00:00:07Z'),time('2012-03-02T23:59:57Z')),24,fade(0,0.5))
+      strokeColor: 0
     `);
     const layer = new carto.Layer('layer', source, viz);
 

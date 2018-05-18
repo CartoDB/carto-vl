@@ -143,7 +143,7 @@
                 },
                 {
                     "title": "Hurricane Harvey",
-                    "desc": "Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall (would be better with day). Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.",
+                    "desc": "Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall. Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.",
                     "file": "advanced/hurricane-harvey.html"
                 }
             ]

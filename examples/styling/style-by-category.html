@@ -14,40 +14,40 @@
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Style by category</h1>
-      </header>
-      <section>
-        <p class="description open-sans">Change the color depending the category.</p>
-        <div id="controls">
-          <ul>
-            <li>
-              <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-              <label for="auto">All categories</label>
-            </li>
-            <li>
-              <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-              <label for="buckets">Custom categories</label>
-            </li>
-            <li>
-              <input type="radio" name="style" onclick="setRampTop()" id="top">
-              <label for="top">Top categories</label>
-            </li>
-          </ul>
-        </div>
-      </section>
-      <footer class="js-footer"></footer>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Style by category</h1>
+        </header>
+        <section>
+          <p class="description open-sans">Options for symbolizing category attributes</p>
+          <div id="controls">
+            <ul>
+              <li>
+                <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
+                <label for="auto">All categories</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+                <label for="buckets">Custom categories</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setRampTop()" id="top">
+                <label for="top">Top categories</label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
     </div>
-  </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
