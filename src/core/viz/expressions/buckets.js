@@ -59,7 +59,7 @@ let bucketUID = 0;
  *
  * @param {Number|String|Property} property - The property to be evaluated and interpolated
  * @param {Number[]|String[]} breakpoints - Numeric expression containing the different breakpoints.
- * @return {Number}
+ * @return {Number|String}
  *
  * @memberof carto.expressions
  * @name buckets
@@ -77,7 +77,7 @@ export default class Buckets extends BaseExpression {
 
         let looseType = undefined;
         if (input.type) {
-            if (input.type != 'number' && input.type != 'category') {
+            if (input.type != 'number' && input.type != 'string') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
@@ -87,7 +87,7 @@ export default class Buckets extends BaseExpression {
                 if (looseType && looseType != arg.type) {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
-                } else if (arg.type != 'number' && arg.type != 'category') {
+                } else if (arg.type != 'number' && arg.type != 'string') {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
                 }
             }
@@ -101,13 +101,13 @@ export default class Buckets extends BaseExpression {
         this.bucketUID = bucketUID++;
         this.numCategories = args.length + 1;
         this.args = args;
-        this.type = 'category';
+        this.type = 'string';
     }
     eval(feature) {
         const v = this.input.eval(feature);
         let i;
         for (i = 0; i < this.args.length; i++) {
-            if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
+            if (this.input.type == 'string' && v == this.args[i].eval(feature)) {
                 return i;
             } else if (this.input.type == 'number' && v < this.args[i].eval(feature)) {
                 return i;
@@ -117,17 +117,17 @@ export default class Buckets extends BaseExpression {
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.othersBucket = this.input.type == 'category';
+        this.othersBucket = this.input.type == 'string';
 
         const input = this.input;
-        if (input.type != 'number' && input.type != 'category') {
+        if (input.type != 'number' && input.type != 'string') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
         this.args.map((arg, index) => {
             if (input.type != arg.type) {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                     `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
-            } else if (arg.type != 'number' && arg.type != 'category') {
+            } else if (arg.type != 'number' && arg.type != 'string') {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
             }
         });
@@ -137,7 +137,7 @@ export default class Buckets extends BaseExpression {
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         const funcName = `buckets${this.bucketUID}`;
-        const cmp = this.input.type == 'category' ? '==' : '<';
+        const cmp = this.input.type == 'string' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index}.;

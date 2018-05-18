@@ -3,8 +3,8 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 
 describe('src/core/viz/expressions/buckets', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('buckets', ['number', 'category-array']);
-        validateDynamicTypeErrors('buckets', ['category', 'number-array']);
+        validateDynamicTypeErrors('buckets', ['number', 'string-array']);
+        validateDynamicTypeErrors('buckets', ['string', 'number-array']);
         validateStaticTypeErrors('buckets', ['color', 'number-array']);
         validateStaticTypeErrors('buckets', ['number', 'color-array']);
 
@@ -16,7 +16,7 @@ describe('src/core/viz/expressions/buckets', () => {
 
     describe('type', () => {
         validateStaticType('buckets', ['number', 'number-array'], 'category');
-        validateStaticType('buckets', ['category', 'category-array'], 'category');
+        validateStaticType('buckets', ['category', 'string-array'], 'category');
     });
 
     describe('eval', () => {

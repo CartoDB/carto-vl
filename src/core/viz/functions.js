@@ -31,10 +31,10 @@
  * for example lets divide the population between a number using the `div` expression to make points smaller:
  *
  * ```javascript
- * const e = carto.expressions; // We use this alias along documentation.
+ * const s = carto.expressions; // We use this alias along documentation.
  * const viz = new carto.Viz({
- *   width: e.div(
- *     e.prop('population'),
+ *   width: s.div(
+ *     s.prop('population'),
  *     10000
  *  )
  * });
@@ -168,7 +168,6 @@ import { Width } from './expressions/ordering';
 
 import { palettes } from './expressions/palettes';
 import { Inverse } from './expressions/palettes';
-import { CustomPalette } from './expressions/palettes';
 
 import Property from './expressions/property';
 
@@ -285,8 +284,6 @@ export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
 export const inverse = (...args) => new Inverse(...args);
-
-export const customPalette = (...args) => new CustomPalette(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };

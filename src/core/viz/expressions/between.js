@@ -12,9 +12,9 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
- * const e = carto.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: e.between(e.prop('dn'), 50, 100);
+ *   filter: s.between(s.prop('dn'), 50, 100);
  * });
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range. (String)</caption>

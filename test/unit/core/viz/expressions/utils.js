@@ -1,4 +1,4 @@
-import * as e from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/core/viz/functions';
 
 const metadata = {
     columns: [
@@ -40,14 +40,14 @@ function equalArgs(argsA, argsB) {
 function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
-            e[expressionName](...args.map(arg => arg[0]))
+            s[expressionName](...args.map(arg => arg[0]))
         ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
     });
 }
 function validateCompileTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
-            const expression = e[expressionName](...args.map(arg => arg[0]));
+            const expression = s[expressionName](...args.map(arg => arg[0]));
             expression._compile(metadata);
         }).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
     });
@@ -73,14 +73,14 @@ export function validateDynamicType(expressionName, argTypes, expectedType) {
 function validateConstructorTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
-            e[expressionName](...args.map(arg => arg[0])).type
+            s[expressionName](...args.map(arg => arg[0])).type
         ).toEqual(expectedType);
     });
 }
 function validateCompileTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
-            compile(e[expressionName](...args.map(arg => arg[0]))).type
+            compile(s[expressionName](...args.map(arg => arg[0]))).type
         ).toEqual(expectedType);
     });
 }
@@ -88,25 +88,23 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 function getSimpleArg(type) {
     switch (type) {
         case 'number':
-            return [e.number(0), '0'];
+            return [s.number(0), '0'];
         case 'number-array':
-            return [e.array([e.number(0)]), '[0]'];
+            return [s.array([s.number(0)]), '[0]'];
         case 'number-property':
-            return [e.property('number'), '$number'];
+            return [s.property('number'), '$number'];
         case 'string':
-            return [e.string('string'), '\'string\''];
+            return [s.string('string'), '\'string\''];
         case 'string-array':
-            return [e.array([e.string('string')]), '[\'string\']'];
+            return [s.array([s.string('string')]), '[\'string\']'];
         case 'string-property':
-            return [e.property('string'), '$string'];
+            return [s.property('string'), '$string'];
         case 'color':
-            return [e.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
+            return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
+        case 'color-array':
+            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
-            return [e.palettes.PRISM, 'PRISM'];
-        case 'customPalette':
-            return [[e.rgb(0, 0, 0), e.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteNumber':
-            return [[10, 20], '[10, 20]'];
+            return [s.palettes.PRISM, 'PRISM'];
         default:
             return [type, `${type}`];
     }
@@ -115,22 +113,21 @@ function getPropertyArg(type) {
     switch (type) {
         case 'number':
         case 'number-property':
-            return [e.property('number'), '$number'];
+            return [s.property('number'), '$number'];
         case 'number-array':
-            return [e.array([e.number(0)]), '[0]'];
+            return [s.array([s.number(0)]), '[0]'];
         case 'string':
         case 'string-property':
-            return [e.property('string'), '$string'];
+            return [s.property('string'), '$string'];
         case 'string-array':
-            return [e.array([e.string('string')]), '[\'string\']'];
+            return [s.array([s.string('string')]), '[\'string\']'];
         case 'color':
-            return [e.hsv(e.property('number'), 0, 0), 'hsv($number, 0, 0)'];
+        case 'color-property':
+            return [s.hsv(s.property('number'), 0, 0), 'hsv($number, 0, 0)'];
+        case 'color-array':
+            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
-            return [e.palettes.PRISM, 'PRISM'];
-        case 'customPalette':
-            return [[e.rgb(0, 0, 0), e.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteNumber':
-            return [[10, 20], '[10, 20]'];
+            return [s.palettes.PRISM, 'PRISM'];
         default:
             return [type, `${type}`];
     }

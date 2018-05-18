@@ -192,9 +192,9 @@ describe('api/viz', () => {
     });
 
     describe('expression.blendTo()', () => {
-        const dateNow = Dats.now;
+        const dateNow = Date.now;
         afterEach(function () {
-            Dats.now = dateNow;
+            Date.now = dateNow;
         });
         it('should return the new/final expression', () => {
             const numberA = s.number(1);
@@ -226,8 +226,8 @@ describe('api/viz', () => {
             });
             numberA.blendTo(numberB, 999);
             viz.onChange(done);
-            const t = Dats.now() + 1000;
-            Dats.now = () => t;
+            const t = Date.now() + 1000;
+            Date.now = () => t;
             viz.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
     });
