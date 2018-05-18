@@ -31,8 +31,8 @@ describe('src/core/dataframe', () => {
             const feature1 = { id: 0, properties: { id: 1 } };
             const feature2 = { id: 1, properties: { id: 2 } };
             const viz = {
-                getWidth: () => ({ eval: () => 0.5 }),
-                getStrokeWidth: () => ({ eval: () => 0.5 })
+                width: { eval: () => 0.5 },
+                strokeWidth: { eval: () => 0.5 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -82,11 +82,7 @@ describe('src/core/dataframe', () => {
                 }
             };
             const viz = {
-                getWidth: () => ({
-                    eval: () => {
-                        return 1;
-                    }
-                })
+                width: { eval: () => 1 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
