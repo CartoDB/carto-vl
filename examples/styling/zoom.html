@@ -10,19 +10,14 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
-
-  <!-- Description -->
   <aside class="toolbox">
     <div class="box">
       <header>
         <h1>Zoom based stylin</h1>
-        
       </header>
       <section>
         <p class="description open-sans">Styling your map based on the zoom level.</p>
@@ -30,15 +25,13 @@
       <footer class="js-footer"></footer>
     </div>
   </aside>
-
-  <div id="loading">
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -55,19 +48,19 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset(`spend_data`);
-    const s = carto.expressions;
-
-    // Define style
+    const source = new carto.source.Dataset('spend_data');
     const viz = new carto.Viz(`
         width: zoom() / 300
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Add layer to map
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+    layer.on('loaded', hideLoader);
 
-    
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
 </html>

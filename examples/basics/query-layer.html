@@ -51,7 +51,7 @@
     const source = new carto.source.SQL(`
       SELECT *
         FROM ne_10m_populated_places_simple
-        WHERE adm0name = \'Spain\'
+        WHERE adm0name = 'Spain'
     `);
     const viz = new carto.Viz(`
       width: 8
@@ -59,7 +59,7 @@
       strokeWidth: 0.5
       strokeColor: #191970
     `);
-    const layer = new carto.Layer('Layer', source, viz);
+    const layer = new carto.Layer('layer', source, viz);
 
     // Add layer to map
     layer.addTo(map, 'watername_ocean');

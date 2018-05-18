@@ -83,6 +83,7 @@
 
     // Add layer to map
     layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
 
     function setRampQuantiles() {
       layer.blendToViz(rampQuantilesViz);

@@ -50,7 +50,7 @@
     // Define layer
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
-        color: ramp(viewportQuantiles($pop_max, 5), redor),
+        color: ramp(viewportQuantiles($pop_max, 5), redor)
         width: 5
         strokeWidth: 0
         filter: between($pop_max, 10000, 100000)
