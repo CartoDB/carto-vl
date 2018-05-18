@@ -10,64 +10,45 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  #map {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-  }
-  #controls {
-    position: absolute;
-    padding: 20px;
-    background: white;
-    top: 12px;
-    right: 12px;
-    box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-    border-radius: 4px;
-    width: 200px;
-    color: #2E3C43;
-  }
-  #controls li {
-    list-style-type: none;
-    margin: 0 0 8px 0;
-    display: flex;
-    vertical-align: middle;
-  }
-  #controls li input {
-    margin: 0 8px 0 0;
-  }
-  #controls li label {
-    font: 12px/16px 'Open Sans';
-    cursor: pointer;
-  }
-  #controls li:last-child {
-    margin-bottom: 0;
-  }
-</style>
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
 </head>
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <ul>
-      <li>
-        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-        <label for="auto">All categories</label>
-      </li>
-      <li>
-        <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-        <label for="buckets">Custom categories</label>
-      </li>
-      <li>
-        <input type="radio" name="style" onclick="setRampTop()" id="top">
-        <label for="top">Top categories</label>
-      </li>
-    </ul>
-  </div>
+
+    <!-- Description -->
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Style by category</h1>
+          <button class="github-logo js-source-link"></button>
+        </header>
+        <section>
+          <p class="description open-sans">Change the color depending the category.</p>
+          <div id="controls">
+            <ul>
+              <li>
+                <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
+                <label for="auto">All categories</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+                <label for="buckets">Custom categories</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setRampTop()" id="top">
+                <label for="top">Top categories</label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+
+
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
