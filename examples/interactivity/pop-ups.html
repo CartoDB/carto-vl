@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Add pop-ups | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,46 +10,39 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
-
 <body>
   <div id="map"></div>
-
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Pop-Ups</h1>
-          
-        </header>
-        <section>
-          <p class="description open-sans">Create pop-up information windows and interact with your map.</p>
-          <div class="separator"></div>
-          <section class="usage">
-            <header>USAGE</header>
-            <p class="open-sans">Select your preferred kind of pop-ups</p>
-          </section>
-
-          <div id="controls">
-              <ul class="actions">
-                <li>
-                  <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
-                  <label for="click">Pop-ups on click</label>
-                </li>
-                <li>
-                  <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
-                  <label for="hover">Pop-ups on hover</label>
-                </li>
-              </ul>
-          </div>
-
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Pop-Ups</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Create pop-up information windows and interact with your map.</p>
+        <div class="separator"></div>
+        <section class="usage">
+          <header>USAGE</header>
+          <p class="open-sans">Select your preferred kind of pop-ups</p>
         </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-  <div id="loading">
+        <div id="controls">
+            <ul class="actions">
+              <li>
+                <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
+                <label for="click">Pop-ups on click</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
+                <label for="hover">Pop-ups on hover</label>
+              </li>
+            </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
@@ -66,7 +58,7 @@
       dragRotate: false
     });
 
-    // Define pop-ups
+    // Define pop-up
     const popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false
@@ -79,11 +71,7 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset(`
-      world_population_2015
-    `);
-
-    // Define style
+    const source = new carto.source.Dataset('world_population_2015');
     const viz = new carto.Viz(`
       @country_name: $country_name
       @pop_2015: $pop_2015
@@ -95,7 +83,7 @@
 
     // Define interactivity
     const interactivity = new carto.Interactivity(layer);
-    const delay = 100;
+    const delay = 50;
     let clickedFeatureId = null;
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
@@ -134,31 +122,21 @@
         feature.strokeColor.reset(delay);
       }
     });
-    layer.on('loaded', () => {
-      enableControls();
-    });
-    layer.addTo(map, 'watername_ocean');
-    setPopupsClick();
 
-    // Define functions
-    function updateTitle(text) {
-      document.getElementsByTagName('h2')[0].innerHTML = text;
-    }
+    // Add layer to map
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    setPopupsClick();
 
     function setPopupsClick() {
       interactivity.off('featureHover', updatePopup);
       interactivity.on('featureClick', updatePopup);
     }
-
     function setPopupsHover() {
       interactivity.off('featureClick', updatePopup);
       interactivity.on('featureHover', updatePopup);
     }
-
-    function enableControls() {
-      document.getElementById('controls').style.pointerEvents = 'auto';
-    }
-
     function updatePopup(event) {
       if (event.features.length > 0) {
         const vars = event.features[0].variables;
@@ -179,7 +157,9 @@
         popup.remove();
       }
     }
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
 

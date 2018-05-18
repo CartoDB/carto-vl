@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Interactive based styling | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,25 +10,19 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  
   <link rel="stylesheet" type="text/css" href="../style.css">
-
-
 </head>
-
 <body>
   <div id="map"></div>
-   <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Interact based on styling</h1>
-          
-        </header>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-  <div id="loading">
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Interact based on styling</h1>
+      </header>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
@@ -52,22 +45,17 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset(`
-      world_population_2015
-    `);
-
-    // Define style
+    const source = new carto.source.Dataset('world_population_2015');
     const viz = new carto.Viz(`
       width: sqrt($pop_2015)/200
       color: opacity(BlueViolet, 0.5)
       strokeColor: opacity(BlueViolet, 0.8)
     `);
     const layer = new carto.Layer('layer', source, viz);
-    layer.addTo(map, 'watername_ocean');
 
     // Define interactivity
     const interactivity = new carto.Interactivity(layer);
-    const delay = 100;
+    const delay = 50;
     let clickedFeatureId = null;
     interactivity.on('featureEnter', event => {
       if (event.features.length > 0) {
@@ -106,8 +94,14 @@
         feature.strokeColor.reset(delay);
       }
     });
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+
+    // Add layer to map
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
-
 </html>
