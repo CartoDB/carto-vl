@@ -70,8 +70,8 @@ aside.toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
-  min-width: 300px;
-  max-width: 300px;
+  min-width: 250px;
+  max-width: 250px;
   z-index: 2;
 }
 

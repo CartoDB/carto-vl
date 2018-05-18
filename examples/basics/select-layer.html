@@ -21,7 +21,7 @@
       <div class="box">
         <header>
           <h1>Change the feature columns</h1>
-          <button class="github-logo js-source-link"></button>
+          
         </header>
         <section>
           <p class="description open-sans">Change the columns returned in the feature event.</p>
@@ -51,7 +51,13 @@
         <footer class="js-footer"></footer>
       </div>
     </aside>
-
+  <div id="loading">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -105,6 +111,10 @@
     function setSpanishCities() {
       citiesLayer.update(spanishCitiesSource, citiesLayer.getViz());
     }
+
+    layer.on('loaded', () => document.getElementById('loading').style.display = 'none')
+
+    
   </script>
 </body>
 </html>
