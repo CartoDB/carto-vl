@@ -150,6 +150,10 @@ function generateGlobalAggregattion(metadataPropertyName) {
             return this._value.expr;
         }
 
+        eval() {
+            return this._value.expr;
+        }
+
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
