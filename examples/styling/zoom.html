@@ -28,8 +28,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.174482, 41.401641],
-      zoom: 4,
+      center: [2.1734, 41.3851],
+      zoom: 12,
       dragRotate: false
     });
 
@@ -45,7 +45,7 @@
 
     // Define style
     const viz = new carto.Viz(`
-        width: zoom()
+        width: zoom() / 300
     `);
     const layer = new carto.Layer('layer', source, viz);
 
