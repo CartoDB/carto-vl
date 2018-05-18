@@ -18,20 +18,27 @@
 <body>
   <div id="map"></div>
 
-    <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Animated map</h1>
-          
-        </header>
-        <section>
-          <p class="description open-sans">Animate by date/time.</p>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-
+  <!-- Description -->
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Animated map</h1>
+        
+      </header>
+      <section>
+        <p class="description open-sans">Animate by date/time.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+    
+  <div id="loading">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
 
 
   <script>
@@ -60,6 +67,10 @@
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+
+
   </script>
 </body>
 </html>
