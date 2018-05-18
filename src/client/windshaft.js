@@ -487,10 +487,13 @@ export default class Windshaft {
         return [c1, c2];//.filter(c1 => !(c1[0] == current[0] && c1[1] == current[1]));
     }
     _clipSegment(a, b) {
-        b = this._intersect(a, b, [-1, -1], [1, -1]) || b;
-        b = this._intersect(a, b, [-1, -1], [-1, 1]) || b;
-        b = this._intersect(a, b, [-1, 1], [1, 1]) || b;
-        b = this._intersect(a, b, [1, -1], [1, 1]) || b;
+        // Make the tile border segments longer to avoid precision errors
+        // This changes the result when segment is completely outside the tile, but we don't care about that
+        // TODO: _intersect is generic, but we could speed up and remove the precision problems if we used the fact that the tile is an AABB
+        b = this._intersect(a, b, [-1.0001, -1], [1.0001, -1]) || b;
+        b = this._intersect(a, b, [-1, -1.0001], [-1, 1.0001]) || b;
+        b = this._intersect(a, b, [-1.0001, 1], [1.0001, 1]) || b;
+        b = this._intersect(a, b, [1, -1.0001], [1, 1.0001]) || b;
         return b;
     }
     _intersect(a, b, c, d) {
