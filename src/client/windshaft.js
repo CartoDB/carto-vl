@@ -304,7 +304,7 @@ export default class Windshaft {
 
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 8
+                'mvt': 1
             },
             layers: [
                 {
@@ -417,6 +417,7 @@ export default class Windshaft {
             //if exterior
             //   push current polygon & set new empty
             //else=> add index to holes
+            let hole = false;
             if (isClockWise(geom[j])) {
                 if (polygon) {
                     geometry.push(polygon);
@@ -431,70 +432,85 @@ export default class Windshaft {
                 if (j == 0) {
                     throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
-                polygon.holes.push(polygon.flat.length / 2);
+                hole = true;
             }
+            let preClippedVertices = [];
             for (let k = 0; k < geom[j].length; k++) {
-                // TODO should additional clipping be done here?
-                let clipping = 0;
                 let x = geom[j][k].x;
                 let y = geom[j][k].y;
-
-                if (x > mvt_extent) {
-                    clipping = clipping | 1;
-                } else if (x < 0) {
-                    clipping = clipping | 2;
-                }
-                if (y > mvt_extent) {
-                    clipping = clipping | 4;
-                } else if (y < 0) {
-                    clipping = clipping | 8;
-                }
-
-                if (clipping) {
-                    polygon.clipped.push(polygon.flat.length);
-                    polygon.clippedType.push(clipping);
-                    polygon.clipped.push(polygon.flat.length + 2);
-                    polygon.clippedType.push(clipping);
-
-                    const current = [2 * x / mvt_extent - 1, 2 * (1 - y / mvt_extent) - 1];
-                    const prevIndex = k - 1 >= 0 ? k - 1 : geom[j].length - 1;
-                    const nextIndex = k + 1 < geom[j].length ? k : 0;
-                    const prev = [2 * geom[j][prevIndex].x / mvt_extent - 1, 2 * (1 - geom[j][prevIndex].y / mvt_extent) - 1];
-                    const next = [2 * geom[j][nextIndex].x / mvt_extent - 1, 2 * (1 - geom[j][nextIndex].y / mvt_extent) - 1];
-                    this._clipVertex(prev, current, next).forEach(vertex =>
-                        polygon.flat.push(vertex[0], vertex[1])
-                    );
-                } else {
-                    x = 2 * x / mvt_extent - 1;
-                    y = 2 * (1 - y / mvt_extent) - 1;
-                    polygon.flat.push(x, y);
-                }
+                x = 2 * x / mvt_extent - 1;
+                y = 2 * (1 - y / mvt_extent) - 1;
+                preClippedVertices.push([x, y]);
             }
+            this._clipPolygon(preClippedVertices, polygon, hole);
         }
         //if current polygon is not empty=> push it
-        if (polygon && polygon.flat.length > 0) {
+        if (polygon) {
             geometry.push(polygon);
         }
         featureGeometries.push(geometry);
     }
-    _clipVertex(prev, current, next) {
-        const c1 = this._clipSegment(prev, current);
-        let c2 = this._clipSegment(next, current);
-        if (c1[0] == current[0] && c1[1] == current[1]) {
-            // c2 = c1;
-            // return [];
+
+    // Add polygon composed by preClippedVertices to the `polygon.flat` array
+    _clipPolygon(preClippedVertices, polygon, isHole) {
+        // Sutherland-Hodgman Algorithm to clip polygons to the tile
+        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
+        const clippingEdges = [
+            p => p[0] <= 1,
+            p => p[1] <= 1,
+            p => p[0] >= -1,
+            p => p[1] >= -1,
+        ];
+        const clippingEdgeIntersectFn = [
+            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
+            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
+            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
+            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
+        ];
+
+        // for each clipping edge
+        for (let i = 0; i < 4; i++) {
+            const preClippedVertices2 = [];
+
+            // for each edge on polygon
+            for (let k = 0; k < preClippedVertices.length - 1; k++) {
+                // clip polygon edge
+                const a = preClippedVertices[k];
+                const b = preClippedVertices[k + 1];
+
+                const insideA = clippingEdges[i](a);
+                const insideB = clippingEdges[i](b);
+
+                if (insideA && insideB) {
+                    // case 1: both inside, push B vertex
+                    preClippedVertices2.push(b);
+                } else if (insideA) {
+                    // case 2: just A outside, push intersection
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                } else if (insideB) {
+                    // case 4: just B outside: push intersection, push B
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                    preClippedVertices2.push(b);
+                } else {
+                    // case 3: both outside: do nothing
+                }
+            }
+            if (preClippedVertices2.length) {
+                preClippedVertices2.push(preClippedVertices2[0]);
+            }
+            preClippedVertices = preClippedVertices2;
         }
-        return [c1, c2];//.filter(c1 => !(c1[0] == current[0] && c1[1] == current[1]));
-    }
-    _clipSegment(a, b) {
-        // Make the tile border segments longer to avoid precision errors
-        // This changes the result when segment is completely outside the tile, but we don't care about that
-        // TODO: _intersect is generic, but we could speed up and remove the precision problems if we used the fact that the tile is an AABB
-        b = this._intersect(a, b, [-1.0001, -1], [1.0001, -1]) || b;
-        b = this._intersect(a, b, [-1, -1.0001], [-1, 1.0001]) || b;
-        b = this._intersect(a, b, [-1.0001, 1], [1.0001, 1]) || b;
-        b = this._intersect(a, b, [1, -1.0001], [1, 1.0001]) || b;
-        return b;
+
+        if (preClippedVertices.length > 3) {
+            if (isHole) {
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            preClippedVertices.forEach(v => {
+                polygon.flat.push(v[0], v[1]);
+            });
+        }
     }
     _intersect(a, b, c, d) {
         //If AB intersects CD => return intersection point

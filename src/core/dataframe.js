@@ -87,7 +87,7 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
         for (let i = 0; i < vertices.length; i += 2) {
-            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
+            while ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
                 index++;
             }
             ids[i + 0] = ((index) % width) / (width - 1);
