@@ -10,29 +10,25 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Spend data</h1>
-          
-        </header>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-  <div id="loading">
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Spend data</h1>
+      </header>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -42,11 +38,13 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
+    // Define layer
     const source = new carto.source.Dataset('spend_data');
     const viz = new carto.Viz(`
       width: blend(3,blend(3, 20*linear($amount,10,100), linear(zoom(), 2^10,2^16)),linear(zoom(), 2^8, 2^10))
@@ -55,11 +53,13 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map);
-    
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+    // Add layer to map
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
 
-
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
 </html>

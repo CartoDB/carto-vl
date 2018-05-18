@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Denver trees | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,43 +10,36 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
-
 <body>
   <div id="map"></div>
-
-    <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Denver trees</h1>
-          
-        </header>
-        <section>
-          <p class="description open-sans">Interact with the trees.</p>
-          <div class="separator"></div>
-          <section class="usage">
-            <header>USAGE</header>
-            <p class="open-sans">Click on the trees</p>
-          </section>
-          <div id="controls">
-            <div id="content"></div>
-          </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Denver trees</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Interact with the trees.</p>
+        <div class="separator"></div>
+        <section class="usage">
+          <header>USAGE</header>
+          <p class="open-sans">Click on the trees</p>
         </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-  <div id="loading">
+        <div id="controls">
+          <div id="content"></div>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
         <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -57,14 +49,14 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      tree_inventory_sloans
-    `);
+    // Define layer
+    const source = new carto.source.Dataset('tree_inventory_sloans');
     const viz = new carto.Viz(`
       @type: $type
       @diameter_number: $diameter_number
@@ -75,18 +67,13 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Define interactivity
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureClick', updateTree);
 
-    layer.on('loaded', () => {
-      updateTitle('Click on the trees');
-    });
-
+    // Add layer to map
     layer.addTo(map, 'watername_ocean');
-
-    function updateTitle(text) {
-      document.getElementsByTagName('h3')[0].innerHTML = text;
-    }
+    layer.on('loaded', hideLoader);
 
     function updateTree(event) {
       let content = '';
@@ -102,11 +89,9 @@
       }
       document.getElementById('content').innerHTML = content;
     }
-
-    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
-
-
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
   </script>
 </body>
-
 </html>
