@@ -64,7 +64,7 @@
                 {
                     "title": "Animate by date/time",
                     "desc": "How to animate features by date/time",
-                    "file": "animation/animation.html"
+                    "file": "styling/animation.html"
                 },
                 {
                     "title": "Filter based styling",
