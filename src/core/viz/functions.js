@@ -93,6 +93,13 @@
  */
 
 /**
+ * Type of Palette Expressions.
+ *
+ * @typedef {} Palette
+ * @api
+ */
+
+/**
  * Type of Property Expressions.
  *
  * @typedef {} Property
@@ -167,7 +174,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import { palettes } from './expressions/palettes';
-import { Inverse } from './expressions/palettes';
+import { Reverse } from './expressions/palettes';
 
 import Property from './expressions/property';
 
@@ -283,7 +290,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const inverse = (...args) => new Inverse(...args);
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };

@@ -365,7 +365,7 @@ export default class Windshaft {
                 this._MNS.columns.map(name => {
                     const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
-                    if (type == 'category') {
+                    if (type == 'string') {
                         catFields.push(name);
                     } else if (type == 'number') {
                         numFields.push(name);
@@ -687,7 +687,7 @@ export default class Windshaft {
             });
             return {
                 name,
-                type: 'category',
+                type: 'string',
                 categoryNames: names,
                 categoryCounts: counts
             };

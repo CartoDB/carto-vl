@@ -23,12 +23,12 @@ import { hexToRgb } from './utils';
  * @example <caption>Using a color scheme.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
+ *   color: s.ramp(s.prop('type'), s.palettes.PRISM);
  * });
  *
  * @example <caption>Using a color scheme. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: ramp($type, PRISM)
+ *   color: ramp($type, PRISM)
  * `);
  *
  * @name carto.expressions.palettes
@@ -65,7 +65,29 @@ Object.keys(cartocolor).map(name => {
     palettes[`${name.toUpperCase()}`] = new PaletteGenerator(name, cartocolor[name]);
 });
 
-class Inverse extends BaseExpression{
+/**
+ * Reverse the provided Palette.
+ *
+ * @param {Palette} palette - Numeric expression to compute the natural logarithm
+ * @return {Palette}
+ *
+ * @example <caption>Invert a Palette.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ * });
+ *
+ * @example <caption>Invert a Palette. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($type, reverse(PRISM))
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name reverse
+ * @function
+ * @api
+ */
+class Reverse extends BaseExpression{
     constructor(palette) {
         super({});
         this.type = 'palette';
@@ -95,4 +117,4 @@ class Inverse extends BaseExpression{
     }
 }
 
-export { palettes, Inverse };
+export { palettes, Reverse };

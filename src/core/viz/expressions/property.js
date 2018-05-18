@@ -53,7 +53,7 @@ export default class Property extends BaseExpression {
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
-        if (this.type == 'category') {
+        if (this.type == 'string') {
             this.numCategories = metaColumn.categoryNames.length;
         }
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
