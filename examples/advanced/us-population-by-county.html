@@ -10,20 +10,34 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
 </head>
 <body>
   <div id="map"></div>
+
+      <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>US Population by county</h1>
+          <button class="github-logo js-source-link"></button>
+        </header>
+        <section>
+          <p class="description open-sans">Marker size depends on the population.</p>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+  <div id="loading">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -48,6 +62,9 @@
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map);
+
+    layer.on('loaded', () => document.getElementById('loading').style.display = 'none')
+
   </script>
 </body>
 </html>
