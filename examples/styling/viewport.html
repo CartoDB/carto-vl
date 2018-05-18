@@ -10,20 +10,27 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
 </head>
 <body>
   <div id="map"></div>
+  <!-- Description -->
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Viewport based styling</h1>
+        <button class="github-logo js-source-link"></button>
+      </header>
+      <section>
+        <p class="description open-sans">Styling your map based on viewport.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
