@@ -157,7 +157,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
-            super.inlineMaker = inline => inline.value;
+            super.inlineMaker = inline => inline._value;
             this._value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
         }
         _getMinimumNeededSchema() {
@@ -220,7 +220,7 @@ export class GlobalPercentile extends BaseExpression {
         super._compile(metadata);
         this.property._compile(metadata);
         this.type = 'number';
-        super.inlineMaker = inline => inline.value;
+        super.inlineMaker = inline => inline._value;
         const copy = metadata.sample.map(s => s[this.property.name]);
         copy.sort((x, y) => x - y);
         const p = this.percentile / 100;

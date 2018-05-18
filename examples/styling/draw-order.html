@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ramp category | CARTO</title>
+  <title>Draw order | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,59 +55,78 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
-        <label for="auto">Ramp auto</label>
+        <input type="radio" name="style" onclick="setDefaultOrder()" id="default" checked>
+        <label for="default">Default</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-        <label for="buckets">Ramp buckets</label>
+        <input type="radio" name="style" onclick="setAscOrder()" id="asc">
+        <label for="asc">Ascending</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setRampTop()" id="top">
-        <label for="top">Ramp top</label>
+        <input type="radio" name="style" onclick="setDescOrder()" id="des">
+        <label for="des">Descending</label>
       </li>
     </ul>
   </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [2.1734, 41.3851],
-      zoom: 12,
+      zoom: 14,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
+    // Define layer
     const source = new carto.source.Dataset(`
-      tx_0125_copy_copy
+      spend_data
     `);
     const s = carto.expressions;
+
+    // Define style
     const viz = new carto.Viz({
-      color: s.ramp(s.prop('category'), s.palettes.VIVID)
+        width: s.sqrt(s.prop('amount')),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
+        strokeWidth: 1,
     });
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
-    function setRampAuto() {
+    // Define functions
+    function setDefaultOrder() {
       layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.prop('category'), s.palettes.VIVID)
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
       }));
     }
 
-    function setRampBuckets() {
+    function setAscOrder() {
       layer.blendToViz(new carto.Viz({
-          color: s.ramp(s.buckets(s.prop('category'), ['Moda y calzado']), s.palettes.VIVID)
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
+          order: s.asc(s.width())
       }));
     }
 
-    function setRampTop() {
+    function setDescOrder() {
       layer.blendToViz(new carto.Viz({
-        color: s.ramp(s.top(s.prop('category'), 3), s.palettes.VIVID)
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
+          order: s.desc(s.width())
       }));
     }
   </script>
