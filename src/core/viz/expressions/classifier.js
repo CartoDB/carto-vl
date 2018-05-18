@@ -67,21 +67,23 @@ class Classifier extends BaseExpression {
 
 
 /**
- * Generate quantiles of size `n` from the features on the viewport.
+ * Classify `input` by using the quantiles method with `n` buckets.
+ *
+ * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {carto.expressions.Base}
  *
- * @example <caption>Use quantiles to define a color ramp.</caption>
+ * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.quantiles(s.prop('density'), 5), s.palettes.PRISM)
+ *   color: s.ramp(s.viewportQuantiles(s.prop('density'), 5), s.palettes.PRISM)
  * });
  *
- * @example <caption>Use quantiles to define a color ramp. (String)</caption>
+ * @example <caption>Use viewportQuantiles to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(quantiles($density, 5), PRISM)
+ *   color: ramp(viewportQuantiles($density, 5), PRISM)
  * `);
  *
  * @memberof carto.expressions
@@ -89,10 +91,10 @@ class Classifier extends BaseExpression {
  * @function
  * @api
  */
-export class Quantiles extends Classifier {
+export class ViewportQuantiles extends Classifier {
     constructor(input, buckets) {
-        checkInstance('quantiles', 'input', 0, Property, input && (input.property || input));
-        checkNumber('quantiles', 'buckets', 1, buckets);
+        checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
+        checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
         let children = {
             input
@@ -102,10 +104,10 @@ export class Quantiles extends Classifier {
     }
     _compile(metadata) {
         super._compile(metadata);
-        checkType('quantiles', 'input', 0, 'number', this.input);
+        checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const hist = this._histogram.eval();
+        const hist = this._histogram.value;
 
         const histogramBuckets = hist.length;
         const min = hist[0].x[0];
@@ -135,7 +137,9 @@ export class Quantiles extends Classifier {
 }
 
 /**
- * Generate quantiles of size `n` from all the features.
+ * Classify `input` by using the quantiles method with `n` buckets.
+ *
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
@@ -176,9 +180,9 @@ export class GlobalQuantiles extends Classifier {
 }
 
 /**
- * Classify input in `n` buckets using global equal intervals.
+ * Classify `input` by using the equal intervals method with `n` buckets.
  *
- * Global classifiers will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression to classify
  * @param {number} n - Number of buckets
@@ -219,9 +223,9 @@ export class GlobalEqIntervals extends Classifier {
 }
 
 /**
- * Classify input in `n` buckets using viewport equal intervals.
+ * Classify `input` by using the equal intervals method with `n` buckets.
  *
- * Viewport classifiers will classify the input based on the filtered dataset filtering by viewport and by `filter`.
+ * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
  * @param {carto.expressions.Base} input - The input expression to classify
  * @param {number} n - Number of buckets
@@ -259,8 +263,8 @@ export class ViewportEqIntervals extends Classifier {
         checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const min = this._min.eval();
-        const max = this._max.eval();
+        const min = this._min.value;
+        const max = this._max.value;
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
