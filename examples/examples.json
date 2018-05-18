@@ -128,7 +128,7 @@
                 },
                 {
                     "title": "US Population by County",
-                    "desc": "This map uses viewportMAX to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport",
+                    "desc": "This map uses viewportMax to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport",
                     "file": "advanced/us-population-by-county.html"
                 },
                 {
