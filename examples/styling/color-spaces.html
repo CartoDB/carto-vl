@@ -14,52 +14,52 @@
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Change color style</h1>
-      </header>
-      <section>
-        <p class="description open-sans">Change the color points.</p>
-        <div id="controls">
-          <ul>
-            <li>
-              <input type="radio" name="viz" onclick="setHEXGreen()" id="green" checked>
-              <label for="green">HEX - Green</label>
-            </li>
-            <li>
-              <input type="radio" name="viz" onclick="setRGBARed()" id="red">
-              <label for="red">RGBA - Red</label>
-            </li>
-            <li>
-              <input type="radio" name="viz" onclick="setNamedColorOrange()" id="orange">
-              <label for="orange">Named Color - Orange</label>
-            </li>
-            <li>
-              <input type="radio" name="viz" onclick="setHSVBlue()" id="blue">
-              <label for="blue">HSV - Blue</label>
-            </li>
-            <li>
-              <input type="radio" name="viz" onclick="setHSLPurple()" id="purple">
-              <label for="purple">HSL - Purple</label>
-            </li>
-            <li>
-              <input type="radio" name="viz" onclick="setCIELABYellow()" id="yellow">
-              <label for="yellow">CIELAB - Yellow</label>
-            </li>
-          </ul>
-        </div>
-      </section>
-      <footer class="js-footer"></footer>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Color spaces</h1>
+        </header>
+        <section>
+          <p class="description open-sans">The color spaces that we support</p>
+          <div id="controls">
+            <ul>
+              <li>
+                <input type="radio" name="viz" onclick="setHEXGreen()" id="green" checked>
+                <label for="green">HEX - Green</label>
+              </li>
+              <li>
+                <input type="radio" name="viz" onclick="setRGBARed()" id="red">
+                <label for="red">RGBA - Red</label>
+              </li>
+              <li>
+                <input type="radio" name="viz" onclick="setNamedColorOrange()" id="orange">
+                <label for="orange">Named Color - Orange</label>
+              </li>
+              <li>
+                <input type="radio" name="viz" onclick="setHSVBlue()" id="blue">
+                <label for="blue">HSV - Blue</label>
+              </li>
+              <li>
+                <input type="radio" name="viz" onclick="setHSLPurple()" id="purple">
+                <label for="purple">HSL - Purple</label>
+              </li>
+              <li>
+                <input type="radio" name="viz" onclick="setCIELABYellow()" id="yellow">
+                <label for="yellow">CIELAB - Yellow</label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
     </div>
-  </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',

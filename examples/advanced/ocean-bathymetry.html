@@ -10,18 +10,18 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Ocean Bathymetry</h1>
-        
+        <h1>Ocean bathymetry</h1>
       </header>
+      <section>
+        <p class="description open-sans">Since the ocean is forever active, and moving, we wanted to demonstrate how we could animate the points to give that sense of movement</p>
+      </section>
       <footer class="js-footer"></footer>
     </div>
   </aside>
@@ -32,7 +32,6 @@
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -60,7 +59,7 @@
 
     layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
 
-    
+
   </script>
 </body>
 </html>

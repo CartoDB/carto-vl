@@ -10,21 +10,17 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
 <body>
   <div id="map"></div>
-
       <aside class="toolbox">
       <div class="box">
         <header>
           <h1>US Population by county</h1>
-          
         </header>
         <section>
-          <p class="description open-sans">Marker size depends on the population.</p>
+          <p class="description open-sans">This map uses viewportMax to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport</p>
         </section>
         <footer class="js-footer"></footer>
       </div>
@@ -36,8 +32,6 @@
       </svg>
     </div>
   </div>
-
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',

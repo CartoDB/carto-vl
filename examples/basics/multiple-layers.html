@@ -14,25 +14,24 @@
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Add more layers</h1>
-        <button class="github-logo js-source-link"></button>
-      </header>
-      <section>
-        <p class="description open-sans">Add multiple CARTO layers to your map.</p>
-      </section>
-      <footer class="js-footer"></footer>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Multiple layers</h1>
+        </header>
+        <section>
+          <p class="description open-sans">Add multiple layers to your map</p>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
     </div>
-  </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',

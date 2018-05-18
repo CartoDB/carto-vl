@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Interact with multiple layers | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,30 +10,22 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../style.css">
-
 </head>
-
 <body>
   <div id="map"></div>
-
-    <!-- Description -->
     <aside class="toolbox">
       <div class="box">
         <header>
-          <h1>Interact multiple layers</h1>
-
+          <h1>Interact with multiple layers</h1>
         </header>
         <section>
-          <p class="description open-sans">Interact with multiple layers on the click event.</p>
+          <p class="description open-sans">Detect features from different layers</p>
+          <div class="separator"></div>
           <section class="usage">
             <header>USAGE</header>
             <p class="open-sans">Click on a city or country</p>
           </section>
-          <div id="controls">
-            <div id="content"></div>
-          </div>
         </section>
         <footer class="js-footer"></footer>
       </div>
@@ -130,5 +121,4 @@
     layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
   </script>
 </body>
-
 </html>

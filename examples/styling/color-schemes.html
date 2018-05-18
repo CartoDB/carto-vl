@@ -14,41 +14,40 @@
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Change color schemes</h1>
-        <button class="github-logo js-source-link"></button>
-      </header>
-      <section>
-        <p class="description open-sans">Change the color scheme.</p>
-        <div id="controls">
-          <ul>
-            <li>
-              <input type="radio" name="style" onclick="setCartocolor()" id="Cartocolor" checked>
-              <label for="Cartocolor">CARTOcolor (default)</label>
-            </li>
-            <li>
-              <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
-              <label for="CartocolorInverse">CARTOcolor (inverse)</label>
-            </li>
-            <li>
-              <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
-              <label for="CustomColors">Custom colors</label>
-            </li>
-          </ul>
-        </div>
-      </section>
-      <footer class="js-footer"></footer>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Color schemes</h1>
+        </header>
+        <section>
+          <p class="description open-sans">How to use CARTOcolors and custom color schemes</p>
+          <div id="controls">
+            <ul>
+              <li>
+                <input type="radio" name="style" onclick="setCartocolor()" id="Cartocolor" checked>
+                <label for="Cartocolor">CARTOcolor (default)</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
+                <label for="CartocolorInverse">CARTOcolor (inverse)</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
+                <label for="CustomColors">Custom colors</label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
     </div>
-  </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',

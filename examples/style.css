@@ -116,6 +116,7 @@ aside.toolbox {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-size: 16px;
   font-weight: 600;
+  margin-top: 8px;
   margin-bottom: 8px;
 }
 
@@ -276,12 +277,12 @@ aside.toolbox {
   margin: 0;
 }
 .widget textarea {
-    width: 100%;
-    resize: none;
-    padding: 7px 8px 6px;
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    margin-bottom: 8px;
+  width: 100%;
+  resize: none;
+  padding: 7px 8px 6px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
 .widget button {
   padding: 4px 12px;
