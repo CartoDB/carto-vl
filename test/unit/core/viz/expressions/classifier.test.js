@@ -5,14 +5,14 @@ describe('src/core/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateStaticTypeErrors('viewportQuantiles', []);
         validateStaticTypeErrors('viewportQuantiles', ['number']);
-        validateStaticTypeErrors('viewportQuantiles', ['number', 'category']);
-        validateDynamicTypeErrors('viewportQuantiles', ['category', 2]);
+        validateStaticTypeErrors('viewportQuantiles', ['number', 'string']);
+        validateDynamicTypeErrors('viewportQuantiles', ['string', 2]);
         validateStaticTypeErrors('viewportQuantiles', ['color', 2]);
         validateStaticTypeErrors('viewportQuantiles', ['number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
+        validateStaticType('viewportQuantiles', ['number-property', 2], 'string');
     });
 
     describe('eval', () => {

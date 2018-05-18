@@ -452,7 +452,7 @@ describe('src/client/windshaft-filtering', () => {
                 )).toBeNull();
             });
 
-            it('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
+            xit('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
                 expect(preFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),

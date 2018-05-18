@@ -19,7 +19,7 @@ class Classifier extends BaseExpression {
         this.numCategories = buckets;
         this.buckets = buckets;
         this.breakpoints = breakpoints;
-        this.type = 'category';
+        this.type = 'string';
     }
     eval(feature) {
         const input = this.input.eval(feature);

@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex, checkArray } from './utils';
+import { implicitCast, getOrdinalFromIndex } from './utils';
 
 let bucketUID = 0;
 
@@ -67,13 +67,9 @@ let bucketUID = 0;
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor(input, args) {
+    constructor(input, list) {
         input = implicitCast(input);
-        args = args || [];
-
-        checkArray(name, 'args', 1, args);
-
-        args = args.map(implicitCast);
+        list = implicitCast(list);
 
         let looseType = undefined;
         if (input.type) {
@@ -82,13 +78,13 @@ export default class Buckets extends BaseExpression {
             }
             looseType = input.type;
         }
-        args.map((arg, index) => {
-            if (arg.type) {
-                if (looseType && looseType != arg.type) {
+        list.expr.map((item, index) => {
+            if (item.type) {
+                if (looseType && looseType != item.type) {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
-                } else if (arg.type != 'number' && arg.type != 'string') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
+                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                } else if (item.type != 'number' && item.type != 'string') {
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
                 }
             }
         });
@@ -96,20 +92,20 @@ export default class Buckets extends BaseExpression {
         let children = {
             input
         };
-        args.map((arg, index) => children[`arg${index}`] = arg);
+        list.expr.map((item, index) => children[`arg${index}`] = item);
         super(children);
         this.bucketUID = bucketUID++;
-        this.numCategories = args.length + 1;
-        this.args = args;
+        this.numCategories = list.expr.length + 1;
+        this.list = list;
         this.type = 'string';
     }
     eval(feature) {
         const v = this.input.eval(feature);
         let i;
-        for (i = 0; i < this.args.length; i++) {
-            if (this.input.type == 'string' && v == this.args[i].eval(feature)) {
+        for (i = 0; i < this.list.expr.length; i++) {
+            if (this.input.type == 'string' && v == this.list.expr[i].eval(feature)) {
                 return i;
-            } else if (this.input.type == 'number' && v < this.args[i].eval(feature)) {
+            } else if (this.input.type == 'number' && v < this.list.expr[i].eval(feature)) {
                 return i;
             }
         }
@@ -123,12 +119,12 @@ export default class Buckets extends BaseExpression {
         if (input.type != 'number' && input.type != 'string') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
-        this.args.map((arg, index) => {
-            if (input.type != arg.type) {
+        this.list.expr.map((item, index) => {
+            if (input.type != item.type) {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
-                    `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
-            } else if (arg.type != 'number' && arg.type != 'string') {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
+                    `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
+            } else if (item.type != 'number' && item.type != 'string') {
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
             }
         });
     }
@@ -142,7 +138,7 @@ export default class Buckets extends BaseExpression {
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index}.;
             }`;
-        const funcBody = this.args.map(elif).join('');
+        const funcBody = this.list.expr.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
             return ${this.numCategories - 1}.;
