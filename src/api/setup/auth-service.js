@@ -4,11 +4,11 @@ import CartoValidationError from '../error-handling/carto-validation-error';
 let defaultAuth = undefined;
 
 /**
- * Set default authentication parameters: apiKey and user.
+ * Set default authentication parameters: user and apiKey.
  *
  * @param {object} auth
- * @param {string} auth.apiKey - API key used to authenticate against CARTO
  * @param {string} auth.user - Name of the user
+ * @param {string} auth.apiKey - API key used to authenticate against CARTO
  *
  * @memberof carto
  * @api

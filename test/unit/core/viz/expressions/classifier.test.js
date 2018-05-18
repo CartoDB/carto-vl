@@ -1,18 +1,18 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { globalQuantiles, property, quantiles, globalEqIntervals, viewportEqIntervals } from '../../../../../src/core/viz/functions';
+import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, viewportQuantiles } from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/classifier', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('quantiles', []);
-        validateStaticTypeErrors('quantiles', ['number']);
-        validateStaticTypeErrors('quantiles', ['number', 'category']);
-        validateDynamicTypeErrors('quantiles', ['category', 2]);
-        validateStaticTypeErrors('quantiles', ['color', 2]);
-        validateStaticTypeErrors('quantiles', ['number', 'color']);
+        validateStaticTypeErrors('viewportQuantiles', []);
+        validateStaticTypeErrors('viewportQuantiles', ['number']);
+        validateStaticTypeErrors('viewportQuantiles', ['number', 'category']);
+        validateDynamicTypeErrors('viewportQuantiles', ['category', 2]);
+        validateStaticTypeErrors('viewportQuantiles', ['color', 2]);
+        validateStaticTypeErrors('viewportQuantiles', ['number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('quantiles', ['number-property', 2], 'category');
+        validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
     });
 
     describe('eval', () => {
@@ -47,7 +47,7 @@ describe('src/core/viz/expressions/classifier', () => {
             expect(q.getBreakpointList()).toEqual([3]);
         });
         it('viewportQuantiles($price, 2)', () => {
-            const q = quantiles($price, 2);
+            const q = viewportQuantiles($price, 2);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([3]);
         });
@@ -68,7 +68,7 @@ describe('src/core/viz/expressions/classifier', () => {
             expect(q.getBreakpointList()).toEqual([2, 4]);
         });
         it('viewportQuantiles($price, 3)', () => {
-            const q = quantiles($price, 3);
+            const q = viewportQuantiles($price, 3);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2, 4]);
         });

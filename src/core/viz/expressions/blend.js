@@ -3,12 +3,29 @@ import Animate from './animate';
 import BaseExpression from './base';
 
 /**
- * Linearly interpolate from *a* to *b* based on *mix*.
+ * Linearly interpolate from `a` to `b` based on *mix*.
  *
  * @param {Number|Color|number} a - Numeric or color expression
  * @param {Number|Color|number} b - Numeric or color expression
  * @param {Number} mix - Numeric expression with the interpolation parameter in the [0,1] range
  * @returns {Number|Color} Numeric expression
+ *
+ * @example <caption>Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.blend(3,
+ *                  s.prop('dn'),
+ *                  s.linear(s.zoom(), s.pow(2, 10), s.pow(2, 14))
+ *           );
+ * });
+ *
+ * @example <caption>Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: blend(3,
+ *                prop('dn'),
+ *                linear(zoom(), 2^10, 2^14)
+ *          )
+ * `);
  *
  * @memberof carto.expressions
  * @name blend

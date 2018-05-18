@@ -4,7 +4,7 @@ import BaseExpression from './base';
 /**
  * Compute the natural logarithm (base e) of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the natural logarithm
+ * @param {Number|number} x - Numeric expression to compute the natural logarithm
  * @return {Number}
  *
  * @example <caption>Natural Logarithm.</caption>
@@ -28,7 +28,7 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 /**
  * Compute the square root of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the square root
+ * @param {Number|number} x - Numeric expression to compute the square root
  * @return {Number}
  *
  * @example <caption>Square root.</caption>
@@ -52,7 +52,7 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 /**
  * Compute the sine of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the sine in radians
+ * @param {Number|number} x - Numeric expression to compute the sine in radians
  * @return {Number}
  *
  * @example <caption>Sin.</caption>
@@ -76,10 +76,10 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 /**
  * Compute the cosine of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the cosine in radians
+ * @param {Number|number} x - Numeric expression to compute the cosine in radians
  * @return {Number}
  *
- * @example <caption>Cos</caption>
+ * @example <caption>Cos.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.cos(0)  // 1
@@ -100,7 +100,7 @@ export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 /**
  * Compute the tangent of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the tangent in radians
+ * @param {Number|number} x - Numeric expression to compute the tangent in radians
  * @return {Number}
  *
  * @example <caption>Tan</caption>
@@ -126,7 +126,7 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
  * This means this function will return 1 if the number is positive, -1 if the number is negative
  * 0 if the number is 0 and -0 if the number is -0.
  *
- * @param {Number|Property|number} x - Number to compute the sign
+ * @param {Number|number} x - Numeric expression to compute the sign
  * @return {Number}
  *
  * @example <caption>Sign.</caption>
@@ -150,18 +150,18 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 /**
  * Compute the absolute value of a number x.
  *
- * @param {Number|Property|number} x - Number to compute the absolute value
+ * @param {Number|number} x - Numeric expression to compute the absolute value
  * @return {Number}
  *
  * @example <caption>Abs.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.abs(100)  // 100
+ *   width: s.abs(-100)  // 100
  * });
  *
  * @example <caption>Abs. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: abs(100)
+ *   width: abs(-100) // 100
  * `);
  *
  * @memberof carto.expressions
@@ -172,13 +172,28 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 
 /**
+ * Check if a numeric expression is NaN.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {Number|number} x - Numeric expression to check
+ * @return {Number}
+ *
+ * @memberof carto.expressions
+ * @name isNaN
+ * @function
+ * @api
+ */
+export const IsNaN = genUnaryOp('isNaN', x => Number.isNaN(x) ? 1 : 0, x => `(isnan(${x})? 1.: 0.)`);
+
+/**
  * Compute the logical negation of the given expression.
  * This is internally computed as 1 - x preserving boolean behavior and allowing fuzzy logic.
  *
  *  - When x is equal to 1 not(x) will be evaluated to 0
  *  - When x is equal to 0 not(x) will be evaluated to 1
  *
- * @param {Number|Property|number} x - Number to compute the not value
+ * @param {Number|number} x - Number to compute the not value
  * @return {Number}
  *
  * @example <caption>Not.</caption>
@@ -206,7 +221,7 @@ export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
  *  - When x is equal to 0.8 floor(x) will be evaluated to 0
  *  - When x is equal to 1.3 floor(x) will be evaluated to 1
  *
- * @param {Number|Property|number} x - Number to compute the floor value
+ * @param {Number|number} x - Number to compute the floor value
  * @return {Number}
  *
  * @example <caption>Floor.</caption>
@@ -234,7 +249,7 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  *  - When x is equal to 0.8 ceil(x) will be evaluated to 1
  *  - When x is equal to 1.3 ceil(x) will be evaluated to 2
  *
- * @param {Number|Property|number} x - Number to compute the ceil value
+ * @param {Number|number} x - Number to compute the ceil value
  * @return {Number}
  *
  * @example <caption>Ceil.</caption>

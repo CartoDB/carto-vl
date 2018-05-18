@@ -449,8 +449,8 @@ export function getFiltering(viz, options = {}) {
     const aggrFiltering = new AggregationFiltering(options);
     const preFiltering = new PreaggregationFiltering(options);
     const filtering = {
-        preaggregation: preFiltering.getFilter(viz.getFilter()),
-        aggregation: aggrFiltering.getFilters(viz.getFilter())
+        preaggregation: preFiltering.getFilter(viz.filter),
+        aggregation: aggrFiltering.getFilters(viz.filter)
     };
     if (!filtering.preaggregation && !filtering.aggregation) {
         return null;

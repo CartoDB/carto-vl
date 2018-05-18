@@ -5,11 +5,13 @@ export const DEFAULT = undefined;
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
-    if (Number.isFinite(value)) {
+    if (_isNumber(value)) {
         return number(value);
-    } else if (typeof value == 'string') {
+    }
+    if (typeof value == 'string') {
         return string(value);
-    } else if (Array.isArray(value)) {
+    }
+    if (Array.isArray(value)) {
         return array(value);
     }
     return value;
@@ -89,7 +91,7 @@ export function throwInvalidInstance(expressionName, parameterName, parameterInd
 
 export function throwInvalidNumber(expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${number}' is not a finite number`);
+    '${number}' is not a number`);
 }
 
 export function throwInvalidArray(expressionName, parameterName, parameterIndex, array) {
@@ -143,7 +145,7 @@ export function checkInstance(expressionName, parameterName, parameterIndex, exp
 }
 
 export function checkNumber(expressionName, parameterName, parameterIndex, number) {
-    if (!Number.isFinite(number)) {
+    if (!_isNumber(number)) {
         throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
     }
 }
@@ -166,4 +168,8 @@ export function clamp(x, min, max) {
 
 export function mix(x, y, a) {
     return x * (1 - a) + y * a;
+}
+
+function _isNumber(value) {
+    return Number.isFinite(value) || value == Infinity || value == -Infinity || Number.isNaN(value);
 }

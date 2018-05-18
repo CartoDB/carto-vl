@@ -4,9 +4,9 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
 /**
  * Evaluates to a hsl color.
  *
- * @param {Number|Property|number} h - The hue of the color
- * @param {Number|Property|number} s - The saturation of the color
- * @param {Number|Property|number} l - The lightness of the color
+ * @param {Number|number} h - hue of the color in the [0, 1] range
+ * @param {Number|number} s - saturation of the color in the [0, 1] range
+ * @param {Number|number} l - lightness of the color in the [0, 1] range
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
@@ -30,10 +30,10 @@ export const HSL = genHSL('hsl', false);
 /**
  * Evaluates to a hsla color.
  *
- * @param {Number|Property|number} h - The hue of the color
- * @param {Number|Property|number} s - The saturation of the color
- * @param {Number|Property|number} l - The lightness of the color
- * @param {Number|Property|number} a - The alpha value of the color
+ * @param {Number|number} h - hue of the color in the [0, 1] range
+ * @param {Number|number} s - saturation of the color in the [0, 1] range
+ * @param {Number|number} l - lightness of the color in the [0, 1] range
+ * @param {Number|number} a - alpha value of the color in the [0, 1] range
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>

@@ -4,9 +4,9 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
 /**
  * Evaluates to a hsv color.
  *
- * @param {Number|Property|number} h - The hue of the color
- * @param {Number|Property|number} s - The saturation of the color
- * @param {Number|Property|number} v - The value (brightness) of the color
+ * @param {Number|number} h - hue of the color in the [0, 1] range
+ * @param {Number|number} s - saturation of the color in the [0, 1] range
+ * @param {Number|number} v - value (brightness) of the color in the [0, 1] range
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
@@ -30,10 +30,10 @@ export const HSV = genHSV('hsv', false);
 /**
  * Evaluates to a hsva color.
  *
- * @param {Number|Property|number} h - The hue of the color
- * @param {Number|Property|number} s - The saturation of the color
- * @param {Number|Property|number} v - The value (brightness) of the color
- * @param {Number|Property|number} a - The alpha value of the color
+ * @param {Number|number} h - hue of the color in the [0, 1] range
+ * @param {Number|number} s - saturation of the color in the [0, 1] range
+ * @param {Number|number} v - value (brightness) of the color in the [0, 1] range
+ * @param {Number|number} a - alpha value of the color in the [0, 1] range
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>

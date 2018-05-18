@@ -4,7 +4,14 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['points']);
-const viz = new carto.Viz('color: ramp(viewportQuantiles($numeric, 3), PRISM), width: 50');
+// Check that precision is good
+const viz = new carto.Viz(`
+    @oneHundred: 10
+    width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * @oneHundred
+`);
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
+
+viz.variables.oneHundred = 100;
+

@@ -53,18 +53,27 @@ export default class Viz {
     * @constructor Viz
     * @memberof carto
     * @api
+    *
+    * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
+    * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
+    * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
+    * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
+    * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+    * @property {object} variables - An object describing the variables used.
+    *
     */
     constructor(definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
         Object.keys(vizSpec).forEach(property => {
-            if (property == 'resolution') {
-                this._resolution = vizSpec[property];
-            } else if (SUPPORTED_PROPERTIES.includes(property)) {
-                this[property] = vizSpec[property];
-            }
+            this._defineProperty(property, vizSpec[property]);
         });
+        if (!Object.keys(vizSpec).includes('variables')) {
+            this._defineProperty('variables', {});
+        }
 
         this.updated = true;
         this._changeCallback = null;
@@ -75,20 +84,51 @@ export default class Viz {
 
         this._updateRootExpressions();
 
-        Object.keys(this.variables).map(varName => {
-            this['__cartovl_variable_' + varName] = this.variables[varName];
-        });
-
         this._resolveAliases();
         this._validateAliasDAG();
     }
 
-    get resolution(){
-        return this._resolution;
-    }
-    set resolution(x){
-        this._resolution = x;
-        this._changed();
+    // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
+    // These setters and the proxy allow us to re-render without requiring further action from the user
+    _defineProperty(propertyName, propertyValue) {
+        if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
+            return;
+        }
+        Object.defineProperty(this, propertyName, {
+            get: () => this['_' + propertyName],
+            set: expr => {
+                if (propertyName != 'resolution') {
+                    expr = implicitCast(expr);
+                }
+                this['_' + propertyName] = expr;
+                this._changed();
+            },
+        });
+
+        let property = propertyValue;
+        if (propertyName == 'variables') {
+            let init = false;
+            const handler = {
+                get: (obj, prop) => {
+                    return obj[prop];
+                },
+                set: (obj, prop, value) => {
+                    value = implicitCast(value);
+                    obj[prop] = value;
+                    this['__cartovl_variable_' + prop] = value;
+                    if (init) {
+                        this._changed();
+                    }
+                    return true;
+                }
+            };
+            property = new Proxy({}, handler);
+            Object.keys(propertyValue).map(varName => {
+                property[varName] = propertyValue[varName];
+            });
+            init = true;
+        }
+        this['_' + propertyName] = property;
     }
 
     _getRootExpressions() {
@@ -110,103 +150,12 @@ export default class Viz {
         });
     }
 
-    /**
-     * Return the resolution.
-     *
-     * @return {number}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getResolution() {
-        return this.resolution;
-    }
-
-    /**
-     * Return the color expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getColor() {
-        return this.color;
-    }
-
-    /**
-     * Return the width expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getWidth() {
-        return this.width;
-    }
-
-    /**
-     * Return the strokeColor expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeColor() {
-        return this.strokeColor;
-    }
-
-    /**
-     * Return the strokeWidth expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeWidth() {
-        return this.strokeWidth;
-    }
-
-    /**
-     * Return the order expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getOrder() {
-        return this.order;
-    }
-
-    /**
-     * Return the filter expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getFilter() {
-        return this.filter;
-    }
-
     isAnimated() {
-        return this.getColor().isAnimated() ||
-            this.getWidth().isAnimated() ||
-            this.getStrokeColor().isAnimated() ||
-            this.getStrokeWidth().isAnimated() ||
-            this.getFilter().isAnimated();
+        return this.color.isAnimated() ||
+            this.width.isAnimated() ||
+            this.strokeColor.isAnimated() ||
+            this.strokeWidth.isAnimated() ||
+            this.filter.isAnimated();
     }
 
     onChange(callback) {
@@ -453,14 +402,14 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution - Control the aggregation level
+         * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
+         * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
+         * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
+         * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
+         * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
-         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
-         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
-         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
-         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
-         * @property {carto.expressions.Base} order - Define how the elements will be stacked
-         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 

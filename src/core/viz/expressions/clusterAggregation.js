@@ -4,11 +4,11 @@ import PropertyExpression from './property';
 import { checkInstance, checkType } from './utils';
 
 /**
- * Aggregate using the average value. This operation disables the access to the property
+ * Aggregate using the average. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Property} property - Column of the table to be aggregated
- * @return {carto.expressions.Number} Aggregated column
+ * @param {Property} property - Column of the table to be aggregated, must be a date or a number
+ * @return {Property} Aggregated column
  *
  * @example <caption>Use cluster average of the population as width.</caption>
  * const s = carto.expressions;
@@ -29,11 +29,11 @@ import { checkInstance, checkType } from './utils';
 export const ClusterAvg = genAggregationOp('avg', 'number');
 
 /**
- * Aggregate using the maximum value. This operation disables the access to the property
+ * Aggregate using the maximum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {Property} property - Column of the table to be aggregated
- * @return {Number} Aggregated column
+ * @param {Property} property - Column of the table to be aggregated, must be a date or a number
+ * @return {Property} Aggregated column
  *
  * @example <caption>Use cluster maximum of the population as width.</caption>
  * const s = carto.expressions;
@@ -54,11 +54,11 @@ export const ClusterAvg = genAggregationOp('avg', 'number');
 export const ClusterMax = genAggregationOp('max', 'number');
 
 /**
- * Aggregate using the minimum value. This operation disables the access to the property
+ * Aggregate using the minimum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {Property} property - Column of the table to be aggregated
- * @return {Number} Aggregated column
+ * @param {Property} property - Column of the table to be aggregated, must be a date or a number
+ * @return {Property} Aggregated column
  *
  * @example <caption>Use cluster minimum of the population as width.</caption>
  * const s = carto.expressions;
@@ -79,11 +79,11 @@ export const ClusterMax = genAggregationOp('max', 'number');
 export const ClusterMin = genAggregationOp('min', 'number');
 
 /**
- * Aggregate using the mode value. This operation disables the access to the property
+ * Aggregate using the mode. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {Property} property - Column of the table to be aggregated
- * @return {Category} Aggregated column
+ * @param {Property} property - Column of the table to be aggregated, must be a string
+ * @return {Property} Aggregated column
  *
  * @example <caption>Use cluster mode of the population in a color ramp.</caption>
  * const s = carto.expressions;
@@ -104,11 +104,11 @@ export const ClusterMin = genAggregationOp('min', 'number');
 export const ClusterMode = genAggregationOp('mode', 'category');
 
 /**
- * Aggregate using the sum value. This operation disables the access to the property
+ * Aggregate using the sum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {Property} property - Column of the table to be aggregated
- * @return {Number} Aggregated column
+ * @param {Property} property - Column of the table to be aggregated, must be a date or a number
+ * @return {Property} Aggregated column
  *
  * @example <caption>Use cluster sum of the population as width.</caption>
  * const s = carto.expressions;

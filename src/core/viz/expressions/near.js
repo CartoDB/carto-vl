@@ -27,7 +27,6 @@ import { implicitCast, clamp } from './utils';
  * @memberof carto.expressions
  * @name near
  * @function
- * @api
  */
 // TODO type checking
 export default class Near extends BaseExpression {

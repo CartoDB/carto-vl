@@ -4,9 +4,9 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from './util
 /**
  * Evaluates to a CIELab color.
  *
- * @param {Number|Property|number} l - The lightness of the color
- * @param {Number|Property|number} a - The color component green–red
- * @param {Number|Property|number} b - The color component blue–yellow
+ * @param {Number|number} l - The lightness of the color
+ * @param {Number|number} a - The green–red color component
+ * @param {Number|number} b - The blue–yellow color component
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>

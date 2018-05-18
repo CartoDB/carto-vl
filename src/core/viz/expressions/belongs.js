@@ -4,14 +4,14 @@ import BaseExpression from './base';
 /**
  * Check if a value belongs to a list of elements.
  *
- * @param {string} value - Expression to be tested against the whitelist
- * @param {string[]} list - Multiple expression parameters that will form the whitelist
+ * @param {String|string} value - Expression to be tested against the whitelist
+ * @param {string[]|string[]} list - Multiple expression parameters that will form the whitelist
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
- * const e = carto.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: e.in(e.prop('type'), ['metropolis', 'capital'])
+ *   filter: s.in(s.prop('type'), ['metropolis', 'capital'])
  * });
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
@@ -36,14 +36,14 @@ function IN_INLINE_MAKER(list) {
 /**
  * Check if value does not belong to the list of elements.
  *
- * @param {carto.expressions.Property} value - Expression to be tested against the blacklist
- * @param {String[]} list - Multiple expression parameters that will form the blacklist
- * @return {carto.expressions.Number} Numeric expression with the result of the check
+ * @param {String|string} value - Expression to be tested against the blacklist
+ * @param {String[]|string[]} list - Multiple expression parameters that will form the blacklist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
- * const e = carto.expressions;
+ * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: e.nin(e.prop('type'), ['metropolis', 'capital'])
+ *   filter: s.nin(s.prop('type'), ['metropolis', 'capital'])
  * });
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>

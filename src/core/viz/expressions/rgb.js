@@ -4,9 +4,9 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 /**
  * Evaluates to a rgb color.
  *
- * @param {Number|Property|number} r - The amount of red in the color
- * @param {Number|Property|number} g - The amount of green in the color
- * @param {Number|Property|number} b - The amount of blue in the color
+ * @param {Number|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {Number|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {Number|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
@@ -30,10 +30,10 @@ export const RGB = genRGB('rgb', false);
 /**
  * Evaluates to a rgba color.
  *
- * @param {Number|Property|number} r - The amount of red in the color
- * @param {Number|Property|number} g - The amount of green in the color
- * @param {Number|Property|number} b - The amount of blue in the color
- * @param {Number|Property|number} a - The alpha value of the color
+ * @param {Number|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {Number|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {Number|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
+ * @param {Number|number} a - The alpha value of the color in the [0, 1] range. Numeric expression.
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>

@@ -72,7 +72,7 @@ export default class Windshaft {
      */
     async getMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
-        const resolution = viz.getResolution();
+        const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API

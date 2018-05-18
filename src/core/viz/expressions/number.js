@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkNumber } from './utils';
 
 /**
- * Wraps a number.
+ * Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
  *
  * @param {number} x - A number to be warped in a numeric expression
  * @return {Number} Numeric expression

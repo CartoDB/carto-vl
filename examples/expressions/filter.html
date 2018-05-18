@@ -34,7 +34,7 @@
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
 
@@ -43,7 +43,7 @@
     `);
     const s = carto.expressions;
     const viz = new carto.Viz({
-        color: s.ramp(s.quantiles(s.prop('dn'), 5), s.palettes.REDOR),
+        color: s.ramp(s.viewportQuantiles(s.prop('dn'), 5), s.palettes.REDOR),
         filter: s.between(s.prop('dn'), 100, 150)
     });
     const layer = new carto.Layer('layer', source, viz);

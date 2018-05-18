@@ -1,5 +1,4 @@
-import { blend, property, animate, notEquals } from './viz/functions';
-import { parseVizExpression } from './viz/parser';
+import Feature from '../api/feature';
 
 export default class RenderLayer {
     constructor() {
@@ -47,80 +46,19 @@ export default class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(feature => {
-
-            const genReset = vizProperty =>
-                (duration = 500) => {
-                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
-                        this.customizedFeatures[feature.id][vizProperty].replaceChild(
-                            this.customizedFeatures[feature.id][vizProperty].mix,
-                            // animate(0) is used to ensure that blend._predraw() "GC" collects it
-                            blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
-                        );
-                        this.viz[vizProperty].notify();
-                        this.customizedFeatures[feature.id][vizProperty] = undefined;
-                    }
-                };
-
-            const genVizProperty = vizProperty => {
-                const blender = (newExpression, duration = 500) => {
-                    if (typeof newExpression == 'string') {
-                        newExpression = parseVizExpression(newExpression);
-                    }
-                    if (this.customizedFeatures[feature.id] && this.customizedFeatures[feature.id][vizProperty]) {
-                        this.customizedFeatures[feature.id][vizProperty].a.blendTo(newExpression, duration);
-                        return;
-                    }
-                    const blendExpr = blend(
-                        newExpression,
-                        this.viz[vizProperty],
-                        blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
-                    );
-                    this.trackFeatureViz(feature.id, vizProperty, blendExpr);
-                    this.viz.replaceChild(
-                        this.viz[vizProperty],
-                        blendExpr,
-                    );
-                    this.viz[vizProperty].notify();
-                };
-                const self = this;
-                const properties = feature.properties;
-                return {
-                    get value() {
-                        return self.viz[vizProperty].eval(properties);
-                    },
-                    blendTo: blender,
-                    reset: genReset(vizProperty)
-                };
-            };
-            const variables = {};
-            Object.keys(this.viz.variables).map(varName => {
-                variables[varName] = genVizProperty('__cartovl_variable_' + varName);
-            });
-
-            return {
-                id: feature.id,
-                color: genVizProperty('color'),
-                width: genVizProperty('width'),
-                strokeColor: genVizProperty('strokeColor'),
-                strokeWidth: genVizProperty('strokeWidth'),
-                variables,
-                reset: (duration = 500) => {
-                    genReset('color')(duration);
-                    genReset('width')(duration);
-                    genReset('strokeColor')(duration);
-                    genReset('strokeWidth')(duration);
-                    Object.keys(this.viz.variables).map(varName => {
-                        variables[varName] = genReset('__cartovl_variable_' + varName)(duration);
-                    });
-                }
-            };
-        });
+        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
     }
 
-    trackFeatureViz(featureID, vizProperty, newViz) {
-        this.customizedFeatures[featureID] = this.customizedFeatures[featureID] || {};
-        this.customizedFeatures[featureID][vizProperty] = newViz;
+    /**
+     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
+     */
+    _generateApiFeature(rawFeature) {
+        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz);
+    }
+
+    trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {
+        customizedFeatures[featureID] = customizedFeatures[featureID] || {};
+        customizedFeatures[featureID][vizProperty] = newViz;
     }
 
     freeDataframes() {

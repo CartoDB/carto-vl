@@ -1,14 +1,14 @@
 import Viz from '../../../src/api/viz';
-import * as e from '../../../src/core/viz/functions';
+import * as s from '../../../src/core/viz/functions';
 
 // Generic Style defaults
 
-const DEFAULT_COLOR_EXPRESSION = e.rgb(0, 0, 0);
-const DEFAULT_WIDTH_EXPRESSION = e.number(1);
-const DEFAULT_STROKE_COLOR_EXPRESSION = e.rgb(0, 0, 0);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = e.number(0);
-const DEFAULT_FILTER_EXPRESSION = e.constant(1);
-const DEFAULT_ORDER_EXPRESSION = e.noOrder();
+const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
+const DEFAULT_WIDTH_EXPRESSION = s.number(1);
+const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
+const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
+const DEFAULT_FILTER_EXPRESSION = s.constant(1);
+const DEFAULT_ORDER_EXPRESSION = s.noOrder();
 const DEFAULT_RESOLUTION = 1;
 
 describe('api/viz', () => {
@@ -21,48 +21,48 @@ describe('api/viz', () => {
                 // Check returned object inherits from Viz
                 expect(actual).toEqual(jasmine.any(Viz));
                 // Check returned object properties
-                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
-                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
-                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
-                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set default viz values when an empty object is given', () => {
                 const actual = new Viz({});
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
-                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
-                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
-                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set the viz properties defined in the vizSpec object', () => {
                 const vizSpec = {
-                    color: e.rgba(255, 0, 0, 1),
-                    width: e.number(10),
-                    strokeColor: e.rgba(0, 0, 255, 1),
-                    strokeWidth: e.number(15),
-                    filter: e.number(0.5),
-                    order: e.asc(e.width()),
+                    color: s.rgba(255, 0, 0, 1),
+                    width: s.number(10),
+                    strokeColor: s.rgba(0, 0, 255, 1),
+                    strokeWidth: s.number(15),
+                    filter: s.number(0.5),
+                    order: s.asc(s.width()),
                     resolution: 2
                 };
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(e.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(e.number(10).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(e.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(e.number(15).eval());
-                expect(actual.getFilter().eval()).toEqual(e.number(0.5).eval());
-                expect(actual.getOrder().expr).toEqual(e.asc(e.width()).expr);
-                expect(actual.getResolution()).toEqual(2);
+                expect(actual.color.eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.width.eval()).toEqual(s.number(10).eval());
+                expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
+                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.resolution).toEqual(2);
             });
 
             it('should allow the viz properties `width` and `strokeWidth` to be numbers', () => {
@@ -72,8 +72,8 @@ describe('api/viz', () => {
                 });
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getWidth().eval()).toEqual(e.number(1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(e.number(10).eval());
+                expect(actual.width.eval()).toEqual(s.number(1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(10).eval());
             });
         });
 
@@ -156,9 +156,9 @@ describe('api/viz', () => {
                 }).toThrowError('`order` parameter is not a valid viz Expresion.');
             });
 
-            it('should add a console.warn when non supported properties are included', () => {
+            it('should add a consols.warn when non supported properties are included', () => {
                 const vizSpec = {
-                    notSupported: e.number(5)
+                    notSupported: s.number(5)
                 };
                 spyOn(console, 'warn');
                 new Viz(vizSpec);
@@ -180,26 +180,26 @@ describe('api/viz', () => {
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(e.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(e.number(10).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(e.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(e.number(15).eval());
-                expect(actual.getFilter().eval()).toEqual(e.number(0.5).eval());
-                expect(actual.getOrder().expr).toEqual(e.asc(e.width()).expr);
-                expect(actual.getResolution()).toEqual(1);
+                expect(actual.color.eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.width.eval()).toEqual(s.number(10).eval());
+                expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
+                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.resolution).toEqual(1);
             });
         });
     });
 
     describe('expression.blendTo()', () => {
-        const dateNow = Date.now;
+        const dateNow = Dats.now;
         afterEach(function () {
-            Date.now = dateNow;
+            Dats.now = dateNow;
         });
         it('should return the new/final expression', () => {
-            const numberA = e.number(1);
-            const numberB = e.number(2);
-            const expected = e.gt(e.property('fake_property'), numberA);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(s.property('fake_property'), numberA);
             new Viz({
                 filter: expected,
             });
@@ -208,9 +208,9 @@ describe('api/viz', () => {
             expect(final).toBe(numberB);
         });
         it('should notify the viz on change', done => {
-            const numberA = e.number(1);
-            const numberB = e.number(2);
-            const expected = e.gt(e.property('fake_property'), numberA);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(s.property('fake_property'), numberA);
             const viz = new Viz({
                 filter: expected,
             });
@@ -218,31 +218,18 @@ describe('api/viz', () => {
             numberA.blendTo(numberB, 10);
         }, 10);
         it('should notify the viz after the final blending', done => {
-            const numberA = e.number(1);
-            const numberB = e.number(2);
-            const expected = e.gt(7, numberA);
+            const numberA = s.number(1);
+            const numberB = s.number(2);
+            const expected = s.gt(7, numberA);
             const viz = new Viz({
                 filter: expected,
             });
             numberA.blendTo(numberB, 999);
             viz.onChange(done);
-            const t = Date.now() + 1000;
-            Date.now = () => t;
+            const t = Dats.now() + 1000;
+            Dats.now = () => t;
             viz.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
-    });
-
-    describe('.getFilter()', () => {
-        it('should return the current filter', () => {
-            const expected = e.gt(e.property('fake_property'), 1000);
-            const viz = new Viz({
-                filter: expected,
-            });
-
-            const actual = viz.getFilter();
-
-            expect(actual).toEqual(expected);
-        });
     });
 
     describe('resolution changes', () => {
@@ -258,7 +245,7 @@ describe('api/viz', () => {
         it('should work with numbers', () => {
             let viz = new Viz('@a: 1');
             expect(viz.variables.a.eval()).toEqual(1);
-            viz = new Viz({ variables: { a: e.number(1) } });
+            viz = new Viz({ variables: { a: s.number(1) } });
             expect(viz.variables.a.eval()).toEqual(1);
             viz = new Viz({ variables: { a: 1 } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual(1);
@@ -267,7 +254,7 @@ describe('api/viz', () => {
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
             expect(viz.variables.a.eval()).toEqual([1,2,3]);
-            viz = new Viz({ variables: { a: e.array([1,2,3]) } });
+            viz = new Viz({ variables: { a: s.array([1,2,3]) } });
             expect(viz.variables.a.eval()).toEqual([1,2,3]);
             viz = new Viz({ variables: { a: [1,2,3] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual([1,2,3]);
@@ -276,14 +263,14 @@ describe('api/viz', () => {
         it('should work with numeric expressions', () => {
             let viz = new Viz('@a: sin(PI / (1 + log(E)))');
             expect(viz.variables.a.eval()).toEqual(1);
-            viz = new Viz({ variables: { a: e.sin(e.div(e.PI, e.add(1, e.log(e.E)))) } });
+            viz = new Viz({ variables: { a: s.sin(s.div(s.PI, s.add(1, s.log(s.E)))) } });
             expect(viz.variables.a.eval()).toEqual(1);
         });
 
         it('should work with strings', () => {
             let viz = new Viz('@a: "Hello"');
             expect(viz.variables.a.eval()).toEqual('Hello');
-            viz = new Viz({ variables: { a: e.string('Hello') } });
+            viz = new Viz({ variables: { a: s.string('Hello') } });
             expect(viz.variables.a.eval()).toEqual('Hello');
             viz = new Viz({ variables: { a: 'Hello' } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual('Hello');
@@ -292,7 +279,7 @@ describe('api/viz', () => {
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
             expect(viz.variables.a.eval()).toEqual(['a','b','c']);
-            viz = new Viz({ variables: { a: e.array(['a','b','c']) } });
+            viz = new Viz({ variables: { a: s.array(['a','b','c']) } });
             expect(viz.variables.a.eval()).toEqual(['a','b','c']);
             viz = new Viz({ variables: { a: ['a','b','c'] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual(['a','b','c']);
@@ -301,7 +288,7 @@ describe('api/viz', () => {
         it('should work with colors', () => {
             let viz = new Viz('@a: red');
             expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
-            viz = new Viz({ variables: { a: e.namedColor('red') } });
+            viz = new Viz({ variables: { a: s.namedColor('red') } });
             expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
         });
 
@@ -311,18 +298,18 @@ describe('api/viz', () => {
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
                 {r: 0, g: 0, b: 255, a: 1}]);
-            viz = new Viz({ variables: { a: e.array([
-                e.namedColor('red'),
-                e.namedColor('lime'),
-                e.namedColor('blue')]) } });
+            viz = new Viz({ variables: { a: s.array([
+                s.namedColor('red'),
+                s.namedColor('lime'),
+                s.namedColor('blue')]) } });
             expect(viz.variables.a.eval()).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
                 {r: 0, g: 0, b: 255, a: 1}]);
             viz = new Viz({ variables: { a: [
-                e.namedColor('red'),
-                e.namedColor('lime'),
-                e.namedColor('blue')] } }); // Implicit cast
+                s.namedColor('red'),
+                s.namedColor('lime'),
+                s.namedColor('blue')] } }); // Implicit cast
             expect(viz.variables.a.eval()).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
@@ -332,33 +319,33 @@ describe('api/viz', () => {
         it('should work with dates', () => {
             let viz = new Viz('@a: date("2022-03-09T00:00:00Z")');
             expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
-            viz = new Viz({ variables: { a: e.date('2022-03-09T00:00:00Z') } });
+            viz = new Viz({ variables: { a: s.date('2022-03-09T00:00:00Z') } });
             expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
         });
 
         it('should work with arrays of dates', () => {
             let viz = new Viz('@a: [date("2022-03-09T00:00:00Z")]');
             expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
-            viz = new Viz({ variables: { a: e.array(e.date('2022-03-09T00:00:00Z')) } });
+            viz = new Viz({ variables: { a: s.array(s.date('2022-03-09T00:00:00Z')) } });
             expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });
 
         it('should throw an error when the array is empty ', () => {
-            expect(() => e.array()
+            expect(() => s.array()
             ).toThrowError('array(): invalid parameters: must receive at least one argument');
-            expect(() => e.array([])
+            expect(() => s.array([])
             ).toThrowError('array(): invalid parameters: must receive at least one argument');
         });
 
         it('should throw an error when the array constains different types ', () => {
-            expect(() => e.array([e.prop('p')])
+            expect(() => s.array([s.prop('p')])
             ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-            expect(() => e.array([1, e.prop('p')])
+            expect(() => s.array([1, s.prop('p')])
             ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
         });
 
         it('should throw an error when the array constains different types ', () => {
-            expect(() => e.array([1, 'a'])
+            expect(() => s.array([1, 'a'])
             ).toThrowError('array(): invalid parameters, invalid argument type combination');
         });
 
