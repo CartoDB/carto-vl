@@ -69,6 +69,7 @@
       strokeColor: opacity(BlueViolet, 0.8)
     `);
     const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'watername_ocean');
 
     // Define interactivity
     const interactivity = new carto.Interactivity(layer);
@@ -111,15 +112,6 @@
         feature.strokeColor.reset(delay);
       }
     });
-    layer.on('loaded', () => {
-      updateTitle('Hover or Click on a country');
-    });
-
-    layer.addTo(map, 'watername_ocean');
-
-    function updateTitle(text) {
-      document.getElementsByTagName('h2')[0].innerHTML = text;
-    }
   </script>
 </body>
 
