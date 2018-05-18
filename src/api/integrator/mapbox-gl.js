@@ -62,7 +62,7 @@ class MGLIntegrator {
     }
 
     addLayer(layer, beforeLayerID) {
-        const callbackID = `_cartoGL_${uid++}`;
+        const callbackID = `_cartovl_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {

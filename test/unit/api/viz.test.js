@@ -21,26 +21,26 @@ describe('api/viz', () => {
                 // Check returned object inherits from Viz
                 expect(actual).toEqual(jasmine.any(Viz));
                 // Check returned object properties
-                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
-                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
-                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
-                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set default viz values when an empty object is given', () => {
                 const actual = new Viz({});
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
-                expect(actual.getWidth().eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
-                expect(actual.getStrokeColor().eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
-                expect(actual.getFilter().eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.getOrder().expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.getResolution()).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
+                expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
+                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
+                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
             });
 
             it('should set the viz properties defined in the vizSpec object', () => {
@@ -56,13 +56,13 @@ describe('api/viz', () => {
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
-                expect(actual.getFilter().eval()).toEqual(s.number(0.5).eval());
-                expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
-                expect(actual.getResolution()).toEqual(2);
+                expect(actual.color.eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.width.eval()).toEqual(s.number(10).eval());
+                expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
+                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.resolution).toEqual(2);
             });
 
             it('should allow the viz properties `width` and `strokeWidth` to be numbers', () => {
@@ -72,8 +72,8 @@ describe('api/viz', () => {
                 });
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getWidth().eval()).toEqual(s.number(1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.number(10).eval());
+                expect(actual.width.eval()).toEqual(s.number(1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(10).eval());
             });
         });
 
@@ -180,13 +180,13 @@ describe('api/viz', () => {
                 const actual = new Viz(vizSpec);
 
                 expect(actual).toEqual(jasmine.any(Viz));
-                expect(actual.getColor().eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
-                expect(actual.getWidth().eval()).toEqual(s.number(10).eval());
-                expect(actual.getStrokeColor().eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
-                expect(actual.getStrokeWidth().eval()).toEqual(s.number(15).eval());
-                expect(actual.getFilter().eval()).toEqual(s.number(0.5).eval());
-                expect(actual.getOrder().expr).toEqual(s.asc(s.width()).expr);
-                expect(actual.getResolution()).toEqual(1);
+                expect(actual.color.eval()).toEqual(s.rgba(255, 0, 0, 1).eval());
+                expect(actual.width.eval()).toEqual(s.number(10).eval());
+                expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
+                expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
+                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.resolution).toEqual(1);
             });
         });
     });
@@ -230,19 +230,6 @@ describe('api/viz', () => {
             Date.now = () => t;
             viz.filter._preDraw(null, {}, { uniform1f: () => { } });
         }, 10);
-    });
-
-    describe('.getFilter()', () => {
-        it('should return the current filter', () => {
-            const expected = s.gt(s.property('fake_property'), 1000);
-            const viz = new Viz({
-                filter: expected,
-            });
-
-            const actual = viz.getFilter();
-
-            expect(actual).toEqual(expected);
-        });
     });
 
     describe('resolution changes', () => {

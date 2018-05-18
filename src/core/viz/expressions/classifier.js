@@ -107,7 +107,7 @@ export class ViewportQuantiles extends Classifier {
         checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const hist = this._histogram.eval();
+        const hist = this._histogram.value;
 
         const histogramBuckets = hist.length;
         const min = hist[0].x[0];
@@ -263,8 +263,8 @@ export class ViewportEqIntervals extends Classifier {
         checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const min = this._min.eval();
-        const max = this._max.eval();
+        const min = this._min.value;
+        const max = this._max.value;
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
