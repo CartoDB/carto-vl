@@ -10,28 +10,29 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  
   <link rel="stylesheet" type="text/css" href="../style.css">
-
-
 </head>
 <body>
   <div id="map"></div>
-
-    <!-- Description -->
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Add more layers</h1>
-          <button class="github-logo js-source-link"></button>
-        </header>
-        <section>
-          <p class="description open-sans">Add multiple CARTO layers to your map.</p>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Add more layers</h1>
+        <button class="github-logo js-source-link"></button>
+      </header>
+      <section>
+        <p class="description open-sans">Add multiple CARTO layers to your map.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loading">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -48,24 +49,25 @@
     });
 
     // Define layers
-    const CitiesSource = new carto.source.SQL(`
+    const citiesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_10m_populated_places_simple
-        WHERE adm0name IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
+        WHERE adm0name IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
-    const CitiesViz = new carto.Viz();
-    const CitiesLayer = new carto.Layer('CitiesLayer', CitiesSource, CitiesViz);
+    const citiesViz = new carto.Viz();
+    const citiesLayer = new carto.Layer('citiesLayer', citiesSource, citiesViz);
 
     const CountriesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_adm0_europe
-        WHERE admin IN (\'Spain\',\'France\',\'Italy\',\'Switzerland\',\'Portugal\')
+        WHERE admin IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
     const CountriesViz = new carto.Viz();
-    const CountriesLayer = new carto.Layer('CountriesLayer', CountriesSource, CountriesViz);
+    const CountriesLayer = new carto.Layer('countriesLayer', CountriesSource, CountriesViz);
 
-    CitiesLayer.addTo(map, 'watername_ocean');
-    CountriesLayer.addTo(map, 'CitiesLayer');
+    // Add layers to map
+    citiesLayer.addTo(map, 'watername_ocean');
+    countriesLayer.addTo(map, 'citiesLayer');
   </script>
 </body>
 </html>

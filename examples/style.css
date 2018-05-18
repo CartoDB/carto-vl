@@ -9,7 +9,7 @@ body {
 
 #loading {
   position: absolute;
-  background: rgba(46, 60, 67, 0.8);
+  /* background: rgba(46, 60, 67, 0.8); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +29,7 @@ body {
   animation: rotate 2s linear infinite;
 }
 .CDB-LoaderIcon-path {
-    stroke: rgba(255,255,255,.88);
+    stroke: rgba(130,130,130,.9);
     stroke-linecap: round;
     animation: dash 1.5s ease-in-out infinite;
     stroke-width: 4px
@@ -57,7 +57,6 @@ body {
         transform: rotate(360deg)
     }
 }
-
 
 #map {
   position: absolute;
