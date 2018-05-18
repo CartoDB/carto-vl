@@ -11373,14 +11373,14 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
         constructor(property) {
             super({
                 property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(metadataPropertyName == 'count' ? Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) : property),
-                value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
+                _impostor: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
             });
             this._isViewport = true;
         }
 
-        // get value() {
-        //     return resolveFn(this);
-        // }
+        get value() {
+            return resolveFn(this);
+        }
 
         eval() {
             return resolveFn(this);
@@ -11390,7 +11390,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
-            super.inlineMaker = inline => inline.value;
+            super.inlineMaker = inline => inline._impostor;
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
@@ -11402,7 +11402,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             accumFn(this, this.property.eval(feature));
         }
         _preDraw(...args) {
-            this.value.expr = this.eval();
+            this._impostor.expr = this.eval();
             super._preDraw(...args);
         }
     };
@@ -11766,7 +11766,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
-            super.inlineMaker = inline => inline.value;
+            super.inlineMaker = inline => inline._value;
             this._value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
         }
         _getMinimumNeededSchema() {
@@ -11829,7 +11829,7 @@ class GlobalPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defaul
         super._compile(metadata);
         this.property._compile(metadata);
         this.type = 'number';
-        super.inlineMaker = inline => inline.value;
+        super.inlineMaker = inline => inline._value;
         const copy = metadata.sample.map(s => s[this.property.name]);
         copy.sort((x, y) => x - y);
         const p = this.percentile / 100;
