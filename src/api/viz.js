@@ -68,7 +68,6 @@ export default class Viz {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
-
         Object.keys(vizSpec).forEach(property => {
             this._defineProperty(property, vizSpec[property]);
         });
@@ -80,7 +79,6 @@ export default class Viz {
         this._changeCallback = null;
 
         this._updateRootExpressions();
-
 
         this._resolveAliases();
         this._validateAliasDAG();
