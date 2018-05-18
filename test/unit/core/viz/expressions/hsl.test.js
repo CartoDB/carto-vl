@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/hsl', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hsl', []);
         validateStaticTypeErrors('hsl', ['number']);
-        validateStaticTypeErrors('hsl', ['number', 'category']);
+        validateStaticTypeErrors('hsl', ['number', 'string']);
         validateStaticTypeErrors('hsl', ['number', 'number', 'color']);
 
         validateStaticTypeErrors('hsla', ['number', 'number', 'number']);
@@ -13,16 +13,16 @@ describe('src/core/viz/expressions/hsl', () => {
 
     describe('type', () => {
         validateStaticType('hsl', ['number', 'number', 'number'], 'color');
-        validateStaticType('hsl', ['category', 'number', 'number'], 'color');
-        validateStaticType('hsl', ['number', 'category', 'number'], 'color');
-        validateStaticType('hsl', ['number', 'number', 'category'], 'color');
-        validateStaticType('hsl', ['category', 'category', 'category'], 'color');
+        validateStaticType('hsl', ['string', 'number', 'number'], 'color');
+        validateStaticType('hsl', ['number', 'string', 'number'], 'color');
+        validateStaticType('hsl', ['number', 'number', 'string'], 'color');
+        validateStaticType('hsl', ['string', 'string', 'string'], 'color');
 
         validateStaticType('hsla', ['number', 'number', 'number', 'number'], 'color');
-        validateStaticType('hsla', ['category', 'number', 'number', 'number'], 'color');
-        validateStaticType('hsla', ['number', 'category', 'number', 'number'], 'color');
-        validateStaticType('hsla', ['number', 'number', 'category', 'number'], 'color');
-        validateStaticType('hsla', ['category', 'category', 'category', 'number'], 'color');
+        validateStaticType('hsla', ['string', 'number', 'number', 'number'], 'color');
+        validateStaticType('hsla', ['number', 'string', 'number', 'number'], 'color');
+        validateStaticType('hsla', ['number', 'number', 'string', 'number'], 'color');
+        validateStaticType('hsla', ['string', 'string', 'string', 'number'], 'color');
     });
 
     describe('eval', () => {

@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/hsv', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hsv', []);
         validateStaticTypeErrors('hsv', ['number']);
-        validateStaticTypeErrors('hsv', ['number', 'category']);
+        validateStaticTypeErrors('hsv', ['number', 'string']);
         validateStaticTypeErrors('hsv', ['number', 'number', 'color']);
 
         validateStaticTypeErrors('hsva', ['number', 'number', 'number']);
@@ -13,16 +13,16 @@ describe('src/core/viz/expressions/hsv', () => {
 
     describe('type', () => {
         validateStaticType('hsv', ['number', 'number', 'number'], 'color');
-        validateStaticType('hsv', ['category', 'number', 'number'], 'color');
-        validateStaticType('hsv', ['number', 'category', 'number'], 'color');
-        validateStaticType('hsv', ['number', 'number', 'category'], 'color');
-        validateStaticType('hsv', ['category', 'category', 'category'], 'color');
+        validateStaticType('hsv', ['string', 'number', 'number'], 'color');
+        validateStaticType('hsv', ['number', 'string', 'number'], 'color');
+        validateStaticType('hsv', ['number', 'number', 'string'], 'color');
+        validateStaticType('hsv', ['string', 'string', 'string'], 'color');
 
         validateStaticType('hsva', ['number', 'number', 'number', 'number'], 'color');
-        validateStaticType('hsva', ['category', 'number', 'number', 'number'], 'color');
-        validateStaticType('hsva', ['number', 'category', 'number', 'number'], 'color');
-        validateStaticType('hsva', ['number', 'number', 'category', 'number'], 'color');
-        validateStaticType('hsva', ['category', 'category', 'category', 'number'], 'color');
+        validateStaticType('hsva', ['string', 'number', 'number', 'number'], 'color');
+        validateStaticType('hsva', ['number', 'string', 'number', 'number'], 'color');
+        validateStaticType('hsva', ['number', 'number', 'string', 'number'], 'color');
+        validateStaticType('hsva', ['string', 'string', 'string', 'number'], 'color');
     });
 
     describe('eval', () => {
@@ -36,5 +36,3 @@ describe('src/core/viz/expressions/hsv', () => {
         });
     });
 });
-
-

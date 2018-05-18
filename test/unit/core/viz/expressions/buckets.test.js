@@ -15,8 +15,8 @@ describe('src/core/viz/expressions/buckets', () => {
     });
 
     describe('type', () => {
-        validateStaticType('buckets', ['number', 'number-array'], 'category');
-        validateStaticType('buckets', ['category', 'string-array'], 'category');
+        validateStaticType('buckets', ['number', 'number-array'], 'string');
+        validateStaticType('buckets', ['string', 'string-array'], 'string');
     });
 
     describe('eval', () => {

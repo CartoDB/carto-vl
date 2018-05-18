@@ -76,7 +76,7 @@ function genHSV(name, alpha) {
         }
         eval(f) {
             const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
+                if (value.type == 'string') {
                     return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
                 }
                 return value.eval(f);
@@ -115,7 +115,7 @@ function genHSV(name, alpha) {
                 checkType('hsva', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
+                if (value.type == 'string') {
                     return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
                 }
                 return '';
@@ -143,7 +143,7 @@ function genHSV(name, alpha) {
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
-        if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
+        if (parameter.type != 'number' && parameter.type != 'string' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }

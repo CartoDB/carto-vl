@@ -456,7 +456,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(preFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', ['red', 'blue']))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
                 )).toBeNull();
             });
@@ -848,7 +848,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(aggrFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', ['red', 'blue']))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
                 )).toEqual({});
             });

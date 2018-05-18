@@ -36,12 +36,12 @@ export default class BaseString extends BaseExpression {
     }
     _applyToShaderSource() {
         return {
-            preface: this._prefaceCode(`uniform float str${this._uid};\n`),
-            inline: `str${this._uid}`
+            preface: this._prefaceCode(`uniform float s${this._uid};\n`),
+            inline: `s${this._uid}`
         };
     }
     _postShaderCompile(program, gl) {
-        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `str${this._uid}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `s${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];

@@ -3,32 +3,32 @@ import { validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/viz/expressions/string', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('category', []);
-        validateStaticTypeErrors('category', [undefined]);
-        validateStaticTypeErrors('category', [123]);
-        validateStaticTypeErrors('category', ['number']);
+        validateStaticTypeErrors('string', []);
+        validateStaticTypeErrors('string', [undefined]);
+        validateStaticTypeErrors('string', [123]);
+        validateStaticTypeErrors('string', ['number']);
     });
 
     describe('type', () => {
-        validateStaticType('category', ['red'], 'category');
-        validateStaticType('category', ['123'], 'category');
+        validateStaticType('string', ['red'], 'string');
+        validateStaticType('string', ['123'], 'string');
     });
 
     describe('.eval()', () => {
         const fakeMetadata = {
             columns: [{
-                type: 'category',
-                name: 'category',
-                categoryNames: ['cat0', 'cat1', 'cat2']
+                type: 'string',
+                name: 'string',
+                categoryNames: ['string0', 'string1', 'string2']
             }],
             categoryIDs: {
-                'cat0': 0,
-                'cat1': 1,
-                'cat2': 2,
+                'string0': 0,
+                'string1': 1,
+                'string2': 2,
             }
         };
         it('should return the value from the metadata', () => {
-            const categoryExpresion = s.string('cat0');
+            const categoryExpresion = s.string('string0');
             categoryExpresion._compile(fakeMetadata);
             const actual = categoryExpresion.eval();
 

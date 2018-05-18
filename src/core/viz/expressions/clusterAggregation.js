@@ -101,7 +101,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * @function
  * @api
  */
-export const ClusterMode = genAggregationOp('mode', 'category');
+export const ClusterMode = genAggregationOp('mode', 'string');
 
 /**
  * Aggregate using the sum. This operation disables the access to the property
