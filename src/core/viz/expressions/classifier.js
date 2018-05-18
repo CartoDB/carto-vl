@@ -263,8 +263,8 @@ export class ViewportEqIntervals extends Classifier {
         checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const min = this._min.value;
-        const max = this._max.value;
+        const min = this._min.eval();
+        const max = this._max.eval();
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;

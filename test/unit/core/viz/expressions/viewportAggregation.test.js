@@ -25,31 +25,31 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
         it('viewportMin($price) should return the metadata min', () => {
             const viewportMin = s.viewportMin($price);
             fakeDrawMetadata(viewportMin);
-            expect(viewportMin.value).toEqual(0);
+            expect(viewportMin.eval()).toEqual(0);
         });
 
         it('viewportAvg($price) should return the metadata avg', () => {
             const viewportAvg = s.viewportAvg($price);
             fakeDrawMetadata(viewportAvg);
-            expect(viewportAvg.value).toEqual(1);
+            expect(viewportAvg.eval()).toEqual(1);
         });
 
         it('viewportMax($price) should return the metadata max', () => {
             const viewportMax = s.viewportMax($price);
             fakeDrawMetadata(viewportMax);
-            expect(viewportMax.value).toEqual(2);
+            expect(viewportMax.eval()).toEqual(2);
         });
 
         it('viewportSum($price) should return the metadata sum', () => {
             const viewportSum = s.viewportSum($price);
             fakeDrawMetadata(viewportSum);
-            expect(viewportSum.value).toEqual(4);
+            expect(viewportSum.eval()).toEqual(4);
         });
 
         it('viewportCount($price) should return the metadata count', () => {
             const viewportCount = s.viewportCount($price);
             fakeDrawMetadata(viewportCount);
-            expect(viewportCount.value).toEqual(4);
+            expect(viewportCount.eval()).toEqual(4);
         });
 
         it('viewportPercentile($price) should return the metadata count', () => {
