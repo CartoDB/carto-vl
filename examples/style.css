@@ -18,6 +18,8 @@ body {
   bottom: 0;
   left: 0;
   z-index: 2;
+  opacity: 1;
+  transition: opacity 300ms;
 }
 .CDB-LoaderIcon--big {
   width: 40px;
