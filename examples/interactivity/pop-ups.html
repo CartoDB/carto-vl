@@ -59,6 +59,9 @@
       closeOnClick: false
     });
 
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
+    
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
