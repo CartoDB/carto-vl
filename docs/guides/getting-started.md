@@ -87,8 +87,8 @@ const map = new mapboxgl.Map({
 ```
 
 The `container` is the id of the div where the map is going to be placed. The `center` and the `zoom` indicates the area of the world
-we are going to visualize. `dragRotate` disables the map rotation (not supported by CARTO VL) and the `style` contains the information about
-how the basemap is going to be rendered. You can add [mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or choose one predefined style offered by CARTO:
+we are going to visualize. `dragRotate` disables the map rotation (coming soon) and the `style` contains the information about
+the basemap. You can add [mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or choose one predefined style offered by CARTO:
 
 - [Voyager](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json)
 - [Positron](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
@@ -153,7 +153,7 @@ Once we get to this point we should see a basic map.
 ```
 </details>
 
-To show your CARTO data you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/).
+To render your CARTO data you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/).
 
 Since your CARTO data is going to be secured the first thing you need to do is to [autenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your user and apiKey.
 
@@ -170,7 +170,7 @@ Then we pick some data from our CARTO account to be displayed in the map, in thi
 const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 ``` 
 
-Then we create a [layer](https://carto.com/developers/carto-vl/reference/#cartolayer) using this source and an empty [viz](https://carto.com/developers/carto-vl/reference/#cartoviz) object.
+Now that we have selected our source table, the next step is to make it a [layer](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be accessed by VL and an empty [viz](https://carto.com/developers/carto-vl/reference/#cartoviz) object where we will define the layer's style
 
 ```js
 const viz = new carto.Viz();
