@@ -193,8 +193,7 @@ export default class Windshaft {
             aggSQL = this._buildQuery(select, backendFilters);
         }
 
-        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL);
-        metadata = overrideMetadata || metadata;
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
@@ -204,6 +203,7 @@ export default class Windshaft {
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
+        console.log("SETTING MD", metadata);
         this.metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
@@ -318,7 +318,7 @@ export default class Windshaft {
         return dataframe;
     }
 
-    async _getInstantiationPromise(query, conf, agg, aggSQL) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata = null) {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
@@ -329,22 +329,24 @@ export default class Windshaft {
                     type: 'mapnik',
                     options: {
                         sql: aggSQL,
-                        aggregation: agg,
-                        metadata: {
-                            geometryType: true,
-                            columnStats: true,
-                            sample: SAMPLE_ROWS // TDDO: sample without geometry
-                        }
+                        aggregation: agg
                     }
                 }
             ]
         };
+        if (!overrideMetadata) {
+            mapConfigAgg.layers[0].options.metadata = {
+                geometryType: true,
+                columnStats: true,
+                sample: SAMPLE_ROWS // TDDO: sample without geometry
+            };
+        }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
-            metadata: this._adaptMetadata(layergroup.metadata.layers[0].meta)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta)
         };
     }
 
