@@ -27,7 +27,7 @@ const viz = new carto.Viz({
 });
 ```
 
-### Style properties
+## Style properties
 
 **Style properties** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. All the style property are typed, this means that only admits one kind of expressions (More information on 03-expressions#types).
 
@@ -64,6 +64,12 @@ const viz = new carto.Viz({
   width: 10
 });
 const layer = new carto.Layer(source, viz);
+```
+
+Style properties can be accessed directly from the *carto.Viz* object. If they do not contain dynamic (animation) or data-driven (properties) information can be also evaluated:
+
+```js
+viz.width.eval();  // 10
 ```
 
 ## Properties
@@ -112,33 +118,53 @@ We use the `@` notation followed by the name (`@name`) to declare and use the va
 ```js
 const viz = new carto.Viz(`
   @size: 10
+  width: @size
 `);
 ```
 
 **Javascript API**
 
 ```js
+const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
     size: 10
-  }
+  },
+  width: s.var('size')
 });
 ```
 
 Variables can be accessed directly from the *carto.Viz* object. If variables do not contain dynamic (animation) or data-driven (properties) information can be also evaluated:
 
 ```js
-viz.variables.size.eval();  // 2
+viz.variables.size.eval();  // 10
 ```
 
 ### Data-driven variables
 
 If the variables contain data-driven information (properties) can be evaluated from the feature object in the interactivity event callbacks. More information at (Link to interactivity events).
 
+**String API**
+
 ```js
 const viz = new carto.Viz(`
   @size: sqrt($population) / 100
 `);
+[...]
+interactivity.on('featureClick', event => {
+  event.features[0].variables.size.eval();  // Different value for each clicked feature
+});
+```
+
+**Javascript API**
+
+```js
+const s = carto.expressions;
+const viz = new carto.Viz({
+  variables: {
+    size: s.div(s.sqrt(s.prop('population')), 100)
+  }
+});
 [...]
 interactivity.on('featureClick', event => {
   event.features[0].variables.size.eval();  // Different value for each clicked feature

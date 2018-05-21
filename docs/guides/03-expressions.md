@@ -1,122 +1,110 @@
 # Expressions
 
-**Expressions** are functions to manipulate static, dynamic and data-driven information which is used to define the style properties of a layer. Main types of expressions are: *Number*, *String*, *Color* and *Date* (more info at #Types).
+**Expressions** are functions to manipulate static, dynamic and data-driven information which is used to define the style properties of a layer. Main types regarding expressions are: *Number*, *String*, *Color* and *Date*. The language includes also *Arrays* to define lists of string categories, custom palettes, etc.
 
-**Style properties** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. The supported style properties are:
+### Types
 
-| Style property | Expression type | Description | Geometries |
-|---|---|---|---|---|
-| `color` | *carto.expression.Color* | fill color | points, lines, polygons |
-| `width` | *carto.expression.Number* | diameter / width | points, lines |
-| `strokeColor` | *carto.expresison.Color* | color of the stroke | points, polygons |
-| `strokeWidth` | *carto.expresison.Number* | width of the stroke | points, polygons |
-| `filter` | *carto.expresison.Number* | delete mismatched elements | points, lines, polygons |
-| `resolution` | *number* | size of the aggregation cell | points |
+#### Number
 
-All expressions and style properties should be defined inside a **Visualization object** (*carto.Viz*). There are two main ways or APIs to define a Viz object:
+This is the equivalent to the *JavaScript number* type,
+e.g. `1`, `2 + 3`, `4 * 5`. There are also some numeric constants defined: `TRUE`, `FALSE`, `PI`, `E`. Numeric expressions can be evaluated to get the result:
 
 ```js
 const viz = new carto.Viz(`
-  // your code here
+  @var: sqrt(2)
 `);
+viz.variables.var.eval();  // 1.4142135623730951
 ```
 
-## Types
+#### String
 
-### Number
-
-e.g. 1, PI, 2+3
-
-### String
-
-e.g. 'a', "b"
-
-### Color
-
-e.g. red, #AAA, hsv(0.67, 1.0, 1.0)
-
-### Date
-
-e.g. date('2022-03-09T00:00:00Z')
-
-## Arrays
-
-e.g. [1, 2, 3]
-
-e.g. ['a', 'b', 'c']
-
-e.g. [red, green, blue]
-
-e.g. [date('2022-03-09T00:00:00Z')]
-
-## Palettes
-
-carto.expression.palettes.PRISM
-
-CartoColors
-
-## Properties
-
-**Properties** are a way to access your data. For **Windshaft** sources (*carto.Dataset*, *carto.SQL*) the properties represent the columns of the tables in the database. For **GeoJSON** sources (*carto.GeoJSON*) the properties are exactly the ones defined in the `properties` object for each feature.
-
-We use the `$` notation followed by the column/property name (`$name`) to refer the property in the *String API*. The expression `e.prop('name')` can also be used to refer to properties in the *JavaScript API*.
-
-These properties cannot be immediately evaluated, they have no global meaning, but they are evaluated for each feature. Therefore, expressions containing properties should be treated as declarations or templates that will be executed and evaluated for each feature with the specific feature data.
-
-### Example
-
-Suppose you have a Dataset that contains all the `world_cities` as points. The table has a numeric column called `density` and you want to create a *Bubble map* in which the size of each city is its density value. The following code implements that behavior:
-
-```js
-const source = new carto.Dataset('world_cities');
-const viz = new carto.Viz(`
-  width: $density
-`);
-const layer = new carto.Layer(source, viz);
-```
-
-If the string column `city_name` is used instead of `density` an Error will be thrown because the style property `width` expects a *Number*.
-
-## Variables
-
-**Variables** are a way to store and reuse expressions.
-
-We use the `@` notation followed by the name (`@name`) to declare and use the variable in the *String API*. The expression `e.var('name')` can also be used to refer to variables in the *JavaScript API*, that should be declared inside the `variables` scope.
+This is the equivalent to the *JavaScript string* type, e.g. `'a'`, `"b"`. They are used to define lists of categories.
 
 ```js
 const viz = new carto.Viz(`
-  @myVariable: 1 + 1
+  @categories: ['a', 'b', 'c']
 `);
 ```
 
-Variables can be accessed directly from the Viz object. If variables do not contain dynamic (animation) or data-driven (properties) information can be also evaluated:
+#### Color
+
+This is a composed type to define the colors. It is defined as a *JavaScript object* with the following RGBA structure:
 
 ```js
-viz.variables.myVariable.eval();  // 2
+{ r: 255, g: 0, b: 0, a: 1 }
 ```
 
-If the variables contain data-driven information (properties) can be evaluated from the feature object in the interactivity event callbacks. More information at (Link to events).
+In the language there are several ways to define a color, e.g. `red`, `#AAA`, `hsv(0.67, 1.0, 1.0)`. They can be used directly, or within an array to define a custom palette.
 
 ```js
 const viz = new carto.Viz(`
-  @size: sqrt($population) / 100
+  @color: rgba(127, 100, 10, 0.7)
+  @customPalette: [red, green, blue]
 `);
-[...]
-interactivity.on('featureClick', event => {
-  event.features[0].variables.size.eval();  // Different value for each clicked feature
-});
 ```
 
-## Functions
+#### Date
 
-### Numeric functions
+This is the equivalent to the *JavaScript Date* type. It is used for animations and can be defined by `time` or `date`, e.g. `date('2022-03-09T00:00:00Z')`.
 
-### String functions
+```js
+const viz = new carto.Viz(`
+  @begin: date('1970-01-01T00:00:00Z')
+  @end: date('2022-03-09T00:00:00Z')
+`);
+```
 
-### Color functions
+## Basic expressions
 
-### Date functions
+### Operations
 
-## Eval
+#### Unary
 
-e.g. {r: 255, g: 0, b: 0, a: 1}
+This is a list of the unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNaN`, `not`, `floor`, `ceil`.
+
+```js
+const viz = new carto.Viz(`
+  width: sqrt($population)
+  strokeWidth: not($nat)
+`);
+```
+
+#### Binary
+
+This is a list of the binary arithmetic operations: `mul`, `div`, `add`, `sub`, `mod`, `pow`. The re are also binary comparison operators: `gt`, `gte`, `lt`, `lte`, `eq`, `neq`, `or`, `and`.
+
+```js
+const viz = new carto.Viz(`
+  color: red + blue
+  width: $population / 100
+  strokeWidth: ($population > 10^5) * 5
+`);
+```
+
+### Colors
+
+This is the list of the color expressions: `rgb`, `rgba`, `hsl`, `hsla`, `hsv`, `hsva`, `cielab`, `opacity`, `hex`, `namedColor`.
+
+```js
+const viz = new carto.Viz(`
+  @myColor: #FABADA
+  color: @myColor
+  strokeColor: opacity(@myColor, 0.7)
+`);
+```
+
+There are a set of Palettes ([CARTOColors](https://carto.com/carto-colors/)) available in the language under the namespace `carto.expressions.palettes` in the JavaScript API or directly by using the palette's name in the String API.
+
+```js
+const viz = new carto.Viz(`
+  @palette: PRISM
+`);
+```
+
+### Aggregations
+
+#### Viewport
+
+#### Global
+
+#### Cluster
