@@ -453,12 +453,6 @@ describe('src/client/windshaft-filtering', () => {
             });
 
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
-                let flt = preFilters(f,
-                    s.or(
-                        s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
-                    )
-                );
                 const expected = {
                     type: 'or',
                     left: {
