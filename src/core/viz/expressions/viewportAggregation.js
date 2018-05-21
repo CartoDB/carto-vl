@@ -1,18 +1,24 @@
 import BaseExpression from './base';
 import { number } from '../functions';
-import * as schema from '../../schema';
+import { implicitCast, clamp } from './utils';
 
 /**
- * Return the average value of the features showed in the viewport
+ * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the average of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_avg: s.viewportAvg(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the average of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_avg: s.viewportAvg($amount)
+ *   \@v_avg: viewportAvg($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -20,19 +26,36 @@ import * as schema from '../../schema';
  * @function
  * @api
  */
-export const ViewportAvg = generateAggregattion('avg');
+export const ViewportAvg = genViewportAgg('avg',
+    self => {
+        self._sum = 0; self._count = 0;
+    },
+    (self, x) => {
+        if (!Number.isNaN(x)) {
+            self._count++;
+            self._sum += x;
+        }
+    },
+    self => self._sum / self._count
+);
 
 /**
- * Return the maximum value of the features showed in the viewport
+ * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_max: s.viewportMax(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_max: s.viewportMax($amount)
+ *   \@v_max: viewportMax($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -40,19 +63,29 @@ export const ViewportAvg = generateAggregattion('avg');
  * @function
  * @api
  */
-export const ViewportMax = generateAggregattion('max');
+export const ViewportMax = genViewportAgg('max',
+    self => { self._value = Number.NEGATIVE_INFINITY; },
+    (self, y) => { self._value = Math.max(self._value, y); },
+    self => self._value
+);
 
 /**
- * Return the minimum value of the features showed in the viewport
+ * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_min: s.viewportMin(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_min: s.viewportMin($amount)
+ *   \@v_min: viewportMin($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -60,19 +93,28 @@ export const ViewportMax = generateAggregattion('max');
  * @function
  * @api
  */
-export const ViewportMin = generateAggregattion('min');
+export const ViewportMin = genViewportAgg('min',
+    self => { self._value = Number.POSITIVE_INFINITY; },
+    (self, y) => { self._value = Math.min(self._value, y); },
+    self => self._value);
 
 /**
- * Return the sum of the values of the features showed in the viewport
+ * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_sum: s.viewportSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_sum: s.viewportSum($amount)
+ *   \@v_sum: viewportSum($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -80,19 +122,27 @@ export const ViewportMin = generateAggregattion('min');
  * @function
  * @api
  */
-export const ViewportSum = generateAggregattion('sum');
+export const ViewportSum = genViewportAgg('sum',
+    self => { self._value = 0; },
+    (self, y) => { self._value = self._value + y; },
+    self => self._value);
 
 /**
- * Return the count of the features showed in the viewport
+ * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the feature count in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_count: s.viewportCount(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the feature count in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_count: s.viewportCount($amount)
+ *   \@v_count: viewportCount($amount)
  * `);
  *
  * @memberof carto.expressions
@@ -100,19 +150,73 @@ export const ViewportSum = generateAggregattion('sum');
  * @function
  * @api
  */
-export const ViewportCount = generateAggregattion('count');
+export const ViewportCount = genViewportAgg('count',
+    self => { self._value = 0; },
+    self => { self._value++; },
+    self => self._value);
+
+
+
+function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
+    return class ViewportAggregation extends BaseExpression {
+        /**
+         * @param {*} property
+         */
+        constructor(property) {
+            super({
+                property: implicitCast(metadataPropertyName == 'count' ? number(0) : property),
+                _impostor: number(0)
+            });
+            this._isViewport = true;
+        }
+
+        get value() {
+            return resolveFn(this);
+        }
+
+        eval() {
+            return resolveFn(this);
+        }
+        _compile(metadata) {
+            super._compile(metadata);
+            // TODO improve type check
+            this.property._compile(metadata);
+            this.type = 'number';
+            super.inlineMaker = inline => inline._impostor;
+        }
+        _getMinimumNeededSchema() {
+            return this.property._getMinimumNeededSchema();
+        }
+        _resetViewportAgg() {
+            zeroFn(this);
+        }
+        _accumViewportAgg(feature) {
+            accumFn(this, this.property.eval(feature));
+        }
+        _preDraw(...args) {
+            this._impostor.expr = this.eval();
+            super._preDraw(...args);
+        }
+    };
+}
 
 /**
- * Return the percentile of the features showed in the viewport
+ * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {carto.expressions.Base} x - numeric expression
  * @return {carto.expressions.Base} Result of the aggregation
  *
- * @example
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
- * const $amount = s.prop('amount');
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_percentile: s.viewportPercentile(s.prop('amount'), 90)
+ *   }
+ * });
+ *
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   @v_percentile: s.viewportPercentile($amount)
+ *   \@v_percentile: viewportPercentile($amount, 90)
  * `);
  *
  * @memberof carto.expressions
@@ -120,239 +224,151 @@ export const ViewportCount = generateAggregattion('count');
  * @function
  * @api
  */
-export const ViewportPercentile = generatePercentile();
+export class ViewportPercentile extends BaseExpression {
+    /**
+     * @param {*} property
+     */
+    constructor(property, percentile) {
+        super({
+            property: implicitCast(property),
+            percentile: implicitCast(percentile),
+            impostor: number(0)
+        });
+        this._isViewport = true;
+    }
 
-/**
- * Return the average value of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_avg: s.globalAvg($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalAvg
- * @function
- * @api
- */
-export const GlobalAvg = generateAggregattion('avg', true);
+    get value() {
+        return this.eval();
+    }
 
-/**
- * Return the maximum value of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_max: s.globalMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMax
- * @function
- * @api
- */
-export const GlobalMax = generateAggregattion('max', true);
+    eval(f) {
+        if (this._value == null) {
+            this._array.sort((a, b) => a - b);
+            const index = clamp(
+                Math.floor(this.percentile.eval(f) / 100 * this._array.length),
+                0, this._array.length - 1);
+            this._value = this._array[index];
+        }
+        return this._value;
+    }
 
-/**
- * Return the minimum value of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_min: s.globalMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMin
- * @function
- * @api
- */
-export const GlobalMin = generateAggregattion('min', true);
-
-/**
- * Return the sum of the values of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_sum: s.globalSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalSum
- * @function
- * @api
- */
-export const GlobalSum = generateAggregattion('sum', true);
-
-/**
- * Return the count of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_count: s.globalCount($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalCount
- * @function
- * @api
- */
-export const GlobalCount = generateAggregattion('count', true);
-
-/**
- * Return the percentile of all the features
- *
- * @param {carto.expressions.Base} property - Column of the table
- * @return {carto.expressions.Base} Result of the aggregation
- *
- * @example
- * const s = carto.expressions;
- * const $amount = s.prop('amount');
- * const viz = new carto.Viz(`
- *   @g_percentile: s.globalPercentile($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalPercentile
- * @function
- * @api
- */
-export const GlobalPercentile = generatePercentile(true);
-
-function generateAggregattion(metadataPropertyName, global) {
-    return class Aggregattion extends BaseExpression {
-        /**
-         * @param {*} property
-         */
-        constructor(property) {
-            super({ value: number(0) });
-            this.property = property;
-        }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            // TODO improve type check
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _updateDrawMetadata(drawMetadata){
-            const name = this._getColumnName();
-            const column = drawMetadata.columns.find(c => c.name === name);
-            if (!global) {
-                this.value.expr = column[metadataPropertyName];
-            }
-        }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
+    _compile(metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
+    }
+    _getMinimumNeededSchema() {
+        return this.property._getMinimumNeededSchema();
+    }
+    _resetViewportAgg() {
+        this._value = null;
+        this._array = [];
+    }
+    _accumViewportAgg(feature) {
+        const v = this.property.eval(feature);
+        this._array.push(v);
+    }
+    _preDraw(...args) {
+        this.impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
 }
 
-function generatePercentile(global) {
-    return class Percentile extends BaseExpression {
-        /**
-         * @param {*} property
-         */
-        constructor(property, percentile) {
-            if (!Number.isFinite(percentile)) {
-                throw new Error('Percentile must be a fixed literal number');
+/**
+ * Generates an histogram.
+ *
+ * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
+ * The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
+ * at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the `size` parameter.
+ *
+ * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
+ *
+ * @param {carto.expressions.Base} x - expression to base the histogram
+ * @param {carto.expressions.Base} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
+ * @return {carto.expressions.Base} Histogram
+ *
+ * @example <caption>Create and use an histogram. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *          \@categoryHistogram: viewportHistogram($type)
+ *          \@numericHistogram:  viewportHistogram($amount, 1, 3)
+ * `);
+ * ...
+ * console.log(viz.variables.categoryHistogram.eval());
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+ * // There are 10 features of type A and 20 of type B
+ *
+ * console.log(viz.variables.numericHistogram.eval());
+ * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+ * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
+ *
+ * @memberof carto.expressions
+ * @name viewportPercentile
+ * @function
+ * @api
+ */
+export class ViewportHistogram extends BaseExpression {
+    constructor(x, weight = 1, size = 1000) {
+        super({
+            x: implicitCast(x),
+            weight: implicitCast(weight),
+        });
+        this._size = size;
+        this._isViewport = true;
+        this.inlineMaker = () => null;
+    }
+    _resetViewportAgg() {
+        this._cached = null;
+        this._histogram = new Map();
+    }
+    _accumViewportAgg(feature) {
+        const x = this.x.eval(feature);
+        const weight = this.weight.eval(feature);
+        const count = this._histogram.get(x) || 0;
+        this._histogram.set(x, count + weight);
+    }
+    get value() {
+        if (this._cached == null) {
+            if (!this._histogram) {
+                return null;
             }
-            super({ value: number(0) });
-            // TODO improve type check
-            this.property = property;
-            this.percentile = percentile;
-        }
-        eval() {
-            return this.value.expr;
-        }
-        _compile(metadata) {
-            super._compile(metadata);
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            if (global) {
-                const copy = metadata.sample.map(s => s[this.property.name]);
-                copy.sort((x, y) => x - y);
-                const p = this.percentile / 100;
-                this.value.expr = copy[Math.floor(p * copy.length)];
-            }
-        }
-        _getMinimumNeededSchema() {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getDrawMetadataRequirements() {
-            if (!global) {
-                return { columns: [this._getColumnName()] };
-            } else {
-                return { columns: [] };
-            }
-        }
-        _preDraw(program, drawMetadata, gl) {
-            // TODO use _updateDrawMetadata
-            const name = this._getColumnName();
-            if (!global) {
-                const column = drawMetadata.columns.find(c => c.name === name);
-                const total = column.accumHistogram[column.histogramBuckets - 1];
-                // TODO OPT: this could be faster with binary search
-                for (var i = 0; i < column.histogramBuckets; i++) {
-                    if (column.accumHistogram[i] >= this.percentile / 100 * total) {
-                        break;
-                    }
+            if (this.x.type == 'number') {
+                const array = [...this._histogram];
+                let min = Number.POSITIVE_INFINITY;
+                let max = Number.NEGATIVE_INFINITY;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    min = Math.min(min, x);
+                    max = Math.max(max, x);
                 }
-                const br = i / column.histogramBuckets * (column.max - column.min) + column.min;
-                this.value.expr = br;
+                const hist = Array(this._size).fill(0);
+                const range = max - min;
+                const sizeMinusOne = this._size - 1;
+                for (let i = 0; i < array.length; i++) {
+                    const x = array[i][0];
+                    const y = array[i][1];
+                    const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
+                    hist[index] += y;
+                }
+                this._cached = hist.map((count, index) => {
+                    return {
+                        x: [min + index / this._size * range, min + (index + 1) / this._size * range],
+                        y: count,
+                    };
+                });
+            } else {
+                this._cached = [...this._histogram].map(([x, y]) => {
+                    return { x: this._metatada.categoryIDsToName[x], y };
+                });
             }
-            this.value._preDraw(program, drawMetadata, gl);
         }
-        _getColumnName() {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return schema.column.aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
+        return this._cached;
+    }
+    _compile(metadata) {
+        this._metatada = metadata;
+        super._compile(metadata);
+    }
 }

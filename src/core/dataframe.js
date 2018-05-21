@@ -18,6 +18,49 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
+        if (this.type == 'polygon') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(polygon => {
+                    const vertices = polygon.flat;
+                    const numVertices = polygon.holes[0] || polygon.flat.length / 2;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        } else if (this.type == 'line') {
+            this._aabb = [];
+            geom.forEach(feature => {
+                const aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY,
+                };
+                feature.forEach(line => {
+                    const vertices = line;
+                    const numVertices = line.length;
+                    for (let i = 0; i < numVertices; i++) {
+                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+                    }
+                });
+                this._aabb.push(aabb);
+            });
+        }
     }
 
     bind(renderer) {
@@ -44,8 +87,14 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
         for (let i = 0; i < vertices.length; i += 2) {
-            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
-                index++;
+            if (!breakpoints.length) {
+                if (i > 0) {
+                    index++;
+                }
+            } else {
+                while (i == breakpoints[index]) {
+                    index++;
+                }
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
@@ -76,6 +125,26 @@ export default class Dataframe {
         }
     }
 
+    inViewport(featureIndex, minx, miny, maxx, maxy) {
+        switch (this.type) {
+            case 'point':
+            {
+                const x = this.geom[2 * featureIndex + 0];
+                const y = this.geom[2 * featureIndex + 1];
+                return x > minx && x < maxx && y > miny && y < maxy;
+            }
+            case 'line':
+            case 'polygon':
+            {
+                const aabb = this._aabb[featureIndex];
+                return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
+
+            }
+            default:
+                return false;
+        }
+    }
+
     _getPointsAtPosition(p, viz) {
         p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
         const points = this.decodedGeom.vertices;
@@ -83,8 +152,8 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.getWidth();
-        const vizStrokeWidth = viz.getStrokeWidth();
+        const vizWidth = viz.width;
+        const vizStrokeWidth = viz.strokeWidth;
         for (let i = 0; i < points.length; i += 2) {
             const featureIndex = i / 2;
             const center = {
@@ -119,7 +188,7 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.getWidth();
+        const vizWidth = viz.width;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -159,12 +228,17 @@ export default class Dataframe {
 
     }
 
-    _getPolygonAtPosition(pos) {
+    _getPolygonAtPosition(pos, viz) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
         let featureIndex = 0;
         const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const vizStrokeWidth = viz.strokeWidth;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
@@ -172,17 +246,25 @@ export default class Dataframe {
             if (i >= breakpoints[featureIndex]) {
                 featureIndex++;
             }
+            const f = {};
+            columnNames.forEach(name => {
+                f[name] = this.properties[name][featureIndex];
+            });
+            // Line with is saturated at 336px
+            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            const scale = lineWidth / 2 * widthScale;
             const v1 = {
-                x: vertices[i + 0],
-                y: vertices[i + 1]
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
             };
             const v2 = {
-                x: vertices[i + 2],
-                y: vertices[i + 3]
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
             };
             const v3 = {
-                x: vertices[i + 4],
-                y: vertices[i + 5]
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
@@ -205,7 +287,7 @@ export default class Dataframe {
             } else {
                 const column = this.metadata.columns.find(c => c.name == propertyName);
                 if (column && column.type == 'category') {
-                    prop = column.categoryNames[prop];
+                    prop = this.metadata.categoryIDsToName[prop];
                 }
                 properties[propertyName] = prop;
             }
@@ -296,10 +378,15 @@ export default class Dataframe {
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
 // Parameters in {x: 0, y:0} form
-function pointInTriangle(p, v1, v2, v3) {
+export function pointInTriangle(p, v1, v2, v3) {
     // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
     // contains an explanation of both this algorithm and one based on barycentric coordinates,
     // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    if (equal(v1, v2) || equal(v2, v3) || equal(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
 
     // A point is inside a triangle or in one of the triangles edges
     // if the point is in the three half-plane defined by the 3 edges
@@ -318,6 +405,10 @@ function halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function equal(a, b) {
+    return (a.x == b.x) && (a.y == b.y);
 }
 
 function pointInCircle(p, center, scale) {

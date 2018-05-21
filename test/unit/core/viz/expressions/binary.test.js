@@ -95,7 +95,9 @@ describe('src/core/viz/expressions/binary', () => {
         });
 
         describe('div', () => {
-            it('div(1, 0) should return an error', () => expect(() => s.div(1, 0)).toThrow());
+            test('div', 1, 0, Infinity);
+            test('div', -1, 0, -Infinity);
+            test('div', 0, 0, NaN);
             test('div', 0, 1, 0);
             test('div', 4, 2, 2);
             test('div', -4, 2, -2);
@@ -118,7 +120,6 @@ describe('src/core/viz/expressions/binary', () => {
         });
 
         describe('mod', () => {
-            it('div(1, 0) should return an error', () => expect(() => s.mod(3, 0)).toThrow());
             test('mod', 0, 1, 0);
             test('mod', 2, 1, 0);
             test('mod', 2, 2, 0);

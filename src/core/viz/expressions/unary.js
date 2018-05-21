@@ -2,16 +2,21 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 import BaseExpression from './base';
 
 /**
- * Compute the natural logarithm (base e) of a number x
+ * Compute the natural logarithm (base e) of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the natural logarithm
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the natural logarithm
  * @return {carto.expressions.Base}
  *
  * @example <caption>Natural Logarithm.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.log(10);  // 2.302585092994046
+ *   width: s.log(10)  // 2.302585092994046
  * });
+ *
+ * @example <caption>Natural Logarithm. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: log(10)
+ * `);
  *
  * @memberof carto.expressions
  * @name log
@@ -21,16 +26,21 @@ import BaseExpression from './base';
 export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 
 /**
- * Compute the square root of a number x
+ * Compute the square root of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the square root
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the square root
  * @return {carto.expressions.Base}
  *
  * @example <caption>Square root.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sqrt(4);  // 2
+ *   width: s.sqrt(4)  // 2
  * });
+ *
+ * @example <caption>Square root. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sqrt(4)
+ * `);
  *
  * @memberof carto.expressions
  * @name sqrt
@@ -40,16 +50,21 @@ export const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 
 /**
- * Compute the sine of a number x
+ * Compute the sine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the sine in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the sine in radians
  * @return {carto.expressions.Base}
  *
- * @example <caption>Sin</caption>
+ * @example <caption>Sin.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sin(Math.PI/2);  // 1
+ *   width: s.sin(Math.PI/2)  // 1
  * });
+ *
+ * @example <caption>Sin. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sin(PI/2)
+ * `);
  *
  * @memberof carto.expressions
  * @name sin
@@ -59,16 +74,21 @@ export const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 
 /**
- * Compute the cosine of a number x
+ * Compute the cosine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the cosine in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the cosine in radians
  * @return {carto.expressions.Base}
  *
- * @example <caption>Cos</caption>
+ * @example <caption>Cos.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.cos(0);  // 1
+ *   width: s.cos(0)  // 1
  * });
+ *
+ * @example <caption>Cos. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: cos(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name cos
@@ -78,16 +98,21 @@ export const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 
 /**
- * Compute the tangent of a number x
+ * Compute the tangent of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the tangent in radians
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the tangent in radians
  * @return {carto.expressions.Base}
  *
  * @example <caption>Tan</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.tan(0);  // 0
+ *   width: s.tan(0)  // 0
  * });
+ *
+ * @example <caption>Tan. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: tan(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name tan
@@ -98,17 +123,22 @@ export const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
 
 /**
  * Compute the sign of a number x, indicating whether the number is positive, negative or zero
- * This means this function will return 1 if the number is positive, -1 if the number is negative 0 if the number is 0 and
- * -0 if the number is -0.
+ * This means this function will return 1 if the number is positive, -1 if the number is negative
+ * 0 if the number is 0 and -0 if the number is -0.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the sign
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the sign
  * @return {carto.expressions.Base}
  *
- * @example <caption>Sign</caption>
+ * @example <caption>Sign.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sign(100);  // 1
+ *   width: s.sign(100)  // 1
  * });
+ *
+ * @example <caption>Sign. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: sign(100)
+ * `);
  *
  * @memberof carto.expressions
  * @name sign
@@ -120,14 +150,19 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 /**
  * Compute the absolute value of a number x.
  *
- * @param {carto.expressions.Base|number} x - Number to compute the absolute value
+ * @param {carto.expressions.Base|number} x - Numeric expression to compute the absolute value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Abs</caption>
+ * @example <caption>Abs.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.abs(100);  // 1
+ *   width: s.abs(-100)  // 100
  * });
+ *
+ * @example <caption>Abs. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: abs(-100) // 100
+ * `);
  *
  * @memberof carto.expressions
  * @name abs
@@ -135,6 +170,21 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
  * @api
  */
 export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
+
+/**
+ * Check if a numeric expression is NaN.
+ *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @param {carto.expressions.Base|number} x - Numeric expression to check
+ * @return {carto.expressions.Base}
+ *
+ * @memberof carto.expressions
+ * @name isNaN
+ * @function
+ * @api
+ */
+export const IsNaN = genUnaryOp('isNaN', x => Number.isNaN(x) ? 1 : 0, x => `(isnan(${x})? 1.: 0.)`);
 
 /**
  * Compute the logical negation of the given expression.
@@ -146,11 +196,16 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the not value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Not</caption>
+ * @example <caption>Not.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.not(0);  // 1
+ *   width: s.not(0)  // 1
  * });
+ *
+ * @example <caption>Not. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: not(0)
+ * `);
  *
  * @memberof carto.expressions
  * @name not
@@ -169,11 +224,16 @@ export const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
  * @param {carto.expressions.Base|number} x - Number to compute the floor value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Floor</caption>
+ * @example <caption>Floor.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.floor(5.9);  // 5
+ *   width: s.floor(5.9)  // 5
  * });
+ *
+ * @example <caption>Floor. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: floor(5.9)
+ * `);
  *
  * @memberof carto.expressions
  * @name floor
@@ -192,11 +252,16 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  * @param {carto.expressions.Base|number} x - Number to compute the ceil value
  * @return {carto.expressions.Base}
  *
- * @example <caption>Ceil</caption>
+ * @example <caption>Ceil.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.ceil(5.1);  // 6
  * });
+ *
+ * @example <caption>Ceil. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: ceil(5.1)
+ * `);
  *
  * @memberof carto.expressions
  * @name ceil

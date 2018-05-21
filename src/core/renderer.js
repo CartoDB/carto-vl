@@ -3,8 +3,6 @@ import * as schema from './schema';
 import Dataframe from './dataframe';
 import { Asc, Desc } from './viz/functions';
 
-const HISTOGRAM_BUCKETS = 1000;
-
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
@@ -154,37 +152,26 @@ class Renderer {
             zoom: 1. / this._zoom,
             columns: []
         };
-        const colorRequirements = viz.getColor()._getDrawMetadataRequirements();
-        const widthRequirements = viz.getWidth()._getDrawMetadataRequirements();
-        const strokeColorRequirements = viz.getStrokeColor()._getDrawMetadataRequirements();
-        const strokeWidthRequirements = viz.getStrokeWidth()._getDrawMetadataRequirements();
-        const filterRequirements = viz.getFilter()._getDrawMetadataRequirements();
-        const variables = Object.values(viz.variables);
-        let requiredColumns = [widthRequirements, colorRequirements, strokeColorRequirements, strokeWidthRequirements, filterRequirements].concat(variables.map(v => v._getDrawMetadataRequirements()))
-            .reduce(schema.union, schema.IDENTITY).columns;
-
-        if (requiredColumns.length == 0) {
-            return drawMetadata;
-        }
-
-        requiredColumns.forEach(column => {
-            drawMetadata.columns.push(
-                {
-                    name: column,
-                    min: Number.POSITIVE_INFINITY,
-                    max: Number.NEGATIVE_INFINITY,
-                    avg: undefined,
-                    count: 0,
-                    sum: 0,
-                    histogramBuckets: HISTOGRAM_BUCKETS,
-                    histogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                    accumHistogram: Array.from({ length: HISTOGRAM_BUCKETS }, () => 0),
-                }
-            );
-        });
 
         const s = 1. / this._zoom;
-        // TODO go feature by feature instead of column by column
+
+        const rootExprs = viz._getRootExpressions();
+        // Performance optimization to avoid doing DFS at each feature iteration
+        const viewportExprs = [];
+        function dfs(expr) {
+            if (expr._isViewport) {
+                viewportExprs.push(expr);
+            } else {
+                expr._getChildren().map(dfs);
+            }
+        }
+        rootExprs.map(dfs);
+        const numViewportExprs = viewportExprs.length;
+        viewportExprs.forEach(expr => expr._resetViewportAgg());
+
+        if (!viewportExprs.length) {
+            return drawMetadata;
+        }
         tiles.forEach(d => {
             d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
             d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
@@ -193,67 +180,27 @@ class Renderer {
             const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
             const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
 
-            const columnNames = viz.getFilter()._getMinimumNeededSchema().columns;
+            const propertyNames = Object.keys(d.properties);
+            const propertyNamesLength = propertyNames.length;
             const f = {};
 
             for (let i = 0; i < d.numFeatures; i++) {
-                const x = d.geom[2 * i + 0];
-                const y = d.geom[2 * i + 1];
-                if (x > minx && x < maxx && y > miny && y < maxy) {
-                    if (viz.getFilter()) {
-                        columnNames.forEach(name => {
-                            f[name] = d.properties[name][i];
-                        });
-                        if (viz.getFilter().eval(f) < 0.5) {
-                            continue;
-                        }
+                if (d.inViewport(i, minx, miny, maxx, maxy)) {
+
+                    for (let j = 0; j < propertyNamesLength; j++) {
+                        const name = propertyNames[j];
+                        f[name] = d.properties[name][i];
                     }
-                    requiredColumns.forEach(column => {
-                        const values = d.properties[column];
-                        const v = values[i];
-                        const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                        metaColumn.min = Math.min(v, metaColumn.min);
-                        metaColumn.max = Math.max(v, metaColumn.max);
-                        metaColumn.count++;
-                        metaColumn.sum += v;
-                    });
-                }
-            }
-        });
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            metaColumn.avg = metaColumn.sum / metaColumn.count;
-        });
-        tiles.forEach(d => {
-            requiredColumns.forEach(column => {
-                const values = d.properties[column];
-                const metaColumn = drawMetadata.columns.find(c => c.name == column);
-                d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-                d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-                const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-                const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-                const vmin = metaColumn.min;
-                const vmax = metaColumn.max;
-                const vdiff = vmax - vmin;
-                for (let i = 0; i < d.numFeatures; i++) {
-                    const x = d.geom[2 * i + 0];
-                    const y = d.geom[2 * i + 1];
-                    if (x > minx && x < maxx && y > miny && y < maxy) {
-                        const v = values[i];
-                        if (!Number.isFinite(v)) {
-                            continue;
-                        }
-                        metaColumn.histogram[Math.ceil(999 * (v - vmin) / vdiff)]++;
+
+                    if (viz.filter.eval(f) < 0.5) {
+                        continue;
+                    }
+
+                    for (let j = 0; j < numViewportExprs; j++) {
+                        const expr = viewportExprs[j];
+                        expr._accumViewportAgg(f);
                     }
                 }
-            });
-        });
-        requiredColumns.forEach(column => {
-            const metaColumn = drawMetadata.columns.find(c => c.name == column);
-            for (let i = 1; i < metaColumn.histogramBuckets; i++) {
-                metaColumn.accumHistogram[i] = metaColumn.accumHistogram[i - 1] + metaColumn.histogram[i];
             }
         });
         return drawMetadata;
@@ -309,11 +256,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.getColor(), viz.propertyColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.getWidth(), viz.propertyWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.getStrokeColor(), viz.propertyStrokeColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.getStrokeWidth(), viz.propertyStrokeWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.getFilter(), viz.propertyFilterTID));
+        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color, viz.propertyColorTID));
+        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width, viz.propertyWidthTID));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor, viz.propertyStrokeColorTID));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth, viz.propertyStrokeWidthTID));
+        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.filter, viz.propertyFilterTID));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -368,7 +315,7 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (s / aspect) * (this._center.x - tile.center.x),
                 s * (this._center.y - tile.center.y));
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type == 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
@@ -387,7 +334,7 @@ class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -406,8 +353,8 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, 2);
 
-            if (tile.type == 'point') {
-                // Lines and polygons don't support stroke
+            if (tile.type != 'line') {
+                // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE3);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
                 gl.uniform1i(renderer.colorStrokeTexture, 3);
@@ -421,7 +368,7 @@ class Renderer {
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type == 'line') {
+            if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
             }
         });
@@ -463,7 +410,7 @@ class Renderer {
 }
 
 function getOrderingRenderBuckets(renderLayer) {
-    const orderer = renderLayer.viz.getOrder();
+    const orderer = renderLayer.viz.order;
     let orderingMins = [0];
     let orderingMaxs = [1000];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels

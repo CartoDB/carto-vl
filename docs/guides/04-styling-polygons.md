@@ -32,8 +32,8 @@ To color features by a string, use a `ramp()` including the attribute name appen
 
 `color: ramp($attribute,colorscheme)`
 
-### Unique Values  
-The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together. 
+### Unique Values
+The map below assigns a unique color to each category value in the `cause_descrip` field using a qualitative CARTOColor scheme `Prism`. By default, features with different `cause_descrip` are not aggregated together.
 
 ```
 color: ramp($cause_descrip,Prism)
@@ -63,13 +63,13 @@ There are a variety of ways to symbolize polygons using numeric attributes.
 + Classed color
 + Unclassed color
 + Manual Classed Color
-	
+
 
 ### Classed Color
 Use an [available classification method](LINK), to group features into a defined set of bins and color them using a sequential color scheme.
 
 ```
-color: ramp(quantiles($total_pop,5),Emrld)
+color: ramp(globalQuantiles($total_pop,5),Emrld)
 ```
 
 ### Unclassed Color

@@ -19,9 +19,9 @@ https://github.com/CartoDB/carto-vl-webpack-demo
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include CARTO Mapbox GL JS fork -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     body { margin: 0; padding: 0; }
     #map { position: absolute; height: 100%; width: 100%; }
@@ -40,8 +40,8 @@ https://github.com/CartoDB/carto-vl-webpack-demo
 
     // Login into your CARTO account
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
     // Set the source of your data

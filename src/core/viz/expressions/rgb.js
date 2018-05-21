@@ -4,9 +4,9 @@ import { implicitCast, checkLooseType, checkType } from './utils';
 /**
  * Evaluates to a rgb color.
  *
- * @param {carto.expressions.Base|number} r - The amount of red in the color
- * @param {carto.expressions.Base|number} g - The amount of green in the color
- * @param {carto.expressions.Base|number} b - The amount of blue in the color
+ * @param {carto.expressions.Base|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {carto.expressions.Base|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {carto.expressions.Base|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
  * @return {carto.expressions.rgb}
  *
  * @example <caption>Display blue points.</caption>
@@ -14,6 +14,11 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * const viz = new carto.Viz({
  *   color: s.rgb(0, 0, 255)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgb(0, 0, 255)
+ * `);
  *
  * @memberof carto.expressions
  * @name rgb
@@ -25,10 +30,10 @@ export const RGB = genRGB('rgb', false);
 /**
  * Evaluates to a rgba color.
  *
- * @param {carto.expressions.Base|number} r - The amount of red in the color
- * @param {carto.expressions.Base|number} g - The amount of green in the color
- * @param {carto.expressions.Base|number} b - The amount of blue in the color
- * @param {carto.expressions.Base|number} a - The alpha value of the color
+ * @param {carto.expressions.Base|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {carto.expressions.Base|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {carto.expressions.Base|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
+ * @param {carto.expressions.Base|number} a - The alpha value of the color in the [0, 1] range. Numeric expression.
  * @return {carto.expressions.rgba}
  *
  * @example <caption>Display blue points.</caption>
@@ -36,6 +41,11 @@ export const RGB = genRGB('rgb', false);
  * const viz = new carto.Viz({
  *   color: s.rgba(0, 0, 255, 1)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: rgba(0, 0, 255, 1)
+ * `);
  *
  * @memberof carto.expressions
  * @name rgba

@@ -1,19 +1,25 @@
-import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression, checkArray } from './utils';
 import BaseExpression from './base';
 
 /**
  * Check if a categorical value belongs to a list of categories.
  *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical whitelist
- * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the whitelist
+ * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
  * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
- * @example <caption>Display only cities where $type is "metropolis" or "capital".</caption>
+ * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
- * const $type = s.prop('type');
  * const viz = new carto.Viz({
- *   filter: s.in($type, 'metropolis', 'capital');
+ *   filter: s.in(s.prop('type'), ['metropolis', 'capital'])
  * });
+ *
+ * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: in($type, ['metropolis', 'capital'])
+ * `);
  *
  * @memberof carto.expressions
  * @name in
@@ -25,16 +31,22 @@ export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => 
 /**
  * Check if value does not belong to the categories list given by the categories parameters.
  *
+ * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
  * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical blacklist
- * @param {...carto.expressions.Base|...string} categories - Multiple categorical expression parameters that will form the blacklist
+ * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the blacklist
  * @return {carto.expressions.Base} Numeric expression with the result of the check
  *
- * @example <caption>Display only cities where $type is not "metropolis" nor "capital".</caption>
+ * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
- * const $type = s.prop('type');
  * const viz = new carto.Viz({
- *   filter: s.nin($type, 'metropolis', 'capital');
+ *   filter: s.nin(s.prop('type'), ['metropolis', 'capital'])
  * });
+ *
+ * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: nin($type, ['metropolis', 'capital'])
+ * `);
  *
  * @memberof carto.expressions
  * @name nin
@@ -59,9 +71,12 @@ function NIN_INLINE_MAKER(categories) {
 
 function generateBelongsExpression(name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
-        constructor(value, ...categories) {
+        constructor(value, categories) {
             value = implicitCast(value);
+            categories = categories || [];
+
             checkExpression(name, 'value', 0, value);
+            checkArray(name, 'categories', 1, categories);
 
             categories = categories.map(implicitCast);
 

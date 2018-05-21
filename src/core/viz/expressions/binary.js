@@ -16,11 +16,16 @@ const CATEGORIES_TO_NUMBER = 8;
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Simple multiplication.</caption>
+ * @example <caption>Number multiplication.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mul(5, 5);  // Upon rendering, width will be evaluated internally to 25
+ *   width: s.mul(5, 5)  // 25
  * });
+ *
+ * @example <caption>Number multiplication. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 5 * 5  // Equivalent to mul(5, 5)
+ * `);
  *
  * @memberof carto.expressions
  * @name mul
@@ -43,8 +48,13 @@ export const Mul = genBinaryOp('mul',
  * @example <caption>Number division.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.div(10, 2);   // Upon rendering, width will be evaluated internally to 5
+ *   width: s.div(10, 2)  // 5
  * });
+ *
+ * @example <caption>Number division. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 / 2  // Equivalent to div(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name div
@@ -67,8 +77,13 @@ export const Div = genBinaryOp('div',
  * @example <caption>Number addition.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.add(10, 2);  // Upon rendering, width will be evaluated internally to 12
+ *   width: s.add(10, 2)  // 12
  * });
+ *
+ * @example <caption>Number addition. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 + 2  // Equivalent to add(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name add
@@ -91,8 +106,13 @@ export const Add = genBinaryOp('add',
  * @example <caption>Number subtraction.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.sub(10, 2);  // Upon rendering, width will be evaluated internally to 8
+ *   width: s.sub(10, 2)  // 8
  * });
+ *
+ * @example <caption>Number subtraction. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 - 2  // Equivalent to sub(10, 2)
+ * `);
  *
  * @memberof carto.expressions
  * @name sub
@@ -115,8 +135,13 @@ export const Sub = genBinaryOp('sub',
  * @example <caption>Number modulus.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mod(10, 6);  // 4
+ *   width: s.mod(10, 6)  // 4
  * });
+ *
+ * @example <caption>Number modulus. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 10 % 6  // Equivalent to mod(10, 6)
+ * `);
  *
  * @memberof carto.expressions
  * @name mod
@@ -137,11 +162,16 @@ export const Mod = genBinaryOp('mod',
  * @param {carto.expressions.Base|number} exponent - Numeric expression
  * @return {carto.expressions.Base} Numeric expression with base ^ exponent
  *
- * @example <caption>Power of two numbers.</caption>
+ * @example <caption>Number power.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.pow(2, 3);  // 8
+ *   width: s.pow(2, 3)  // 8
  * });
+ *
+ * @example <caption>Number power. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 2 ^ 3  // Equivalent to pow(2, 3)
+ * `);
  *
  * @memberof carto.expressions
  * @name pow
@@ -163,11 +193,16 @@ export const Pow = genBinaryOp('pow',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price > 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.gt(s.prop('price'), 30);
+ *   filter: s.gt(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price greater than 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price > 30  // Equivalent to gt($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name gt
@@ -189,11 +224,16 @@ export const GreaterThan = genBinaryOp('greaterThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price >= 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.gte(s.prop('price'), 30);
+ *   filter: s.gte(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price >= 30  // Equivalent to gte($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name gte
@@ -215,11 +255,16 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price < 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.lt(s.prop('price'), 30);
+ *   filter: s.lt(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price less than 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30  // Equivalent to lt($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name lt
@@ -241,11 +286,16 @@ export const LessThan = genBinaryOp('lessThan',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price <= 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.lte(s.prop('price'), 30);
+ *   filter: s.lte(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price less than or equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price <= 30  // Equivalent to lte($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name lte
@@ -263,15 +313,20 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
+ * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price === 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.eq(s.prop('price'), 30);
+ *   filter: s.eq(s.prop('price'), 30)
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name eq
@@ -289,15 +344,20 @@ export const Equals = genBinaryOp('equals',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
+ * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
+ * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Compare two numbers to show only elements with price !== 30</caption>
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.neq(s.prop('price'), 30);
  * });
+ *
+ * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price != 30  // Equivalent to neq($price, 30)
+ * `);
  *
  * @memberof carto.expressions
  * @name neq
@@ -321,15 +381,19 @@ export const NotEquals = genBinaryOp('notEquals',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Show only elements with price < 30 or price > 1000</caption>
+ * @example <caption>Show only elements with price < 30 OR price > 1000.</caption>
  * const s = carto.expressions;
- * const $price = s.prop('price');
  * const viz = new carto.Viz({
  *   filter: s.or(
- *     s.lt($price, 30),
- *     s.gt($price, 1000)
+ *     s.lt(s.prop('price'), 30),
+ *     s.gt(s.prop('price'), 1000)
  *   )
  * });
+ *
+ * @example <caption>Show only elements with price < 30 OR price > 1000. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30 or $price > 1000  // Equivalent to or(lt($price, 30), gt($price, 1000))
+ * `);
  *
  * @memberof carto.expressions
  * @name or
@@ -344,7 +408,7 @@ export const Or = genBinaryOp('or',
 
 /**
  * Perform a binary AND between two numeric expressions.
- * If the numbers are different from 0 or 1 this performs a [fuzzy or operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
+ * If the numbers are different from 0 or 1 this performs a [fuzzy and operation](https://en.wikipedia.org/wiki/Fuzzy_logic#Fuzzification).
  * This fuzzy behavior will allow transitions to work in a continuos, non-discrete, fashion.
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
@@ -353,17 +417,19 @@ export const Or = genBinaryOp('or',
  * @param {carto.expressions.Base|number} y - Numeric expression
  * @return {carto.expressions.Base} Numeric expression
  *
- * @example <caption>Show only elements with price < 30 AND category === 'fruit'</caption>
+ * @example <caption>Show only elements with price < 30 AND category == 'fruit'.</caption>
  * const s = carto.expressions;
- * const $price = s.prop('price');
- * const $category = s.prop('category');
- *
  * const viz = new carto.Viz({
  *   filter: s.and(
- *     s.lt($price, 30),
- *     s.eq($category, 'fruit')
+ *     s.lt(s.prop('price'), 30),
+ *     s.eq(s.prop('category'), 'fruit')
  *   )
  * });
+ *
+ * @example <caption>Show only elements with price < 30 AND category == 'fruit'. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $price < 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+ * `);
  *
  * @memberof carto.expressions
  * @name and

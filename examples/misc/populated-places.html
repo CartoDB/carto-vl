@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Populated places | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     * {
       margin: 0;
@@ -78,9 +79,12 @@
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
+
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
 
     const populatedPlacesSource = new carto.source.Dataset(`
       ne_10m_populated_places_simple

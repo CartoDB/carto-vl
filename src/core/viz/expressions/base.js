@@ -10,11 +10,13 @@ let uid = 0;
  * All expressions listed in  {@link carto.expressions} inherit from this class so any of them
  * they can be used where an Expression is required as long as the types match.
  *
- * This means that you can't a numeric expression where a color expression is expected.
+ * This means that you can't use a numeric expression where a color expression is expected.
  *
  * @memberof carto.expressions
  * @name Base
+ * @hideconstructor
  * @abstract
+ * @class
  * @api
  */
 export default class Base {
@@ -40,7 +42,7 @@ export default class Base {
         return this;
     }
 
-    _prefaceCode(glslCode){
+    _prefaceCode(glslCode) {
         return `
         #ifndef DEF_${this._uid}
         #define DEF_${this._uid}
@@ -98,9 +100,11 @@ export default class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _getDrawMetadataRequirements() {
-        // Depth First Search => reduce using union
-        return this._getChildren().map(child => child._getDrawMetadataRequirements()).reduce(schema.union, schema.IDENTITY);
+    _resetViewportAgg() {
+        this._getChildren().forEach(child => child._resetViewportAgg());
+    }
+    _accumViewportAgg(f) {
+        this._getChildren().forEach(child => child._accumViewportAgg(f));
     }
 
     /**
@@ -145,17 +149,19 @@ export default class Base {
 
     /**
      * Linear interpolation between this and finalValue with the specified duration
-     * @jsapi
+     * @api
      * @param {Expression} final
      * @param {Expression} duration
      * @param {Expression} blendFunc
+     * @memberof carto.expressions.Base
+     * @instance
+     * @name blendTo
      */
-    //TODO blendFunc = 'linear'
     blendTo(final, duration = 500) {
+        //TODO blendFunc = 'linear'
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, animate(duration));
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
         return final;
@@ -165,7 +171,6 @@ export default class Base {
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
-        this._metaBindings.map(m => blender._bind(m));
         parent.replaceChild(this, blender);
         blender.notify();
     }

@@ -4,9 +4,9 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
 /**
  * Evaluates to a hsv color.
  *
- * @param {carto.expressions.Base|number} h - The hue of the color
- * @param {carto.expressions.Base|number} s - The saturation of the color
- * @param {carto.expressions.Base|number} v - The value (brightness) of the color
+ * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
+ * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
+ * @param {carto.expressions.Base|number} v - value (brightness) of the color in the [0, 1] range
  * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
@@ -14,6 +14,11 @@ import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from 
  * const viz = new carto.Viz({
  *   color: s.hsv(0.67, 1.0, 1.0)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsv(0.67, 1.0, 1.0)
+ * `);
  *
  * @memberof carto.expressions
  * @name hsv
@@ -25,10 +30,10 @@ export const HSV = genHSV('hsv', false);
 /**
  * Evaluates to a hsva color.
  *
- * @param {carto.expressions.Base|number} h - The hue of the color
- * @param {carto.expressions.Base|number} s - The saturation of the color
- * @param {carto.expressions.Base|number} v - The value (brightness) of the color
- * @param {carto.expressions.Base|number} a - The alpha value of the color
+ * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
+ * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
+ * @param {carto.expressions.Base|number} v - value (brightness) of the color in the [0, 1] range
+ * @param {carto.expressions.Base|number} a - alpha value of the color in the [0, 1] range
  * @return {carto.expressions.Base}
  *
  * @example <caption>Display blue points.</caption>
@@ -36,6 +41,11 @@ export const HSV = genHSV('hsv', false);
  * const viz = new carto.Viz({
  *   color: s.hsva(0.67, 1.0, 1.0, 1.0)
  * });
+ *
+ * @example <caption>Display blue points. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: hsva(0.67, 1.0, 1.0, 1.0)
+ * `);
  *
  * @memberof carto.expressions
  * @function

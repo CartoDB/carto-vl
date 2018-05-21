@@ -10,11 +10,20 @@ import { checkString } from './utils';
  * @param {string} name - The property in the dataset that is going to be evaluated
  * @return {carto.expressions.Base}
  *
- * @example <caption>Display only cities with name different from "London"</caption>
+ * @example <caption>Display only cities with name different from "London".</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *  filter: s.neq(s.prop('name'), 'london'),
+ *  filter: s.neq(s.prop('name'), 'london')
  * });
+ *
+ * @example <caption>Display only cities with name different from "London". (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: neq(prop('name'), 'london')
+ * `);
+ *
+ * const viz = new carto.Viz(`
+ *   filter: $name != 'london'
+ * `);
  *
  * @memberof carto.expressions
  * @name prop
@@ -30,9 +39,14 @@ export default class Property extends BaseExpression {
         super({});
         this.name = name;
     }
+
     eval(feature) {
+        if (!feature) {
+            throw new Error('A property needs to be evaluated in a feature');
+        }
         return feature[this.name];
     }
+
     _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {

@@ -1,4 +1,4 @@
-import Dataframe from '../../../src/core/dataframe';
+import Dataframe, { pointInTriangle } from '../../../src/core/dataframe';
 
 describe('src/core/dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
@@ -8,7 +8,7 @@ describe('src/core/dataframe', () => {
                 scale: 1,
                 geom: [
                     0, 0,
-                    1, 1,
+                    1, 1
                 ],
                 properties: {
                     id: [1, 2],
@@ -31,8 +31,8 @@ describe('src/core/dataframe', () => {
             const feature1 = { id: 0, properties: { id: 1 } };
             const feature2 = { id: 1, properties: { id: 2 } };
             const viz = {
-                getWidth: () => ({ eval: () => 0.5 }),
-                getStrokeWidth: () => ({ eval: () => 0.5 })
+                width: { eval: () => 0.5 },
+                strokeWidth: { eval: () => 0.5 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -82,11 +82,7 @@ describe('src/core/dataframe', () => {
                 }
             };
             const viz = {
-                getWidth: () => ({
-                    eval: () => {
-                        return 1;
-                    }
-                })
+                width: { eval: () => 1 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
@@ -108,6 +104,7 @@ describe('src/core/dataframe', () => {
                     1, 0
                 ],
                 holes: [],
+                clipped: []
             };
             const dataframe = new Dataframe({
                 center: { x: 0, y: 0 },
@@ -132,6 +129,14 @@ describe('src/core/dataframe', () => {
                         }]
                 }
             });
+            const viz = {
+                strokeWidth: {
+                    eval: () => {
+                        return 1;
+                    }
+                }
+            };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
                 id: 0,
                 properties: {
@@ -139,18 +144,32 @@ describe('src/core/dataframe', () => {
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 })).toEqual([]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 })).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.51, y: 0.51 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.01 }, viz)).toEqual([]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 }, viz)).toEqual([]);
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 })).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 })).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 }, viz)).toEqual([feature1]);
+                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, viz)).toEqual([feature1]);
             });
         });
 
+    });
+
+    describe('.pointInTriangle', () => {
+        it('should return true if the point is contained in the triangle', () => {
+            expect(pointInTriangle({x:0, y:0}, {x:0, y:1}, {x:1, y:-1}, {x:-1, y:-1})).toBe(true);
+        });
+
+        it('should return false if the point is not contained in the triangle', () => {
+            expect(pointInTriangle({x:1, y:1}, {x:0, y:1}, {x:1, y:-1}, {x:-1, y:-1})).toBe(false);
+        });
+
+        it('should return false if the triangle has zero area', () => {
+            expect(pointInTriangle({x:0, y:1}, {x:0, y:1}, {x:0, y:-1}, {x:0, y:-1})).toBe(false);
+        });
     });
 });
