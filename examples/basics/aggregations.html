@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Single layer | CARTO</title>
+  <title>Aggregate layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -11,22 +10,28 @@
   <script src="../../vendor/mapbox-gl-dev.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
-
 <body>
   <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Aggregate layer</h1>
+      </header>
+      <section>
+        <p class="description open-sans">How to cluster a data layer</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -36,21 +41,25 @@
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'YOUR_API_KEY'
     });
 
+    // Define layer
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const s = carto.expressions;
+
+    // Define style
     const viz = new carto.Viz({
       width:  s.div(s.clusterAvg(s.prop('pop_max')), 100000),
       resolution: 6
     });
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>
 </body>
-
 </html>
