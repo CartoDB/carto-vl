@@ -515,9 +515,6 @@ export default class Windshaft {
     _intersect(a, b, c, d) {
         //If AB intersects CD => return intersection point
         // Intersection method from Real Time Rendering, Third Edition, page 780
-        const sub = ([ax, ay], [bx, by]) => ([ax - bx, ay - by]);
-        const dot = ([ax, ay], [bx, by]) => (ax * bx + ay * by);
-        const perpendicular = ([x, y]) => [-y, x];
         const o1 = a;
         const o2 = c;
         const d1 = sub(b, a);
@@ -808,6 +805,15 @@ function authURL(url, conf) {
     return url;
 }
 
+function sub([ax, ay], [bx, by]) {
+    return ([ax - bx, ay - by]);
+}
+function dot([ax, ay], [bx, by]) {
+    return (ax * bx + ay * by);
+}
+function perpendicular([x, y]) {
+    return [-y, x];
+}
 /**
  * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
  */
