@@ -1,54 +1,56 @@
 
 # Animations
 
-Carto VL provides a number of tools which can be used to create animated maps: maps that change dynamically, for example showing the change over time of some data attribute.
+CARTO VL provides a number of tools which can be used to create animated maps: maps that change dynamically, for example showing the change over time of some data attribute.
 
 ## Torque
 
-The main tool for animation is the `torque`, which allows to compute values varying in time for eacch feature; these values can be use to filter (i.e. show/hide) features, or to be applied to any of the styling properties (color, width, etc.). The name of this function is inspired by the [technology](...) to create animated maps in CARTO.JS and Builder.
+The main tool for animation is the `torque` expression, which allows computing values varying in time for each feature; these values can be used to filter (i.e. show/hide) features, or to be applied to any of the styling properties (color, width, etc.). The name of this function is inspired by https://carto.com/torque/ which is a previous CARTO technology to create temporal maps, however, they are different technologies and only the CARTO VL documentation should be used to use CARTO VL `torque`.
 
-What torque does is generate a set of cyclic values over a duration of time (xx s by defaut).
+What torque does is generate a set of cyclic values over a duration of time (10 seconds by default).
 ```
-torque(value, duration, fade)
+torque(input, duration, fade(fadeIn, fadeOut))
 ```
 
 ### Input value parameter
 
-The input value is an expresion evaluated at each feature which should yield a value between 0 and 1.
+The input value is a numeric or date property expression or a generic numeric expression (in this case the [0,1] range of the expression will be used, this is very useful since you can use `linear`).
 A special and common case is to use a property for this argument, in which case it will be automatically
-mapped to a liear value between 0 and 1. Thus, `torque($time)` would be equivalent to
+mapped to the minimum and maximum values of the property. Thus, `torque($time)` would be equivalent to
 `torque(linear($time, globalMin($time), globalMax($time)))`
 
-The `linear(value, min, max)` function applies a linear map to a value, in a way that the `min` value is mapped to 0 and the `max` value is mapped to 1. This allows to easily adjust the range of values of any expression to the 0,1 range.
+The `linear(value, min, max)` function applies a linear map to a value, in a way that the `min` value is mapped to 0 and the `max` value is mapped to 1. This allows to easily adjust the range of values of any expression to the 0,1 range. Values outside the [0,1] range won't appear on the animation. This means that if we have data for an entire year and we want to animate between February and June we can use: `torque(linear($month, 2, 6))`.
+
+// TODO timestamp
 
 ### duration parameter
 
-Defines a the duration of an animation cycle in seconds, during which all possible input values are matched in succession. When an input value is matched by the animation cycle torque returns a 1 value for the feature. A 0 value means absence of match.
+Defines the duration of an animation cycle in seconds, during which all possible input values are matched in succession. When an input value is matched by the animation cycle torque returns a 1 value for the feature. A 0 value means the absence of a match. The transition between 0 and 1 will be smooth by the fade parameter.
 
 ### fade parameter
 
-This allows to define two additional durations (in seconds) by means of the `fade` function. During the *fade-in* phase the matching result will transition from 0 to 1, and during the *fade-out* phase it will transition back to 0 again. This way, changes in features selected by torque, or in general in any style property controlled by it, can occur gradually.
+This allows defining two additional durations (in seconds) by means of the `fade` function. During the *fade-in* phase the matching result will transition from 0 to 1, and during the *fade-out* phase it will transition back to 0 again. This way, changes in features selected by torque, or in general in any style property controlled by it, can occur gradually.
 
 ## Operation
 
-Torque will intenally generate a cyclic value varying from 0 to 1 in the specified duration; when the input value (of a feature) concides with the generated value torque returns a match (1 value), and otherwise it returs a miss (0 value). If the result of torque is applied a a filter, features will appear in the map only when torque *matches* them.
+Torque will generate a cyclic value varying from 0 to 1 in the specified duration; when the input value (of a feature) coincides with the generated value torque returns a match (1 value), and otherwise, it returns a miss (0 value). If the result of torque is applied to a filter, features will appear in the map only when torque *matches* them.
 
-The values generated by torque can be interpreted as a *simulation time* when the input values are given by a date property: in this case the extreme 0 and 1 values correspond the the extremes of the date property. The method `getSimTime` can be applied to a torque expression to obtain the current simulation time at any moment. This works when the input parameter of torque is either a property or the result of applyting `linear` to a property.
+The values generated by torque can be interpreted as a *simulation time* when the input values are given by a date property: in this case, the extreme 0 and 1 values correspond to the extremes of the date property. The method `getSimTime` can be applied to a torque expression to obtain the current simulation time at any moment.
 
-The convention in Carto VL is for 0 to represent the boolean `false` value, i.e. the notion of absence or *off* state, while 1 represents `true` (presence or *on* state). Filters or opacity act like this. But sometimes the values between 0 and 1 can also be used to represent in-between states. Filters and opacity support this interpretation by making use of partial visibility of the features (by grading their opacity/transparency). This can be a powerful animation tool.
+The convention in CARTO VL is for 0 to represent the boolean `false` value, i.e. the notion of absence or *off* state, while 1 represents `true` (presence or *on* state). Filters or opacity act like this. But sometimes the values between 0 and 1 can also be used to represent in-between states. Filters and opacity support this interpretation by making use of partial visibility of the features (by grading their opacity/transparency). This can be a powerful animation tool.
 
-The way for torque to generate intermediate values between 0 and 1 is by mans of the fade parameter. This defines a range of values around the *current* one (i.e. a period of simulated time) for which the torque result varies between 0 and 1. The fade-in and fade-out parameters of the `fade` funtion are defines as a *real* time length, just like the `duration` parameter. So they can be interpreted as the fraction of the duration in which the matching transitions from 0 to 1 and back to 0 again.
+The way for torque to generate intermediate values between 0 and 1 is by means of the fade parameter. This defines a range of values around the *current* one (i.e. a period of simulated time) for which the torque result varies between 0 and 1. The fade-in and fade-out parameters of the `fade` function are defined as a *real* time length, just like the `duration` parameter. So they can be interpreted as the fraction of the duration in which the matching transitions from 0 to 1 and back to 0 again.
 
 ## Usage
 
-Let's see an example using a dataset whichs has a time property (date); We'll call the time represented in the property "simulation time" and we'll use the name `sim_time` for the property. For clarity we'll generate a synthetic data set in which points are place on a horizontal segment ordered by increasing simulation time from left to right. We'll generate 100 values over one day's length.
+Let's see an example using a dataset which has a time property (date); We'll call the time represented in the property "simulation time" and we'll use the name `sim_time` for the property. For clarity, we'll generate a synthetic dataset in which points are placed on a horizontal segment ordered by increasing simulation time from left to right. We'll generate 100 values over one day's length.
 
-When we supply a property as the input value, torque will automatially map it's extremes (global minumum and maximum) to 0 and 1. If we're interested in a narrower time period (e.b. because of the presence of outliers) we can manually map using linear. For example try replacing the `$sim_time` in our example by `linear($time, time('2018-04-12T00:00:00Z'), time('2018-04-12T10:00:00Z'))` to animate only a fraction of the points.
+When we supply a property as the input value, torque will automatically map it's extremes (global minimum and maximum) to 0 and 1. If we're interested in a narrower time period (e.b. because of the presence of outliers) we can manually map using linear. For example try replacing the `$sim_time` in our example by `linear($time, time('2018-04-12T00:00:00Z'), time('2018-04-12T10:00:00Z'))` to animate only a fraction of the points.
 
-Now, during rendering, torque will compute a cyclical simulation time between the extremes of the `sim_time` property (or the extremes passed to `linear`). The duration of this cycle (in real time) is the one defined by the `duration` parameter in seconds, 10s in our case. During this cycle simulation time varies continously between the minimum time
-(that mapped to 0) and the maximum (mapped to 1). We use `getSimTIme()` in the exampel to show the simulation time in the screen. In the example we use the torque matching value to control two properties of the visualization: the size of the points and their color hue. We'll use fade in and out values so that the transition of these values becomes clearly visible.
+Now, during rendering, torque will compute a cyclical simulation time between the extremes of the `sim_time` property (or the extremes passed to `linear`). The duration of this cycle (in real time) is the one defined by the `duration` parameter in seconds, 10s in our case. During this cycle, simulation time varies continuously between the minimum time
+(that mapped to 0) and the maximum (mapped to 1). We use `getSimTIme()` in the example to show the simulation time in the screen. In the example, we use the torque matching value to control two properties of the visualization: the size of the points and their color hue. We'll use fade in and out values so that the transition of these values becomes clearly visible.
 
-So, at any given moment with have a torque simulation time, and the feature matching this time will have largest size assign to it as well as the red color (hue 1). Features away from it will have 0 size, so only it's stroke will be visible. Features close to it (with `sim_time` values slightly larger or smaller), will have their size increae as they get closer to the *current* feature.
+So, at any given moment with have a torque simulation time, and the feature matching this time will have largest size assign to it as well as the red color (hue 1). Features away from it will have zero size, so only it's stroke will be visible. Features close to it (with `sim_time` values slightly larger or smaller), will have their size increase as they get closer to the *current* feature.
 
 Example: https://gist.github.com/jgoizueta/2fbf74989a915521220a6e6d5965341c
 TODO: change point location now centered at X=0 to have the left end at 0 and avoid being between tiles
