@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Feature enter/leave | CARTO</title>
+  <title>Enter/Leave | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -54,6 +54,10 @@
       font: 400 16px/22px 'Open Sans';
       margin-bottom: 4px;
     }
+
+    #content p {
+      font: 400 12px/16px 'Open Sans';
+    }
   </style>
 </head>
 
@@ -64,51 +68,64 @@
     <div id="content">
     </div>
   </div>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      center: [-0.127, 51.507],
+      zoom: 10,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
 
+    // Define layer
     const source = new carto.source.Dataset(`
-      ne_50m_rivers_lake_centerlines
+      london_neighbourhoods
     `);
+
+    // Define variables for interactivity
     const viz = new carto.Viz(`
-      @name: $name
-      width: zoom()
-      color: ramp($name, bold)
-      filter: in($featurecla, ['River'])
+      @neighbourhood: $neighbourhood
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Define interactivity
     const interactivity = new carto.Interactivity(layer);
-    interactivity.on('featureEnter', updateRiver);
+    interactivity.on('featureEnter', updateNeighbourhood);
     interactivity.on('featureLeave', clearContent);
 
     layer.on('loaded', () => {
-      updateTitle('Move the mouse over the rivers');
+      updateTitle('Hover over each neighbourhood');
     });
 
     layer.addTo(map, 'watername_ocean');
 
+    // Define functions
     function updateTitle(text) {
       document.getElementsByTagName('h2')[0].innerHTML = text;
     }
 
-    function updateRiver(event) {
+    function updateNeighbourhood(event) {
       let content = '';
       for (let feature of event.features) {
         content += `
           <div class="container">
-            <h3>${feature.variables.name.value}</h3>
+            <h3>${feature.variables.neighbourhood.value}</h3>
+            <p>Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p>Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>
         `;
       }
@@ -118,7 +135,9 @@
     function clearContent() {
       document.getElementById('content').innerHTML = '';
     }
+    layer.on('loaded', () => document.getElementById('loading').style.opacity = '0')
+
+
   </script>
 </body>
-
 </html>

@@ -5,13 +5,10 @@ export const DEFAULT = undefined;
 
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast(value) {
-    if (Number.isFinite(value) ||
-        value == Infinity ||
-        value == -Infinity ||
-        Number.isNaN(value)
-    ) {
+    if (_isNumber(value)) {
         return number(value);
-    } else if (typeof value == 'string') {
+    }
+    if (typeof value == 'string') {
         return category(value);
     }
     return value;
@@ -172,4 +169,8 @@ export function clamp(x, min, max) {
 
 export function mix(x, y, a) {
     return x * (1 - a) + y * a;
+}
+
+function _isNumber(value) {
+    return Number.isFinite(value) || value == Infinity || value == -Infinity || Number.isNaN(value);
 }

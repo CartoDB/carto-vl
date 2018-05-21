@@ -6,7 +6,7 @@ const map = new mapboxgl.Map({
 });
 
 carto.setDefaultAuth({
-    user: 'cartogl',
+    user: 'cartovl',
     apiKey: 'default_public'
 });
 

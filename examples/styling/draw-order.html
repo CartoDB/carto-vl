@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Change viz | CARTO</title>
+  <title>Draw order | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -55,16 +55,16 @@
   <div id="controls">
     <ul>
       <li>
-        <input type="radio" name="style" onclick="setRed()" id="red" checked>
-        <label for="red">Size 7px - Red</label>
+        <input type="radio" name="style" onclick="setDefaultOrder()" id="default" checked>
+        <label for="default">Default</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setGreen()" id="green">
-        <label for="green">Size 9px - Green</label>
+        <input type="radio" name="style" onclick="setAscOrder()" id="asc">
+        <label for="asc">Ascending</label>
       </li>
       <li>
-        <input type="radio" name="style" onclick="setBlue()" id="blue">
-        <label for="blue">Size 11px - Blue</label>
+        <input type="radio" name="style" onclick="setDescOrder()" id="des">
+        <label for="des">Descending</label>
       </li>
     </ul>
   </div>
@@ -72,51 +72,62 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      center: [2.1734, 41.3851],
+      zoom: 14,
       dragRotate: false
     });
 
+    // Define user
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
 
+    // Define layer
     const source = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      spend_data
     `);
-    const vizRed = new carto.Viz(`
-      width: 6
-      color: rgb(237, 76, 89)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
-    const vizGreen = new carto.Viz(`
-      width: 8
-      color: rgb(156, 199, 59)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
-    const vizBlue = new carto.Viz(`
-      width: 10
-      color: rgb(23, 133, 250)
-      strokeWidth: 1
-      strokeColor: rgb(255, 255, 255)
-    `);
-    const layer = new carto.Layer('layer', source, vizRed);
+    const s = carto.expressions;
+
+    // Define style
+    const viz = new carto.Viz({
+        width: s.sqrt(s.prop('amount')),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
+        strokeWidth: 1,
+    });
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
 
-    function setRed() {
-      layer.blendToViz(vizRed);
+    // Define functions
+    function setDefaultOrder() {
+      layer.blendToViz(new carto.Viz({
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
+      }));
     }
 
-    function setGreen() {
-      layer.blendToViz(vizGreen);
+    function setAscOrder() {
+      layer.blendToViz(new carto.Viz({
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
+          order: s.asc(s.width())
+      }));
     }
 
-    function setBlue() {
-      layer.blendToViz(vizBlue);
+    function setDescOrder() {
+      layer.blendToViz(new carto.Viz({
+          width: s.sqrt(s.prop('amount')),
+          color: s.ramp(s.prop('category'), s.palettes.PRISM),
+          strokeColor: s.rgba(255, 255, 255, 0.5),
+          strokeWidth: 1,
+          order: s.desc(s.width())
+      }));
     }
   </script>
 </body>

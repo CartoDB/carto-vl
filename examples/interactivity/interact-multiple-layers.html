@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interact with multiple layers | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Interact with multiple layers</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Detect features from different layers</p>
+        <div class="separator"></div>
+        <section class="usage">
+          <header>USAGE</header>
+          <p class="open-sans">Click on a city or country</p>
+        </section>
+        <div id="controls">
+          <div id="content"></div>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 43],
+      zoom: 4,
+      dragRotate: false
+    });
+
+    // Define user
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define first layer style and variables for interactivity
+    const citiesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_10m_populated_places_simple
+        WHERE adm0name IN ('Spain','France','Italy','Switzerland','Portugal')
+    `);
+    const citiesViz = new carto.Viz(`
+      @name: $name
+      @pop: $pop_max
+      width: sqrt($pop_max/2000)
+    `);
+    const citiesLayer = new carto.Layer('citiesLayer', citiesSource, citiesViz);
+
+    // Define second layer style and variables for interactivity
+    const countriesSource = new carto.source.SQL(`
+      SELECT *
+        FROM ne_adm0_europe
+        WHERE admin IN ('Spain','France','Italy','Switzerland','Portugal')
+    `);
+    const countriesViz = new carto.Viz(`
+      @country: $admin
+    `);
+    const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
+
+    // Define interactivity
+    const interactivity = new carto.Interactivity([countriesLayer, citiesLayer]);
+    interactivity.on('featureClick', updateInfo);
+
+    // Add layers to map
+    citiesLayer.addTo(map, 'watername_ocean');
+    countriesLayer.addTo(map, 'citiesLayer');
+    countriesLayer.on('loaded', hideLoader);
+
+    function updateInfo(event) {
+      let content = '<div class="container">';
+      for (let feature of event.features) {
+        if (feature.layerId === 'countriesLayer') {
+          content += `
+            <h3 class="h3">${feature.variables.country.value}</h3>
+          `;
+        }
+        if (feature.layerId === 'citiesLayer') {
+          content += `
+            <p class="open-sans"><b>${feature.variables.name.value}</b></p>
+            <p class="open-sans">Population: ${feature.variables.pop.value}</p>
+          `;
+        }
+      }
+      content += `
+        <p class="open-sans">Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+        <p class="open-sans">Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+      `
+      content += '</div>';
+      document.getElementById('content').innerHTML = content;
+    }
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+</html>
