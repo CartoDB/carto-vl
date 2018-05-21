@@ -138,6 +138,8 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
+    }else{
+        return null;
     }
 }
 

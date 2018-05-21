@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Color schemes | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,91 +13,122 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Color schemes</h1>
-        </header>
-        <section>
-          <p class="description open-sans">How to use CARTOcolors and custom color schemes</p>
-          <div id="controls">
-            <ul>
-              <li>
-                <input type="radio" name="style" onclick="setCartocolor()" id="Cartocolor" checked>
-                <label for="Cartocolor">CARTOcolor (default)</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
-                <label for="CartocolorInverse">CARTOcolor (inverse)</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
-                <label for="CustomColors">Custom colors</label>
-              </li>
-            </ul>
-          </div>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Color schemes</h1>
+      </header>
+      <section>
+        <p class="description open-sans">How to use CARTOcolors and custom color schemes</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="style" onclick="setCartocolor()" id="Cartocolor" checked>
+              <label for="Cartocolor">CARTOcolor (default)</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
+              <label for="CartocolorInverse">CARTOcolor (inverse)</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
+              <label for="CustomColors">Custom colors</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
     </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiamF0b3JyZSIsImEiOiJFMUhQUHdzIn0.My_BXfSzI30ma8kNllg5tg';
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [-100.3710, 38.4793],
+      style: 'mapbox://styles/jatorre/cjhckkj120wdq2smmmvdzfhsj',
+      center: [128, -3],
       zoom: 4,
       dragRotate: false
     });
 
     // Define user
     carto.setDefaultAuth({
-      user: 'cartovl',
+      user: 'rochoa',
       apiKey: 'default_public'
     });
 
-    // Define viz
-    const cartoColorViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
-      strokeWidth: 0
-    `);
-    const cartoColorInverseViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), inverse(sunsetdark))
-      strokeWidth: 0
-    `);
-    const customColorViz = new carto.Viz(`
-      color: ramp(linear($total_pop, 10000, 500000), [#0a3e39, #84ebe1])
-      strokeWidth: 0
-    `);
+    const source = new carto.source.SQL('SELECT * from worldfish');
 
-    // Define layer
-    const source = new carto.source.Dataset('us_county_points');
-    const layer = new carto.Layer('layer', source, cartoColorViz);
+    const protectedAreasSource = new carto.source.Dataset('protectedplanet_timor_leste_poly');
 
-    // Add layer to map
-    layer.addTo(map, 'watername_ocean');
+    const animatedByHour = `
+@time: linear($t, globalMIN($t), globalMAX($t))
+@hour: (linear($t, globalMIN($t), globalMAX($t))*1872 % 24)
+//color: ramp(linear(@hour,  0, 24), [deeppink,gold,turquoise,darkslateblue])
+
+color: ramp(buckets($activity,["Fishing","Steaming","Departing","Unknown Activity","Parked"]),[#1439ff,rgba(210,210,210,1),rgba(210,210,210,1),rgba(210,210,210,1),rgba(0,0,0,0),orange])
+width: ramp(buckets($activity,["Fishing","Steaming","Departing","Unknown Activity","Parked"]),[2.5,1.5,1,1,0,1])
+strokeWidth: 0
+filter: torque(linear(@hour,  0, 24),8,fade(0.05,0.8))+0.0018
+`;
+
+    const colorByHour = `
+@time: linear($t, globalMIN($t), globalMAX($t))
+@hour: (linear($t, globalMIN($t), globalMAX($t))*1872 % 24)
+color: ramp(linear(@hour,  0, 24), [deeppink,gold,turquoise,darkslateblue])
+
+width: ramp(buckets($activity,["Fishing","Steaming","Departing","Unknown Activity","Parked"]),[2.5,1.5,1,1,0,1])
+strokeWidth: 0
+`;
+
+    const density = `
+@time: linear($t, globalMIN($t), globalMAX($t))
+
+color: ramp(buckets($activity,["Fishing","Steaming","Departing","Unknown Activity","Parked"]),[#1439ff,rgba(210,210,210,1),rgba(210,210,210,1),rgba(210,210,210,1),rgba(0,0,0,0),orange])
+width: ramp(buckets($activity,["Fishing","Steaming","Departing","Unknown Activity","Parked"]),[2.5,1.5,1,1,0,1])
+strokeWidth: 0
+filter: torque(@time,1200,fade(0.05,0.8))+0.008
+`
+
+    const viz = new carto.Viz(colorByHour);
+    const layer = new carto.Layer('layer', source, viz);
+
+    window.layer = layer;
+    window.density = density;
+    window.colorByHour = colorByHour;
+    window.animatedByHour = animatedByHour;
+
+    const protectedAreasLayer = new carto.Layer('protectedAreasLayer', protectedAreasSource, new carto.Viz(``));
+    protectedAreasLayer.addTo(map);
+
+    layer.addTo(map);
+
+
+
     layer.on('loaded', hideLoader);
 
     function setCartocolor() {
-      layer.blendToViz(cartoColorViz);
+      layer.blendToViz(animatedByHour);
     }
     function setCartocolorInverse() {
-      layer.blendToViz(cartoColorInverseViz);
+      layer.blendToViz(colorByHour);
     }
     function setCustomColors() {
-      layer.blendToViz(customColorViz);
+      layer.blendToViz(density);
     }
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>
