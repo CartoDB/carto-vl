@@ -149,7 +149,7 @@ map.on('load', () => {
         $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
         $('#tutorial').text(texts[index]);
 
-        $('#dataset').val('tx_0125_copy_copy');
+        $('#dataset').val('spend_data');
         $('#user').val('cartovl');
         $('#serverURL').val('https://{user}.carto.com');
 
