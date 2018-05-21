@@ -18,7 +18,7 @@ viz.variables.var.eval();  // 1.4142135623730951
 
 #### String
 
-This is the equivalent to the *JavaScript string* type, e.g. `'a'`, `"b"`. They are used to define lists of categories.
+This is the equivalent to the *JavaScript string* type, e.g. `'a'`, `"b"`. They could be used to define lists of categories.
 
 ```js
 const viz = new carto.Viz(`
@@ -60,7 +60,7 @@ const viz = new carto.Viz(`
 
 #### Unary
 
-This is a list of the unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNaN`, `not`, `floor`, `ceil`.
+This is the list of the available unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNaN`, `not`, `floor`, `ceil`.
 
 ```js
 const viz = new carto.Viz(`
@@ -71,7 +71,7 @@ const viz = new carto.Viz(`
 
 #### Binary
 
-This is a list of the binary arithmetic operations: `mul`, `div`, `add`, `sub`, `mod`, `pow`. The re are also binary comparison operators: `gt`, `gte`, `lt`, `lte`, `eq`, `neq`, `or`, `and`.
+This is the list of the available binary arithmetic operations: `mul`, `div`, `add`, `sub`, `mod`, `pow`. There are also binary comparison operators: `gt`, `gte`, `lt`, `lte`, `eq`, `neq`, `or`, `and`.
 
 ```js
 const viz = new carto.Viz(`
@@ -83,7 +83,7 @@ const viz = new carto.Viz(`
 
 ### Colors
 
-This is the list of the color expressions: `rgb`, `rgba`, `hsl`, `hsla`, `hsv`, `hsva`, `cielab`, `opacity`, `hex`, `namedColor`.
+This is the list of the available color expressions: `rgb`, `rgba`, `hsl`, `hsla`, `hsv`, `hsva`, `cielab`, `opacity`, `hex`, `namedColor`.
 
 ```js
 const viz = new carto.Viz(`
@@ -93,7 +93,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-There are a set of Palettes ([CARTOColors](https://carto.com/carto-colors/)) available in the language under the namespace `carto.expressions.palettes` in the JavaScript API or directly by using the palette's name in the String API.
+There are a set of Palettes ([CARTOColors](https://carto.com/carto-colors/)) shiped with the language under the namespace `carto.expressions.palettes` in the JavaScript API or directly by using the palette's name in the String API.
 
 ```js
 const viz = new carto.Viz(`
@@ -105,6 +105,37 @@ const viz = new carto.Viz(`
 
 #### Viewport
 
+Viewport aggregations evaluate the provided expression with the features showed in the map. This is the list of the viewport aggregations: `viewportAvg`, `viewportMax`, `viewportMin`, `viewportSum`, `viewportCount`, `viewportPercentile`, `viewportHistogram`.
+
+```js
+const viz = new carto.Viz(`
+  @view_total: viewportCount($cities)
+`);
+[...]
+viz.variables.view_total.eval();
+```
+
 #### Global
 
+Global aggregations evaluate a property for all the features in the source data. These are the available global aggregations: `globalAvg`, `globalMax`, `globalMin`, `globalSum`, `globalCount`, `globalPercentile`.
+
+```js
+const viz = new carto.Viz(`
+  @total: globalCount($cities)
+`);
+[...]
+viz.variables.total.eval();
+```
+
 #### Cluster
+
+Cluster aggregations generates a new property aggregating the provided property with a specific resolution. These aggregations are made in back-end and they are: `clusterAvg`, `clusterMax`, `clusterMin`, `clusterMode`, `clusterSum`. There are not available for *GeoJSON* sources.
+
+
+```js
+const viz = new carto.Viz(`
+  width: clusterAvg($population)
+`);
+```
+
+NOTE: these operations disable the access to the property except within other cluster aggregate functions.
