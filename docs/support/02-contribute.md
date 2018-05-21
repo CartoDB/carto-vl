@@ -8,15 +8,15 @@ If you want to open a new issue in our repository, please follow these instructi
 
 - Add a descriptive title.
 - Write a good description, answering the following questions:
-    - what is happening?
-    - what should happen?
-    - how to reproduce the issue. Remember to include Browser, OS and carto-vl version.
-- Try to add an example showing the problem (using JSFiddle, JSBin or a just code snippet).
+    - What is happening?
+    - What should happen instead?
+    - How to reproduce the issue. Remember to include Browser, OS and carto-vl version.
+- Try to add an example showing the problem (using JSFiddle, JSBin or a code snippet).
 
 
 ## Contributing code
 
-Best part of open source, collaborate in CARTO VL code! We like hearing from you, so if you have any bug fixed, or a new feature ready to be merged. Those are the steps you should follow:
+The best part of open source: collaborate directly with our CARTO VL code! If you have fixed a bug or have a new functionality on your hands, we'd love to see it! These are the steps you should follow:
 
 - Sign our Contributor License Agreement (CLA) [Learn more here](https://carto.com/contributions/)
 - Fork the carto-vl repository.
@@ -24,12 +24,12 @@ Best part of open source, collaborate in CARTO VL code! We like hearing from you
 - Commit your changes. Remeber to add new tests if possible.
 - Open a pull request.
 - Any of the carto-vl mantainers will take a look.
-- If everything works, it will merged and released \o/.
+- If everything works, it will be merged and released \o/.
 - If you want more detailed information, [this GitHub guide](https://opensource.guide/how-to-contribute/) is a must.
 
 ## Completing documentation
 
-CARTO VL documentation is located in docs/. That folder is the content that appears in the [Developer Center](https://carto.com/developers/carto-vl/support/contribute/). Just follow the instructions described in contributing code and after accepting your pull request, we will make it appear online :).
+CARTO VL documentation is located in docs/. That folder is the content that appears in CARTO's  [Developer Center](https://carto.com/developers/carto-vl/support/contribute/). Follow the instructions described above and once we accept your pull request it will appear online :).
 
 ## Submitting contributions
 
