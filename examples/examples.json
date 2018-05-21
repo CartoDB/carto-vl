@@ -142,36 +142,6 @@
                     "file": "advanced/hurricane-harvey.html"
                 }
             ]
-        },
-        {
-            "title": "Landing page",
-            "samples": [
-                {
-                    "title": "Fine control for map design",
-                    "desc": "Style using Javascript or CARTO VL’s styling language, visualize mathematical calculations and formulas to answer hard questions.",
-                    "file": "advanced/landing-page/spend-data.html"
-                },
-                {
-                    "title": "Animate points, lines, and polygons",
-                    "desc": "Visually understand data patterns over time or by any other parameter needed.",
-                    "file": "advanced/landing-page/detroit-development.html"
-                },
-                {
-                    "title": "Multi-scale thematic mapping",
-                    "desc": "Styling is optimized for viewport and zoom level automatically. Never worry about map clutter or information overload.",
-                    "file": "advanced/landing-page/us-population-by-country.html"
-                },
-                {
-                    "title": "Performant maps at all scales",
-                    "desc": "Visualizations are always automatically optimized for speed and user experience regardless of data size.",
-                    "file": "advanced/landing-page/rivers.html"
-                },
-                {
-                    "title": "Full design power of the web",
-                    "desc": "Visualize data in 2D and 3D, design custom map transitions and animations, create custom symbology and style maps without limits.",
-                    "file": "advanced/landing-page/hurricane-harvey.html"
-                }
-            ]
         }
     ]
 }
