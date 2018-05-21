@@ -23,19 +23,19 @@ const viz = new carto.Viz(`
 
 ## Types
 
-### carto.expression.Number
+### Number
 
 e.g. 1, PI, 2+3
 
-### carto.expression.String
+### String
 
 e.g. 'a', "b"
 
-### carto.expression.Color
+### Color
 
 e.g. red, #AAA, hsv(0.67, 1.0, 1.0)
 
-### carto.expression.Date
+### Date
 
 e.g. date('2022-03-09T00:00:00Z')
 
