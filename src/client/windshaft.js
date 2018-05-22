@@ -130,9 +130,6 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
-        if (!this.metadata) {
-            return true;
-        }
         return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
     }
 
