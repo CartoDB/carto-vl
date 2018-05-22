@@ -17,13 +17,13 @@ The easiest way to use CARTO VL is to include the required files from our CDN. T
 </head>
 ```
 
-Create a `div` where the map is going to be drawn. In this case we give the `div` the `map` id.
+Create a `div` where the map is going to be drawn. In this case we are giving the `div` a map `id`.
 
 ```html
   <div id="map"></div>
 ```
 
-Style this `div` to ensure it will be displayed correctly.
+Style the `div` to ensure it will be displayed correctly.
 
 ```css
 #map {
@@ -33,23 +33,23 @@ Style this `div` to ensure it will be displayed correctly.
 }
 ```
 
-### Displaying the basemap
+### Defining the basemap
 
 Once we have the `div`, we use the `mapboxgl` object to initialize our map using the following parameters:
 
-- `container` is the id of the div where the map is going to be placed
-- `center` indicates the area of the world we are going to visualize
-- `dragRotate` disables the map rotation (coming soon)
+- `container` indicates where the map is going to be placed
 - `style` contains the information about the basemap
+- `center` indicates the area of the world we are going to visualize
 - `zoom` defines the default zoom level  
+- `dragRotate` disables the map rotation
 
 ```js
 const map = new mapboxgl.Map({
-      center: [0, 30],
       container: 'map',
-      dragRotate: false
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
       zoom: 2,
+      dragRotate: false  
     });
 ```
 
@@ -59,11 +59,9 @@ For basemaps you can add [Mapbox custom styles](https://www.mapbox.com/mapbox-gl
 - Positron: https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
 - Dark Matter: https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
 
-At this point you will have a basic map ([Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)).
+At this point you will have a basic map ([example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)).
 
-### Adding data from CARTO
-
-[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html)
+### Defining the source
 
 In order to render data from CARTO you first need to create a CARTO account and then get the necessary [credentials](https://carto.com/developers/fundamentals/authorization/).
 
@@ -76,7 +74,7 @@ carto.setDefaultAuth({
 });
 ```
 
-The next step is to define the `source` from your account to be displayed on the map. In the example below we are defining the [`source`](https://carto.com/developers/carto-vl/reference/#cartosourcedataset) for a dataset named `ne_10m_populated_places_simple` with all the populated places around the world.
+The next step is to define the [`source`](https://carto.com/developers/carto-vl/reference/#cartosourcedataset) from your account to be displayed on the map. In the example below we are defining the `source` for a dataset named `ne_10m_populated_places_simple` with all the populated places around the world.
 
 ```js
 const source = new carto.source.Dataset('ne_10m_populated_places_simple');
@@ -90,7 +88,7 @@ Now that we have defined our `source`, we need to define it as a [`layer`](https
 const layer = new carto.Layer('layer', source, viz);
 ```
 
-Once we have the layer we need to use the [`addTo`](https://carto.com/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
+Once we have the layer we need to use the [`addTo`](https://carto.com/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map [example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html).
 
 ```js
 layer.addTo(map);
@@ -104,7 +102,7 @@ To define a style we need a [`viz`](https://carto.com/developers/carto-vl/refere
 const viz = new carto.Viz();
 ```
 
-The example below demonstrates how to change the color and size of the points on our map ([Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)).
+The example below demonstrates how to change the color and size of the points on our map ([example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)).
 
 ```js
 const viz = new carto.Viz(`
