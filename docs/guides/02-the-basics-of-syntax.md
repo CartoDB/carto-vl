@@ -1,14 +1,14 @@
 ## The Basics of Syntax
 
-**CARTO VL** introduces a new language to style your data from static, dynamic and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
+CARTO VL introduces a new language to style your data from static, dynamic, and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
 
-This language is used to define **style properties** using **expressions**. All expressions and style properties should be defined inside a **Visualization object** (*carto.Viz*). It is the second parameter to create a *carto.Layer*, after the *carto.source* parameter.
+This language is used to define **style properties** using **[expressions]()**. All expressions and style properties should be defined inside a **Visualization object** (*[carto.Viz](https://carto.com/developers/carto-vl/reference/#cartoviz)*). It is the second parameter to create a *carto.Layer*, after the *[carto.source](https://carto.com/developers/carto-vl/reference/#cartosourcedataset)* parameter.
 
-There are two main ways or APIs to define a *carto.Viz* object:
+There are two ways to define a *carto.Viz* object:
 
 **String API**
 
-This is the easy and shorter flavor of the language. The *carto.Viz* object gets an *string* with all the code. It is recommended to use E6 back-ticks (\`) to enjoy multiline string capabilities.
+This is the easier and shorter way. The *carto.Viz* object gets a string with all the code. It is recommended to use E6 back-ticks (\`) to enjoy multiline string capabilities.
 
 ```js
 const viz = new carto.Viz(`
@@ -18,7 +18,7 @@ const viz = new carto.Viz(`
 
 **JavaScript API**
 
-This flavor uses a *JavaScript object* as a parameter of the *carto.Viz* object. It is more verbose but allows to use directly JavaScript elements (variables, functions) to describe your visualization. All the expressions are grouped by the namespace *carto.expressions*. It is recommended to use a shortcut alias for the namespace.
+This way uses a *JavaScript object* as a parameter of the *carto.Viz* object. It is more verbose but allows to use directly JavaScript elements (like variables or functions) to describe your visualization. All the expressions are grouped by the namespace *[carto.expressions](https://carto.com/developers/carto-vl/reference/#cartoexpressions)*. It is recommended to use a shortcut alias for the namespace.
 
 ```js
 const s = carto.expressions;
@@ -29,12 +29,12 @@ const viz = new carto.Viz({
 
 ### Style properties
 
-**Style properties** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. All the style property are typed, this means that only admits one kind of expressions (More information on 03-expressions#types).
+**Style properties** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. All the style properties are typed, this means that it only admits one kind of expression (More information on 03-introduction-to-expressions#types).
 
 The supported style properties are:
 
 | Style property | Expression type | Description | Geometries |
-|---|---|---|---|---|
+|---|---|---|---|
 | `color` | *Color* | fill color | points, lines, polygons |
 | `width` | *Number* | diameter / width | points, lines |
 | `strokeColor` | *Color* | color of the stroke | points, polygons |
@@ -44,7 +44,7 @@ The supported style properties are:
 
 #### Example
 
-The following code shows how to style a dataset of points (`world_cities`) by a fixed *width* for the diameter, in both APIs:
+The following code shows how to style a dataset of points (`world_cities`) by a fixed `width` for the diameter, in both APIs:
 
 **String API**
 
@@ -66,7 +66,7 @@ const viz = new carto.Viz({
 const layer = new carto.Layer(source, viz);
 ```
 
-Style properties can be accessed directly from the *carto.Viz* object. If they do not contain dynamic (animation) or data-driven (properties) information can be also evaluated:
+Style properties can be accessed directly from the *carto.Viz* object. If they do not contain dynamic (animation) or data-driven (properties) information, they can also be evaluated:
 
 ```js
 viz.width.eval();  // 10
@@ -82,7 +82,7 @@ These properties cannot be immediately evaluated, they have no global meaning, b
 
 #### Example
 
-Suppose you have a dataset that contains all the `world_cities` as points. The table has a numeric column called `density` and you want to create a *Bubble map* in which the size of each city is its density value. The following code implements that behavior in both APIs:
+Suppose you have a dataset that contains all the `world_cities` as points. The table has a numeric column called `density` and you want to create a bubble map in which the size of each city is its density value. The following code implements that behavior in both APIs:
 
 **String API**
 
