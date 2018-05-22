@@ -196,7 +196,6 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
@@ -204,6 +203,7 @@ export default class Windshaft {
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
+        this._checkLayerMeta(MNS);
     }
 
     async _instantiate(MNS, resolution, filters, choices, metadata) {
