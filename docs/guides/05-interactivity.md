@@ -30,7 +30,7 @@ event happened and the list of [Features](https://carto.com/developers/carto-vl/
 
 ## Example: change the color on feature enter
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/featureEnter.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/featureEnter.html)
 
 As usual, we create a layer to display the `populated places` dataset:
 
@@ -74,7 +74,7 @@ Initially this field will be empty and only variables present in the [Viz object
 
 ### Example: Display city name on click
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/variables.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/variables.html)
 
 We want to display the city name when the user clicks on a feature, as usual we create a layer but this time we declare the `@name` variable
 in the `Viz` object.
@@ -102,7 +102,7 @@ interactivity.on('featureClick', featureEvent => {
 
 ## Popups
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/popups.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/popups.html)
 
 Following the previous example, we create a layer to show the `populated_places` dataset with a variable for the `name`.
 

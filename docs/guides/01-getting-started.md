@@ -2,7 +2,7 @@
 
 ## Displaying the basemap
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)
 
 CARTO VL is a JavaScript library that interacts with different CARTO APIs to build custom apps leveraging vector rendering. 
 
@@ -63,7 +63,7 @@ Once we get to this point we should see a basic map.
 ## Adding data from CARTO
 
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html)
 
 To render your CARTO data you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/).
 
@@ -97,7 +97,7 @@ layer.addTo(map);
 
 ## Basic styling
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)
 
 One of the strongest points of CARTO VL is the ability to define very powerful visualizations through the [viz object](https://carto.com/developers/carto-vl/reference/#cartoviz). In this guide we are only covering a very basic example of how to change the color of the points.  Instead creating an empty `viz` object we create the viz as the following in order to get red points with a width of 10 pixels.
 

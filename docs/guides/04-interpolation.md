@@ -19,7 +19,7 @@ We will start by creating a map where each point's area is proportionate to its 
 ```
 width: sqrt($amount)
 ```
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interpolation/step-0.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-0.html)
 
 In order to avoid symbols that are visually too large or too small, there are times when multiplying by a constant is recommended. For example, the styling above could be modified to `width: 0.5*sqrt($amount)` essentially cutting the symbol size in half.
 
@@ -31,7 +31,7 @@ color: ramp(linear($amount, 10, 1000), emrld)
 strokeWidth: 0
 ```
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interpolation/step-1.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-1.html)
 
 ### Interpolating symbol size for multi-scale maps
 Being able to mix expressions without popping is a very useful tool that can be used in different situations, we’ll look here at one particular example: creating maps with different styles at different zoom levels.
@@ -52,4 +52,4 @@ strokeWidth: 0
 
 Here, we are telling CARTO VL to use 1 on zoom levels that are smaller than 10, use the original bubblemap expression on zoom levels higher than 14, and mix both (1 and the bubblemap expression) in the intermediate zoom levels.
 
-[Live example](http://cartovl-beta-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interpolation/step-2.html)
+[Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-2.html)
