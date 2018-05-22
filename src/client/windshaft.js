@@ -70,7 +70,7 @@ export default class Windshaft {
      */
     async getMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
-        const resolution = viz.getResolution();
+        const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
@@ -445,6 +445,7 @@ export default class Windshaft {
             //if exterior
             //   push current polygon & set new empty
             //else=> add index to holes
+            let hole = false;
             if (isClockWise(geom[j])) {
                 if (polygon) {
                     geometry.push(polygon);
@@ -459,37 +460,104 @@ export default class Windshaft {
                 if (j == 0) {
                     throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
-                polygon.holes.push(polygon.flat.length / 2);
+                hole = true;
             }
+            let preClippedVertices = [];
             for (let k = 0; k < geom[j].length; k++) {
-                // TODO should additional clipping be done here?
-                let clipping = 0;
                 let x = geom[j][k].x;
                 let y = geom[j][k].y;
-
-                if (x > mvt_extent) {
-                    clipping = clipping | 1;
-                } else if (x < 0) {
-                    clipping = clipping | 2;
-                }
-                if (y > mvt_extent) {
-                    clipping = clipping | 4;
-                } else if (y < 0) {
-                    clipping = clipping | 8;
-                }
-                if (clipping) {
-                    polygon.clipped.push(polygon.flat.length);
-                    polygon.clippedType.push(clipping);
-                }
-                polygon.flat.push(2 * x / mvt_extent - 1);
-                polygon.flat.push(2 * (1 - y / mvt_extent) - 1);
+                x = 2 * x / mvt_extent - 1;
+                y = 2 * (1 - y / mvt_extent) - 1;
+                preClippedVertices.push([x, y]);
             }
+            this._clipPolygon(preClippedVertices, polygon, hole);
         }
         //if current polygon is not empty=> push it
-        if (polygon && polygon.flat.length > 0) {
+        if (polygon) {
             geometry.push(polygon);
         }
         featureGeometries.push(geometry);
+    }
+
+    // Add polygon composed by preClippedVertices to the `polygon.flat` array
+    _clipPolygon(preClippedVertices, polygon, isHole) {
+        // Sutherland-Hodgman Algorithm to clip polygons to the tile
+        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
+        const clippingEdges = [
+            p => p[0] <= 1,
+            p => p[1] <= 1,
+            p => p[0] >= -1,
+            p => p[1] >= -1,
+        ];
+        const clippingEdgeIntersectFn = [
+            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
+            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
+            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
+            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
+        ];
+
+        // for each clipping edge
+        for (let i = 0; i < 4; i++) {
+            const preClippedVertices2 = [];
+
+            // for each edge on polygon
+            for (let k = 0; k < preClippedVertices.length - 1; k++) {
+                // clip polygon edge
+                const a = preClippedVertices[k];
+                const b = preClippedVertices[k + 1];
+
+                const insideA = clippingEdges[i](a);
+                const insideB = clippingEdges[i](b);
+
+                if (insideA && insideB) {
+                    // case 1: both inside, push B vertex
+                    preClippedVertices2.push(b);
+                } else if (insideA) {
+                    // case 2: just A outside, push intersection
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                } else if (insideB) {
+                    // case 4: just B outside: push intersection, push B
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                    preClippedVertices2.push(b);
+                } else {
+                    // case 3: both outside: do nothing
+                }
+            }
+            if (preClippedVertices2.length) {
+                preClippedVertices2.push(preClippedVertices2[0]);
+            }
+            preClippedVertices = preClippedVertices2;
+        }
+
+        if (preClippedVertices.length > 3) {
+            if (isHole) {
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            preClippedVertices.forEach(v => {
+                polygon.flat.push(v[0], v[1]);
+            });
+        }
+    }
+    _intersect(a, b, c, d) {
+        //If AB intersects CD => return intersection point
+        // Intersection method from Real Time Rendering, Third Edition, page 780
+        const o1 = a;
+        const o2 = c;
+        const d1 = sub(b, a);
+        const d2 = sub(d, c);
+        const d1t = perpendicular(d1);
+        const d2t = perpendicular(d2);
+
+        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
+        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Intersects!
+            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
+        }
+        // Doesn't intersects
     }
 
     _decodeLines(geom, featureGeometries, mvt_extent) {
@@ -662,6 +730,16 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
     else {
         return promiseGenerator(finalAssumptions);
     }
+}
+
+function sub([ax, ay], [bx, by]) {
+    return ([ax - bx, ay - by]);
+}
+function dot([ax, ay], [bx, by]) {
+    return (ax * bx + ay * by);
+}
+function perpendicular([x, y]) {
+    return [-y, x];
 }
 
 /**

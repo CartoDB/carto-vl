@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Edit SQL & Expressions | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -136,8 +137,11 @@ filter: $pop_max > 10000
       dragRotate: false
     });
 
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
+
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
 

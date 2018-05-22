@@ -142,19 +142,25 @@ function generateGlobalAggregattion(metadataPropertyName) {
          * @param {*} property
          */
         constructor(property) {
-            super({ value: number(0) });
+            super({ _value: number(0) });
             this.property = implicitCast(property);
         }
-        eval() {
-            return this.value.expr;
+
+        get value() {
+            return this._value.expr;
         }
+
+        eval() {
+            return this._value.expr;
+        }
+
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
-            super.inlineMaker = inline => inline.value;
-            this.value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
+            super.inlineMaker = inline => inline._value;
+            this._value.expr = metadata.columns.find(c => c.name === this.property.name)[metadataPropertyName];
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
@@ -202,23 +208,25 @@ export class GlobalPercentile extends BaseExpression {
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');
         }
-        super({ value: number(0) });
+        super({ _value: number(0) });
         // TODO improve type check
         this.property = property;
         this.percentile = percentile;
     }
-    eval() {
-        return this.value.expr;
+
+    get value() {
+        return this._value.expr;
     }
+
     _compile(metadata) {
         super._compile(metadata);
         this.property._compile(metadata);
         this.type = 'number';
-        super.inlineMaker = inline => inline.value;
+        super.inlineMaker = inline => inline._value;
         const copy = metadata.sample.map(s => s[this.property.name]);
         copy.sort((x, y) => x - y);
         const p = this.percentile / 100;
-        this.value.expr = copy[Math.floor(p * copy.length)];
+        this._value.expr = copy[Math.floor(p * copy.length)];
     }
     _getMinimumNeededSchema() {
         return this.property._getMinimumNeededSchema();

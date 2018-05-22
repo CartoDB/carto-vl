@@ -57,41 +57,41 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
 
             viewportPercentile = s.viewportPercentile($price, 0);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(0);
+            expect(viewportPercentile.value).toEqual(0);
 
             viewportPercentile = s.viewportPercentile($price, 24);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(0);
+            expect(viewportPercentile.value).toEqual(0);
             viewportPercentile = s.viewportPercentile($price, 26);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(0.5);
+            expect(viewportPercentile.value).toEqual(0.5);
 
 
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(0.5);
+            expect(viewportPercentile.value).toEqual(0.5);
             viewportPercentile = s.viewportPercentile($price, 51);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(1.5);
+            expect(viewportPercentile.value).toEqual(1.5);
 
 
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(1.5);
+            expect(viewportPercentile.value).toEqual(1.5);
             viewportPercentile = s.viewportPercentile($price, 76);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(2);
+            expect(viewportPercentile.value).toEqual(2);
 
             viewportPercentile = s.viewportPercentile($price, 100);
             fakeDrawMetadata(viewportPercentile);
-            expect(viewportPercentile.eval()).toEqual(2);
+            expect(viewportPercentile.value).toEqual(2);
 
         });
 
         it('viewportHistogram($price, 1, 3) should eval to the correct histogram', () => {
             const viewportHistogram = s.viewportHistogram($price, 1, 3);
             fakeDrawMetadata(viewportHistogram);
-            expect(viewportHistogram.eval()).toEqual([
+            expect(viewportHistogram.value).toEqual([
                 {
                     x: [0, 2 / 3],
                     y: 2
@@ -110,7 +110,7 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
         it('viewportHistogram($cat) should eval to the correct histogram', () => {
             const viewportHistogram = s.viewportHistogram($cat);
             fakeDrawMetadata(viewportHistogram);
-            expect(viewportHistogram.eval()).toEqual([
+            expect(viewportHistogram.value).toEqual([
                 {
                     x: 'a',
                     y: 1

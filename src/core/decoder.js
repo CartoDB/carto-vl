@@ -38,14 +38,8 @@ function decodePoint(vertices) {
     };
 }
 
-function clip(x) {
-    if (x > 1) {
-        return 1;
-    }
-    if (x < -1) {
-        return -1;
-    }
-    return x;
+function isClipped(l) {
+    return l[0] == -1 || l[0] == 1 || l[1] == -1 || l[1] == 1;
 }
 
 function decodePolygon(geometry) {
@@ -58,21 +52,12 @@ function decodePolygon(geometry) {
             const trianglesLength = triangles.length;
             for (let i = 0; i < trianglesLength; i++) {
                 const index = triangles[i];
-                vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
+                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
 
             const lineString = polygon.flat;
             for (let i = 0; i < lineString.length - 2; i += 2) {
-                // TODO performance
-                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
-                    if (polygon.clippedType[polygon.clipped.indexOf(i)] &
-                        polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {
-                        // Skip tile border lines which don't intersect the tile
-                        continue;
-                    }
-                }
-
                 if (polygon.holes.includes((i + 2) / 2)) {
                     // Skip adding the line which connects two rings
                     continue;
@@ -80,6 +65,10 @@ function decodePolygon(geometry) {
 
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
+
+                if (isClipped(a) && isClipped(b)) {
+                    continue;
+                }
 
                 let normal = getLineNormal(b, a);
 

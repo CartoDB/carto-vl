@@ -107,7 +107,7 @@ export class ViewportQuantiles extends Classifier {
         checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
-        const hist = this._histogram.eval();
+        const hist = this._histogram.value;
 
         const histogramBuckets = hist.length;
         const min = hist[0].x[0];

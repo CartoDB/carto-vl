@@ -87,8 +87,14 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
         for (let i = 0; i < vertices.length; i += 2) {
-            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
-                index++;
+            if (!breakpoints.length) {
+                if (i > 0) {
+                    index++;
+                }
+            } else {
+                while (i == breakpoints[index]) {
+                    index++;
+                }
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
@@ -146,8 +152,8 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.getWidth();
-        const vizStrokeWidth = viz.getStrokeWidth();
+        const vizWidth = viz.width;
+        const vizStrokeWidth = viz.strokeWidth;
         for (let i = 0; i < points.length; i += 2) {
             const featureIndex = i / 2;
             const center = {
@@ -182,7 +188,7 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.getWidth();
+        const vizWidth = viz.width;
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily

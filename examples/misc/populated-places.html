@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Populated places | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,9 +79,12 @@
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
+
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
 
     const populatedPlacesSource = new carto.source.Dataset(`
       ne_10m_populated_places_simple
