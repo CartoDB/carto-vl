@@ -4,15 +4,13 @@ Interpolation is the process of estimating an unknown value from two known value
 
 For example, in real life we usually mix cold and hot water to get warm water, and in many cases we don’t want an equal share of cold and hot water: we may choose to have 70% hot water and 30% cold water. This distributing factor is the third and last input of an interpolation.
 
-## Use cases
+## Use Cases
 
 In data visualization, interpolation is traditionally used for two basic purposes: interpolating between symbol sizes and interpolating between colors. Interpolation is useful for exploratory analysis of continuous data. It has the potential to uncover insights that may otherwise be hidden using classification methods, like quantiles or equal intervals, that group values into a predefined number of buckets. Using interpolation, the entire range of values are mapped to a color, size, or other visual variable providing a "raw" visualization of the data that minimize the effects of generalization.
 
-In the web mapping context, interpolation is also powerful for multi-scale cartography.
-
 Using CARTO VL, you can interpolate both color and size, while also taking advantage of these capabilities for powerful web based, multi-scale cartography. 
 
-#### Interpolating Colors
+#### Interpolating Color
 
 We will start by creating a map where each point's area is proportionate to its attribute value (`amount`) using the square root (`sqrt`) function. 
 
@@ -33,12 +31,11 @@ strokeWidth: 0
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-1.html)
 
-### Interpolating symbol size for multi-scale maps
-Being able to mix expressions without popping is a very useful tool that can be used in different situations, we’ll look here at one particular example: creating maps with different styles at different zoom levels.
+### Interpolating Size Through Zoom
 
-With CartoCSS powered renderers it’s easy to write conditional styling that styles a map in one way at some zoom levels, and styles it in other way at other zoom levels. However, it is not possible to have a smooth transition between those styles. The sudden change of style is what we call popping.
+Using CartoCSS powered renderers, you can write conditional styling to change the appearance of features through zoom. However, a limitation of these renderers is that they lack smooth transitions between each zoom-based style. CARTO VL's interpolation capabilities enable us to combinie multiple styles for different zoom levels with smooth transitions.
 
-The CARTO VL interpolation capabilities enables the combination of multiple styles for different zoom level with smooth transitions: without popping.
+The example below demonstrates how to use CARTO VL to create a map with zoom-based styles using interpolation.
 
 #### Example
 
@@ -50,6 +47,6 @@ color: ramp(linear($amount, 10, 1000), emrld)
 strokeWidth: 0
 ```
 
-Here, we are telling CARTO VL to use 1 on zoom levels that are smaller than 10, use the original bubblemap expression on zoom levels higher than 14, and mix both (1 and the bubblemap expression) in the intermediate zoom levels.
+Here, we are telling CARTO VL to use a symbol size of 1 for zoom levels less than 10, and at zooms greater than 14 to transition to the original symbol size expression in the previous example. At intermediate zoom levels, CARTO VL's interpolation will blend between 1 and the symbol size expression.
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-2.html)
