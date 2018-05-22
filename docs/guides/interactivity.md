@@ -30,68 +30,7 @@ event happened and the list of [Features](https://carto.com/developers/carto-vl/
 
 ## Example: change the color on feature enter
 
-<details>
-  <summary>Full code</summary>
-
-  ```html
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Change color on feature enter | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <!-- Include CARTO VL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="map"></div>
-    <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-            center: [-2, 40],
-            zoom: 5,
-            dragRotate: false
-        });
-
-        carto.setDefaultAuth({
-            user: 'cartogl',
-            apiKey: 'default_public'
-        });
-
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-        const viz = new carto.Viz(`width: 15`);
-        const layer = new carto.Layer('layer', source, viz);
-
-        const interactivity = new carto.Interactivity(layer);
-        interactivity.on('featureEnter', featureEvent => {
-            featureEvent.features[0].color.blendTo('rgba(255, 0, 0, 0.5)', 100);
-        });
-
-        interactivity.on('featureLeave', featureEvent => {
-            featureEvent.features[0].color.reset();
-        });
-
-        layer.addTo(map);
-    </script>
-</body>
-
-</html>
-```
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/featureEnter.html)
 
 As usual, we create a layer to display the `populated places` dataset:
 
@@ -135,67 +74,7 @@ Initially this field will be empty and only variables present in the [Viz object
 
 ### Example: Display city name on click
 
-<details>
-  <summary>Full code</summary>
-
-```html
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Variables | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <!-- Include CARTO VL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="map"></div>
-    <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-            center: [-2, 40],
-            zoom: 5,
-            dragRotate: false
-        });
-
-        carto.setDefaultAuth({
-            user: 'cartogl',
-            apiKey: 'default_public'
-        });
-
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-        const viz = new carto.Viz(`
-            @name: $name
-            width: 15
-        `);
-        const layer = new carto.Layer('layer', source, viz);
-
-        const interactivity = new carto.Interactivity(layer);
-        interactivity.on('featureClick', featureEvent => {
-            alert(featureEvent.features[0].variables.name.value)
-        });
-
-        layer.addTo(map);
-    </script>
-</body>
-
-</html>
-```
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/variables.html)
 
 We want to display the city name when the user clicks on a feature, as usual we create a layer but this time we declare the `@name` variable
 in the `Viz` object.
@@ -223,76 +102,7 @@ interactivity.on('featureClick', featureEvent => {
 
 ## Popups
 
-<details>
-  <summary>Full code</summary>
-
-```html
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Popups | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <!-- Include CARTO VL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="map"></div>
-    <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-            center: [-2, 40],
-            zoom: 5,
-            dragRotate: false
-        });
-
-        carto.setDefaultAuth({
-            user: 'cartogl',
-            apiKey: 'default_public'
-        });
-
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-        const viz = new carto.Viz(`
-            @name: $name
-            width: 20
-        `);
-        const layer = new carto.Layer('layer', source, viz);
-
-        const interactivity = new carto.Interactivity(layer);
-        interactivity.on('featureClick', featureEvent => {
-            const coords = featureEvent.coordinates;
-            const feature = featureEvent.features[0];
-            if (!feature) {
-                return;
-            }
-            new mapboxgl.Popup()
-                .setLngLat([coords.lng, coords.lat])
-                .setHTML(`<h1>${feature.variables.name.value}</h1>`)
-                .addTo(map);
-        });
-
-        layer.addTo(map);
-    </script>
-</body>
-
-</html>
-
-```
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/interactivity/popups.html)
 
 Following the previous example, we create a layer to show the `populated_places` dataset with a variable for the `name`.
 

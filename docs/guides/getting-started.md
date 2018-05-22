@@ -2,45 +2,7 @@
 
 ## Displaying the basemap
 
-<details>
-<summary>Full example</summary>
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- Include CARTO VL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-  <!-- Make the map visible -->
-  <style>
-    #map {
-      position: absolute;  
-      height: 100%;
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
-  <!-- Map goes here -->
-  <div id="map"></div>
-  <script>
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
-      dragRotate: false
-    });
-  </script>
-</body>
-</html>
-```
-
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)
 
 CARTO VL is a JavaScript library that interacts with different CARTO APIs to build custom apps leveraging vector rendering. 
 
@@ -101,57 +63,7 @@ Once we get to this point we should see a basic map.
 ## Adding data from CARTO
 
 
-<details>
-<summary>Full example</summary>
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- Include CARTO VL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-  <!-- Make the map visible -->
-  <style>
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
-  <!-- Map goes here -->
-  <div id="map"></div>
-  <script>
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
-      dragRotate: false
-    });
-    // Autenticate the client
-    carto.setDefaultAuth({
-        user: 'cartogl',
-        apiKey: 'default_public'
-    });
-    // Create the source
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    // Create an empty viz
-    const viz = new carto.Viz();
-    // Create the layer
-    const layer = new carto.Layer('layer', source, viz);
-    // Add the layer to the map
-    layer.addTo(map);
-  </script>
-</body>
-</html>
-```
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html)
 
 To render your CARTO data you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/).
 
@@ -185,60 +97,7 @@ layer.addTo(map);
 
 ## Basic styling
 
-<details>
-<summary>Full example</summary>
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- Include CARTO VL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
-  <!-- Make the map visible -->
-  <style>
-    #map {
-      position: absolute;  
-      height: 100%;
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
-  <!-- Map goes here -->
-  <div id="map"></div>
-  <script>
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
-      dragRotate: false
-    });
-    // Autenticate the client
-    carto.setDefaultAuth({
-        user: 'cartogl',
-        apiKey: 'default_public'
-    });
-    // Create the source
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    // Create a viz with some styles
-    const viz = new carto.Viz(`
-        color: red
-        width: 10
-    `);
-    // Create the layer
-    const layer = new carto.Layer('layer', source, viz);
-    // Add the layer to the map
-    layer.addTo(map);
-  </script>
-</body>
-</html>
-```
-</details>
+[Live example](http://beta-cartovl-guides.developers.carto-staging.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)
 
 One of the strongest points of CARTO VL is the ability to define very powerful visualizations through the [viz object](https://carto.com/developers/carto-vl/reference/#cartoviz). In this guide we are only covering a very basic example of how to change the color of the points.  Instead creating an empty `viz` object we create the viz as the following in order to get red points with a width of 10 pixels.
 
