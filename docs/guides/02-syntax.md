@@ -1,4 +1,4 @@
-# Syntax
+## Syntax
 
 **CARTO VL** introduces a new language to style your data from static, dynamic and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
 
@@ -27,7 +27,7 @@ const viz = new carto.Viz({
 });
 ```
 
-## Style properties
+### Style properties
 
 **Style properties** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. All the style property are typed, this means that only admits one kind of expressions (More information on 03-expressions#types).
 
@@ -72,7 +72,7 @@ Style properties can be accessed directly from the *carto.Viz* object. If they d
 viz.width.eval();  // 10
 ```
 
-## Properties
+### Properties
 
 **Properties** are a way to access your data. For **Windshaft** sources (*carto.Dataset*, *carto.SQL*) the properties represent the columns of the tables in the database. For **GeoJSON** sources (*carto.GeoJSON*) the properties are exactly the ones defined in the `properties` object for each feature.
 
@@ -107,7 +107,7 @@ const layer = new carto.Layer(source, viz);
 
 If the string column `city_name` (column of strings) is used instead of `density` an Error will be thrown because the style property `width` expects a *Number*.
 
-## Variables
+### Variables
 
 **Variables** are a way to store and reuse expressions.
 
@@ -140,7 +140,7 @@ Variables can be accessed directly from the *carto.Viz* object. If variables do 
 viz.variables.size.eval();  // 10
 ```
 
-### Data-driven variables
+#### Data-driven variables
 
 If the variables contain data-driven information (properties) can be evaluated from the feature object in the interactivity event callbacks. More information at (Link to interactivity events).
 

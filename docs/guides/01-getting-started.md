@@ -1,10 +1,10 @@
-# Getting started
+## Getting started
 
-## Displaying the basemap
+### Displaying the basemap
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)
 
-CARTO VL is a JavaScript library that interacts with different CARTO APIs to build custom apps leveraging vector rendering. 
+CARTO VL is a JavaScript library that interacts with different CARTO APIs to build custom apps leveraging vector rendering.
 
 The easiest way to use CARTO VL is to include the required files from our CDN. This will add the `carto` and the `mapboxgl` objects to the global namespace.
 
@@ -56,12 +56,9 @@ the basemap. You can add [mapbox custom styles](https://www.mapbox.com/mapbox-gl
 - [Positron](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
 - [DarkMatter](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
 
-
 Once we get to this point we should see a basic map.
 
-
-## Adding data from CARTO
-
+### Adding data from CARTO
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/addingData.html)
 
@@ -80,7 +77,7 @@ Then we pick some data from our CARTO account to be displayed in the map, in thi
 
 ```js
 const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-``` 
+```
 
 Now that we have selected our source table, the next step is to make it a [layer](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be accessed by VL and an empty [viz](https://carto.com/developers/carto-vl/reference/#cartoviz) object where we will define the layer's style
 
@@ -95,7 +92,7 @@ Once we have the layer we just need to use the [addTo](https://carto.com/develop
 layer.addTo(map);
 ```
 
-## Basic styling
+### Basic styling
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html)
 
