@@ -2,9 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/CartoDB/carto-vl.svg?style=svg)](https://circleci.com/gh/CartoDB/carto-vl)
 
-CARTO VL is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/).
-
-It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful **Vector maps**.
+[CARTO VL](https://github.com/cartodb/carto-vl) is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/). It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful **Vector maps**.
 
 | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/points.png) | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/lines.png) |
 |---|---|
@@ -13,9 +11,16 @@ It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful **Vector maps
 
 ## Documentation and examples
 
-You **need to generate the documentation to have an up to date version**.
+ - [Documentation overview](https://carto.com/developers/carto-vl/): for all the public documentation resources.
+ - [Getting started guide](https://carto.com/developers/carto-vl/guides/getting-started/): the best resource to begin using it.
+ - [Full reference API](https://carto.com/developers/carto-vl/reference/): for specific methods, arguments, and sample code.
+ - [Examples](https://carto.com/developers/carto-vl/examples/).
 
-### Public documentation
+### Generate documentation
+
+You **can generate generate the documentation to have an up to date version**.
+
+#### Public documentation
 
 This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
  - Getting started introduction with a basic example.
@@ -28,7 +33,7 @@ For generating the public documentation, you should run:
 yarn docs
 ```
 
-### Serve docs and examples
+#### Serve docs and examples
 
 The recommended way to navigate the documentation and check the examples is running the following command:
 
@@ -36,7 +41,7 @@ The recommended way to navigate the documentation and check the examples is runn
 yarn serve
 ```
 
-### Internal documentation
+#### Internal documentation
 
 It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
 
