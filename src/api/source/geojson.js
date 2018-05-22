@@ -138,13 +138,13 @@ export default class GeoJSON extends Base {
             }
         });
 
-        this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample);
-
+        let geomType = '';
         if (featureCount > 0) {
             // Set the geomType of the first feature to the metadata
-            let geomType = this._getDataframeType(this._features[0].geometry.type);
-            this._metadata.setGeomType(geomType);
+            geomType = this._getDataframeType(this._features[0].geometry.type);
         }
+
+        this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample, geomType);
 
         return this._metadata;
     }
