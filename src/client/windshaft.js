@@ -333,7 +333,7 @@ export default class Windshaft {
         if (!overrideMetadata) {
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
-                columnStats: true,
+                columnStats: { topCategories: 32768, includeNulls: true },
                 sample: SAMPLE_ROWS // TDDO: sample without geometry
             };
         }
