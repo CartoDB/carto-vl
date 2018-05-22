@@ -139,6 +139,8 @@ filter: $pop_max > 10000
 
     // disable map zoom when using scroll
     map.scrollZoom.disable();
+    // Disables the "pinch to rotate" interaction
+    map.touchZoomRotate.disableRotation();
 
     carto.setDefaultAuth({
       user: 'cartovl',

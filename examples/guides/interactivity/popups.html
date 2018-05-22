@@ -30,6 +30,8 @@
             zoom: 5,
             dragRotate: false
         });
+        // Disables the "pinch to rotate" interaction
+        map.touchZoomRotate.disableRotation();
 
         carto.setDefaultAuth({
             user: 'cartogl',

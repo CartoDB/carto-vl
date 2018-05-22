@@ -31,6 +31,8 @@
     });
 
     map.scrollZoom.disable();
+    // Disables the "pinch to rotate" interaction
+    map.touchZoomRotate.disableRotation();
 
     // Define user
     carto.setDefaultAuth({

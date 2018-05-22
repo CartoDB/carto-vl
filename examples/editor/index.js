@@ -104,6 +104,9 @@ var map = new mapboxgl.Map({
     dragRotate: false // disable drag to rotate handling
 });
 
+// Disables the "pinch to rotate" interaction
+map.touchZoomRotate.disableRotation();
+
 let layer = null;
 setInterval(() => {
     if (layer) {
