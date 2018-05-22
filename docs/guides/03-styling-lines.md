@@ -4,31 +4,30 @@ This guide walks through making a variety of common thematic map types with line
 
 ## Basic Styling Properties
 
-+ Line Width
-+ Line Color
-+ Line Draw Order
++ Width
++ Color
 
-### Line Width
+### Width
 
-To adjust the line width, use the `width` property.
+Use the `width` property to adjust the line `thickness` in pixels.
+
+Remember there is a limitation of `126px` in the total thickness of the line.
 
 ```
 width: 1.5
 ```
 
-### Line Color
-Use the `color` property to color features with one of CARTO VL's supported color spaces.
+### Color
+Use the `color` property to specify the line color with one of CARTO VL's [supported color expressions](LINK).
 
 ```
 width: 1.5
 color: hsv(0.5,1,1)
 ```
 
-### Line Draw Order
+TODO: REVIEW FROM HERE 
+---
 
-```
-order: desc(width())
-```
 
 ## Color by Value: String
 + Unique Values

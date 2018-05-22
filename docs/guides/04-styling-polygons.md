@@ -4,10 +4,14 @@ This guide walks through making a variety of common thematic map types with poly
 
 ## Styling Properties
 
-+ Polygon Color
++ Color
 
-### Polygon Color
-Use the `color` property to color features with one of CARTO VL's [supported color spaces](LINK).
+### Color
+Use the `color` property to specify the polygon fill color with one of CARTO VL's [supported color expressions](LINK).
+
+
+TODO: REVIEW FROM HERE
+---
 
 ## Color by Value: String
 + Basic Syntax

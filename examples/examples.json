@@ -30,6 +30,11 @@
                     "title": "Select layer",
                     "desc": "Update the source of your layers",
                     "file": "basics/select-layer.html"
+                },
+                {
+                    "title": "Aggregate layer",
+                    "desc": "Cluster your layer",
+                    "file": "basics/aggregations.html"
                 }
             ]
         },
