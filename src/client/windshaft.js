@@ -58,7 +58,7 @@ export default class Windshaft {
             MNS,
             resolution,
             filtering: choices.backendFilters ? filtering : null,
-            choices: choices
+            options: choices
         });
     }
 
