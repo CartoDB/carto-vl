@@ -1,4 +1,4 @@
-## Interpolation
+## Introduction to Interpolation
 
 Interpolation is the process of estimating an unknown value from two known values. This estimation can be controlled by weighting each original value differently.
 
@@ -51,6 +51,6 @@ color: ramp(linear($amount, 10, 1000), emrld)
 strokeWidth: 0
 ```
 
-Here, we are telling CARTO VL to use 1 on zoom levels that are smaller than 10, use the original bubblemap expression on zoom levels higher than 14, and mix both (1 and the bubblemap expression) in the intermediate zoom levels.
+Here, we are telling CARTO VL to use 1 on zoom levels that are smaller than 10, use the original bubble map expression on zoom levels higher than 14, and mix both (1 and the bubble map expression) in the intermediate zoom levels.
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-2.html)

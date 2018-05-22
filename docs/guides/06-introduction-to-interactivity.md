@@ -1,4 +1,4 @@
-## Interactivity
+## Introduction to Interactivity
 
 With CARTO VL users can interact with the map in multiple ways. Thanks to vector technology animations can be created when the user clicks, moves or interacts with the map in multiple ways.
 
@@ -7,9 +7,9 @@ In this guide we will cover the basic aspects of user interaction.
 ### Interactivity events
 
 CARTO VL offers an [Interactivity object](https://carto.com/developers/carto-vl/reference/#cartointeractivity) that allows you to listen to several
-map events in order to create rich interactive experiencies.
+map events in order to create rich interactive experiences.
 
-The following events are availiable:
+The following events are available:
 
 - `featureClick`: Fired when the user clicks on features.
 - `featureClickOut`: Fired when the user clicks outside a feature that was clicked in the last featureClick event.
@@ -17,7 +17,7 @@ The following events are availiable:
 - `featureEnter`: Fired the first time the user moves the cursor inside a feature.
 - `featureLeave`: Fired the first time the user moves the cursor outside a feature.
 
-For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interacitivty in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer). And setup a callback for the `featureClick` event.
+For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interactivity in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer). And setup a callback for the `featureClick` event.
 
 
 ```js

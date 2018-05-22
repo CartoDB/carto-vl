@@ -64,7 +64,7 @@ Once we get to this point we should see a basic map.
 
 To render your CARTO data you need to create a CARTO account and get your [credentials](https://carto.com/developers/fundamentals/authorization/).
 
-Since your CARTO data is going to be secured the first thing you need to do is to [autenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your user and apiKey.
+Since your CARTO data is going to be secured the first thing you need to do is to [authenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your user and apiKey.
 
 ```js
 carto.setDefaultAuth({

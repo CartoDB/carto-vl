@@ -1,4 +1,4 @@
-## Expressions
+## Introduction to Expressions
 
 **Expressions** are functions to manipulate static, dynamic and data-driven information which is used to define the style properties of a layer. Main types regarding expressions are: *Number*, *String*, *Color* and *Date*. The language includes also *Arrays* to define lists of string categories, custom palettes, etc.
 

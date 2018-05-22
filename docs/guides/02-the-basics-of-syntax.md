@@ -1,4 +1,4 @@
-## Syntax
+## The Basics of Syntax
 
 **CARTO VL** introduces a new language to style your data from static, dynamic and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
 
