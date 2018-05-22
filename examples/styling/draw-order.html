@@ -10,45 +10,7 @@
   <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-    #controls {
-      position: absolute;
-      padding: 20px;
-      background: white;
-      top: 12px;
-      right: 12px;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-      border-radius: 4px;
-      width: 200px;
-      color: #2E3C43;
-    }
-    #controls li {
-      list-style-type: none;
-      margin: 0 0 8px 0;
-      display: flex;
-      vertical-align: middle;
-    }
-    #controls li input {
-      margin: 0 8px 0 0;
-    }
-    #controls li label {
-      font: 12px/16px 'Open Sans';
-      cursor: pointer;
-    }
-    #controls li:last-child {
-      margin-bottom: 0;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
   <div id="map"></div>
@@ -77,9 +39,8 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
-    
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -103,7 +64,6 @@
 
     layer.addTo(map, 'watername_ocean');
 
-    // Define functions
     function setDefaultOrder() {
       layer.blendToViz(new carto.Viz({
           width: s.sqrt(s.prop('amount')),

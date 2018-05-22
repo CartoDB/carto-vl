@@ -58,7 +58,6 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
 
     // Define user
@@ -92,7 +91,6 @@
     `);
     const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
-    // Add layer to map
     citiesLayer.addTo(map, 'watername_ocean');
     citiesLayer.on('loaded', hideLoader);
 
