@@ -107,7 +107,7 @@ color: ramp(viewportQuantiles($price, 5), Prism)
 
 ```
 color: ramp(linear($price, 10000, 500000), Prism)
-``
+```
 
 #### Manual
 
