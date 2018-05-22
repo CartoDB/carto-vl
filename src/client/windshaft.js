@@ -200,7 +200,6 @@ export default class Windshaft {
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
-        console.log("SETTING MD", metadata);
         this.metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
