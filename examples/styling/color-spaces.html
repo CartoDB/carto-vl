@@ -69,16 +69,15 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
-    
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define viz
+    // Define styles
     const vizGreen = new carto.Viz(`
       color: #00874D
     `);
@@ -102,7 +101,6 @@
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const layer = new carto.Layer('layer', source, vizGreen);
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

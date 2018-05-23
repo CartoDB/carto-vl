@@ -41,7 +41,6 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
 
     // Define user
@@ -59,7 +58,6 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-    // Define layer
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
