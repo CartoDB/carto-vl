@@ -139,7 +139,7 @@ function parseIdentifier(node) {
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
     } else {
-        return null;
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
 }
 
