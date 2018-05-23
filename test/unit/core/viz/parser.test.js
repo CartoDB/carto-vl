@@ -67,4 +67,10 @@ describe('src/core/viz/parser', () => {
             expect(() => parseVizDefinition(str)).not.toThrow();
         });
     });
+
+    describe('invalid identifier', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition('width: wadus')).toThrow();
+        });
+    });
 });
