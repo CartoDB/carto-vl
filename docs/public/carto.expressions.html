@@ -45,7 +45,6 @@
 <li><strong>strokeColor</strong>: stroke/border color of points and polygons, not applicable to lines</li>
 <li><strong>width</strong>: fill diameter of points, thickness of lines, not applicable to polygons</li>
 <li><strong>strokeWidth</strong>: stroke width of points and polygons, not applicable to lines</li>
-<li><strong>order</strong>: rendering order of the features, only applicable to points</li>
 <li><strong>filter</strong>: filter features by removing from rendering and interactivity all the features that don't pass the test</li>
 <li><strong>resolution</strong>: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points</li>
 </ul>
@@ -949,170 +948,6 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     
 
 
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".asc"><span class="type-signature">(static) </span>asc<span class="signature">(by)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Order ascending by a provided expression. NOTE: only works with <code>width()</code>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>by</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>must be <code>width()</code></p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Ascending order based on width.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  order: s.asc(s.width())
-});</code></pre>
-
-        <p class="code-caption">Ascending order based on width. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  order: asc(width())
-`);</code></pre>
 
 
 
@@ -3494,170 +3329,6 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: cos(0)
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".desc"><span class="type-signature">(static) </span>desc<span class="signature">(by)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Order descending by a provided expression. NOTE: only works with <code>width()</code>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>by</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>must be <code>width()</code></p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Descending order based on width.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  order: s.desc(s.width())
-});</code></pre>
-
-        <p class="code-caption">Descending order based on width. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  order: desc(width())
 `);</code></pre>
 
 
@@ -7613,7 +7284,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min, max)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
     
 
     
@@ -7621,7 +7292,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Linearly interpolates the value of a given input between min and max.</p>
+    <p>Linearly interpolates the value of a given input between a minimum and a maximum. If <code>min</code> and <code>max</code> are not defined they will
+default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
 </div>
 
 
@@ -7645,7 +7317,11 @@ const viz = new carto.Viz({
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
+        
+        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -7670,7 +7346,19 @@ const viz = new carto.Viz({
             </td>
 
             
+                <td class="attributes">
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last"><p>The input to be evaluated and interpolated, can be a numeric property or a date property</p></td>
@@ -7693,7 +7381,23 @@ const viz = new carto.Viz({
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    globalMin(input)
+                
+                </td>
             
 
             <td class="description last"><p>Numeric or date expression pointing to the lower limit</p></td>
@@ -7716,7 +7420,23 @@ const viz = new carto.Viz({
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
 
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    globalMax(input)
+                
+                </td>
             
 
             <td class="description last"><p>Numeric or date expression pointing to the higher limit</p></td>
@@ -7802,14 +7522,14 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption"> Display points with a different color depending on the `category` property.</p>
+        <p class="code-caption"> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 });</code></pre>
 
-        <p class="code-caption"> Display points with a different color depending on the `category` property. (String)</p>
+        <p class="code-caption"> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp(linear($speed, 10, 100), PRISM)
@@ -9330,121 +9050,6 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   filter: nin($type, ['metropolis', 'capital'])
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".noOrder"><span class="type-signature">(static) </span>noOrder<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>No order expression.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">No order.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  order: s.noOrder()
-});</code></pre>
-
-        <p class="code-caption">No order. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  order: noOrder()
 `);</code></pre>
 
 
@@ -14508,121 +14113,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".width"><span class="type-signature">(static) </span>width<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the expression assigned in the <code>width</code> property. ONLY usable in an <code>order:</code> property.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Ascending order based on width.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  order: s.asc(s.width())
-});</code></pre>
-
-        <p class="code-caption">Ascending order based on width. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  order: asc(width())
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".zoom"><span class="type-signature">(static) </span>zoom<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
     
 
@@ -14754,7 +14244,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 21 2018 13:03:19 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 23 2018 17:26:57 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

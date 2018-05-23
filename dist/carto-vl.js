@@ -543,7 +543,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
- *  - **order**: rendering order of the features, only applicable to points
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
@@ -2364,7 +2363,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @memberof carto.expressions
  * @name asc
  * @function
- * @api
+ * @IGNOREapi
  */
 class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
@@ -2396,7 +2395,7 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @memberof carto.expressions
  * @name desc
  * @function
- * @api
+ * @IGNOREapi
  */
 class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
@@ -2427,7 +2426,7 @@ class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @api
+ * @IGNOREapi
  */
 class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor() {
@@ -2457,7 +2456,7 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @memberof carto.expressions
  * @name width
  * @function
- * @api
+ * @IGNOREapi
  */
 class Width extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor() {
@@ -4967,8 +4966,14 @@ class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
         for (let i = 0; i < vertices.length; i += 2) {
-            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
-                index++;
+            if (!breakpoints.length) {
+                if (i > 0) {
+                    index++;
+                }
+            } else {
+                while (i == breakpoints[index]) {
+                    index++;
+                }
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
@@ -5339,7 +5344,7 @@ const metadataExample = {
 */
 
 class Metadata {
-    constructor(categoryIDs, columns, featureCount, sample) {
+    constructor(categoryIDs, columns, featureCount, sample, geomType, isAggregated = false) {
         this.categoryIDsToName = {};
         Object.keys(categoryIDs).forEach(name=>{
             this.categoryIDsToName[categoryIDs[name]] = name;
@@ -5349,11 +5354,8 @@ class Metadata {
         this.columns = columns;
         this.featureCount = featureCount;
         this.sample = sample;
-        this.geomType = '';
-    }
-
-    setGeomType(geomType) {
         this.geomType = geomType;
+        this.isAggregated = isAggregated;
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Metadata;
@@ -6610,7 +6612,7 @@ class Viz {
     * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-    * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @IGNOREproperty {carto.expressions.Base} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *
@@ -7166,6 +7168,8 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (__WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["a" /* CSS_COLOR_NAMES */].includes(node.name.toLowerCase())) {
         return new __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["b" /* NamedColor */](node.name.toLowerCase());
+    } else {
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
 }
 
@@ -7251,8 +7255,8 @@ function cleanComments(str) {
         }
 
         if (mode.blockComment) {
-            if (str[i] === '*' && str[i+1] === '/') {
-                str[i+1] = '';
+            if (str[i] === '*' && str[i + 1] === '/') {
+                str[i + 1] = '';
                 mode.blockComment = false;
             }
             str[i] = '';
@@ -7260,10 +7264,10 @@ function cleanComments(str) {
         }
 
         if (mode.lineComment) {
-            if (str[i+1] === '\n' || str[i+1] === '\r') {
+            if (str[i + 1] === '\n' || str[i + 1] === '\r') {
                 mode.lineComment = false;
             }
-            if (i+1 < l) {
+            if (i + 1 < l) {
                 str[i] = '';
             }
             continue;
@@ -7274,12 +7278,12 @@ function cleanComments(str) {
 
         if (str[i] === '/') {
 
-            if (str[i+1] === '*') {
+            if (str[i + 1] === '*') {
                 str[i] = '';
                 mode.blockComment = true;
                 continue;
             }
-            if (str[i+1] === '/') {
+            if (str[i + 1] === '/') {
                 str[i] = '';
                 mode.lineComment = true;
                 continue;
@@ -7779,24 +7783,27 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
+
 
 
 
 /**
-* Linearly interpolates the value of a given input between min and max.
+* Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
+* default to `globalMin(input)` and `globalMax(input)`.
 *
 * @param {carto.expressions.Base} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {carto.expressions.Base} min - Numeric or date expression pointing to the lower limit
-* @param {carto.expressions.Base} max - Numeric or date expression pointing to the higher limit
+* @param {carto.expressions.Base} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
+* @param {carto.expressions.Base} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
 * @return {carto.expressions.Base}
 *
-* @example <caption> Display points with a different color depending on the `category` property.</caption>
+* @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
 *   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 * });
 *
-* @example <caption> Display points with a different color depending on the `category` property. (String)</caption>
+* @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between. (String)</caption>
 * const viz = new carto.Viz(`
 *   color: ramp(linear($speed, 10, 100), PRISM)
 * `);
@@ -7809,6 +7816,12 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, min, max) {
         input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+
+        if (min == undefined && max == undefined) {
+            min = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMin"])(input);
+            max = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMax"])(input);
+        }
+
         min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(min);
         max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(max);
 
@@ -12137,13 +12150,13 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             }
         });
 
-        this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](this._categoryIDs, this._columns, featureCount, sample);
-
+        let geomType = '';
         if (featureCount > 0) {
             // Set the geomType of the first feature to the metadata
-            let geomType = this._getDataframeType(this._features[0].geometry.type);
-            this._metadata.setGeomType(geomType);
+            geomType = this._getDataframeType(this._features[0].geometry.type);
         }
+
+        this._metadata = new __WEBPACK_IMPORTED_MODULE_5__core_metadata__["a" /* default */](this._categoryIDs, this._columns, featureCount, sample, geomType);
 
         return this._metadata;
     }
@@ -12866,14 +12879,8 @@ function decodePoint(vertices) {
     };
 }
 
-function clip(x) {
-    if (x > 1) {
-        return 1;
-    }
-    if (x < -1) {
-        return -1;
-    }
-    return x;
+function isClipped(l) {
+    return l[0] == -1 || l[0] == 1 || l[1] == -1 || l[1] == 1;
 }
 
 function decodePolygon(geometry) {
@@ -12886,21 +12893,12 @@ function decodePolygon(geometry) {
             const trianglesLength = triangles.length;
             for (let i = 0; i < trianglesLength; i++) {
                 const index = triangles[i];
-                vertices.push(clip(polygon.flat[2 * index]), clip(polygon.flat[2 * index + 1]));
+                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
 
             const lineString = polygon.flat;
             for (let i = 0; i < lineString.length - 2; i += 2) {
-                // TODO performance
-                if (polygon.clipped.includes(i) && polygon.clipped.includes(i + 2)) {
-                    if (polygon.clippedType[polygon.clipped.indexOf(i)] &
-                        polygon.clippedType[polygon.clipped.indexOf(i + 2)]) {
-                        // Skip tile border lines which don't intersect the tile
-                        continue;
-                    }
-                }
-
                 if (polygon.holes.includes((i + 2) / 2)) {
                     // Skip adding the line which connects two rings
                     continue;
@@ -12908,6 +12906,10 @@ function decodePolygon(geometry) {
 
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
+
+                if (isClipped(a) && isClipped(b)) {
+                    continue;
+                }
 
                 let normal = getLineNormal(b, a);
 
@@ -14052,8 +14054,6 @@ const MIN_FILTERING = 2000000;
 // Requrest SQL API (temp)
 // Cache dataframe
 
-
-
 class Windshaft {
 
     constructor(source) {
@@ -14083,7 +14083,6 @@ class Windshaft {
         };
         this.cache = __WEBPACK_IMPORTED_MODULE_4_lru_cache__(lruOptions);
         this.inProgressInstantiations = {};
-        this.geomType = '';
     }
 
     _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -14092,11 +14091,12 @@ class Windshaft {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    _getInstantiationID(MNS, resolution, filtering) {
+    _getInstantiationID(MNS, resolution, filtering, choices) {
         return JSON.stringify({
             MNS,
             resolution,
-            filtering: this.metadata && this.metadata.featureCount > MIN_FILTERING ? filtering : null
+            filtering: choices.backendFilters ? filtering : null,
+            options: choices
         });
     }
 
@@ -14116,7 +14116,7 @@ class Windshaft {
             MNS.columns.push('cartodb_id');
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            const instantiationData = await this._instantiate(MNS, resolution, filtering);
+            const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
@@ -14191,21 +14191,32 @@ class Windshaft {
         return this._categoryStringToIDMap[category];
     }
 
+    _intantiationChoices(metadata) {
+        let choices = {
+            // default choices
+            backendFilters: true,
+            castColumns: []
+        };
+        if (metadata) {
+            if (metadata.featureCount >= 0) {
+                choices.backendFilters = metadata.featureCount > MIN_FILTERING;
+            }
+            if (metadata.columns) {
+                choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
+            }
+        }
+        return choices;
+    }
 
-    async _instantiateUncached(MNS, resolution, filters) {
+    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }, overrideMetadata = null) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        let select = this._buildSelectClause(MNS);
+        let select = this._buildSelectClause(MNS, choices.castColumns);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
-        const metadata = await this._getMetadata(query, MNS, conf);
 
-        select = this._buildSelectClause(MNS, metadata.columns.filter(c => c.type == 'date').map(c => c.name));
-        aggSQL = this._buildQuery(select);
-
-        // If the number of features is higher than the minimun, enable server filtering.
-        let backendFilters = metadata.featureCount > MIN_FILTERING ? filters : null;
+        let backendFilters = choices.backendFilters ? filters : null;
 
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getAggregationFilters */](backendFilters);
@@ -14217,15 +14228,12 @@ class Windshaft {
             aggSQL = this._buildQuery(select, backendFilters);
         }
 
-        const urlTemplate = await this._getUrlPromise(query, conf, agg, aggSQL);
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
 
-        metadata.setGeomType(this.geomType);
-
-        return { MNS, resolution, filters, metadata, urlTemplate };
+        return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        this._checkLayerMeta(MNS);
         this._oldDataframes = [];
         this.cache.reset();
         this.urlTemplate = urlTemplate;
@@ -14233,15 +14241,29 @@ class Windshaft {
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
+        this._checkLayerMeta(MNS);
     }
 
-    async _instantiate(MNS, resolution, filters) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)]) {
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)];
+    async _instantiate(MNS, resolution, filters, choices, metadata) {
+        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
+            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
         }
-        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters)] = instantiationPromise;
+        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices, metadata);
+        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)] = instantiationPromise;
         return instantiationPromise;
+    }
+
+    async _repeatableInstantiate(MNS, resolution, filters) {
+        // TODO: we shouldn't reinstantiate just to not apply backend filters
+        // (we'd need to add a choice comparison function argument to repeatablePromise)
+        let finalMetadata = null;
+        const initialChoices = this._intantiationChoices(this.metadata);
+        const finalChoices = instantiation => {
+            // first instantiation metadata is kept
+            finalMetadata = instantiation.metadata;
+            return this._intantiationChoices(instantiation.metadata);
+        };
+        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices, finalMetadata));
     }
 
     _checkLayerMeta(MNS) {
@@ -14253,7 +14275,7 @@ class Windshaft {
     }
 
     _isAggregated() {
-        return this._layerMeta ? this._layerMeta.aggregation.mvt : false;
+        return this.metadata && this.metadata.isAggregated;
     }
 
     _requiresAggregation(MNS) {
@@ -14330,14 +14352,8 @@ class Windshaft {
         return dataframe;
     }
 
-    async _getUrlPromise(query, conf, agg, aggSQL) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata = null) {
         const LAYER_INDEX = 0;
-        this.geomType = await this.getGeometryType(query, conf);
-
-        if (this.geomType != 'point') {
-            agg = false;
-        }
-
         const mapConfigAgg = {
             buffersize: {
                 'mvt': 1
@@ -14352,17 +14368,27 @@ class Windshaft {
                 }
             ]
         };
+        if (!overrideMetadata) {
+            mapConfigAgg.layers[0].options.metadata = {
+                geometryType: true,
+                columnStats: { topCategories: 32768, includeNulls: true },
+                sample: SAMPLE_ROWS // TDDO: sample without geometry
+            };
+        }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
-        this._layerMeta = layergroup.metadata.layers[0].meta;
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
-        return getLayerUrl(layergroup, LAYER_INDEX, conf);
+        return {
+            url: getLayerUrl(layergroup, LAYER_INDEX, conf),
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta)
+        };
     }
 
     _getRequestConfig(mapConfigAgg) {
         return {
             method: 'POST',
             headers: {
+
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
@@ -14423,8 +14449,8 @@ class Windshaft {
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
                 });
-                let dataFrameGeometry = this.geomType == 'point' ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.geomType);
+                let dataFrameGeometry = this.metadata.geomType == 'point' ? points : featureGeometries;
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
             });
@@ -14453,6 +14479,7 @@ class Windshaft {
             //if exterior
             //   push current polygon & set new empty
             //else=> add index to holes
+            let hole = false;
             if (isClockWise(geom[j])) {
                 if (polygon) {
                     geometry.push(polygon);
@@ -14467,37 +14494,104 @@ class Windshaft {
                 if (j == 0) {
                     throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
-                polygon.holes.push(polygon.flat.length / 2);
+                hole = true;
             }
+            let preClippedVertices = [];
             for (let k = 0; k < geom[j].length; k++) {
-                // TODO should additional clipping be done here?
-                let clipping = 0;
                 let x = geom[j][k].x;
                 let y = geom[j][k].y;
-
-                if (x > mvt_extent) {
-                    clipping = clipping | 1;
-                } else if (x < 0) {
-                    clipping = clipping | 2;
-                }
-                if (y > mvt_extent) {
-                    clipping = clipping | 4;
-                } else if (y < 0) {
-                    clipping = clipping | 8;
-                }
-                if (clipping) {
-                    polygon.clipped.push(polygon.flat.length);
-                    polygon.clippedType.push(clipping);
-                }
-                polygon.flat.push(2 * x / mvt_extent - 1);
-                polygon.flat.push(2 * (1 - y / mvt_extent) - 1);
+                x = 2 * x / mvt_extent - 1;
+                y = 2 * (1 - y / mvt_extent) - 1;
+                preClippedVertices.push([x, y]);
             }
+            this._clipPolygon(preClippedVertices, polygon, hole);
         }
         //if current polygon is not empty=> push it
-        if (polygon && polygon.flat.length > 0) {
+        if (polygon) {
             geometry.push(polygon);
         }
         featureGeometries.push(geometry);
+    }
+
+    // Add polygon composed by preClippedVertices to the `polygon.flat` array
+    _clipPolygon(preClippedVertices, polygon, isHole) {
+        // Sutherland-Hodgman Algorithm to clip polygons to the tile
+        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
+        const clippingEdges = [
+            p => p[0] <= 1,
+            p => p[1] <= 1,
+            p => p[0] >= -1,
+            p => p[1] >= -1,
+        ];
+        const clippingEdgeIntersectFn = [
+            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
+            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
+            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
+            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
+        ];
+
+        // for each clipping edge
+        for (let i = 0; i < 4; i++) {
+            const preClippedVertices2 = [];
+
+            // for each edge on polygon
+            for (let k = 0; k < preClippedVertices.length - 1; k++) {
+                // clip polygon edge
+                const a = preClippedVertices[k];
+                const b = preClippedVertices[k + 1];
+
+                const insideA = clippingEdges[i](a);
+                const insideB = clippingEdges[i](b);
+
+                if (insideA && insideB) {
+                    // case 1: both inside, push B vertex
+                    preClippedVertices2.push(b);
+                } else if (insideA) {
+                    // case 2: just A outside, push intersection
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                } else if (insideB) {
+                    // case 4: just B outside: push intersection, push B
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                    preClippedVertices2.push(b);
+                } else {
+                    // case 3: both outside: do nothing
+                }
+            }
+            if (preClippedVertices2.length) {
+                preClippedVertices2.push(preClippedVertices2[0]);
+            }
+            preClippedVertices = preClippedVertices2;
+        }
+
+        if (preClippedVertices.length > 3) {
+            if (isHole) {
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            preClippedVertices.forEach(v => {
+                polygon.flat.push(v[0], v[1]);
+            });
+        }
+    }
+    _intersect(a, b, c, d) {
+        //If AB intersects CD => return intersection point
+        // Intersection method from Real Time Rendering, Third Edition, page 780
+        const o1 = a;
+        const o2 = c;
+        const d1 = sub(b, a);
+        const d2 = sub(d, c);
+        const d1t = perpendicular(d1);
+        const d2t = perpendicular(d2);
+
+        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
+        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Intersects!
+            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
+        }
+        // Doesn't intersects
     }
 
     _decodeLines(geom, featureGeometries, mvt_extent) {
@@ -14517,22 +14611,22 @@ class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
-        if (this.geomType == 'point') {
+        if (metadata.geomType == 'point') {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (this.geomType == 'point') {
+            if (metadata.geomType == 'point') {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (this.geomType == 'polygon') {
+            } else if (metadata.geomType == 'polygon') {
                 this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (this.geomType == 'line') {
+            } else if (metadata.geomType == 'line') {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
-                throw new Error(`Unimplemented geometry type: '${this.geomType}'`);
+                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }
 
             catFields.map((name, index) => {
@@ -14557,178 +14651,27 @@ class Windshaft {
         return { properties, points, featureGeometries };
     }
 
-    async _getMetadata(query, proto, conf) {
-        //Get column names and types with a limit 0
-        //Get min,max,sum and count of numerics
-        //for each category type
-        //Get category names and counts by grouping by
-        //Assign ids
-
-        const [{ numerics, categories, dates }, featureCount] = await Promise.all([
-            this._getColumnTypes(query, conf),
-            this.getFeatureCount(query, conf)]);
-
-        const sampling = Math.min(SAMPLE_ROWS / featureCount, 1);
-
-        const [sample, numericsTypes, datesTypes, categoriesTypes] = await Promise.all([
-            this.getSample(conf, sampling),
-            this.getNumericTypes(numerics, query, conf),
-            this.getDatesTypes(dates, query, conf),
-            this.getCategoryTypes(categories, query, conf)]);
-
-        let columns = [];
-        numerics.forEach((name, index) => columns.push(numericsTypes[index]));
-        dates.forEach((name, index) => columns.push(datesTypes[index]));
-
+    _adaptMetadata(meta) {
+        const { stats, aggregation } = meta;
+        const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
+        const geomType = adaptGeometryType(stats.geometryType);
+        const columns = Object.keys(stats.columns)
+            .map(name => Object.assign({ name }, stats.columns[name]))
+            .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
+            .map(col => Object.assign(col, adaptColumnValues(col)))
+            .filter(col => ['number', 'date', 'category'].includes(col.type));
         const categoryIDs = {};
-        categories.map((name, index) => {
-            const t = categoriesTypes[index];
-            t.categoryNames.map(name => categoryIDs[name] = this._getCategoryIDFromString(name, false));
-            columns.push(t);
-        });
-        return new __WEBPACK_IMPORTED_MODULE_7__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, sample);
-    }
-
-    /**
-     * Return an object with the names of the columns clasified by type.
-     */
-    async _getColumnTypes(query, conf) {
-        const fields = await this.getColumnTypes(query, conf);
-        let numerics = [];
-        let categories = [];
-        let dates = [];
-        Object.keys(fields).map(name => {
-            const type = fields[name].type;
-            if (type == 'number') {
-                numerics.push(name);
-            } else if (type == 'string') {
-                categories.push(name);
-            } else if (type == 'date') {
-                dates.push(name);
-            } else if (type != 'geometry') {
-                throw new Error(`Unsuportted type ${type}`);
+        columns.forEach(column => {
+            if (column.type === 'category' && column.categories) {
+                column.categories.forEach(category => {
+                    categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
+                });
+                column.categoryNames = column.categories.map(cat => cat.category);
             }
         });
-
-        return { numerics, categories, dates };
+        return new __WEBPACK_IMPORTED_MODULE_7__core_metadata__["a" /* default */](categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
 
-    async getSample(conf, sampling) {
-        let q;
-        if (this._source._tableName) {
-            q = `SELECT * FROM ${this._source._tableName} TABLESAMPLE BERNOULLI (${100 * sampling}) REPEATABLE (0);`;
-        } else {
-            // Fallback to random() since 'TABLESAMPLE BERNOULLI' is not supported on queries
-            q = `WITH _rndseed as (SELECT setseed(0.5))
-                    SELECT * FROM (${this._source._query}) as _cdb_query_wrapper WHERE random() < ${sampling};`;
-        }
-
-        const response = await getSQL(q, conf);
-        const json = await response.json();
-        return json.rows;
-    }
-
-    // Returns the total feature count, including possibly filtered features
-    async getFeatureCount(query, conf) {
-        const q = `SELECT COUNT(*) FROM ${query};`;
-        const response = await getSQL(q, conf);
-        const json = await response.json();
-        return json.rows[0].count;
-    }
-
-    async getColumnTypes(query, conf) {
-        const columnListQuery = `select * from ${query} limit 0;`;
-        const response = await getSQL(columnListQuery, conf);
-        const json = await response.json();
-        return json.fields;
-    }
-
-    async getGeometryType(query, conf) {
-        const columnListQuery = `SELECT ST_GeometryType(the_geom) AS type FROM ${query} WHERE the_geom IS NOT NULL LIMIT 1;`;
-        const response = await getSQL(columnListQuery, conf);
-        const json = await response.json();
-        const type = json.rows[0].type;
-        switch (type) {
-            case 'ST_MultiPolygon':
-                return 'polygon';
-            case 'ST_Point':
-                return 'point';
-            case 'ST_MultiLineString':
-                return 'line';
-            default:
-                throw new Error(`Unimplemented geometry type ''${type}'`);
-        }
-    }
-
-    async getNumericTypes(names, query, conf) {
-        const aggFns = ['min', 'max', 'sum', 'avg'];
-        const numericsSelect = names.map(name =>
-            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-        ).concat(['COUNT(*)']).join();
-        const numericsQuery = `SELECT ${numericsSelect} FROM ${query};`;
-        const response = await getSQL(numericsQuery, conf);
-        const json = await response.json();
-        return names.map(name => {
-            return {
-                name,
-                type: 'number',
-                min: json.rows[0][`${name}_min`],
-                max: json.rows[0][`${name}_max`],
-                avg: json.rows[0][`${name}_avg`],
-                sum: json.rows[0][`${name}_sum`],
-            };
-        }
-        );
-    }
-
-    _getDateFromStr(str) {
-        if (Number.isNaN(Date.parse(str))) {
-            throw new Error(`Invalid date: '${str}'`);
-        }
-        return new Date(str);
-    }
-
-    async getDatesTypes(names, query, conf) {
-        if (names.length == 0) {
-            return [];
-        }
-        const aggFns = ['min', 'max'];
-        const datesSelect = names.map(name =>
-            aggFns.map(fn => `${fn}(${name}) AS ${name}_${fn}`)
-        ).join();
-        const numericsQuery = `SELECT ${datesSelect} FROM ${query};`;
-        const response = await getSQL(numericsQuery, conf);
-        const json = await response.json();
-        return names.map(name => {
-            return {
-                name,
-                type: 'date',
-                min: this._getDateFromStr(json.rows[0][`${name}_min`]),
-                max: this._getDateFromStr(json.rows[0][`${name}_max`]),
-            };
-        }
-        );
-    }
-
-    async getCategoryTypes(names, query, conf) {
-        return Promise.all(names.map(async name => {
-            const catQuery = `SELECT COUNT(*), ${name} AS name FROM ${query} GROUP BY ${name} ORDER BY COUNT(*) DESC;`;
-            const response = await getSQL(catQuery, conf);
-            const json = await response.json();
-            let counts = [];
-            let names = [];
-            json.rows.map(row => {
-                counts.push(row.count);
-                names.push(row.name);
-            });
-            return {
-                name,
-                type: 'category',
-                categoryNames: names,
-                categoryCounts: counts
-            };
-        }));
-    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Windshaft;
 
@@ -14761,18 +14704,80 @@ function getLayerUrl(layergroup, layerIndex, conf) {
     return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
 }
 
-function getSQL(query, conf) {
-    let url = `${conf.sqlServerURL}/api/v2/sql?q=` + encodeURIComponent(query);
-    url = authURL(url, conf);
-    return fetch(url);
-}
-
 function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
     }
     return url;
+}
+
+function adaptGeometryType(type) {
+    switch (type) {
+        case 'ST_MultiPolygon':
+        case 'ST_Polygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+        case 'ST_LineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
+    }
+}
+
+function adaptColumnType(type) {
+    if (type === 'string') {
+        return 'category';
+    }
+    return type;
+}
+
+function adaptColumnValues(column) {
+    let adaptedColumn = { name: column.name, type: column.type };
+    Object.keys(column).forEach(key => {
+        if (!['name', 'type'].includes(key)) {
+            adaptedColumn[key] = adaptColumnValue(column[key], column.type);
+        }
+    });
+    return adaptedColumn;
+}
+
+function adaptColumnValue(value, type) {
+    switch (type) {
+        case 'date':
+            if (Number.isNaN(Date.parse(value))) {
+                throw new Error(`Invalid date: '${value}'`);
+            }
+            return new Date(value);
+        default:
+            return value;
+    }
+}
+
+// generate a promise under certain assumptions/choices; then if the result changes the assumptions,
+// repeat the generation with the new information
+async function repeatablePromise(initialAssumptions, assumptionsFromResult, promiseGenerator) {
+    let promise = promiseGenerator(initialAssumptions);
+    let result = await promise;
+    let finalAssumptions = assumptionsFromResult(result);
+    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+        return promise;
+    }
+    else {
+        return promiseGenerator(finalAssumptions);
+    }
+}
+
+function sub([ax, ay], [bx, by]) {
+    return ([ax - bx, ay - by]);
+}
+function dot([ax, ay], [bx, by]) {
+    return (ax * bx + ay * by);
+}
+function perpendicular([x, y]) {
+    return [-y, x];
 }
 
 /**
@@ -18069,7 +18074,7 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
         if (query === '') {
             throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidQuery');
         }
-        var sqlRegex = /(SELECT|select)\s+.*\s+(FROM|from)\s+.*/;
+        var sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
             throw new __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__["a" /* default */]('source', 'nonValidSQLQuery');
         }
