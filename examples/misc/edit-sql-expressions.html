@@ -137,6 +137,9 @@ filter: $pop_max > 10000
       dragRotate: false
     });
 
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
+
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'

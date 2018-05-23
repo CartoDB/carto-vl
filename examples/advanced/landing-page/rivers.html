@@ -1,30 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Spend data | CARTO</title>
+  <title>US Population by County | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Spend data</h1>
-      </header>
-      <section>
-        <p class="description open-sans">Multi-scale animation with color interpolation through time of day and sized by amount spent</p>
-      </section>
-      <footer class="js-footer"></footer>
-    </div>
-  </aside>
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -36,24 +25,23 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [2.17, 41.38],
-      zoom: 13,
+      center: [-109.09006557529761, 38.851788545949745],
+      zoom: 8,
       dragRotate: false
     });
+    map.scrollZoom.disable();
 
     // Define user
     carto.setDefaultAuth({
-      user: 'cartovl',
+      user: 'mamataakella',
       apiKey: 'default_public'
     });
 
     // Define layer
-    const source = new carto.source.Dataset('spend_data');
+    const source = new carto.source.Dataset('river_directions_upper_co');
     const viz = new carto.Viz(`
-      width: blend(3,blend(3, 20*linear($amount,10,100), linear(zoom(), 2^10,2^16)),linear(zoom(), 2^8, 2^10))
-      color: ramp(linear($hour,5,20),[deeppink,gold,turquoise,darkmagenta,black])
-      filter: torque(linear($tx_date_proc,time('2012-03-01T00:00:07Z'),time('2012-03-02T23:59:57Z')),24,fade(0,0.5))
-      strokeColor: 0
+      width: $strahler/2
+      color: ramp(linear($strahler,0,10),ag_sunset)
     `);
     const layer = new carto.Layer('layer', source, viz);
 

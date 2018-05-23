@@ -1,6 +1,6 @@
 {
     "main": {
-        "file": "styling/category-ramps.html"
+        "file": "styling/style-by-category.html"
     },
     "categories": [
         {
@@ -118,16 +118,11 @@
             "samples": [
                 {
                     "title": "Denver trees",
-                    "desc": "",
+                    "desc": "Size symbols by attributes value",
                     "file": "advanced/denver-trees.html"
                 },
                 {
-                    "title": "Spend data",
-                    "desc": "Multi-scale animation with color interpolation through time of day and sized by amount spent.",
-                    "file": "advanced/spend-data.html"
-                },
-                {
-                    "title": "US Population by County",
+                    "title": "US population by county",
                     "desc": "This map uses viewportMax to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport",
                     "file": "advanced/us-population-by-county.html"
                 },

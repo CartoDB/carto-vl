@@ -1,30 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add layer | CARTO</title>
+  <title>Hurricane Harvey | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Add layer</h1>
-      </header>
-      <section>
-        <p class="description open-sans">Add one CARTO layer to your map</p>
-      </section>
-      <footer class="js-footer"></footer>
-    </div>
-  </aside>
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -35,13 +24,11 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-96, 30],
+      zoom: 7,
       dragRotate: false
     });
-
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
 
     // Define user
@@ -51,11 +38,15 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const viz = new carto.Viz();
+    const source = new carto.source.Dataset('table_30');
+    const viz = new carto.Viz(`
+      color: opacity(ramp(linear($sum_qpf,1,120),temps),($e_totpop/$area_sqmi)/500)
+      filter: torque(linear($sum_qpf,144.5, 1.5),5,fade(0,100))+0.1
+      strokeWidth: 0
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
-    // Add layer to map
+    // Define layer
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

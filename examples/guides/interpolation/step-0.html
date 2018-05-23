@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Map goes here -->
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [2.2021031855412048, 41.3982014758933],
+            zoom: 14,
+            dragRotate: false
+        });
+        // Autenticate the client
+        carto.setDefaultAuth({
+            user: 'cartogl',
+            apiKey: 'default_public'
+        });
+        // Create the source
+        const source = new carto.source.Dataset('tx_0125_copy_copy');
+        // Each point's area is proportionate to its attribute value (amount) using the square root (sqrt) function
+        const viz = new carto.Viz(`
+            width: sqrt($amount)
+        `);
+        // Create the layer
+        const layer = new carto.Layer('layer', source, viz);
+        // Add the layer to the map
+        layer.addTo(map);
+    </script>
+</body>
+
+</html>

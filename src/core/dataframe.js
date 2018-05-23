@@ -87,8 +87,14 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
         for (let i = 0; i < vertices.length; i += 2) {
-            if ((!breakpoints.length && i > 0) || i == breakpoints[index]) {
-                index++;
+            if (!breakpoints.length) {
+                if (i > 0) {
+                    index++;
+                }
+            } else {
+                while (i == breakpoints[index]) {
+                    index++;
+                }
             }
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;

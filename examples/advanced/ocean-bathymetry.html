@@ -41,6 +41,9 @@
       dragRotate: false
     });
 
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -55,6 +58,7 @@
       width: 5
       color: ramp(linear($dn,0,255),teal)
       filter: sin(@speed)*0.5+0.5
+      strokeWidth: 0
     `);
     const layer = new carto.Layer('layer', source, viz);
 

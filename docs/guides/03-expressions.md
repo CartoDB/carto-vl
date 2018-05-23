@@ -135,6 +135,7 @@ Cluster aggregations generates a new property aggregating the provided property 
 ```js
 const viz = new carto.Viz(`
   width: clusterAvg($population)
+  resolution: 2.5
 `);
 ```
 

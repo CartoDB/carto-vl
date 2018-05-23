@@ -83,6 +83,9 @@
       apiKey: 'default_public'
     });
 
+    // disable map zoom when using scroll
+    map.scrollZoom.disable();
+
     const populatedPlacesSource = new carto.source.Dataset(`
       ne_10m_populated_places_simple
     `);
