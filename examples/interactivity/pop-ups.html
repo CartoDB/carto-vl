@@ -50,7 +50,9 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 1.5,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     // Define pop-up
@@ -58,9 +60,6 @@
       closeButton: false,
       closeOnClick: false
     });
-
-    // disable map zoom when using scroll
-    map.scrollZoom.disable();
     
     // Define user
     carto.setDefaultAuth({
@@ -122,7 +121,6 @@
       }
     });
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

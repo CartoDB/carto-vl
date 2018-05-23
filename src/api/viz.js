@@ -59,7 +59,7 @@ export default class Viz {
     * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-    * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @IGNOREproperty {carto.expressions.Base} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *

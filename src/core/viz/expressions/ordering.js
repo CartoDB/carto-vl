@@ -21,6 +21,7 @@ import { checkInstance } from './utils';
  * @memberof carto.expressions
  * @name asc
  * @function
+ * @IGNOREapi
  */
 export class Asc extends BaseExpression {
     constructor(by) {
@@ -50,6 +51,7 @@ export class Asc extends BaseExpression {
  * @memberof carto.expressions
  * @name desc
  * @function
+ * @IGNOREapi
  */
 export class Desc extends BaseExpression {
     constructor(by) {
@@ -78,6 +80,7 @@ export class Desc extends BaseExpression {
  * @memberof carto.expressions
  * @name noOrder
  * @function
+ * @IGNOREapi
  */
 export class NoOrder extends BaseExpression {
     constructor() {
@@ -105,6 +108,7 @@ export class NoOrder extends BaseExpression {
  * @memberof carto.expressions
  * @name width
  * @function
+ * @IGNOREapi
  */
 export class Width extends BaseExpression {
     constructor() {

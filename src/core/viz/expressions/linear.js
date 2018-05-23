@@ -1,21 +1,23 @@
 import BaseExpression from './base';
 import { checkExpression, checkLooseType, implicitCast, checkType } from './utils';
+import { globalMin, globalMax } from '../functions';
 
 /**
-* Linearly interpolates the value of a given input between min and max.
+* Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
+* default to `globalMin(input)` and `globalMax(input)`.
 *
-* @param {Number} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {Number} min - Numeric or date expression pointing to the lower limit
-* @param {Number} max - Numeric or date expression pointing to the higher limit
-* @return {Number}
+* @param {Number|Date} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {Number|Date} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
+* @param {Number|Date} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
+* @return {Number|Date}
 *
-* @example <caption> Display points with a different color depending on the `category` property.</caption>
+* @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
 *   color: s.ramp(s.linear(s.prop('speed'), 10, 100), s.palettes.PRISM)
 * });
 *
-* @example <caption> Display points with a different color depending on the `category` property. (String)</caption>
+* @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between. (String)</caption>
 * const viz = new carto.Viz(`
 *   color: ramp(linear($speed, 10, 100), PRISM)
 * `);
@@ -28,6 +30,12 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 export default class Linear extends BaseExpression {
     constructor(input, min, max) {
         input = implicitCast(input);
+
+        if (min == undefined && max == undefined) {
+            min = globalMin(input);
+            max = globalMax(input);
+        }
+
         min = implicitCast(min);
         max = implicitCast(max);
 
