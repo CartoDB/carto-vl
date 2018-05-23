@@ -54,7 +54,9 @@
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
       center: [-100.3710, 38.4793],
       zoom: 4,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     // Define user
@@ -63,7 +65,7 @@
       apiKey: 'default_public'
     });
 
-    // Define viz
+    // Define styles
     const cartoColorViz = new carto.Viz(`
       color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
       strokeWidth: 0
@@ -81,7 +83,6 @@
     const source = new carto.source.Dataset('us_county_points');
     const layer = new carto.Layer('layer', source, cartoColorViz);
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

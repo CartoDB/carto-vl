@@ -138,6 +138,8 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
+    } else {
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
 }
 
@@ -223,8 +225,8 @@ export function cleanComments(str) {
         }
 
         if (mode.blockComment) {
-            if (str[i] === '*' && str[i+1] === '/') {
-                str[i+1] = '';
+            if (str[i] === '*' && str[i + 1] === '/') {
+                str[i + 1] = '';
                 mode.blockComment = false;
             }
             str[i] = '';
@@ -232,10 +234,10 @@ export function cleanComments(str) {
         }
 
         if (mode.lineComment) {
-            if (str[i+1] === '\n' || str[i+1] === '\r') {
+            if (str[i + 1] === '\n' || str[i + 1] === '\r') {
                 mode.lineComment = false;
             }
-            if (i+1 < l) {
+            if (i + 1 < l) {
                 str[i] = '';
             }
             continue;
@@ -246,12 +248,12 @@ export function cleanComments(str) {
 
         if (str[i] === '/') {
 
-            if (str[i+1] === '*') {
+            if (str[i + 1] === '*') {
                 str[i] = '';
                 mode.blockComment = true;
                 continue;
             }
-            if (str[i+1] === '/') {
+            if (str[i + 1] === '/') {
                 str[i] = '';
                 mode.lineComment = true;
                 continue;

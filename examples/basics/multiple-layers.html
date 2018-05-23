@@ -38,7 +38,9 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 43],
       zoom: 4,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     // Define user
@@ -64,7 +66,6 @@
     const countriesViz = new carto.Viz();
     const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
 
-    // Add layers to map
     citiesLayer.addTo(map, 'watername_ocean');
     countriesLayer.addTo(map, 'citiesLayer');
     countriesLayer.on('loaded', hideLoader);

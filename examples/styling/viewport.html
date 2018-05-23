@@ -38,9 +38,11 @@
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
       center: [2.1734, 41.3851],
       zoom: 12,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
-
+    
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -56,7 +58,6 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

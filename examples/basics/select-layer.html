@@ -55,7 +55,9 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     // Define user
@@ -89,7 +91,6 @@
     `);
     const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
-    // Add layer to map
     citiesLayer.addTo(map, 'watername_ocean');
     citiesLayer.on('loaded', hideLoader);
 

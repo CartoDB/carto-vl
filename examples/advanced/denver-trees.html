@@ -41,7 +41,9 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [-105.048, 39.749],
       zoom: 15,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     // Define user
@@ -66,7 +68,6 @@
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureClick', updateTree);
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
