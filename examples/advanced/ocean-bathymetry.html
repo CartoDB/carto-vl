@@ -38,10 +38,10 @@
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
       center: [-20, 20],
       zoom: 2,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
-
-    map.scrollZoom.disable();
 
     // Define user
     carto.setDefaultAuth({

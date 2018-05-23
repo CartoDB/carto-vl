@@ -32,11 +32,11 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [-0.127, 51.507],
       zoom: 10,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
-
-    map.scrollZoom.disable();
-
+    
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
