@@ -46,11 +46,10 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 43],
       zoom: 4,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
-
-    // disable map zoom when using scroll
-    map.scrollZoom.disable();
     
     // Define user
     carto.setDefaultAuth({
