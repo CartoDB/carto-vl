@@ -41,7 +41,6 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
 
     // Define user
@@ -67,7 +66,6 @@
     const countriesViz = new carto.Viz();
     const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
 
-    // Add layers to map
     citiesLayer.addTo(map, 'watername_ocean');
     countriesLayer.addTo(map, 'citiesLayer');
     countriesLayer.on('loaded', hideLoader);

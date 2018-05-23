@@ -49,9 +49,8 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
-    
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -86,7 +85,6 @@
     const interactivity = new carto.Interactivity([countriesLayer, citiesLayer]);
     interactivity.on('featureClick', updateInfo);
 
-    // Add layers to map
     citiesLayer.addTo(map, 'watername_ocean');
     countriesLayer.addTo(map, 'citiesLayer');
     countriesLayer.on('loaded', hideLoader);

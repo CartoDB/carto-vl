@@ -57,16 +57,15 @@
       dragRotate: false
     });
 
-    // disable map zoom when using scroll
     map.scrollZoom.disable();
-    
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define viz
+    // Define styles
     const rampQuantilesViz = new carto.Viz(`
       color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
       strokeWidth: 0
@@ -84,7 +83,6 @@
     const source = new carto.source.Dataset('us_county_points');
     const layer = new carto.Layer('layer', source, rampQuantilesViz);
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

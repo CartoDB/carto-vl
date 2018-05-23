@@ -1,15 +1,15 @@
-# Interactivity
+## Introduction to Interactivity
+
 With CARTO VL users can interact with the map in multiple ways. Thanks to vector technology animations can be created when the user clicks, moves or interacts with the map in multiple ways.
 
 In this guide we will cover the basic aspects of user interaction.
 
-
-## Interactivity Events
+### Interactivity events
 
 CARTO VL offers an [Interactivity object](https://carto.com/developers/carto-vl/reference/#cartointeractivity) that allows you to listen to several
-map events in order to create rich interactive experiencies.
+map events in order to create rich interactive experiences.
 
-The following events are availiable:
+The following events are available:
 
 - `featureClick`: Fired when the user clicks on features.
 - `featureClickOut`: Fired when the user clicks outside a feature that was clicked in the last featureClick event.
@@ -17,7 +17,7 @@ The following events are availiable:
 - `featureEnter`: Fired the first time the user moves the cursor inside a feature.
 - `featureLeave`: Fired the first time the user moves the cursor outside a feature.
 
-For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interacitivty in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer). And setup a callback for the `featureClick` event.
+For example, if you want to display an alert when the user clicks on a feature, you just need to create a new Interactivity in the desired [Layer](https://carto.com/developers/carto-vl/reference/#cartolayer). And setup a callback for the `featureClick` event.
 
 
 ```js
@@ -25,10 +25,10 @@ const interactivity = new carto.Interactivity(layer);
 interactivity.on('featureClick', featureEvent => alert('Feature clicked'));
 ```
 
-This callback will be called with a single parameter of type [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent). This object will have the `position` and `coordinates` where the 
+This callback will be called with a single parameter of type [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent). This object will have the `position` and `coordinates` where the
 event happened and the list of [Features](https://carto.com/developers/carto-vl/reference/#feature) that have been interacted.
 
-## Example: change the color on feature enter
+#### Example: change the color on feature enter
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/featureEnter.html)
 
@@ -64,15 +64,14 @@ interactivity.on('featureLeave', featureEvent => {
 });
 ```
 
-
-## Variables
+### Variables
 
 The [featureEvent](https://carto.com/developers/carto-vl/reference/#featureevent) object has a special field called `variables`, this field
 is used to get the values of the properties.
 
 Initially this field will be empty and only variables present in the [Viz object](https://carto.com/developers/carto-vl/reference/#vizspec) will appear.
 
-### Example: Display city name on click
+#### Example: Display city name on click
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/variables.html)
 
@@ -91,7 +90,6 @@ const layer = new carto.Layer('layer', source, viz);
 Then we create an Interactivity object defining a callback for the  `featureClick` event, this callback will use `variables.name.value` property
 to show the name of the clicked city.
 
-
 ```js
 const interactivity = new carto.Interactivity(layer);
 interactivity.on('featureClick', featureEvent => {
@@ -99,8 +97,7 @@ interactivity.on('featureClick', featureEvent => {
 });
 ```
 
-
-## Popups
+### Popups
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/popups.html)
 
@@ -115,12 +112,10 @@ const viz = new carto.Viz(`
 const layer = new carto.Layer('layer', source, viz);
 ```
 
-
 Since we are using `mapbox.gl` to draw the basemap, we can use the [popup](https://www.mapbox.com/mapbox-gl-js/api#popup) object with our interactivity API.
 
 All we need is to create a `popup` element in the callback of the `featureClick` event in our Interactivity object extracting the desired
 fields from the `featureEvent`.
-
 
 ```js
 const interactivity = new carto.Interactivity(layer);

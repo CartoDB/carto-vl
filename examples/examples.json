@@ -1,6 +1,6 @@
 {
     "main": {
-        "file": "styling/style-by-category.html"
+        "file": "advanced/taxi-pickups.html"
     },
     "categories": [
         {

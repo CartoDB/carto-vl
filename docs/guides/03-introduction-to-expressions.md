@@ -1,4 +1,4 @@
-# Expressions
+## Introduction to Expressions
 
 **Expressions** are functions to manipulate static, dynamic and data-driven information which is used to define the style properties of a layer. Main types regarding expressions are: *Number*, *String*, *Color* and *Date*. The language includes also *Arrays* to define lists of string categories, custom palettes, etc.
 
@@ -69,7 +69,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-#### Binary
+### Binary
 
 This is the list of the available binary arithmetic operations: `mul`, `div`, `add`, `sub`, `mod`, `pow`. There are also binary comparison operators: `gt`, `gte`, `lt`, `lte`, `eq`, `neq`, `or`, `and`.
 
@@ -139,4 +139,5 @@ const viz = new carto.Viz(`
 `);
 ```
 
-NOTE: these operations disable the access to the property except within other cluster aggregate functions.
+**Note:**
+These operations disable the access to the property except within other cluster aggregate functions.
