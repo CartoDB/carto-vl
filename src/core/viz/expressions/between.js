@@ -6,9 +6,9 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {Number|number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {Number|number} lowerLimit - Numeric expression with the lower limit of the range
- * @param {Number|number} upperLimit -  Numeric expression with the upper limit of the range
+ * @param {Number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {Number} lowerLimit - Numeric expression with the lower limit of the range
+ * @param {Number} upperLimit -  Numeric expression with the upper limit of the range
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>

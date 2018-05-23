@@ -5,7 +5,7 @@ import { checkLooseType, checkType } from './utils';
 /**
  * Override the input color opacity.
  *
- * @param {Number|Property|number} x - A number to be warped in a numeric expression
+ * @param {Number} x - A number to be warped in a numeric expression
  * @return {Color}
  *
  * @example <caption>Display blue points with 50% opacity.</caption>

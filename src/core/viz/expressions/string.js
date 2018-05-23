@@ -10,7 +10,7 @@ import { checkString } from './utils';
  * @memberof carto.expressions
  * @name string
  * @function
- * @api
+ * @IGNOREapi
  */
 export default class BaseString extends BaseExpression {
     constructor(name) {

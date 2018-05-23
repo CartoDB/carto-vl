@@ -21,6 +21,7 @@ import { checkNumber } from './utils';
  * @memberof carto.expressions
  * @name number
  * @function
+ * @IGNOREapi
  */
 export default class BaseNumber extends BaseExpression {
     constructor(x) {

@@ -4,9 +4,9 @@ import { checkExpression, checkLooseType, implicitCast, checkType } from './util
 /**
 * Linearly interpolates the value of a given input between min and max.
 *
-* @param {Number|Property|number} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {Number|Property|number} min - Numeric or date expression pointing to the lower limit
-* @param {Number|Property|number} max - Numeric or date expression pointing to the higher limit
+* @param {Number} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {Number} min - Numeric or date expression pointing to the lower limit
+* @param {Number} max - Numeric or date expression pointing to the higher limit
 * @return {Number}
 *
 * @example <caption> Display points with a different color depending on the `category` property.</caption>

@@ -5,8 +5,8 @@ import { implicitCast, clamp } from './utils';
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the average of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -42,8 +42,8 @@ export const ViewportAvg = genViewportAgg('avg',
 /**
  * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -72,8 +72,8 @@ export const ViewportMax = genViewportAgg('max',
 /**
  * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -101,8 +101,8 @@ export const ViewportMin = genViewportAgg('min',
 /**
  * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -130,7 +130,8 @@ export const ViewportSum = genViewportAgg('sum',
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the feature count in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -203,8 +204,8 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -285,10 +286,10 @@ export class ViewportPercentile extends BaseExpression {
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
- * @param {carto.expressions.Base} x - expression to base the histogram
- * @param {carto.expressions.Base} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} input - expression to base the histogram
+ * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
- * @return {carto.expressions.Base} Histogram
+ * @return {Histogram} Histogram
  *
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;

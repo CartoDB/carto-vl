@@ -71,7 +71,7 @@ class Classifier extends BaseExpression {
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {Number|Property|number} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {String}
  *
@@ -141,7 +141,7 @@ export class ViewportQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {Number|Property|number} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
  * @return {String}
  *
@@ -184,7 +184,7 @@ export class GlobalQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {Number|Property|number} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
  * @return {String}
  *
@@ -227,7 +227,7 @@ export class GlobalEqIntervals extends Classifier {
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {Number|Property|number} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
  * @return {String}
  *

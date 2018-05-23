@@ -5,8 +5,8 @@ import BaseExpression from './base';
 /**
  * Linearly interpolate from `a` to `b` based on *mix*.
  *
- * @param {Number|Color|number} a - Numeric or color expression
- * @param {Number|Color|number} b - Numeric or color expression
+ * @param {Number|Color} a - Numeric or color expression
+ * @param {Number|Color} b - Numeric or color expression
  * @param {Number} mix - Numeric expression with the interpolation parameter in the [0,1] range
  * @returns {Number|Color} Numeric expression
  *

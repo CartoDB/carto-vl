@@ -4,8 +4,8 @@ import BaseExpression from './base';
 /**
  * Check if a value belongs to a list of elements.
  *
- * @param {String|string} value - Expression to be tested against the whitelist
- * @param {string[]|string[]} list - Multiple expression parameters that will form the whitelist
+ * @param {String} value - Expression to be tested against the whitelist
+ * @param {String[]} list - Multiple expression parameters that will form the whitelist
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
@@ -36,8 +36,8 @@ function IN_INLINE_MAKER(list) {
 /**
  * Check if value does not belong to the list of elements.
  *
- * @param {String|string} value - Expression to be tested against the blacklist
- * @param {String[]|string[]} list - Multiple expression parameters that will form the blacklist
+ * @param {String} value - Expression to be tested against the blacklist
+ * @param {String[]} list - Multiple expression parameters that will form the blacklist
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>

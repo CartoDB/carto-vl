@@ -3,9 +3,9 @@ import BaseExpression from './base';
 /**
  * Get the top `n` properties.
  *
- * @param {Number|String|Property} property - Column of the table
+ * @param {Number|String} property - Column of the table
  * @param {number} n - Number of top properties to be returned
- * @return {Category}
+ * @return {String}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -83,7 +83,7 @@ export default class Top extends BaseExpression {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
             });
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);            
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);

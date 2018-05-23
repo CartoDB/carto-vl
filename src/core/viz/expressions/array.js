@@ -4,13 +4,13 @@ import { checkType, checkExpression, implicitCast } from './utils';
 /**
  * Wrapper around arrays.
  *
- * @param {Array} elements
+ * @param {Number[]|String[]|Color[]|Date[]} elements
  * @returns {Array}
  *
  * @memberof carto.expressions
  * @name array
  * @function
- * @api
+ * @IGNOREapi
  */
 export default class BaseArray extends BaseExpression {
     constructor(elems) {

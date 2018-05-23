@@ -7,10 +7,10 @@ import { implicitCast, clamp } from './utils';
  *       _____
  * _____/     \_____
  *
- * @param {Number|Property|number} input
- * @param {Number|Property|number} center
- * @param {Number|Property|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
- * @param {Number|Property|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @param {Number} input
+ * @param {Number} center
+ * @param {Number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {Number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
  * @return {Number}
  *
  * @example <caption></caption>
