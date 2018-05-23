@@ -52,8 +52,68 @@ Now, during rendering, torque will compute a cyclical simulation time between th
 
 So, at any given moment with have a torque simulation time, and the feature matching this time will have largest size assign to it as well as the red color (hue 1). Features away from it will have zero size, so only it's stroke will be visible. Features close to it (with `sim_time` values slightly larger or smaller), will have their size increase as they get closer to the *current* feature.
 
-Example: https://gist.github.com/jgoizueta/2fbf74989a915521220a6e6d5965341c
-TODO: change point location now centered at X=0 to have the left end at 0 and avoid being between tiles
+Here's the code for our animation demonstration:
+
+```javascript
+  const animStart = '2018-04-11T12:00:00Z';
+  const animEnd = '2018-04-12T12:00:00Z';
+  const animDuration = 10;
+  const lineLength = 600000;
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    center: [0, 0],
+    zoom: 6,
+    dragRotate: false
+  });
+
+  carto.setDefaultAuth({
+    user: 'cartogl',
+    apiKey: 'default_public'
+  });
+
+  const source = new carto.source.SQL(`
+    WITH params AS (
+      SELECT
+      -- simulation time limits:
+      '${animStart}'::timestamp with time zone AS min_st,
+      '${animEnd}'::timestamp with time zone AS max_st,
+      0.0 AS x0, 0.0 AS y0,     -- center at the equator
+      600000 AS length,         -- line length: 600 km
+      100 AS n                  -- 100 points
+    ),
+    positions AS (
+      SELECT
+        step::float8/n AS s,
+        x0 + (step::float8/n)*length AS x, y0 AS y
+      FROM params, generate_series(1, n) AS step
+    )
+    SELECT
+      row_number() over () AS cartodb_id,
+      min_st + (max_st - min_st)*s AS sim_time,
+      ST_SetSRID(ST_MakePoint(x, y),3857) AS the_geom_webmercator,
+      ST_Transform(ST_SetSRID(ST_MakePoint(x, y),3857), 4326) AS the_geom
+      FROM params, positions
+  `);
+  const s = carto.expressions;
+  let torque = s.torque(s.prop('sim_time'), 5, s.fade(0.5, 1));
+  setInterval(() => document.getElementById("timer").textContent = torque.getSimTime(), 100);
+  let viz = new carto.Viz({
+      strokeWidth: 1,
+      color: s.hsv(torque, 1, 1),
+      width:  s.add(1,s.mul(torque,30)),
+      order: s.desc(s.width())
+
+  });
+  const layer = new carto.Layer('layer', source, viz);
+  layer.addTo(map, 'watername_ocean');
+```
+
+And the result:
+
+
+![animation demonstration](toque_red_stroke_4.gif "Simple animation")
 
 TODO: real examples, like:
 
