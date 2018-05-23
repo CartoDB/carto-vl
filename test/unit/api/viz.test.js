@@ -241,6 +241,12 @@ describe('api/viz', () => {
         });
     });
 
+    describe('invalid viz', () => {
+        it('should throw an error', () => {
+            expect(() => new Viz('width: wadus')).toThrowError();
+        });
+    });
+
     describe('aliases', () => {
         it('should throw an error when the graph is not a DAG', () => {
             expect(() => new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
