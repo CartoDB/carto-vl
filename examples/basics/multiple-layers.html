@@ -43,6 +43,11 @@
       touchZoomRotate: false,
     });
 
+<<<<<<< HEAD
+=======
+    map.scrollZoom.disable();
+
+>>>>>>> master
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -66,7 +71,6 @@
     const countriesViz = new carto.Viz();
     const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
 
-    // Add layers to map
     citiesLayer.addTo(map, 'watername_ocean');
     countriesLayer.addTo(map, 'citiesLayer');
     countriesLayer.on('loaded', hideLoader);

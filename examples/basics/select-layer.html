@@ -60,6 +60,11 @@
       touchZoomRotate: false,
     });
 
+<<<<<<< HEAD
+=======
+    map.scrollZoom.disable();
+
+>>>>>>> master
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -91,7 +96,6 @@
     `);
     const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
-    // Add layer to map
     citiesLayer.addTo(map, 'watername_ocean');
     citiesLayer.on('loaded', hideLoader);
 

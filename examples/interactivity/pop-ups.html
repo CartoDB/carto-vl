@@ -60,7 +60,13 @@
       closeButton: false,
       closeOnClick: false
     });
+<<<<<<< HEAD
     
+=======
+
+    map.scrollZoom.disable();
+
+>>>>>>> master
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -121,7 +127,6 @@
       }
     });
 
-    // Add layer to map
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 

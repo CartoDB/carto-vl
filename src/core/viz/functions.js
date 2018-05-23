@@ -6,7 +6,6 @@
  *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
- *  - **order**: rendering order of the features, only applicable to points
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
