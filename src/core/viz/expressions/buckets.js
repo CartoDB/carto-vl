@@ -81,10 +81,10 @@ export default class Buckets extends BaseExpression {
         list.elems.map((item, index) => {
             if (item.type) {
                 if (looseType && looseType != item.type) {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
                 } else if (item.type != 'number' && item.type != 'category') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
                 }
             }
         });
@@ -121,10 +121,10 @@ export default class Buckets extends BaseExpression {
         }
         this.list.elems.map((item, index) => {
             if (input.type != item.type) {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
                     `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
             } else if (item.type != 'number' && item.type != 'category') {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
             }
         });
     }
