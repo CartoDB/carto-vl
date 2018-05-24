@@ -35,7 +35,7 @@ export default class Hex extends BaseExpression {
         }
     }
     get value() {
-        return this.color;
+        return this.eval();
     }
     eval() {
         return this.color;

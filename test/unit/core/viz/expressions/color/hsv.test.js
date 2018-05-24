@@ -25,7 +25,17 @@ describe('src/core/viz/expressions/hsv', () => {
         validateStaticType('hsva', ['string', 'string', 'string', 'number'], 'color');
     });
 
-    describe('eval', () => {
+    describe('.value', () => {
+        it('should work without alpha', () => {
+            expect(hsv(0, 1, 1).value).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+        });
+
+        it('should work with alpha', () => {
+            expect(hsva(0, 1, 1, 0.5).value).toEqual({ r: 255, g: 0, b: 0, a: 0.5 });
+        });
+    });
+
+    describe('.eval', () => {
         it('should work without alpha', () => {
             expect(hsv(0, 1, 1).eval()).toEqual({ r: 255, g: 0, b: 0, a: 1 });
             expect(hsv(0.2596, 0.675, 0.812).eval()).toEqual({ r: 129.12675720000004, g: 207.06, b: 67.29449999999999, a: 1 });

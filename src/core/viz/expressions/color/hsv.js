@@ -74,6 +74,9 @@ function genHSV(name, alpha) {
             super(children);
             this.type = 'color';
         }
+        get value() {
+            return this.eval();
+        }
         eval(f) {
             const normalize = (value, hue = false) => {
                 if (value.type == 'string') {

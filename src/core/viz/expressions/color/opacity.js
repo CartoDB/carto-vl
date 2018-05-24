@@ -39,16 +39,19 @@ export default class Opacity extends BaseExpression {
         super({ color, alpha });
         this.type = 'color';
     }
-    _compile(meta) {
-        super._compile(meta);
-        checkType('opacity', 'color', 0, 'color', this.color);
-        checkType('opacity', 'alpha', 1, 'number', this.alpha);
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
+    get value() {
+        return this.eval();
     }
     eval(f) {
         const color = this.color.eval(f);
         const alpha = this.alpha.eval(f);
         color.a = alpha;
         return color;
+    }
+    _compile(meta) {
+        super._compile(meta);
+        checkType('opacity', 'color', 0, 'color', this.color);
+        checkType('opacity', 'alpha', 1, 'number', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
 }

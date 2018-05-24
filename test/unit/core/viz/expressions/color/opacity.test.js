@@ -13,7 +13,13 @@ describe('src/core/viz/expressions/opacity', () => {
         validateStaticType('opacity', ['color', 'number'], 'color');
     });
 
-    describe('eval', () => {
+    describe('.value', () => {
+        it('should override the alpha channel', () => {
+            expect(opacity(rgba(255, 255, 255, 0.5), 0.7).value).toEqual({ r: 255, g: 255, b: 255, a: 0.7 });
+        });
+    });
+
+    describe('.eval', () => {
         it('should override the alpha channel', () => {
             expect(opacity(rgba(255, 255, 255, 0.5), 0.7).eval()).toEqual({ r: 255, g: 255, b: 255, a: 0.7 });
         });
