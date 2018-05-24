@@ -66,6 +66,10 @@
 /**
  * Type of Numeric Expressions.
  *
+ * Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.
+ *
+ * JavaScript numbers are automatically converted to Numeric Expressions.
+ *
  * @typedef {} Number
  * @api
  */
@@ -73,12 +77,22 @@
 /**
  * Type of Category Expressions.
  *
+ * Associated to expressions that return is a category string. When these expressions are evaluated it should return a JavaScript string.
+ *
+ * JavaScript strings are automatically converted to Category Expressions.
+ *
  * @typedef {} Category
  * @api
  */
 
 /**
  * Type of Color Expressions.
+ *
+ * Associated to expressions that return a color. When these expressions are evaluated it should return a RGBA object like:
+ *
+ * ```
+ * { r: 255, g: 255, b: 255, a: 1.0 }
+ * ```
  *
  * @typedef {} Color
  * @api
@@ -100,6 +114,8 @@
 
 /**
  * Type of Palette Expressions.
+ *
+ * More information in {@link carto.expressions.palettes|carto.expressions.palettes}.
  *
  * @typedef {} Palette
  * @api

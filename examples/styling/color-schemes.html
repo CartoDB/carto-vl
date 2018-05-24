@@ -29,7 +29,7 @@
               </li>
               <li>
                 <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
-                <label for="CartocolorInverse">CARTOcolor (inverse)</label>
+                <label for="CartocolorInverse">CARTOcolor (reverse)</label>
               </li>
               <li>
                 <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
@@ -71,7 +71,7 @@
       strokeWidth: 0
     `);
     const cartoColorInverseViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), inverse(sunsetdark))
+      color: ramp(viewportQuantiles($total_pop, 5), reverse(sunsetdark))
       strokeWidth: 0
     `);
     const customColorViz = new carto.Viz(`
