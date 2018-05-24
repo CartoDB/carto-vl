@@ -14,7 +14,15 @@ describe('src/core/viz/expressions/string', () => {
         validateStaticType('string', ['123'], 'string');
     });
 
-    describe('.eval()', () => {
+    describe('.value', () => {
+        it('should return the value of the string', () => {
+            const actual = s.string('string0').value;
+
+            expect(actual).toEqual('string0');
+        });
+    });
+
+    describe('.eval', () => {
         const fakeMetadata = {
             columns: [{
                 type: 'string',

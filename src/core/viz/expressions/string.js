@@ -19,13 +19,14 @@ export default class BaseString extends BaseExpression {
         this.expr = name;
         this.type = 'string';
     }
+    get value() {
+        // Return the plain string
+        return this.expr;
+    }
     eval() {
         if (this._metadata) {
-            // If has metadata return the category ID
+            // If it has metadata return the category ID
             return this._metadata.categoryIDs[this.expr];
-        } else {
-            // Else return the plain string
-            return this.expr;
         }
     }
     isAnimated() {

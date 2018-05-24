@@ -12,7 +12,7 @@ describe('src/core/viz/expressions/number', () => {
         validateStaticType('number', [123], 'number');
     });
 
-    describe('value', () => {
+    describe('.value', () => {
         it('should return the float value', () => {
             const actual = s.number(101).value;
 
@@ -20,7 +20,7 @@ describe('src/core/viz/expressions/number', () => {
         });
     });
 
-    describe('eval', () => {
+    describe('.eval', () => {
         it('should return the float value', () => {
             const actual = s.number(101).eval();
 
