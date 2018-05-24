@@ -9,31 +9,18 @@ import WidthShader from './style/WidthShader';
 import FilterShader from './style/FilterShader';
 
 
-
 const AABlender = AntiAliasingShader;
 
 const renderer = {
-    createPointShader: function (gl) {
-        return new PointShader(gl);
-    },
-    createTriShader: function (gl) {
-        return new TriangleShader(gl);
-    },
-    createLineShader: function (gl) {
-        return new LineShader(gl);
-    }
+    createPointShader: gl => new PointShader(gl),
+    createTriShader: gl => new TriangleShader(gl),
+    createLineShader: gl => new LineShader(gl),
 };
 
 const styler = {
-    createColorShader: function (gl, preface, inline) {
-        return new ColorShader(gl, preface, inline);
-    },
-    createWidthShader: function (gl, preface, inline) {
-        return new WidthShader(gl, preface, inline);
-    },
-    createFilterShader: function (gl, preface, inline) {
-        return new FilterShader(gl, preface, inline);
-    }
+    createColorShader: (gl, preface, inline) => new ColorShader(gl, preface, inline),
+    createWidthShader: (gl, preface, inline) => new WidthShader(gl, preface, inline),
+    createFilterShader: (gl, preface, inline) => new FilterShader(gl, preface, inline)
 };
 
 export { renderer, styler, AABlender };
