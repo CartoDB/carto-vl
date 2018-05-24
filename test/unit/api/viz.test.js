@@ -244,20 +244,20 @@ describe('api/viz', () => {
     describe('variables', () => {
         it('should work with numbers', () => {
             let viz = new Viz('@a: 1');
-            expect(viz.variables.a.eval()).toEqual(1);
+            expect(viz.variables.a.value).toEqual(1);
             viz = new Viz({ variables: { a: s.number(1) } });
-            expect(viz.variables.a.eval()).toEqual(1);
+            expect(viz.variables.a.value).toEqual(1);
             viz = new Viz({ variables: { a: 1 } }); // Implicit cast
-            expect(viz.variables.a.eval()).toEqual(1);
+            expect(viz.variables.a.value).toEqual(1);
         });
 
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
-            expect(viz.variables.a.eval()).toEqual([1,2,3]);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
             viz = new Viz({ variables: { a: s.array([1,2,3]) } });
-            expect(viz.variables.a.eval()).toEqual([1,2,3]);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
             viz = new Viz({ variables: { a: [1,2,3] } }); // Implicit cast
-            expect(viz.variables.a.eval()).toEqual([1,2,3]);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
         });
 
         it('should work with numeric expressions', () => {
@@ -269,20 +269,20 @@ describe('api/viz', () => {
 
         it('should work with strings', () => {
             let viz = new Viz('@a: "Hello"');
-            expect(viz.variables.a.eval()).toEqual('Hello');
+            expect(viz.variables.a.value).toEqual('Hello');
             viz = new Viz({ variables: { a: s.string('Hello') } });
-            expect(viz.variables.a.eval()).toEqual('Hello');
+            expect(viz.variables.a.value).toEqual('Hello');
             viz = new Viz({ variables: { a: 'Hello' } }); // Implicit cast
-            expect(viz.variables.a.eval()).toEqual('Hello');
+            expect(viz.variables.a.value).toEqual('Hello');
         });
 
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
-            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+            expect(viz.variables.a.value).toEqual(['a','b','c']);
             viz = new Viz({ variables: { a: s.array(['a','b','c']) } });
-            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+            expect(viz.variables.a.value).toEqual(['a','b','c']);
             viz = new Viz({ variables: { a: ['a','b','c'] } }); // Implicit cast
-            expect(viz.variables.a.eval()).toEqual(['a','b','c']);
+            expect(viz.variables.a.value).toEqual(['a','b','c']);
         });
 
         it('should work with colors', () => {
@@ -318,16 +318,16 @@ describe('api/viz', () => {
 
         it('should work with dates', () => {
             let viz = new Viz('@a: date("2022-03-09T00:00:00Z")');
-            expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
+            expect(viz.variables.a.value).toEqual(new Date('2022-03-09T00:00:00Z'));
             viz = new Viz({ variables: { a: s.date('2022-03-09T00:00:00Z') } });
-            expect(viz.variables.a.eval()).toEqual(new Date('2022-03-09T00:00:00Z'));
+            expect(viz.variables.a.value).toEqual(new Date('2022-03-09T00:00:00Z'));
         });
 
         it('should work with arrays of dates', () => {
             let viz = new Viz('@a: [date("2022-03-09T00:00:00Z")]');
-            expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
+            expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
             viz = new Viz({ variables: { a: s.array(s.date('2022-03-09T00:00:00Z')) } });
-            expect(viz.variables.a.eval()).toEqual([new Date('2022-03-09T00:00:00Z')]);
+            expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });
 
         it('should throw an error when the array is empty ', () => {

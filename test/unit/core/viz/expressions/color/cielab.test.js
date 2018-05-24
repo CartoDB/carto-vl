@@ -1,4 +1,4 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
 
 describe('src/core/viz/expressions/cielab', () => {
     describe('error control', () => {
@@ -21,5 +21,3 @@ describe('src/core/viz/expressions/cielab', () => {
         // TODO
     });
 });
-
-

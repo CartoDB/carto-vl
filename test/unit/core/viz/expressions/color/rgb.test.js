@@ -1,4 +1,4 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
 
 describe('src/core/viz/expressions/rgb', () => {
     describe('error control', () => {

@@ -1,5 +1,5 @@
-import { validateStaticType, validateStaticTypeErrors } from './utils';
-import { hex } from '../../../../../src/core/viz/functions';
+import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { hex } from '../../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/hex', () => {
     describe('error control', () => {
@@ -14,7 +14,13 @@ describe('src/core/viz/expressions/hex', () => {
         validateStaticType('hex', ['#AAA'], 'color');
     });
 
-    describe('eval', () => {
+    describe('.value', () => {
+        it('should work with #FFF forms', () => {
+            expect(hex('#FFF').value).toEqual({ r: 255, g: 255, b: 255, a: 1 });
+        });
+    });
+
+    describe('.eval', () => {
         it('should work with #FFF forms', () => {
             expect(hex('#FFF').eval()).toEqual({ r: 255, g: 255, b: 255, a: 1 });
         });

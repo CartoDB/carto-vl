@@ -1,5 +1,5 @@
-import * as s from '../../../../../src/core/viz/functions';
-import { validateStaticType, validateStaticTypeErrors } from './utils';
+import * as s from '../../../../../../src/core/viz/functions';
+import { validateStaticType, validateStaticTypeErrors } from '../utils';
 
 describe('src/core/viz/expressions/number', () => {
     describe('error control', () => {

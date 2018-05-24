@@ -1,4 +1,4 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');

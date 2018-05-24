@@ -1,4 +1,4 @@
-import { validateStaticTypeErrors } from './utils';
+import { validateStaticTypeErrors } from '../utils';
 
 describe('src/core/viz/expressions/variable', () => {
     describe('error control', () => {
@@ -8,4 +8,3 @@ describe('src/core/viz/expressions/variable', () => {
         validateStaticTypeErrors('variable', ['number']);
     });
 });
-

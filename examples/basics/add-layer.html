@@ -51,7 +51,25 @@
 
     // Define layer
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const viz = new carto.Viz();
+    const viz = new carto.Viz(`
+      @number: 1
+      @string: 'mimi'
+      @color: #F00
+      @date: date('2016-05-01T00:00:07Z')
+      @number_array: [1,2,3]
+      @string_array: ['a','b','c']
+      @color_array: [red, blue, green]
+      @date_array: [date('2016-05-01T00:00:07Z')]
+
+    `);
+    console.log(viz.variables.number.value,
+    viz.variables.string.value,
+    viz.variables.color.value,
+    viz.variables.date.value,
+    viz.variables.number_array.value,
+    viz.variables.string_array.value,
+    viz.variables.color_array.value,
+    viz.variables.date_array.value);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');

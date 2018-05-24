@@ -1,5 +1,5 @@
-import * as s from '../../../../../src/core/viz/functions';
-import { validateStaticTypeErrors } from './utils';
+import * as s from '../../../../../../src/core/viz/functions';
+import { validateStaticTypeErrors } from '../utils';
 
 describe('src/core/viz/expressions/property', () => {
     describe('error control', () => {
@@ -24,4 +24,3 @@ describe('src/core/viz/expressions/property', () => {
         });
     });
 });
-

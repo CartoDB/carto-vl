@@ -1,5 +1,5 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
-import { opacity, rgba } from '../../../../../src/core/viz/functions';
+import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from '../utils';
+import { opacity, rgba } from '../../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/opacity', () => {
     describe('error control', () => {
