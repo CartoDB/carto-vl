@@ -190,7 +190,9 @@ export default class MVT extends Base {
                     continue;
                     //throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
-                polygon.holes.push(polygon.flat.length / 2);
+                if (polygon != null) {
+                    polygon.holes.push(polygon.flat.length / 2);
+                }
             }
             for (let k = 0; k < geom[j].length; k++) {
                 // TODO should additional clipping be done here?
@@ -213,8 +215,10 @@ export default class MVT extends Base {
                     polygon.clipped.push(polygon.flat.length);
                     polygon.clippedType.push(clipping);
                 }
-                polygon.flat.push(2 * x / mvt_extent - 1.);
-                polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
+                if (polygon != null) {
+                    polygon.flat.push(2 * x / mvt_extent - 1.);
+                    polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
+                }
             }
         }
         //if current polygon is not empty=> push it
