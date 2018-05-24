@@ -17,7 +17,7 @@ describe('src/core/viz/expressions/basic/array', () => {
 
         it('should throw an error when the array constains different types ', () => {
             expect(() => s.array([1, 'a'])
-            ).toThrowError('array(): invalid parameters, invalid argument type combination');
+            ).toThrowError('array(): invalid second parameter type, invalid argument type combination');
         });
     });
 

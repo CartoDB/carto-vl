@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkExpression, implicitCast } from '../utils';
+import { checkExpression, implicitCast, getOrdinalFromIndex } from '../utils';
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
@@ -35,7 +35,7 @@ export default class BaseArray extends BaseExpression {
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type != type && item.type != undefined) {
-                throw new Error('array(): invalid parameters, invalid argument type combination');
+                throw new Error(`array(): invalid ${getOrdinalFromIndex(index+1)} parameter type, invalid argument type combination`);
             }
         });
         super({});
@@ -55,5 +55,19 @@ export default class BaseArray extends BaseExpression {
     }
     _resolveAliases(aliases) {
         this.elems.map(c => c._resolveAliases(aliases));
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+  
+        const type = this.elems[0].type;
+        if (['number', 'category', 'color', 'time'].indexOf(type) == -1) {
+            throw new Error(`array(): invalid parameters type: ${type}`);
+        }
+        this.elems.map((item, index) => {
+            checkExpression('array', `item[${index}]`, index, item);
+            if (item.type != type) {
+                throw new Error(`array(): invalid ${getOrdinalFromIndex(index)} parameter, invalid argument type combination`);
+            }
+        });
     }
 }
