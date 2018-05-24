@@ -34,7 +34,7 @@ export default class Time extends BaseExpression {
         this.inlineMaker = () => undefined;
     }
     get value() {
-        return this.date;
+        return this.eval();
     }
     eval() {
         return this.date;

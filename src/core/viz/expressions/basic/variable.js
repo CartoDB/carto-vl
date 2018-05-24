@@ -36,6 +36,9 @@ export default class Variable extends BaseExpression {
         super({});
         this.name = name;
     }
+    get value() {
+        return this.eval();
+    }
     eval(feature) {
         return this.alias.eval(feature);
     }

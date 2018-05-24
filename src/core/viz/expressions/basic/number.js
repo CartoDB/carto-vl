@@ -31,7 +31,7 @@ export default class BaseNumber extends BaseExpression {
         this.type = 'number';
     }
     get value() {
-        return this.expr;
+        return this.eval();
     }
     eval() {
         return this.expr;

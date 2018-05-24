@@ -461,6 +461,9 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
         }
+        get value() {
+            return this.eval();
+        }
         eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }

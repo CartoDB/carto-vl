@@ -39,14 +39,15 @@ export default class Property extends BaseExpression {
         super({});
         this.name = name;
     }
-
+    get value() {
+        return this.eval();
+    }
     eval(feature) {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
         return feature[this.name];
     }
-
     _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {

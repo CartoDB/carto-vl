@@ -262,9 +262,9 @@ describe('api/viz', () => {
 
         it('should work with numeric expressions', () => {
             let viz = new Viz('@a: sin(PI / (1 + log(E)))');
-            expect(viz.variables.a.eval()).toEqual(1);
+            expect(viz.variables.a.value).toEqual(1);
             viz = new Viz({ variables: { a: s.sin(s.div(s.PI, s.add(1, s.log(s.E)))) } });
-            expect(viz.variables.a.eval()).toEqual(1);
+            expect(viz.variables.a.value).toEqual(1);
         });
 
         it('should work with strings', () => {
@@ -287,14 +287,14 @@ describe('api/viz', () => {
 
         it('should work with colors', () => {
             let viz = new Viz('@a: red');
-            expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
+            expect(viz.variables.a.value).toEqual({r: 255, g: 0, b: 0, a: 1});
             viz = new Viz({ variables: { a: s.namedColor('red') } });
-            expect(viz.variables.a.eval()).toEqual({r: 255, g: 0, b: 0, a: 1});
+            expect(viz.variables.a.value).toEqual({r: 255, g: 0, b: 0, a: 1});
         });
 
         it('should work with arrays of colors', () => {
             let viz = new Viz('@a: [red, lime, blue]');
-            expect(viz.variables.a.eval()).toEqual([
+            expect(viz.variables.a.value).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
                 {r: 0, g: 0, b: 255, a: 1}]);
@@ -302,7 +302,7 @@ describe('api/viz', () => {
                 s.namedColor('red'),
                 s.namedColor('lime'),
                 s.namedColor('blue')]) } });
-            expect(viz.variables.a.eval()).toEqual([
+            expect(viz.variables.a.value).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
                 {r: 0, g: 0, b: 255, a: 1}]);
@@ -310,7 +310,7 @@ describe('api/viz', () => {
                 s.namedColor('red'),
                 s.namedColor('lime'),
                 s.namedColor('blue')] } }); // Implicit cast
-            expect(viz.variables.a.eval()).toEqual([
+            expect(viz.variables.a.value).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
                 {r: 0, g: 255, b: 0, a: 1},
                 {r: 0, g: 0, b: 255, a: 1}]);

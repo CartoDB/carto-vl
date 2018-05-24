@@ -278,6 +278,9 @@ function genUnaryOp(name, jsFn, glsl) {
             super({ a });
             this.type = 'number';
         }
+        get value() {
+            return this.eval();
+        }
         eval(feature) {
             return jsFn(this.a.eval(feature));
         }

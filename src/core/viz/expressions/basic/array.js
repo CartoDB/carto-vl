@@ -40,7 +40,7 @@ export default class BaseArray extends BaseExpression {
         this.type = type + '-array';
         this.expr = elems;
         try {
-            this.expr.map(c => c.eval());
+            this.expr.map(c => c.value);
         } catch (error) {
             throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
         }
