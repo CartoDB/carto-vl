@@ -2,9 +2,9 @@ import BaseExpression from '../base';
 import { checkString } from '../utils';
 
 /**
- * Wrapper around string names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
+ * Wrapper around category names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
  *
- * @param {string} name
+ * @param {string} categoryName
  * @returns {Category} category expression with the name provided
  *
  * @memberof carto.expressions

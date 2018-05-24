@@ -78,10 +78,6 @@ export default class Viz {
         this.updated = true;
         this._changeCallback = null;
 
-        Object.keys(this.variables).map(varName => {
-            this.variables[varName] = implicitCast(this.variables[varName]);
-        });
-
         this._updateRootExpressions();
 
         this._resolveAliases();
@@ -245,10 +241,10 @@ export default class Viz {
             this.width,
             this.strokeColor,
             this.strokeWidth,
-            this.filter
-        ].concat(Object.values(this.variables)).forEach(expr => {
-            expr._resolveAliases(this.variables);
-        });
+            this.filter,
+        ].concat(Object.values(this.variables)).forEach(expr =>
+            expr._resolveAliases(this.variables)
+        );
     }
 
     _validateAliasDAG() {

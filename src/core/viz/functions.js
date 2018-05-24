@@ -55,7 +55,7 @@
  *
  * The most important types are:
  *  - **Numer** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
- *  - **Category** expression. Expressions that contains strings. Categories can have a limited set of values, like the country or the region of a feature.
+ *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
  * @namespace carto.expressions

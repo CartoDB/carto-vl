@@ -73,7 +73,7 @@ class Classifier extends BaseExpression {
  *
  * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {String}
+ * @return {Category}
  *
  * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -143,7 +143,7 @@ export class ViewportQuantiles extends Classifier {
  *
  * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {String}
+ * @return {Category}
  *
  * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -186,7 +186,7 @@ export class GlobalQuantiles extends Classifier {
  *
  * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {String}
+ * @return {Category}
  *
  * @example <caption>Use global equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -229,7 +229,7 @@ export class GlobalEqIntervals extends Classifier {
  *
  * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {String}
+ * @return {Category}
  *
  * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;
