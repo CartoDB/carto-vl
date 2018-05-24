@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkType, checkExpression, implicitCast } from '../utils';
+import { checkExpression, implicitCast } from '../utils';
 
 /**
  * Wrapper around arrays.
@@ -22,17 +22,19 @@ export default class BaseArray extends BaseExpression {
         if (!elems.length) {
             throw new Error('array(): invalid parameters: must receive at least one argument');
         }
-        const type = elems[0].type;
-        if (type == undefined) {
-            throw new Error('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+        let type = '';
+        for (let elem of elems) {
+            type = elem.type;
+            if (elem.type != undefined) {
+                break;
+            }
         }
-        checkType('array', 'elems[0]', 0, ['number', 'string', 'color', 'time'], elems[0]);
+        if (['number', 'string', 'color', 'time', undefined].indexOf(type) == -1) {
+            throw new Error(`array(): invalid parameters type: ${type}`);
+        }
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
-            if (item.type == undefined) {
-                throw new Error('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-            }
-            if (item.type != type) {
+            if (item.type != type && item.type != undefined) {
                 throw new Error('array(): invalid parameters, invalid argument type combination');
             }
         });
@@ -50,5 +52,8 @@ export default class BaseArray extends BaseExpression {
     }
     eval() {
         return this.expr.map(c => c.eval());
+    }
+    _resolveAliases(aliases) {
+        this.expr.map(c => c._resolveAliases(aliases));
     }
 }

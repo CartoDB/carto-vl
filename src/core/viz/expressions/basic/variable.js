@@ -40,7 +40,9 @@ export default class Variable extends BaseExpression {
         return this.eval();
     }
     eval(feature) {
-        return this.alias.eval(feature);
+        if (this.alias) {
+            return this.alias.eval(feature);
+        }
     }
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
