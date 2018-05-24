@@ -267,6 +267,18 @@ describe('api/viz', () => {
             expect(viz.variables.a.value).toEqual(1);
         });
 
+        it('should work with other variables', () => {
+            let viz = new Viz('@a: [@v, 2, 3] @v: 1');
+            expect(viz.variables.v.value).toEqual(1);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
+            viz = new Viz({ variables: { a: s.array([s.var('v'),2,3]), v: s.number(1) } });
+            expect(viz.variables.v.value).toEqual(1);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
+            viz = new Viz({ variables: { a: [1,2,3], v: 1 } }); // Implicit cast
+            expect(viz.variables.v.value).toEqual(1);
+            expect(viz.variables.a.value).toEqual([1,2,3]);
+        });
+
         it('should work with strings', () => {
             let viz = new Viz('@a: "Hello"');
             expect(viz.variables.a.value).toEqual('Hello');

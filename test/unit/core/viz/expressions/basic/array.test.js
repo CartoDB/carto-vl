@@ -16,13 +16,6 @@ describe('src/core/viz/expressions/array', () => {
         });
 
         it('should throw an error when the array constains different types ', () => {
-            expect(() => s.array([s.prop('p')])
-            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-            expect(() => s.array([1, s.prop('p')])
-            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-        });
-
-        it('should throw an error when the array constains different types ', () => {
             expect(() => s.array([1, 'a'])
             ).toThrowError('array(): invalid parameters, invalid argument type combination');
         });
