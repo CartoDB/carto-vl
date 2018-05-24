@@ -115,8 +115,8 @@ class AggregationFiltering {
     _in(f) {
         if (f instanceof In) {
             let p = this._aggregation(f.value);
-            let values = f.list.expr.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.expr.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 p.filters.push({
                     in: values
                 });
@@ -128,8 +128,8 @@ class AggregationFiltering {
     _notIn(f) {
         if (f instanceof Nin) {
             let p = this._aggregation(f.value);
-            let values = f.list.expr.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.expr.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 p.filters.push({
                     not_in: values
                 });
@@ -357,8 +357,8 @@ class PreaggregationFiltering {
     _in(f) {
         if (f instanceof In) {
             let p = this._property(f.value);
-            let values = f.list.expr.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.expr.length) {
+            let values = f.list.elems.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 return {
                     type: 'in',
                     property: p.property,
@@ -371,8 +371,8 @@ class PreaggregationFiltering {
     _notIn(f) {
         if (f instanceof Nin) {
             let p = this._property(f.value);
-            let values = f.list.expr.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.expr.length) {
+            let values = f.list.elems.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 return {
                     type: 'notIn',
                     property: p.property,

@@ -28,8 +28,8 @@
                 <label for="Cartocolor">CARTOcolor (default)</label>
               </li>
               <li>
-                <input type="radio" name="style" onclick="setCartocolorInverse()" id="CartocolorInverse">
-                <label for="CartocolorInverse">CARTOcolor (reverse)</label>
+                <input type="radio" name="style" onclick="setCartocolorReverse()" id="CartocolorReverse">
+                <label for="CartocolorReverse">CARTOcolor (reverse)</label>
               </li>
               <li>
                 <input type="radio" name="style" onclick="setCustomColors()" id="CustomColors">
@@ -70,7 +70,7 @@
       color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
-    const cartoColorInverseViz = new carto.Viz(`
+    const cartoColorReverseViz = new carto.Viz(`
       color: ramp(viewportQuantiles($total_pop, 5), reverse(sunsetdark))
       strokeWidth: 0
     `);
@@ -89,8 +89,8 @@
     function setCartocolor() {
       layer.blendToViz(cartoColorViz);
     }
-    function setCartocolorInverse() {
-      layer.blendToViz(cartoColorInverseViz);
+    function setCartocolorReverse() {
+      layer.blendToViz(cartoColorReverseViz);
     }
     function setCustomColors() {
       layer.blendToViz(customColorViz);

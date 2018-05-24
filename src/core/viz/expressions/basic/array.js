@@ -40,20 +40,20 @@ export default class BaseArray extends BaseExpression {
         });
         super({});
         this.type = type + '-array';
-        this.expr = elems;
+        this.elems = elems;
         try {
-            this.expr.map(c => c.value);
+            this.elems.map(c => c.value);
         } catch (error) {
             throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
     get value() {
-        return this.expr.map(c => c.value);
+        return this.elems.map(c => c.value);
     }
     eval() {
-        return this.expr.map(c => c.eval());
+        return this.elems.map(c => c.eval());
     }
     _resolveAliases(aliases) {
-        this.expr.map(c => c._resolveAliases(aliases));
+        this.elems.map(c => c._resolveAliases(aliases));
     }
 }

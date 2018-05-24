@@ -78,10 +78,10 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             checkType(name, 'list', 1, 'category-array', list);
 
             let children = { value };
-            list.expr.map((arg, index) => children[`arg${index}`] = arg);
+            list.elems.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
             this.list = list;
-            this.inlineMaker = inlineMaker(this.list.expr);
+            this.inlineMaker = inlineMaker(this.list.elems);
             this.type = 'number';
         }
         eval(feature) {
