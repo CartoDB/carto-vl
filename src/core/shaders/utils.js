@@ -1,4 +1,4 @@
-import ShaderCache from '../shader-cache';
+import ShaderCache from './ShaderCache';
 
 let programID = 1;
 

@@ -1,5 +1,6 @@
 import { compileProgram } from '../utils';
-import { VS, FS } from '../../renderer/point';
+import { VS, FS } from './point-glsl';
+
 
 export default class PointShader {
     constructor(gl) {
