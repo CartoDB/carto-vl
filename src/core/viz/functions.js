@@ -108,7 +108,7 @@
 
 import Animate from './expressions/animate';
 
-import BaseArray from './expressions/array';
+import BaseArray from './expressions/basic/array';
 
 import { In } from './expressions/belongs.js';
 import { Nin } from './expressions/belongs.js';
@@ -134,57 +134,57 @@ import Blend from './expressions/blend';
 
 import Buckets from './expressions/buckets';
 
-import CIELab from './expressions/CIELab';
+import CIELab from './expressions/color/CIELab';
 
-import { ClusterAvg } from './expressions/clusterAggregation';
-import { ClusterMax } from './expressions/clusterAggregation';
-import { ClusterMin } from './expressions/clusterAggregation';
-import { ClusterMode } from './expressions/clusterAggregation';
-import { ClusterSum } from './expressions/clusterAggregation';
+import { ClusterAvg } from './expressions/aggregation/clusterAggregation';
+import { ClusterMax } from './expressions/aggregation/clusterAggregation';
+import { ClusterMin } from './expressions/aggregation/clusterAggregation';
+import { ClusterMode } from './expressions/aggregation/clusterAggregation';
+import { ClusterSum } from './expressions/aggregation/clusterAggregation';
 
-import Constant from './expressions/constant';
+import Constant from './expressions/basic/constant';
 
-import Hex from './expressions/hex';
+import Hex from './expressions/color/hex';
 
-import { HSL } from './expressions/hsl';
-import { HSLA } from './expressions/hsl';
+import { HSL } from './expressions/color/hsl';
+import { HSLA } from './expressions/color/hsl';
 
-import { HSV } from './expressions/hsv';
-import { HSVA } from './expressions/hsv';
+import { HSV } from './expressions/color/hsv';
+import { HSVA } from './expressions/color/hsv';
 
 import { Cubic } from './expressions/interpolators';
 import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import { NamedColor } from './expressions/named-color';
+import { NamedColor } from './expressions/color/named-color';
 
 import Near from './expressions/near';
 
 import Now from './expressions/now';
 
-import BaseNumber from './expressions/number';
+import BaseNumber from './expressions/basic/number';
 
-import Opacity from './expressions/opacity';
+import Opacity from './expressions/color/opacity';
 
 import { Asc } from './expressions/ordering';
 import { Desc } from './expressions/ordering';
 import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
-import { palettes } from './expressions/palettes';
-import { Reverse } from './expressions/palettes';
+import { palettes } from './expressions/color/palettes';
+import { Reverse } from './expressions/color/palettes';
 
-import Property from './expressions/property';
+import Property from './expressions/basic/property';
 
 import { ViewportQuantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
 
 import Ramp from './expressions/ramp';
 
-import { RGB } from './expressions/rgb';
-import { RGBA } from './expressions/rgb';
+import { RGB } from './expressions/color/rgb';
+import { RGBA } from './expressions/color/rgb';
 
-import BaseString from './expressions/string';
+import BaseString from './expressions/basic/string';
 
 import Time from './expressions/time';
 
@@ -204,10 +204,10 @@ import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
 
-import Variable from './expressions/variable';
+import Variable from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/viewportAggregation';
-import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/globalAggregation';
+import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 
 import XYZ from './expressions/xyz';
 

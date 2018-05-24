@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkNumber } from './utils';
+import BaseExpression from '../base';
+import { checkNumber } from '../utils';
 
 /**
  * Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.

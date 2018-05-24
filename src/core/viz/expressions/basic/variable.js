@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkString } from './utils';
+import BaseExpression from '../base';
+import { checkString } from '../utils';
 
 /**
  * Alias to a named variable defined in the Viz.

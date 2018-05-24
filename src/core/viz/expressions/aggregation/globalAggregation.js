@@ -1,7 +1,7 @@
-import BaseExpression from './base';
-import { number } from '../functions';
-import * as schema from '../../schema';
-import { implicitCast } from './utils';
+import BaseExpression from '../base';
+import { number } from '../../functions';
+import * as schema from '../../../schema';
+import { implicitCast } from '../utils';
 
 /**
  * Return the average of the feature property for the entire source data.

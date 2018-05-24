@@ -1,6 +1,6 @@
-import BaseExpression from './base';
-import { number } from '../functions';
-import { checkLooseType, checkType } from './utils';
+import BaseExpression from '../base';
+import { number } from '../../functions';
+import { checkLooseType, checkType } from '../utils';
 
 /**
  * Override the input color opacity.

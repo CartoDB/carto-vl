@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { number, viewportHistogram, viewportMax, viewportMin } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
-import Property from './property';
+import Property from './basic/property';
 import * as schema from '../../schema';
 
 let classifierUID = 0;

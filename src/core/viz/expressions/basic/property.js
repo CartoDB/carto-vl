@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkString } from './utils';
+import BaseExpression from '../base';
+import { checkString } from '../utils';
 
 /**
  * Evaluates the value of a column for every row in the dataset.

@@ -1,6 +1,6 @@
-import BaseExpression from './base';
-import { number } from '../functions';
-import { implicitCast, clamp } from './utils';
+import BaseExpression from '../base';
+import { number } from '../../functions';
+import { implicitCast, clamp } from '../utils';
 
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).

@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
-import Property from './property';
+import Property from './basic/property';
 
 const DEFAULT_FADE = 0.15;
 

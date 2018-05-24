@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkNumber } from './utils';
+import BaseExpression from '../base';
+import { checkNumber } from '../utils';
 
 /**
  * Wraps a constant number. Implies a GPU optimization vs {@link carto.expressions.number|number expression}.

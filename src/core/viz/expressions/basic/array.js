@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkType, checkExpression, implicitCast } from './utils';
+import BaseExpression from '../base';
+import { checkType, checkExpression, implicitCast } from '../utils';
 
 /**
  * Wrapper around arrays.

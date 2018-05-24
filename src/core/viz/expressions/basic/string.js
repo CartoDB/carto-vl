@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkString } from './utils';
+import BaseExpression from '../base';
+import { checkString } from '../utils';
 
 /**
  * Wrapper around string names.

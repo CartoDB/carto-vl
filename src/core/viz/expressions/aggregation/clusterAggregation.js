@@ -1,7 +1,7 @@
-import BaseExpression from './base';
-import * as schema from '../../schema';
-import PropertyExpression from './property';
-import { checkInstance, checkType } from './utils';
+import BaseExpression from '../base';
+import * as schema from '../../../schema';
+import PropertyExpression from '../basic/property';
+import { checkInstance, checkType } from '../utils';
 
 /**
  * Aggregate using the average. This operation disables the access to the property

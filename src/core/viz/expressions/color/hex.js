@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { checkString, hexToRgb, getStringErrorPreface } from './utils';
+import BaseExpression from '../base';
+import { checkString, hexToRgb, getStringErrorPreface } from '../utils';
 
 /**
  * Create a color from its hexadecimal description.

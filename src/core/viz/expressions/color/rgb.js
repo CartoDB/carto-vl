@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkType } from './utils';
+import BaseExpression from '../base';
+import { implicitCast, checkLooseType, checkType } from '../utils';
 
 /**
  * Evaluates to a rgb color.
@@ -71,6 +71,9 @@ function genRGB(name, alpha) {
             }
             super(children);
             this.type = 'color';
+        }
+        get value() {
+            return this.eval();
         }
         eval(f) {
             return {

@@ -1,7 +1,7 @@
 
 import * as cartocolor from 'cartocolor';
-import BaseExpression from './base';
-import { hexToRgb } from './utils';
+import BaseExpression from '../base';
+import { hexToRgb } from '../utils';
 
 /**
  * Color palettes.

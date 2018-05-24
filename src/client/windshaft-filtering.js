@@ -1,13 +1,13 @@
 import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/viz/expressions/binary';
 import { In, Nin } from '../core/viz/expressions/belongs';
 import Between from '../core/viz/expressions/between';
-import Property from '../core/viz/expressions/property';
+import Property from '../core/viz/expressions/basic/property';
 import Blend from '../core/viz/expressions/blend';
 import Animate from '../core/viz/expressions/animate';
-import NumberExpression from '../core/viz/expressions/number';
-import ConstantExpression from '../core/viz/expressions/constant';
-import StringExpression from '../core/viz/expressions/string';
-import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/clusterAggregation';
+import NumberExpression from '../core/viz/expressions/basic/number';
+import ConstantExpression from '../core/viz/expressions/basic/constant';
+import StringExpression from '../core/viz/expressions/basic/string';
+import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/aggregation/clusterAggregation';
 import * as schema from '../core/schema';
 
 class AggregationFiltering {

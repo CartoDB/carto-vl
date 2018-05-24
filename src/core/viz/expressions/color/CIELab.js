@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkType, checkExpression } from './utils';
+import BaseExpression from '../base';
+import { implicitCast, checkLooseType, checkType, checkExpression } from '../utils';
 
 /**
  * Evaluates to a CIELab color.

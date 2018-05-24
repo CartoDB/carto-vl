@@ -1,5 +1,5 @@
-import BaseExpression from './base';
-import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from './utils';
+import BaseExpression from '../base';
+import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from '../utils';
 
 /**
  * Evaluates to a hsv color.
