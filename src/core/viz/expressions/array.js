@@ -45,6 +45,9 @@ export default class BaseArray extends BaseExpression {
             throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
+    get value() {
+        return this.expr.map(c => c.value);
+    }
     eval() {
         return this.expr.map(c => c.eval());
     }

@@ -34,6 +34,9 @@ export default class Hex extends BaseExpression {
             throw new Error(getStringErrorPreface('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
     }
+    get value() {
+        return this.color;
+    }
     eval() {
         return this.color;
     }
