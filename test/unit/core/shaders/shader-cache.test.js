@@ -1,4 +1,4 @@
-import ShaderCache from '../../../../src/core/shaders/shader-cache';
+import ShaderCache from '../../../../src/core/shaders/ShaderCache';
 
 describe('src/core/shaders/shader-cache', () => {
     let shaderCache;
