@@ -194,28 +194,28 @@ export default class MVT extends Base {
                     polygon.holes.push(polygon.flat.length / 2);
                 }
             }
-            for (let k = 0; k < geom[j].length; k++) {
-                // TODO should additional clipping be done here?
-                let clipping = 0;
-                let x = geom[j][k].x;
-                let y = geom[j][k].y;
+            if (polygon != null) {
+                for (let k = 0; k < geom[j].length; k++) {
+                    // TODO should additional clipping be done here?
+                    let clipping = 0;
+                    let x = geom[j][k].x;
+                    let y = geom[j][k].y;
 
-                if (x > mvt_extent) {
-                    clipping = clipping | 1;
-                } else if (x < 0) {
-                    clipping = clipping | 2;
+                    if (x > mvt_extent) {
+                        clipping = clipping | 1;
+                    } else if (x < 0) {
+                        clipping = clipping | 2;
 
-                }
-                if (y > mvt_extent) {
-                    clipping = clipping | 4;
-                } else if (y < 0) {
-                    clipping = clipping | 8;
-                }
-                if (clipping) {
-                    polygon.clipped.push(polygon.flat.length);
-                    polygon.clippedType.push(clipping);
-                }
-                if (polygon != null) {
+                    }
+                    if (y > mvt_extent) {
+                        clipping = clipping | 4;
+                    } else if (y < 0) {
+                        clipping = clipping | 8;
+                    }
+                    if (clipping) {
+                        polygon.clipped.push(polygon.flat.length);
+                        polygon.clippedType.push(clipping);
+                    }
                     polygon.flat.push(2 * x / mvt_extent - 1.);
                     polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
                 }
