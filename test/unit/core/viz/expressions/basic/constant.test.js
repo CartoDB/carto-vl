@@ -1,7 +1,7 @@
 import * as s from '../../../../../../src/core/viz/functions';
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/constant', () => {
+describe('src/core/viz/expressions/basic/constant', () => {
     describe('error control', () => {
         validateStaticTypeErrors('number', [undefined]);
         validateStaticTypeErrors('number', ['123']);

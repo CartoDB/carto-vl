@@ -282,7 +282,7 @@ describe('api/viz', () => {
         it('should work with strings', () => {
             let viz = new Viz('@a: "Hello"');
             expect(viz.variables.a.value).toEqual('Hello');
-            viz = new Viz({ variables: { a: s.string('Hello') } });
+            viz = new Viz({ variables: { a: s.category('Hello') } });
             expect(viz.variables.a.value).toEqual('Hello');
             viz = new Viz({ variables: { a: 'Hello' } }); // Implicit cast
             expect(viz.variables.a.value).toEqual('Hello');

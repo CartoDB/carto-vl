@@ -1,7 +1,7 @@
 import * as s from '../../../../../../src/core/viz/functions';
 import { validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/property', () => {
+describe('src/core/viz/expressions/basic/property', () => {
     describe('error control', () => {
         validateStaticTypeErrors('property', []);
         validateStaticTypeErrors('property', [undefined]);
@@ -9,7 +9,7 @@ describe('src/core/viz/expressions/property', () => {
         validateStaticTypeErrors('property', ['number']);
     });
 
-    describe('.eval()', () => {
+    describe('.eval', () => {
         it('should return the value from the feature', () => {
             const fakeFeature = {
                 property0: 'foo',

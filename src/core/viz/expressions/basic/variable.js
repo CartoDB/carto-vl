@@ -5,7 +5,7 @@ import { checkString } from '../utils';
  * Alias to a named variable defined in the Viz.
  *
  * @param {string} name - The variable name that is going to be evaluated
- * @return {Number|String|Color|Date}
+ * @return {Number|Category|Color|Date}
  *
  * @example <caption></caption>
  * const s = carto.expressions;

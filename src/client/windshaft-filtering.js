@@ -6,7 +6,7 @@ import Blend from '../core/viz/expressions/blend';
 import Animate from '../core/viz/expressions/animate';
 import NumberExpression from '../core/viz/expressions/basic/number';
 import ConstantExpression from '../core/viz/expressions/basic/constant';
-import StringExpression from '../core/viz/expressions/basic/string';
+import CategoryExpression from '../core/viz/expressions/basic/category';
 import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/aggregation/clusterAggregation';
 import * as schema from '../core/schema';
 
@@ -92,7 +92,7 @@ class AggregationFiltering {
 
     _value(f) {
         f = this._removeBlend(f);
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof StringExpression) {
+        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
             return f.expr;
         }
     }
@@ -346,7 +346,7 @@ class PreaggregationFiltering {
     }
 
     _value(f) {
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof StringExpression) {
+        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
             return {
                 type: 'value',
                 value: f.expr

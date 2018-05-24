@@ -21,13 +21,13 @@ describe('src/core/viz/expressions/clusterAggregation', () => {
         validateStaticTypeErrors('clusterMax', []);
         validateStaticTypeErrors('clusterMax', ['color']);
         validateStaticTypeErrors('clusterMax', [0]);
-        validateDynamicTypeErrors('clusterMax', ['string']);
+        validateDynamicTypeErrors('clusterMax', ['category']);
         validateDynamicTypeErrors('clusterMode', ['number']);
     });
 
     describe('type', () => {
         validateStaticType('clusterMax', ['number-property'], 'number');
-        validateStaticType('clusterMode', ['string-property'], 'string');
+        validateStaticType('clusterMode', ['category-property'], 'category');
     });
 
     describe('eval', () => {

@@ -82,7 +82,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * Aggregate using the mode. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.property} property - Column of the table to be aggregated, must be a string
+ * @param {carto.expressions.property} property - Column of the table to be aggregated must be a string
  * @return {carto.expressions.property} Aggregated column
  *
  * @example <caption>Use cluster mode of the population in a color ramp.</caption>
@@ -101,7 +101,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * @function
  * @api
  */
-export const ClusterMode = genAggregationOp('mode', 'string');
+export const ClusterMode = genAggregationOp('mode', 'category');
 
 /**
  * Aggregate using the sum. This operation disables the access to the property

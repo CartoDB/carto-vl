@@ -18,7 +18,7 @@ import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 * Numeric expressions to numeric
 * Numeric expressions can be used as the input for `ramp` in combination with numeric palettes. Linear interpolation will be used to generate intermediate output values.
 *
-* @param {Number|String} input - The input expression to give a color
+* @param {Number|Category} input - The input expression to give a color
 * @param {Palette|Color[]|Number[]} palette - The color palette that is going to be used
 * @return {Number|Color}
 *
@@ -60,7 +60,7 @@ export default class Ramp extends BaseExpression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-        checkLooseType('ramp', 'input', 0, ['number', 'string'], input);
+        checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
         checkType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array'], palette);
 
         super({ input: input });
@@ -99,7 +99,7 @@ export default class Ramp extends BaseExpression {
     }
     _compile(meta) {
         super._compile(meta);
-        checkType('ramp', 'input', 0, ['number', 'string'], this.input);
+        checkType('ramp', 'input', 0, ['number', 'category'], this.input);
         this._texCategories = null;
         this._GLtexCategories = null;
     }
@@ -153,7 +153,7 @@ export default class Ramp extends BaseExpression {
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
-            if (this.input.type == 'string') {
+            if (this.input.type == 'category') {
                 this.maxKey = this.input.numCategories - 1;
             }
             const width = 256;

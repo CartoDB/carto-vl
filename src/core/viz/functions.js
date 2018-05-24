@@ -54,8 +54,8 @@
  * type of their parameters.
  *
  * The most important types are:
- *  - **Numeric** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
- *  - **String** expression. Expressions that contains strings. Categories can have a limited set of values, like the country or the region of a feature.
+ *  - **Numer** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
+ *  - **Category** expression. Expressions that contains strings. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
  * @namespace carto.expressions
@@ -71,9 +71,9 @@
  */
 
 /**
- * Type of String Expressions.
+ * Type of Category Expressions.
  *
- * @typedef {} String
+ * @typedef {} Category
  * @api
  */
 
@@ -92,19 +92,18 @@
  */
 
 /**
+ * Type of Fade Expressions.
+ *
+ * @typedef {} Fade
+ * @api
+ */
+
+/**
  * Type of Palette Expressions.
  *
  * @typedef {} Palette
  * @api
  */
-
-/**
- * Type of Property Expressions.
- *
- * @typedef {} Property
- * @api
- */
-
 
 import Animate from './expressions/animate';
 
@@ -133,6 +132,8 @@ import { And } from './expressions/binary';
 import Blend from './expressions/blend';
 
 import Buckets from './expressions/buckets';
+
+import BaseCategory from './expressions/basic/category';
 
 import CIELab from './expressions/color/CIELab';
 
@@ -183,8 +184,6 @@ import Ramp from './expressions/ramp';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
-
-import BaseString from './expressions/basic/string';
 
 import Time from './expressions/time';
 
@@ -304,7 +303,7 @@ export const ramp = (...args) => new Ramp(...args);
 export const rgb = (...args) => new RGB(...args);
 export const rgba = (...args) => new RGBA(...args);
 
-export const string = (...args) => new BaseString(...args);
+export const category = (...args) => new BaseCategory(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };

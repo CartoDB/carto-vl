@@ -4,9 +4,9 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 describe('src/core/viz/expressions/belongs', () => {
     const fakeMetadata = {
         columns: [{
-            type: 'string',
+            type: 'category',
             name: 'category',
-            categoryNames: ['string0', 'string1', 'string2']
+            categoryNames: ['category0', 'category1', 'category2']
         }],
         categoryIDs: {
             'category0': 0,
@@ -24,15 +24,15 @@ describe('src/core/viz/expressions/belongs', () => {
 
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
-        validateStaticTypeErrors('in', ['string']);
+        validateStaticTypeErrors('in', ['category']);
         validateStaticTypeErrors('in', ['number']);
         validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'string-array']);
-        validateDynamicTypeErrors('in', ['string', 'number-array']);
+        validateDynamicTypeErrors('in', ['number', 'category-array']);
+        validateDynamicTypeErrors('in', ['category', 'number-array']);
     });
 
     describe('type', () => {
-        validateStaticType('in', ['string', 'string-array'], 'number');
+        validateStaticType('in', ['category', 'category-array'], 'number');
     });
 
     describe('eval', () => {

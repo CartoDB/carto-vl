@@ -74,8 +74,8 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             checkExpression(name, 'value', 0, value);
             checkExpression(name, 'list', 1, list);
 
-            checkLooseType(name, 'value', 0, 'string', value);
-            checkType(name, 'list', 1, 'string-array', list);
+            checkLooseType(name, 'value', 0, 'category', value);
+            checkType(name, 'list', 1, 'category-array', list);
 
             let children = { value };
             list.expr.map((arg, index) => children[`arg${index}`] = arg);
@@ -89,8 +89,8 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
         }
         _compile(meta) {
             super._compile(meta);
-            checkType(name, 'value', 0, 'string', this.value);
-            checkType(name, 'list', 1, 'string-array', this.list);
+            checkType(name, 'value', 0, 'category', this.value);
+            checkType(name, 'list', 1, 'category-array', this.list);
         }
     };
 }

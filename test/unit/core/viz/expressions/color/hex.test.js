@@ -5,7 +5,7 @@ describe('src/core/viz/expressions/hex', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hex', []);
         validateStaticTypeErrors('hex', ['number']);
-        validateStaticTypeErrors('hex', ['string']);
+        validateStaticTypeErrors('hex', ['category']);
         validateStaticTypeErrors('hex', ['#Z08080']);
     });
 

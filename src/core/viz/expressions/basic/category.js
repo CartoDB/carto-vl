@@ -2,22 +2,22 @@ import BaseExpression from '../base';
 import { checkString } from '../utils';
 
 /**
- * Wrapper around string names.
+ * Wrapper around string names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
  *
  * @param {string} name
- * @returns {String} string expression with the name provided
+ * @returns {Category} category expression with the name provided
  *
  * @memberof carto.expressions
- * @name string
+ * @name category
  * @function
  * @IGNOREapi
  */
-export default class BaseString extends BaseExpression {
-    constructor(name) {
-        checkString('string', 'name', 0, name);
+export default class BaseCategory extends BaseExpression {
+    constructor(categoryName) {
+        checkString('category', 'categoryName', 0, categoryName);
         super({});
-        this.expr = name;
-        this.type = 'string';
+        this.expr = categoryName;
+        this.type = 'category';
     }
     get value() {
         // Return the plain string
@@ -37,12 +37,12 @@ export default class BaseString extends BaseExpression {
     }
     _applyToShaderSource() {
         return {
-            preface: this._prefaceCode(`uniform float s${this._uid};\n`),
-            inline: `s${this._uid}`
+            preface: this._prefaceCode(`uniform float cat${this._uid};\n`),
+            inline: `cat${this._uid}`
         };
     }
     _postShaderCompile(program, gl) {
-        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `s${this._uid}`);
+        this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryIDs[this.expr];

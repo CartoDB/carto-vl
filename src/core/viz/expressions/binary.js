@@ -7,7 +7,7 @@ const UNSUPPORTED_SIGNATURE = 0;
 const NUMBERS_TO_NUMBER = 1;
 const NUMBER_AND_COLOR_TO_COLOR = 2;
 const COLORS_TO_COLOR = 4;
-const STRINGS_TO_NUMBER = 8;
+const CATEGORIES_TO_NUMBER = 8;
 
 /**
  * Multiply two numeric expressions.
@@ -313,8 +313,8 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {Number|String} x - Firt value of the comparison
- * @param {Number|String} y - Second value of the comparison
+ * @param {Number|Category} x - Firt value of the comparison
+ * @param {Number|Category} y - Second value of the comparison
  * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
@@ -334,7 +334,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * @api
  */
 export const Equals = genBinaryOp('equals',
-    NUMBERS_TO_NUMBER | STRINGS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
     (x, y) => x == y ? 1 : 0,
     (x, y) => `(${x}==${y}? 1.:0.)`
 );
@@ -344,8 +344,8 @@ export const Equals = genBinaryOp('equals',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {Number|String} x - Firt value of the comparison
- * @param {Number|String} y - Second value of the comparison
+ * @param {Number|Category} x - Firt value of the comparison
+ * @param {Number|Category} y - Second value of the comparison
  * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>
@@ -365,7 +365,7 @@ export const Equals = genBinaryOp('equals',
  * @api
  */
 export const NotEquals = genBinaryOp('notEquals',
-    NUMBERS_TO_NUMBER | STRINGS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
     (x, y) => x != y ? 1 : 0,
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
@@ -493,8 +493,8 @@ function getSignature(a, b) {
         return NUMBER_AND_COLOR_TO_COLOR;
     } else if (a.type == 'color' && b.type == 'color') {
         return COLORS_TO_COLOR;
-    } else if (a.type == 'string' && b.type == 'string') {
-        return STRINGS_TO_NUMBER;
+    } else if (a.type == 'category' && b.type == 'category') {
+        return CATEGORIES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -508,7 +508,7 @@ function getReturnTypeFromSignature(signature) {
             return 'color';
         case COLORS_TO_COLOR:
             return 'color';
-        case STRINGS_TO_NUMBER:
+        case CATEGORIES_TO_NUMBER:
             return 'number';
         default:
             return undefined;

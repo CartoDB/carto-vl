@@ -77,7 +77,7 @@ function genHSL(name, alpha) {
         }
         eval(f) {
             const normalize = (value, hue = false) => {
-                if (value.type == 'string') {
+                if (value.type == 'category') {
                     return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
                 }
                 return value.eval(f);
@@ -118,7 +118,7 @@ function genHSL(name, alpha) {
                 checkType('hsla', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
-                if (value.type == 'string') {
+                if (value.type == 'category') {
                     return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
                 }
                 return '';
@@ -147,7 +147,7 @@ function genHSL(name, alpha) {
 
     function hslCheckType(parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
-        if (parameter.type != 'number' && parameter.type != 'string' && parameter.type !== undefined) {
+        if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }

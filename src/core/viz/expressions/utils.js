@@ -1,4 +1,4 @@
-import { number, string, array } from '../functions';
+import { number, category, array } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -9,7 +9,7 @@ export function implicitCast(value) {
         return number(value);
     }
     if (typeof value == 'string') {
-        return string(value);
+        return category(value);
     }
     if (Array.isArray(value)) {
         return array(value);

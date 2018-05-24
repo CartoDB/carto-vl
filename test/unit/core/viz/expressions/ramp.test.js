@@ -5,14 +5,14 @@ describe('src/core/viz/expressions/ramp', () => {
     describe('error control', () => {
         validateStaticTypeErrors('ramp', []);
         validateStaticTypeErrors('ramp', ['number']);
-        validateStaticTypeErrors('ramp', ['string']);
+        validateStaticTypeErrors('ramp', ['category']);
     });
 
     describe('type', () => {
         validateStaticType('ramp', ['number', 'palette'], 'color');
-        validateStaticType('ramp', ['string', 'palette'], 'color');
-        validateStaticType('ramp', ['string', 'color-array'], 'color');
-        validateStaticType('ramp', ['string', 'number-array'], 'number');
+        validateStaticType('ramp', ['category', 'palette'], 'color');
+        validateStaticType('ramp', ['category', 'color-array'], 'color');
+        validateStaticType('ramp', ['category', 'number-array'], 'number');
     });
 
     describe('eval', () => {

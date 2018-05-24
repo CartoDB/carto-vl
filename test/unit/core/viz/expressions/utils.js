@@ -7,9 +7,9 @@ const metadata = {
             type: 'number'
         },
         {
-            name: 'string',
-            type: 'string',
-            categoryNames: ['string0', 'string1', 'string2']
+            name: 'category',
+            type: 'category',
+            categoryNames: ['category0', 'category1', 'category2']
         }
     ],
 };
@@ -93,12 +93,12 @@ function getSimpleArg(type) {
             return [s.array([s.number(0)]), '[0]'];
         case 'number-property':
             return [s.property('number'), '$number'];
-        case 'string':
-            return [s.string('string'), '\'string\''];
-        case 'string-array':
-            return [s.array([s.string('string')]), '[\'string\']'];
-        case 'string-property':
-            return [s.property('string'), '$string'];
+        case 'category':
+            return [s.category('category'), '\'category\''];
+        case 'category-array':
+            return [s.array([s.category('category')]), '[\'category\']'];
+        case 'category-property':
+            return [s.property('category'), '$category'];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
         case 'color-array':
@@ -116,11 +116,11 @@ function getPropertyArg(type) {
             return [s.property('number'), '$number'];
         case 'number-array':
             return [s.array([s.number(0)]), '[0]'];
-        case 'string':
-        case 'string-property':
-            return [s.property('string'), '$string'];
-        case 'string-array':
-            return [s.array([s.string('string')]), '[\'string\']'];
+        case 'category':
+        case 'category-property':
+            return [s.property('category'), '$category'];
+        case 'category-array':
+            return [s.array([s.category('category')]), '[\'category\']'];
         case 'color':
         case 'color-property':
             return [s.hsv(s.property('number'), 0, 0), 'hsv($number, 0, 0)'];

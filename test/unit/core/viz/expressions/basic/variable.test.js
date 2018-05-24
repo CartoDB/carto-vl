@@ -1,6 +1,6 @@
 import { validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/variable', () => {
+describe('src/core/viz/expressions/basic/variable', () => {
     describe('error control', () => {
         validateStaticTypeErrors('variable', []);
         validateStaticTypeErrors('variable', [undefined]);

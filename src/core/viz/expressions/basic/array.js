@@ -2,9 +2,9 @@ import BaseExpression from '../base';
 import { checkExpression, implicitCast } from '../utils';
 
 /**
- * Wrapper around arrays.
+ * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
- * @param {Number[]|String[]|Color[]|Date[]} elements
+ * @param {Number[]|Category[]|Color[]|Date[]} elements
  * @returns {Array}
  *
  * @memberof carto.expressions
@@ -29,7 +29,7 @@ export default class BaseArray extends BaseExpression {
                 break;
             }
         }
-        if (['number', 'string', 'color', 'time', undefined].indexOf(type) == -1) {
+        if (['number', 'category', 'color', 'time', undefined].indexOf(type) == -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         elems.map((item, index) => {

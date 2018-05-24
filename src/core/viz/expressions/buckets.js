@@ -73,7 +73,7 @@ export default class Buckets extends BaseExpression {
 
         let looseType = undefined;
         if (input.type) {
-            if (input.type != 'number' && input.type != 'string') {
+            if (input.type != 'number' && input.type != 'category') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
@@ -83,7 +83,7 @@ export default class Buckets extends BaseExpression {
                 if (looseType && looseType != item.type) {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                } else if (item.type != 'number' && item.type != 'string') {
+                } else if (item.type != 'number' && item.type != 'category') {
                     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
                 }
             }
@@ -97,13 +97,13 @@ export default class Buckets extends BaseExpression {
         this.bucketUID = bucketUID++;
         this.numCategories = list.expr.length + 1;
         this.list = list;
-        this.type = 'string';
+        this.type = 'category';
     }
     eval(feature) {
         const v = this.input.eval(feature);
         let i;
         for (i = 0; i < this.list.expr.length; i++) {
-            if (this.input.type == 'string' && v == this.list.expr[i].eval(feature)) {
+            if (this.input.type == 'category' && v == this.list.expr[i].eval(feature)) {
                 return i;
             } else if (this.input.type == 'number' && v < this.list.expr[i].eval(feature)) {
                 return i;
@@ -113,17 +113,17 @@ export default class Buckets extends BaseExpression {
     }
     _compile(metadata) {
         super._compile(metadata);
-        this.othersBucket = this.input.type == 'string';
+        this.othersBucket = this.input.type == 'category';
 
         const input = this.input;
-        if (input.type != 'number' && input.type != 'string') {
+        if (input.type != 'number' && input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
         this.list.expr.map((item, index) => {
             if (input.type != item.type) {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
                     `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
-            } else if (item.type != 'number' && item.type != 'string') {
+            } else if (item.type != 'number' && item.type != 'category') {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${item.type}`);
             }
         });
@@ -133,7 +133,7 @@ export default class Buckets extends BaseExpression {
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
         const funcName = `buckets${this.bucketUID}`;
-        const cmp = this.input.type == 'string' ? '==' : '<';
+        const cmp = this.input.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index}.;

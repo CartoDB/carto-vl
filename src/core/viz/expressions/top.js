@@ -3,9 +3,9 @@ import BaseExpression from './base';
 /**
  * Get the top `n` properties.
  *
- * @param {Number|String} property - Column of the table
+ * @param {Number|Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned
- * @return {String}
+ * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -43,10 +43,10 @@ export default class Top extends BaseExpression {
     }
     _compile(metadata) {
         super._compile(metadata);
-        if (this.property.type != 'string') {
+        if (this.property.type != 'category') {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
-        this.type = 'string';
+        this.type = 'category';
         this.othersBucket = true;
         this._meta = metadata;
         this._textureBuckets = null;
