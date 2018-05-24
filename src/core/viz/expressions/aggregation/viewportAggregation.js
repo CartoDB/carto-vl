@@ -204,7 +204,8 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {Number} input - numeric expression
+ * @param {Number} input - Numeric expression
+ * @param {Number} percentile - Numeric expression [0, 100]
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>

@@ -156,7 +156,7 @@ describe('api/viz', () => {
                 }).toThrowError('`order` parameter is not a valid viz Expresion.');
             });
 
-            it('should add a consols.warn when non supported properties are included', () => {
+            it('should add a console.warn when non supported properties are included', () => {
                 const vizSpec = {
                     notSupported: s.number(5)
                 };

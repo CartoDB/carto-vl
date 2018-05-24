@@ -3,7 +3,7 @@ import BaseExpression from './base';
 /**
  * Get the top `n` properties.
  *
- * @param {Number|Category} property - Column of the table
+ * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned
  * @return {Category}
  *
