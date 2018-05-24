@@ -43,10 +43,10 @@ export default class Top extends BaseExpression {
     }
     _compile(metadata) {
         super._compile(metadata);
-        if (this.property.type != 'category') {
+        if (this.property.type != 'string') {
             throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
         }
-        this.type = 'category';
+        this.type = 'string';
         this.othersBucket = true;
         this._meta = metadata;
         this._textureBuckets = null;

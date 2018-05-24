@@ -194,7 +194,7 @@ export default class GeoJSON extends Base {
             this._catFields.add(propertyName);
             this._columns.push({
                 name: propertyName,
-                type: 'category',
+                type: 'string',
                 categoryNames: new Set(),
             });
         }

@@ -98,7 +98,6 @@ export default class Windshaft {
         }
     }
 
-
     _getTiles(tiles) {
         this._requestGroupID++;
         var completedTiles = [];

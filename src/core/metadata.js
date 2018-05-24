@@ -24,7 +24,7 @@ const metadataExample = {
         },
         {
             name: 'cat',
-            type: 'category',
+            type: 'string',
             categoryNames: ['red', 'blue', 'green'],
             categoryCount: [10, 30, 15],
         }

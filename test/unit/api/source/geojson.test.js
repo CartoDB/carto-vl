@@ -125,7 +125,7 @@ describe('api/source/geojson', () => {
                     },
                     {
                         name: 'category',
-                        type: 'category',
+                        type: 'string',
                         categoryNames: ['red', 'blue'],
                     },
                 ],
