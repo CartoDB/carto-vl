@@ -7,6 +7,27 @@ describe('src/core/viz/expressions/array', () => {
     describe('type', () => {
     });
 
+    describe('constructor', () => {
+        it('should throw an error when the array is empty ', () => {
+            expect(() => s.array()
+            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+            expect(() => s.array([])
+            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+        });
+
+        it('should throw an error when the array constains different types ', () => {
+            expect(() => s.array([s.prop('p')])
+            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+            expect(() => s.array([1, s.prop('p')])
+            ).toThrowError('array(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
+        });
+
+        it('should throw an error when the array constains different types ', () => {
+            expect(() => s.array([1, 'a'])
+            ).toThrowError('array(): invalid parameters, invalid argument type combination');
+        });
+    });
+
     describe('.value', () => {
         it('should return array of numbers', () => {
             const actual = s.array([1, 2, 3]).value;
