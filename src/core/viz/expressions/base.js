@@ -32,12 +32,16 @@ export default class Base {
         this._getChildren().map(child => child.parent = this);
         this.preface = '';
         this._shaderBindings = new Map();
-        this._uid = uid++;
     }
 
     _bind(metadata) {
         this._compile(metadata);
         return this;
+    }
+
+    _setUID(idGenerator){
+        this._uid = idGenerator.getID(this);
+        this._getChildren().map(child => child._setUID(idGenerator));
     }
 
     _prefaceCode(glslCode) {
