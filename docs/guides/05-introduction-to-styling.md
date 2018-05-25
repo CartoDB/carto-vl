@@ -38,7 +38,7 @@ Use the `strokeWidth` property to define the size of a point or polygon stroke w
 strokeWidth: 3
 ```
 
-### Opacity
+#### Opacity
 
 Set a feature's [`opacity`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsopacity) with the alpha channel (see [supported Color Spaces](https://carto.com/developers/carto-vl/guides/introduction-to-styling/#supported-color-spaces)) or inside of a `ramp` expression.
 
@@ -56,7 +56,7 @@ Use `resolution` to aggregate points into clusters.
 resolution: 5
 ```
 
-### Filter
+#### Filter
 Use `filter` to show only the features that match the specified [expression](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/).
 
 ```js
