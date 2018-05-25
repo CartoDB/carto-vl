@@ -6,7 +6,9 @@ import { implicitCast } from '../utils';
 /**
  * Return the average of the feature property for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
+ * Note: `globalAvg` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global average of the `amount` property to a variable.</caption>
@@ -32,8 +34,10 @@ export const GlobalAvg = generateGlobalAggregattion('avg');
 /**
  * Return the maximum of the feature property for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
- * @return {Number} Result of the aggregation
+ * Note: `globalMax` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
  *
  * @example <caption>Assign the global maximum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -58,8 +62,10 @@ export const GlobalMax = generateGlobalAggregattion('max');
 /**
  * Return the minimum of the feature property for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
- * @return {Number} Result of the aggregation
+ * Note: `globalMin` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
  *
  * @example <caption>Assign the global minimum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -84,7 +90,9 @@ export const GlobalMin = generateGlobalAggregattion('min');
 /**
  * Return the sum of the feature property for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
+ * Note: `globalSum` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global sum of the `amount` property to a variable.</caption>
@@ -110,7 +118,9 @@ export const GlobalSum = generateGlobalAggregattion('sum');
 /**
  * Return the feature count for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
+ * Note: `globalCount` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global count of the `amount` property to a variable.</caption>
@@ -177,7 +187,9 @@ function generateGlobalAggregattion(metadataPropertyName) {
 /**
  * Return the Nth percentile of the feature property for the entire source data.
  *
- * @param {carto.expressions.prop} property - property expression of date or number type
+ * Note: `globalSum` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global percentile of the `amount` property to a variable.</caption>

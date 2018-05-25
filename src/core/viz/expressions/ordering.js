@@ -4,7 +4,7 @@ import { checkInstance } from './utils';
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.width} by - must be `width()`
+ * @param {carto.expressions.Width} by - must be `width()`
  * @return {Order}
  *
  * @example <caption>Ascending order based on width.</caption>
@@ -34,7 +34,7 @@ export class Asc extends BaseExpression {
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.width} by - must be `width()`
+ * @param {carto.expressions.Width} by - must be `width()`
  * @return {Order}
  *
  * @example <caption>Descending order based on width.</caption>
@@ -92,7 +92,7 @@ export class NoOrder extends BaseExpression {
 /**
  * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
  *
- * @return {carto.expressions.width}
+ * @return {carto.expressions.Width}
  *
  * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
