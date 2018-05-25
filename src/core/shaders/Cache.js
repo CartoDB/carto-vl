@@ -1,9 +1,9 @@
 /** 
- * To avoid recompiling the shaders we keep a shader cache.
+ * Keep a cacheTo avoid recompiling webgl programs and shaders.
  * We need a different shader per webgl context so we use a 2 level cache where at the first level
  * the webgl context is the key and at the second level the shader code is the cache key.
  */
-export default class ShaderCache {
+export default class Cache {
     constructor() {
         this.caches = new WeakMap();
     }
