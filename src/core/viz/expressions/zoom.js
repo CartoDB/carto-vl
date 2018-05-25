@@ -4,7 +4,7 @@ import { number } from '../functions';
 /**
  * Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.
  *
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
  * @example <caption>Show constant width in zoom.</caption>
  * const s = carto.expressions;
@@ -16,7 +16,7 @@ import { number } from '../functions';
  * const viz = new carto.Viz(`
  *   width: zoom() / 1000
  * `);
- * 
+ *
  * @memberof carto.expressions
  * @name zoom
  * @function

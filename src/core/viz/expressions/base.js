@@ -16,8 +16,7 @@ let uid = 0;
  * @name Base
  * @hideconstructor
  * @abstract
- * @class
- * @api
+ * @IGNOREapi
  */
 export default class Base {
     /**
@@ -30,14 +29,12 @@ export default class Base {
         this.childrenNames = Object.keys(children);
         Object.keys(children).map(name => this[name] = implicitCast(children[name]));
         this._getChildren().map(child => child.parent = this);
-        this._metaBindings = [];
         this.preface = '';
         this._shaderBindings = new Map();
         this._uid = uid++;
     }
 
     _bind(metadata) {
-        this._metaBindings.push(metadata);
         this._compile(metadata);
         return this;
     }

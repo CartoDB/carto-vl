@@ -4,7 +4,7 @@ import BaseExpression from './base';
  * Time contant expression
  *
  * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
- * @return {carto.expressions.Base}
+ * @return {Date}
  *
  * @example <caption>Filter by a date between dates.</caption>
  * const s = carto.expressions;
@@ -32,6 +32,9 @@ export default class Time extends BaseExpression {
         this.type = 'time';
         this.date = date;
         this.inlineMaker = () => undefined;
+    }
+    get value() {
+        return this.eval();
     }
     eval() {
         return this.date;

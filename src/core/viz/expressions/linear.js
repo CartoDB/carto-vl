@@ -6,10 +6,10 @@ import { globalMin, globalMax } from '../functions';
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
 *
-* @param {carto.expressions.Base} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {carto.expressions.Base} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
-* @param {carto.expressions.Base} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
-* @return {carto.expressions.Base}
+* @param {Number|Date} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {Number|Date} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
+* @param {Number|Date} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
+* @return {Number|Date}
 *
 * @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</caption>
 * const s = carto.expressions;
