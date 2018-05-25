@@ -47,6 +47,7 @@ export default class Variable extends BaseExpression {
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
             this.childrenNames.push('alias');
+            this.childrenNames = [...(new Set(this.childrenNames))];
             this.alias = aliases[this.name];
         } else {
             throw new Error(`variable() name '${this.name}' doesn't exist`);
