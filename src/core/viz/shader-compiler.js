@@ -1,4 +1,19 @@
+class IDGenerator {
+    constructor() {
+        this._ids = new Map();
+    }
+    getID(expression) {
+        if (this._ids.has(expression)) {
+            return this._ids.get(expression);
+        }
+        const id = this._ids.size;
+        this._ids.set(expression, id);
+        return id;
+    }
+}
+
 export function compileShader(gl, vizRootExpr, shaderCreator) {
+    vizRootExpr._setUID(new IDGenerator());
     let tid = {};
     const colorModifier = vizRootExpr._applyToShaderSource(name => {
         if (tid[name] === undefined) {
