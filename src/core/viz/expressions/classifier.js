@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { number, viewportHistogram, viewportMax, viewportMin } from '../functions';
 import { checkNumber, checkInstance, checkType } from './utils';
-import Property from './property';
+import Property from './basic/property';
 import * as schema from '../../schema';
 
 let classifierUID = 0;
@@ -71,9 +71,9 @@ class Classifier extends BaseExpression {
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -141,9 +141,9 @@ export class ViewportQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -184,9 +184,9 @@ export class GlobalQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use global equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -227,9 +227,9 @@ export class GlobalEqIntervals extends Classifier {
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;

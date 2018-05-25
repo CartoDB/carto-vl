@@ -1,4 +1,3 @@
-import * as s from '../../../../../src/core/viz/functions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 describe('src/core/viz/expressions/buckets', () => {
@@ -7,11 +6,6 @@ describe('src/core/viz/expressions/buckets', () => {
         validateDynamicTypeErrors('buckets', ['category', 'number-array']);
         validateStaticTypeErrors('buckets', ['color', 'number-array']);
         validateStaticTypeErrors('buckets', ['number', 'color-array']);
-
-        it('should throw an error when the wrong parameters are passed', () => {
-            let $category = s.property('category');
-            expect(() => s.buckets($category, '0')).toThrowError(/is not an array/g);
-        });
     });
 
     describe('type', () => {

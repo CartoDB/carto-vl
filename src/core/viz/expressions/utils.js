@@ -1,4 +1,4 @@
-import { number, category } from '../functions';
+import { number, category, array } from '../functions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -10,6 +10,9 @@ export function implicitCast(value) {
     }
     if (typeof value == 'string') {
         return category(value);
+    }
+    if (Array.isArray(value)) {
+        return array(value);
     }
     return value;
 }
@@ -142,11 +145,7 @@ export function checkInstance(expressionName, parameterName, parameterIndex, exp
 }
 
 export function checkNumber(expressionName, parameterName, parameterIndex, number) {
-    if (!Number.isFinite(number) &&
-        number !== Infinity &&
-        number !== -Infinity &&
-        !Number.isNaN(number)
-    ) {
+    if (!_isNumber(number)) {
         throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
     }
 }

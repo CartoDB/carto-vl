@@ -16,8 +16,7 @@ let uid = 0;
  * @name Base
  * @hideconstructor
  * @abstract
- * @class
- * @api
+ * @IGNOREapi
  */
 export default class Base {
     /**

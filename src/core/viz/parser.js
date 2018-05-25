@@ -2,8 +2,8 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 import { implicitCast } from './expressions/utils';
-import { CSS_COLOR_NAMES, NamedColor } from './expressions/named-color';
-import Hex from './expressions/hex';
+import { CSS_COLOR_NAMES, NamedColor } from './expressions/color/named-color';
+import Hex from './expressions/color/hex';
 
 // TODO use Schema classes
 
@@ -16,6 +16,7 @@ Object.keys(functions)
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 lowerCaseFunctions.pi = functions.PI;
+lowerCaseFunctions.e = functions.E;
 
 export function parseVizExpression(str) {
     prepareJsep();

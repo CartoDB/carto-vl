@@ -54,12 +54,12 @@ export default class Viz {
     * @memberof carto
     * @api
     *
-    * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
-    * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
-    * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
-    * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-    * @IGNOREproperty {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @property {Color} color - fill color of points and polygons and color of lines
+    * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+    * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+    * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *
@@ -398,12 +398,12 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
-         * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
-         * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
-         * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
-         * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+         * @property {Color} color - fill color of points and polygons and color of lines
+         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
          * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
          * @api
@@ -411,8 +411,10 @@ export default class Viz {
 
         // TODO: Check expression types ie: color is not a number expression!
 
+        // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
+        vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
             throw new CartoValidationError('viz', 'resolutionNumberRequired');
