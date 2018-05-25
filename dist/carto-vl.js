@@ -90,8 +90,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 
-let uid = 0;
-
 /**
  * Abstract expression class
  *
@@ -119,12 +117,16 @@ class Base {
         this._getChildren().map(child => child.parent = this);
         this.preface = '';
         this._shaderBindings = new Map();
-        this._uid = uid++;
     }
 
     _bind(metadata) {
         this._compile(metadata);
         return this;
+    }
+
+    _setUID(idGenerator){
+        this._uid = idGenerator.getID(this);
+        this._getChildren().map(child => child._setUID(idGenerator));
     }
 
     _prefaceCode(glslCode) {
@@ -2418,30 +2420,32 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = compileProgram;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ShaderCache__ = __webpack_require__(69);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Cache__ = __webpack_require__(69);
 
 
 let programID = 1;
+const shaderCache = new __WEBPACK_IMPORTED_MODULE_0__Cache__["a" /* default */]();
+const programCache = new __WEBPACK_IMPORTED_MODULE_0__Cache__["a" /* default */]();
 
-const shaderCache = new __WEBPACK_IMPORTED_MODULE_0__ShaderCache__["a" /* default */]();
-
+/**
+ * Compile a webgl program.
+ * Use a cache to improve speed.
+ * 
+ * @param {WebGLRenderingContext} gl - The context where the program will be executed
+ * @param {string} glslVS - vertex shader code
+ * @param {string} glslFS - fragment shader code
+ */
 function compileProgram(gl, glslVS, glslFS) {
+    const code = glslVS + glslFS;
+    if (programCache.has(gl, code)) {
+        return programCache.get(gl, code);
+    }
     const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
     const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-    const program = gl.createProgram();
-    gl.attachShader(program, VS);
-    gl.attachShader(program, FS);
-    gl.linkProgram(program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(program));
-    }
 
-    return {
-        program: program,
-        programID: programID++
-    };
+    const program = createProgram(gl, VS, FS);
+    programCache.set(gl, code, { program: program, programID: programID++ });
+    return { program, programID };
 }
 
 function compileShader(gl, sourceCode, type) {
@@ -2458,6 +2462,19 @@ function compileShader(gl, sourceCode, type) {
     }
     shaderCache.set(gl, sourceCode, shader);
     return shader;
+}
+
+function createProgram(gl, VS, FS) {
+    const program = gl.createProgram();
+    gl.attachShader(program, VS);
+    gl.attachShader(program, FS);
+    gl.linkProgram(program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(program));
+    }
+    return program;
 }
 
 
@@ -11297,6 +11314,7 @@ class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
             this.childrenNames.push('alias');
+            this.childrenNames = [...(new Set(this.childrenNames))];
             this.alias = aliases[this.name];
         } else {
             throw new Error(`variable() name '${this.name}' doesn't exist`);
@@ -12563,11 +12581,11 @@ class AntiAliasingShader {
 
 "use strict";
 /** 
- * To avoid recompiling the shaders we keep a shader cache.
+ * Keep a cacheTo avoid recompiling webgl programs and shaders.
  * We need a different shader per webgl context so we use a 2 level cache where at the first level
  * the webgl context is the key and at the second level the shader code is the cache key.
  */
-class ShaderCache {
+class Cache {
     constructor() {
         this.caches = new WeakMap();
     }
@@ -12596,7 +12614,7 @@ class ShaderCache {
         return this.get(gl, shadercode) !== undefined;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ShaderCache;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Cache;
 
 
 
@@ -18388,7 +18406,22 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = compileShader;
+class IDGenerator {
+    constructor() {
+        this._ids = new Map();
+    }
+    getID(expression) {
+        if (this._ids.has(expression)) {
+            return this._ids.get(expression);
+        }
+        const id = this._ids.size;
+        this._ids.set(expression, id);
+        return id;
+    }
+}
+
 function compileShader(gl, vizRootExpr, shaderCreator) {
+    vizRootExpr._setUID(new IDGenerator());
     let tid = {};
     const colorModifier = vizRootExpr._applyToShaderSource(name => {
         if (tid[name] === undefined) {
