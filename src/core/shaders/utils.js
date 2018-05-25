@@ -1,6 +1,7 @@
 import ProgramCache from './ProgramCache';
 
 let programID = 1;
+const shaderCache = new ProgramCache();
 const programCache = new ProgramCache();
 
 /**
@@ -25,6 +26,9 @@ export function compileProgram(gl, glslVS, glslFS) {
 }
 
 function compileShader(gl, sourceCode, type) {
+    if (shaderCache.has(gl, sourceCode)) {
+        return shaderCache.get(gl, sourceCode);
+    }
     const shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
@@ -33,6 +37,7 @@ function compileShader(gl, sourceCode, type) {
         gl.deleteShader(shader);
         throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
     }
+    shaderCache.set(gl, sourceCode, shader);
     return shader;
 }
 
