@@ -1,27 +1,25 @@
 
 # Animations
 
-CARTO VL provides a number of tools which can be used to create animated maps: maps that change dynamically, for example showing the change over time of some data attribute.
+CARTO VL provides a number of tools which can be used to create animated maps; that is, maps that change dynamically, for example showing the variation over time of some data attribute.
 
 ## Torque
 
-The main tool for animation is the `torque` expression, which allows computing values varying in time for each feature; these values can be used to filter (i.e. show/hide) features, or to be applied to any of the styling properties (color, width, etc.). The name of this function is inspired by https://carto.com/torque/ which is a previous CARTO technology to create temporal maps, however, they are different technologies and only the CARTO VL documentation should be used to use CARTO VL `torque`.
+The main tool for animation is the `torque` expression, which allows computing values varying in time for each feature; these values can be used to filter (i.e. show/hide) features, or to be applied to any of the styling properties (color, width, etc.). The name of this function is inspired by https://carto.com/torque/ which is a previous CARTO technology to create temporal maps. However, they are different technologies and only the CARTO VL documentation should be used to use CARTO VL `torque`.
 
 What torque does is generate a set of cyclic values over a duration of time (10 seconds by default).
+
 ```
 torque(input, duration, fade(fadeIn, fadeOut))
 ```
 
 ### Input value parameter
 
-The input value is a numeric or date property expression or a generic numeric expression (in this case the [0,1] range of the expression will be used, this is very useful since you can use `linear`).
-A special and common case is to use a property for this argument, in which case it will be automatically
-mapped to the minimum and maximum values of the property. Thus, `torque($time)` would be equivalent to
+The first parameter of `torque`, the input value, is a numeric or date property expression or a generic numeric expression (in which case the [0,1] range of the expression will be used, this is very useful since you can use `linear`).
+A special and common case is to use a property for this argument, in which case it will be automatically mapped to the minimum and maximum values of the property. Thus, `torque($time)` would be equivalent to
 `torque(linear($time, globalMin($time), globalMax($time)))`
 
-The `linear(value, min, max)` function applies a linear map to a value, in a way that the `min` value is mapped to 0 and the `max` value is mapped to 1. This allows to easily adjust the range of values of any expression to the 0,1 range. Values outside the [0,1] range won't appear on the animation. This means that if we have data for an entire year and we want to animate between February and June we can use: `torque(linear($month, 2, 6))`.
-
-// TODO timestamp
+The `linear(value, min, max)` function applies a linear map to a value, in a way that the `min` value is mapped to 0 and the `max` value is mapped to 1. This allows to easily adjust the range of values of any expression to the [0,1] range. Values outside the [0,1] range won't appear on the animation. This means that if we have data for an entire year and we want to animate between February and June we can use: `torque(linear($month, 2, 6))`. Similarly, if we have a timestamp property `$date` in our data we could select a specific period using `time` expressions: `torque(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))`
 
 ### duration parameter
 
@@ -115,6 +113,3 @@ And the result:
 
 ![animation demonstration](toque_red_stroke_4.gif "Simple animation")
 
-TODO: real examples, like:
-
-https://cartodb.github.io/carto-vl/examples/editor/index.html#eyJhIjoidXNkbV9hbGxfMjAxOCIsImIiOiIiLCJjIjoiY2FydG9nbCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChidWNrZXRzKCRkbSwwLDEsMiwzLDQpLHBpbmt5bCksYmxlbmQoMC43LDAuOSxsaW5lYXIoJGRtLDAsMykpKVxuZmlsdGVyOiB0b3JxdWUobGluZWFyKCRkYXRlLHRpbWUoJzIwMTgtMDEtMDFUMDA6MDA6MDBaJyksdGltZSgnMjAxOC0wNC0yNFQwMDowMDowMFonKSksMTcsZmFkZSgyLDIpKSIsImYiOnsibG5nIjotODAuMjk1NTQxNzE1NDU0NDIsImxhdCI6MzUuODIzMjAxMzMyNTEwMTk1fSwiZyI6NS45NzQ2NzE4MTIxMDQzNDUsImgiOiJWb3lhZ2VyIn0=
