@@ -102,6 +102,238 @@
 
         
                 
+<h4 class="name" id="Category">Category</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Category Expressions.</p>
+<p>Associated to expressions that return is a category string. When these expressions are evaluated it should return a JavaScript string.</p>
+<p>JavaScript strings are automatically converted to Category Expressions.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Color">Color</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Color Expressions.</p>
+<p>Associated to expressions that return a color. When these expressions are evaluated it should return a RGBA object like:</p>
+<pre class="prettyprint source"><code>{ r: 255, g: 255, b: 255, a: 1.0 }</code></pre>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Date">Date</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Date Expressions.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Fade">Fade</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Fade Expressions.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
 <h4 class="name" id="Feature">Feature</h4>
 
 
@@ -756,6 +988,123 @@
 
             
                 
+<h4 class="name" id="Number">Number</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Numeric Expressions.</p>
+<p>Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.</p>
+<p>JavaScript numbers are automatically converted to Numeric Expressions.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="Palette">Palette</h4>
+
+
+
+
+<div class="description">
+    <p>Type of Palette Expressions.</p>
+<p>More information in <a href="carto.expressions.html#.palettes">carto.expressions.palettes</a>.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
 <h4 class="name" id="VizSpec">VizSpec</h4>
 
 
@@ -814,7 +1163,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -837,7 +1186,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -860,7 +1209,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -883,7 +1232,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -906,7 +1255,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -917,29 +1266,6 @@ For a better understanding we recommend reading the VIZ guide</p>
             
 
             <td class="description last"><p>filter features by removing from rendering and interactivity all the features that don't pass the test</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>order</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>rendering order of the features, only applicable to points</p></td>
         </tr>
 
     
@@ -1953,13 +2279,13 @@ This is useful to create external widgets that are refreshed reactively to chang
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 23 2018 17:26:57 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 25 2018 14:34:44 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

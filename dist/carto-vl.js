@@ -75,7 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 43);
+/******/ 	return __webpack_require__(__webpack_require__.s = 45);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -104,8 +104,7 @@ let uid = 0;
  * @name Base
  * @hideconstructor
  * @abstract
- * @class
- * @api
+ * @IGNOREapi
  */
 class Base {
     /**
@@ -116,16 +115,14 @@ class Base {
      */
     constructor(children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(children[name]));
+        Object.keys(children).map(name => this[name] = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(children[name]));
         this._getChildren().map(child => child.parent = this);
-        this._metaBindings = [];
         this.preface = '';
         this._shaderBindings = new Map();
         this._uid = uid++;
     }
 
     _bind(metadata) {
-        this._metaBindings.push(metadata);
         this._compile(metadata);
         return this;
     }
@@ -247,7 +244,7 @@ class Base {
      */
     blendTo(final, duration = 500) {
         //TODO blendFunc = 'linear'
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(this, final, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration));
         parent.replaceChild(this, blender);
@@ -256,7 +253,7 @@ class Base {
     }
 
     _blendFrom(final, duration = 500, interpolator = null) {
-        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(final);
+        final = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(final);
         const parent = this.parent;
         const blender = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["blend"])(final, this, Object(__WEBPACK_IMPORTED_MODULE_1__functions__["animate"])(duration), interpolator);
         parent.replaceChild(this, blender);
@@ -288,24 +285,24 @@ class Base {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["m"] = implicitCast;
-/* harmony export (immutable) */ __webpack_exports__["l"] = hexToRgb;
-/* harmony export (immutable) */ __webpack_exports__["j"] = getOrdinalFromIndex;
-/* harmony export (immutable) */ __webpack_exports__["k"] = getStringErrorPreface;
+/* harmony export (immutable) */ __webpack_exports__["l"] = implicitCast;
+/* harmony export (immutable) */ __webpack_exports__["k"] = hexToRgb;
+/* harmony export (immutable) */ __webpack_exports__["i"] = getOrdinalFromIndex;
+/* harmony export (immutable) */ __webpack_exports__["j"] = getStringErrorPreface;
 /* unused harmony export throwInvalidType */
 /* unused harmony export throwInvalidInstance */
 /* unused harmony export throwInvalidNumber */
 /* unused harmony export throwInvalidArray */
 /* unused harmony export throwInvalidString */
-/* harmony export (immutable) */ __webpack_exports__["e"] = checkLooseType;
-/* harmony export (immutable) */ __webpack_exports__["c"] = checkExpression;
-/* harmony export (immutable) */ __webpack_exports__["h"] = checkType;
-/* harmony export (immutable) */ __webpack_exports__["d"] = checkInstance;
-/* harmony export (immutable) */ __webpack_exports__["f"] = checkNumber;
-/* harmony export (immutable) */ __webpack_exports__["g"] = checkString;
-/* harmony export (immutable) */ __webpack_exports__["b"] = checkArray;
-/* harmony export (immutable) */ __webpack_exports__["i"] = clamp;
-/* harmony export (immutable) */ __webpack_exports__["n"] = mix;
+/* harmony export (immutable) */ __webpack_exports__["d"] = checkLooseType;
+/* harmony export (immutable) */ __webpack_exports__["b"] = checkExpression;
+/* harmony export (immutable) */ __webpack_exports__["g"] = checkType;
+/* harmony export (immutable) */ __webpack_exports__["c"] = checkInstance;
+/* harmony export (immutable) */ __webpack_exports__["e"] = checkNumber;
+/* harmony export (immutable) */ __webpack_exports__["f"] = checkString;
+/* unused harmony export checkArray */
+/* harmony export (immutable) */ __webpack_exports__["h"] = clamp;
+/* harmony export (immutable) */ __webpack_exports__["m"] = mix;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
 
@@ -322,6 +319,9 @@ function implicitCast(value) {
     }
     if (typeof value == 'string') {
         return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["category"])(value);
+    }
+    if (Array.isArray(value)) {
+        return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["array"])(value);
     }
     return value;
 }
@@ -454,11 +454,7 @@ function checkInstance(expressionName, parameterName, parameterIndex, expectedCl
 }
 
 function checkNumber(expressionName, parameterName, parameterIndex, number) {
-    if (!Number.isFinite(number) &&
-        number !== Infinity &&
-        number !== -Infinity &&
-        !Number.isNaN(number)
-    ) {
+    if (!_isNumber(number)) {
         throwInvalidNumber(expressionName, parameterName, parameterIndex, number);
     }
 }
@@ -496,45 +492,47 @@ function _isNumber(value) {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return in_; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "prop", function() { return property; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "date", function() { return time; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "var", function() { return variable; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_animate__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_belongs_js__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_blend__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_category__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_constant__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_hex__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_linear__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_near__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_now__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_number__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_property__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_time__ = __webpack_require__(57);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_top__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_torque__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_unary__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_variable__ = __webpack_require__(59);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__expressions_xyz__ = __webpack_require__(62);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__expressions_zoom__ = __webpack_require__(63);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["b"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__expressions_animate__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__expressions_basic_array__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_belongs_js__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_between__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_binary__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__expressions_blend__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__expressions_buckets__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__expressions_basic_category__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__expressions_color_CIELab__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__expressions_color_hex__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__expressions_color_hsl__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__expressions_color_hsv__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__expressions_interpolators__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__expressions_linear__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__expressions_color_named_color__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__expressions_near__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__expressions_now__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__expressions_basic_number__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__expressions_color_opacity__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__expressions_color_palettes__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__expressions_basic_property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__expressions_classifier__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__expressions_ramp__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__expressions_color_rgb__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__expressions_time__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__expressions_top__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__expressions_torque__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__expressions_unary__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_31__expressions_basic_variable__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_34__expressions_xyz__ = __webpack_require__(65);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_35__expressions_zoom__ = __webpack_require__(66);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return __WEBPACK_IMPORTED_MODULE_22__expressions_color_palettes__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["b"]; });
 /**
  *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
  *  A viz has the following properties:
@@ -591,13 +589,73 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * type of their parameters.
  *
  * The most important types are:
- *  - **Numeric** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
+ *  - **Numer** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
  *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
  * @namespace carto.expressions
  * @api
  */
+
+
+/**
+ * Type of Numeric Expressions.
+ *
+ * Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.
+ *
+ * JavaScript numbers are automatically converted to Numeric Expressions.
+ *
+ * @typedef {} Number
+ * @api
+ */
+
+/**
+ * Type of Category Expressions.
+ *
+ * Associated to expressions that return is a category string. When these expressions are evaluated it should return a JavaScript string.
+ *
+ * JavaScript strings are automatically converted to Category Expressions.
+ *
+ * @typedef {} Category
+ * @api
+ */
+
+/**
+ * Type of Color Expressions.
+ *
+ * Associated to expressions that return a color. When these expressions are evaluated it should return a RGBA object like:
+ *
+ * ```
+ * { r: 255, g: 255, b: 255, a: 1.0 }
+ * ```
+ *
+ * @typedef {} Color
+ * @api
+ */
+
+/**
+ * Type of Date Expressions.
+ *
+ * @typedef {} Date
+ * @api
+ */
+
+/**
+ * Type of Fade Expressions.
+ *
+ * @typedef {} Fade
+ * @api
+ */
+
+/**
+ * Type of Palette Expressions.
+ *
+ * More information in {@link carto.expressions.palettes|carto.expressions.palettes}.
+ *
+ * @typedef {} Palette
+ * @api
+ */
+
 
 
 
@@ -712,56 +770,60 @@ const animate = (...args) => new __WEBPACK_IMPORTED_MODULE_0__expressions_animat
 /* harmony export (immutable) */ __webpack_exports__["animate"] = animate;
 
 
-const in_ = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_belongs_js__["a" /* In */](...args);
-const nin = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_belongs_js__["b" /* Nin */](...args);
+const array = (...args) => new __WEBPACK_IMPORTED_MODULE_1__expressions_basic_array__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["array"] = array;
+
+
+const in_ = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_belongs_js__["a" /* In */](...args);
+const nin = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_belongs_js__["b" /* Nin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["nin"] = nin;
 
 
 
-const between = (...args) => new __WEBPACK_IMPORTED_MODULE_2__expressions_between__["a" /* default */](...args);
+const between = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_between__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["between"] = between;
 
 
-const mul = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["j" /* Mul */](...args);
+const mul = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["j" /* Mul */](...args);
 /* harmony export (immutable) */ __webpack_exports__["mul"] = mul;
 
-const div = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["c" /* Div */](...args);
+const div = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["c" /* Div */](...args);
 /* harmony export (immutable) */ __webpack_exports__["div"] = div;
 
-const add = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["a" /* Add */](...args);
+const add = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["a" /* Add */](...args);
 /* harmony export (immutable) */ __webpack_exports__["add"] = add;
 
-const sub = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["n" /* Sub */](...args);
+const sub = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["n" /* Sub */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sub"] = sub;
 
-const pow = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["m" /* Pow */](...args);
+const pow = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["m" /* Pow */](...args);
 /* harmony export (immutable) */ __webpack_exports__["pow"] = pow;
 
-const mod = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["i" /* Mod */](...args);
+const mod = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["i" /* Mod */](...args);
 /* harmony export (immutable) */ __webpack_exports__["mod"] = mod;
 
-const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["e" /* GreaterThan */](...args);
+const greaterThan = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["e" /* GreaterThan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["greaterThan"] = greaterThan;
 
-const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["f" /* GreaterThanOrEqualTo */](...args);
+const greaterThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["f" /* GreaterThanOrEqualTo */](...args);
 /* harmony export (immutable) */ __webpack_exports__["greaterThanOrEqualTo"] = greaterThanOrEqualTo;
 
-const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["g" /* LessThan */](...args);
+const lessThan = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["g" /* LessThan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["lessThan"] = lessThan;
 
-const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["h" /* LessThanOrEqualTo */](...args);
+const lessThanOrEqualTo = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["h" /* LessThanOrEqualTo */](...args);
 /* harmony export (immutable) */ __webpack_exports__["lessThanOrEqualTo"] = lessThanOrEqualTo;
 
-const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["d" /* Equals */](...args);
+const equals = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["d" /* Equals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["equals"] = equals;
 
-const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["k" /* NotEquals */](...args);
+const notEquals = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["k" /* NotEquals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["notEquals"] = notEquals;
 
-const and = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["b" /* And */](...args);
+const and = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["b" /* And */](...args);
 /* harmony export (immutable) */ __webpack_exports__["and"] = and;
 
-const or = (...args) => new __WEBPACK_IMPORTED_MODULE_3__expressions_binary__["l" /* Or */](...args);
+const or = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_binary__["l" /* Or */](...args);
 /* harmony export (immutable) */ __webpack_exports__["or"] = or;
 
 const gt = greaterThan;
@@ -783,251 +845,251 @@ const neq = notEquals;
 /* harmony export (immutable) */ __webpack_exports__["neq"] = neq;
 
 
-const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_4__expressions_blend__["a" /* default */](...args);
+const blend = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_blend__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["blend"] = blend;
 
 
-const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_5__expressions_buckets__["a" /* default */](...args);
+const buckets = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_buckets__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["buckets"] = buckets;
 
 
-const category = (...args) => new __WEBPACK_IMPORTED_MODULE_6__expressions_category__["a" /* default */](...args);
-/* harmony export (immutable) */ __webpack_exports__["category"] = category;
-
-
-const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_CIELab__["a" /* default */](...args);
+const cielab = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_color_CIELab__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cielab"] = cielab;
 
 
-const clusterAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["a" /* ClusterAvg */](...args);
+const clusterAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__["a" /* ClusterAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["clusterAvg"] = clusterAvg;
 
-const clusterMax = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["b" /* ClusterMax */](...args);
+const clusterMax = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__["b" /* ClusterMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["clusterMax"] = clusterMax;
 
-const clusterMin = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["c" /* ClusterMin */](...args);
+const clusterMin = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__["c" /* ClusterMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["clusterMin"] = clusterMin;
 
-const clusterMode = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["d" /* ClusterMode */](...args);
+const clusterMode = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__["d" /* ClusterMode */](...args);
 /* harmony export (immutable) */ __webpack_exports__["clusterMode"] = clusterMode;
 
-const clusterSum = (...args) => new __WEBPACK_IMPORTED_MODULE_8__expressions_clusterAggregation__["e" /* ClusterSum */](...args);
+const clusterSum = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_aggregation_clusterAggregation__["e" /* ClusterSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["clusterSum"] = clusterSum;
 
 
-const constant = (...args) => new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](...args);
+const constant = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["constant"] = constant;
 
 
-const hex = (...args) => new __WEBPACK_IMPORTED_MODULE_10__expressions_hex__["a" /* default */](...args);
+const hex = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_color_hex__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hex"] = hex;
 
 
-const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__["a" /* HSL */](...args);
+const hsl = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_color_hsl__["a" /* HSL */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsl"] = hsl;
 
-const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_11__expressions_hsl__["b" /* HSLA */](...args);
+const hsla = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_color_hsl__["b" /* HSLA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsla"] = hsla;
 
 
-const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__["a" /* HSV */](...args);
+const hsv = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_color_hsv__["a" /* HSV */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsv"] = hsv;
 
-const hsva = (...args) => new __WEBPACK_IMPORTED_MODULE_12__expressions_hsv__["b" /* HSVA */](...args);
+const hsva = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_color_hsv__["b" /* HSVA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["hsva"] = hsva;
 
 
-const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__["a" /* Cubic */](...args);
+const cubic = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_interpolators__["a" /* Cubic */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cubic"] = cubic;
 
-const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_13__expressions_interpolators__["b" /* ILinear */](...args);
+const ilinear = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_interpolators__["b" /* ILinear */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ilinear"] = ilinear;
 
 
-const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_14__expressions_linear__["a" /* default */](...args);
+const linear = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_linear__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["linear"] = linear;
 
 
-const namedColor = (...args) => new __WEBPACK_IMPORTED_MODULE_15__expressions_named_color__["b" /* NamedColor */](...args);
+const namedColor = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_color_named_color__["b" /* NamedColor */](...args);
 /* harmony export (immutable) */ __webpack_exports__["namedColor"] = namedColor;
 
 
-const near = (...args) => new __WEBPACK_IMPORTED_MODULE_16__expressions_near__["a" /* default */](...args);
+const near = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_near__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["near"] = near;
 
 
-const now = (...args) => new __WEBPACK_IMPORTED_MODULE_17__expressions_now__["a" /* default */](...args);
+const now = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_now__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["now"] = now;
 
 
-const number = (...args) => new __WEBPACK_IMPORTED_MODULE_18__expressions_number__["a" /* default */](...args);
+const number = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_basic_number__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["number"] = number;
 
 
-const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_19__expressions_opacity__["a" /* default */](...args);
+const opacity = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_color_opacity__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["opacity"] = opacity;
 
 
-const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["a" /* Asc */](...args);
+const asc = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["a" /* Asc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["asc"] = asc;
 
-const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["b" /* Desc */](...args);
+const desc = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["b" /* Desc */](...args);
 /* harmony export (immutable) */ __webpack_exports__["desc"] = desc;
 
-const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["c" /* NoOrder */](...args);
+const noOrder = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["c" /* NoOrder */](...args);
 /* harmony export (immutable) */ __webpack_exports__["noOrder"] = noOrder;
 
-const width = (...args) => new __WEBPACK_IMPORTED_MODULE_20__expressions_ordering__["d" /* Width */](...args);
+const width = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_ordering__["d" /* Width */](...args);
 /* harmony export (immutable) */ __webpack_exports__["width"] = width;
 
 
-const inverse = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["b" /* Inverse */](...args);
-/* harmony export (immutable) */ __webpack_exports__["inverse"] = inverse;
+const reverse = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_color_palettes__["a" /* Reverse */](...args);
+/* harmony export (immutable) */ __webpack_exports__["reverse"] = reverse;
 
 
-const customPalette = (...args) => new __WEBPACK_IMPORTED_MODULE_21__expressions_palettes__["a" /* CustomPalette */](...args);
-/* harmony export (immutable) */ __webpack_exports__["customPalette"] = customPalette;
-
-
-const property = (...args) => new __WEBPACK_IMPORTED_MODULE_22__expressions_property__["a" /* default */](...args);
+const property = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_basic_property__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["property"] = property;
 
 
 
-const viewportQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["d" /* ViewportQuantiles */](...args);
+const viewportQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_classifier__["d" /* ViewportQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportQuantiles"] = viewportQuantiles;
 
-const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["b" /* GlobalQuantiles */](...args);
+const globalQuantiles = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_classifier__["b" /* GlobalQuantiles */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalQuantiles"] = globalQuantiles;
 
-const globalEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["a" /* GlobalEqIntervals */](...args);
+const globalEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_classifier__["a" /* GlobalEqIntervals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalEqIntervals"] = globalEqIntervals;
 
-const viewportEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_23__expressions_classifier__["c" /* ViewportEqIntervals */](...args);
+const viewportEqIntervals = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_classifier__["c" /* ViewportEqIntervals */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportEqIntervals"] = viewportEqIntervals;
 
 
-const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_24__expressions_ramp__["a" /* default */](...args);
+const ramp = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_ramp__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ramp"] = ramp;
 
 
-const rgb = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__["a" /* RGB */](...args);
+const rgb = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_color_rgb__["a" /* RGB */](...args);
 /* harmony export (immutable) */ __webpack_exports__["rgb"] = rgb;
 
-const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_25__expressions_rgb__["b" /* RGBA */](...args);
+const rgba = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_color_rgb__["b" /* RGBA */](...args);
 /* harmony export (immutable) */ __webpack_exports__["rgba"] = rgba;
 
 
-const time = (...args) => new __WEBPACK_IMPORTED_MODULE_26__expressions_time__["a" /* default */](...args);
+const category = (...args) => new __WEBPACK_IMPORTED_MODULE_7__expressions_basic_category__["a" /* default */](...args);
+/* harmony export (immutable) */ __webpack_exports__["category"] = category;
+
+
+const time = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_time__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["time"] = time;
 
 
-const top = (...args) => new __WEBPACK_IMPORTED_MODULE_27__expressions_top__["a" /* default */](...args);
+
+const top = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_top__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["top"] = top;
 
 
-const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_torque__["a" /* Fade */](...args);
+const fade = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_torque__["a" /* Fade */](...args);
 /* harmony export (immutable) */ __webpack_exports__["fade"] = fade;
 
-const torque = (...args) => new __WEBPACK_IMPORTED_MODULE_28__expressions_torque__["b" /* Torque */](...args);
+const torque = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_torque__["b" /* Torque */](...args);
 /* harmony export (immutable) */ __webpack_exports__["torque"] = torque;
 
 
-const log = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["f" /* Log */](...args);
+const log = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["f" /* Log */](...args);
 /* harmony export (immutable) */ __webpack_exports__["log"] = log;
 
-const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["j" /* Sqrt */](...args);
+const sqrt = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["j" /* Sqrt */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sqrt"] = sqrt;
 
-const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["i" /* Sin */](...args);
+const sin = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["i" /* Sin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sin"] = sin;
 
-const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["c" /* Cos */](...args);
+const cos = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["c" /* Cos */](...args);
 /* harmony export (immutable) */ __webpack_exports__["cos"] = cos;
 
-const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["k" /* Tan */](...args);
+const tan = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["k" /* Tan */](...args);
 /* harmony export (immutable) */ __webpack_exports__["tan"] = tan;
 
-const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["h" /* Sign */](...args);
+const sign = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["h" /* Sign */](...args);
 /* harmony export (immutable) */ __webpack_exports__["sign"] = sign;
 
-const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["a" /* Abs */](...args);
+const abs = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["a" /* Abs */](...args);
 /* harmony export (immutable) */ __webpack_exports__["abs"] = abs;
 
-const isNaN = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["e" /* IsNaN */](...args);
+const isNaN = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["e" /* IsNaN */](...args);
 /* harmony export (immutable) */ __webpack_exports__["isNaN"] = isNaN;
 
-const not = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["g" /* Not */](...args);
+const not = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["g" /* Not */](...args);
 /* harmony export (immutable) */ __webpack_exports__["not"] = not;
 
-const floor = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["d" /* Floor */](...args);
+const floor = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["d" /* Floor */](...args);
 /* harmony export (immutable) */ __webpack_exports__["floor"] = floor;
 
-const ceil = (...args) => new __WEBPACK_IMPORTED_MODULE_29__expressions_unary__["b" /* Ceil */](...args);
+const ceil = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_unary__["b" /* Ceil */](...args);
 /* harmony export (immutable) */ __webpack_exports__["ceil"] = ceil;
 
 
-const variable = (...args) => new __WEBPACK_IMPORTED_MODULE_30__expressions_variable__["a" /* default */](...args);
+const variable = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_basic_variable__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["variable"] = variable;
 
 
 
-const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["a" /* ViewportAvg */](...args);
+const viewportAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["a" /* ViewportAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportAvg"] = viewportAvg;
 
-const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["d" /* ViewportMax */](...args);
+const viewportMax = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["d" /* ViewportMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMax"] = viewportMax;
 
-const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["e" /* ViewportMin */](...args);
+const viewportMin = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["e" /* ViewportMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportMin"] = viewportMin;
 
-const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["g" /* ViewportSum */](...args);
+const viewportSum = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["g" /* ViewportSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportSum"] = viewportSum;
 
-const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["b" /* ViewportCount */](...args);
+const viewportCount = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["b" /* ViewportCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportCount"] = viewportCount;
 
-const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["f" /* ViewportPercentile */](...args);
+const viewportPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["f" /* ViewportPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportPercentile"] = viewportPercentile;
 
-const viewportHistogram = (...args) => new __WEBPACK_IMPORTED_MODULE_31__expressions_viewportAggregation__["c" /* ViewportHistogram */](...args);
+const viewportHistogram = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_aggregation_viewportAggregation__["c" /* ViewportHistogram */](...args);
 /* harmony export (immutable) */ __webpack_exports__["viewportHistogram"] = viewportHistogram;
 
-const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["a" /* GlobalAvg */](...args);
+const globalAvg = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["a" /* GlobalAvg */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalAvg"] = globalAvg;
 
-const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["c" /* GlobalMax */](...args);
+const globalMax = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["c" /* GlobalMax */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMax"] = globalMax;
 
-const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["d" /* GlobalMin */](...args);
+const globalMin = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["d" /* GlobalMin */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalMin"] = globalMin;
 
-const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["f" /* GlobalSum */](...args);
+const globalSum = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["f" /* GlobalSum */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalSum"] = globalSum;
 
-const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["b" /* GlobalCount */](...args);
+const globalCount = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["b" /* GlobalCount */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalCount"] = globalCount;
 
-const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_32__expressions_globalAggregation__["e" /* GlobalPercentile */](...args);
+const globalPercentile = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_aggregation_globalAggregation__["e" /* GlobalPercentile */](...args);
 /* harmony export (immutable) */ __webpack_exports__["globalPercentile"] = globalPercentile;
 
 
-const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_33__expressions_xyz__["a" /* default */](...args);
+const xyz = (...args) => new __WEBPACK_IMPORTED_MODULE_34__expressions_xyz__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["xyz"] = xyz;
 
 
-const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_34__expressions_zoom__["a" /* default */](...args);
+const zoom = (...args) => new __WEBPACK_IMPORTED_MODULE_35__expressions_zoom__["a" /* default */](...args);
 /* harmony export (immutable) */ __webpack_exports__["zoom"] = zoom;
 
 
-const TRUE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](1);
+const TRUE = new __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__["a" /* default */](1);
 /* harmony export (immutable) */ __webpack_exports__["TRUE"] = TRUE;
 
-const FALSE = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](0);
+const FALSE = new __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__["a" /* default */](0);
 /* harmony export (immutable) */ __webpack_exports__["FALSE"] = FALSE;
 
-const PI = new __WEBPACK_IMPORTED_MODULE_9__expressions_constant__["a" /* default */](Math.PI);
+const PI = new __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__["a" /* default */](Math.PI);
 /* harmony export (immutable) */ __webpack_exports__["PI"] = PI;
+
+const E = new __WEBPACK_IMPORTED_MODULE_10__expressions_basic_constant__["a" /* default */](Math.E);
+/* harmony export (immutable) */ __webpack_exports__["E"] = E;
 
 
 
@@ -1055,9 +1117,9 @@ const CATEGORIES_TO_NUMBER = 8;
 /**
  * Multiply two numeric expressions.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Color} x - First value to multiply
+ * @param {Number|Color} y - Second value to multiply
+ * @return {Number|Color} Result of the multiplication
  *
  * @example <caption>Number multiplication.</caption>
  * const s = carto.expressions;
@@ -1086,9 +1148,9 @@ const Mul = genBinaryOp('mul',
 /**
  * Divide two numeric expressions.
  *
- * @param {carto.expressions.Base|number} numerator - Numerator of the division
- * @param {carto.expressions.Base|number} denominator - Denominator of the division
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Color} numerator - Numerator of the division
+ * @param {Number|Color} denominator - Denominator of the division
+ * @return {Number|Color} Result of the division
  *
  * @example <caption>Number division.</caption>
  * const s = carto.expressions;
@@ -1117,9 +1179,9 @@ const Div = genBinaryOp('div',
 /**
  * Add two numeric expressions.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Color} x - First value to add
+ * @param {Number|Color} y - Second value to add
+ * @return {Number|Color} Result of the addition
  *
  * @example <caption>Number addition.</caption>
  * const s = carto.expressions;
@@ -1148,9 +1210,9 @@ const Add = genBinaryOp('add',
 /**
  * Substract two numeric expressions.
  *
- * @param {carto.expressions.Base|number} minuend - The minuend of the subtraction
- * @param {carto.expressions.Base|number} subtrahend - The subtrahend of the subtraction
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Color} minuend - The minuend of the subtraction
+ * @param {Number|Color} subtrahend - The subtrahend of the subtraction
+ * @return {Number|Color} Result of the substraction
  *
  * @example <caption>Number subtraction.</caption>
  * const s = carto.expressions;
@@ -1179,9 +1241,9 @@ const Sub = genBinaryOp('sub',
 /**
  * Modulus of two numeric expressions, mod returns a numeric expression with the value of x modulo y. This is computed as x - y * floor(x/y).
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - First value of the modulus
+ * @param {Number} y - Second value of the modulus
+ * @return {Number} Result of the modulus
  *
  * @example <caption>Number modulus.</caption>
  * const s = carto.expressions;
@@ -1211,9 +1273,9 @@ const Mod = genBinaryOp('mod',
  * Compute the base to the exponent power, return a numeric expression with the value of the first parameter raised to the power of the second.
  * The result is undefined if x<0 or if x=0 and y≤0.
  *
- * @param {carto.expressions.Base|number} base - Numeric expression
- * @param {carto.expressions.Base|number} exponent - Numeric expression
- * @return {carto.expressions.Base} Numeric expression with base ^ exponent
+ * @param {Number} base - Base of the power
+ * @param {Number} exponent - Exponent of the power
+ * @return {Number} Result of the power
  *
  * @example <caption>Number power.</caption>
  * const s = carto.expressions;
@@ -1244,9 +1306,9 @@ const Pow = genBinaryOp('pow',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - Firt value of the comparison
+ * @param {Number} y - Firt value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price greater than 30.</caption>
  * const s = carto.expressions;
@@ -1277,9 +1339,9 @@ const GreaterThan = genBinaryOp('greaterThan',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - Firt value of the comparison
+ * @param {Number} y - Second value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price greater than or equal to 30.</caption>
  * const s = carto.expressions;
@@ -1310,9 +1372,9 @@ const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - Firt value of the comparison
+ * @param {Number} y - Second value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price less than 30.</caption>
  * const s = carto.expressions;
@@ -1343,9 +1405,9 @@ const LessThan = genBinaryOp('lessThan',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - Firt value of the comparison
+ * @param {Number} y - Second value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price less than or equal to 30.</caption>
  * const s = carto.expressions;
@@ -1376,9 +1438,9 @@ const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
- * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Category} x - Firt value of the comparison
+ * @param {Number|Category} y - Second value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30.</caption>
  * const s = carto.expressions;
@@ -1409,9 +1471,9 @@ const Equals = genBinaryOp('equals',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric or category expression, type must match `y` type
- * @param {carto.expressions.Base|number} y - Numeric or category expression, type must match `x` type
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number|Category} x - Firt value of the comparison
+ * @param {Number|Category} y - Second value of the comparison
+ * @return {Number} Result of the comparison: 0 or 1
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30.</caption>
  * const s = carto.expressions;
@@ -1444,9 +1506,9 @@ const NotEquals = genBinaryOp('notEquals',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - First value of the expression
+ * @param {Number} y - Second value of the expression
+ * @return {Number} Result of the expression
  *
  * @example <caption>Show only elements with price < 30 OR price > 1000.</caption>
  * const s = carto.expressions;
@@ -1482,9 +1544,9 @@ const Or = genBinaryOp('or',
  *
  * This returns a number expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression
- * @param {carto.expressions.Base|number} y - Numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @param {Number} x - First value of the expression
+ * @param {Number} y - Second value of the expression
+ * @return {Number} Result of the expression
  *
  * @example <caption>Show only elements with price < 30 AND category == 'fruit'.</caption>
  * const s = carto.expressions;
@@ -1519,8 +1581,8 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return Object(__WEBPACK_IMPORTED_MODULE_0__functions__["number"])(jsFn(a, b));
             }
-            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
-            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(b);
+            a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+            b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
 
             const signature = getSignature(a, b);
             if (signature !== undefined) {
@@ -1531,6 +1593,9 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
 
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
+        }
+        get value() {
+            return this.eval();
         }
         eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
@@ -1597,8 +1662,8 @@ function getReturnTypeFromSignature(signature) {
 /**
  * Compute the natural logarithm (base e) of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the natural logarithm
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the natural logarithm
+ * @return {Number}
  *
  * @example <caption>Natural Logarithm.</caption>
  * const s = carto.expressions;
@@ -1623,8 +1688,8 @@ const Log = genUnaryOp('log', x => Math.log(x), x => `log(${x})`);
 /**
  * Compute the square root of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the square root
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the square root
+ * @return {Number}
  *
  * @example <caption>Square root.</caption>
  * const s = carto.expressions;
@@ -1649,8 +1714,8 @@ const Sqrt = genUnaryOp('sqrt', x => Math.sqrt(x), x => `sqrt(${x})`);
 /**
  * Compute the sine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the sine in radians
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the sine in radians
+ * @return {Number}
  *
  * @example <caption>Sin.</caption>
  * const s = carto.expressions;
@@ -1675,8 +1740,8 @@ const Sin = genUnaryOp('sin', x => Math.sin(x), x => `sin(${x})`);
 /**
  * Compute the cosine of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the cosine in radians
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the cosine in radians
+ * @return {Number}
  *
  * @example <caption>Cos.</caption>
  * const s = carto.expressions;
@@ -1701,8 +1766,8 @@ const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
 /**
  * Compute the tangent of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the tangent in radians
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the tangent in radians
+ * @return {Number}
  *
  * @example <caption>Tan</caption>
  * const s = carto.expressions;
@@ -1729,8 +1794,8 @@ const Tan = genUnaryOp('tan', x => Math.tan(x), x => `tan(${x})`);
  * This means this function will return 1 if the number is positive, -1 if the number is negative
  * 0 if the number is 0 and -0 if the number is -0.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the sign
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the sign
+ * @return {Number}
  *
  * @example <caption>Sign.</caption>
  * const s = carto.expressions;
@@ -1755,8 +1820,8 @@ const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 /**
  * Compute the absolute value of a number x.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to compute the absolute value
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to compute the absolute value
+ * @return {Number}
  *
  * @example <caption>Abs.</caption>
  * const s = carto.expressions;
@@ -1783,8 +1848,8 @@ const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} x - Numeric expression to check
- * @return {carto.expressions.Base}
+ * @param {Number} x - Numeric expression to check
+ * @return {Number}
  *
  * @memberof carto.expressions
  * @name isNaN
@@ -1802,8 +1867,8 @@ const IsNaN = genUnaryOp('isNaN', x => Number.isNaN(x) ? 1 : 0, x => `(isnan(${x
  *  - When x is equal to 1 not(x) will be evaluated to 0
  *  - When x is equal to 0 not(x) will be evaluated to 1
  *
- * @param {carto.expressions.Base|number} x - Number to compute the not value
- * @return {carto.expressions.Base}
+ * @param {Number} x - Number to compute the not value
+ * @return {Number}
  *
  * @example <caption>Not.</caption>
  * const s = carto.expressions;
@@ -1832,8 +1897,8 @@ const Not = genUnaryOp('not', x => 1 - x, x => `(1.0 - ${x})`);
  *  - When x is equal to 0.8 floor(x) will be evaluated to 0
  *  - When x is equal to 1.3 floor(x) will be evaluated to 1
  *
- * @param {carto.expressions.Base|number} x - Number to compute the floor value
- * @return {carto.expressions.Base}
+ * @param {Number} x - Number to compute the floor value
+ * @return {Number}
  *
  * @example <caption>Floor.</caption>
  * const s = carto.expressions;
@@ -1862,8 +1927,8 @@ const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`);
  *  - When x is equal to 0.8 ceil(x) will be evaluated to 1
  *  - When x is equal to 1.3 ceil(x) will be evaluated to 2
  *
- * @param {carto.expressions.Base|number} x - Number to compute the ceil value
- * @return {carto.expressions.Base}
+ * @param {Number} x - Number to compute the ceil value
+ * @return {Number}
  *
  * @example <caption>Ceil.</caption>
  * const s = carto.expressions;
@@ -1888,17 +1953,20 @@ const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 function genUnaryOp(name, jsFn, glsl) {
     return class UnaryOperation extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
         constructor(a) {
-            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(a);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, 'x', 0, 'number', a);
+            a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
+        }
+        get value() {
+            return this.eval();
         }
         eval(feature) {
             return jsFn(this.a.eval(feature));
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, 'x', 0, 'number', this.a);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'x', 0, 'number', this.a);
             if (this.a.type != 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
@@ -1962,7 +2030,7 @@ function isObject(value) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(74);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__carto_error__ = __webpack_require__(83);
 
 
 /**
@@ -2063,7 +2131,7 @@ const column = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__basic_property__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils__ = __webpack_require__(1);
 
 
@@ -2074,8 +2142,10 @@ const column = {
  * Aggregate using the average. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated, must be a date or a number
- * @return {carto.expressions.Base} Aggregated column
+ * Note: `clusterAvg` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - Column of the table to be aggregated
+ * @return {Number} Aggregated column
  *
  * @example <caption>Use cluster average of the population as width.</caption>
  * const s = carto.expressions;
@@ -2101,8 +2171,10 @@ const ClusterAvg = genAggregationOp('avg', 'number');
  * Aggregate using the maximum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated, must be a date or a number
- * @return {carto.expressions.Base} Aggregated column
+ * Note: `clusterMax` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - Column of the table to be aggregated
+ * @return {Number} Aggregated column
  *
  * @example <caption>Use cluster maximum of the population as width.</caption>
  * const s = carto.expressions;
@@ -2128,8 +2200,10 @@ const ClusterMax = genAggregationOp('max', 'number');
  * Aggregate using the minimum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated, must be a date or a number
- * @return {carto.expressions.Base} Aggregated column
+ * Note: `clusterMin` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - Column of the table to be aggregated
+ * @return {Number} Aggregated column
  *
  * @example <caption>Use cluster minimum of the population as width.</caption>
  * const s = carto.expressions;
@@ -2155,18 +2229,20 @@ const ClusterMin = genAggregationOp('min', 'number');
  * Aggregate using the mode. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated, must be a string
- * @return {carto.expressions.Property} Aggregated column
+ * Note: `clusterMode` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
- * @example <caption>Use cluster mode of the population as width.</caption>
+ * @param {Category} property - Column of the table to be aggregated
+ * @return {Category} Aggregated column
+ *
+ * @example <caption>Use cluster mode of the population in a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.clusterMode(s.prop('population'))
+ *   color: s.ramp(s.clusterMode(s.prop('category')), s.palettes.PRISM)
  * });
  *
- * @example <caption>Use cluster mode of the population as width. (String)</caption>
+ * @example <caption>Use cluster mode of the population in a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: clusterMode($population)
+ *   color: ramp(clusterMode($category), PRISM)
  * `);
  *
  * @memberof carto.expressions
@@ -2182,8 +2258,10 @@ const ClusterMode = genAggregationOp('mode', 'category');
  * Aggregate using the sum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * @param {carto.expressions.Base} property - Column of the table to be aggregated, must be a date or a number
- * @return {carto.expressions.Base} Aggregated column
+ * Note: `clusterSum` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - Column of the table to be aggregated
+ * @return {Number} Aggregated column
  *
  * @example <caption>Use cluster sum of the population as width.</caption>
  * const s = carto.expressions;
@@ -2208,7 +2286,7 @@ const ClusterSum = genAggregationOp('sum', 'number');
 function genAggregationOp(aggName, aggType) {
     return class AggregationOperation extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(property) {
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["d" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__property__["a" /* default */], property);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["c" /* checkInstance */])(aggName, 'property', 0, __WEBPACK_IMPORTED_MODULE_2__basic_property__["a" /* default */], property);
             super({ property });
             this._aggName = aggName;
             this.type = aggType;
@@ -2228,7 +2306,7 @@ function genAggregationOp(aggName, aggType) {
         //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
         _compile(metadata) {
             super._compile(metadata);
-            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["h" /* checkType */])(aggName, 'property', 0, aggType, this.property);
+            Object(__WEBPACK_IMPORTED_MODULE_3__utils__["g" /* checkType */])(aggName, 'property', 0, aggType, this.property);
         }
         _applyToShaderSource(getGLSLforProperty) {
             return {
@@ -2265,7 +2343,7 @@ function genAggregationOp(aggName, aggType) {
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
  * @param {string} name - The property in the dataset that is going to be evaluated
- * @return {carto.expressions.Base}
+ * @return {Number|Category|Date}
  *
  * @example <caption>Display only cities with name different from "London".</caption>
  * const s = carto.expressions;
@@ -2289,21 +2367,22 @@ function genAggregationOp(aggName, aggType) {
  */
 class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(name) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('property', 'name', 0, name);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('property', 'name', 0, name);
         if (name == '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
     }
-
+    get value() {
+        return this.eval();
+    }
     eval(feature) {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
         return feature[this.name];
     }
-
     _compile(meta) {
         const metaColumn = meta.columns.find(c => c.name == this.name);
         if (!metaColumn) {
@@ -2338,6 +2417,55 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = compileProgram;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ShaderCache__ = __webpack_require__(69);
+
+
+let programID = 1;
+
+const shaderCache = new __WEBPACK_IMPORTED_MODULE_0__ShaderCache__["a" /* default */]();
+
+function compileProgram(gl, glslVS, glslFS) {
+    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
+    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
+    const program = gl.createProgram();
+    gl.attachShader(program, VS);
+    gl.attachShader(program, FS);
+    gl.linkProgram(program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(program));
+    }
+
+    return {
+        program: program,
+        programID: programID++
+    };
+}
+
+function compileShader(gl, sourceCode, type) {
+    if (shaderCache.has(gl, sourceCode)) {
+        return shaderCache.get(gl, sourceCode);
+    }
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, sourceCode);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        gl.deleteShader(shader);
+        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+    }
+    shaderCache.set(gl, sourceCode, shader);
+    return shader;
+}
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 
@@ -2346,8 +2474,8 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - must be `width()`
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
  * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
@@ -2368,7 +2496,7 @@ class Property extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
         super({});
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkInstance */])('asc', 'by', 0, Width, by);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('asc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -2378,8 +2506,8 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - must be `width()`
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
  * @example <caption>Descending order based on width.</caption>
  * const s = carto.expressions;
@@ -2400,7 +2528,7 @@ class Asc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(by) {
         super({});
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkInstance */])('desc', 'by', 0, Width, by);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkInstance */])('desc', 'by', 0, Width, by);
         this.type = 'orderer';
     }
 }
@@ -2410,7 +2538,7 @@ class Desc extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * No order expression.
  *
- * @return {carto.expressions.Base}
+ * @return {Order}
  *
  * @example <caption>No order.</caption>
  * const s = carto.expressions;
@@ -2440,7 +2568,7 @@ class NoOrder extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
  *
- * @return {carto.expressions.Base}
+ * @return {carto.expressions.Width}
  *
  * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
@@ -2469,14 +2597,14 @@ class Width extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Renderer; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shaders__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataframe__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz_functions__ = __webpack_require__(2);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__dataframe__["a"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__schema__; });
@@ -2914,7 +3042,7 @@ function getOrderingRenderBuckets(renderLayer) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3064,7 +3192,7 @@ function getRsysFromTile(x, y, z) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3078,7 +3206,7 @@ function getRsysFromTile(x, y, z) {
  * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
  *
  * @param {number} duration - Animation duration in milliseconds
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
  * @memberof carto.expressions
  * @name animate
@@ -3088,9 +3216,9 @@ function getRsysFromTile(x, y, z) {
 //TODO refactor to use uniformfloat class
 class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(duration) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('animate', 'duration', 0, duration);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('animate', 'duration', 0, duration);
         if (duration < 0) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
         }
         super({});
         this.aTime = Date.now();
@@ -3129,7 +3257,7 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3141,11 +3269,9 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Check if a categorical value belongs to a list of categories.
  *
- * This returns a numeric expression where 0 means `false` and 1 means `true`.
- *
- * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical whitelist
- * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the whitelist
- * @return {carto.expressions.Base} Numeric expression with the result of the check
+ * @param {Category} value - Categorical expression to be tested against the whitelist
+ * @param {Category[]} list - Multiple expression parameters that will form the whitelist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
@@ -3163,18 +3289,23 @@ class Animate extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * @function
  * @api
  */
-const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.some(cat => cat == p) ? 1 : 0);
+const In = generateBelongsExpression('in', IN_INLINE_MAKER, (value, list) => list.some(item => item == value) ? 1 : 0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = In;
 
 
+function IN_INLINE_MAKER(list) {
+    if (list.length == 0) {
+        return () => '0.';
+    }
+    return inline => `(${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+}
+
 /**
- * Check if value does not belong to the categories list given by the categories parameters.
+ * Check if value does not belong to the list of elements.
  *
- * This returns a numeric expression where 0 means `false` and 1 means `true`.
- *
- * @param {carto.expressions.Base|string} value - Categorical expression to be tested against the categorical blacklist
- * @param {carto.expressions.Base[]|string[]} categories - Multiple categorical expression parameters that will form the blacklist
- * @return {carto.expressions.Base} Numeric expression with the result of the check
+ * @param {Category} value - Categorical expression to be tested against the blacklist
+ * @param {Category[]} list - Multiple expression parameters that will form the blacklist
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
  * const s = carto.expressions;
@@ -3192,210 +3323,46 @@ const In = generateBelongsExpression('in', IN_INLINE_MAKER, (p, cats) => cats.so
  * @function
  * @api
  */
-const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (p, cats) => !cats.some(cat => cat == p) ? 1 : 0);
+const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (value, list) => list.some(item => item == value) ? 0 : 1);
 /* harmony export (immutable) */ __webpack_exports__["b"] = Nin;
 
 
-function IN_INLINE_MAKER(categories) {
-    if (categories.length == 0) {
-        return () => '0.';
-    }
-    return inline => `(${categories.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
-}
-
-function NIN_INLINE_MAKER(categories) {
-    if (categories.length == 0) {
+function NIN_INLINE_MAKER(list) {
+    if (list.length == 0) {
         return () => '1.';
     }
-    return inline => `(${categories.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `(${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
 function generateBelongsExpression(name, inlineMaker, jsEval) {
     return class BelongExpression extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
-        constructor(value, categories) {
-            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(value);
-            categories = categories || [];
+        constructor(value, list) {
+            value = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(value);
+            list = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(list);
 
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])(name, 'value', 0, value);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkArray */])(name, 'categories', 1, categories);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'value', 0, value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])(name, 'list', 1, list);
 
-            categories = categories.map(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */]);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])(name, 'value', 0, 'category', value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'list', 1, 'category-array', list);
 
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, 'value', 0, 'category', value);
-            categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])(name, '', index + 1, 'category', cat));
-
-            let children = {
-                value
-            };
-            categories.map((arg, index) => children[`arg${index}`] = arg);
+            let children = { value };
+            list.elems.map((arg, index) => children[`arg${index}`] = arg);
             super(children);
-            this.categories = categories;
-            this.inlineMaker = inlineMaker(this.categories);
+            this.list = list;
+            this.inlineMaker = inlineMaker(this.list.elems);
             this.type = 'number';
         }
         eval(feature) {
-            return jsEval(this.value.eval(feature), this.categories.map(category => category.eval(feature)));
+            return jsEval(this.value.eval(feature), this.list.eval());
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, 'value', 0, 'category', this.value);
-            this.categories.map((cat, index) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])(name, '', index + 1, 'category', cat));
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'value', 0, 'category', this.value);
+            Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])(name, 'list', 1, 'category-array', this.list);
         }
     };
 }
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return palettes; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Inverse; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-
-
-
-
-
-/**
- * Color palettes.
- *
- * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|CARTOColors} and {@link https://github.com/axismaps/colorbrewer/|ColorBrewer} palettes easily.
- * Use them with a {@link carto.expressions.ramp|ramp}
- *
- * The following palettes are availiable in the namespace {@link carto.expressions.palettes|carto.expressions.palettes}.
- *
- *  ```
- *  BURG, BURGYL, REDOR, ORYEL, PEACH, PINKYL, MINT, BLUGRN, DARKMINT, EMRLD, AG_GRNYL, BLUYL, TEAL, TEALGRN,
- *  PURP, PURPOR, SUNSET, MAGENTA, SUNSETDARK, AG_SUNSET, BRWNYL, ARMYROSE, FALL, GEYSER, TEMPS, TEALROSE, TROPIC,
- *  EARTH, ANTIQUE, BOLD, PASTEL, PRISM, SAFE, VIVID, CB_YLGN, CB_YLGNBU, CB_GNBU, CB_BUGN, CB_PUBUGN, CB_PUBU,
- *  CB_BUPU, CB_RDPU, CB_PURD, CB_ORRD, CB_YLORRD, CB_YLORBR, CB_PURPLES, CB_BLUES, CB_GREENS, CB_ORANGES, CB_REDS,
- *  CB_GREYS, CB_PUOR, CB_BRBG, CB_PRGN, CB_PIYG, CB_RDBU, CB_RDGY, CB_RDYLBU, CB_SPECTRAL, CB_RDYLGN, CB_ACCENT,
- *  CB_DARK2, CB_PAIRED, CB_PASTEL1, CB_PASTEL2, CB_SET1, CB_SET2, CB_SET3
- *  ```
- *
- * @example <caption>Using a color scheme.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   filter: s.ramp(s.prop('type'), s.palettes.PRISM);
- * });
- *
- * @example <caption>Using a color scheme. (String)</caption>
- * const viz = new carto.Viz(`
- *   filter: ramp($type, PRISM)
- * `);
- *
- * @name carto.expressions.palettes
- * @memberof carto.expressions
- * @api
- */
-const palettes = {};
-
-class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
-    constructor(name, subPalettes) {
-        super({});
-        this.type = 'palette';
-        this.name = name;
-        this.subPalettes = new Proxy(subPalettes, {
-            get: (target, name) => {
-                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
-                    return target[name].map(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* hexToRgb */]);
-                }
-            }
-        });
-        this.tags = subPalettes.tags;
-    }
-    getLongestSubPalette() {
-        const s = this.subPalettes;
-        for (let i = 20; i >= 0; i--) {
-            if (s[i]) {
-                return s[i];
-            }
-        }
-    }
-}
-
-class CustomPalette extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
-    // colors is a list of expression of type 'color'
-    constructor(elems) {
-        elems = elems || [];
-        if (!Array.isArray(elems)) {
-            elems = [elems];
-        }
-        elems = elems.map(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */]);
-        if (!elems.length) {
-            throw new Error('customPalette(): invalid parameters: must receive at least one argument');
-        }
-        const type = elems[0].type;
-        if (type == undefined) {
-            throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-        }
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('customPalette', 'colors[0]', 0, ['color', 'number'], elems[0]);
-        elems.map((color, index) => {
-            Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkExpression */])('customPalette', `colors[${index}]`, index, color);
-            if (color.type == undefined) {
-                throw new Error('customPalette(): invalid parameters, must be formed by constant expressions, they cannot depend on feature properties');
-            }
-            if (color.type != type) {
-                throw new Error('customPalette(): invalid parameters, invalid argument type combination');
-            }
-        });
-        super({});
-        this.type = type == 'color' ? 'customPalette' : 'customPaletteNumber';
-        try {
-            if (type == 'color') {
-                // in form [{ r: 0, g: 0, b: 0, a: 0 }, { r: 255, g: 255, b: 255, a: 255 }]
-                this.colors = elems.map(c => c.eval());
-            } else {
-                this.floats = elems.map(c => c.eval());
-            }
-        } catch (error) {
-            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = CustomPalette;
-
-
-Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
-    palettes[`${name.toUpperCase()}`] = new PaletteGenerator(name, __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name]);
-});
-
-class Inverse extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */]{
-    constructor(palette) {
-        super({});
-        this.type = 'palette';
-        this._originalPalette = palette;
-        this.tags = palette.tags;
-        this.subPalettes = new Proxy(palette.subPalettes, {
-            get: (target, name) => {
-                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
-                    return this._reversePalette(target[name]);
-                }
-                return target[name];
-            }
-        });
-    }
-    getLongestSubPalette() {
-        return this._reversePalette(this._originalPalette.getLongestSubPalette());
-    }
-    _reversePalette(palette) {
-        if (this.tags.includes('qualitative')) {
-            // Last color is 'others', therefore, we shouldn't change the order of that one
-            const copy = [...palette];
-            const others = copy.pop();
-            return [...copy.reverse(), others];
-
-        }
-        return [...palette].reverse();
-    }
-}
-
-
 
 
 /***/ }),
@@ -3429,6 +3396,29 @@ class Base {
 
 /***/ }),
 /* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__style_glsl__ = __webpack_require__(78);
+
+
+
+class BaseStyleShader {
+    constructor(gl, preface, inline) {
+        const fragmentShader = __WEBPACK_IMPORTED_MODULE_1__style_glsl__["a" /* FS */].replace('$PREFACE', preface).replace('$INLINE', inline);
+        const { program, programID } = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* compileProgram */])(gl, __WEBPACK_IMPORTED_MODULE_1__style_glsl__["b" /* VS */], fragmentShader);
+        this.program = program;
+        this.programID = programID;
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseStyleShader;
+
+
+
+/***/ }),
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3499,7 +3489,7 @@ function mitt(all                 ) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3513,10 +3503,10 @@ function mitt(all                 ) {
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {carto.expressions.Base|number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
- * @param {carto.expressions.Base|number} lowerLimit - Numeric expression with the lower limit of the range
- * @param {carto.expressions.Base|number} upperLimit -  Numeric expression with the upper limit of the range
- * @return {carto.expressions.Base} Numeric expression with the result of the check
+ * @param {Number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {Number} lowerLimit - Numeric expression with the lower limit of the range
+ * @param {Number} upperLimit -  Numeric expression with the upper limit of the range
+ * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where the population density is within the [50,100] range.</caption>
  * const s = carto.expressions;
@@ -3536,13 +3526,13 @@ function mitt(all                 ) {
  */
 class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(value, lowerLimit, upperLimit) {
-        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(value);
-        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(lowerLimit);
-        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(upperLimit);
+        value = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(value);
+        lowerLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(lowerLimit);
+        upperLimit = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(upperLimit);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'value', 0, 'number', value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'lowerLimit', 1, 'number', lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('between', 'upperLimit', 2, 'number', upperLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'value', 0, 'number', value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'lowerLimit', 1, 'number', lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('between', 'upperLimit', 2, 'number', upperLimit);
 
         super({ value, lowerLimit, upperLimit });
         this.type = 'number';
@@ -3556,9 +3546,9 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _compile(meta) {
         super._compile(meta);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'value', 0, 'number', this.value);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'lowerLimit', 1, 'number', this.lowerLimit);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('between', 'upperLimit', 2, 'number', this.upperLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'value', 0, 'number', this.value);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'lowerLimit', 1, 'number', this.lowerLimit);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('between', 'upperLimit', 2, 'number', this.upperLimit);
 
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
@@ -3568,26 +3558,26 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__animate__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__base__ = __webpack_require__(0);
 
 
 
 
 /**
- * Linearly interpolate from `a` to `b` based on *mix*.
+ * Linearly interpolate from `a` to `b` based on `mix`.
  *
- * @param {carto.expressions.Base|number} a - Numeric or color expression
- * @param {carto.expressions.Base|number} b - Numeric or color expression
- * @param {carto.expressions.Base|number} mix - Numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.expressions.Base} Numeric expression
+ * @param {Number|Color} a - Numeric or color expression, `a` type must match `b` type
+ * @param {Number|Color} b - Numeric or color expression, `b` type must match `a` type
+ * @param {Number} mix - Numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {Number|Color} Numeric or color expression with the same type as `a` and `b`
  *
- * @example <caption>Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels.</caption>
+ * @example <caption>Blend based on the zoom level to display a bubble map at high zoom levels and display fixed-sized points at low zoom levels.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.blend(3,
@@ -3596,14 +3586,14 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *           );
  * });
  *
- * @example <caption>Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels. (String)</caption>
+ * @example <caption>Blend based on the zoom level to display a bubble map at high zoom levels and display fixed-sized points at low zoom levels. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: blend(3,
- *                prop('dn'),
+ *                $dn,
  *                linear(zoom(), 2^10, 2^14)
  *          )
  * `);
- *
+ * 
  * @memberof carto.expressions
  * @name blend
  * @function
@@ -3611,17 +3601,17 @@ class Between extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
     constructor(a, b, mix, interpolator) {
-        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(b);
-        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(mix);
+        a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(b);
+        mix = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(mix);
 
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'a', 0, a);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'b', 1, b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* checkExpression */])('blend', 'mix', 2, mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'a', 0, a);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'b', 1, b);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* checkExpression */])('blend', 'mix', 2, mix);
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* checkLooseType */])('blend', 'mix', 2, 'number', mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* checkLooseType */])('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
@@ -3636,10 +3626,10 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
         }
     }
     eval(feature) {
-        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* clamp */])(this.mix.eval(feature), 0, 1);
+        const a = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* clamp */])(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
-        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["n" /* mix */])(x, y, a);
+        return Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* mix */])(x, y, a);
     }
     replaceChild(toReplace, replacer) {
         if (toReplace == this.mix) {
@@ -3651,7 +3641,7 @@ class Blend extends __WEBPACK_IMPORTED_MODULE_2__base__["a" /* default */] {
         super._compile(meta);
 
         abTypeCheck(this.a, this.b);
-        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* checkType */])('blend', 'mix', 1, 'number', this.mix);
+        Object(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* checkType */])('blend', 'mix', 1, 'number', this.mix);
 
         this.type = this.a.type;
 
@@ -3676,7 +3666,7 @@ function abTypeCheck(a, b) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3689,22 +3679,29 @@ function abTypeCheck(a, b) {
  * Wrapper around category names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
  *
  * @param {string} categoryName
- * @returns {carto.expressions.Base} category expression with the category name provided
+ * @returns {Category} category expression with the name provided
  *
  * @memberof carto.expressions
  * @name category
  * @function
- * @api
+ * @IGNOREapi
  */
-class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+class BaseCategory extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(categoryName) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('category', 'categoryName', 0, categoryName);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('category', 'categoryName', 0, categoryName);
         super({});
         this.expr = categoryName;
         this.type = 'category';
     }
+    get value() {
+        // Return the plain string
+        return this.expr;
+    }
     eval() {
-        return this._metadata.categoryIDs[this.expr];
+        if (this._metadata) {
+            // If it has metadata return the category ID
+            return this._metadata.categoryIDs[this.expr];
+        }
     }
     isAnimated() {
         return false;
@@ -3726,12 +3723,12 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Category;
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseCategory;
 
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3744,7 +3741,7 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * Wraps a constant number. Implies a GPU optimization vs {@link carto.expressions.number|number expression}.
  *
  * @param {number} x - A number to be warped in a constant numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @return {Number} Numeric expression
  *
  * @example <caption>Creating a constant number expression.</caption>
  * const s = carto.expressions;
@@ -3764,11 +3761,14 @@ class Category extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('constant', 'x', 0, x);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('constant', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
+    }
+    get value() {
+        return this.eval();
     }
     eval() {
         return this.expr;
@@ -3779,7 +3779,7 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3792,7 +3792,7 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * Create a color from its hexadecimal description.
  *
  * @param {string} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
- * @return {carto.expressions.Base}
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -3812,14 +3812,17 @@ class Constant extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(hexadecimalColor) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('hex', 'hexadecimalColor', 0, hexadecimalColor);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('hex', 'hexadecimalColor', 0, hexadecimalColor);
         super({});
         this.type = 'color';
         try {
-            this.color = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* hexToRgb */])(hexadecimalColor);
+            this.color = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* hexToRgb */])(hexadecimalColor);
         } catch (error) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
+    }
+    get value() {
+        return this.eval();
     }
     eval() {
         return this.color;
@@ -3834,7 +3837,7 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3846,10 +3849,10 @@ class Hex extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Evaluates to a hsl color.
  *
- * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} l - lightness of the color in the [0, 1] range
- * @return {carto.expressions.Base}
+ * @param {Number} h - hue of the color in the [0, 1] range
+ * @param {Number} s - saturation of the color in the [0, 1] range
+ * @param {Number} l - lightness of the color in the [0, 1] range
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -3874,11 +3877,11 @@ const HSL = genHSL('hsl', false);
 /**
  * Evaluates to a hsla color.
  *
- * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} l - lightness of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} a - alpha value of the color in the [0, 1] range
- * @return {carto.expressions.Base}
+ * @param {Number} h - hue of the color in the [0, 1] range
+ * @param {Number} s - saturation of the color in the [0, 1] range
+ * @param {Number} l - lightness of the color in the [0, 1] range
+ * @param {Number} a - alpha value of the color in the [0, 1] range
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -3903,11 +3906,11 @@ const HSLA = genHSL('hsla', true);
 function genHSL(name, alpha) {
     return class HSLA extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(h, s, l, a) {
-            [h, s, l, a] = [h, s, l, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
+            [h, s, l, a] = [h, s, l, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
 
             const children = { h, s, l };
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -3918,6 +3921,9 @@ function genHSL(name, alpha) {
             super(children);
             this.type = 'color';
         }
+        get value() {
+            return this.eval();
+        }
         eval(f) {
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -3925,9 +3931,9 @@ function genHSL(name, alpha) {
                 }
                 return value.eval(f);
             };
-            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.h, true), 0, 1);
-            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.s), 0, 1);
-            const l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.l), 0, 1);
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
+            const l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.l), 0, 1);
 
             const hslToRgb = (h, s, l) => {
                 const c = {
@@ -3939,9 +3945,9 @@ function genHSL(name, alpha) {
 
                 const C = (1 - Math.abs(2 * l - 1)) * s;
 
-                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.r, 0, 1);
-                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.g, 0, 1);
-                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.b, 0, 1);
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
 
                 c.r = ((c.r - 0.5) * C + l) * 255;
                 c.g = ((c.g - 0.5) * C + l) * 255;
@@ -3958,7 +3964,7 @@ function genHSL(name, alpha) {
             hslCheckType('s', 1, this.s);
             hslCheckType('l', 2, this.l);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('hsla', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsla', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -3989,7 +3995,7 @@ function genHSL(name, alpha) {
     };
 
     function hslCheckType(parameterName, parameterIndex, parameter) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
         if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
@@ -3998,7 +4004,7 @@ function genHSL(name, alpha) {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4010,10 +4016,10 @@ function genHSL(name, alpha) {
 /**
  * Evaluates to a hsv color.
  *
- * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} v - value (brightness) of the color in the [0, 1] range
- * @return {carto.expressions.Base}
+ * @param {Number} h - hue of the color in the [0, 1] range
+ * @param {Number} s - saturation of the color in the [0, 1] range
+ * @param {Number} v - value (brightness) of the color in the [0, 1] range
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -4038,11 +4044,11 @@ const HSV = genHSV('hsv', false);
 /**
  * Evaluates to a hsva color.
  *
- * @param {carto.expressions.Base|number} h - hue of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} s - saturation of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} v - value (brightness) of the color in the [0, 1] range
- * @param {carto.expressions.Base|number} a - alpha value of the color in the [0, 1] range
- * @return {carto.expressions.Base}
+ * @param {Number} h - hue of the color in the [0, 1] range
+ * @param {Number} s - saturation of the color in the [0, 1] range
+ * @param {Number} v - value (brightness) of the color in the [0, 1] range
+ * @param {Number} a - alpha value of the color in the [0, 1] range
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -4067,13 +4073,13 @@ const HSVA = genHSV('hsva', true);
 function genHSV(name, alpha) {
     return class extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(h, s, v, a) {
-            h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(h);
-            s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(s);
-            v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(v);
+            h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(h);
+            s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(s);
+            v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(v);
             const children = { h, s, v };
             if (alpha) {
-                a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
 
@@ -4084,6 +4090,9 @@ function genHSV(name, alpha) {
             super(children);
             this.type = 'color';
         }
+        get value() {
+            return this.eval();
+        }
         eval(f) {
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -4091,21 +4100,21 @@ function genHSV(name, alpha) {
                 }
                 return value.eval(f);
             };
-            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.h, true), 0, 1);
-            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.s), 0, 1);
-            const v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(normalize(this.v), 0, 1);
+            const h = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.h, true), 0, 1);
+            const s = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.s), 0, 1);
+            const v = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(normalize(this.v), 0, 1);
 
             const hsvToRgb = (h, s, v) => {
                 const c = {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(this.a.eval(f), 0,1) : 1,
+                    a: alpha ? Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(this.a.eval(f), 0,1) : 1,
                 };
 
-                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.r, 0, 1);
-                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.g, 0, 1);
-                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(c.b, 0, 1);
+                c.r = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.r, 0, 1);
+                c.g = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.g, 0, 1);
+                c.b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(c.b, 0, 1);
 
                 c.r = ((c.r - 1) * s + 1) * v * 255;
                 c.g = ((c.g - 1) * s + 1) * v * 255;
@@ -4122,7 +4131,7 @@ function genHSV(name, alpha) {
             hsvCheckType('s', 1, this.s);
             hsvCheckType('v', 2, this.v);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('hsva', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('hsva', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
                 if (value.type == 'category') {
@@ -4152,7 +4161,7 @@ function genHSV(name, alpha) {
     };
 
     function hsvCheckType(parameterName, parameterIndex, parameter) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])(name, parameterName, parameterIndex, parameter);
         if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
@@ -4161,7 +4170,7 @@ function genHSV(name, alpha) {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4236,7 +4245,7 @@ class BounceEaseIn extends genInterpolator(
 function genInterpolator(inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
         constructor(m) {
-            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["m" /* implicitCast */])(m);
+            m = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* implicitCast */])(m);
             super({ m });
         }
         eval(feature) {
@@ -4257,7 +4266,7 @@ function genInterpolator(inlineMaker, preface, jsEval) {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4274,7 +4283,7 @@ const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azu
  * Create a color from its name.
  *
  * @param {string} name - The name of the color
- * @return {carto.expressions.Base}
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -4294,14 +4303,17 @@ const CSS_COLOR_NAMES = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azu
  */
 class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(colorName) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('namedColor', 'colorName', 0, colorName);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('namedColor', 'colorName', 0, colorName);
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
-            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* getStringErrorPreface */])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
+            throw new Error(Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getStringErrorPreface */])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
         }
         super({});
         this.type = 'color';
         this.name = colorName;
         this.color = this._nameToRGB(this.name);
+    }
+    get value() {
+        return this.eval();
     }
     eval() {
         return this.color;
@@ -4328,7 +4340,7 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4338,10 +4350,10 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
 
 
 /**
- * Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
+ * Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all numbers using this function.
  *
  * @param {number} x - A number to be warped in a numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ * @return {Number} Numeric expression
  *
  * @example <caption>Creating a number expression.</caption>
  * const s = carto.expressions;
@@ -4357,14 +4369,17 @@ class NamedColor extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
  * @memberof carto.expressions
  * @name number
  * @function
- * @api
+ * @IGNOREapi
  */
-class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+class BaseNumber extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkNumber */])('number', 'x', 0, x);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkNumber */])('number', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
+    }
+    get value() {
+        return this.eval();
     }
     eval() {
         return this.expr;
@@ -4385,12 +4400,145 @@ class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         gl.uniform1f(this._getBinding(program).uniformLocation, this.expr);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Number;
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseNumber;
 
 
 
 /***/ }),
-/* 28 */
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return palettes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Reverse; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cartocolor___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cartocolor__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
+
+
+
+
+
+/**
+ * Color palettes.
+ *
+ * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|CARTOColors} and {@link https://github.com/axismaps/colorbrewer/|ColorBrewer} palettes easily.
+ * Use them with a {@link carto.expressions.ramp|ramp}
+ *
+ * The following palettes are availiable in the namespace {@link carto.expressions.palettes|carto.expressions.palettes}.
+ *
+ *  ```
+ *  BURG, BURGYL, REDOR, ORYEL, PEACH, PINKYL, MINT, BLUGRN, DARKMINT, EMRLD, AG_GRNYL, BLUYL, TEAL, TEALGRN,
+ *  PURP, PURPOR, SUNSET, MAGENTA, SUNSETDARK, AG_SUNSET, BRWNYL, ARMYROSE, FALL, GEYSER, TEMPS, TEALROSE, TROPIC,
+ *  EARTH, ANTIQUE, BOLD, PASTEL, PRISM, SAFE, VIVID, CB_YLGN, CB_YLGNBU, CB_GNBU, CB_BUGN, CB_PUBUGN, CB_PUBU,
+ *  CB_BUPU, CB_RDPU, CB_PURD, CB_ORRD, CB_YLORRD, CB_YLORBR, CB_PURPLES, CB_BLUES, CB_GREENS, CB_ORANGES, CB_REDS,
+ *  CB_GREYS, CB_PUOR, CB_BRBG, CB_PRGN, CB_PIYG, CB_RDBU, CB_RDGY, CB_RDYLBU, CB_SPECTRAL, CB_RDYLGN, CB_ACCENT,
+ *  CB_DARK2, CB_PAIRED, CB_PASTEL1, CB_PASTEL2, CB_SET1, CB_SET2, CB_SET3
+ *  ```
+ *
+ * @example <caption>Using a color scheme.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.prop('type'), s.palettes.PRISM);
+ * });
+ *
+ * @example <caption>Using a color scheme. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($type, PRISM)
+ * `);
+ *
+ * @name carto.expressions.palettes
+ * @memberof carto.expressions
+ * @api
+ */
+const palettes = {};
+
+class PaletteGenerator extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */] {
+    constructor(name, subPalettes) {
+        super({});
+        this.type = 'palette';
+        this.name = name;
+        this.subPalettes = new Proxy(subPalettes, {
+            get: (target, name) => {
+                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                    return target[name].map(__WEBPACK_IMPORTED_MODULE_2__utils__["k" /* hexToRgb */]);
+                }
+            }
+        });
+        this.tags = subPalettes.tags;
+    }
+    getLongestSubPalette() {
+        const s = this.subPalettes;
+        for (let i = 20; i >= 0; i--) {
+            if (s[i]) {
+                return s[i];
+            }
+        }
+    }
+}
+
+Object.keys(__WEBPACK_IMPORTED_MODULE_0_cartocolor__).map(name => {
+    palettes[`${name.toUpperCase()}`] = new PaletteGenerator(name, __WEBPACK_IMPORTED_MODULE_0_cartocolor__[name]);
+});
+
+/**
+ * Reverse the provided Palette.
+ *
+ * @param {Palette} palette - Numeric expression to compute the natural logarithm
+ * @return {Palette}
+ *
+ * @example <caption>Invert a Palette.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ * });
+ *
+ * @example <caption>Invert a Palette. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($type, reverse(PRISM))
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name reverse
+ * @function
+ * @api
+ */
+class Reverse extends __WEBPACK_IMPORTED_MODULE_1__base__["a" /* default */]{
+    constructor(palette) {
+        super({});
+        this.type = 'palette';
+        this._originalPalette = palette;
+        this.tags = palette.tags;
+        this.subPalettes = new Proxy(palette.subPalettes, {
+            get: (target, name) => {
+                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                    return this._reversePalette(target[name]);
+                }
+                return target[name];
+            }
+        });
+    }
+    getLongestSubPalette() {
+        return this._reversePalette(this._originalPalette.getLongestSubPalette());
+    }
+    _reversePalette(palette) {
+        if (this.tags.includes('qualitative')) {
+            // Last color is 'others', therefore, we shouldn't change the order of that one
+            const copy = [...palette];
+            const others = copy.pop();
+            return [...copy.reverse(), others];
+
+        }
+        return [...palette].reverse();
+    }
+}
+
+
+
+
+/***/ }),
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4402,10 +4550,10 @@ class Number extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Evaluates to a rgb color.
  *
- * @param {carto.expressions.Base|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
- * @param {carto.expressions.Base|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
- * @param {carto.expressions.Base|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
- * @return {carto.expressions.rgb}
+ * @param {Number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {Number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {Number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -4430,11 +4578,11 @@ const RGB = genRGB('rgb', false);
 /**
  * Evaluates to a rgba color.
  *
- * @param {carto.expressions.Base|number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
- * @param {carto.expressions.Base|number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
- * @param {carto.expressions.Base|number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
- * @param {carto.expressions.Base|number} a - The alpha value of the color in the [0, 1] range. Numeric expression.
- * @return {carto.expressions.rgba}
+ * @param {Number} r - The amount of red in the color in the [0, 255] range. Numeric expression.
+ * @param {Number} g - The amount of green in the color in the [0, 255] range. Numeric expression.
+ * @param {Number} b - The amount of blue in the color in the [0, 255] range. Numeric expression.
+ * @param {Number} a - The alpha value of the color in the [0, 1] range. Numeric expression.
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -4461,18 +4609,21 @@ const RGBA = genRGB('rgba', true);
 function genRGB(name, alpha) {
     return class RGBA extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         constructor(r, g, b, a) {
-            [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'r', 0, 'number', r);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'g', 1, 'number', g);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'b', 2, 'number', b);
+            [r, g, b, a] = [r, g, b, a].map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'r', 0, 'number', r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'g', 1, 'number', g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'b', 2, 'number', b);
 
             const children = { r, g, b };
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])(name, 'a', 3, 'number', a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])(name, 'a', 3, 'number', a);
                 children.a = a;
             }
             super(children);
             this.type = 'color';
+        }
+        get value() {
+            return this.eval();
         }
         eval(f) {
             return {
@@ -4484,11 +4635,11 @@ function genRGB(name, alpha) {
         }
         _compile(meta) {
             super._compile(meta);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'r', 0, 'number', this.r);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'g', 1, 'number', this.g);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])(name, 'b', 2, 'number', this.b);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'r', 0, 'number', this.r);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'g', 1, 'number', this.g);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])(name, 'b', 2, 'number', this.b);
             if (alpha) {
-                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('rgba', 'a', 3, 'number', this.a);
+                Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('rgba', 'a', 3, 'number', this.a);
             }
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
@@ -4497,14 +4648,14 @@ function genRGB(name, alpha) {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__basic_property__ = __webpack_require__(9);
 
 
 
@@ -4515,9 +4666,9 @@ const DEFAULT_FADE = 0.15;
 /**
  * Create a FadeIn/FadeOut configuration. See `torque` for more details.
  *
- * @param {carto.expressions.Base|number} param1 - Expression of type number or Number
- * @param {carto.expressions.Base|number} param2 - Expression of type number or Number
- * @return {carto.expressions.Base}
+ * @param {Number} param1 - Expression of type number or Number
+ * @param {Number} param2 - Expression of type number or Number
+ * @return {Fade}
  *
  * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds.</caption>
  * const s = carto.expressions;
@@ -4556,8 +4707,8 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (param2 == __WEBPACK_IMPORTED_MODULE_1__utils__["a" /* DEFAULT */]) {
             fadeOut = fadeIn;
         }
-        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(fadeIn);
-        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(fadeOut);
+        fadeIn = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeIn);
+        fadeOut = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(fadeOut);
         // TODO improve type check
         super({ fadeIn, fadeOut });
         this.type = 'fade';
@@ -4573,14 +4724,14 @@ class Fade extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Create an animated temporal filter (torque).
  *
- * @param {carto.expressions.Base} input input to base the temporal filter,
+ * @param {Number} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
- * @param {carto.expressions.Base} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
- * @return {carto.expressions.Torque}
+ * @param {Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
+ * @return {Number}
  *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
@@ -4631,7 +4782,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (!Number.isFinite(duration)) {
             throw new Error('Torque(): invalid second parameter, duration.');
         }
-        if (input instanceof __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */]) {
+        if (input instanceof __WEBPACK_IMPORTED_MODULE_3__basic_property__["a" /* default */]) {
             input = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["linear"])(input, Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMin"])(input), Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMax"])(input));
         }
         const _cycle = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["div"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["mod"])(Object(__WEBPACK_IMPORTED_MODULE_2__functions__["now"])(), duration), duration);
@@ -4645,7 +4796,7 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         const duration = this.duration;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        return 1 - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
     }
     /**
      * Get the current time stamp of the simulation
@@ -4695,188 +4846,56 @@ class Torque extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return styler; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AABlender; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__renderer__ = __webpack_require__(65);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__styler__ = __webpack_require__(69);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__aaBlender__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__shader_cache__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_AntiAliasingShader__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__geometry_LineShader__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__geometry_PointShader__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_TriangleShader__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__style_ColorShader__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__style_WidthShader__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__style_FilterShader__ = __webpack_require__(80);
 
 
 
 
 
-const shaderCache = new __WEBPACK_IMPORTED_MODULE_3__shader_cache__["a" /* default */]();
 
-let programID = 1;
 
-function compileShader(gl, sourceCode, type) {
-    if (shaderCache.has(gl, sourceCode)) {
-        return shaderCache.get(gl, sourceCode);
-    }
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceCode);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        const log = gl.getShaderInfoLog(shader);
-        gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
-    }
-    shaderCache.set(gl, sourceCode, shader);
-    return shader;
-}
 
-function compileProgram(gl, glslVS, glslFS) {
-    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
-    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-    this.programID = programID++;
-}
 
-class AABlender {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_2__aaBlender__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_2__aaBlender__["a" /* FS */]);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
-    }
-}
 
-class Point {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["b" /* point */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
-        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
-    }
-}
-class Tri {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["c" /* tris */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'strokeColorTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
-class Line {
-    constructor(gl) {
-        compileProgram.call(this, gl, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].VS, __WEBPACK_IMPORTED_MODULE_0__renderer__["a" /* line */].FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
-class GenericStyler {
-    constructor(gl, glsl, preface, inline) {
-        const VS = glsl.VS;
-        let FS = glsl.FS;
-        FS = FS.replace('$PREFACE', preface);
-        FS = FS.replace('$INLINE', inline);
-        compileProgram.call(this, gl, VS, FS);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-    }
-}
-class Color extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Color*/' + preface, inline);
-    }
-}
-class Width extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__,
-            `
-        /*Width*/
-        // From pixels in [0.,255.] to [0.,1.] in exponential-like form
-        float encodeWidth(float x){
-            if (x<16.){
-                x = x*4.;
-            }else if (x<80.){
-                x = (x-16.)+64.;
-            }else{
-                x = (x-80.)*0.5 + 128.;
-            }
-            return x / 255.;
-        }
-        ` + preface,
-            `vec4(encodeWidth(${inline}))`);
-    }
-}
 
-class Filter extends GenericStyler {
-    constructor(gl, preface, inline) {
-        super(gl, __WEBPACK_IMPORTED_MODULE_1__styler__, '/*Filter*/' + preface, `vec4(${inline})`);
-    }
-}
+const AABlender = __WEBPACK_IMPORTED_MODULE_0__common_AntiAliasingShader__["a" /* default */];
 
 const renderer = {
-    createPointShader: function (gl) {
-        return new Point(gl);
-    },
-    createTriShader: function (gl) {
-        return new Tri(gl);
-    },
-    createLineShader: function (gl) {
-        return new Line(gl);
-    }
+    createPointShader: gl => new __WEBPACK_IMPORTED_MODULE_2__geometry_PointShader__["a" /* default */](gl),
+    createTriShader: gl => new __WEBPACK_IMPORTED_MODULE_3__geometry_TriangleShader__["a" /* default */](gl),
+    createLineShader: gl => new __WEBPACK_IMPORTED_MODULE_1__geometry_LineShader__["a" /* default */](gl),
 };
 
 const styler = {
-    createColorShader: function (gl, preface, inline) {
-        return new Color(gl, preface, inline);
-    },
-    createWidthShader: function (gl, preface, inline) {
-        return new Width(gl, preface, inline);
-    },
-    createFilterShader: function (gl, preface, inline) {
-        return new Filter(gl, preface, inline);
-    }
+    createColorShader: (gl, preface, inline) => new __WEBPACK_IMPORTED_MODULE_4__style_ColorShader__["a" /* default */](gl, preface, inline),
+    createWidthShader: (gl, preface, inline) => new __WEBPACK_IMPORTED_MODULE_5__style_WidthShader__["a" /* default */](gl, preface, inline),
+    createFilterShader: (gl, preface, inline) => new __WEBPACK_IMPORTED_MODULE_6__style_FilterShader__["a" /* default */](gl, preface, inline)
 };
 
 
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export pointInTriangle */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(72);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__decoder__ = __webpack_require__(81);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_rsys__ = __webpack_require__(13);
 
 
 
@@ -5303,7 +5322,7 @@ function pointInCircle(p, center, scale) {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5363,15 +5382,15 @@ class Metadata {
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__client_windshaft__ = __webpack_require__(86);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__setup_auth_service__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__setup_config_service__ = __webpack_require__(40);
 
 
 
@@ -5435,7 +5454,7 @@ class BaseWindshaft extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default *
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -5625,13 +5644,13 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileFeature = __webpack_require__(36);
+var VectorTileFeature = __webpack_require__(38);
 
 module.exports = VectorTileLayer;
 
@@ -5693,13 +5712,13 @@ VectorTileLayer.prototype.feature = function(i) {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Point = __webpack_require__(91);
+var Point = __webpack_require__(100);
 
 module.exports = VectorTileFeature;
 
@@ -5933,7 +5952,7 @@ function signedArea(ring) {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6023,7 +6042,7 @@ function checkUsername(username) {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6091,20 +6110,20 @@ function _checkServerURL(serverURL) {
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__source_base__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(95);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__viz__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__map__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__integrator_carto__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__integrator_mapbox_gl__ = __webpack_require__(105);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__error_handling_carto_validation_error__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_renderLayer__ = __webpack_require__(106);
 
 
 
@@ -6538,16 +6557,16 @@ class Layer {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_schema__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_shader_compiler__ = __webpack_require__(93);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_shaders__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_shader_compiler__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_parser__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__ = __webpack_require__(6);
@@ -6607,12 +6626,12 @@ class Viz {
     * @memberof carto
     * @api
     *
-    * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
-    * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
-    * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
-    * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-    * @IGNOREproperty {carto.expressions.Base} order - rendering order of the features, only applicable to points
+    * @property {Color} color - fill color of points and polygons and color of lines
+    * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+    * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+    * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *
@@ -6647,7 +6666,7 @@ class Viz {
             get: () => this['_' + propertyName],
             set: expr => {
                 if (propertyName != 'resolution') {
-                    expr = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(expr);
+                    expr = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(expr);
                 }
                 this['_' + propertyName] = expr;
                 this._changed();
@@ -6662,7 +6681,7 @@ class Viz {
                     return obj[prop];
                 },
                 set: (obj, prop, value) => {
-                    value = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(value);
+                    value = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(value);
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
@@ -6951,12 +6970,12 @@ class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {carto.expressions.Base} color - fill color of points and polygons and color of lines
-         * @property {carto.expressions.Base} width - fill diameter of points, thickness of lines, not applicable to polygons
-         * @property {carto.expressions.Base} strokeColor - stroke/border color of points and polygons, not applicable to lines
-         * @property {carto.expressions.Base} strokeWidth - stroke width of points and polygons, not applicable to lines
-         * @property {carto.expressions.Base} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {carto.expressions.Base} order - rendering order of the features, only applicable to points
+         * @property {Color} color - fill color of points and polygons and color of lines
+         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
          * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
          * @api
@@ -6964,8 +6983,10 @@ class Viz {
 
         // TODO: Check expression types ie: color is not a number expression!
 
-        vizSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(vizSpec.width);
-        vizSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["m" /* implicitCast */])(vizSpec.strokeWidth);
+        // Apply implicit cast to numeric style properties
+        vizSpec.width = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(vizSpec.width);
+        vizSpec.strokeWidth = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(vizSpec.strokeWidth);
+        vizSpec.filter = Object(__WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_utils__["l" /* implicitCast */])(vizSpec.filter);
 
         if (!__WEBPACK_IMPORTED_MODULE_0__util__["c" /* isNumber */](vizSpec.resolution)) {
             throw new __WEBPACK_IMPORTED_MODULE_8__error_handling_carto_validation_error__["a" /* default */]('viz', 'resolutionNumberRequired');
@@ -7015,19 +7036,19 @@ function _markDefault(expression) {
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["b"] = parseVizExpression;
 /* harmony export (immutable) */ __webpack_exports__["a"] = parseVizDefinition;
 /* unused harmony export cleanComments */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep__ = __webpack_require__(103);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jsep___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jsep__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__expressions_utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_hex__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__expressions_color_named_color__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__expressions_color_hex__ = __webpack_require__(23);
 
 
 
@@ -7046,10 +7067,11 @@ Object.keys(__WEBPACK_IMPORTED_MODULE_1__functions__)
 lowerCaseFunctions.true = __WEBPACK_IMPORTED_MODULE_1__functions__["TRUE"];
 lowerCaseFunctions.false = __WEBPACK_IMPORTED_MODULE_1__functions__["FALSE"];
 lowerCaseFunctions.pi = __WEBPACK_IMPORTED_MODULE_1__functions__["PI"];
+lowerCaseFunctions.e = __WEBPACK_IMPORTED_MODULE_1__functions__["E"];
 
 function parseVizExpression(str) {
     prepareJsep();
-    const r = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str)));
+    const r = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(parseNode(__WEBPACK_IMPORTED_MODULE_0_jsep___default()(str)));
     cleanJsep();
     return r;
 }
@@ -7079,13 +7101,13 @@ function parseVizNamedExpr(vizSpec, node) {
         throw new Error('Invalid syntax');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(parseNode(node.right));
+        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(parseNode(node.right));
     } else if (name == 'resolution') {
         const value = parseNode(node.right);
         vizSpec[name] = value;
     } else {
         const value = parseNode(node.right);
-        vizSpec[name] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["m" /* implicitCast */])(value);
+        vizSpec[name] = Object(__WEBPACK_IMPORTED_MODULE_2__expressions_utils__["l" /* implicitCast */])(value);
     }
 
 }
@@ -7159,15 +7181,15 @@ function parseIdentifier(node) {
     if (node.name.startsWith('__cartovl_variable_')) {
         return __WEBPACK_IMPORTED_MODULE_1__functions__["variable"](node.name.substr('__cartovl_variable_'.length));
     } else if (node.name[0] == '#') {
-        return new __WEBPACK_IMPORTED_MODULE_4__expressions_hex__["a" /* default */](node.name);
+        return new __WEBPACK_IMPORTED_MODULE_4__expressions_color_hex__["a" /* default */](node.name);
     } else if (node.name[0] == '$') {
         return __WEBPACK_IMPORTED_MODULE_1__functions__["property"](node.name.substring(1));
     } else if (__WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toUpperCase()]) {
         return __WEBPACK_IMPORTED_MODULE_1__functions__["palettes"][node.name.toUpperCase()];
     } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
         return lowerCaseFunctions[node.name.toLowerCase()];
-    } else if (__WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["a" /* CSS_COLOR_NAMES */].includes(node.name.toLowerCase())) {
-        return new __WEBPACK_IMPORTED_MODULE_3__expressions_named_color__["b" /* NamedColor */](node.name.toLowerCase());
+    } else if (__WEBPACK_IMPORTED_MODULE_3__expressions_color_named_color__["a" /* CSS_COLOR_NAMES */].includes(node.name.toLowerCase())) {
+        return new __WEBPACK_IMPORTED_MODULE_3__expressions_color_named_color__["b" /* NamedColor */](node.name.toLowerCase());
     } else {
         throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
@@ -7297,7 +7319,7 @@ function cleanComments(str) {
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7438,22 +7460,22 @@ class Map {
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "source", function() { return source; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(64);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(92);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__api_source_geojson__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__api_source_sql__ = __webpack_require__(101);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_layer__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__api_viz__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__api_map__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__api_interactivity__ = __webpack_require__(109);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultAuth", function() { return __WEBPACK_IMPORTED_MODULE_6__api_setup_auth_service__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "setDefaultConfig", function() { return __WEBPACK_IMPORTED_MODULE_7__api_setup_config_service__["c"]; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "expressions", function() { return __WEBPACK_IMPORTED_MODULE_0__core_viz_functions__; });
@@ -7498,7 +7520,91 @@ const source = { Dataset: __WEBPACK_IMPORTED_MODULE_2__api_source_dataset__["a" 
 
 
 /***/ }),
-/* 44 */
+/* 46 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
+
+
+
+/**
+ * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
+ *
+ * @param {Number[]|Category[]|Color[]|Date[]} elements
+ * @returns {Array}
+ *
+ * @memberof carto.expressions
+ * @name array
+ * @function
+ * @IGNOREapi
+ */
+class BaseArray extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
+    constructor(elems) {
+        elems = elems || [];
+        if (!Array.isArray(elems)) {
+            elems = [elems];
+        }
+        elems = elems.map(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */]);
+        if (!elems.length) {
+            throw new Error('array(): invalid parameters: must receive at least one argument');
+        }
+        let type = '';
+        for (let elem of elems) {
+            type = elem.type;
+            if (elem.type != undefined) {
+                break;
+            }
+        }
+        if (['number', 'category', 'color', 'time', undefined].indexOf(type) == -1) {
+            throw new Error(`array(): invalid parameters type: ${type}`);
+        }
+        elems.map((item, index) => {
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('array', `item[${index}]`, index, item);
+            if (item.type != type && item.type != undefined) {
+                throw new Error(`array(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index+1)} parameter type, invalid argument type combination`);
+            }
+        });
+        super({});
+        this.type = type + '-array';
+        this.elems = elems;
+        try {
+            this.elems.map(c => c.value);
+        } catch (error) {
+            throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
+        }
+    }
+    get value() {
+        return this.elems.map(c => c.value);
+    }
+    eval() {
+        return this.elems.map(c => c.eval());
+    }
+    _resolveAliases(aliases) {
+        this.elems.map(c => c._resolveAliases(aliases));
+    }
+    _compile(metadata) {
+        super._compile(metadata);
+  
+        const type = this.elems[0].type;
+        if (['number', 'category', 'color', 'time'].indexOf(type) == -1) {
+            throw new Error(`array(): invalid parameters type: ${type}`);
+        }
+        this.elems.map((item, index) => {
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('array', `item[${index}]`, index, item);
+            if (item.type != type) {
+                throw new Error(`array(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index)} parameter, invalid argument type combination`);
+            }
+        });
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = BaseArray;
+
+
+
+/***/ }),
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7563,9 +7669,9 @@ let bucketUID = 0;
  * `);
  * ```
  *
- * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {carto.expressions.Base[]} breakpoints - Numeric expression containing the different breakpoints.
- * @return {carto.expressions.Base}
+ * @param {Number|Category} property - The property to be evaluated and interpolated
+ * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
+ * @return {Number|Category}
  *
  * @memberof carto.expressions
  * @name buckets
@@ -7573,13 +7679,9 @@ let bucketUID = 0;
  * @api
  */
 class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
-    constructor(input, args) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
-        args = args || [];
-
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkArray */])(name, 'args', 1, args);
-
-        args = args.map(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */]);
+    constructor(input, list) {
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        list = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(list);
 
         let looseType = undefined;
         if (input.type) {
@@ -7588,13 +7690,13 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             }
             looseType = input.type;
         }
-        args.map((arg, index) => {
-            if (arg.type) {
-                if (looseType && looseType != arg.type) {
-                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
-                } else if (arg.type != 'number' && arg.type != 'category') {
-                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
+        list.elems.map((item, index) => {
+            if (item.type) {
+                if (looseType && looseType != item.type) {
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index+1)} parameter type` +
+                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                } else if (item.type != 'number' && item.type != 'category') {
+                    throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index+1)} parameter type\n\ttype was ${item.type}`);
                 }
             }
         });
@@ -7602,20 +7704,20 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         let children = {
             input
         };
-        args.map((arg, index) => children[`arg${index}`] = arg);
+        list.elems.map((item, index) => children[`arg${index}`] = item);
         super(children);
         this.bucketUID = bucketUID++;
-        this.numCategories = args.length + 1;
-        this.args = args;
+        this.numCategories = list.elems.length + 1;
+        this.list = list;
         this.type = 'category';
     }
     eval(feature) {
         const v = this.input.eval(feature);
         let i;
-        for (i = 0; i < this.args.length; i++) {
-            if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
+        for (i = 0; i < this.list.elems.length; i++) {
+            if (this.input.type == 'category' && v == this.list.elems[i].eval(feature)) {
                 return i;
-            } else if (this.input.type == 'number' && v < this.args[i].eval(feature)) {
+            } else if (this.input.type == 'number' && v < this.list.elems[i].eval(feature)) {
                 return i;
             }
         }
@@ -7629,12 +7731,12 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (input.type != 'number' && input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
-        this.args.map((arg, index) => {
-            if (input.type != arg.type) {
-                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type` +
-                    `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
-            } else if (arg.type != 'number' && arg.type != 'category') {
-                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* getOrdinalFromIndex */])(index)} parameter type\n\ttype was ${arg.type}`);
+        this.list.elems.map((item, index) => {
+            if (input.type != item.type) {
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index+1)} parameter type` +
+                    `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
+            } else if (item.type != 'number' && item.type != 'category') {
+                throw new Error(`buckets(): invalid ${Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* getOrdinalFromIndex */])(index+1)} parameter type\n\ttype was ${item.type}`);
             }
         });
     }
@@ -7648,7 +7750,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index}.;
             }`;
-        const funcBody = this.args.map(elif).join('');
+        const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
             return ${this.numCategories - 1}.;
@@ -7665,7 +7767,7 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 45 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7677,10 +7779,10 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Evaluates to a CIELab color.
  *
- * @param {carto.expressions.Base|number} l - The lightness of the color
- * @param {carto.expressions.Base|number} a - The green–red color component
- * @param {carto.expressions.Base|number} b - The blue–yellow color component
- * @return {carto.expressions.Base}
+ * @param {Number} l - The lightness of the color
+ * @param {Number} a - The green–red color component
+ * @param {Number} b - The blue–yellow color component
+ * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
  * const s = carto.expressions;
@@ -7700,16 +7802,16 @@ class Buckets extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(l, a, b) {
-        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(l);
-        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(a);
-        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(b);
+        l = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(l);
+        a = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(a);
+        b = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(b);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'l', 0, l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'a', 1, a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('cielab', 'b', 2, b);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'l', 0, 'number', l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'a', 1, 'number', a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('cielab', 'b', 2, 'number', b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'l', 0, l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'a', 1, a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('cielab', 'b', 2, b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'l', 0, 'number', l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'a', 1, 'number', a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('cielab', 'b', 2, 'number', b);
 
         super({ l, a, b });
         this.type = 'color';
@@ -7718,9 +7820,9 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     _compile(meta) {
         super._compile(meta);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'l', 0, 'number', this.l);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'a', 1, 'number', this.a);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('cielab', 'b', 2, 'number', this.b);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'l', 0, 'number', this.l);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'a', 1, 'number', this.a);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('cielab', 'b', 2, 'number', this.b);
 
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
@@ -7777,7 +7879,7 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 46 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7792,10 +7894,10 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
 *
-* @param {carto.expressions.Base} input - The input to be evaluated and interpolated, can be a numeric property or a date property
-* @param {carto.expressions.Base} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
-* @param {carto.expressions.Base} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
-* @return {carto.expressions.Base}
+* @param {Number|Date} input - The input to be evaluated and interpolated, can be a numeric property or a date property
+* @param {Number|Date} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
+* @param {Number|Date} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
+* @return {Number|Date}
 *
 * @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</caption>
 * const s = carto.expressions;
@@ -7815,26 +7917,26 @@ class CIELab extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 */
 class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, min, max) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
 
         if (min == undefined && max == undefined) {
             min = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMin"])(input);
             max = Object(__WEBPACK_IMPORTED_MODULE_2__functions__["globalMax"])(input);
         }
 
-        min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(min);
-        max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(max);
+        min = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(min);
+        max = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(max);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'input', 0, input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'min', 1, min);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('linear', 'max', 2, max);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'min', 1, min);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('linear', 'max', 2, max);
 
         super({ input, min, max });
 
         if (this.min.type != 'time') {
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'input', 0, 'number', this.input);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'min', 1, 'number', this.min);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('linear', 'max', 2, 'number', this.max);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'input', 0, 'number', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'min', 1, 'number', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('linear', 'max', 2, 'number', this.max);
         }
         this.type = 'number';
     }
@@ -7860,9 +7962,9 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
 
         } else {
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'input', 0, 'number', this.input);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'min', 1, 'number', this.min);
-            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('linear', 'max', 2, 'number', this.max);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'input', 0, 'number', this.input);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'min', 1, 'number', this.min);
+            Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('linear', 'max', 2, 'number', this.max);
 
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
@@ -7873,7 +7975,7 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7888,11 +7990,11 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *       _____
  * _____/     \_____
  *
- * @param {carto.expressions.Base} input
- * @param {carto.expressions.Base|number} center
- * @param {carto.expressions.Base|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
- * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
- * @return {carto.expressions.Base}
+ * @param {Number} input
+ * @param {Number} center
+ * @param {Number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {Number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @return {Number}
  *
  * @example <caption></caption>
  * const s = carto.expressions;
@@ -7912,10 +8014,10 @@ class Linear extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 // TODO type checking
 class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, center, threshold, falloff) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
-        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(center);
-        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(threshold);
-        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(falloff);
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        center = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(center);
+        threshold = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(threshold);
+        falloff = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(falloff);
 
         super({ input, center, threshold, falloff });
     }
@@ -7924,7 +8026,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         const center = this.center.eval(feature);
         const threshold = this.threshold.eval(feature);
         const falloff = this.falloff.eval(feature);
-        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
+        return 1. - Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])((Math.abs(input - center) - threshold) / falloff, 0, 1);
     }
     _compile(meta) {
         super._compile(meta);
@@ -7941,7 +8043,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 48 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7953,7 +8055,7 @@ class Near extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Get the current timestamp. This is an advanced form of animation, `torque` is preferred.
  *
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
  * @example <caption>Update width during the time.</caption>
  * const s = carto.expressions;
@@ -7998,7 +8100,7 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 49 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8012,8 +8114,9 @@ class Now extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Override the input color opacity.
  *
- * @param {carto.expressions.Base|number} x - A number to be warped in a numeric expression
- * @return {carto.expressions.Base}
+ * @param {Color} color - Color expression to apply the opacity
+ * @param {Number} alpha - Number expression with the alpha (transparency) value
+ * @return {Color}
  *
  * @example <caption>Display blue points with 50% opacity.</caption>
  * const s = carto.expressions;
@@ -8041,16 +8144,13 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         if (Number.isFinite(alpha)) {
             alpha = Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(alpha);
         }
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkLooseType */])('opacity', 'color', 0, 'color', color);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkLooseType */])('opacity', 'alpha', 1, 'number', alpha);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'color', 0, 'color', color);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkLooseType */])('opacity', 'alpha', 1, 'number', alpha);
         super({ color, alpha });
         this.type = 'color';
     }
-    _compile(meta) {
-        super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('opacity', 'color', 0, 'color', this.color);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('opacity', 'alpha', 1, 'number', this.alpha);
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
+    get value() {
+        return this.eval();
     }
     eval(f) {
         const color = this.color.eval(f);
@@ -8058,20 +8158,26 @@ class Opacity extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         color.a = alpha;
         return color;
     }
+    _compile(meta) {
+        super._compile(meta);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'color', 0, 'color', this.color);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('opacity', 'alpha', 1, 'number', this.alpha);
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Opacity;
 
 
 
 /***/ }),
-/* 50 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(51);
+module.exports = __webpack_require__(54);
 
 
 /***/ }),
-/* 51 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;!function() {
@@ -9924,7 +10030,7 @@ var colorbrewer_tags = {
   "YlOrRd": { "tags": ["quantitative"] }
 }
 
-var colorbrewer = __webpack_require__(52);
+var colorbrewer = __webpack_require__(55);
 
 // augment colorbrewer with tags
 for (var r in colorbrewer) {
@@ -9957,14 +10063,14 @@ if (true) {
 
 
 /***/ }),
-/* 52 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(53);
+module.exports = __webpack_require__(56);
 
 
 /***/ }),
-/* 53 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;// This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).
@@ -10289,14 +10395,14 @@ if (true) {
 
 
 /***/ }),
-/* 54 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__functions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__basic_property__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__schema__ = __webpack_require__(7);
 
 
@@ -10371,9 +10477,9 @@ class Classifier extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -10393,8 +10499,8 @@ class Classifier extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] 
  */
 class ViewportQuantiles extends Classifier {
     constructor(input, buckets) {
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('viewportQuantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('viewportQuantiles', 'buckets', 1, buckets);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('viewportQuantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__basic_property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('viewportQuantiles', 'buckets', 1, buckets);
 
         let children = {
             input
@@ -10404,7 +10510,7 @@ class ViewportQuantiles extends Classifier {
     }
     _compile(metadata) {
         super._compile(metadata);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('viewportQuantiles', 'input', 0, 'number', this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('viewportQuantiles', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
         const hist = this._histogram.value;
@@ -10443,9 +10549,9 @@ class ViewportQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression used in the quantiles
+ * @param {Number} input - The input expression used in the quantiles
  * @param {number} n - Number of buckets to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -10465,13 +10571,13 @@ class ViewportQuantiles extends Classifier {
  */
 class GlobalQuantiles extends Classifier {
     constructor(input, buckets) {
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('globalQuantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('globalQuantiles', 'buckets', 1, buckets);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('globalQuantiles', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__basic_property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('globalQuantiles', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
     _compile(metadata) {
         super._compile(metadata);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('globalQuantiles', 'input', 0, 'number', this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('globalQuantiles', 'input', 0, 'number', this.input);
         const copy = metadata.sample.map(s => s[this.input.name]);
         copy.sort((x, y) => x - y);
         this.breakpoints.map((breakpoint, index) => {
@@ -10488,9 +10594,9 @@ class GlobalQuantiles extends Classifier {
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use global equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -10510,13 +10616,13 @@ class GlobalQuantiles extends Classifier {
  */
 class GlobalEqIntervals extends Classifier {
     constructor(input, buckets) {
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('globalEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('globalEqIntervals', 'buckets', 1, buckets);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('globalEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__basic_property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('globalEqIntervals', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
     _compile(metadata) {
         super._compile(metadata);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('globalEqIntervals', 'input', 0, 'number', this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('globalEqIntervals', 'input', 0, 'number', this.input);
         const { min, max } = metadata.columns.find(c => c.name == this.input.name);
 
         this.breakpoints.map((breakpoint, index) => {
@@ -10533,9 +10639,9 @@ class GlobalEqIntervals extends Classifier {
  *
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
- * @param {carto.expressions.Base} input - The input expression to classify
+ * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -10555,8 +10661,8 @@ class GlobalEqIntervals extends Classifier {
  */
 class ViewportEqIntervals extends Classifier {
     constructor(input, buckets) {
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["d" /* checkInstance */])('viewportEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__property__["a" /* default */], input && (input.property || input));
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["f" /* checkNumber */])('viewportEqIntervals', 'buckets', 1, buckets);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["c" /* checkInstance */])('viewportEqIntervals', 'input', 0, __WEBPACK_IMPORTED_MODULE_3__basic_property__["a" /* default */], input && (input.property || input));
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["e" /* checkNumber */])('viewportEqIntervals', 'buckets', 1, buckets);
         let children = {
             input
         };
@@ -10566,7 +10672,7 @@ class ViewportEqIntervals extends Classifier {
     }
     _compile(metadata) {
         super._compile(metadata);
-        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* checkType */])('viewportEqIntervals', 'input', 0, 'number', this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_2__utils__["g" /* checkType */])('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
     _genBreakpoints() {
         const min = this._min.eval();
@@ -10583,15 +10689,13 @@ class ViewportEqIntervals extends Classifier {
 
 
 /***/ }),
-/* 55 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__colorspaces__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__functions__ = __webpack_require__(2);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__colorspaces__ = __webpack_require__(59);
 
 
 
@@ -10612,9 +10716,9 @@ class ViewportEqIntervals extends Classifier {
 * Numeric expressions to numeric
 * Numeric expressions can be used as the input for `ramp` in combination with numeric palettes. Linear interpolation will be used to generate intermediate output values.
 *
-* @param {carto.expressions.Base} input - The input expression to give a color
-* @param {carto.expressions.palettes} palette - The color palette that is going to be used
-* @return {carto.expressions.Base}
+* @param {Number|Category} input - The input expression to give a color
+* @param {Palette|Color[]|Number[]} palette - The color palette that is going to be used
+* @return {Number|Color}
 *
 * @example <caption>Mapping categories to colors and numbers</caption>
 * const s = carto.expressions;
@@ -10650,35 +10754,42 @@ class ViewportEqIntervals extends Classifier {
 */
 class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(input, palette) {
-        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(input);
-        if (Array.isArray(palette)) {
-            palette = Object(__WEBPACK_IMPORTED_MODULE_3__functions__["customPalette"])(palette);
-        }
+        input = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(input);
+        palette = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(palette);
 
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* checkExpression */])('ramp', 'input', 0, input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* checkLooseType */])('ramp', 'input', 0, ['number', 'category'], input);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* checkExpression */])('ramp', 'input', 0, input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* checkLooseType */])('ramp', 'input', 0, ['number', 'category'], input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'palette', 1, ['palette', 'color-array', 'number-array'], palette);
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        if (palette.type == 'customPaletteNumber') {
+        if (palette.type == 'number-array') {
             this.type = 'number';
         } else {
             this.type = 'color';
         }
+        try {
+            if (palette.type == 'number-array') {
+                this.palette.floats = this.palette.eval();
+            } else if (palette.type == 'color-array') {
+                this.palette.colors = this.palette.eval();
+            }
+        } catch (error) {
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+        }
     }
     eval(o) {
-        if (this.palette.type != 'customPaletteNumber') {
+        if (this.palette.type != 'number-array') {
             super.eval(o);
         }
         this._computeTextureIfNeeded();
         const input = this.input.eval(o);
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
-        const lowIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.floor(len * m), 0, len);
-        const highIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* clamp */])(Math.ceil(len * m), 0, len);
+        const lowIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.floor(len * m), 0, len);
+        const highIndex = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* clamp */])(Math.ceil(len * m), 0, len);
         const low = this.pixel[lowIndex];
         const high = this.pixel[highIndex];
         const fract = len * m - Math.floor(len * m);
@@ -10686,7 +10797,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     }
     _compile(meta) {
         super._compile(meta);
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkType */])('ramp', 'input', 0, ['number', 'category'], this.input);
         this._texCategories = null;
         this._GLtexCategories = null;
     }
@@ -10701,7 +10812,7 @@ class Ramp extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         uniform float keyMin${this._uid};
         uniform float keyWidth${this._uid};
         `),
-            inline: this.palette.type == 'customPaletteNumber' ?
+            inline: this.palette.type == 'number-array' ?
                 `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
@@ -10841,7 +10952,7 @@ function interpolate(low, high, m) {
 
 
 /***/ }),
-/* 56 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10939,9 +11050,9 @@ function XYZToSRGB({ x, y, z, a }) {
     // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space
 
     // Convert XYZ to linear RGB
-    const r = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(3.2406 * x - 1.5372 * y - 0.4986 * z, 0, 1);
-    const g = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(-0.9689 * x + 1.8758 * y + 0.0415 * z, 0, 1);
-    const b = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["i" /* clamp */])(0.0557 * x - 0.2040 * y + 1.0570 * z, 0, 1);
+    const r = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(3.2406 * x - 1.5372 * y - 0.4986 * z, 0, 1);
+    const g = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(-0.9689 * x + 1.8758 * y + 0.0415 * z, 0, 1);
+    const b = Object(__WEBPACK_IMPORTED_MODULE_0__expressions_utils__["h" /* clamp */])(0.0557 * x - 0.2040 * y + 1.0570 * z, 0, 1);
 
     return linearRGBToSRGB({ r, g, b, a });
 }
@@ -10964,7 +11075,7 @@ function cielabToXYZ({ l, a, b, alpha }) {
 
 
 /***/ }),
-/* 57 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10975,7 +11086,7 @@ function cielabToXYZ({ l, a, b, alpha }) {
  * Time contant expression
  *
  * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
- * @return {carto.expressions.Base}
+ * @return {Date}
  *
  * @example <caption>Filter by a date between dates.</caption>
  * const s = carto.expressions;
@@ -11004,6 +11115,9 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
         this.date = date;
         this.inlineMaker = () => undefined;
     }
+    get value() {
+        return this.eval();
+    }
     eval() {
         return this.date;
     }
@@ -11016,7 +11130,7 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 58 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11026,9 +11140,9 @@ class Time extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Get the top `n` properties.
  *
- * @param {carto.expressions.Base} property - Column of the table
+ * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned
- * @return {carto.expressions.Base}
+ * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
  * const s = carto.expressions;
@@ -11106,7 +11220,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
             });
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);            
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 pixels);
@@ -11128,7 +11242,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 59 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11141,9 +11255,9 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * Alias to a named variable defined in the Viz.
  *
  * @param {string} name - The variable name that is going to be evaluated
- * @return {carto.expressions.Base}
+ * @return {Number|Category|Color|Date}
  *
- * @example <caption></caption
+ * @example <caption></caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
@@ -11152,7 +11266,7 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  *  filter: s.neq(s.var('sum_price'), 'london'),
  * });
  *
- * @example <caption>(String)</caption
+ * @example <caption>(String)</caption>
  * const viz = new carto.Viz(`
  *   @sum_price: clusterSum($price)
  *   filter: @sum_price != 'london'
@@ -11165,15 +11279,20 @@ class Top extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  */
 class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(name) {
-        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* checkString */])('name', 'name', 0, name);
+        Object(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* checkString */])('name', 'name', 0, name);
         if (name == '') {
             throw new Error('variable(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
     }
+    get value() {
+        return this.eval();
+    }
     eval(feature) {
-        return this.alias.eval(feature);
+        if (this.alias) {
+            return this.alias.eval(feature);
+        }
     }
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
@@ -11202,7 +11321,7 @@ class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 60 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11216,8 +11335,8 @@ class Variable extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the average of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11255,8 +11374,8 @@ const ViewportAvg = genViewportAgg('avg',
 /**
  * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11287,8 +11406,8 @@ const ViewportMax = genViewportAgg('max',
 /**
  * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11318,8 +11437,8 @@ const ViewportMin = genViewportAgg('min',
 /**
  * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11349,7 +11468,8 @@ const ViewportSum = genViewportAgg('sum',
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the feature count in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11385,7 +11505,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
          */
         constructor(property) {
             super({
-                property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(metadataPropertyName == 'count' ? Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) : property),
+                property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */])(metadataPropertyName == 'count' ? Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) : property),
                 _impostor: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
             });
             this._isViewport = true;
@@ -11424,8 +11544,9 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {carto.expressions.Base} x - numeric expression
- * @return {carto.expressions.Base} Result of the aggregation
+ * @param {Number} input - Numeric expression
+ * @param {Number} percentile - Numeric expression [0, 100]
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
  * const s = carto.expressions;
@@ -11451,8 +11572,8 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defa
      */
     constructor(property, percentile) {
         super({
-            property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(property),
-            percentile: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(percentile),
+            property: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */])(property),
+            percentile: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */])(percentile),
             impostor: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0)
         });
         this._isViewport = true;
@@ -11465,7 +11586,7 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defa
     eval(f) {
         if (this._value == null) {
             this._array.sort((a, b) => a - b);
-            const index = Object(__WEBPACK_IMPORTED_MODULE_2__utils__["i" /* clamp */])(
+            const index = Object(__WEBPACK_IMPORTED_MODULE_2__utils__["h" /* clamp */])(
                 Math.floor(this.percentile.eval(f) / 100 * this._array.length),
                 0, this._array.length - 1);
             this._value = this._array[index];
@@ -11508,10 +11629,10 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defa
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
- * @param {carto.expressions.Base} x - expression to base the histogram
- * @param {carto.expressions.Base} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} input - expression to base the histogram
+ * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
- * @return {carto.expressions.Base} Histogram
+ * @return {Histogram} Histogram
  *
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
@@ -11536,8 +11657,8 @@ class ViewportPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defa
 class ViewportHistogram extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x, weight = 1, size = 1000) {
         super({
-            x: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(x),
-            weight: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["m" /* implicitCast */])(weight),
+            x: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */])(x),
+            weight: Object(__WEBPACK_IMPORTED_MODULE_2__utils__["l" /* implicitCast */])(weight),
         });
         this._size = size;
         this._isViewport = true;
@@ -11600,7 +11721,7 @@ class ViewportHistogram extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defau
 
 
 /***/ }),
-/* 61 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11613,14 +11734,13 @@ class ViewportHistogram extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defau
 
 
 
-
-
-
 /**
  * Return the average of the feature property for the entire source data.
  *
- * @param {carto.expressions.Base} property - property expression of date or number type
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalAvg` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global average of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11647,8 +11767,10 @@ const GlobalAvg = generateGlobalAggregattion('avg');
 /**
  * Return the maximum of the feature property for the entire source data.
  *
- * @param {carto.expressions.Base} property - property expression of date or number type
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalMax` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
  *
  * @example <caption>Assign the global maximum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11675,8 +11797,10 @@ const GlobalMax = generateGlobalAggregattion('max');
 /**
  * Return the minimum of the feature property for the entire source data.
  *
- * @param {carto.expressions.Base} property - property expression of date or number type
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalMin` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
  *
  * @example <caption>Assign the global minimum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11703,8 +11827,10 @@ const GlobalMin = generateGlobalAggregattion('min');
 /**
  * Return the sum of the feature property for the entire source data.
  *
- * @param {carto.expressions.Base} property - property expression of date or number type
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalSum` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global sum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11731,7 +11857,10 @@ const GlobalSum = generateGlobalAggregattion('sum');
 /**
  * Return the feature count for the entire source data.
  *
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalCount` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global count of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11763,7 +11892,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
          */
         constructor(property) {
             super({ _value: Object(__WEBPACK_IMPORTED_MODULE_1__functions__["number"])(0) });
-            this.property = Object(__WEBPACK_IMPORTED_MODULE_3__utils__["m" /* implicitCast */])(property);
+            this.property = Object(__WEBPACK_IMPORTED_MODULE_3__utils__["l" /* implicitCast */])(property);
         }
 
         get value() {
@@ -11799,8 +11928,11 @@ function generateGlobalAggregattion(metadataPropertyName) {
 /**
  * Return the Nth percentile of the feature property for the entire source data.
  *
- * @param {carto.expressions.Base} property - property expression of date or number type
- * @return {carto.expressions.Base} Result of the aggregation
+ * Note: `globalPercentile` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
+ * @param {Number} percentile - Numeric expression [0, 100]
+ * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the global percentile of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
@@ -11864,7 +11996,7 @@ class GlobalPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defaul
 
 
 /***/ }),
-/* 62 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11876,9 +12008,9 @@ class GlobalPercentile extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* defaul
 // TODO should this expression be removed?
 class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
     constructor(x, y, z) {
-        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(x);
-        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(y);
-        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["m" /* implicitCast */])(z);
+        x = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(x);
+        y = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(y);
+        z = Object(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* implicitCast */])(z);
         super({ x: x, y: y, z: z });
         // TODO improve type check
     }
@@ -11948,7 +12080,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11960,7 +12092,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 /**
  * Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.
  *
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
  * @example <caption>Show constant width in zoom.</caption>
  * const s = carto.expressions;
@@ -11972,7 +12104,7 @@ class XYZ extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
  * const viz = new carto.Viz(`
  *   width: zoom() / 1000
  * `);
- * 
+ *
  * @memberof carto.expressions
  * @name zoom
  * @function
@@ -12000,16 +12132,16 @@ class Zoom extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__client_rsys__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__error_handling_carto_validation_error__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_metadata__ = __webpack_require__(34);
 
 
 
@@ -12403,27 +12535,242 @@ class GeoJSON extends __WEBPACK_IMPORTED_MODULE_0__base__["a" /* default */] {
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__point__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tris__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lines__ = __webpack_require__(68);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__point__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_1__tris__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_2__lines__; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__antialiasing_glsl__ = __webpack_require__(70);
 
 
+
+class AntiAliasingShader {
+    constructor(gl) {
+        const { program, programID } = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* compileProgram */])(gl, __WEBPACK_IMPORTED_MODULE_1__antialiasing_glsl__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_1__antialiasing_glsl__["a" /* FS */]);
+        this.program = program;
+        this.programID = programID;
+        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
+        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = AntiAliasingShader;
 
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/** 
+ * To avoid recompiling the shaders we keep a shader cache.
+ * We need a different shader per webgl context so we use a 2 level cache where at the first level
+ * the webgl context is the key and at the second level the shader code is the cache key.
+ */
+class ShaderCache {
+    constructor() {
+        this.caches = new WeakMap();
+    }
+
+    get(gl, shadercode) {
+        if (this.caches.has(gl)) {
+            let cache = this.caches.get(gl);
+            if (cache[shadercode]) {
+                return cache[shadercode];
+            }
+        }
+    }
+
+    set(gl, shadercode, shader) {
+        if (this.caches.has(gl)) {
+            let cache = this.caches.get(gl);
+            cache[shadercode] = shader;
+        } else {
+            let cache = new WeakMap;
+            cache[shadercode] = shader;
+            this.caches.set(gl, cache);
+        }
+    }
+
+    has(gl, shadercode) {
+        return this.get(gl, shadercode) !== undefined;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = ShaderCache;
+
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+const VS = `
+
+precision highp float;
+attribute vec2 vertex;
+
+varying  vec2 uv;
+
+void main(void) {
+    uv = vertex*0.5+vec2(0.5);
+    gl_Position = vec4(vertex, 0.5, 1.);
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["b"] = VS;
+
+
+const FS = `
+
+precision highp float;
+
+varying  vec2 uv;
+
+uniform sampler2D aaTex;
+
+void main(void) {
+    vec4 aa = texture2D(aaTex, uv);
+    gl_FragColor = aa;
+}
+`;
+/* harmony export (immutable) */ __webpack_exports__["a"] = FS;
+
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__line_glsl__ = __webpack_require__(72);
+
+
+
+
+class LineShader {
+    constructor(gl) {
+        const { program, programID } = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* compileProgram */])(gl, __WEBPACK_IMPORTED_MODULE_1__line_glsl__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_1__line_glsl__["a" /* FS */]);
+        this.program = program;
+        this.programID = programID;
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = LineShader;
+
+
+
+/***/ }),
+/* 72 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const VS = `
+
+precision highp float;
+
+attribute vec2 vertexPosition;
+attribute vec2 featureID;
+attribute vec2 normal;
+
+uniform vec2 vertexScale;
+uniform vec2 vertexOffset;
+uniform vec2 normalScale;
+
+uniform sampler2D colorTex;
+uniform sampler2D widthTex;
+uniform sampler2D filterTex;
+
+varying lowp vec4 color;
+
+// From [0.,1.] in exponential-like form to pixels in [0.,255.]
+float decodeWidth(float x){
+    x*=255.;
+    if (x < 64.){
+        return x*0.25;
+    }else if (x<128.){
+        return (x-64.)+16.;
+    }else{
+        return (x-127.)*2.+80.;
+    }
+}
+
+void main(void) {
+    color = texture2D(colorTex, featureID);
+    float filtering = texture2D(filterTex, featureID).a;
+    color.a *= filtering;
+    color.rgb *= color.a;
+    float size = decodeWidth(texture2D(widthTex, featureID).a);
+
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+    if (size==0. || color.a==0.){
+        p.x=10000.;
+    }
+    gl_Position  = p;
+}`;
+/* harmony export (immutable) */ __webpack_exports__["b"] = VS;
+
+
+const FS = `
+precision highp float;
+
+varying lowp vec4 color;
+
+void main(void) {
+    gl_FragColor = color;
+}`;
+/* harmony export (immutable) */ __webpack_exports__["a"] = FS;
+
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__point_glsl__ = __webpack_require__(74);
+
+
+
+
+class PointShader {
+    constructor(gl) {
+        const { program, programID } = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* compileProgram */])(gl, __WEBPACK_IMPORTED_MODULE_1__point_glsl__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_1__point_glsl__["a" /* FS */]);
+        this.program = program;
+        this.programID = programID;
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
+        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
+        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = PointShader;
+
+
+
+/***/ }),
+/* 74 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 //TODO performance optimization: direct stroke/color/widths from uniform instead of texture read when possible
 
 /*
@@ -12537,7 +12884,7 @@ void main(void) {
     }
     gl_Position  = p;
 }`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
+/* harmony export (immutable) */ __webpack_exports__["b"] = VS;
 
 
 const FS = `
@@ -12572,16 +12919,46 @@ void main(void) {
 
     gl_FragColor = c;
 }`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+/* harmony export (immutable) */ __webpack_exports__["a"] = FS;
 
 
 
 /***/ }),
-/* 67 */
+/* 75 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__triangle_glsl__ = __webpack_require__(76);
+
+
+
+class TriangleShader {
+    constructor(gl) {
+        const { program, programID } = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* compileProgram */])(gl, __WEBPACK_IMPORTED_MODULE_1__triangle_glsl__["b" /* VS */], __WEBPACK_IMPORTED_MODULE_1__triangle_glsl__["a" /* FS */]);
+        this.program = program;
+        this.programID = programID;
+        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
+        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
+        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
+        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
+        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
+        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'strokeColorTex');
+        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
+        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TriangleShader;
+
+
+
+/***/ }),
+/* 76 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 const VS = `
 
 precision highp float;
@@ -12632,7 +13009,7 @@ void main(void) {
     color = vec4(c.rgb*c.a, c.a);
     gl_Position  = p;
 }`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
+/* harmony export (immutable) */ __webpack_exports__["b"] = VS;
 
 
 const FS = `
@@ -12643,118 +13020,33 @@ varying highp vec4 color;
 void main(void) {
     gl_FragColor = color;
 }`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+/* harmony export (immutable) */ __webpack_exports__["a"] = FS;
+
 
 
 /***/ }),
-/* 68 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-const VS = `
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__ = __webpack_require__(17);
 
-precision highp float;
 
-attribute vec2 vertexPosition;
-attribute vec2 featureID;
-attribute vec2 normal;
-
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
-uniform vec2 normalScale;
-
-uniform sampler2D colorTex;
-uniform sampler2D widthTex;
-uniform sampler2D filterTex;
-
-varying lowp vec4 color;
-
-// From [0.,1.] in exponential-like form to pixels in [0.,255.]
-float decodeWidth(float x){
-    x*=255.;
-    if (x < 64.){
-        return x*0.25;
-    }else if (x<128.){
-        return (x-64.)+16.;
-    }else{
-        return (x-127.)*2.+80.;
+class ColorShader extends __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__["a" /* default */] {
+    constructor(gl, preface, inline) {
+        super(gl, '/*Color*/' + preface, inline);
     }
 }
-
-void main(void) {
-    color = texture2D(colorTex, featureID);
-    float filtering = texture2D(filterTex, featureID).a;
-    color.a *= filtering;
-    color.rgb *= color.a;
-    float size = decodeWidth(texture2D(widthTex, featureID).a);
-
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
-    if (size==0. || color.a==0.){
-        p.x=10000.;
-    }
-    gl_Position  = p;
-}`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-precision highp float;
-
-varying lowp vec4 color;
-
-void main(void) {
-    gl_FragColor = color;
-}`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
+/* harmony export (immutable) */ __webpack_exports__["a"] = ColorShader;
 
 
 
 /***/ }),
-/* 69 */
+/* 78 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //TODO Discuss size scaling constant, maybe we need to remap using an exponential map
-
-const VS = `
-
-precision highp float;
-attribute vec2 vertex;
-
-varying  vec2 uv;
-
-void main(void) {
-    uv = vertex*0.5+vec2(0.5);
-    gl_Position = vec4(vertex, 0.5, 1.);
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["VS"] = VS;
-
-
-const FS = `
-
-precision highp float;
-
-varying vec2 uv;
-
-$PREFACE
-
-void main(void) {
-    vec2 featureID = uv;
-    gl_FragColor = $INLINE;
-}
-`;
-/* harmony export (immutable) */ __webpack_exports__["FS"] = FS;
-
-
-
-/***/ }),
-/* 70 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 
 const VS = `
 
@@ -12775,13 +13067,13 @@ const FS = `
 
 precision highp float;
 
-varying  vec2 uv;
+varying vec2 uv;
 
-uniform sampler2D aaTex;
+$PREFACE
 
 void main(void) {
-    vec4 aa = texture2D(aaTex, uv);
-    gl_FragColor = aa;
+    vec2 featureID = uv;
+    gl_FragColor = $INLINE;
 }
 `;
 /* harmony export (immutable) */ __webpack_exports__["a"] = FS;
@@ -12789,55 +13081,62 @@ void main(void) {
 
 
 /***/ }),
-/* 71 */
+/* 79 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/** 
- * To avoid recompiling the shaders we keep a shader cache.
- * We need a different shader per webgl context so we use a 2 level cache where at the first level
- * the webgl context is the key and at the second level the shader code is the cache key.
- */
-class ShaderCache {
-    constructor() {
-        this.caches = new WeakMap();
-    }
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__ = __webpack_require__(17);
 
-    get(gl, shadercode) {
-        if (this.caches.has(gl)) {
-            let cache = this.caches.get(gl);
-            if (cache[shadercode]) {
-                return cache[shadercode];
-            }
-        }
-    }
 
-    set(gl, shadercode, shader) {
-        if (this.caches.has(gl)) {
-            let cache = this.caches.get(gl);
-            cache[shadercode] = shader;
-        } else {
-            let cache = new WeakMap;
-            cache[shadercode] = shader;
-            this.caches.set(gl, cache);
-        }
-    }
-
-    has(gl, shadercode) {
-        return this.get(gl, shadercode) !== undefined;
+class WidthShader extends __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__["a" /* default */] {
+    constructor(gl, preface, inline) {
+        super(gl, PREFACE_2 + preface, `vec4(encodeWidth(${inline}))`);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ShaderCache;
+/* harmony export (immutable) */ __webpack_exports__["a"] = WidthShader;
+
+
+const PREFACE_2 = `
+/* Width */
+
+// From pixels in [0.,255.] to [0.,1.] in exponential-like form
+float encodeWidth(float x){
+    if (x < 16.){
+        x = x * 4.;
+    } else if (x < 80.){
+        x = (x - 16.) + 64.;
+    } else{
+        x = (x - 80.) * 0.5 + 128.;
+    }
+    return x / 255.;
+}
+`;
+
+
+/***/ }),
+/* 80 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__ = __webpack_require__(17);
+
+
+class Filter extends __WEBPACK_IMPORTED_MODULE_0__BaseStyleShader__["a" /* default */] {
+    constructor(gl, preface, inline) {
+        super(gl, '/*Filter*/' + preface, `vec4(${inline})`);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Filter;
 
 
 
 /***/ }),
-/* 72 */
+/* 81 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export decodeGeom */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut__ = __webpack_require__(82);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_earcut___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_earcut__);
 
 
@@ -13029,7 +13328,7 @@ function normalize(v) {
 
 
 /***/ }),
-/* 73 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13686,12 +13985,12 @@ earcut.flatten = function (data) {
 
 
 /***/ }),
-/* 74 */
+/* 83 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CartoError; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(75);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error_list__ = __webpack_require__(84);
 
 
 const UNEXPECTED_ERROR = 'unexpected error';
@@ -13775,7 +14074,7 @@ class CartoError extends Error {
 
 
 /***/ }),
-/* 75 */
+/* 84 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13944,12 +14243,12 @@ const validation = {
 
 
 /***/ }),
-/* 76 */
+/* 85 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -14021,21 +14320,21 @@ class Dataset extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* defau
 
 
 /***/ }),
-/* 77 */
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(78);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rsys__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_dataframe__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf__ = __webpack_require__(87);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_pbf___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_pbf__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(80);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache__ = __webpack_require__(89);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_lru_cache___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_lru_cache__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__ = __webpack_require__(98);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__mapbox_vector_tile__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_metadata__ = __webpack_require__(34);
 
 
 
@@ -14135,7 +14434,6 @@ class Windshaft {
             this._getTiles(tiles);
         }
     }
-
 
     _getTiles(tiles) {
         this._requestGroupID++;
@@ -14786,7 +15084,7 @@ function perpendicular([x, y]) {
 
 
 /***/ }),
-/* 78 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14794,7 +15092,7 @@ function perpendicular([x, y]) {
 
 module.exports = Pbf;
 
-var ieee754 = __webpack_require__(79);
+var ieee754 = __webpack_require__(88);
 
 function Pbf(buf) {
     this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);
@@ -15411,7 +15709,7 @@ function writeUtf8(buf, str, pos) {
 
 
 /***/ }),
-/* 79 */
+/* 88 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -15501,7 +15799,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 80 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15511,11 +15809,11 @@ module.exports = LRUCache
 
 // This will be a proper iterable 'Map' in engines that support it,
 // or a fakey-fake PseudoMap in older versions.
-var Map = __webpack_require__(81)
-var util = __webpack_require__(83)
+var Map = __webpack_require__(90)
+var util = __webpack_require__(92)
 
 // A linked list to keep track of recently-used-ness
-var Yallist = __webpack_require__(87)
+var Yallist = __webpack_require__(96)
 
 // use symbols if possible, otherwise just _props
 var hasSymbol = typeof Symbol === 'function'
@@ -15975,7 +16273,7 @@ function Entry (key, value, length, now, maxAge) {
 
 
 /***/ }),
-/* 81 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {if (process.env.npm_package_name === 'pseudomap' &&
@@ -15985,13 +16283,13 @@ function Entry (key, value, length, now, maxAge) {
 if (typeof Map === 'function' && !process.env.TEST_PSEUDOMAP) {
   module.exports = Map
 } else {
-  module.exports = __webpack_require__(82)
+  module.exports = __webpack_require__(91)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(34)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(36)))
 
 /***/ }),
-/* 82 */
+/* 91 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = Object.prototype.hasOwnProperty
@@ -16110,7 +16408,7 @@ function set (data, k, v) {
 
 
 /***/ }),
-/* 83 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -16638,7 +16936,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(85);
+exports.isBuffer = __webpack_require__(94);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -16682,7 +16980,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(86);
+exports.inherits = __webpack_require__(95);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -16700,10 +16998,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(84), __webpack_require__(34)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(93), __webpack_require__(36)))
 
 /***/ }),
-/* 84 */
+/* 93 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16730,7 +17028,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 85 */
+/* 94 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -16741,7 +17039,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 86 */
+/* 95 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -16770,7 +17068,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 87 */
+/* 96 */
 /***/ (function(module, exports) {
 
 module.exports = Yallist
@@ -17146,7 +17444,7 @@ function Node (value, prev, next, list) {
 
 
 /***/ }),
-/* 88 */
+/* 97 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17154,15 +17452,15 @@ function Node (value, prev, next, list) {
 /* harmony export (immutable) */ __webpack_exports__["c"] = getSQLWhere;
 /* harmony export (immutable) */ __webpack_exports__["a"] = getAggregationFilters;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_viz_expressions_binary__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_viz_expressions_between__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_property__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_expressions_blend__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_expressions_animate__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__core_viz_expressions_between__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_basic_property__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__core_viz_expressions_blend__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__core_viz_expressions_animate__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_basic_number__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_basic_constant__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_basic_category__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__core_schema__ = __webpack_require__(7);
 
 
@@ -17258,7 +17556,7 @@ class AggregationFiltering {
 
     _value(f) {
         f = this._removeBlend(f);
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__["a" /* default */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_basic_number__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_basic_constant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_basic_category__["a" /* default */]) {
             return f.expr;
         }
     }
@@ -17281,8 +17579,8 @@ class AggregationFiltering {
     _in(f) {
         if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__["a" /* In */]) {
             let p = this._aggregation(f.value);
-            let values = f.categories.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.categories.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 p.filters.push({
                     in: values
                 });
@@ -17294,8 +17592,8 @@ class AggregationFiltering {
     _notIn(f) {
         if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__["b" /* Nin */]) {
             let p = this._aggregation(f.value);
-            let values = f.categories.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.categories.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 p.filters.push({
                     not_in: values
                 });
@@ -17330,7 +17628,7 @@ class AggregationFiltering {
 
     _aggregation(f) {
         f = this._removeBlend(f);
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["a" /* ClusterAvg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["b" /* ClusterMax */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["c" /* ClusterMin */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["d" /* ClusterMode */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_clusterAggregation__["e" /* ClusterSum */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__["a" /* ClusterAvg */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__["b" /* ClusterMax */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__["c" /* ClusterMin */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__["d" /* ClusterMode */] || f instanceof __WEBPACK_IMPORTED_MODULE_9__core_viz_expressions_aggregation_clusterAggregation__["e" /* ClusterSum */]) {
             let p = this._property(f.property);
             if (p) {
                 p.property = __WEBPACK_IMPORTED_MODULE_10__core_schema__["column"].aggColumn(p.property, f.aggName);
@@ -17347,7 +17645,7 @@ class AggregationFiltering {
 
     _property(f) {
         f = this._removeBlend(f);
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_property__["a" /* default */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_basic_property__["a" /* default */]) {
             return {
                 property: f.name,
                 filters: []
@@ -17503,7 +17801,7 @@ class PreaggregationFiltering {
     }
 
     _property(f) {
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_property__["a" /* default */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_3__core_viz_expressions_basic_property__["a" /* default */]) {
             return {
                 type: 'property',
                 property: f.name
@@ -17512,7 +17810,7 @@ class PreaggregationFiltering {
     }
 
     _value(f) {
-        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_number__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_constant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_category__["a" /* default */]) {
+        if (f instanceof __WEBPACK_IMPORTED_MODULE_6__core_viz_expressions_basic_number__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_7__core_viz_expressions_basic_constant__["a" /* default */] || f instanceof __WEBPACK_IMPORTED_MODULE_8__core_viz_expressions_basic_category__["a" /* default */]) {
             return {
                 type: 'value',
                 value: f.expr
@@ -17523,8 +17821,8 @@ class PreaggregationFiltering {
     _in(f) {
         if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__["a" /* In */]) {
             let p = this._property(f.value);
-            let values = f.categories.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.categories.length) {
+            let values = f.list.elems.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 return {
                     type: 'in',
                     property: p.property,
@@ -17537,8 +17835,8 @@ class PreaggregationFiltering {
     _notIn(f) {
         if (f instanceof __WEBPACK_IMPORTED_MODULE_1__core_viz_expressions_belongs__["b" /* Nin */]) {
             let p = this._property(f.value);
-            let values = f.categories.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.categories.length) {
+            let values = f.list.elems.map(cat => this._value(cat));
+            if (p && values.length > 0 && values.length == f.list.elems.length) {
                 return {
                     type: 'notIn',
                     property: p.property,
@@ -17645,22 +17943,22 @@ function getAggregationFilters(filtering) {
 
 
 /***/ }),
-/* 89 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports.VectorTile = __webpack_require__(90);
-module.exports.VectorTileFeature = __webpack_require__(36);
-module.exports.VectorTileLayer = __webpack_require__(35);
+module.exports.VectorTile = __webpack_require__(99);
+module.exports.VectorTileFeature = __webpack_require__(38);
+module.exports.VectorTileLayer = __webpack_require__(37);
 
 
 /***/ }),
-/* 90 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var VectorTileLayer = __webpack_require__(35);
+var VectorTileLayer = __webpack_require__(37);
 
 module.exports = VectorTile;
 
@@ -17678,7 +17976,7 @@ function readTile(tag, layers, pbf) {
 
 
 /***/ }),
-/* 91 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17997,12 +18295,12 @@ Point.convert = function (a) {
 
 
 /***/ }),
-/* 92 */
+/* 101 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__base_windshaft__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__error_handling_carto_validation_error__ = __webpack_require__(6);
 
 
@@ -18085,7 +18383,7 @@ class SQL extends __WEBPACK_IMPORTED_MODULE_1__base_windshaft__["a" /* default *
 
 
 /***/ }),
-/* 93 */
+/* 102 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18112,7 +18410,7 @@ function compileShader(gl, vizRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 94 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //     JavaScript Expression Parser (JSEP) 0.3.4
@@ -18833,12 +19131,12 @@ function compileShader(gl, vizRootExpr, shaderCreator) {
 
 
 /***/ }),
-/* 95 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getCartoMapIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_renderer__ = __webpack_require__(12);
 
 
 let integrator = null;
@@ -18866,13 +19164,13 @@ class CartoMapIntegrator {
 
 
 /***/ }),
-/* 96 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = getMGLIntegrator;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_renderer__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(5);
 
 
@@ -19001,11 +19299,11 @@ class MGLIntegrator {
 
 
 /***/ }),
-/* 97 */
+/* 106 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_feature__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__api_feature__ = __webpack_require__(107);
 
 
 class RenderLayer {
@@ -19080,11 +19378,11 @@ class RenderLayer {
 
 
 /***/ }),
-/* 98 */
+/* 107 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__featureVizProperty__ = __webpack_require__(99);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__featureVizProperty__ = __webpack_require__(108);
 
 
 /**
@@ -19133,12 +19431,12 @@ class Feature {
 
 
 /***/ }),
-/* 99 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_viz_functions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_parser__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__core_viz_parser__ = __webpack_require__(43);
 
 
 
@@ -19210,14 +19508,14 @@ function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz
 
 
 /***/ }),
-/* 100 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_mitt__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__layer__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__client_rsys__ = __webpack_require__(13);
 
 
 

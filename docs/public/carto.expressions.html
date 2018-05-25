@@ -73,7 +73,7 @@ it was a categorical property. Each expression defines some restrictions regardi
 type of their parameters.</p>
 <p>The most important types are:</p>
 <ul>
-<li><strong>Numeric</strong> expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.</li>
+<li><strong>Numer</strong> expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.</li>
 <li><strong>Category</strong> expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.</li>
 <li><strong>Color</strong> expression. Expressions that contains colors. An alpha or transparency channel is included in this type.</li>
 </ul></div>
@@ -130,9 +130,6 @@ type of their parameters.</p>
         <h3 class="subsection-title">Classes</h3>
 
         <dl>
-            <dt><a href="carto.expressions.Base.html">Base</a></dt>
-            <dd></dd>
-        
             <dt><a href="carto.expressions.Torque.html">Torque</a></dt>
             <dd></dd>
         </dl>
@@ -218,13 +215,13 @@ Use them with a <a href="carto.expressions.html#.ramp">ramp</a></p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.ramp(s.prop('type'), s.palettes.PRISM);
+  color: s.ramp(s.prop('type'), s.palettes.PRISM);
 });</code></pre>
 
         <p class="code-caption">Using a color scheme. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: ramp($type, PRISM)
+  color: ramp($type, PRISM)
 `);</code></pre>
 
 
@@ -241,7 +238,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".abs"><span class="type-signature">(static) </span>abs<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".abs"><span class="type-signature">(static) </span>abs<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -291,10 +288,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -374,7 +368,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -408,7 +402,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".add"><span class="type-signature">(static) </span>add<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".add"><span class="type-signature">(static) </span>add<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -458,10 +452,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -471,7 +465,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>First value to add</p></td>
         </tr>
 
     
@@ -484,10 +478,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -497,7 +491,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value to add</p></td>
         </tr>
 
     
@@ -560,7 +554,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the addition</p>
 </div>
 
 
@@ -571,7 +565,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -605,7 +602,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".and"><span class="type-signature">(static) </span>and<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".and"><span class="type-signature">(static) </span>and<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -658,10 +655,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -671,7 +665,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>First value of the expression</p></td>
         </tr>
 
     
@@ -684,10 +678,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -697,7 +688,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the expression</p></td>
         </tr>
 
     
@@ -760,7 +751,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the expression</p>
 </div>
 
 
@@ -771,7 +762,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -808,7 +799,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".animate"><span class="type-signature">(static) </span>animate<span class="signature">(duration)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".animate"><span class="type-signature">(static) </span>animate<span class="signature">(duration)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -939,7 +930,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -957,7 +948,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     
 
     
-    <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -1008,10 +999,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -1034,10 +1022,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -1060,10 +1045,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -1147,7 +1129,7 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -1181,7 +1163,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".blend"><span class="type-signature">(static) </span>blend<span class="signature">(a, b, mix)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".blend"><span class="type-signature">(static) </span>blend<span class="signature">(a, b, mix)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -1189,7 +1171,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Linearly interpolate from <code>a</code> to <code>b</code> based on <em>mix</em>.</p>
+    <p>Linearly interpolate from <code>a</code> to <code>b</code> based on <code>mix</code>.</p>
 </div>
 
 
@@ -1231,10 +1213,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -1244,7 +1226,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or color expression</p></td>
+            <td class="description last"><p>Numeric or color expression, <code>a</code> type must match <code>b</code> type</p></td>
         </tr>
 
     
@@ -1257,10 +1239,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -1270,7 +1252,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or color expression</p></td>
+            <td class="description last"><p>Numeric or color expression, <code>b</code> type must match <code>a</code> type</p></td>
         </tr>
 
     
@@ -1283,10 +1265,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -1359,7 +1338,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Numeric or color expression with the same type as <code>a</code> and <code>b</code></p>
 </div>
 
 
@@ -1370,7 +1349,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -1383,7 +1365,7 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels.</p>
+        <p class="code-caption">Blend based on the zoom level to display a bubble map at high zoom levels and display fixed-sized points at low zoom levels.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
@@ -1393,11 +1375,11 @@ const viz = new carto.Viz({
           );
 });</code></pre>
 
-        <p class="code-caption">Display a bubble map at high zoom levels, show fixed-sized points at low zoom levels, interpolate at intermediate zoom levels. (String)</p>
+        <p class="code-caption">Blend based on the zoom level to display a bubble map at high zoom levels and display fixed-sized points at low zoom levels. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: blend(3,
-               prop('dn'),
+               $dn,
                linear(zoom(), 2^10, 2^14)
          )
 `);</code></pre>
@@ -1410,7 +1392,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, breakpoints)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, breakpoints)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -1495,7 +1477,10 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -1518,7 +1503,10 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;<a href="carto.expressions.Base.html">carto.expressions.Base</a>></span>
+<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
 
 
             
@@ -1598,7 +1586,10 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -1616,159 +1607,7 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
     
 
     
-    <h4 class="name" id=".category"><span class="type-signature">(static) </span>category<span class="signature">(categoryName)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Wrapper around category names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>categoryName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>category expression with the category name provided</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".ceil"><span class="type-signature">(static) </span>ceil<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".ceil"><span class="type-signature">(static) </span>ceil<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -1823,10 +1662,7 @@ Find the nearest integer that is greater than or equal to the expression value.<
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -1906,7 +1742,7 @@ Find the nearest integer that is greater than or equal to the expression value.<
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -1940,7 +1776,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".cielab"><span class="type-signature">(static) </span>cielab<span class="signature">(l, a, b)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".cielab"><span class="type-signature">(static) </span>cielab<span class="signature">(l, a, b)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -1990,10 +1826,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2016,10 +1849,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2042,10 +1872,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2125,7 +1952,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -2159,7 +1986,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".clusterAvg"><span class="type-signature">(static) </span>clusterAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".clusterAvg"><span class="type-signature">(static) </span>clusterAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -2169,6 +1996,7 @@ const viz = new carto.Viz({
 <div class="description">
     <p>Aggregate using the average. This operation disables the access to the property
 except within other cluster aggregate functions.</p>
+<p>Note: <code>clusterAvg</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -2210,7 +2038,7 @@ except within other cluster aggregate functions.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2220,7 +2048,7 @@ except within other cluster aggregate functions.</p>
 
             
 
-            <td class="description last"><p>Column of the table to be aggregated, must be a date or a number</p></td>
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
         </tr>
 
     
@@ -2294,7 +2122,7 @@ except within other cluster aggregate functions.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -2328,7 +2156,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".clusterMax"><span class="type-signature">(static) </span>clusterMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".clusterMax"><span class="type-signature">(static) </span>clusterMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -2338,6 +2166,7 @@ const viz = new carto.Viz({
 <div class="description">
     <p>Aggregate using the maximum. This operation disables the access to the property
 except within other cluster aggregate functions.</p>
+<p>Note: <code>clusterMax</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -2379,7 +2208,7 @@ except within other cluster aggregate functions.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2389,7 +2218,7 @@ except within other cluster aggregate functions.</p>
 
             
 
-            <td class="description last"><p>Column of the table to be aggregated, must be a date or a number</p></td>
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
         </tr>
 
     
@@ -2463,7 +2292,7 @@ except within other cluster aggregate functions.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -2497,7 +2326,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".clusterMin"><span class="type-signature">(static) </span>clusterMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".clusterMin"><span class="type-signature">(static) </span>clusterMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -2507,6 +2336,7 @@ const viz = new carto.Viz({
 <div class="description">
     <p>Aggregate using the minimum. This operation disables the access to the property
 except within other cluster aggregate functions.</p>
+<p>Note: <code>clusterMin</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -2548,7 +2378,7 @@ except within other cluster aggregate functions.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2558,7 +2388,7 @@ except within other cluster aggregate functions.</p>
 
             
 
-            <td class="description last"><p>Column of the table to be aggregated, must be a date or a number</p></td>
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
         </tr>
 
     
@@ -2632,7 +2462,7 @@ except within other cluster aggregate functions.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -2666,7 +2496,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".clusterMode"><span class="type-signature">(static) </span>clusterMode<span class="signature">(property)</span><span class="type-signature"> &rarr; {carto.expressions.Property}</span></h4>
+    <h4 class="name" id=".clusterMode"><span class="type-signature">(static) </span>clusterMode<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -2676,6 +2506,7 @@ const viz = new carto.Viz({
 <div class="description">
     <p>Aggregate using the mode. This operation disables the access to the property
 except within other cluster aggregate functions.</p>
+<p>Note: <code>clusterMode</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -2717,7 +2548,7 @@ except within other cluster aggregate functions.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -2727,7 +2558,7 @@ except within other cluster aggregate functions.</p>
 
             
 
-            <td class="description last"><p>Column of the table to be aggregated, must be a string</p></td>
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
         </tr>
 
     
@@ -2801,7 +2632,7 @@ except within other cluster aggregate functions.</p>
     </dt>
     <dd>
         
-<span class="param-type">carto.expressions.Property</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -2814,17 +2645,17 @@ except within other cluster aggregate functions.</p>
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Use cluster mode of the population as width.</p>
+        <p class="code-caption">Use cluster mode of the population in a color ramp.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.clusterMode(s.prop('population'))
+  color: s.ramp(s.clusterMode(s.prop('category')), s.palettes.PRISM)
 });</code></pre>
 
-        <p class="code-caption">Use cluster mode of the population as width. (String)</p>
+        <p class="code-caption">Use cluster mode of the population in a color ramp. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: clusterMode($population)
+  color: ramp(clusterMode($category), PRISM)
 `);</code></pre>
 
 
@@ -2835,7 +2666,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".clusterSum"><span class="type-signature">(static) </span>clusterSum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".clusterSum"><span class="type-signature">(static) </span>clusterSum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -2845,6 +2676,7 @@ const viz = new carto.Viz({
 <div class="description">
     <p>Aggregate using the sum. This operation disables the access to the property
 except within other cluster aggregate functions.</p>
+<p>Note: <code>clusterSum</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -2886,7 +2718,7 @@ except within other cluster aggregate functions.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -2896,7 +2728,7 @@ except within other cluster aggregate functions.</p>
 
             
 
-            <td class="description last"><p>Column of the table to be aggregated, must be a date or a number</p></td>
+            <td class="description last"><p>Column of the table to be aggregated</p></td>
         </tr>
 
     
@@ -2970,7 +2802,7 @@ except within other cluster aggregate functions.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -3004,7 +2836,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".constant"><span class="type-signature">(static) </span>constant<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".constant"><span class="type-signature">(static) </span>constant<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -3012,7 +2844,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Wraps a constant number. Implies a GPU optimization vs <a href="carto.expressions.html#.number">number expression</a>.</p>
+    <p>Wraps a constant number. Implies a GPU optimization vs number expression.</p>
 </div>
 
 
@@ -3138,7 +2970,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -3172,7 +3004,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".cos"><span class="type-signature">(static) </span>cos<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".cos"><span class="type-signature">(static) </span>cos<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -3222,10 +3054,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -3305,7 +3134,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -3339,7 +3168,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".div"><span class="type-signature">(static) </span>div<span class="signature">(numerator, denominator)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".div"><span class="type-signature">(static) </span>div<span class="signature">(numerator, denominator)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -3389,10 +3218,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -3415,10 +3244,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -3491,7 +3320,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the division</p>
 </div>
 
 
@@ -3502,7 +3331,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -3536,7 +3368,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".eq"><span class="type-signature">(static) </span>eq<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".eq"><span class="type-signature">(static) </span>eq<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -3587,10 +3419,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -3600,7 +3432,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or category expression, type must match <code>y</code> type</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -3613,10 +3445,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -3626,7 +3458,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or category expression, type must match <code>x</code> type</p></td>
+            <td class="description last"><p>Second value of the comparison</p></td>
         </tr>
 
     
@@ -3689,7 +3521,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -3700,7 +3532,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -3734,7 +3566,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".fade"><span class="type-signature">(static) </span>fade<span class="signature">(param1, param2)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".fade"><span class="type-signature">(static) </span>fade<span class="signature">(param1, param2)</span><span class="type-signature"> &rarr; {<a href="global.html#Fade">Fade</a>}</span></h4>
     
 
     
@@ -3784,10 +3616,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -3810,10 +3639,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -3893,7 +3719,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Fade">Fade</a></span>
 
 
     </dd>
@@ -3927,7 +3753,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".floor"><span class="type-signature">(static) </span>floor<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".floor"><span class="type-signature">(static) </span>floor<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -3982,10 +3808,7 @@ Find the nearest integer less than or equal to the expression value.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -4065,7 +3888,7 @@ Find the nearest integer less than or equal to the expression value.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -4099,7 +3922,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalAvg"><span class="type-signature">(static) </span>globalAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalAvg"><span class="type-signature">(static) </span>globalAvg<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -4108,6 +3931,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the average of the feature property for the entire source data.</p>
+<p>Note: <code>globalAvg</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -4149,7 +3973,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -4159,7 +3983,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>property expression of date or number type</p></td>
+            <td class="description last"><p>property expression of number type</p></td>
         </tr>
 
     
@@ -4233,7 +4057,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -4269,7 +4093,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalCount"><span class="type-signature">(static) </span>globalCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalCount"><span class="type-signature">(static) </span>globalCount<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -4278,6 +4102,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the feature count for the entire source data.</p>
+<p>Note: <code>globalCount</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -4286,6 +4111,55 @@ const viz = new carto.Viz({
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>property expression</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -4354,7 +4228,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -4390,7 +4264,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalEqIntervals"><span class="type-signature">(static) </span>globalEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalEqIntervals"><span class="type-signature">(static) </span>globalEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -4441,7 +4315,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -4544,7 +4418,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -4578,7 +4452,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalMax"><span class="type-signature">(static) </span>globalMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalMax"><span class="type-signature">(static) </span>globalMax<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -4587,6 +4461,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the maximum of the feature property for the entire source data.</p>
+<p>Note: <code>globalMax</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -4628,7 +4503,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
             
@@ -4712,7 +4590,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -4748,7 +4629,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalMin"><span class="type-signature">(static) </span>globalMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalMin"><span class="type-signature">(static) </span>globalMin<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -4757,6 +4638,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the minimum of the feature property for the entire source data.</p>
+<p>Note: <code>globalMin</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -4798,7 +4680,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
             
@@ -4882,7 +4767,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -4918,7 +4806,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalPercentile"><span class="type-signature">(static) </span>globalPercentile<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalPercentile"><span class="type-signature">(static) </span>globalPercentile<span class="signature">(property, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -4927,6 +4815,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the Nth percentile of the feature property for the entire source data.</p>
+<p>Note: <code>globalPercentile</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -4968,7 +4857,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -4978,7 +4867,30 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>property expression of date or number type</p></td>
+            <td class="description last"><p>property expression of number type</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>percentile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression [0, 100]</p></td>
         </tr>
 
     
@@ -5052,7 +4964,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -5088,7 +5000,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalQuantiles"><span class="type-signature">(static) </span>globalQuantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalQuantiles"><span class="type-signature">(static) </span>globalQuantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -5139,7 +5051,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5242,7 +5154,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -5276,7 +5188,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalSum"><span class="type-signature">(static) </span>globalSum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".globalSum"><span class="type-signature">(static) </span>globalSum<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -5285,6 +5197,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the sum of the feature property for the entire source data.</p>
+<p>Note: <code>globalSum</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -5326,7 +5239,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5336,7 +5249,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>property expression of date or number type</p></td>
+            <td class="description last"><p>property expression of number type</p></td>
         </tr>
 
     
@@ -5410,7 +5323,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -5446,7 +5359,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".gt"><span class="type-signature">(static) </span>gt<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".gt"><span class="type-signature">(static) </span>gt<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -5497,10 +5410,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5510,7 +5420,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -5523,10 +5433,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5536,7 +5443,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -5599,7 +5506,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -5610,7 +5517,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -5644,7 +5551,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".gte"><span class="type-signature">(static) </span>gte<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".gte"><span class="type-signature">(static) </span>gte<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -5695,10 +5602,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5708,7 +5612,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -5721,10 +5625,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -5734,7 +5635,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the comparison</p></td>
         </tr>
 
     
@@ -5797,7 +5698,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -5808,7 +5709,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -5842,7 +5743,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".hex"><span class="type-signature">(static) </span>hex<span class="signature">(hexadecimalColor)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".hex"><span class="type-signature">(static) </span>hex<span class="signature">(hexadecimalColor)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -5972,7 +5873,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -6006,7 +5907,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".hsl"><span class="type-signature">(static) </span>hsl<span class="signature">(h, s, l)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".hsl"><span class="type-signature">(static) </span>hsl<span class="signature">(h, s, l)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -6056,10 +5957,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6082,10 +5980,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6108,10 +6003,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6191,7 +6083,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -6225,7 +6117,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".hsla"><span class="type-signature">(static) </span>hsla<span class="signature">(h, s, l, a)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".hsla"><span class="type-signature">(static) </span>hsla<span class="signature">(h, s, l, a)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -6275,10 +6167,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6301,10 +6190,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6327,10 +6213,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6353,10 +6236,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6436,7 +6316,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -6470,7 +6350,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".hsv"><span class="type-signature">(static) </span>hsv<span class="signature">(h, s, v)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".hsv"><span class="type-signature">(static) </span>hsv<span class="signature">(h, s, v)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -6520,10 +6400,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6546,10 +6423,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6572,10 +6446,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6655,7 +6526,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -6689,7 +6560,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".hsva"><span class="type-signature">(static) </span>hsva<span class="signature">(h, s, v, a)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".hsva"><span class="type-signature">(static) </span>hsva<span class="signature">(h, s, v, a)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -6739,10 +6610,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6765,10 +6633,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6791,10 +6656,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6817,10 +6679,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -6900,7 +6759,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -6934,7 +6793,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, categories)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -6943,7 +6802,6 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Check if a categorical value belongs to a list of categories.</p>
-<p>This returns a numeric expression where 0 means <code>false</code> and 1 means <code>true</code>.</p>
 </div>
 
 
@@ -6985,10 +6843,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -6998,23 +6853,20 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Categorical expression to be tested against the categorical whitelist</p></td>
+            <td class="description last"><p>Categorical expression to be tested against the whitelist</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>categories</code></td>
+                <td class="name"><code>list</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;<a href="carto.expressions.Base.html">carto.expressions.Base</a>></span>
-|
-
-<span class="param-type">Array.&lt;string></span>
+<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
 
 
             
@@ -7024,7 +6876,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Multiple categorical expression parameters that will form the whitelist</p></td>
+            <td class="description last"><p>Multiple expression parameters that will form the whitelist</p></td>
         </tr>
 
     
@@ -7098,7 +6950,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -7132,7 +6984,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".isNaN"><span class="type-signature">(static) </span>isNaN<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".isNaN"><span class="type-signature">(static) </span>isNaN<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -7183,10 +7035,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7266,7 +7115,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -7284,7 +7133,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -7339,7 +7188,10 @@ default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
             
@@ -7374,7 +7226,10 @@ default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
             
@@ -7413,7 +7268,10 @@ default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
             
@@ -7509,7 +7367,10 @@ default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -7543,7 +7404,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".log"><span class="type-signature">(static) </span>log<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".log"><span class="type-signature">(static) </span>log<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -7593,10 +7454,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7676,7 +7534,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -7710,7 +7568,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".lt"><span class="type-signature">(static) </span>lt<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".lt"><span class="type-signature">(static) </span>lt<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -7761,10 +7619,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7774,7 +7629,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -7787,10 +7642,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7800,7 +7652,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the comparison</p></td>
         </tr>
 
     
@@ -7863,7 +7715,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -7874,7 +7726,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -7908,7 +7760,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".lte"><span class="type-signature">(static) </span>lte<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".lte"><span class="type-signature">(static) </span>lte<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -7959,10 +7811,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7972,7 +7821,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -7985,10 +7834,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -7998,7 +7844,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the comparison</p></td>
         </tr>
 
     
@@ -8061,7 +7907,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -8072,7 +7918,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -8106,7 +7952,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".mod"><span class="type-signature">(static) </span>mod<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".mod"><span class="type-signature">(static) </span>mod<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -8156,10 +8002,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -8169,7 +8012,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>First value of the modulus</p></td>
         </tr>
 
     
@@ -8182,10 +8025,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -8195,7 +8035,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the modulus</p></td>
         </tr>
 
     
@@ -8258,7 +8098,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the modulus</p>
 </div>
 
 
@@ -8269,7 +8109,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -8303,7 +8143,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".mul"><span class="type-signature">(static) </span>mul<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".mul"><span class="type-signature">(static) </span>mul<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -8353,10 +8193,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -8366,7 +8206,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>First value to multiply</p></td>
         </tr>
 
     
@@ -8379,10 +8219,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -8392,7 +8232,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value to multiply</p></td>
         </tr>
 
     
@@ -8455,7 +8295,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the multiplication</p>
 </div>
 
 
@@ -8466,7 +8306,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -8500,7 +8343,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".namedColor"><span class="type-signature">(static) </span>namedColor<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".namedColor"><span class="type-signature">(static) </span>namedColor<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -8630,7 +8473,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -8664,7 +8507,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".neq"><span class="type-signature">(static) </span>neq<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".neq"><span class="type-signature">(static) </span>neq<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -8715,10 +8558,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -8728,7 +8571,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or category expression, type must match <code>y</code> type</p></td>
+            <td class="description last"><p>Firt value of the comparison</p></td>
         </tr>
 
     
@@ -8741,10 +8584,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -8754,7 +8597,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric or category expression, type must match <code>x</code> type</p></td>
+            <td class="description last"><p>Second value of the comparison</p></td>
         </tr>
 
     
@@ -8817,7 +8660,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the comparison: 0 or 1</p>
 </div>
 
 
@@ -8828,7 +8671,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -8862,7 +8705,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".nin"><span class="type-signature">(static) </span>nin<span class="signature">(value, categories)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".nin"><span class="type-signature">(static) </span>nin<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -8870,8 +8713,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Check if value does not belong to the categories list given by the categories parameters.</p>
-<p>This returns a numeric expression where 0 means <code>false</code> and 1 means <code>true</code>.</p>
+    <p>Check if value does not belong to the list of elements.</p>
 </div>
 
 
@@ -8913,10 +8755,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">string</span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -8926,23 +8765,20 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Categorical expression to be tested against the categorical blacklist</p></td>
+            <td class="description last"><p>Categorical expression to be tested against the blacklist</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>categories</code></td>
+                <td class="name"><code>list</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;<a href="carto.expressions.Base.html">carto.expressions.Base</a>></span>
-|
-
-<span class="param-type">Array.&lt;string></span>
+<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
 
 
             
@@ -8952,7 +8788,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Multiple categorical expression parameters that will form the blacklist</p></td>
+            <td class="description last"><p>Multiple expression parameters that will form the blacklist</p></td>
         </tr>
 
     
@@ -9026,7 +8862,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -9060,7 +8896,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".not"><span class="type-signature">(static) </span>not<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".not"><span class="type-signature">(static) </span>not<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -9115,10 +8951,7 @@ This is internally computed as 1 - x preserving boolean behavior and allowing fu
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -9198,7 +9031,7 @@ This is internally computed as 1 - x preserving boolean behavior and allowing fu
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -9232,7 +9065,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".now"><span class="type-signature">(static) </span>now<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".now"><span class="type-signature">(static) </span>now<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -9313,7 +9146,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -9347,175 +9180,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".number"><span class="type-signature">(static) </span>number<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>x</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A number to be warped in a numeric expression</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Numeric expression</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Creating a number expression.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  width: s.number(15)  // Equivalent to `width: 15`
-});</code></pre>
-
-        <p class="code-caption">Creating a number expression. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: 15  // Equivalent to number(15)
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".opacity"><span class="type-signature">(static) </span>opacity<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".opacity"><span class="type-signature">(static) </span>opacity<span class="signature">(color, alpha)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -9559,16 +9224,13 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>color</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -9578,7 +9240,30 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>A number to be warped in a numeric expression</p></td>
+            <td class="description last"><p>Color expression to apply the opacity</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alpha</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number expression with the alpha (transparency) value</p></td>
         </tr>
 
     
@@ -9648,7 +9333,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -9682,7 +9367,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".or"><span class="type-signature">(static) </span>or<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".or"><span class="type-signature">(static) </span>or<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -9735,10 +9420,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -9748,7 +9430,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>First value of the expression</p></td>
         </tr>
 
     
@@ -9761,10 +9443,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -9774,7 +9453,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Second value of the expression</p></td>
         </tr>
 
     
@@ -9837,7 +9516,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the expression</p>
 </div>
 
 
@@ -9848,7 +9527,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -9885,7 +9564,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".pow"><span class="type-signature">(static) </span>pow<span class="signature">(base, exponent)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".pow"><span class="type-signature">(static) </span>pow<span class="signature">(base, exponent)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -9936,10 +9615,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -9949,7 +9625,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Base of the power</p></td>
         </tr>
 
     
@@ -9962,10 +9638,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -9975,7 +9648,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
 
             
 
-            <td class="description last"><p>Numeric expression</p></td>
+            <td class="description last"><p>Exponent of the power</p></td>
         </tr>
 
     
@@ -10038,7 +9711,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
 
         
 <div class="param-desc">
-    <p>Numeric expression with base ^ exponent</p>
+    <p>Result of the power</p>
 </div>
 
 
@@ -10049,7 +9722,7 @@ The result is undefined if x&lt;0 or if x=0 and y≤0.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -10083,7 +9756,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".prop"><span class="type-signature">(static) </span>prop<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".prop"><span class="type-signature">(static) </span>prop<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Category">Category</a>|<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -10215,7 +9888,13 @@ The <code>prop('name')</code> will return the name of the current city for every
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -10253,7 +9932,7 @@ const viz = new carto.Viz(`
     
 
     
-    <h4 class="name" id=".quantiles"><span class="type-signature">(static) </span>quantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".quantiles"><span class="type-signature">(static) </span>quantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -10304,7 +9983,7 @@ const viz = new carto.Viz(`
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10407,7 +10086,7 @@ const viz = new carto.Viz(`
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -10441,7 +10120,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(input, palette)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(input, palette)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -10500,7 +10179,10 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -10523,7 +10205,13 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.html#.palettes">carto.expressions.palettes</a></span>
+<span class="param-type"><a href="global.html#Palette">Palette</a></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Color">Color</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
 
 
             
@@ -10603,7 +10291,10 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -10654,7 +10345,171 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".rgb"><span class="type-signature">(static) </span>rgb<span class="signature">(r, g, b)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.rgb">carto.expressions.rgb</a>}</span></h4>
+    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(palette)</span><span class="type-signature"> &rarr; {<a href="global.html#Palette">Palette</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Reverse the provided Palette.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>palette</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Palette">Palette</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression to compute the natural logarithm</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Palette">Palette</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Invert a Palette.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+});</code></pre>
+
+        <p class="code-caption">Invert a Palette. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp($type, reverse(PRISM))
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".rgb"><span class="type-signature">(static) </span>rgb<span class="signature">(r, g, b)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -10704,10 +10559,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10730,10 +10582,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10756,10 +10605,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10839,7 +10685,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.html#.rgb">carto.expressions.rgb</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -10873,7 +10719,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".rgba"><span class="type-signature">(static) </span>rgba<span class="signature">(r, g, b, a)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.html#.rgba">carto.expressions.rgba</a>}</span></h4>
+    <h4 class="name" id=".rgba"><span class="type-signature">(static) </span>rgba<span class="signature">(r, g, b, a)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -10923,10 +10769,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10949,10 +10792,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -10975,10 +10815,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11001,10 +10838,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11084,7 +10918,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.html#.rgba">carto.expressions.rgba</a></span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -11118,7 +10952,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".sign"><span class="type-signature">(static) </span>sign<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".sign"><span class="type-signature">(static) </span>sign<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -11170,10 +11004,7 @@ This means this function will return 1 if the number is positive, -1 if the numb
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11253,7 +11084,7 @@ This means this function will return 1 if the number is positive, -1 if the numb
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -11287,7 +11118,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".sin"><span class="type-signature">(static) </span>sin<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".sin"><span class="type-signature">(static) </span>sin<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -11337,10 +11168,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11420,7 +11248,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -11454,7 +11282,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".sqrt"><span class="type-signature">(static) </span>sqrt<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".sqrt"><span class="type-signature">(static) </span>sqrt<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -11504,10 +11332,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11587,7 +11412,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -11621,7 +11446,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".sub"><span class="type-signature">(static) </span>sub<span class="signature">(minuend, subtrahend)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".sub"><span class="type-signature">(static) </span>sub<span class="signature">(minuend, subtrahend)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
     
@@ -11671,10 +11496,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -11697,10 +11522,10 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 |
 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
             
@@ -11773,7 +11598,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Numeric expression</p>
+    <p>Result of the substraction</p>
 </div>
 
 
@@ -11784,7 +11609,10 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
 
 
     </dd>
@@ -11818,7 +11646,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".tan"><span class="type-signature">(static) </span>tan<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".tan"><span class="type-signature">(static) </span>tan<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -11868,10 +11696,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
-|
-
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -11951,7 +11776,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -11985,7 +11810,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".time"><span class="type-signature">(static) </span>time<span class="signature">(date)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".time"><span class="type-signature">(static) </span>time<span class="signature">(date)</span><span class="type-signature"> &rarr; {<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -12035,7 +11860,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type">Date</span>
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 |
 
 <span class="param-type">string</span>
@@ -12118,7 +11943,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -12152,7 +11977,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".top"><span class="type-signature">(static) </span>top<span class="signature">(property, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".top"><span class="type-signature">(static) </span>top<span class="signature">(property, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -12202,7 +12027,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
             
@@ -12305,7 +12130,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -12339,7 +12164,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".torque"><span class="type-signature">(static) </span>torque<span class="signature">(input, duration, fade)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Torque.html">carto.expressions.Torque</a>}</span></h4>
+    <h4 class="name" id=".torque"><span class="type-signature">(static) </span>torque<span class="signature">(input, duration, fade)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -12389,7 +12214,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -12415,7 +12240,7 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -12438,7 +12263,7 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Fade">Fade</a></span>
 
 
             
@@ -12518,7 +12343,7 @@ this can be problematic if outliers are present. Otherwise input must be a numbe
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -12569,7 +12394,7 @@ layer.on('updated', () => {
     
 
     
-    <h4 class="name" id=".var"><span class="type-signature">(static) </span>var<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".var"><span class="type-signature">(static) </span>var<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Category">Category</a>|<a href="global.html#Color">Color</a>|<a href="global.html#Date">Date</a>}</span></h4>
     
 
     
@@ -12699,7 +12524,16 @@ layer.on('updated', () => {
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
+|
+
+<span class="param-type"><a href="global.html#Date">Date</a></span>
 
 
     </dd>
@@ -12712,7 +12546,7 @@ layer.on('updated', () => {
 
     <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>&lt;caption>&lt;/caption
+    <pre class="prettyprint"><code>&lt;caption>&lt;/caption>
 const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
@@ -12721,8 +12555,9 @@ const viz = new carto.Viz({
  filter: s.neq(s.var('sum_price'), 'london'),
 });</code></pre>
 
-    <pre class="prettyprint"><code>&lt;caption>(String)&lt;/caption
-const viz = new carto.Viz(`
+        <p class="code-caption">(String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   </code></pre>
 
 
@@ -12733,7 +12568,7 @@ const viz = new carto.Viz(`
     
 
     
-    <h4 class="name" id=".viewportAvg"><span class="type-signature">(static) </span>viewportAvg<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportAvg"><span class="type-signature">(static) </span>viewportAvg<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -12777,13 +12612,13 @@ const viz = new carto.Viz(`
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -12867,7 +12702,7 @@ const viz = new carto.Viz(`
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -12903,7 +12738,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportCount"><span class="type-signature">(static) </span>viewportCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportCount"><span class="type-signature">(static) </span>viewportCount<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -12920,6 +12755,55 @@ const viz = new carto.Viz({
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric expression</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -12988,7 +12872,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -13024,7 +12908,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportEqIntervals"><span class="type-signature">(static) </span>viewportEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportEqIntervals"><span class="type-signature">(static) </span>viewportEqIntervals<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
     
@@ -13075,7 +12959,7 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13178,7 +13062,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Category">Category</a></span>
 
 
     </dd>
@@ -13212,7 +13096,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportMax"><span class="type-signature">(static) </span>viewportMax<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportMax"><span class="type-signature">(static) </span>viewportMax<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -13256,13 +13140,13 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13346,7 +13230,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -13382,7 +13266,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportMin"><span class="type-signature">(static) </span>viewportMin<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportMin"><span class="type-signature">(static) </span>viewportMin<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -13426,13 +13310,13 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13516,7 +13400,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -13552,7 +13436,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(x, weight, size)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, weight, size)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
     
 
     
@@ -13600,13 +13484,13 @@ at regular intervals between the minimum and maximum. The number of bars in this
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13629,7 +13513,7 @@ at regular intervals between the minimum and maximum. The number of bars in this
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13652,7 +13536,7 @@ at regular intervals between the minimum and maximum. The number of bars in this
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13736,7 +13620,7 @@ at regular intervals between the minimum and maximum. The number of bars in this
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type">Histogram</span>
 
 
     </dd>
@@ -13773,7 +13657,7 @@ console.log(viz.variables.numericHistogram.eval());
     
 
     
-    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -13817,13 +13701,13 @@ console.log(viz.variables.numericHistogram.eval());
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -13833,7 +13717,30 @@ console.log(viz.variables.numericHistogram.eval());
 
             
 
-            <td class="description last"><p>numeric expression</p></td>
+            <td class="description last"><p>Numeric expression</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>percentile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression [0, 100]</p></td>
         </tr>
 
     
@@ -13907,7 +13814,7 @@ console.log(viz.variables.numericHistogram.eval());
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -13943,7 +13850,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportSum"><span class="type-signature">(static) </span>viewportSum<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".viewportSum"><span class="type-signature">(static) </span>viewportSum<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -13987,13 +13894,13 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -14077,7 +13984,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -14113,7 +14020,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".zoom"><span class="type-signature">(static) </span>zoom<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="carto.expressions.Base.html">carto.expressions.Base</a>}</span></h4>
+    <h4 class="name" id=".zoom"><span class="type-signature">(static) </span>zoom<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -14194,7 +14101,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type"><a href="carto.expressions.Base.html">carto.expressions.Base</a></span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
     </dd>
@@ -14238,13 +14145,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 23 2018 17:26:57 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri May 25 2018 14:34:44 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
