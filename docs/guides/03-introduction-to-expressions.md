@@ -69,7 +69,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-### Binary
+#### Binary
 
 This is the list of the available binary arithmetic operations: `mul`, `div`, `add`, `sub`, `mod`, `pow`. There are also binary comparison operators: `gt`, `gte`, `lt`, `lte`, `eq`, `neq`, `or`, `and`.
 

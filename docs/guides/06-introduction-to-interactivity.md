@@ -97,7 +97,7 @@ interactivity.on('featureClick', featureEvent => {
 });
 ```
 
-### Popups
+### Pop-ups
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interactivity/popups.html)
 
@@ -112,9 +112,9 @@ const viz = new carto.Viz(`
 const layer = new carto.Layer('layer', source, viz);
 ```
 
-Since we are using `mapbox.gl` to draw the basemap, we can use the [popup](https://www.mapbox.com/mapbox-gl-js/api#popup) object with our interactivity API.
+Since we are using `mapbox.gl` to draw the basemap, we can use the [pop-up](https://www.mapbox.com/mapbox-gl-js/api#popup) object with our interactivity API.
 
-All we need is to create a `popup` element in the callback of the `featureClick` event in our Interactivity object extracting the desired
+All we need is to create a `pop-up` element in the callback of the `featureClick` event in our Interactivity object extracting the desired
 fields from the `featureEvent`.
 
 ```js
