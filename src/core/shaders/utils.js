@@ -1,8 +1,8 @@
-import ProgramCache from './ProgramCache';
+import Cache from './Cache';
 
 let programID = 1;
-const shaderCache = new ProgramCache();
-const programCache = new ProgramCache();
+const shaderCache = new Cache();
+const programCache = new Cache();
 
 /**
  * Compile a webgl program.

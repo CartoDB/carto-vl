@@ -1,9 +1,9 @@
-import ShaderCache from '../../../../src/core/shaders/ProgramCache';
+import Cache from '../../../../src/core/shaders/Cache';
 
 describe('src/core/shaders/shader-cache', () => {
-    let shaderCache;
+    let cache;
     beforeEach(() => {
-        shaderCache = new ShaderCache();
+        cache = new Cache();
     });
 
     describe('has', () => {
@@ -11,7 +11,7 @@ describe('src/core/shaders/shader-cache', () => {
             const fakeWebGLContext = jasmine.createSpy();
             const code = 'fake_shader_code';
 
-            expect(shaderCache.has(fakeWebGLContext, code)).toEqual(false);
+            expect(cache.has(fakeWebGLContext, code)).toEqual(false);
         });
 
         it('should return false when not in webgl context and code is the same different', () => {
@@ -19,18 +19,18 @@ describe('src/core/shaders/shader-cache', () => {
             const fakeWebGLContext1 = jasmine.createSpy();
             const fakeShaderCode = 'fake_shader_code';
             const fakeShader = jasmine.createSpy();
-            shaderCache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
+            cache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
 
-            expect(shaderCache.has(fakeWebGLContext1, fakeShaderCode)).toEqual(false);
+            expect(cache.has(fakeWebGLContext1, fakeShaderCode)).toEqual(false);
         });
 
         it('should return true when same webgl context and code is the same different', () => {
             const fakeWebGLContext0 = jasmine.createSpy();
             const fakeShaderCode = 'fake_shader_code';
             const fakeShader = jasmine.createSpy();
-            shaderCache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
+            cache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
 
-            expect(shaderCache.has(fakeWebGLContext0, fakeShaderCode)).toEqual(true);
+            expect(cache.has(fakeWebGLContext0, fakeShaderCode)).toEqual(true);
         });
 
     });
@@ -40,9 +40,9 @@ describe('src/core/shaders/shader-cache', () => {
             const fakeWebGLContext0 = jasmine.createSpy();
             const fakeShaderCode = 'fake_shader_code';
             const fakeShader = jasmine.createSpy();
-            shaderCache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
+            cache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
 
-            expect(shaderCache.get(fakeWebGLContext0, fakeShaderCode)).toEqual(fakeShader);
+            expect(cache.get(fakeWebGLContext0, fakeShaderCode)).toEqual(fakeShader);
         });
 
         it('should return null when shader is not stored (different webgl context)', () => {
@@ -50,9 +50,9 @@ describe('src/core/shaders/shader-cache', () => {
             const fakeWebGLContext1 = jasmine.createSpy();
             const fakeShaderCode = 'fake_shader_fakeShaderCode_0';
             const fakeShader = jasmine.createSpy();
-            shaderCache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
+            cache.set(fakeWebGLContext0, fakeShaderCode, fakeShader);
 
-            expect(shaderCache.get(fakeWebGLContext1, fakeShaderCode)).toBeUndefined();
+            expect(cache.get(fakeWebGLContext1, fakeShaderCode)).toBeUndefined();
         });
 
         it('should return null when shader is not stored (different code)', () => {
@@ -61,9 +61,9 @@ describe('src/core/shaders/shader-cache', () => {
             const fakeShaderCode1 = 'fake_shader_fakeShaderCode_1';
             const fakeShader = jasmine.createSpy();
             
-            shaderCache.set(fakeWebGLContext0, fakeShaderCode0, fakeShader);
+            cache.set(fakeWebGLContext0, fakeShaderCode0, fakeShader);
 
-            expect(shaderCache.get(fakeWebGLContext0, fakeShaderCode1)).toBeUndefined();
+            expect(cache.get(fakeWebGLContext0, fakeShaderCode1)).toBeUndefined();
         });
     });
 });
