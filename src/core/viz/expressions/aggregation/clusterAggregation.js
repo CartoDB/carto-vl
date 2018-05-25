@@ -7,7 +7,7 @@ import { checkInstance, checkType } from '../utils';
  * Aggregate using the average. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * Note: `clusterAvg` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `clusterAvg` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
  * @param {Number} property - Column of the table to be aggregated
  * @return {Number} Aggregated column
@@ -34,7 +34,7 @@ export const ClusterAvg = genAggregationOp('avg', 'number');
  * Aggregate using the maximum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * Note: `clusterMax` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `clusterMax` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
  * @param {Number} property - Column of the table to be aggregated
  * @return {Number} Aggregated column
@@ -61,7 +61,7 @@ export const ClusterMax = genAggregationOp('max', 'number');
  * Aggregate using the minimum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * Note: `clusterMin` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `clusterMin` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
  * @param {Number} property - Column of the table to be aggregated
  * @return {Number} Aggregated column
@@ -88,7 +88,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * Aggregate using the mode. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * Note: `clusterMode` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `clusterMode` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
  * @param {Category} property - Column of the table to be aggregated
  * @return {Category} Aggregated column
@@ -115,7 +115,7 @@ export const ClusterMode = genAggregationOp('mode', 'category');
  * Aggregate using the sum. This operation disables the access to the property
  * except within other cluster aggregate functions.
  *
- * Note: `clusterSum` input property can only be a {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `clusterSum` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
  * @param {Number} property - Column of the table to be aggregated
  * @return {Number} Aggregated column
