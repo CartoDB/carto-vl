@@ -5,10 +5,10 @@ import BaseExpression from './base';
 /**
  * Linearly interpolate from `a` to `b` based on `mix`.
  *
- * @param {carto.expressions.Base|number} a - Numeric or color expression, `a` type must match `b` type
- * @param {carto.expressions.Base|number} b - Numeric or color expression, `b` type must match `a` type
- * @param {carto.expressions.Base|number} mix - Numeric expression with the interpolation parameter in the [0,1] range
- * @returns {carto.expressions.Base} Numeric or color expression with the same type as `a` and `b`
+ * @param {Number|Color} a - Numeric or color expression, `a` type must match `b` type
+ * @param {Number|Color} b - Numeric or color expression, `b` type must match `a` type
+ * @param {Number} mix - Numeric expression with the interpolation parameter in the [0,1] range
+ * @returns {Number|Color} Numeric or color expression with the same type as `a` and `b`
  *
  * @example <caption>Blend based on the zoom level to display a bubble map at high zoom levels and display fixed-sized points at low zoom levels.</caption>
  * const s = carto.expressions;

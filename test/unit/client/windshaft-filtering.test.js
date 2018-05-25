@@ -453,12 +453,27 @@ describe('src/client/windshaft-filtering', () => {
             });
 
             it('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
-                expect(preFilters(f,
+                const expected = {
+                    type: 'or',
+                    left: {
+                        type: 'between',
+                        property: 'numericProperty',
+                        lower: 10,
+                        upper: 20
+                    },
+                    right: {
+                        type: 'notIn',
+                        property: 'categoricalProperty',
+                        values: [ 'red', 'blue' ]
+                    }
+                };
+                const actual = preFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', ['red', 'blue']))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
-                )).toBeNull();
+                );
+                expect(actual).toEqual(expected);
             });
 
             it('with aggregate properties', () => {
@@ -848,7 +863,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(aggrFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', ['red', 'blue']))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
                 )).toEqual({});
             });

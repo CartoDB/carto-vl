@@ -1,7 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
-import { customPalette } from '../functions';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -19,9 +18,9 @@ import { customPalette } from '../functions';
 * Numeric expressions to numeric
 * Numeric expressions can be used as the input for `ramp` in combination with numeric palettes. Linear interpolation will be used to generate intermediate output values.
 *
-* @param {carto.expressions.Base} input - The input expression to give a color
-* @param {carto.expressions.palettes} palette - The color palette that is going to be used
-* @return {carto.expressions.Base}
+* @param {Number|Category} input - The input expression to give a color
+* @param {Palette|Color[]|Number[]} palette - The color palette that is going to be used
+* @return {Number|Color}
 *
 * @example <caption>Mapping categories to colors and numbers</caption>
 * const s = carto.expressions;
@@ -58,26 +57,33 @@ import { customPalette } from '../functions';
 export default class Ramp extends BaseExpression {
     constructor(input, palette) {
         input = implicitCast(input);
-        if (Array.isArray(palette)) {
-            palette = customPalette(palette);
-        }
+        palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkType('ramp', 'palette', 1, ['palette', 'customPalette', 'customPaletteNumber'], palette);
+        checkType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array'], palette);
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        if (palette.type == 'customPaletteNumber') {
+        if (palette.type == 'number-array') {
             this.type = 'number';
         } else {
             this.type = 'color';
         }
+        try {
+            if (palette.type == 'number-array') {
+                this.palette.floats = this.palette.eval();
+            } else if (palette.type == 'color-array') {
+                this.palette.colors = this.palette.eval();
+            }
+        } catch (error) {
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+        }
     }
     eval(o) {
-        if (this.palette.type != 'customPaletteNumber') {
+        if (this.palette.type != 'number-array') {
             super.eval(o);
         }
         this._computeTextureIfNeeded();
@@ -108,7 +114,7 @@ export default class Ramp extends BaseExpression {
         uniform float keyMin${this._uid};
         uniform float keyWidth${this._uid};
         `),
-            inline: this.palette.type == 'customPaletteNumber' ?
+            inline: this.palette.type == 'number-array' ?
                 `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };

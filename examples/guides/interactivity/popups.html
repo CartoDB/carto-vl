@@ -10,7 +10,7 @@
     <!-- Include Mapbox GL JS -->
     <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.45.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <style>
         #map {
             position: absolute;
@@ -30,6 +30,7 @@
             zoom: 5,
             dragRotate: false
         });
+        map.touchZoomRotate.disableRotation();
 
         carto.setDefaultAuth({
             user: 'cartogl',

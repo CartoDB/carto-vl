@@ -4,8 +4,8 @@ import { checkInstance } from './utils';
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - must be `width()`
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
  * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
@@ -21,7 +21,7 @@ import { checkInstance } from './utils';
  * @memberof carto.expressions
  * @name asc
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Asc extends BaseExpression {
     constructor(by) {
@@ -34,8 +34,8 @@ export class Asc extends BaseExpression {
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - must be `width()`
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
  * @example <caption>Descending order based on width.</caption>
  * const s = carto.expressions;
@@ -51,7 +51,7 @@ export class Asc extends BaseExpression {
  * @memberof carto.expressions
  * @name desc
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Desc extends BaseExpression {
     constructor(by) {
@@ -64,7 +64,7 @@ export class Desc extends BaseExpression {
 /**
  * No order expression.
  *
- * @return {carto.expressions.Base}
+ * @return {Order}
  *
  * @example <caption>No order.</caption>
  * const s = carto.expressions;
@@ -80,7 +80,7 @@ export class Desc extends BaseExpression {
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @api
+ * @IGNOREapi
  */
 export class NoOrder extends BaseExpression {
     constructor() {
@@ -92,7 +92,7 @@ export class NoOrder extends BaseExpression {
 /**
  * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
  *
- * @return {carto.expressions.Base}
+ * @return {carto.expressions.Width}
  *
  * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
@@ -108,7 +108,7 @@ export class NoOrder extends BaseExpression {
  * @memberof carto.expressions
  * @name width
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Width extends BaseExpression {
     constructor() {

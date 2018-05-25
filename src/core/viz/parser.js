@@ -2,8 +2,8 @@
 import jsep from 'jsep';
 import * as functions from './functions';
 import { implicitCast } from './expressions/utils';
-import { CSS_COLOR_NAMES, NamedColor } from './expressions/named-color';
-import Hex from './expressions/hex';
+import { CSS_COLOR_NAMES, NamedColor } from './expressions/color/named-color';
+import Hex from './expressions/color/hex';
 
 // TODO use Schema classes
 
@@ -16,6 +16,7 @@ Object.keys(functions)
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 lowerCaseFunctions.pi = functions.PI;
+lowerCaseFunctions.e = functions.E;
 
 export function parseVizExpression(str) {
     prepareJsep();
@@ -138,6 +139,8 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
+    } else {
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
 }
 
@@ -223,8 +226,8 @@ export function cleanComments(str) {
         }
 
         if (mode.blockComment) {
-            if (str[i] === '*' && str[i+1] === '/') {
-                str[i+1] = '';
+            if (str[i] === '*' && str[i + 1] === '/') {
+                str[i + 1] = '';
                 mode.blockComment = false;
             }
             str[i] = '';
@@ -232,10 +235,10 @@ export function cleanComments(str) {
         }
 
         if (mode.lineComment) {
-            if (str[i+1] === '\n' || str[i+1] === '\r') {
+            if (str[i + 1] === '\n' || str[i + 1] === '\r') {
                 mode.lineComment = false;
             }
-            if (i+1 < l) {
+            if (i + 1 < l) {
                 str[i] = '';
             }
             continue;
@@ -246,12 +249,12 @@ export function cleanComments(str) {
 
         if (str[i] === '/') {
 
-            if (str[i+1] === '*') {
+            if (str[i + 1] === '*') {
                 str[i] = '';
                 mode.blockComment = true;
                 continue;
             }
-            if (str[i+1] === '/') {
+            if (str[i + 1] === '/') {
                 str[i] = '';
                 mode.lineComment = true;
                 continue;

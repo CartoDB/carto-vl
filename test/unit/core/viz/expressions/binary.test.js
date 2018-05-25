@@ -193,7 +193,9 @@ describe('src/core/viz/expressions/binary', () => {
 
         function test(fn, param1, param2, expected) {
             it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
-                const actual = s[fn](param1, param2).eval();
+                let actual = s[fn](param1, param2).eval();
+                expect(actual).toEqual(expected);
+                actual = s[fn](param1, param2).value;
                 expect(actual).toEqual(expected);
             });
         }

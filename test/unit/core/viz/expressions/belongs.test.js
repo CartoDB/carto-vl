@@ -6,17 +6,12 @@ describe('src/core/viz/expressions/belongs', () => {
         columns: [{
             type: 'category',
             name: 'category',
-            categoryNames: ['cat0', 'cat1', 'cat2']
-        },
-        {
-            name: 'price',
-            type: 'number',
-        }
-        ],
+            categoryNames: ['category0', 'category1', 'category2']
+        }],
         categoryIDs: {
-            'cat0': 0,
-            'cat1': 1,
-            'cat2': 2,
+            'category0': 0,
+            'category1': 1,
+            'category2': 2
         }
     };
 
@@ -29,13 +24,11 @@ describe('src/core/viz/expressions/belongs', () => {
 
     describe('error control', () => {
         validateStaticTypeErrors('in', []);
+        validateStaticTypeErrors('in', ['category']);
+        validateStaticTypeErrors('in', ['number']);
         validateStaticTypeErrors('in', ['color']);
         validateDynamicTypeErrors('in', ['number', 'category-array']);
         validateDynamicTypeErrors('in', ['category', 'number-array']);
-
-        it('should throw an error when the wrong parameters are passed', () => {
-            expect(() => s.in($category, '0')).toThrowError(/is not an array/g);
-        });
     });
 
     describe('type', () => {
@@ -44,53 +37,38 @@ describe('src/core/viz/expressions/belongs', () => {
 
     describe('eval', () => {
         describe('in', () => {
-            it('in($category, ["cat1", "cat2"]) should return 0', () => {
+            it('in($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 0 };
-                const sIn = s.in($category, ['cat1', 'cat2']);
+                const sIn = s.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
 
-            it('in($category, ["cat1", "cat2"]) should return 1', () => {
+            it('in($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 1 };
-                const sIn = s.in($category, ['cat1', 'cat2']);
+                const sIn = s.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(1);
-            });
-            it('in($category) should return 0', () => {
-                const fakeFeature = { category: 0 };
-                const sIn = s.in($category);
-                sIn._compile(fakeMetadata);
-                const actual = sIn.eval(fakeFeature);
-                expect(actual).toEqual(0);
             });
         });
 
         describe('nin', () => {
-            it('nin($category, ["cat1", "cat2"]) should return 1', () => {
+            it('nin($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 0 };
-                const nin = s.nin($category, ['cat1', 'cat2']);
+                const nin = s.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
 
-            it('nin($category, ["cat1", "cat2"]) should return 0', () => {
+            it('nin($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 1 };
-                const nin = s.nin($category, ['cat1', 'cat2']);
+                const nin = s.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(0);
-            });
-
-            it('nin($category) should return 1', () => {
-                const fakeFeature = { category: 1 };
-                const nin = s.nin($category);
-                nin._compile(fakeMetadata);
-                const actual = nin.eval(fakeFeature);
-                expect(actual).toEqual(1);
             });
         });
     });

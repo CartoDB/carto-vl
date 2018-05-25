@@ -4,7 +4,7 @@ import { number } from '../functions';
 /**
  * Get the current timestamp. This is an advanced form of animation, `torque` is preferred.
  *
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
  * @example <caption>Update width during the time.</caption>
  * const s = carto.expressions;
