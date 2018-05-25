@@ -2,8 +2,6 @@ import { implicitCast } from './utils';
 import { blend, animate } from '../functions';
 import * as schema from '../../schema';
 
-let uid = 0;
-
 /**
  * Abstract expression class
  *
