@@ -4,75 +4,55 @@ This guide walks through making a variety of visualizations for points, lines, a
 
 ### Supported Color Spaces
 
-* [HEX](https://carto.com/developers/carto-vl/reference/#cartoexpressionshex)
-* [RGB](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgb)
-* [RGBA](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgba)
-* [Named Colors](https://carto.com/developers/carto-vl/reference/#cartoexpressionsnamedcolor)
-* [HSV](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsv)
-* [HSVA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsva)
-* [HSL](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsl)
-* [HSLA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsla)
-* [CIELAB](https://carto.com/developers/carto-vl/reference/#cartoexpressionscielab)
+Supported color spaces are [HEX](https://carto.com/developers/carto-vl/reference/#cartoexpressionshex), [RGB](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgb), [RGBA](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgba), [Named Colors](https://carto.com/developers/carto-vl/reference/#cartoexpressionsnamedcolor), [HSV](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsv), [HSVA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsva), [HSL](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsl), [HSLA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsla), [CIELAB](https://carto.com/developers/carto-vl/reference/#cartoexpressionscielab).
 
 In addition to these [supported color spaces](http://cartovl-tabs.developers.carto-staging.com/developers/carto-vl/examples/#example-color-spaces), you can also use our [CARTOcolors](https://carto.com/carto-colors/) schemes directly.
 
-## Basic Styling Properties
+### Styling Properties
 
-* Color
-* Width
-* Stroke color
-* Stroke width
-* Resolution
-* Opacity
-
-### Color
+#### Color
 Use the `color` property to define the fill color of a point, line or polygon.
 
 ```
 color: #F24440
 ```
 
-### Width
+#### Width
 Use the `width` property to define a point size or line width.
 
 ```
 width: 5
 ```
 
-### Stroke Color
+#### Stroke Color
 Use the `strokeColor` property to define the color of a point or polygon stroke.
 
 ```
 strokeColor: #F24440
 ```
 
-### Stroke Width
+#### Stroke Width
 Use the `strokeWidth` property to define the size of a point or polygon stroke width.
 
 ```
 strokeWidth: 3
 ```
 
-### Resolution
+#### Resolution
 Use `resolution` to aggregate points into clusters.
 
 ```
 resolution: 5
 ```
 
-### Opacity
-Set a feature´s opacity with the alpha channel or inside of a `ramp` [expression](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/).
+### Filter
+Use `filter` to show only the features that match the specified expression.
 
 ```
-color: rgba(232,66,244,0.5)
-```
-```
-color: opacity(ramp($animals,Prism),0.5)
+filter: between($numfloors, 10, 120)
 ```
 
-## Color by value
-
-### Style by category
+### Style Color by Category
 
 [Live example](https://carto.com/developers/carto-vl/examples/#example-style-by-category)
 
@@ -97,7 +77,7 @@ To color features by the most common category, you can use the expression [`top`
 color: ramp(top($animals, 4),Prism)
 ```
 
-### Style by number
+### Style Color by Number
 
 [Live example](https://carto.com/developers/carto-vl/examples/#example-style-by-number)
 
@@ -123,23 +103,23 @@ To map colors to particular categories, use [`buckets`](https://carto.com/develo
 color: ramp(buckets($price, [50, 100, 500, 1000]), [purple, red, orange, yellow, grey])
 ```
 
-## Size by value
+### Style Size by Number
 
-### By attribute value
+#### By attribute value
 Use the `width` property to define a point size or line width by an attribute value. The example below will assign different sizes to the geometry depending of the price value associated to each one.
 
 ```
 width: $price
 ```
 
-### Interpolate
+#### Interpolate
 Use [`blend`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsblend) to linearly interpolate the value of a given input between min and max.
 
 ```
 width: blend(5,20,$price/100)
 ```
 
-### Manual
+#### Manual
 To map sizes to particular categories, use [`buckets`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets). In the example below the manually defined prices are assigned a unique color and all the other features are colored as other.
 
 ```

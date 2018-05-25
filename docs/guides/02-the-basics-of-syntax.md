@@ -2,7 +2,7 @@
 
 CARTO VL introduces a new language to style your data from static, dynamic, and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
 
-This language is used to define **style properties** using **[expressions]()**. All expressions and style properties should be defined inside a **Visualization object** (*[carto.Viz](https://carto.com/developers/carto-vl/reference/#cartoviz)*). It is the second parameter to create a *carto.Layer*, after the *[carto.source](https://carto.com/developers/carto-vl/reference/#cartosourcedataset)* parameter.
+This language is used to define **style properties** using **[expressions](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/)**. All expressions and style properties should be defined inside a **Visualization object** (*[carto.Viz](https://carto.com/developers/carto-vl/reference/#cartoviz)*). It is the second parameter to create a *carto.Layer*, after the *[carto.source](https://carto.com/developers/carto-vl/reference/#cartosourcedataset)* parameter.
 
 There are two ways to define a *carto.Viz* object:
 
