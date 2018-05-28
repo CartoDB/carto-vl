@@ -356,6 +356,9 @@ export default class Windshaft {
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        if (!response.ok) {
+            throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
+        }
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
