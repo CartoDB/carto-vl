@@ -282,14 +282,14 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => R.schema.column.getBase(name)).map(
+        const columns = MRS.columns.map(name => R.schema.column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
-        )
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        ).concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
 
     _buildQuery(select, filters) {
-        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const columns = select.join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
