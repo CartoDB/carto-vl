@@ -591,7 +591,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * type of their parameters.
  *
  * The most important types are:
- *  - **Numer** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
+ *  - **Number** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
  *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
@@ -6175,31 +6175,32 @@ function _checkServerURL(serverURL) {
  * @event updated
  * @type {LayerEvent}
  * @api
- */
+*/
 
+
+/**
+*
+* A Layer is the primary way to visualize geospatial data.
+*
+* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+*
+* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
+*
+* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {carto.source.Base} source - The source of the data
+* @param {carto.Viz} viz - The description of the visualization of the data
+*
+* @example
+* const layer = new carto.Layer('layer0', source, viz);
+*
+* @fires CartoError
+*
+* @constructor Layer
+* @memberof carto
+* @api
+*/
 class Layer {
-    /**
-    *
-    * A Layer is the primary way to visualize geospatial data.
-    *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
-    *
-    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
-    *
-    * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-    * @param {carto.source.Base} source - The source of the data
-    * @param {carto.Viz} viz - The description of the visualization of the data
-    *
-    * @example
-    * const layer = new carto.Layer('layer0', source, viz);
-    *
-    * @fires CartoError
-    *
-    * @constructor Layer
-    * @memberof carto
-    * @api
-    */
     constructor(id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
@@ -14484,7 +14485,12 @@ class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
-        return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
+        return !__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].equals(this._MNS, MNS)
+            || resolution != this.resolution
+            || (
+                JSON.stringify(filtering) != JSON.stringify(this.filtering)
+                && this.metadata.featureCount > MIN_FILTERING
+            );
     }
 
     _isInstantiated() {
@@ -14515,7 +14521,7 @@ class Windshaft {
         };
         if (metadata) {
             if (metadata.featureCount >= 0) {
-                choices.backendFilters = metadata.featureCount > MIN_FILTERING;
+                choices.backendFilters = metadata.featureCount > MIN_FILTERING || !metadata.backendFiltersApplied;
             }
             if (metadata.columns) {
                 choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
@@ -14533,18 +14539,25 @@ class Windshaft {
         const query = `(${aggSQL}) AS tmp`;
 
         let backendFilters = choices.backendFilters ? filters : null;
+        let backendFiltersApplied = false;
 
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["a" /* getAggregationFilters */](backendFilters);
+            if (agg.filters) {
+                backendFiltersApplied = true;
+            }
             if (!this._exclusive) {
                 backendFilters = null;
             }
         }
         if (backendFilters) {
-            aggSQL = this._buildQuery(select, backendFilters);
+            const filteredSQL = this._buildQuery(select, backendFilters);
+            backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
+            aggSQL = filteredSQL;
         }
 
-        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
+        metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
@@ -14598,7 +14611,7 @@ class Windshaft {
         return MNS.columns.some(column => __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.isAggregated(column));
     }
 
-    _generateAggregation(MRS, resolution) {
+    _generateAggregation(MNS, resolution) {
         let aggregation = {
             columns: {},
             dimensions: {},
@@ -14607,7 +14620,7 @@ class Windshaft {
             threshold: 1,
         };
 
-        MRS.columns
+        MNS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
                     if (__WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.isAggregated(name)) {
@@ -14624,15 +14637,15 @@ class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getBase(name)).map(
+    _buildSelectClause(MNS, dateFields = []) {
+        const columns = MNS.columns.map(name => __WEBPACK_IMPORTED_MODULE_0__core_renderer__["c" /* schema */].column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
-        )
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        ).concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
 
     _buildQuery(select, filters) {
-        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const columns = select.join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? __WEBPACK_IMPORTED_MODULE_5__windshaft_filtering__["c" /* getSQLWhere */](filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
@@ -14668,7 +14681,7 @@ class Windshaft {
         return dataframe;
     }
 
-    async _getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata = null) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
@@ -14685,10 +14698,15 @@ class Windshaft {
             ]
         };
         if (!overrideMetadata) {
+            const excludedColumns = ['the_geom', 'the_geom_webmercator'];
+            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
-                sample: SAMPLE_ROWS // TDDO: sample without geometry
+                sample: {
+                    num_rows: SAMPLE_ROWS,
+                    include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
+                }
             };
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
