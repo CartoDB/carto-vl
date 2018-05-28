@@ -2,7 +2,7 @@
 
 CARTO VL introduces a new language to style your data from static, dynamic, and data-driven information. This new language is based on CartoCSS syntax but adds new visualization capabilities to describe your vector data layers.
 
-This language is used to define **[style properties](https://carto.com/developers/carto-vl/guides/introduction-to-styling/#styling-properties)** using **[expressions](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/)**. All expressions and style properties should be defined inside a **Visualization object** (`[carto.Viz](https://carto.com/developers/carto-vl/reference/#cartoviz)`). It is the second parameter to create a `carto.Layer`, after the `[carto.source](https://carto.com/developers/carto-vl/reference/#cartosourcedataset)` parameter.
+This language is used to define **[style properties](https://carto.com/developers/carto-vl/guides/introduction-to-styling/#styling-properties)** using **[expressions](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/)**. All expressions and style properties should be defined inside a **Visualization object** ([`carto.Viz`](https://carto.com/developers/carto-vl/reference/#cartoviz)). It is the second parameter to create a `carto.Layer`, after the [`carto.source`](https://carto.com/developers/carto-vl/reference/#cartosourcedataset) parameter.
 
 There are two ways to define a `carto.Viz` object:
 
@@ -18,7 +18,7 @@ const viz = new carto.Viz(`
 
 **JavaScript API**
 
-This way uses a *JavaScript object* as a parameter of the `carto.Viz` object. It is more verbose but allows to use directly JavaScript elements (like variables or functions) to describe your visualization. All the expressions are grouped by the namespace `[carto.expressions](https://carto.com/developers/carto-vl/reference/#cartoexpressions)`. It is recommended to use a shortcut alias for the namespace.
+This way uses a *JavaScript object* as a parameter of the `carto.Viz` object. It is more verbose but allows to use directly JavaScript elements (like variables or functions) to describe your visualization. All the expressions are grouped by the namespace [`carto.expressions`](https://carto.com/developers/carto-vl/reference/#cartoexpressions). It is recommended to use a shortcut alias for the namespace.
 
 ```js
 const s = carto.expressions;
@@ -32,14 +32,15 @@ const viz = new carto.Viz({
 **[Style properties](https://carto.com/developers/carto-vl/guides/introduction-to-styling/#styling-properties)** are attributes that affect the visualization of the data for the supported geometry types: points, lines and polygons. All the style properties are typed, this means that it only admits one kind of expression (see [Types of expressions](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/#types)).
 
 The supported style properties are:
-| **Style property** | **Expression type** | **Description** | **Geometries** |
-|---|---|---|---|
-| `color` | *Color* | fill color | points, lines, polygons |
-| `width` | *Number* | diameter / width | points, lines |
-| `strokeColor` | *Color* | color of the stroke | points, polygons |
-| `strokeWidth` | *Number* | width of the stroke | points, polygons |
-| `filter` | *Number* | delete mismatched elements | points, lines, polygons |
-| `resolution` | *Number* | size of the aggregation cell | points |
+
+| **Style property** | **Expression type** | **Description**              | **Geometries**          |
+|--------------------|---------------------|------------------------------|-------------------------|
+| `color`            | *Color*             | fill color                   | points, lines, polygons |
+| `width`            | *Number*            | diameter / width             | points, lines           |
+| `strokeColor`      | *Color*             | color of the stroke          | points, polygons        |
+| `strokeWidth`      | *Number*            | width of the stroke          | points, polygons        |
+| `filter`           | *Number*            | delete mismatched elements   | points, lines, polygons |
+| `resolution`       | *Number*            | size of the aggregation cell | points                  |
 
 #### Example
 
