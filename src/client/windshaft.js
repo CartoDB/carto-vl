@@ -129,7 +129,12 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
-        return !R.schema.equals(this._MNS, MNS) || resolution != this.resolution || (JSON.stringify(filtering) != JSON.stringify(this.filtering) && this.metadata.featureCount > MIN_FILTERING);
+        return !R.schema.equals(this._MNS, MNS)
+            || resolution != this.resolution
+            || (
+                JSON.stringify(filtering) != JSON.stringify(this.filtering)
+                && this.metadata.featureCount > MIN_FILTERING
+            );
     }
 
     _isInstantiated() {
@@ -160,7 +165,7 @@ export default class Windshaft {
         };
         if (metadata) {
             if (metadata.featureCount >= 0) {
-                choices.backendFilters = metadata.featureCount > MIN_FILTERING;
+                choices.backendFilters = metadata.featureCount > MIN_FILTERING || !metadata.backendFiltersApplied;
             }
             if (metadata.columns) {
                 choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
@@ -178,18 +183,25 @@ export default class Windshaft {
         const query = `(${aggSQL}) AS tmp`;
 
         let backendFilters = choices.backendFilters ? filters : null;
+        let backendFiltersApplied = false;
 
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
+            if (agg.filters) {
+                backendFiltersApplied = true;
+            }
             if (!this._exclusive) {
                 backendFilters = null;
             }
         }
         if (backendFilters) {
-            aggSQL = this._buildQuery(select, backendFilters);
+            const filteredSQL = this._buildQuery(select, backendFilters);
+            backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
+            aggSQL = filteredSQL;
         }
 
         let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
+        metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
