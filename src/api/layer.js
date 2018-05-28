@@ -78,6 +78,9 @@ export default class Layer {
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
+        this._integratorPromise = new Promise((resolve) => {
+            this._integratorCallback = resolve;
+        });
 
         this.metadata = null;
         this._renderLayer = new RenderLayer();
@@ -140,7 +143,7 @@ export default class Layer {
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         const metadata = await source.requestMetadata(viz);
-        await this._context;
+        await this._integratorPromise;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
         }
@@ -156,6 +159,11 @@ export default class Layer {
         }
         this._source = source;
         this.requestData();
+
+        await this._context;
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
 
         if (this._viz) {
             this._viz.onChange(null);
@@ -230,6 +238,7 @@ export default class Layer {
     initCallback() {
         this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
+        this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
         this.requestMetadata();
     }
 
@@ -238,7 +247,6 @@ export default class Layer {
         if (!viz) {
             return;
         }
-        await this._context;
         return this._source.requestMetadata(viz);
     }
 
@@ -358,6 +366,7 @@ export default class Layer {
     _onMapLoaded(map, beforeLayerID) {
         this._integrator = getMGLIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _compileShaders(viz, metadata) {
@@ -417,7 +426,16 @@ export default class Layer {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
         }
-        throw new Error('?');
+
+        // FIXME !!!
+        // TODO this is an implementation detail of the integrator
+
+        const c = this._integrator.map.getCenter();
+        const center = { x: c.lng / 180., y: util.projectToWebMercator(c).y / util.WM_R };
+
+        const sx = this._integrator.getZoom();
+        const sy = this._integrator.getZoom();
+        return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
     }
 
     _freeSource() {
