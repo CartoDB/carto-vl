@@ -200,7 +200,7 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
@@ -255,7 +255,7 @@ export default class Windshaft {
         return MNS.columns.some(column => R.schema.column.isAggregated(column));
     }
 
-    _generateAggregation(MRS, resolution) {
+    _generateAggregation(MNS, resolution) {
         let aggregation = {
             columns: {},
             dimensions: {},
@@ -264,7 +264,7 @@ export default class Windshaft {
             threshold: 1,
         };
 
-        MRS.columns
+        MNS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
                     if (R.schema.column.isAggregated(name)) {
@@ -281,15 +281,15 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MRS, dateFields = []) {
-        return MRS.columns.map(name => R.schema.column.getBase(name)).map(
+    _buildSelectClause(MNS, dateFields = []) {
+        const columns = MNS.columns.map(name => R.schema.column.getBase(name)).map(
             name => dateFields.includes(name) ? name + '::text' : name
-        )
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        ).concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
 
     _buildQuery(select, filters) {
-        const columns = select.filter((item, pos) => select.indexOf(item) == pos).join();
+        const columns = select.join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
@@ -325,7 +325,7 @@ export default class Windshaft {
         return dataframe;
     }
 
-    async _getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata = null) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
@@ -342,10 +342,15 @@ export default class Windshaft {
             ]
         };
         if (!overrideMetadata) {
+            const excludedColumns = ['the_geom', 'the_geom_webmercator'];
+            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
-                sample: SAMPLE_ROWS // TDDO: sample without geometry
+                sample: {
+                    num_rows: SAMPLE_ROWS,
+                    include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
+                }
             };
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
