@@ -37,11 +37,11 @@ Style the `div` to ensure it will be displayed correctly.
 
 Once we have the `div`, we use the `mapboxgl` object to initialize our map using the following parameters:
 
-- `container` indicates where the map is going to be placed
-- `style` contains the information about the basemap
-- `center` indicates the area of the world we are going to visualize
-- `zoom` defines the default zoom level  
-- `dragRotate` disables the map rotation
+- **`container`** indicates where the map is going to be placed
+- **`style`** contains the information about the basemap
+- **`center`** indicates the area of the world we are going to visualize
+- **`zoom`** defines the default zoom level  
+- **`dragRotate`** disables the map rotation
 
 ```js
 const map = new mapboxgl.Map({
@@ -55,9 +55,9 @@ const map = new mapboxgl.Map({
 
 For basemaps you can add [Mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or choose one of the three predefined styles offered by CARTO:
 
-- Voyager: https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json
-- Positron: https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
-- Dark Matter: https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
+- **Voyager:** https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json
+- **Positron:** https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
+- **Dark Matter:** https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
 
 At this point you will have a basic map ([example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basemap.html)).
 
