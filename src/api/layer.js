@@ -32,31 +32,32 @@ import RenderLayer from '../core/renderLayer';
  * @event updated
  * @type {LayerEvent}
  * @api
- */
+*/
 
+
+/**
+*
+* A Layer is the primary way to visualize geospatial data.
+*
+* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+*
+* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
+*
+* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {carto.source.Base} source - The source of the data
+* @param {carto.Viz} viz - The description of the visualization of the data
+*
+* @example
+* const layer = new carto.Layer('layer0', source, viz);
+*
+* @fires CartoError
+*
+* @constructor Layer
+* @memberof carto
+* @api
+*/
 export default class Layer {
-    /**
-    *
-    * A Layer is the primary way to visualize geospatial data.
-    *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
-    *
-    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
-    *
-    * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-    * @param {carto.source.Base} source - The source of the data
-    * @param {carto.Viz} viz - The description of the visualization of the data
-    *
-    * @example
-    * const layer = new carto.Layer('layer0', source, viz);
-    *
-    * @fires CartoError
-    *
-    * @constructor Layer
-    * @memberof carto
-    * @api
-    */
     constructor(id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
