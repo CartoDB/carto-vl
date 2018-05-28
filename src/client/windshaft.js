@@ -200,7 +200,7 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata);
+        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplate: url };
@@ -325,7 +325,7 @@ export default class Windshaft {
         return dataframe;
     }
 
-    async _getInstantiationPromise(query, conf, agg, aggSQL, overrideMetadata = null) {
+    async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
@@ -342,10 +342,15 @@ export default class Windshaft {
             ]
         };
         if (!overrideMetadata) {
+            const excludedColumns = ['the_geom', 'the_geom_webmercator'];
+            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
-                sample: SAMPLE_ROWS // TDDO: sample without geometry
+                sample: {
+                    num_rows: SAMPLE_ROWS,
+                    include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
+                }
             };
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
