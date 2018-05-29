@@ -57,9 +57,9 @@ export default class MVT extends Base {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    async requestMetadata(style) {
-        this._MNS = style.getMinimumNeededSchema();
-        this._resolution = style.getResolution();
+    async requestMetadata(viz) {
+        this._MNS = viz.getMinimumNeededSchema();
+        this._resolution = viz.getResolution;
         return this.metadata;
     }
 
@@ -125,7 +125,7 @@ export default class MVT extends Base {
                         jsonFields.push(c.name);
                     } else if (type == 'number') {
                         numFields.push(c.name);
-                    } else if (type == 'string') {
+                    } else if (type == 'category') {
                         stringFields.push(c.name);
                     } else {
                         throw new Error(`Column type '${type}' not supported`);
@@ -174,6 +174,7 @@ export default class MVT extends Base {
             //if exterior
             //   push current polygon & set new empty
             //else=> add index to holes
+            let hole = false;
             if (this._isClockWise(geom[j])) {
                 if (polygon) {
                     geometry.push(polygon);
@@ -190,42 +191,104 @@ export default class MVT extends Base {
                     continue;
                     //throw new Error('Invalid MVT tile: first polygon ring MUST be external');
                 }
-                if (polygon != null) {
-                    polygon.holes.push(polygon.flat.length / 2);
-                }
+                hole = true;
             }
-            if (polygon != null) {
-                for (let k = 0; k < geom[j].length; k++) {
-                    // TODO should additional clipping be done here?
-                    let clipping = 0;
-                    let x = geom[j][k].x;
-                    let y = geom[j][k].y;
-
-                    if (x > mvt_extent) {
-                        clipping = clipping | 1;
-                    } else if (x < 0) {
-                        clipping = clipping | 2;
-
-                    }
-                    if (y > mvt_extent) {
-                        clipping = clipping | 4;
-                    } else if (y < 0) {
-                        clipping = clipping | 8;
-                    }
-                    if (clipping) {
-                        polygon.clipped.push(polygon.flat.length);
-                        polygon.clippedType.push(clipping);
-                    }
-                    polygon.flat.push(2 * x / mvt_extent - 1.);
-                    polygon.flat.push(2 * (1. - y / mvt_extent) - 1.);
-                }
+            let preClippedVertices = [];
+            for (let k = 0; k < geom[j].length; k++) {
+                let x = geom[j][k].x;
+                let y = geom[j][k].y;
+                x = 2 * x / mvt_extent - 1;
+                y = 2 * (1 - y / mvt_extent) - 1;
+                preClippedVertices.push([x, y]);
             }
+            this._clipPolygon(preClippedVertices, polygon, hole);
         }
         //if current polygon is not empty=> push it
-        if (polygon && polygon.flat.length > 0) {
+        if (polygon) {
             geometry.push(polygon);
         }
         featureGeometries.push(geometry);
+    }
+
+    // Add polygon composed by preClippedVertices to the `polygon.flat` array
+    _clipPolygon(preClippedVertices, polygon, isHole) {
+        // Sutherland-Hodgman Algorithm to clip polygons to the tile
+        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
+        const clippingEdges = [
+            p => p[0] <= 1,
+            p => p[1] <= 1,
+            p => p[0] >= -1,
+            p => p[1] >= -1,
+        ];
+        const clippingEdgeIntersectFn = [
+            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
+            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
+            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
+            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
+        ];
+
+        // for each clipping edge
+        for (let i = 0; i < 4; i++) {
+            const preClippedVertices2 = [];
+
+            // for each edge on polygon
+            for (let k = 0; k < preClippedVertices.length - 1; k++) {
+                // clip polygon edge
+                const a = preClippedVertices[k];
+                const b = preClippedVertices[k + 1];
+
+                const insideA = clippingEdges[i](a);
+                const insideB = clippingEdges[i](b);
+
+                if (insideA && insideB) {
+                    // case 1: both inside, push B vertex
+                    preClippedVertices2.push(b);
+                } else if (insideA) {
+                    // case 2: just A outside, push intersection
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                } else if (insideB) {
+                    // case 4: just B outside: push intersection, push B
+                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                    preClippedVertices2.push(intersectionPoint);
+                    preClippedVertices2.push(b);
+                } else {
+                    // case 3: both outside: do nothing
+                }
+            }
+            if (preClippedVertices2.length) {
+                preClippedVertices2.push(preClippedVertices2[0]);
+            }
+            preClippedVertices = preClippedVertices2;
+        }
+
+        if (preClippedVertices.length > 3) {
+            if (isHole) {
+                polygon.holes.push(polygon.flat.length / 2);
+            }
+            preClippedVertices.forEach(v => {
+                polygon.flat.push(v[0], v[1]);
+            });
+        }
+    }
+    _intersect(a, b, c, d) {
+        //If AB intersects CD => return intersection point
+        // Intersection method from Real Time Rendering, Third Edition, page 780
+        const o1 = a;
+        const o2 = c;
+        const d1 = sub(b, a);
+        const d2 = sub(d, c);
+        const d1t = perpendicular(d1);
+        const d2t = perpendicular(d2);
+
+        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
+        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            // Intersects!
+            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
+        }
+        // Doesn't intersects
     }
 
     _decodeLines(geom, featureGeometries, mvt_extent) {
@@ -248,7 +311,7 @@ export default class MVT extends Base {
                 e = new Float32Array(mvtLayer.length + 1024);
             } else if (c.type == 'json') {
                 e = {};
-            } else if (c.type == 'string') {
+            } else if (c.type == 'category') {
                 e = {};
             }
             properties[fieldMap[c.name]] = e;
@@ -281,7 +344,7 @@ export default class MVT extends Base {
                     e = Number(f.properties[c.name]);
                 } else if (c.type == 'json') {
                     e = JSON.parse(f.properties[c.name]);
-                } else if (c.type == 'string') {
+                } else if (c.type == 'category') {
                     e = f.properties[c.name];
                 }
                 properties[fieldMap[c.name]][i] = e;
@@ -376,11 +439,14 @@ export default class MVT extends Base {
 
         return dataframe;
     }
+}
 
-    // _validateServerURL(serverURL) {
-    //     var urlregex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
-    //     if (!serverURL.match(urlregex)) {
-    //         throw new CartoValidationError('source', 'nonValidServerURL');
-    //     }
-    // }
+function sub([ax, ay], [bx, by]) {
+    return ([ax - bx, ay - by]);
+}
+function dot([ax, ay], [bx, by]) {
+    return (ax * bx + ay * by);
+}
+function perpendicular([x, y]) {
+    return [-y, x];
 }
