@@ -422,7 +422,7 @@ export default class MVT extends Base {
             a += vertices[i].x * vertices[j].y;
             a -= vertices[j].x * vertices[i].y;
         }
-        return a < 0;
+        return a > 0;
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
