@@ -2,15 +2,20 @@ import BaseExpression from './base';
 import { number } from '../functions';
 
 /**
- * Get the current timestamp.
+ * Get the current timestamp. This is an advanced form of animation, `torque` is preferred.
  *
- * @return {carto.expressions.Base}
+ * @return {Number}
  *
- * @example
+ * @example <caption>Update width during the time.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.mod(s.now(), 10);
+ *   width: s.mod(s.now(), 10)
  * });
+ *
+ * @example <caption>Update width during the time. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: now() % 10
+ * `);
  *
  * @memberof carto.expressions
  * @name now

@@ -1,12 +1,19 @@
-import * as rendererGLSL from './renderer';
-import * as aaBlenderGLSL from './aaBlender';
-import ShaderCache from './shader-cache';
+import ShaderCache from './Cache';
 
 import * as stylerGLSL from './styler';
 
 const shaderCache = new ShaderCache();
+import AntiAliasingShader from './common/AntiAliasingShader';
 
-let programID = 1;
+import LineShader from './geometry/LineShader';
+import PointShader from './geometry/PointShader';
+import TriangleShader from './geometry/TriangleShader';
+
+import ColorShader from './style/ColorShader';
+import WidthShader from './style/WidthShader';
+import FilterShader from './style/FilterShader';
+
+let programID = 0;
 
 export const styleColorGLSL = {VS: stylerGLSL.VS,
     FS: stylerGLSL.FS.replace('$style_inline', '$color_inline').replace('$style_preface', '$color_preface')
@@ -63,67 +70,12 @@ function compileProgram(gl, glslVS, glslFS) {
     this.programID = programID++;
 }
 
-class AABlender {
-    constructor(gl) {
-        compileProgram.call(this, gl, aaBlenderGLSL.VS, aaBlenderGLSL.FS);
-        this.vertexAttribute = gl.getAttribLocation(this.program, 'vertex');
-        this.readTU = gl.getUniformLocation(this.program, 'aaTex');
-    }
-}
-
-class Point {
-    constructor(gl) {
-        compileProgram.call(this, gl, rendererGLSL.point.VS, rendererGLSL.point.FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
-        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
-    }
-}
-class Tri {
-    constructor(gl) {
-        compileProgram.call(this, gl, rendererGLSL.tris.VS, rendererGLSL.tris.FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-    }
-}
-class Line {
-    constructor(gl) {
-        compileProgram.call(this, gl, rendererGLSL.line.VS, rendererGLSL.line.FS);
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
+const AABlender = AntiAliasingShader;
 
 const renderer = {
-    createPointShader: function (gl) {
-        return new Point(gl);
-    },
-    createTriShader: function (gl) {
-        return new Tri(gl);
-    },
-    createLineShader: function (gl) {
-        return new Line(gl);
-    }
+    createPointShader: gl => new PointShader(gl),
+    createTriShader: gl => new TriangleShader(gl),
+    createLineShader: gl => new LineShader(gl),
 };
 
 // TODO remove class nonsense
@@ -171,4 +123,10 @@ export function createShader(gl, glslTemplate, codes) {
     return shader;
 }
 
-export { renderer, AABlender };
+const styler = {
+    createColorShader: (gl, preface, inline) => new ColorShader(gl, preface, inline),
+    createWidthShader: (gl, preface, inline) => new WidthShader(gl, preface, inline),
+    createFilterShader: (gl, preface, inline) => new FilterShader(gl, preface, inline)
+};
+
+export { renderer, AABlender, styler };

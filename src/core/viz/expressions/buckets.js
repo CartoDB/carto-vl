@@ -13,16 +13,21 @@ let bucketUID = 0;
  *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
  *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
  *
- *
  * ```javascript
  *  const s = carto.expressions;
  *  const $speed = s.prop('speed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, 30, 80, 120),
+ *      s.buckets($speed, [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
+ * ```
+ *
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+ * `);
  * ```
  *
  * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
@@ -40,15 +45,21 @@ let bucketUID = 0;
  *  const $procesedSpeed = s.prop('procesedSpeed');
  *  const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($procesedSpeed, 'slow', 'medium', 'high'),
+ *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
  *      s.palettes.PRISM)
  *    )
  * });
  * ```
  *
- * @param {carto.expressions.Base} property - The property to be evaluated and interpolated
- * @param {...carto.expressions.Base} breakpoints - Numeric expression containing the different breakpoints.
- * @return {carto.expressions.Base}
+ * ```javascript
+ *  const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
+ * ```
+ *
+ * @param {Number|Category} property - The property to be evaluated and interpolated
+ * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
+ * @return {Number|Category}
  *
  * @memberof carto.expressions
  * @name buckets
@@ -56,9 +67,9 @@ let bucketUID = 0;
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor(input, ...args) {
+    constructor(input, list) {
         input = implicitCast(input);
-        args = args.map(implicitCast);
+        list = implicitCast(list);
 
         let looseType = undefined;
         if (input.type) {
@@ -67,13 +78,13 @@ export default class Buckets extends BaseExpression {
             }
             looseType = input.type;
         }
-        args.map((arg, index) => {
-            if (arg.type) {
-                if (looseType && looseType != arg.type) {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${arg.type}`);
-                } else if (arg.type != 'number' && arg.type != 'category') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
+        list.elems.map((item, index) => {
+            if (item.type) {
+                if (looseType && looseType != item.type) {
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
+                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                } else if (item.type != 'number' && item.type != 'category') {
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
                 }
             }
         });
@@ -81,20 +92,20 @@ export default class Buckets extends BaseExpression {
         let children = {
             input
         };
-        args.map((arg, index) => children[`arg${index}`] = arg);
+        list.elems.map((item, index) => children[`arg${index}`] = item);
         super(children);
         this.bucketUID = bucketUID++;
-        this.numCategories = args.length + 1;
-        this.args = args;
+        this.numCategories = list.elems.length + 1;
+        this.list = list;
         this.type = 'category';
     }
     eval(feature) {
         const v = this.input.eval(feature);
         let i;
-        for (i = 0; i < this.args.length; i++) {
-            if (this.input.type == 'category' && v == this.args[i].eval(feature)) {
+        for (i = 0; i < this.list.elems.length; i++) {
+            if (this.input.type == 'category' && v == this.list.elems[i].eval(feature)) {
                 return i;
-            } else if (this.input.type == 'number' && v < this.args[i].eval(feature)) {
+            } else if (this.input.type == 'number' && v < this.list.elems[i].eval(feature)) {
                 return i;
             }
         }
@@ -108,12 +119,12 @@ export default class Buckets extends BaseExpression {
         if (input.type != 'number' && input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
         }
-        this.args.map((arg, index) => {
-            if (input.type != arg.type) {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type` +
-                    `\n\texpected type was ${input.type}\n\tactual type was ${arg.type}`);
-            } else if (arg.type != 'number' && arg.type != 'category') {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index)} parameter type\n\ttype was ${arg.type}`);
+        this.list.elems.map((item, index) => {
+            if (input.type != item.type) {
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
+                    `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
+            } else if (item.type != 'number' && item.type != 'category') {
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
             }
         });
     }
@@ -127,7 +138,7 @@ export default class Buckets extends BaseExpression {
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
                 return ${index}.;
             }`;
-        const funcBody = this.args.map(elif).join('');
+        const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
             return ${this.numCategories - 1}.;

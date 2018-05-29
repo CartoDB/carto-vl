@@ -147,26 +147,26 @@ describe('src/client/windshaft-filtering', () => {
                 expect(actual).toEqual(expected);
             });
 
-            it('in($categoricalProperty, \'red\', \'blue\')', () => {
+            it('in($categoricalProperty, [\'red\', \'blue\'])', () => {
                 const expected = {
                     type: 'in',
                     property: 'categoricalProperty',
                     values: ['red', 'blue']
                 };
                 const actual = preFilters(f,
-                    s.in(s.property('categoricalProperty'), 'red', 'blue')
+                    s.in(s.property('categoricalProperty'), ['red', 'blue'])
                 );
                 expect(actual).toEqual(expected);
             });
 
-            it('nin($categoricalProperty, \'red\', \'blue\')', () => {
+            it('nin($categoricalProperty, [\'red\', \'blue\'])', () => {
                 const expected = {
                     type: 'notIn',
                     property: 'categoricalProperty',
                     values: ['red', 'blue']
                 };
                 const actual = preFilters(f,
-                    s.nin(s.property('categoricalProperty'), 'red', 'blue')
+                    s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                 );
                 expect(actual).toEqual(expected);
             });
@@ -273,7 +273,7 @@ describe('src/client/windshaft-filtering', () => {
                 )).toEqual(expected);
             });
 
-            it('between($numericProperty,10,20) and ($numericProperty < 100 or in($categoricalProperty, \'red\', \'blue\'))', () => {
+            it('between($numericProperty,10,20) and ($numericProperty < 100 or in($categoricalProperty, [\'red\', \'blue\']))', () => {
                 const expected = {
                     type: 'and',
                     left: {
@@ -307,7 +307,7 @@ describe('src/client/windshaft-filtering', () => {
                         s.between(s.property('numericProperty'), 10, 20),
                         s.or(
                             s.lt(s.property('numericProperty'), 100),
-                            s.in(s.property('categoricalProperty'), 'red', 'blue')
+                            s.in(s.property('categoricalProperty'), ['red', 'blue'])
                         )
                     )
                 );
@@ -452,13 +452,28 @@ describe('src/client/windshaft-filtering', () => {
                 )).toBeNull();
             });
 
-            it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
-                expect(preFilters(f,
+            it('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
+                const expected = {
+                    type: 'or',
+                    left: {
+                        type: 'between',
+                        property: 'numericProperty',
+                        lower: 10,
+                        upper: 20
+                    },
+                    right: {
+                        type: 'notIn',
+                        property: 'categoricalProperty',
+                        values: [ 'red', 'blue' ]
+                    }
+                };
+                const actual = preFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', 'red', 'blue'))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
-                )).toBeNull();
+                );
+                expect(actual).toEqual(expected);
             });
 
             it('with aggregate properties', () => {
@@ -511,26 +526,26 @@ describe('src/client/windshaft-filtering', () => {
                 expect(actual).toEqual(expected);
             });
 
-            it('`in($categoricalProperty, \'red\', \'blue\') `', () => {
+            it('`in($categoricalProperty, [\'red\', \'blue\']) `', () => {
                 const expected = {
                     categoricalProperty: [{
                         in: ['red', 'blue']
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.in(s.property('categoricalProperty'), 'red', 'blue')
+                    s.in(s.property('categoricalProperty'), ['red', 'blue'])
                 );
                 expect(actual).toEqual(expected);
             });
 
-            it('`nin($categoricalProperty, \'red\', \'blue\') `', () => {
+            it('`nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
                 const expected = {
                     categoricalProperty: [{
                         not_in: ['red', 'blue']
                     }]
                 };
                 const actual = aggrFilters(f,
-                    s.nin(s.property('categoricalProperty'), 'red', 'blue')
+                    s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                 );
                 expect(actual).toEqual(expected);
             });
@@ -605,7 +620,7 @@ describe('src/client/windshaft-filtering', () => {
                 expect(actual).toEqual(expected);
             });
 
-            it('`between($prop1, 10,20) and ($prop2 < 100 and in($prop3, \'red\', \'blue\'))`', () => {
+            it('`between($prop1, 10,20) and ($prop2 < 100 and in($prop3, [\'red\', \'blue\']))`', () => {
                 const expected = {
                     prop1: [{
                         greater_than_or_equal_to:  10,
@@ -619,14 +634,14 @@ describe('src/client/windshaft-filtering', () => {
                         s.between(s.property('prop1'), 10, 20),
                         s.and(
                             s.lt(s.property('prop2'), 100),
-                            s.in(s.property('prop3'), 'red', 'blue')
+                            s.in(s.property('prop3'), ['red', 'blue'])
                         )
                     )
                 );
                 expect(actual).toEqual(expected);
             });
 
-            it('`($prop > 10 and $prop <= 100) and in($prop2, \'red\', \'blue\'))`', () => {
+            it('`($prop > 10 and $prop <= 100) and in($prop2, [\'red\', \'blue\']))`', () => {
                 const expected = {
                     prop: [{
                         greater_than: 10,
@@ -640,7 +655,7 @@ describe('src/client/windshaft-filtering', () => {
                             s.gt(s.property('prop'), 10),
                             s.lte(s.property('prop'), 100)
                         ),
-                        s.in(s.property('prop2'), 'red', 'blue')
+                        s.in(s.property('prop2'), ['red', 'blue'])
                     )
                 );
                 expect(actual).toEqual(expected);
@@ -723,7 +738,7 @@ describe('src/client/windshaft-filtering', () => {
                     expect(actual).toEqual(expected);
                 });
 
-                it('`between($numericProperty, 10,20) and ($numericProperty < 100 or in($categoricalProperty, \'red\', \'blue\'))`', () => {
+                it('`between($numericProperty, 10,20) and ($numericProperty < 100 or in($categoricalProperty, [\'red\', \'blue\']))`', () => {
                     const expected = {
                         numericProperty: [{
                             greater_than_or_equal_to:  10,
@@ -735,7 +750,7 @@ describe('src/client/windshaft-filtering', () => {
                             s.between(s.property('numericProperty'), 10, 20),
                             s.or(
                                 s.lt(s.property('numericProperty'), 100),
-                                s.in(s.property('categoricalProperty'), 'red', 'blue')
+                                s.in(s.property('categoricalProperty'), ['red', 'blue'])
                             )
                         )
                     );
@@ -789,26 +804,26 @@ describe('src/client/windshaft-filtering', () => {
                 )).toEqual({});
             });
 
-            it('`between($numericProperty, 10,20) and ($numericProperty < 100 and in($categoricalProperty, \'red\', \'blue\'))`', () => {
+            it('`between($numericProperty, 10,20) and ($numericProperty < 100 and in($categoricalProperty, [\'red\', \'blue\']))`', () => {
                 const actual = aggrFilters(f,
                     s.and(
                         s.between(s.property('numericProperty'), 10, 20),
                         s.and(
                             s.lt(s.property('numericProperty'), 100),
-                            s.in(s.property('categoricalProperty'), 'red', 'blue')
+                            s.in(s.property('categoricalProperty'), ['red', 'blue'])
                         )
                     )
                 );
                 expect(actual).toEqual({});
             });
 
-            it('`between($numericProperty, 10,20) or ($numericProperty < 100 or in($categoricalProperty, \'red\', \'blue\'))`', () => {
+            it('`between($numericProperty, 10,20) or ($numericProperty < 100 or in($categoricalProperty, [\'red\', \'blue\']))`', () => {
                 const actual = aggrFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
                         s.or(
                             s.lt(s.property('numericProperty'), 100),
-                            s.in(s.property('categoricalProperty'), 'red', 'blue')
+                            s.in(s.property('categoricalProperty'), ['red', 'blue'])
                         )
                     )
                 );
@@ -844,11 +859,11 @@ describe('src/client/windshaft-filtering', () => {
                 )).toEqual({});
             });
 
-            it('`between($numericProperty, 10,20) or nin($categoricalProperty, \'red\', \'blue\') `', () => {
+            it('`between($numericProperty, 10,20) or nin($categoricalProperty, [\'red\', \'blue\']) `', () => {
                 expect(aggrFilters(f,
                     s.or(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.nin(s.property('categoricalProperty', 'red', 'blue'))
+                        s.nin(s.property('categoricalProperty'), ['red', 'blue'])
                     )
                 )).toEqual({});
             });

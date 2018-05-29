@@ -1,5 +1,19 @@
 import { createShader } from '../shaders';
 
+class IDGenerator {
+    constructor() {
+        this._ids = new Map();
+    }
+    getID(expression) {
+        if (this._ids.has(expression)) {
+            return this._ids.get(expression);
+        }
+        const id = this._ids.size;
+        this._ids.set(expression, id);
+        return id;
+    }
+}
+
 export function compileShader(gl, template, expressions) {
     let tid = {};
     const getPropertyAccessCode = name => {
@@ -11,6 +25,7 @@ export function compileShader(gl, template, expressions) {
     let codes = {};
     Object.keys(expressions).forEach(exprName => {
         const expr = expressions[exprName];
+        expr._setUID(new IDGenerator());
         const exprCodes = expr._applyToShaderSource(getPropertyAccessCode);
         codes[exprName + '_preface'] = exprCodes.preface;
         codes[exprName + '_inline'] = exprCodes.inline;

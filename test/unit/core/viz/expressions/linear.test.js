@@ -1,10 +1,10 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { GlobalMin, GlobalMax } from '../../../../../src/core/viz/expressions/aggregation/globalAggregation';
 
 describe('src/core/viz/expressions/linear', () => {
     describe('error control', () => {
         validateStaticTypeErrors('linear', []);
-        validateStaticTypeErrors('linear', ['number']);
         validateStaticTypeErrors('linear', ['number', 'number']);
         validateStaticTypeErrors('linear', ['number', 'color']);
         validateStaticTypeErrors('linear', ['number', 'color', 'number']);
@@ -13,7 +13,18 @@ describe('src/core/viz/expressions/linear', () => {
     });
 
     describe('type', () => {
+        validateStaticType('linear', ['number'], 'number');
         validateStaticType('linear', ['number', 'number', 'number'], 'number');
+    });
+
+    describe('min/max', () => {
+        it('should default to globalMin(input) and globalMax(input)', ()=>{
+            const l = s.linear(s.prop('wadus'));
+            expect(l.min).toEqual(jasmine.any(GlobalMin));
+            expect(l.max).toEqual(jasmine.any(GlobalMax));
+            expect(l.min.property.name).toEqual('wadus');
+            expect(l.max.property.name).toEqual('wadus');
+        });
     });
 
     describe('.eval()', () => {
@@ -30,4 +41,3 @@ describe('src/core/viz/expressions/linear', () => {
         });
     });
 });
-

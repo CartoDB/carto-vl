@@ -9,30 +9,30 @@ import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { symbolizerGLSL } from '../core/shaders/symbolizer';
 
-const DEFAULT_RESOLUTION = () => 1;
-const DEFAULT_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_WIDTH_EXPRESSION = () => s.number(5);
-const DEFAULT_STROKE_COLOR_EXPRESSION = () => s.rgba(0, 255, 0, 0.5);
-const DEFAULT_STROKE_WIDTH_EXPRESSION = () => s.number(0);
+const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
+const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
+const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
+const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
 const DEFAULT_SYMBOL_EXPRESSION = () => { const expr = s.FALSE; expr._default = true; return expr; };
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => s.BOTTOM;
+const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
 const MAX_RESOLUTION = 256;
 
 const SUPPORTED_PROPERTIES = [
-    'resolution',
     'color',
     'width',
     'strokeColor',
     'strokeWidth',
     'order',
     'filter',
-    'variables',
     'symbol',
     'symbolPlacement',
+    'resolution',
+    'variables'
 ];
 
 export default class Viz {
@@ -58,31 +58,82 @@ export default class Viz {
     * @constructor Viz
     * @memberof carto
     * @api
+    *
+    * @property {Color} color - fill color of points and polygons and color of lines
+    * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+    * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+    * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+    * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+    * @property {object} variables - An object describing the variables used.
+    *
     */
     constructor(definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
         Object.keys(vizSpec).forEach(property => {
-            if (SUPPORTED_PROPERTIES.includes(property)) {
-                this[property] = vizSpec[property];
-            }
+            this._defineProperty(property, vizSpec[property]);
         });
+        if (!Object.keys(vizSpec).includes('variables')) {
+            this._defineProperty('variables', {});
+        }
 
         this.updated = true;
         this._changeCallback = null;
 
-        this._getRootExpressions().forEach(expr => {
-            expr.parent = this;
-            expr.notify = this._changed.bind(this);
-        });
-
-        Object.keys(this.variables).map(varName => {
-            this['__cartovl_variable_' + varName] = this.variables[varName];
-        });
+        this._updateRootExpressions();
 
         this._resolveAliases();
         this._validateAliasDAG();
+    }
+
+    _fetch() {
+        return Promise.all(this._getRootExpressions().map(expr => expr._fetch()));
+    }
+
+    // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
+    // These setters and the proxy allow us to re-render without requiring further action from the user
+    _defineProperty(propertyName, propertyValue) {
+        if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
+            return;
+        }
+        Object.defineProperty(this, propertyName, {
+            get: () => this['_' + propertyName],
+            set: expr => {
+                if (propertyName != 'resolution') {
+                    expr = implicitCast(expr);
+                }
+                this['_' + propertyName] = expr;
+                this._changed();
+            },
+        });
+
+        let property = propertyValue;
+        if (propertyName == 'variables') {
+            let init = false;
+            const handler = {
+                get: (obj, prop) => {
+                    return obj[prop];
+                },
+                set: (obj, prop, value) => {
+                    value = implicitCast(value);
+                    obj[prop] = value;
+                    this['__cartovl_variable_' + prop] = value;
+                    if (init) {
+                        this._changed();
+                    }
+                    return true;
+                }
+            };
+            property = new Proxy({}, handler);
+            Object.keys(propertyValue).map(varName => {
+                property[varName] = propertyValue[varName];
+            });
+            init = true;
+        }
+        this['_' + propertyName] = property;
     }
 
     _getRootExpressions() {
@@ -99,103 +150,21 @@ export default class Viz {
         ];
     }
 
-    _fetch() {
-        return Promise.all(this._getRootExpressions().map(expr => expr._fetch()));
-    }
-
-    /**
-     * Return the resolution.
-     *
-     * @return {number}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getResolution() {
-        return this.resolution;
-    }
-
-    /**
-     * Return the color expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getColor() {
-        return this.color;
-    }
-
-    /**
-     * Return the width expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getWidth() {
-        return this.width;
-    }
-
-    /**
-     * Return the strokeColor expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeColor() {
-        return this.strokeColor;
-    }
-
-    /**
-     * Return the strokeWidth expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getStrokeWidth() {
-        return this.strokeWidth;
-    }
-
-    /**
-     * Return the order expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getOrder() {
-        return this.order;
-    }
-
-    /**
-     * Return the filter expression.
-     *
-     * @return {carto.expressions.Base}
-     *
-     * @memberof carto.Viz
-     * @instance
-     * @api
-     */
-    getFilter() {
-        return this.filter;
+    _updateRootExpressions() {
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
     }
 
     isAnimated() {
-        return this._getRootExpressions().some(rootExpr => rootExpr.isAnimated());
+        return this.color.isAnimated() ||
+            this.width.isAnimated() ||
+            this.strokeColor.isAnimated() ||
+            this.strokeWidth.isAnimated() ||
+            this.filter.isAnimated() ||
+            this.symbol.isAnimated() ||
+            this.symbolPlacement.isAnimated();
     }
 
     onChange(callback) {
@@ -213,6 +182,52 @@ export default class Viz {
     getMinimumNeededSchema() {
         const exprs = this._getRootExpressions().filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+    }
+
+    setDefaultsIfRequired(geomType) {
+        let defaults = this._getDefaultGeomStyle(geomType);
+        if (defaults) {
+            if (this.color.default) {
+                this.color = defaults.COLOR_EXPRESSION();
+            }
+            if (this.width.default) {
+                this.width = defaults.WIDTH_EXPRESSION();
+            }
+            if (this.strokeColor.default) {
+                this.strokeColor = defaults.STROKE_COLOR_EXPRESSION();
+            }
+            if (this.strokeWidth.default) {
+                this.strokeWidth = defaults.STROKE_WIDTH_EXPRESSION();
+            }
+            this._updateRootExpressions();
+        }
+    }
+
+    _getDefaultGeomStyle(geomType) {
+        if (geomType === 'point') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(7)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
+            };
+        }
+        if (geomType === 'line') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
+            };
+        }
+        if (geomType === 'polygon') {
+            return {
+                COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
+                WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
+                STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
+            };
+        }
     }
 
     _resolveAliases() {
@@ -323,8 +338,6 @@ export default class Viz {
         }
     }
 
-    // ^^
-
     /**
      * This function checks the input parameter `definition` returning always an object.
      * If the `definition` is an object it returns the same object.
@@ -354,15 +367,33 @@ export default class Viz {
      * @return {VizSpec}
      */
     _setDefaults(vizSpec) {
-        vizSpec.resolution = util.isUndefined(vizSpec.resolution) ? DEFAULT_RESOLUTION() : vizSpec.resolution;
-        vizSpec.color = vizSpec.color || DEFAULT_COLOR_EXPRESSION();
-        vizSpec.width = vizSpec.width || DEFAULT_WIDTH_EXPRESSION();
-        vizSpec.strokeColor = vizSpec.strokeColor || DEFAULT_STROKE_COLOR_EXPRESSION();
-        vizSpec.strokeWidth = vizSpec.strokeWidth || DEFAULT_STROKE_WIDTH_EXPRESSION();
-        vizSpec.order = vizSpec.order || DEFAULT_ORDER_EXPRESSION();
-        vizSpec.filter = vizSpec.filter || DEFAULT_FILTER_EXPRESSION();
-        vizSpec.symbol = vizSpec.symbol || DEFAULT_SYMBOL_EXPRESSION();
-        vizSpec.symbolPlacement = vizSpec.symbolPlacement || DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
+        if (util.isUndefined(vizSpec.color)) {
+            vizSpec.color = DEFAULT_COLOR_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.width)) {
+            vizSpec.width = DEFAULT_WIDTH_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.strokeColor)) {
+            vizSpec.strokeColor = DEFAULT_STROKE_COLOR_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.strokeWidth)) {
+            vizSpec.strokeWidth = DEFAULT_STROKE_WIDTH_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.order)) {
+            vizSpec.order = DEFAULT_ORDER_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.filter)) {
+            vizSpec.filter = DEFAULT_FILTER_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.resolution)) {
+            vizSpec.resolution = DEFAULT_RESOLUTION();
+        }
+        if (util.isUndefined(vizSpec.symbol)) {
+            vizSpec.symbol = DEFAULT_SYMBOL_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.symbolPlacement)) {
+            vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
+        }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
@@ -372,22 +403,24 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {number} resolution - Control the aggregation level
+         * @property {Color} color - fill color of points and polygons and color of lines
+         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
-         * @property {carto.expressions.Base} color - A `color` expression that controls the color of the elements.
-         * @property {carto.expressions.Base} width - A  `numeric` expression that controls the width of the elements.
-         * @property {carto.expressions.Base} strokeColor - A `color` expression that controls the stroke color of the elements.
-         * @property {carto.expressions.Base} strokeWidth - A `numeric` expression that controls the with of the stroke of the elements.
-         * @property {carto.expressions.Base} order - Define how the elements will be stacked
-         * @property {carto.expressions.Base} filter - A `boolean` expression that controlls which elements will be shown.
          * @api
          */
 
         // TODO: Check expression types ie: color is not a number expression!
 
+        // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
             throw new CartoValidationError('viz', 'resolutionNumberRequired');
@@ -428,4 +461,13 @@ export default class Viz {
             }
         }
     }
+}
+
+/**
+ * Mark default expressions to apply the style defaults for each
+ * geometry (point, line, polygon) when available.
+ */
+function _markDefault(expression) {
+    expression.default = true;
+    return expression;
 }

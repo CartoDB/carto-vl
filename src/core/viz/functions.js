@@ -1,25 +1,24 @@
 /**
- *  Expressions are used to define vizs, a viz is composed of an expression for every configurable attribute.
- *  Remember a viz has the following attributes:
+ *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
+ *  A viz has the following properties:
  *
- *  - **color**: Determine the element fill color.
- *  - **strokeColor**: Determine the element border color.
- *  - **width**: Determine the element width: diameter when points, thickness when lines, not used for polygons.
- *  - **strokeWidth**: Determine the element border size.
- *  - **order**: This is a special property used to order the elements in ascendent/descendent order.
- *  - **filter**: This is a special property used to remove elements that do not meet the expression.
- *  - **resolution**: Determine the resolution of the property-aggregation functions.
+ *  - **color**: fill color of points and polygons and color of lines
+ *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
+ *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
+ *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
+ *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
+ *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
- * For example the point diameter could be using the `number` expression:
+ * For example the point diameter could be using the `add` expression:
  *
  * ```javascript
  * const viz = new carto.Viz({
- *   width: carto.expressions.number(10)  // Equivalent to `width: 10`
+ *   width: carto.expressions.add(5, 5)  // Equivalent to `width: 10`
  * });
  * ```
  *
- * You can evaluate dataset properties inside an expression. Imagine we are representing cities in a map,
- * we can set the point width depending on the population using the `property` expression.
+ * You can use dataset properties inside expressions. Imagine we are representing cities in a map,
+ * we can make the point width proportional to the population using the `property`/`prop` expression.
  *
  * ```javascript
  * const viz = new carto.Viz({
@@ -35,18 +34,27 @@
  * const viz = new carto.Viz({
  *   width: s.div(
  *     s.prop('population'),
- *     s.number(10000)  // Equivalent to 10000
+ *     10000
  *  )
  * });
  * ```
  *
- * Although expression combination is very powerful, you must be aware of the different types to produce valid combinations.
+ * All these expressions can be used also in a String API form. This API is a more compact way to create and use expressions.
+ * It has shortcut notation to access your feature properties using the `$` symbol. It also allows inline comments using the JavaScript syntax.
+ *
+ * ```javascript
+ * const viz = new carto.Viz(`
+ *   width: $population / 10000  // Size proportional to the population for each feature
+ * `);
+ * ```
+ *
+ * Although the combination of expressions is very powerful, you must be aware of the different types to produce valid combinations.
  * For example, the previous example is valid since we assumed that 'population' is a numeric property, it won't be valid if
  * it was a categorical property. Each expression defines some restrictions regarding their parameters, particularly, the
  * type of their parameters.
  *
  * The most important types are:
- *  - **Numeric** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
+ *  - **Number** expression. Expressions that contains numbers, both integers and floating point numbers. Boolean types are emulated by this type, being 0 false, and 1 true.
  *  - **Category** expression. Expressions that contains categories. Categories can have a limited set of values, like the country or the region of a feature.
  *  - **Color** expression. Expressions that contains colors. An alpha or transparency channel is included in this type.
  *
@@ -54,7 +62,68 @@
  * @api
  */
 
+
+/**
+ * Type of Numeric Expressions.
+ *
+ * Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.
+ *
+ * JavaScript numbers are automatically converted to Numeric Expressions.
+ *
+ * @typedef {} Number
+ * @api
+ */
+
+/**
+ * Type of Category Expressions.
+ *
+ * Associated to expressions that return is a category string. When these expressions are evaluated it should return a JavaScript string.
+ *
+ * JavaScript strings are automatically converted to Category Expressions.
+ *
+ * @typedef {} Category
+ * @api
+ */
+
+/**
+ * Type of Color Expressions.
+ *
+ * Associated to expressions that return a color. When these expressions are evaluated it should return a RGBA object like:
+ *
+ * ```
+ * { r: 255, g: 255, b: 255, a: 1.0 }
+ * ```
+ *
+ * @typedef {} Color
+ * @api
+ */
+
+/**
+ * Type of Date Expressions.
+ *
+ * @typedef {} Date
+ * @api
+ */
+
+/**
+ * Type of Fade Expressions.
+ *
+ * @typedef {} Fade
+ * @api
+ */
+
+/**
+ * Type of Palette Expressions.
+ *
+ * More information in {@link carto.expressions.palettes|carto.expressions.palettes}.
+ *
+ * @typedef {} Palette
+ * @api
+ */
+
 import Animate from './expressions/animate';
+
+import BaseArray from './expressions/basic/array';
 
 import { In } from './expressions/belongs.js';
 import { Nin } from './expressions/belongs.js';
@@ -80,59 +149,57 @@ import Blend from './expressions/blend';
 
 import Buckets from './expressions/buckets';
 
-import Category from './expressions/category';
+import BaseCategory from './expressions/basic/category';
 
-import CIELab from './expressions/CIELab';
+import CIELab from './expressions/color/CIELab';
 
-import { ClusterAvg } from './expressions/clusterAggregation';
-import { ClusterMax } from './expressions/clusterAggregation';
-import { ClusterMin } from './expressions/clusterAggregation';
-import { ClusterMode } from './expressions/clusterAggregation';
-import { ClusterSum } from './expressions/clusterAggregation';
+import { ClusterAvg } from './expressions/aggregation/clusterAggregation';
+import { ClusterMax } from './expressions/aggregation/clusterAggregation';
+import { ClusterMin } from './expressions/aggregation/clusterAggregation';
+import { ClusterMode } from './expressions/aggregation/clusterAggregation';
+import { ClusterSum } from './expressions/aggregation/clusterAggregation';
 
-import Constant from './expressions/constant';
+import Constant from './expressions/basic/constant';
 
-import Hex from './expressions/hex';
+import Hex from './expressions/color/hex';
 
-import { HSL } from './expressions/hsl';
-import { HSLA } from './expressions/hsl';
+import { HSL } from './expressions/color/hsl';
+import { HSLA } from './expressions/color/hsl';
 
-import { HSV } from './expressions/hsv';
-import { HSVA } from './expressions/hsv';
+import { HSV } from './expressions/color/hsv';
+import { HSVA } from './expressions/color/hsv';
 
 import { Cubic } from './expressions/interpolators';
 import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import { NamedColor } from './expressions/named-color';
+import { NamedColor } from './expressions/color/named-color';
 
 import Near from './expressions/near';
 
 import Now from './expressions/now';
 
-import Number from './expressions/number';
+import BaseNumber from './expressions/basic/number';
 
-import Opacity from './expressions/opacity';
+import Opacity from './expressions/color/opacity';
 
 import { Asc } from './expressions/ordering';
 import { Desc } from './expressions/ordering';
 import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
-import { palettes } from './expressions/palettes';
-import { Inverse } from './expressions/palettes';
-import { CustomPalette } from './expressions/palettes';
+import { palettes } from './expressions/color/palettes';
+import { Reverse } from './expressions/color/palettes';
 
-import Property from './expressions/property';
+import Property from './expressions/basic/property';
 
-import { Quantiles } from './expressions/quantiles';
-import { GlobalQuantiles } from './expressions/quantiles';
+import { ViewportQuantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
 
 import Ramp from './expressions/ramp';
 
-import { RGB } from './expressions/rgb';
-import { RGBA } from './expressions/rgb';
+import { RGB } from './expressions/color/rgb';
+import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
 
@@ -147,25 +214,15 @@ import { Sin } from './expressions/unary';
 import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
-import { Abs } from './expressions/unary';
+import { Abs, IsNaN } from './expressions/unary';
 import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
 
-import Variable from './expressions/variable';
+import Variable from './expressions/basic/variable';
 
-import { ViewportAvg } from './expressions/viewportAggregation';
-import { ViewportMax } from './expressions/viewportAggregation';
-import { ViewportMin } from './expressions/viewportAggregation';
-import { ViewportSum } from './expressions/viewportAggregation';
-import { ViewportCount } from './expressions/viewportAggregation';
-import { ViewportPercentile } from './expressions/viewportAggregation';
-import { GlobalAvg } from './expressions/viewportAggregation';
-import { GlobalMax } from './expressions/viewportAggregation';
-import { GlobalMin } from './expressions/viewportAggregation';
-import { GlobalSum } from './expressions/viewportAggregation';
-import { GlobalCount } from './expressions/viewportAggregation';
-import { GlobalPercentile } from './expressions/viewportAggregation';
+import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 
 import XYZ from './expressions/xyz';
 
@@ -178,6 +235,8 @@ import Sprites from './expressions/sprites';
 /* Expose classes as constructor functions */
 
 export const animate = (...args) => new Animate(...args);
+
+export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -210,8 +269,6 @@ export const blend = (...args) => new Blend(...args);
 
 export const buckets = (...args) => new Buckets(...args);
 
-export const category = (...args) => new Category(...args);
-
 export const cielab = (...args) => new CIELab(...args);
 
 export const clusterAvg = (...args) => new ClusterAvg(...args);
@@ -242,7 +299,7 @@ export const near = (...args) => new Near(...args);
 
 export const now = (...args) => new Now(...args);
 
-export const number = (...args) => new Number(...args);
+export const number = (...args) => new BaseNumber(...args);
 
 export const opacity = (...args) => new Opacity(...args);
 
@@ -251,22 +308,25 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const inverse = (...args) => new Inverse(...args);
-
-export const customPalette = (...args) => new CustomPalette(...args);
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const quantiles = (...args) => new Quantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
+export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 
 export const rgb = (...args) => new RGB(...args);
 export const rgba = (...args) => new RGBA(...args);
 
+export const category = (...args) => new BaseCategory(...args);
+
 export const time = (...args) => new Time(...args);
+export { time as date };
 
 export const top = (...args) => new Top(...args);
 
@@ -280,6 +340,7 @@ export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const abs = (...args) => new Abs(...args);
+export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
@@ -294,6 +355,7 @@ export const viewportMin = (...args) => new ViewportMin(...args);
 export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
+export const viewportHistogram = (...args) => new ViewportHistogram(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
@@ -308,6 +370,8 @@ export const placement = (...args) => new Placement(...args);
 
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
+export const PI = new Constant(Math.PI);
+export const E = new Constant(Math.E);
 
 export const CENTER = new Placement(constant(0), constant(0));
 export const BOTTOM = new Placement(constant(0), constant(-1));

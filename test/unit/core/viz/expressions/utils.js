@@ -3,13 +3,13 @@ import * as s from '../../../../../src/core/viz/functions';
 const metadata = {
     columns: [
         {
-            name: 'price',
+            name: 'number',
             type: 'number'
         },
         {
-            name: 'cat',
+            name: 'category',
             type: 'category',
-            categoryNames: ['red', 'blue']
+            categoryNames: ['category0', 'category1', 'category2']
         }
     ],
 };
@@ -46,14 +46,12 @@ function validateConstructorTimeTypeError(expressionName, args) {
 }
 function validateCompileTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
-        const expression = s[expressionName](...args.map(arg => arg[0]));
-        expect(() =>
-            expression._compile(metadata)
-        ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        expect(() => {
+            const expression = s[expressionName](...args.map(arg => arg[0]));
+            expression._compile(metadata);
+        }).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
     });
 }
-
-
 
 export function validateStaticType(expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
@@ -89,42 +87,47 @@ function validateCompileTimeType(expressionName, args, expectedType) {
 
 function getSimpleArg(type) {
     switch (type) {
-        case 'number-property':
-            return [s.property('price'), '$price'];
-        case 'category-property':
-            return [s.property('cat'), '$cat'];
         case 'number':
             return [s.number(0), '0'];
+        case 'number-array':
+            return [s.array([s.number(0)]), '[0]'];
+        case 'number-property':
+            return [s.property('number'), '$number'];
         case 'category':
-            return [s.category('red'), '\'red\''];
+            return [s.category('category'), '\'category\''];
+        case 'category-array':
+            return [s.array([s.category('category')]), '[\'category\']'];
+        case 'category-property':
+            return [s.property('category'), '$category'];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
+        case 'color-array':
+            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'customPalette':
-            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteNumber':
-            return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
     }
 }
 function getPropertyArg(type) {
     switch (type) {
-        case 'number-property':
         case 'number':
-            return [s.property('price'), '$price'];
-        case 'category-property':
+        case 'number-property':
+            return [s.property('number'), '$number'];
+        case 'number-array':
+            return [s.array([s.number(0)]), '[0]'];
         case 'category':
-            return [s.property('cat'), '$cat'];
+        case 'category-property':
+            return [s.property('category'), '$category'];
+        case 'category-array':
+            return [s.array([s.category('category')]), '[\'category\']'];
         case 'color':
-            return [s.hsv(s.property('price'), 0, 0), 'hsv($price, 0, 0)'];
+        case 'color-property':
+            return [s.hsv(s.property('number'), 0, 0), 'hsv($number, 0, 0)'];
+        case 'color-array':
+            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'customPalette':
-            return [[s.rgb(0, 0, 0), s.rgb(255, 255, 255)], '[rgb(0, 0, 0), rgb(255, 255, 255)]'];
-        case 'customPaletteNumber':
-            return [[10, 20], '[10, 20]'];
         default:
             return [type, `${type}`];
     }

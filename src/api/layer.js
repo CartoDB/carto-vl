@@ -9,29 +9,55 @@ import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
+/**
+ *
+ * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
+ *
+ * @typedef {object} LayerEvent
+ * @api
+ */
+
+/**
+ * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
+ *
+ * @event loaded
+ * @type {LayerEvent}
+ * @api
+ */
+
+/**
+ * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+ * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
+ *
+ * @event updated
+ * @type {LayerEvent}
+ * @api
+*/
+
+
+/**
+*
+* A Layer is the primary way to visualize geospatial data.
+*
+* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+*
+* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
+*
+* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {carto.source.Base} source - The source of the data
+* @param {carto.Viz} viz - The description of the visualization of the data
+*
+* @example
+* const layer = new carto.Layer('layer0', source, viz);
+*
+* @fires CartoError
+*
+* @constructor Layer
+* @memberof carto
+* @api
+*/
 export default class Layer {
-    /**
-    *
-    * A Layer is the primary way to visualize geospatial data.
-    *
-    * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
-    *
-    * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-    * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
-    *
-    * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-    * @param {carto.source.Base} source - The source of the data
-    * @param {carto.Viz} viz - The description of the visualization of the data
-    *
-    * @example
-    * const layer = new carto.Layer('layer0', source, viz);
-    *
-    * @fires CartoError
-    *
-    * @constructor Layer
-    * @memberof carto
-    * @api
-    */
     constructor(id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
@@ -56,13 +82,14 @@ export default class Layer {
         this.metadata = null;
         this._renderLayer = new RenderLayer();
         this.state = 'init';
-        this.isLoaded = false;
+        this._isLoaded = false;
+        this._isUpdated = false;
 
         this.update(source, viz);
     }
 
     /**
-     * Register an event handler for the given type.
+     * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
      *
      * @param {string} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event
@@ -123,6 +150,8 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
@@ -164,12 +193,27 @@ export default class Layer {
     async blendToViz(viz, ms = 400, interpolator = cubic) {
         try {
             this._checkViz(viz);
+            viz.setDefaultsIfRequired(this.metadata.geomType);
             if (this._viz) {
-                viz.getColor()._blendFrom(this._viz.getColor(), ms, interpolator);
-                viz.getStrokeColor()._blendFrom(this._viz.getStrokeColor(), ms, interpolator);
-                viz.getWidth()._blendFrom(this._viz.getWidth(), ms, interpolator);
-                viz.getStrokeWidth()._blendFrom(this._viz.getStrokeWidth(), ms, interpolator);
-                viz.getFilter()._blendFrom(this._viz.getFilter(), ms, interpolator);
+                Object.keys(this._viz.variables).map(varName => {
+                    // If an existing variable is not re-declared we add it to the new viz
+                    if (!viz.variables[varName]) {
+                        viz.variables[varName] = this._viz.variables[varName];
+                    }
+                });
+
+                Object.keys(viz.variables).map(varName => {
+                    // If the variable existed, we need to blend it, nothing to do if not
+                    if (this._viz.variables[varName]) {
+                        viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
+                    }
+                });
+
+                viz.color._blendFrom(this._viz.color, ms, interpolator);
+                viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
+                viz.width._blendFrom(this._viz.width, ms, interpolator);
+                viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
+                viz.filter._blendFrom(this._viz.filter, ms, interpolator);
             }
 
             return this._vizChanged(viz).then(() => {
@@ -205,6 +249,7 @@ export default class Layer {
             return;
         }
         this._source.requestData(this._getViewport());
+        this._isUpdated = true;
     }
 
     hasDataframes() {
@@ -239,10 +284,14 @@ export default class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
+            if (this._viz.isAnimated() || this._isUpdated) {
+                this._isUpdated = false;
+                this._fire('updated');
+            }
         }
-        if (!this.isLoaded && this.state == 'dataLoaded') {
+        if (!this._isLoaded && this.state == 'dataLoaded') {
+            this._isLoaded = true;
             this._fire('loaded');
-            this.isLoaded = true;
         }
     }
 
@@ -258,6 +307,7 @@ export default class Layer {
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         this._integrator.needRefresh();
+        this._isUpdated = true;
     }
 
     /**

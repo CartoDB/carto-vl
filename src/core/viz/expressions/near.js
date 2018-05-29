@@ -7,22 +7,26 @@ import { implicitCast, clamp } from './utils';
  *       _____
  * _____/     \_____
  *
- * @param {carto.expressions.Base} input
- * @param {carto.expressions.Base|number} center
- * @param {carto.expressions.Base|number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
- * @param {carto.expressions.Base|number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
- * @return {carto.expressions.Base}
+ * @param {Number} input
+ * @param {Number} center
+ * @param {Number} threshold - Size of the allowed distance between input and center that is filtered in (returning one)
+ * @param {Number} falloff - Size of the distance to be used as a falloff to linearly interpolate between zero and one
+ * @return {Number}
  *
- * @example
+ * @example <caption></caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10)
  * });
  *
+ * @example <caption>(String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: near($day, (25 * now()) % 10000, 0, 10)
+ * `);
+ *
  * @memberof carto.expressions
  * @name near
  * @function
- * @api
  */
 // TODO type checking
 export default class Near extends BaseExpression {

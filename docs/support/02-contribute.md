@@ -1,36 +1,36 @@
 ## Contribute
 
-CARTO platform is an open-source ecosystem. You can read about the [fundamentals]({{site.fundamental_docs}}/components/) of CARTO architecture and its components.
-We are more than happy to receive your contributions to the code and the documentation as well.
+CARTO VL platform is an open-source library. We are more than happy to receive your contributions to the code and the documentation as well.
 
-## Filling a ticket
+### Filling a ticket
+
 If you want to open a new issue in our repository, please follow these instructions:
 
-1. Descriptive title.
-2. Write a good description, it always helps.
-3. Include your browser, OS and CartoDB.js version (it shows up in the browser console).
-4. Specify the steps to reproduce the problem.
-5. Try to add an example showing the problem (using [JSFiddle](http://jsfiddle.net), [JSBin](http://jsbin.com),...).
+- Add a descriptive title.
+- Write a good description, answering the following questions:
+    - What is happening?
+    - What should happen instead?
+    - How to reproduce the issue. Remember to include Browser, OS and carto-vl version.
+- Try to add an example showing the problem (using JSFiddle, JSBin or a code snippet).
 
 
-## Contributing code
-Best part of open source, collaborate in CARTO VL code!. We like hearing from you, so if you have any bug fixed, or a new feature ready to be merged, those are the steps you should follow:
+### Contributing code
 
-1. Fork the CartoDB.js repository.
-2. Create a new branch in your forked repository.
-3. Commit your changes. Add new tests if it is necessary (```grunt test```).
-4. Open a pull request.
-5. Any of the CartoDB.js mantainers will take a look.
-6. If everything works, it will merged and released \o/.
+The best part of open source: collaborate directly with our CARTO VL code! If you have fixed a bug or have a new functionality on your hands, we'd love to see it! These are the steps you should follow:
 
-If you want more detailed information, this [GitHub guide](https://guides.github.com/activities/contributing-to-open-source/) is a must.
+- Sign our Contributor License Agreement (CLA) [Learn more here](https://carto.com/contributions/)
+- Fork the carto-vl repository.
+- Create a new branch in your forked repository.
+- Commit your changes. Remeber to add new tests if possible.
+- Open a pull request.
+- Any of the carto-vl mantainers will take a look.
+- If everything works, it will be merged and released \o/.
+- If you want more detailed information, [this GitHub guide](https://opensource.guide/how-to-contribute/) is a must.
 
+### Completing documentation
 
-## Completing documentation
+CARTO VL documentation is located in docs/. That folder is the content that appears in CARTO's  [Developer Center](https://carto.com/developers/carto-vl/support/contribute/). Follow the instructions described above and once we accept your pull request it will appear online :).
 
-CARTO VL documentation is located in ```docs/```. That folder is the content that appears in the [Developer Center](http://carto.com/developer-center/carto-vl/). 
-Just follow the instructions described in [contributing code](#contributing-code) and after accepting your pull request, we will make it appear online :).
+### Submitting contributions
 
-## Submitting contributions
-
-You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here](https://carto.com/contributions).
+You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here](https://carto.com/contributions/).

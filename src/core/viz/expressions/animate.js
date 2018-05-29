@@ -6,6 +6,7 @@ import { checkNumber, getStringErrorPreface } from './utils';
  * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
  *
  * @param {number} duration - Animation duration in milliseconds
+ * @return {Number}
  *
  * @memberof carto.expressions
  * @name animate

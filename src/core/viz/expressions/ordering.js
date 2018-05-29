@@ -4,19 +4,24 @@ import { checkInstance } from './utils';
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
- * @example
+ * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.asc(s.width())
  * });
  *
+ * @example <caption>Ascending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: asc(width())
+ * `);
+ *
  * @memberof carto.expressions
  * @name asc
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Asc extends BaseExpression {
     constructor(by) {
@@ -29,19 +34,24 @@ export class Asc extends BaseExpression {
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
  *
- * @param {carto.expressions.Base} by - Expression used to evaluate the ordering
- * @return {carto.expressions.Base}
+ * @param {carto.expressions.Width} by - must be `width()`
+ * @return {Order}
  *
- * @example
+ * @example <caption>Descending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.desc(s.width())
  * });
  *
+ * @example <caption>Descending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: desc(width())
+ * `);
+ *
  * @memberof carto.expressions
  * @name desc
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Desc extends BaseExpression {
     constructor(by) {
@@ -54,18 +64,23 @@ export class Desc extends BaseExpression {
 /**
  * No order expression.
  *
- * @return {carto.expressions.Base}
+ * @return {Order}
  *
- * @example
+ * @example <caption>No order.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.noOrder()
  * });
  *
+ * @example <caption>No order. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: noOrder()
+ * `);
+ *
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @api
+ * @IGNOREapi
  */
 export class NoOrder extends BaseExpression {
     constructor() {
@@ -75,20 +90,25 @@ export class NoOrder extends BaseExpression {
 }
 
 /**
- * Return the expression assigned in the `width` property
+ * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
  *
- * @return {carto.expressions.Base}
+ * @return {carto.expressions.Width}
  *
- * @example
+ * @example <caption>Ascending order based on width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   order: s.asc(s.width())
  * });
  *
+ * @example <caption>Ascending order based on width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   order: asc(width())
+ * `);
+ *
  * @memberof carto.expressions
  * @name width
  * @function
- * @api
+ * @IGNOREapi
  */
 export class Width extends BaseExpression {
     constructor() {

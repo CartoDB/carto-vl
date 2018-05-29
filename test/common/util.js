@@ -62,12 +62,13 @@ function testSST(file, template, asyncLoad) {
 }
 
 function writeTemplate(file, template) {
+    const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.js`,
         sources: sources,
-        cartovl: '/dist/carto-vl.js',
-        mapboxgl: '/dist/mapbox-gl-dev.js',
-        mapboxglcss: '/dist/mapbox-gl-dev.css'
+        cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
+        mapboxgl: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+        mapboxglcss: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
 }
 

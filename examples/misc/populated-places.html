@@ -7,48 +7,10 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-    #controls {
-      position: absolute;
-      padding: 20px;
-      background: white;
-      top: 12px;
-      right: 12px;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
-      border-radius: 4px;
-      width: 200px;
-      color: #2E3C43;
-    }
-    #controls li {
-      list-style-type: none;
-      margin: 0 0 8px 0;
-      display: flex;
-      vertical-align: middle;
-    }
-    #controls li input {
-      margin: 0 8px 0 0;
-    }
-    #controls li label {
-      font: 12px/16px 'Open Sans';
-      cursor: pointer;
-    }
-    #controls li:last-child {
-      margin-bottom: 0;
-    }
-  </style>
+  <link href="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
   <div id="map"></div>
@@ -74,12 +36,14 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
-      dragRotate: false
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
     const populatedPlacesSource = new carto.source.Dataset(`

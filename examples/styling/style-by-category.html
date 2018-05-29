@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Style by category | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Style by category</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Options for symbolizing category attributes</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="style" onclick="setRampAuto()" id="auto" checked>
+              <label for="auto">All categories</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
+              <label for="buckets">Custom categories</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampTop()" id="top">
+              <label for="top">Top categories</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [2.1734, 41.3851],
+      zoom: 12,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
+    });
+    
+    // Define user
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define styles
+    const rampAutoViz = new carto.Viz(`
+      color: ramp($category, vivid)
+      strokeWidth: 0
+    `);
+    const rampBucketsViz = new carto.Viz(`
+      color: ramp(buckets($category, ['Moda y calzado']), vivid)
+      strokeWidth: 0
+    `);
+    const rampTopViz = new carto.Viz(`
+      color: ramp(top($category, 3), vivid)
+      strokeWidth: 0
+    `);
+
+    // Define layer
+    const source = new carto.source.Dataset('spend_data');
+    const layer = new carto.Layer('layer', source, rampAutoViz);
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    function setRampAuto() {
+      layer.blendToViz(rampAutoViz);
+    }
+    function setRampBuckets() {
+      layer.blendToViz(rampBucketsViz);
+    }
+    function setRampTop() {
+      layer.blendToViz(rampTopViz);
+    }
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+</html>
