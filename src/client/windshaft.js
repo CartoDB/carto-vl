@@ -6,6 +6,7 @@ import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
+import { version } from '../index'
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -684,6 +685,7 @@ function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
+        url += `&client=vl-${version}`;
     }
     return url;
 }
