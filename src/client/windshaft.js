@@ -685,7 +685,7 @@ function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
-        url += `&client=vl-${version}`;
+        url += '&client=' + encodeURIComponent('vl-' + version);
     }
     return url;
 }
