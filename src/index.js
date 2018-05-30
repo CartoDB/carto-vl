@@ -26,7 +26,7 @@ import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
 import Interactivity from './api/interactivity';
-import { version } from '../package.json';
+import { version } from '../package';
 
 // Namespaces
 
