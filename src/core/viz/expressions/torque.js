@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp, checkType } from './utils';
+import { implicitCast, DEFAULT, clamp, checkType, checkLooseType } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
@@ -121,7 +121,7 @@ export class Fade extends BaseExpression {
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
-        checkType('torque', 'duration', 1, 'number', duration);
+        checkLooseType('torque', 'duration', 1, 'number', duration);
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         }
@@ -173,6 +173,7 @@ export class Torque extends BaseExpression {
     }
     _compile(meta) {
         super._compile(meta);
+        checkType('torque', 'duration', 1, 'number', this.duration);
         if (this.input.type != 'number') {
             throw new Error('Torque(): invalid first parameter, input.');
         } else if (this.fade.type != 'fade') {
