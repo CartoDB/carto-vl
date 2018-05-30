@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
+import Variable from './basic/variable';
 
 const DEFAULT_FADE = 0.15;
 
@@ -126,7 +127,7 @@ export class Torque extends BaseExpression {
             input = linear(input, globalMin(input), globalMax(input));
         }
         const _cycle = div(mod(now(), duration), duration);
-        super({ input, _cycle, fade });
+        super({ _input: input, _cycle, fade });
         // TODO improve type check
         this.duration = duration;
     }
@@ -167,6 +168,9 @@ export class Torque extends BaseExpression {
         date.setTime(tmix);
         return date;
 
+    }
+    get input() {
+        return this._input instanceof Variable ? this._input.alias : this._input;
     }
     _compile(meta) {
         super._compile(meta);
