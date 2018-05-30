@@ -26,13 +26,14 @@ import { setDefaultAuth } from './api/setup/auth-service';
 import { setDefaultConfig } from './api/setup/config-service';
 import Map from './api/map';
 import Interactivity from './api/interactivity';
-import { version } from '../package.json';
 
 // Namespaces
 
 const source = { Dataset, SQL, GeoJSON };
+const version = VERSION;     version: VERSION // eslint-disable-line
 
 export {
+    version,
     setDefaultAuth,
     setDefaultConfig,
     source,
@@ -41,5 +42,4 @@ export {
     Viz,
     Map,
     Interactivity,
-    version
 };

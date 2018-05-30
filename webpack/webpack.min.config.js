@@ -14,6 +14,9 @@ module.exports = {
     devtool: 'sourcemap',
     plugins: [
         new UglifyJsPlugin(),
-        new webpack.BannerPlugin(banner)
+        new webpack.BannerPlugin(banner),
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require('../package.json').version)
+        })
     ]
 };
