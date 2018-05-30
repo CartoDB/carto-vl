@@ -131,22 +131,23 @@ describe('api/layer', () => {
 
     describe('.addTo', () => {
         describe('._addToMGLMap', () => {
+            let layer;
             beforeEach(() => {
-                this.layer = new Layer('layer0', source, viz);
-                this.layer._onMapLoaded = () => { };
-                spyOn(this.layer, '_onMapLoaded');
+                layer = new Layer('layer0', source, viz);
+                layer._onMapLoaded = () => { };
+                spyOn(layer, '_onMapLoaded');
             });
 
             it('should call onMapLoaded when the map is loaded', () => {
                 const mapMock = { isStyleLoaded: () => true };
-                this.layer._addToMGLMap(mapMock);
-                expect(this.layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
+                layer._addToMGLMap(mapMock);
+                expect(layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
             });
 
             it('should not call onMapLoaded when the map is not loaded', () => {
                 const mapMock = { isStyleLoaded: () => false, on: () => { } };
-                this.layer._addToMGLMap(mapMock);
-                expect(this.layer._onMapLoaded).not.toHaveBeenCalled();
+                layer._addToMGLMap(mapMock);
+                expect(layer._onMapLoaded).not.toHaveBeenCalled();
             });
 
             it('should call onMapLoaded when the map `load` event is triggered', () => {
@@ -158,8 +159,8 @@ describe('api/layer', () => {
                         }
                     }
                 };
-                this.layer._addToMGLMap(mapMock);
-                expect(this.layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
+                layer._addToMGLMap(mapMock);
+                expect(layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
             });
 
             it('should not call onMapLoaded when other the map event is triggered', () => {
@@ -171,8 +172,8 @@ describe('api/layer', () => {
                         }
                     }
                 };
-                this.layer._addToMGLMap(mapMock);
-                expect(this.layer._onMapLoaded).not.toHaveBeenCalled();
+                layer._addToMGLMap(mapMock);
+                expect(layer._onMapLoaded).not.toHaveBeenCalled();
             });
         });
     });
