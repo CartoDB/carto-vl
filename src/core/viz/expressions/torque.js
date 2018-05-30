@@ -182,6 +182,6 @@ export class Torque extends BaseExpression {
         this.type = 'number';
 
         this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
 }
