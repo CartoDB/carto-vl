@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp } from './utils';
+import { implicitCast, DEFAULT, clamp, checkType } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
@@ -120,21 +120,20 @@ export class Fade extends BaseExpression {
  */
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Torque(): invalid second parameter, duration.');
-        }
+        duration = implicitCast(duration);
+        checkType('torque', 'duration', 1, 'number', duration);
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         }
         const _cycle = div(mod(now(), duration), duration);
-        super({ _input: input, _cycle, fade });
+        super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
     }
     eval(feature) {
         const input = this.input.eval(feature);
         const cycle = this._cycle.eval(feature);
-        const duration = this.duration;
+        const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
@@ -182,6 +181,6 @@ export class Torque extends BaseExpression {
         this.type = 'number';
 
         this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
 }
