@@ -57,6 +57,7 @@
     "puppeteer": "^1.1.0",
     "s3": "^4.4.0",
     "sloc": "^0.2.0",
+    "wait-on": "^2.1.0",
     "webpack": "^4.0.0",
     "webpack-cli": "^2.1.4"
   },
@@ -80,7 +81,7 @@
     "test:user:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js",
     "test:user:watchc": "karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
-    "test:render": "yarn build:dev &&  serve -p 5000 & mocha test/integration/render/render.test.js",
+    "test:render": "yarn build:dev &&  yarn http-server -s -p 5000 & export HTTP_SERVER=$! && yarn wait-on http://localhost:5000 && mocha test/integration/render/render.test.js ; kill $HTTP_SERVER ; echo PID $HTTP_SERVER",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
     "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
     "test:e2e": "yarn build:dev && mocha test/acceptance/e2e.test.js",

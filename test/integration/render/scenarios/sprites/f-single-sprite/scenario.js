@@ -1,10 +1,15 @@
 const map = new carto.Map({
     container: 'map',
-    background: 'black'
+    background: 'white'
 });
 
-const source = new carto.source.GeoJSON(sources['point']);
-const viz = new carto.Viz('color: rgb(255, 0, 0)');
+const source = new carto.source.GeoJSON(sources['points']);
+const viz = new carto.Viz(`
+width: 50
+color: ramp(linear($numeric), prism)
+symbol: sprite('../../../../../common/marker.svg')
+symbolPlacement: bottom
+`);
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

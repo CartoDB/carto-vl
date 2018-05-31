@@ -66,7 +66,7 @@ function writeTemplate(file, template) {
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.js`,
         sources: sources,
-        cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
+        cartovl: 'http://localhost:5000/dist/carto-vl.js',
         mapboxgl: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
         mapboxglcss: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));

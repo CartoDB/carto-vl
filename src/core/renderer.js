@@ -206,9 +206,9 @@ class Renderer {
         return drawMetadata;
     }
 
-    renderLayer(renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
-        const viz = renderLayer.viz;
+    renderLayer(layer, repeat=true) {
+        const tiles = layer.getActiveDataframes();
+        const viz = layer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
 
@@ -225,7 +225,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
 
-        const drawMetadata = this._computeDrawMetadata(renderLayer);
+        const drawMetadata = this._computeDrawMetadata(layer);
 
         Object.values(viz.variables).map(v => {
             v._updateDrawMetadata(drawMetadata);
@@ -269,7 +269,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (renderLayer.type != 'point') {
+        if (layer.type != 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -292,7 +292,7 @@ class Renderer {
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
 
@@ -386,6 +386,7 @@ class Renderer {
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
                 gl.uniform1i(renderer.strokeWidthTexture, 4);
             }
+        
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
@@ -399,7 +400,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type != 'point') {
+        if (layer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -418,6 +419,10 @@ class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
+
+        if (repeat){
+            this.renderLayer(layer, false);
+        }
     }
 
 
