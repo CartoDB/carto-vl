@@ -190,6 +190,9 @@ export class Torque extends BaseExpression {
         super._compile(meta);
         checkType('torque', 'input', 0, 'number', this.input);
         checkType('torque', 'fade', 2, 'fade', this.fade);
+        checkFeatureIndependent('torque', 'duration', 1, this.duration);
+
+
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
