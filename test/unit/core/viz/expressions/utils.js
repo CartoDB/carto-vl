@@ -15,6 +15,15 @@ const metadata = {
     ],
 };
 
+export function validateFeatureDependentErrors(expressionName, argTypes) {
+    const args = argTypes.map(getPropertyArg);
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
+        expect(() =>
+            s[expressionName](...args.map(arg => arg[0]))
+        ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+    });
+}
+
 export function validateTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);

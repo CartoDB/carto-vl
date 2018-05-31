@@ -1,17 +1,17 @@
 import * as s from '../../../../../src/core/viz/functions';
-import { validateTypeErrors, validateStaticType } from './utils';
+import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
 describe('src/core/viz/expressions/torque', () => {
     describe('error control', () => {
-        validateTypeErrors('torque', ['category', 'number']);
-        validateTypeErrors('torque', ['number', 'category']);
-        validateTypeErrors('torque', ['number', 'number', 'color']);
-        validateTypeErrors('torque', ['color', 'number']);
+        validateFeatureDependentErrors('torque', [0.5, 'number']);
+        validateTypeErrors('torque', ['category', 10]);
+        validateTypeErrors('torque', ['number', 10, 'color']);
+        validateTypeErrors('torque', ['color', 10]);
         validateTypeErrors('torque', ['number', 'color']);
     });
     describe('type', () => {
         validateStaticType('torque', ['number'], 'number');
-        validateStaticType('torque', ['number', 'number'], 'number');
+        validateStaticType('torque', ['number', 10], 'number');
     });
     describe('.eval()', () => {
         it('should eval to 0 when the input is 1', () => {

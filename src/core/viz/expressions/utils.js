@@ -180,6 +180,13 @@ export function checkArray(expressionName, parameterName, parameterIndex, array)
     }
 }
 
+export function checkFeatureIndependent(expressionName, parameterName, parameterIndex, parameter) {
+    if (parameter._isFeatureDependent()) {
+        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        parameter cannot be feature dependent`);
+    }
+}
+
 export function clamp(x, min, max) {
     return Math.min(Math.max(x, min), max);
 }
