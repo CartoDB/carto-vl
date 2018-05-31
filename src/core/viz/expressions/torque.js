@@ -123,7 +123,7 @@ export class Torque extends BaseExpression {
         duration = implicitCast(duration);
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
-        }else{
+        } else {
             input = implicitCast(input);
         }
 
@@ -135,7 +135,7 @@ export class Torque extends BaseExpression {
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
-        this.type = 'number';        
+        this.type = 'number';
     }
     eval(feature) {
         const input = this.input.eval(feature);
@@ -180,13 +180,9 @@ export class Torque extends BaseExpression {
     }
     _compile(meta) {
         super._compile(meta);
+        checkType('torque', 'input', 0, 'number', this.input);
         checkType('torque', 'duration', 1, 'number', this.duration);
-        if (this.input.type != 'number') {
-            throw new Error('Torque(): invalid first parameter, input.');
-        } else if (this.fade.type != 'fade') {
-            throw new Error('Torque(): invalid third parameter, fade.');
-        }
-
+        checkType('torque', 'fade', 2, 'fade', this.fade);
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
