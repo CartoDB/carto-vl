@@ -19,7 +19,7 @@ const metadata = {
 export function validateFeatureDependentErrors(expressionName, argTypes) {
     {
         const args = argTypes.map(type => type == 'dependent' ? 'number-property' : type).map(getPropertyArg);
-        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
+        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time a feature dependent error`, () => {
             expect(() =>
                 s[expressionName](...args.map(arg => arg[0]))
             ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
@@ -28,7 +28,7 @@ export function validateFeatureDependentErrors(expressionName, argTypes) {
     {
         const v = s.variable('var1');
         const args = argTypes.map(type => type == 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
-        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
             v.alias = s.property('wadus');
             expect(() =>
