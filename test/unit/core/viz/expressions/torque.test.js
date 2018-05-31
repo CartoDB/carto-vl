@@ -3,7 +3,7 @@ import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors 
 
 describe('src/core/viz/expressions/torque', () => {
     describe('error control', () => {
-        validateFeatureDependentErrors('torque', [0.5, 'number']);
+        validateFeatureDependentErrors('torque', [0.5, 'dependent']);
         validateTypeErrors('torque', ['category', 10]);
         validateTypeErrors('torque', ['number', 10, 'color']);
         validateTypeErrors('torque', ['color', 10]);
