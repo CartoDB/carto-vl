@@ -1,7 +1,9 @@
 import BaseExpression from './base';
+import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance } from './utils';
+import Property from './basic/property';
 
 /**
- * Get the top `n` properties.
+ * Get the top `n` properties, aggregating the rest into an "others" bucket category.
  *
  * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned
@@ -25,9 +27,12 @@ import BaseExpression from './base';
  */
 export default class Top extends BaseExpression {
     constructor(property, buckets) {
-        // TODO 'cat'
+        buckets = implicitCast(buckets);
+        checkInstance('top', 'property', 0, Property, property);
+        checkLooseType('top', 'buckets', 1, 'number', buckets);
+        checkFeatureIndependent('top', 'buckets', 1, buckets);
         super({ property, buckets });
-        // TODO improve type check
+        this.type = 'category';
     }
     eval(feature) {
         const p = this.property.eval(feature);
@@ -42,11 +47,10 @@ export default class Top extends BaseExpression {
         return ret;
     }
     _compile(metadata) {
+        checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         super._compile(metadata);
-        if (this.property.type != 'category') {
-            throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
-        }
-        this.type = 'category';
+        checkType('top', 'property', 0, 'category', this.property);
+        checkType('top', 'buckets', 1, 'number', this.buckets);
         this.othersBucket = true;
         this._meta = metadata;
         this._textureBuckets = null;
