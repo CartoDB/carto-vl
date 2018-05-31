@@ -55,21 +55,6 @@ function compileShader(gl, sourceCode, type) {
     return shader;
 }
 
-function compileProgram(gl, glslVS, glslFS) {
-    const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
-    const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-    this.program = gl.createProgram();
-    gl.attachShader(this.program, VS);
-    gl.attachShader(this.program, FS);
-    gl.linkProgram(this.program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(this.program));
-    }
-    this.programID = programID++;
-}
-
 const AABlender = AntiAliasingShader;
 
 const renderer = {
@@ -80,7 +65,7 @@ const renderer = {
 
 // TODO remove class nonsense
 
-function compileProgram2(gl, glslVS, glslFS) {
+function compileProgram(gl, glslVS, glslFS) {
     const shader = {};
     const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
     const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
@@ -105,7 +90,7 @@ export function createShader(gl, glslTemplate, codes) {
         VS = VS.replace('$' + codeName, codes[codeName]);
         FS = FS.replace('$' + codeName, codes[codeName]);
     });
-    const shader = compileProgram2(gl, VS, FS);
+    const shader = compileProgram(gl, VS, FS);
     shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
