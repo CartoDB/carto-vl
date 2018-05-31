@@ -6,6 +6,7 @@ import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
+import { version } from '../../package';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -355,6 +356,9 @@ export default class Windshaft {
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        if (!response.ok) {
+            throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
+        }
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
@@ -684,6 +688,7 @@ function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
+        url += '&client=' + encodeURIComponent('vl-' + version);
     }
     return url;
 }

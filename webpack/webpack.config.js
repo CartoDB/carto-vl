@@ -11,6 +11,7 @@ module.exports = {
         libraryTarget: 'umd'
     },
     devtool: 'sourcemap',
+    mode: 'development',
     plugins: [
         new webpack.BannerPlugin(banner)
     ]

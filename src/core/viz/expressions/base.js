@@ -36,12 +36,15 @@ export default class Base {
         return this;
     }
 
-    _setUID(idGenerator){
+    _setUID(idGenerator) {
         this._uid = idGenerator.getID(this);
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
     _prefaceCode(glslCode) {
+        if (!glslCode) {
+            return '';
+        }
         return `
         #ifndef DEF_${this._uid}
         #define DEF_${this._uid}
