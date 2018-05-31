@@ -121,10 +121,12 @@ export class Fade extends BaseExpression {
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
+        let originalInput = input;
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         } else {
             input = implicitCast(input);
+            originalInput = input;
         }
 
         checkLooseType('torque', 'input', 0, 'number', input);
@@ -136,6 +138,7 @@ export class Torque extends BaseExpression {
         // TODO improve type check
         this.duration = duration;
         this.type = 'number';
+        this._originalInput = originalInput;
     }
     eval(feature) {
         const input = this.input.eval(feature);
@@ -179,9 +182,12 @@ export class Torque extends BaseExpression {
         return this._input instanceof Variable ? this._input.alias : this._input;
     }
     _compile(meta) {
+        this._originalInput._compile(meta);
+        this.duration._compile(meta);
+        checkType('torque', 'input', 0, 'number', this._originalInput);        
+        checkType('torque', 'duration', 1, 'number', this.duration);
         super._compile(meta);
         checkType('torque', 'input', 0, 'number', this.input);
-        checkType('torque', 'duration', 1, 'number', this.duration);
         checkType('torque', 'fade', 2, 'fade', this.fade);
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
