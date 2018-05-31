@@ -58,7 +58,7 @@ function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
             s[expressionName](...args.map(arg => arg[0]))
-        ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+        ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*`, 'g'));
     });
 }
 
@@ -67,7 +67,7 @@ function validateCompileTimeTypeError(expressionName, args) {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
             expression._compile(metadata);
-        }).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g'));
     });
 }
 
