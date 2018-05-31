@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const banner = require('./banner');
 
 module.exports = {
@@ -11,9 +10,9 @@ module.exports = {
         library: 'carto',
         libraryTarget: 'umd'
     },
-    devtool: 'sourcemap',
+    devtool: false,
+    mode: 'production',
     plugins: [
-        new UglifyJsPlugin(),
         new webpack.BannerPlugin(banner)
     ]
 };
