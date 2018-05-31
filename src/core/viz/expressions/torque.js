@@ -121,14 +121,21 @@ export class Fade extends BaseExpression {
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
-        checkLooseType('torque', 'duration', 1, 'number', duration);
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
+        }else{
+            input = implicitCast(input);
         }
+
+        checkLooseType('torque', 'input', 0, 'number', input);
+        checkLooseType('torque', 'duration', 1, 'number', duration);
+        checkLooseType('torque', 'fade', 2, 'fade', fade);
+
         const _cycle = div(mod(now(), duration), duration);
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
+        this.type = 'number';        
     }
     eval(feature) {
         const input = this.input.eval(feature);
@@ -179,7 +186,6 @@ export class Torque extends BaseExpression {
         } else if (this.fade.type != 'fade') {
             throw new Error('Torque(): invalid third parameter, fade.');
         }
-        this.type = 'number';
 
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
