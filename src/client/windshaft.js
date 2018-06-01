@@ -13,6 +13,13 @@ import featureDecoder from './mvt/feature-decoder';
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 
+const geometryTypes = {
+    UNKNOWN: 'unknown',
+    POINT: 'point',
+    LINE: 'line',
+    POLYGON: 'polygon'
+};
+
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
 // Instantiate map Windshaft
@@ -433,7 +440,7 @@ export default class Windshaft {
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
                 });
-                let dataFrameGeometry = this.metadata.geomType == featureDecoder.geometryTypes.POINT ? points : featureGeometries;
+                let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
                 const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
@@ -486,20 +493,20 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
-        if (metadata.geomType == featureDecoder.geometryTypes.POINT) {
+        if (metadata.geomType == geometryTypes.POINT) {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (metadata.geomType == featureDecoder.geometryTypes.POINT) {
+            if (metadata.geomType == geometryTypes.POINT) {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (metadata.geomType == featureDecoder.geometryTypes.POLYGON) {
+            } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
                 featureGeometries.push(...decodedPolygons);
-            } else if (metadata.geomType == featureDecoder.geometryTypes.LINE) {
+            } else if (metadata.geomType == geometryTypes.LINE) {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
                 throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);

@@ -1,12 +1,5 @@
 import geometryUtils from '../../utils/geometry';
 
-export const geometryTypes = {
-    UNKNOWN: 'unknown',
-    POINT: 'point',
-    LINE: 'line',
-    POLYGON: 'polygon'
-};
-
 export class Polygon {
     constructor () {
         this.flat = [];
