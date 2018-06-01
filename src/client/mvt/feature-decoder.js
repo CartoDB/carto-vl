@@ -1,4 +1,20 @@
-import GeometryUtils from '../../utils/geometry';
+import geometryUtils from '../../utils/geometry';
+
+export const geometryTypes = {
+    UNKNOWN: 'unknown',
+    POINT: 'point',
+    LINE: 'line',
+    POLYGON: 'polygon'
+};
+
+export class Polygon {
+    constructor () {
+        this.flat = [];
+        this.holes = [];
+        this.clipped = [];
+        this.clippedType = []; // Store a bitmask of the clipped half-planes
+    }
+}
 
 /*
     All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
@@ -7,49 +23,38 @@ import GeometryUtils from '../../utils/geometry';
         https://github.com/mapbox/vector-tile-spec/tree/master/2.1
         https://en.wikipedia.org/wiki/Shoelace_formula
 */
-export function decodePolygons(polygons, featureGeometries, mvtExtent) {
+export function decodePolygons(geom, mvtExtent) {
     let currentPolygon = null;
-    let decodedPolygons = [];
+    let decoded = [];
 
-    polygons.forEach((polygon, index) => {
-        const isExternalPolygon = GeometryUtils.isClockWise(polygon);
+    geom.forEach((polygon, index) => {
+        const isExternalPolygon = geometryUtils.isClockWise(polygon);
         const preClippedVertices = _getPreClippedVertices(polygon, mvtExtent);
 
-        if (_isFirstPolygonInternal(isExternalPolygon, index)) {
-            throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-        }
-
-        if (isExternalPolygon) {
-            if (currentPolygon) {
-                decodedPolygons.push(currentPolygon);
-            }
-
-            currentPolygon = {
-                flat: [],
-                holes: [],
-                clipped: [],
-                clippedType: [], // Store a bitmask of the clipped half-planes
-            };
-        }
-
-        currentPolygon = GeometryUtils.clipPolygon(
-            preClippedVertices,
-            currentPolygon, !isExternalPolygon
-        );
+        _checkIsFirstPolygonInternal(isExternalPolygon, index);
+        _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices);
     });
 
-    if (currentPolygon) {
-        decodedPolygons.push(currentPolygon);
-    }
+    if (currentPolygon) decoded.push(currentPolygon);
 
-    featureGeometries.push(decodedPolygons);
-
-    return featureGeometries;
+    return decoded;
 }
 
-function _isFirstPolygonInternal(isExternalPolygon, index) {
+function _checkIsFirstPolygonInternal(isExternalPolygon, index) {
     const IS_FIRST_POLYGON = index === 0;
-    return !isExternalPolygon && IS_FIRST_POLYGON;
+
+    if (!isExternalPolygon && IS_FIRST_POLYGON) {
+        throw new Error('Invalid MVT tile: first polygon ring MUST be external');
+    }
+}
+
+function _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices) {
+    if (isExternalPolygon) {
+        if (currentPolygon) decoded.push(currentPolygon);
+        currentPolygon = new Polygon();
+    }
+
+    currentPolygon = geometryUtils.clipPolygon(preClippedVertices, currentPolygon, !isExternalPolygon);
 }
 
 function _getPreClippedVertices(polygon, mvtExtent) {
@@ -62,5 +67,6 @@ function _getPreClippedVertices(polygon, mvtExtent) {
 }
 
 export default {
+    geometryTypes,
     decodePolygons
 };
