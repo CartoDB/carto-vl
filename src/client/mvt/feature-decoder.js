@@ -60,6 +60,5 @@ function _getPreClippedVertices(polygon, mvtExtent) {
 }
 
 export default {
-    geometryTypes,
     decodePolygons
 };
