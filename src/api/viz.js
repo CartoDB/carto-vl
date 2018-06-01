@@ -293,10 +293,6 @@ export default class Viz {
                 symbolPlacement: this.symbolPlacement
             });
         }
-
-        Object.values(this.variables).map(v => {
-            v._bind(metadata);
-        });
     }
 
     replaceChild(toReplace, replacer) {
@@ -420,6 +416,7 @@ export default class Viz {
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
