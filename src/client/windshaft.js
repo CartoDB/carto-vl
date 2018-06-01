@@ -456,26 +456,6 @@ export default class Windshaft {
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
-    _intersect(a, b, c, d) {
-        //If AB intersects CD => return intersection point
-        // Intersection method from Real Time Rendering, Third Edition, page 780
-        const o1 = a;
-        const o2 = c;
-        const d1 = sub(b, a);
-        const d2 = sub(d, c);
-        const d1t = perpendicular(d1);
-        const d2t = perpendicular(d2);
-
-        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
-        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
-
-        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-            // Intersects!
-            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
-        }
-        // Doesn't intersects
-    }
-
     _decodeLines(geom, featureGeometries, mvt_extent) {
         let geometry = [];
         geom.map(l => {
@@ -638,16 +618,6 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
     else {
         return promiseGenerator(finalAssumptions);
     }
-}
-
-function sub([ax, ay], [bx, by]) {
-    return ([ax - bx, ay - by]);
-}
-function dot([ax, ay], [bx, by]) {
-    return (ax * bx + ay * by);
-}
-function perpendicular([x, y]) {
-    return [-y, x];
 }
 
 /**

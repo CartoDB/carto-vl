@@ -1,3 +1,4 @@
+import geometryUtils from '../../utils/geometry';
 export class Polygon {
     constructor () {
         this.flat = [];
@@ -54,10 +55,10 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     ];
 
     const clippingEdgeIntersectFn = [
-        (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
-        (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
-        (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
-        (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
+        (a, b) => geometryUtils.intersect(a, b, [1, -10], [1, 10]),
+        (a, b) => geometryUtils.intersect(a, b, [-10, 1], [10, 1]),
+        (a, b) => geometryUtils.intersect(a, b, [-1, -10], [-1, 10]),
+        (a, b) => geometryUtils.intersect(a, b, [-10, -1], [10, -1]),
     ];
 
     // for each clipping edge
