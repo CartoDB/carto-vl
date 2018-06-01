@@ -8,6 +8,8 @@ import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
 
+import featureDecoder from './mvt/feature-decoder';
+
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 
@@ -447,115 +449,6 @@ export default class Windshaft {
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
-    _decodePolygons(geom, featureGeometries, mvt_extent) {
-        let polygon = null;
-        let geometry = [];
-        /*
-            All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-            It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-            See:
-                https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                https://en.wikipedia.org/wiki/Shoelace_formula
-        */
-        for (let j = 0; j < geom.length; j++) {
-            //if exterior
-            //   push current polygon & set new empty
-            //else=> add index to holes
-            let hole = false;
-            if (isClockWise(geom[j])) {
-                if (polygon) {
-                    geometry.push(polygon);
-                }
-                polygon = {
-                    flat: [],
-                    holes: [],
-                    clipped: [],
-                    clippedType: [], // Store a bitmask of the clipped half-planes
-                };
-            } else {
-                if (j == 0) {
-                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                }
-                hole = true;
-            }
-            let preClippedVertices = [];
-            for (let k = 0; k < geom[j].length; k++) {
-                let x = geom[j][k].x;
-                let y = geom[j][k].y;
-                x = 2 * x / mvt_extent - 1;
-                y = 2 * (1 - y / mvt_extent) - 1;
-                preClippedVertices.push([x, y]);
-            }
-            this._clipPolygon(preClippedVertices, polygon, hole);
-        }
-        //if current polygon is not empty=> push it
-        if (polygon) {
-            geometry.push(polygon);
-        }
-        featureGeometries.push(geometry);
-    }
-
-    // Add polygon composed by preClippedVertices to the `polygon.flat` array
-    _clipPolygon(preClippedVertices, polygon, isHole) {
-        // Sutherland-Hodgman Algorithm to clip polygons to the tile
-        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
-        const clippingEdges = [
-            p => p[0] <= 1,
-            p => p[1] <= 1,
-            p => p[0] >= -1,
-            p => p[1] >= -1,
-        ];
-        const clippingEdgeIntersectFn = [
-            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
-            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
-            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
-            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
-        ];
-
-        // for each clipping edge
-        for (let i = 0; i < 4; i++) {
-            const preClippedVertices2 = [];
-
-            // for each edge on polygon
-            for (let k = 0; k < preClippedVertices.length - 1; k++) {
-                // clip polygon edge
-                const a = preClippedVertices[k];
-                const b = preClippedVertices[k + 1];
-
-                const insideA = clippingEdges[i](a);
-                const insideB = clippingEdges[i](b);
-
-                if (insideA && insideB) {
-                    // case 1: both inside, push B vertex
-                    preClippedVertices2.push(b);
-                } else if (insideA) {
-                    // case 2: just A outside, push intersection
-                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
-                    preClippedVertices2.push(intersectionPoint);
-                } else if (insideB) {
-                    // case 4: just B outside: push intersection, push B
-                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
-                    preClippedVertices2.push(intersectionPoint);
-                    preClippedVertices2.push(b);
-                } else {
-                    // case 3: both outside: do nothing
-                }
-            }
-            if (preClippedVertices2.length) {
-                preClippedVertices2.push(preClippedVertices2[0]);
-            }
-            preClippedVertices = preClippedVertices2;
-        }
-
-        if (preClippedVertices.length > 3) {
-            if (isHole) {
-                polygon.holes.push(polygon.flat.length / 2);
-            }
-            preClippedVertices.forEach(v => {
-                polygon.flat.push(v[0], v[1]);
-            });
-        }
-    }
     _intersect(a, b, c, d) {
         //If AB intersects CD => return intersection point
         // Intersection method from Real Time Rendering, Third Edition, page 780
@@ -604,7 +497,7 @@ export default class Windshaft {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             } else if (metadata.geomType == 'polygon') {
-                this._decodePolygons(geom, featureGeometries, mvt_extent);
+                featureDecoder.decodePolygons(geom, featureGeometries, mvt_extent);
             } else if (metadata.geomType == 'line') {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
@@ -657,15 +550,15 @@ export default class Windshaft {
 }
 
 
-function isClockWise(vertices) {
-    let a = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        let j = (i + 1) % vertices.length;
-        a += vertices[i].x * vertices[j].y;
-        a -= vertices[j].x * vertices[i].y;
-    }
-    return a > 0;
-}
+// function isClockWise(vertices) {
+//     let a = 0;
+//     for (let i = 0; i < vertices.length; i++) {
+//         let j = (i + 1) % vertices.length;
+//         a += vertices[i].x * vertices[j].y;
+//         a -= vertices[j].x * vertices[i].y;
+//     }
+//     return a > 0;
+// }
 
 const endpoint = (conf, path = '') => {
     let url = `${conf.mapsServerURL}/api/v1/map`;
