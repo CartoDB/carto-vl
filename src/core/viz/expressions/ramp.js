@@ -112,7 +112,7 @@ export default class Ramp extends BaseExpression {
             gl.deleteTexture(this.texture);
         }
     }
-    _fetch(){
+    _fetch() {
         return Promise.all([this.input._fetch(), this.palette._fetch()]);
     }
     _applyToShaderSource(getGLSLforProperty) {
@@ -244,8 +244,8 @@ export default class Ramp extends BaseExpression {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
-        this._computeGLTextureIfNeeded(gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+        this._computeGLTextureIfNeeded(gl);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
         gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
