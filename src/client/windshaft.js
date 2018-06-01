@@ -485,7 +485,7 @@ export default class Windshaft {
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
-                featureGeometries.push(...decodedPolygons);
+                featureGeometries.push(decodedPolygons);
             } else if (metadata.geomType == geometryTypes.LINE) {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {

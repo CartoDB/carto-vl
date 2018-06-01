@@ -1,6 +1,6 @@
 import geometryUtils from '../../utils/geometry';
 export class Polygon {
-    constructor () {
+    constructor() {
         this.flat = [];
         this.holes = [];
         this.clipped = [];
@@ -15,16 +15,25 @@ export class Polygon {
         https://github.com/mapbox/vector-tile-spec/tree/master/2.1
         https://en.wikipedia.org/wiki/Shoelace_formula
 */
-export function decodePolygons(geom, mvtExtent) {
+export function decodePolygons(geometries, mvtExtent) {
     let currentPolygon = null;
     let decoded = [];
 
-    geom.forEach((polygon, index) => {
-        const isExternalPolygon = isClockWise(polygon);
-        const preClippedVertices = _getPreClippedVertices(polygon, mvtExtent);
+    geometries.forEach((geom, index) => {
+        const isExternalPolygon = isClockWise(geom);
+        const preClippedVertices = _getPreClippedVertices(geom, mvtExtent);
 
         _checkIsFirstPolygonInternal(isExternalPolygon, index);
-        _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices);
+
+        if (isExternalPolygon) {
+            if (currentPolygon) {
+                decoded.push(currentPolygon);
+            }
+
+            currentPolygon = new Polygon();
+        }
+
+        currentPolygon = clipPolygon(preClippedVertices, currentPolygon, !isExternalPolygon);
     });
 
     if (currentPolygon) {
@@ -116,22 +125,13 @@ function _checkIsFirstPolygonInternal(isExternalPolygon, index) {
     }
 }
 
-function _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices) {
-    if (isExternalPolygon) {
-        if (currentPolygon) {
-            decoded.push(currentPolygon);
-        }
+function _getPreClippedVertices(geom, mvtExtent) {
+    return geom.map((coord) => {
+        let x = coord.x;
+        let y = coord.y;
 
-        currentPolygon = new Polygon();
-    }
-
-    currentPolygon = clipPolygon(preClippedVertices, currentPolygon, !isExternalPolygon);
-}
-
-function _getPreClippedVertices(polygon, mvtExtent) {
-    return polygon.map((coord) => {
-        const x = coord.x / mvtExtent - 1;
-        const y = 2 * (1 - coord.y / mvtExtent) - 1;
+        x = 2 * x / mvtExtent - 1;	
+        y = 2 * (1 - y / mvtExtent) - 1;	
 
         return [x, y];
     });
