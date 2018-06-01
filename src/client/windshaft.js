@@ -337,7 +337,8 @@ export default class Windshaft {
                     type: 'mapnik',
                     options: {
                         sql: aggSQL,
-                        aggregation: agg
+                        aggregation: agg,
+                        dates_as_numbers: true
                     }
                 }
             ]
