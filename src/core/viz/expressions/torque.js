@@ -184,7 +184,7 @@ export class Torque extends BaseExpression {
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
-        checkType('torque', 'input', 0, ['input', 'date'], this._originalInput);
+        checkType('torque', 'input', 0, ['number', 'date'], this._originalInput);
         checkType('torque', 'duration', 1, 'number', this.duration);
         super._compile(meta);
         checkType('torque', 'input', 0, 'number', this.input);
