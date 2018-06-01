@@ -43,7 +43,7 @@ function takeReference(file, template, asyncLoad) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
         let options = loadOptions();
-        options.url = `file://${getHTML(file)}`;
+        options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
         options.output = `${getPNG(file)}`;
         if (asyncLoad) options.waitForFn = () => window.loaded;
         return exquisite.getReference(options);
