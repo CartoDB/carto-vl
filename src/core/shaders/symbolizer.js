@@ -16,16 +16,12 @@ uniform vec2 resolution;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
-uniform sampler2D colorStrokeTex;
-uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
 //TODO order bucket texture
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
-varying highp vec4 stroke;
 varying highp float fillScale;
-varying highp float strokeScale;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
 float decodeWidth(float x){
@@ -45,20 +41,12 @@ $propertyPreface
 void main(void) {
     featureIDVar = featureID;
     color = texture2D(colorTex, featureID);
-    stroke = texture2D(colorStrokeTex, featureID);
     float filtering = texture2D(filterTex, featureID).a;
     color.a *= filtering;
-    stroke.a *= filtering;
 
     float size = decodeWidth(texture2D(widthTex, featureID).a);
     float fillSize = size;
-    float strokeSize = decodeWidth(texture2D(strokeWidthTex, featureID).a);
-    size+=strokeSize;
     fillScale=size/fillSize;
-    strokeScale=size/max(0.001, (fillSize-strokeSize));
-    if (fillScale==strokeScale){
-        stroke.a=0.;
-    }
     if (size > 126.){
         size = 126.;
     }
@@ -66,7 +54,7 @@ void main(void) {
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
     p.xy -= ($symbolPlacement_inline)*gl_PointSize/resolution;
-    if (size==0. || (stroke.a==0. && color.a==0.) || size<orderMinWidth || size>=orderMaxWidth){
+    if (size==0. || color.a==0. || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;
@@ -77,7 +65,6 @@ precision highp float;
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
-varying highp vec4 stroke;
 
 $symbol_preface
 $propertyPreface
