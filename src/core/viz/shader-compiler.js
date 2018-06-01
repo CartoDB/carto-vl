@@ -23,9 +23,10 @@ export function compileShader(gl, template, expressions) {
         return `texture2D(propertyTex${tid[name]}, featureID).a`;
     };
     let codes = {};
+    const idGen = new IDGenerator();
     Object.keys(expressions).forEach(exprName => {
         const expr = expressions[exprName];
-        expr._setUID(new IDGenerator());
+        expr._setUID(idGen);
         const exprCodes = expr._applyToShaderSource(getPropertyAccessCode);
         codes[exprName + '_preface'] = exprCodes.preface;
         codes[exprName + '_inline'] = exprCodes.inline;

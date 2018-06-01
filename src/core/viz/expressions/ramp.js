@@ -82,6 +82,10 @@ export default class Ramp extends BaseExpression {
             throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
+    _setUID(idGenerator) {
+        super._setUID(idGenerator);
+        this.palette._setUID(idGenerator);
+    }
     eval(o) {
         if (this.palette.type != 'number-array') {
             super.eval(o);
@@ -167,6 +171,9 @@ export default class Ramp extends BaseExpression {
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
     _computeTextureIfNeeded() {
+        if (this.palette.type == 'sprites') {
+            return;
+        }
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
@@ -232,12 +239,12 @@ export default class Ramp extends BaseExpression {
         }
     }
     _preDraw(program, drawMetadata, gl) {
-        this._computeGLTextureIfNeeded(gl);
         this.input._preDraw(program, drawMetadata, gl);
         if (this.palette.type == 'sprites') {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
+        this._computeGLTextureIfNeeded(gl);
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
