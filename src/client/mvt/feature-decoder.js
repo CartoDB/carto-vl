@@ -28,7 +28,9 @@ export function decodePolygons(geom, mvtExtent) {
         _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices);
     });
 
-    if (currentPolygon) decoded.push(currentPolygon);
+    if (currentPolygon) {
+        decoded.push(currentPolygon);
+    }
 
     return decoded;
 }
@@ -43,7 +45,10 @@ function _checkIsFirstPolygonInternal(isExternalPolygon, index) {
 
 function _updateCurrentPolygon(isExternalPolygon, decoded, currentPolygon, preClippedVertices) {
     if (isExternalPolygon) {
-        if (currentPolygon) decoded.push(currentPolygon);
+        if (currentPolygon) {
+            decoded.push(currentPolygon);
+        }
+        
         currentPolygon = new Polygon();
     }
 
