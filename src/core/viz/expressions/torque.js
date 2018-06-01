@@ -1,7 +1,8 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp } from './utils';
+import { implicitCast, DEFAULT, clamp, checkType, checkLooseType } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
+import Variable from './basic/variable';
 
 const DEFAULT_FADE = 0.15;
 
@@ -119,21 +120,30 @@ export class Fade extends BaseExpression {
  */
 export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
-        if (!Number.isFinite(duration)) {
-            throw new Error('Torque(): invalid second parameter, duration.');
-        }
+        duration = implicitCast(duration);
+        let originalInput = input;
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
+        } else {
+            input = implicitCast(input);
+            originalInput = input;
         }
+
+        checkLooseType('torque', 'input', 0, 'number', input);
+        checkLooseType('torque', 'duration', 1, 'number', duration);
+        checkLooseType('torque', 'fade', 2, 'fade', fade);
+
         const _cycle = div(mod(now(), duration), duration);
-        super({ input, _cycle, fade });
+        super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
+        this.type = 'number';
+        this._originalInput = originalInput;
     }
     eval(feature) {
         const input = this.input.eval(feature);
         const cycle = this._cycle.eval(feature);
-        const duration = this.duration;
+        const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
@@ -168,16 +178,18 @@ export class Torque extends BaseExpression {
         return date;
 
     }
+    get input() {
+        return this._input instanceof Variable ? this._input.alias : this._input;
+    }
     _compile(meta) {
+        this._originalInput._compile(meta);
+        this.duration._compile(meta);
+        checkType('torque', 'input', 0, 'number', this._originalInput);        
+        checkType('torque', 'duration', 1, 'number', this.duration);
         super._compile(meta);
-        if (this.input.type != 'number') {
-            throw new Error('Torque(): invalid first parameter, input.');
-        } else if (this.fade.type != 'fade') {
-            throw new Error('Torque(): invalid third parameter, fade.');
-        }
-        this.type = 'number';
-
+        checkType('torque', 'input', 0, 'number', this.input);
+        checkType('torque', 'fade', 2, 'fade', this.fade);
         this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline.input}-${inline._cycle})*(${this.duration.toFixed(20)})/(${inline.input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
 }
