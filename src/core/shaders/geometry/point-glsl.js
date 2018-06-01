@@ -72,14 +72,15 @@ varying highp float strokeScale;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
 float decodeWidth(float x){
-    x*=255.;
-    if (x < 64.){
-        return x*0.25;
-    }else if (x<128.){
-        return (x-64.)+16.;
-    }else{
-        return (x-127.)*2.+80.;
+    float w;
+    if (x < 0.25098039215686274){ // x < 64/255
+        w = 63.75 * x; // 255 * 0.25
+    }else if (x < 0.5019607843137255){ // x < 128/255
+        w = x*255. -48.;
+    }else {
+        w = x*510. -174.;
     }
+    return w;
 }
 
 void main(void) {

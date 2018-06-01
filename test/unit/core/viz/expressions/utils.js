@@ -1,4 +1,5 @@
 import * as s from '../../../../../src/core/viz/functions';
+import { isArgConstructorTimeTyped } from '../../../../../src/core/viz/expressions/utils';
 
 const metadata = {
     columns: [
@@ -14,13 +15,29 @@ const metadata = {
     ],
 };
 
+export function validateTypeErrors(expressionName, argTypes) {
+    describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
+        const simpleArgs = argTypes.map(getSimpleArg);
+        const propertyArgs = argTypes.map(getPropertyArg);
+        
+        validateConstructorTimeTypeError(expressionName, simpleArgs);
+
+        if (equalArgs(simpleArgs, propertyArgs)){
+            return;
+        }
+        if (argTypes.every(isArgConstructorTimeTyped)) {           
+            validateConstructorTimeTypeError(expressionName, propertyArgs);
+        }else{
+            validateCompileTimeTypeError(expressionName, propertyArgs);
+        }
+    });
+}
 export function validateDynamicTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
         validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
     });
 }
-
 export function validateStaticTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
@@ -41,15 +58,16 @@ function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
             s[expressionName](...args.map(arg => arg[0]))
-        ).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*/g);
+        ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*`, 'g'));
     });
 }
+
 function validateCompileTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
             expression._compile(metadata);
-        }).toThrowError(/[\s\S]*invalid.*parameter[\s\S]*type[\s\S]*/g);
+        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g'));
     });
 }
 
