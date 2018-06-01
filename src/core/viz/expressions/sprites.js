@@ -39,6 +39,7 @@ export default class Sprites extends Base {
             const spriteSize = 256;
 
             this.init = true;
+            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
             this.texture = gl.createTexture();
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);

@@ -206,7 +206,7 @@ class Renderer {
         return drawMetadata;
     }
 
-    renderLayer(layer, repeat=true) {
+    renderLayer(layer) {
         const tiles = layer.getActiveDataframes();
         const viz = layer.viz;
         const gl = this.gl;
@@ -374,9 +374,7 @@ class Renderer {
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
-            }
-
-            if (tile.type != 'line') {
+            } else if (tile.type != 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE3);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
@@ -386,7 +384,6 @@ class Renderer {
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
                 gl.uniform1i(renderer.strokeWidthTexture, 4);
             }
-        
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
@@ -420,9 +417,6 @@ class Renderer {
 
         gl.disable(gl.CULL_FACE);
 
-        if (repeat){
-            this.renderLayer(layer, false);
-        }
     }
 
 
