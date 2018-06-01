@@ -554,19 +554,7 @@ export default class Windshaft {
         });
         return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
-
 }
-
-
-// function isClockWise(vertices) {
-//     let a = 0;
-//     for (let i = 0; i < vertices.length; i++) {
-//         let j = (i + 1) % vertices.length;
-//         a += vertices[i].x * vertices[j].y;
-//         a -= vertices[j].x * vertices[i].y;
-//     }
-//     return a > 0;
-// }
 
 const endpoint = (conf, path = '') => {
     let url = `${conf.mapsServerURL}/api/v1/map`;
