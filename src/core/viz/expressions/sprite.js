@@ -42,6 +42,7 @@ export default class Sprite extends Base {
     _preDraw(program, drawMetadata, gl) {
         if (!this.init && this.ready) {
             this.init = true;
+            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
             this.texture = gl.createTexture();
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
