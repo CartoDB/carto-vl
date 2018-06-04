@@ -32,7 +32,8 @@
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
     "lru-cache": "^4.1.1",
     "mitt": "^1.1.3",
-    "pbf": "^3.1.0"
+    "pbf": "^3.1.0",
+    "serve": "^7.2.0"
   },
   "devDependencies": {
     "@carto/mapbox-gl": "0.45.0-carto1",
@@ -81,9 +82,9 @@
     "test:user:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js",
     "test:user:watchc": "karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
-    "test:render": "yarn build:dev &&  yarn http-server -s -p 5000 & export HTTP_SERVER=$! && yarn wait-on http://localhost:5000 && mocha test/integration/render/render.test.js ; kill $HTTP_SERVER ; echo PID $HTTP_SERVER",
+    "test:render": "yarn build:dev && mocha test/integration/render/render.test.js",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
-    "test:render:prepare": "yarn build:dev  &&  yarn http-server -s -p 5000 & export HTTP_SERVER=$! && yarn wait-on http://localhost:5000 && node test/integration/render/render.prepare.js ; kill $HTTP_SERVER ; echo PID $HTTP_SERVER",
+    "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
     "test:e2e": "yarn build:dev && mocha test/acceptance/e2e.test.js",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
