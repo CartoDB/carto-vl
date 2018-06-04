@@ -89,8 +89,8 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
-    _fetch() {
-        return Promise.all(this._getRootExpressions().map(expr => expr._fetch()));
+    loadSprites() {
+        return Promise.all(this._getRootExpressions().map(expr => expr.loadSprites()));
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object

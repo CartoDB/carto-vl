@@ -6,7 +6,8 @@ export default class Sprite extends Base {
         this.type = 'color';
         this._url = url;
     }
-    _fetch() {
+    
+    loadSprites() {
         return new Promise((resolve, reject) => {
             this.image = new Image();
             this.image.onload = () => {
@@ -18,6 +19,7 @@ export default class Sprite extends Base {
             this.image.src = this._url;
         });
     }
+    
     _compile(meta) {
         super._compile(meta);
     }

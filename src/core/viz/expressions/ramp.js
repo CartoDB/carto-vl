@@ -82,10 +82,16 @@ export default class Ramp extends BaseExpression {
             throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
+
+    loadSprites() {
+        return Promise.all([this.input.loadSprites(), this.palette.loadSprites()]);
+    }
+    
     _setUID(idGenerator) {
         super._setUID(idGenerator);
         this.palette._setUID(idGenerator);
     }
+
     eval(o) {
         if (this.palette.type != 'number-array') {
             super.eval(o);
@@ -107,14 +113,13 @@ export default class Ramp extends BaseExpression {
         this._texCategories = null;
         this._GLtexCategories = null;
     }
+    
     _free(gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);
         }
     }
-    _fetch() {
-        return Promise.all([this.input._fetch(), this.palette._fetch()]);
-    }
+
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
         if (this.palette.type == 'sprites') {
