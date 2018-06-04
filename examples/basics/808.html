@@ -145,11 +145,11 @@
   const duration = nSteps/4*60/bpm;
   const steps = s.linear(s.prop('step'), 0, nSteps);
   let torque = s.torque(steps, duration, s.fade(duration/nSteps/2, duration/nSteps/2));
-  // setInterval(() => document.getElementById("timer").textContent = torque.getSimTime(), 100);
-  let op = s.add(0.5, s.div(s.mod(s.floor(s.div(s.sub(s.prop('step'),1),4)),2),2));
+  let op = s.add(0.75, s.div(s.mod(s.add(1,s.floor(s.div(s.sub(s.prop('step'),1),4))),2),4));
   op = s.add(s.div(op, 2), s.div(torque, 2));
-  const offSize = s.mul(0.8,s.zoom());
-  const onSize = s.mul(1.4,s.zoom());
+  const size = sz => s.mul(sz,s.zoom());
+  const offSize = () => size(0.8);
+  const onSize = () => size(1.4);
   let viz = new carto.Viz({
       variables: {
         inst: s.prop('inst'),
@@ -157,7 +157,7 @@
       },
       strokeWidth: 0,
       color: s.opacity(s.ramp(s.div(s.prop('inst'),nInst-1),s.palettes.PRISM), op),
-      width: offSize
+      width: offSize()
   });
   let matrix = {};
   const layer = new carto.Layer('layer', source, viz);
@@ -175,7 +175,7 @@
       matrix[step][inst] = matrix[step][inst] || false;
       matrix[step][inst] = !matrix[step][inst];
       const state = matrix[step][inst];
-      const width = state ? onSize : offSize;
+      const width = state ? onSize() : offSize();
       feature.width.blendTo(width, 100);
       // console.log("Instrument",inst,"At",step,":",step);
     }
