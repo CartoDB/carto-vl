@@ -60,10 +60,8 @@ const AABlender = AntiAliasingShader;
 const renderer = {
     createPointShader: gl => new PointShader(gl),
     createTriShader: gl => new TriangleShader(gl),
-    createLineShader: gl => new LineShader(gl),
+    createLineShader: gl => new LineShader(gl)
 };
-
-// TODO remove class nonsense
 
 function compileProgram(gl, glslVS, glslFS) {
     const shader = {};
