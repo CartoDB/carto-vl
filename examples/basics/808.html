@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> EKO ComputeRhythm | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: '20px', left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+  const AudioContext = window.AudioContext || window.webkitAudioContext || false;
+  const soundPrefix = 'https://blog.omgmog.net/beatmaker/sounds/';
+  const sounds = [
+    'bass_drum.wav',
+    'snare_drum.wav',
+    'cl_hi_hat.wav',
+    'low_tom.wav',
+    'mid_tom.wav',
+    'hi_tom.wav',
+    'rim_shot.wav',
+    'cowbell.wav',
+    'low_conga.wav',
+    'mid_conga.wav',
+  ];
+  var buffers = {};
+  if (AudioContext) {
+    var context = new AudioContext();
+  }
+  var playSound = function (index) {
+    var url = soundPrefix + sounds[index];
+
+    if (!AudioContext) {
+      new Audio(url).play();
+      return;
+    }
+    if (typeof(buffers[url]) == 'undefined') {
+      buffers[url] = null;
+      var req = new XMLHttpRequest();
+      req.open('GET', url, true);
+      req.responseType = 'arraybuffer';
+
+      req.onload = function () {
+        context.decodeAudioData(req.response,
+          function (buffer) {
+            buffers[url] = buffer;
+            playBuffer(buffer);
+          },
+          function (err) {
+            console.log(err);
+          }
+        );
+      };
+      req.send();
+    }
+    function playBuffer(buffer) {
+      var source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      source.start();
+    };
+    if (buffers[url]) {
+      playBuffer(buffers[url]);
+    }
+  };
+
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: {
+      version: 8,
+      sources: {
+
+      },
+      layers: [
+        {
+          id: 'background',
+          type: 'background',
+          paint: { 'background-color': 'black' }
+        }
+      ]
+    },
+    center: [4, 5],
+    zoom: 5,
+    dragRotate: false
+  });
+
+  carto.setDefaultAuth({
+    user: 'cartogl',
+    apiKey: 'default_public'
+  });
+
+  const nSteps = 16;
+  const nInst = sounds.length;
+
+  const source = new carto.source.SQL(`
+    WITH params AS (
+      SELECT
+      0.0 AS x0, 0.0 AS y0,     -- center at the equator
+      50000 AS dx,
+      100000 AS dy
+    ),
+    positions AS (
+      SELECT
+        step,
+        inst,
+        step*dx + x0 AS x,
+        inst*dy + y0 AS y
+      FROM params,
+            generate_series(1, ${nSteps}) AS step, generate_series(1,${nInst}) AS inst
+    )
+    SELECT
+      row_number() over () AS cartodb_id,
+      step, inst,
+      ST_SetSRID(ST_MakePoint(x, y),3857) AS the_geom_webmercator,
+      ST_Transform(ST_SetSRID(ST_MakePoint(x, y),3857), 4326) AS the_geom
+      FROM params, positions
+  `);
+  const s = carto.expressions;
+  let bpm = new URL(location.href).searchParams.get('bpm') || 120;
+  const duration = nSteps/4*60/bpm;
+  const steps = s.linear(s.prop('step'), 0, nSteps);
+  let torque = s.torque(steps, duration, s.fade(duration/nSteps/2, duration/nSteps/2));
+  // setInterval(() => document.getElementById("timer").textContent = torque.getSimTime(), 100);
+  let op = s.add(0.5, s.div(s.mod(s.floor(s.div(s.sub(s.prop('step'),1),4)),2),2));
+  op = s.add(s.div(op, 2), s.div(torque, 2));
+  const offSize = s.mul(0.8,s.zoom());
+  const onSize = s.mul(1.4,s.zoom());
+  let viz = new carto.Viz({
+      variables: {
+        inst: s.prop('inst'),
+        step: s.prop('step'),
+      },
+      strokeWidth: 0,
+      color: s.opacity(s.ramp(s.div(s.prop('inst'),nInst-1),s.palettes.PRISM), op),
+      width: offSize
+  });
+  let matrix = {};
+  const layer = new carto.Layer('layer', source, viz);
+  layer.addTo(map, 'background');
+  const interactivity = new carto.Interactivity(layer);
+  interactivity.on('featureClick', featureEvent => {
+    const coords = featureEvent.coordinates;
+    const feature = featureEvent.features[0];
+    if (feature) {
+      const inst = feature.variables.inst.value;
+      const step = feature.variables.step.value;
+      if (!matrix[step]) {
+          matrix[step] = {};
+      }
+      matrix[step][inst] = matrix[step][inst] || false;
+      matrix[step][inst] = !matrix[step][inst];
+      const state = matrix[step][inst];
+      const width = state ? onSize : offSize;
+      feature.width.blendTo(width, 100);
+      // console.log("Instrument",inst,"At",step,":",step);
+    }
+  });
+  const tol = 1E-1;
+  function tick() {
+      const t = (s.now().eval().expr % duration)/duration;
+      let nearStep = Math.round(t*nSteps) % nSteps;
+      const err = duration*Math.abs(t - nearStep/nSteps);
+      let nextStep = nearStep + 1;
+      if (nearStep === 0) {
+        nearStep = nSteps;
+      }
+      if (err < tol) {
+          // console.log(nearStep, matrix[nearStep]);
+          if (matrix[nearStep]) {
+            Object.keys(matrix[nearStep]).forEach(inst => {
+              if (matrix[nearStep][inst]) {
+                playSound(inst-1);
+              }
+            });
+          }
+      }
+      else {
+        nextStep = Math.ceil(t*nSteps);
+        if (nextStep === 0) {
+            nextStep = nSteps;
+        }
+      }
+      const dt = 1000*(nextStep/nSteps - t)*duration;
+      // console.log(duration,"t",t,"nS",nearStep,"err",err,"nxS",nextStep,"dt",dt);
+      setTimeout(tick, dt);
+  }
+  tick();
+  </script>
+</body>
+</html>

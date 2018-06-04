@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { number } from '../functions';
+import { INITIAL_TIMESTAMP } from '../../renderer'
 
 /**
  * Get the current timestamp. This is an advanced form of animation, `torque` is preferred.
@@ -27,7 +28,8 @@ export default class Now extends BaseExpression {
         super({ now: number(0) });
     }
     eval() {
-        return this.now.expr;
+        // return this.now.expr;
+        return number((Date.now() - INITIAL_TIMESTAMP) / 1000);
     }
     isAnimated() {
         return true;
