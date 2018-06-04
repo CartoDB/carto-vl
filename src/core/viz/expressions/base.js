@@ -31,6 +31,10 @@ export default class Base {
         this._shaderBindings = new Map();
     }
 
+    loadSprites() {
+        return Promise.all(this._getChildren().map(child => child.loadSprites()));
+    }
+
     _bind(metadata) {
         this._compile(metadata);
         return this;
@@ -51,10 +55,6 @@ export default class Base {
         ${glslCode}
         #endif
         `;
-    }
-
-    _fetch(){
-        return Promise.all(this._getChildren().map(child => child._fetch()));
     }
 
     _getDependencies() {
