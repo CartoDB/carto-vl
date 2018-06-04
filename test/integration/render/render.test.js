@@ -15,18 +15,15 @@ describe('Render tests:', () => {
     let server;
     
     before(() => {
-        server = http.createServer((request, response) => {
-            return handler(request, response);
-        });
-
+        server = http.createServer(handler);
         server.listen(PORT);
     });
+
+    files.forEach(test);
 
     after(() => {
         server.close();
     });
-    
-    files.forEach(test);
 });
 
 function test(file) {
