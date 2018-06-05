@@ -21,7 +21,7 @@ export default class MVT extends Base {
      * Create a carto.source.MVT.
      *
      * @param {object} data - A MVT data object
-     * @param {object} metadatadata - A carto.source.mvt.Metadata object
+     * @param {object} metadata - A carto.source.mvt.Metadata object
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
