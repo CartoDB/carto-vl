@@ -21,7 +21,6 @@ uniform sampler2D filterTex;
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
-varying highp float fillScale;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
 float decodeWidth(float x){
@@ -46,7 +45,6 @@ void main(void) {
 
     float size = decodeWidth(texture2D(widthTex, featureID).a);
     float fillSize = size;
-    fillScale=size/fillSize;
     if (size > 126.){
         size = 126.;
     }
