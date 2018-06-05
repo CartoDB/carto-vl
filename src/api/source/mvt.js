@@ -6,6 +6,7 @@ import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
 import featureDecoder from '../../client/mvt/feature-decoder';
+import { validateTemplateURL } from '../url';
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -33,10 +34,10 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(serverURL, metadata) {
+    constructor(templateURL, metadata) {
         super();
-        // TODO this._validateServerURL(serverURL);
-        this._serverURL = serverURL;
+        validateTemplateURL(templateURL);
+        this._templateURL = templateURL;
         this._requestGroupID = 0;
         this._oldDataframes = [];
         const lruOptions = {
@@ -62,7 +63,7 @@ export default class MVT extends Base {
     }
 
     _clone(){
-        return new MVT(this._serverURL, this.metadata);
+        return new MVT(this._templateURL, this.metadata);
     }
 
     bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
@@ -169,7 +170,7 @@ export default class MVT extends Base {
     }
 
     _getTileUrl(x, y, z) {
-        return this._serverURL.replace('{x}', x).replace('{y}', y).replace('{z}', z);
+        return this._templateURL.replace('{x}', x).replace('{y}', y).replace('{z}', z);
     }
 
     _getSubdomain(x, y) {

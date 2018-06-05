@@ -80,6 +80,10 @@ const validation = {
             messageRegex: /nonValidServerURL/,
             friendlyMessage: '`serverURL` property is not a valid URL.'
         },
+        'non-valid-template-url': {
+            messageRegex: /nonValidTemplateURL/,
+            friendlyMessage: '`templateURL` property is not a valid URL.'
+        },
         'table-name-required': {
             messageRegex: /tableNameRequired/,
             friendlyMessage: '`tableName` property is required.'
