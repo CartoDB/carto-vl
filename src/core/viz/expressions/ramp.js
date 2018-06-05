@@ -61,7 +61,7 @@ export default class Ramp extends BaseExpression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array'], palette);
+        checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array'], palette);
 
         super({ input: input });
         this.minKey = 0;

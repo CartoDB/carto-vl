@@ -28,7 +28,7 @@ import { checkInstance, checkType } from '../utils';
  * @function
  * @api
  */
-export const ClusterAvg = genAggregationOp('avg', 'number');
+export const ClusterAvg = genAggregationOp('clusterAvg', 'number');
 
 /**
  * Aggregate using the maximum. This operation disables the access to the property
@@ -55,7 +55,7 @@ export const ClusterAvg = genAggregationOp('avg', 'number');
  * @function
  * @api
  */
-export const ClusterMax = genAggregationOp('max', 'number');
+export const ClusterMax = genAggregationOp('clusterMax', 'number');
 
 /**
  * Aggregate using the minimum. This operation disables the access to the property
@@ -82,7 +82,7 @@ export const ClusterMax = genAggregationOp('max', 'number');
  * @function
  * @api
  */
-export const ClusterMin = genAggregationOp('min', 'number');
+export const ClusterMin = genAggregationOp('clusterMin', 'number');
 
 /**
  * Aggregate using the mode. This operation disables the access to the property
@@ -109,7 +109,7 @@ export const ClusterMin = genAggregationOp('min', 'number');
  * @function
  * @api
  */
-export const ClusterMode = genAggregationOp('mode', 'category');
+export const ClusterMode = genAggregationOp('clusterMode', 'category');
 
 /**
  * Aggregate using the sum. This operation disables the access to the property
@@ -136,12 +136,13 @@ export const ClusterMode = genAggregationOp('mode', 'category');
  * @function
  * @api
  */
-export const ClusterSum = genAggregationOp('sum', 'number');
+export const ClusterSum = genAggregationOp('clusterSum', 'number');
 
-function genAggregationOp(aggName, aggType) {
+function genAggregationOp(expressionName, aggType) {
+    const aggName = expressionName.replace('cluster', '').toLowerCase();
     return class AggregationOperation extends BaseExpression {
         constructor(property) {
-            checkInstance(aggName, 'property', 0, PropertyExpression, property);
+            checkInstance(expressionName, 'property', 0, PropertyExpression, property);
             super({ property });
             this._aggName = aggName;
             this.type = aggType;
@@ -161,7 +162,7 @@ function genAggregationOp(aggName, aggType) {
         //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
         _compile(metadata) {
             super._compile(metadata);
-            checkType(aggName, 'property', 0, aggType, this.property);
+            checkType(expressionName, 'property', 0, aggType, this.property);
         }
         _applyToShaderSource(getGLSLforProperty) {
             return {

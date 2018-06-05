@@ -1,6 +1,6 @@
 export const VS = `
 
-precision highp float;
+precision mediump float;
 
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
@@ -15,18 +15,19 @@ uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
 
-varying highp vec4 color;
+varying lowp vec4 color;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
 float decodeWidth(float x){
-    x*=255.;
-    if (x < 64.){
-        return x*0.25;
-    }else if (x<128.){
-        return (x-64.)+16.;
-    }else{
-        return (x-127.)*2.+80.;
+    float w;
+    if (x < 0.25098039215686274){ // x < 64/255
+        w = 63.75 * x; // 255 * 0.25
+    }else if (x < 0.5019607843137255){ // x < 128/255
+        w = x*255. -48.;
+    }else {
+        w = x*510. -174.;
     }
+    return w;
 }
 
 void main(void) {
@@ -50,9 +51,9 @@ void main(void) {
 }`;
 
 export const FS = `
-precision highp float;
+precision lowp float;
 
-varying highp vec4 color;
+varying lowp vec4 color;
 
 void main(void) {
     gl_FragColor = color;
