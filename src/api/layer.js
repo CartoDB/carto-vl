@@ -278,10 +278,6 @@ export default class Layer {
         return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
     }
 
-    getTime() {
-        return this._renderLayer.getTime();
-    }
-
     $paintCallback() {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;

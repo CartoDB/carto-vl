@@ -144,10 +144,6 @@ class Renderer {
         return 1;
     }
 
-    getTime() {
-        return (Date.now() - INITIAL_TIMESTAMP) / 1000.;
-    }
-
     _computeDrawMetadata(renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
@@ -243,7 +239,7 @@ class Renderer {
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(TID).length;
-            vizExpr._setTimestamp(this.getTime());
+            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             vizExpr._updateDrawMetadata(drawMetadata);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
