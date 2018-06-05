@@ -30,7 +30,7 @@
   <div id="map"></div>
   <div id="timer"></div>
   <script>
-  const AudioContext = window.AudioContext || window.webkitAudioContext || false;
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
   const soundPrefix = 'https://blog.omgmog.net/beatmaker/sounds/';
   const sounds = [
     'bass_drum.wav',
@@ -44,44 +44,43 @@
     'low_conga.wav',
     'mid_conga.wav',
   ];
-  const buffers = {};
-  const context = new AudioContext();
-  function playInst(index) {
-    const url = soundPrefix + sounds[index - 1];
-    if (typeof(buffers[url]) == 'undefined') {
-      buffers[url] = null;
-      const req = new XMLHttpRequest();
-      req.open('GET', url, true);
-      req.responseType = 'arraybuffer';
-      req.onload = () => {
-        context.decodeAudioData(req.response,
-          buffer => {
-            buffers[url] = buffer;
-            playBuffer(buffer);
-          },
-          err => console.log(err)
-        );
-      };
-      req.send();
-    } else if (buffers[url]) {
-      playBuffer(buffers[url]);
-    }
 
-    function playBuffer(buffer) {
-      const source = context.createBufferSource();
-      source.buffer = buffer;
-      source.connect(context.destination);
-      source.start();
-    };
+  const context = new AudioContext();
+  const buffers = {};
+
+  function playInst(inst) {
+    const url = soundPrefix + sounds[inst - 1];
+    let audio = buffers[url];
+    if (audio) {
+      playBuffer(audio);
+    }
+    else {
+      fetch(url).then(response => {
+        if (response.status === 200) {
+          response.arrayBuffer().then(buffer => {
+            context.decodeAudioData(buffer)
+            .then(audio => {
+              buffers[url] = audio;
+              playBuffer(audio);
+            })
+          });
+        }
+      });
+    }
+  };
+
+  function playBuffer(buffer) {
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.start();
   };
 
   const map = new mapboxgl.Map({
     container: 'map',
     style: {
       version: 8,
-      sources: {
-
-      },
+      sources: {},
       layers: [
         {
           id: 'background',
@@ -182,7 +181,7 @@
           if (pattern[nearStep]) {
             Object.keys(pattern[nearStep]).forEach(inst => {
               if (pattern[nearStep][inst]) {
-                playInst(inst-1);
+                playInst(inst);
               }
             });
           }
