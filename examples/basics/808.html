@@ -144,9 +144,9 @@
   let bpm = new URL(location.href).searchParams.get('bpm') || 120;
   const duration = nSteps/4*60/bpm;
   const steps = s.linear(s.prop('step'), 0, nSteps);
-  let torque = s.torque(steps, duration, s.fade(duration/nSteps/2, duration/nSteps/2));
+  const cycle = s.torque(steps, duration, s.fade(duration/nSteps/2, duration/nSteps/2));
   let op = s.add(0.75, s.div(s.mod(s.add(1,s.floor(s.div(s.sub(s.prop('step'),1),4))),2),4));
-  op = s.add(s.div(op, 2), s.div(torque, 2));
+  op = s.add(s.div(op, 2), s.div(cycle, 2));
   const size = sz => s.mul(sz,s.zoom());
   const offSize = () => size(0.8);
   const onSize = () => size(1.4);
@@ -159,7 +159,7 @@
       color: s.opacity(s.ramp(s.div(s.prop('inst'),nInst-1),s.palettes.PRISM), op),
       width: offSize()
   });
-  let matrix = {};
+  let pattern = {};
   const layer = new carto.Layer('layer', source, viz);
   layer.addTo(map, 'background');
   const interactivity = new carto.Interactivity(layer);
@@ -169,12 +169,12 @@
     if (feature) {
       const inst = feature.variables.inst.value;
       const step = feature.variables.step.value;
-      if (!matrix[step]) {
-          matrix[step] = {};
+      if (!pattern[step]) {
+          pattern[step] = {};
       }
-      matrix[step][inst] = matrix[step][inst] || false;
-      matrix[step][inst] = !matrix[step][inst];
-      const state = matrix[step][inst];
+      pattern[step][inst] = pattern[step][inst] || false;
+      pattern[step][inst] = !pattern[step][inst];
+      const state = pattern[step][inst];
       const width = state ? onSize() : offSize();
       feature.width.blendTo(width, 100);
       // console.log("Instrument",inst,"At",step,":",step);
@@ -190,10 +190,10 @@
         nearStep = nSteps;
       }
       if (err < tol) {
-          // console.log(nearStep, matrix[nearStep]);
-          if (matrix[nearStep]) {
-            Object.keys(matrix[nearStep]).forEach(inst => {
-              if (matrix[nearStep][inst]) {
+          // console.log(nearStep, pattern[nearStep]);
+          if (pattern[nearStep]) {
+            Object.keys(pattern[nearStep]).forEach(inst => {
+              if (pattern[nearStep][inst]) {
                 playSound(inst-1);
               }
             });
