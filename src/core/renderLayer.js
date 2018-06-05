@@ -49,6 +49,12 @@ export default class RenderLayer {
         return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
     }
 
+    getTime() {
+        if (this.renderer) {
+            return this.renderer.getTime();
+        }
+    }
+
     /**
      * Return a public `Feature` object from the internal feature object obtained from a dataframe.
      */
