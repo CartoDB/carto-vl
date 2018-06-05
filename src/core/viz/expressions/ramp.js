@@ -86,7 +86,7 @@ export default class Ramp extends BaseExpression {
     loadSprites() {
         return Promise.all([this.input.loadSprites(), this.palette.loadSprites()]);
     }
-    
+
     _setUID(idGenerator) {
         super._setUID(idGenerator);
         this.palette._setUID(idGenerator);
@@ -113,7 +113,7 @@ export default class Ramp extends BaseExpression {
         this._texCategories = null;
         this._GLtexCategories = null;
     }
-    
+
     _free(gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);
@@ -176,9 +176,6 @@ export default class Ramp extends BaseExpression {
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
     _computeTextureIfNeeded() {
-        if (this.palette.type == 'sprites') {
-            return;
-        }
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
