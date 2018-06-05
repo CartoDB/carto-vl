@@ -428,4 +428,4 @@ function getOrderingRenderBuckets(renderLayer) {
     };
 }
 
-export { Renderer, Dataframe, schema };
+export { Renderer, Dataframe, schema, INITIAL_TIMESTAMP };
