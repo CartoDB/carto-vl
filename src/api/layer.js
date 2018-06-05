@@ -294,10 +294,10 @@ export default class Layer {
                 this._isUpdated = false;
                 this._fire('updated');
             }
-        }
-        if (!this._isLoaded && this.state == 'dataLoaded') {
-            this._isLoaded = true;
-            this._fire('loaded');
+            if (!this._isLoaded && this.state == 'dataLoaded') {
+                this._isLoaded = true;
+                this._fire('loaded');
+            }
         }
     }
 
