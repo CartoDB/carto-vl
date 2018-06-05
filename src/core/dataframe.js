@@ -304,6 +304,7 @@ export default class Dataframe {
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
+        this.height = height;
 
         let propertyID = this.propertyID[propertyName];
         if (propertyID === undefined) {
@@ -325,10 +326,6 @@ export default class Dataframe {
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties(properties) {
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.height = height;
         Object.keys(properties).forEach(propertyName => {
             this._addProperty(propertyName, properties[propertyName]);
             this.properties[propertyName] = properties[propertyName];
