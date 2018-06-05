@@ -47,47 +47,36 @@
     'low_conga.wav',
     'mid_conga.wav',
   ];
-  var buffers = {};
-  if (AudioContext) {
-    var context = new AudioContext();
-  }
-  var playSound = function (index) {
-    var url = soundPrefix + sounds[index];
-
-    if (!AudioContext) {
-      new Audio(url).play();
-      return;
-    }
+  const buffers = {};
+  const context = new AudioContext();
+  function playInst(index) {
+    const url = soundPrefix + sounds[index - 1];
     if (typeof(buffers[url]) == 'undefined') {
       buffers[url] = null;
-      var req = new XMLHttpRequest();
+      const req = new XMLHttpRequest();
       req.open('GET', url, true);
       req.responseType = 'arraybuffer';
-
-      req.onload = function () {
+      req.onload = () => {
         context.decodeAudioData(req.response,
-          function (buffer) {
+          buffer => {
             buffers[url] = buffer;
             playBuffer(buffer);
           },
-          function (err) {
-            console.log(err);
-          }
+          err => console.log(err)
         );
       };
       req.send();
+    } else if (buffers[url]) {
+      playBuffer(buffers[url]);
     }
+
     function playBuffer(buffer) {
-      var source = context.createBufferSource();
+      const source = context.createBufferSource();
       source.buffer = buffer;
       source.connect(context.destination);
       source.start();
     };
-    if (buffers[url]) {
-      playBuffer(buffers[url]);
-    }
   };
-
 
   const map = new mapboxgl.Map({
     container: 'map',
@@ -198,7 +187,7 @@
           if (pattern[nearStep]) {
             Object.keys(pattern[nearStep]).forEach(inst => {
               if (pattern[nearStep][inst]) {
-                playSound(inst-1);
+                playInst(inst-1);
               }
             });
           }
