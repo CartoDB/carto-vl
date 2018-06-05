@@ -295,7 +295,7 @@ class Renderer {
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
-
+            let freeTexUnit = 0;
             let renderer = null;
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
@@ -343,22 +343,25 @@ class Renderer {
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
             }
 
-            gl.activeTexture(gl.TEXTURE0);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(renderer.colorTexture, 0);
+            gl.uniform1i(renderer.colorTexture, freeTexUnit);
+            freeTexUnit++;
 
-            gl.activeTexture(gl.TEXTURE1);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(renderer.widthTexture, 1);
+            gl.uniform1i(renderer.widthTexture, freeTexUnit);
+            freeTexUnit++;
 
 
-            gl.activeTexture(gl.TEXTURE2);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
-            gl.uniform1i(renderer.filterTexture, 2);
+            gl.uniform1i(renderer.filterTexture, freeTexUnit);
+            freeTexUnit++;
 
             if (!viz.symbol._default) {
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
-                drawMetadata.freeTexUnit = 5 + Object.keys(viz.symbolShader.tid).length;
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.tid).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbol._updateDrawMetadata(drawMetadata);
                 viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
@@ -367,22 +370,26 @@ class Renderer {
                 viz.symbolPlacement._updateDrawMetadata(drawMetadata);
                 viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
-                Object.keys(viz.symbolShader.tid).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE5 + i);
+                freeTexUnit = drawMetadata.freeTexUnit;
+                Object.keys(viz.symbolShader.tid).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                     gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
-                    gl.uniform1i(viz.symbolShader.tid[name], 5 + i);
+                    gl.uniform1i(viz.symbolShader.tid[name], freeTexUnit);
+                    freeTexUnit++;
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             } else if (tile.type != 'line') {
                 // Lines don't support stroke
-                gl.activeTexture(gl.TEXTURE3);
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-                gl.uniform1i(renderer.colorStrokeTexture, 3);
+                gl.uniform1i(renderer.colorStrokeTexture, freeTexUnit);
+                freeTexUnit++;
 
-                gl.activeTexture(gl.TEXTURE4);
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-                gl.uniform1i(renderer.strokeWidthTexture, 4);
+                gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
+                freeTexUnit++;
             }
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
