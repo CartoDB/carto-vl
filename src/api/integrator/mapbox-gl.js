@@ -29,6 +29,7 @@ class MGLIntegrator {
         this.moveObservers = {};
         this._layers = [];
         this._paintedLayers = 0;
+        this.invalidateWebGLState = () => { };
     }
 
     on(name, cb) {
@@ -65,8 +66,10 @@ class MGLIntegrator {
         const callbackID = `_cartovl_${uid++}`;
         const layerId = layer.getId();
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
+        let firstCallback = true;
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (!this.invalidateWebGLState) {
+            if (firstCallback) {
+                firstCallback = false;
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
