@@ -177,7 +177,6 @@
         nearStep = nSteps;
       }
       if (err < tol) {
-          // console.log(nearStep, pattern[nearStep]);
           if (pattern[nearStep]) {
             Object.keys(pattern[nearStep]).forEach(inst => {
               if (pattern[nearStep][inst]) {
@@ -193,7 +192,6 @@
         }
       }
       const dt = 1000*((nextStep - t)/nSteps)*duration;
-      // console.log(duration,"t",t,"nS",nearStep,"err",err,"nxS",nextStep,"dt",dt);
       setTimeout(tick, dt);
   }
   tick();
