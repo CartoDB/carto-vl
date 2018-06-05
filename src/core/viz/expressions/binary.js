@@ -451,7 +451,7 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             a = implicitCast(a);
             b = implicitCast(b);
 
-            const signature = getSignature(a, b);
+            const signature = getSignatureLoose(a, b);
             if (signature !== undefined) {
                 if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
                     throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
@@ -480,6 +480,30 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
     };
+}
+
+function getSignatureLoose(a, b) {
+    if (!a.type || !b.type) {
+        if (!a.type && !b.type){
+            return undefined;
+        }
+        const knownType = a.type || b.type;
+        if (knownType == 'color'){
+            return NUMBER_AND_COLOR_TO_COLOR;
+        }
+    } else if (a.type == 'number' && b.type == 'number') {
+        return NUMBERS_TO_NUMBER;
+    } else if (a.type == 'number' && b.type == 'color') {
+        return NUMBER_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'number') {
+        return NUMBER_AND_COLOR_TO_COLOR;
+    } else if (a.type == 'color' && b.type == 'color') {
+        return COLORS_TO_COLOR;
+    } else if (a.type == 'category' && b.type == 'category') {
+        return CATEGORIES_TO_NUMBER;
+    } else {
+        return UNSUPPORTED_SIGNATURE;
+    }
 }
 
 function getSignature(a, b) {
