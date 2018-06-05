@@ -7,8 +7,10 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
+import Time from '../core/viz/expressions/time'
 
 import featureDecoder from './mvt/feature-decoder';
+import { date } from '../core/viz/functions';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -170,24 +172,20 @@ export default class Windshaft {
     _intantiationChoices(metadata) {
         let choices = {
             // default choices
-            backendFilters: true,
-            castColumns: []
+            backendFilters: true
         };
         if (metadata) {
             if (metadata.featureCount >= 0) {
                 choices.backendFilters = metadata.featureCount > MIN_FILTERING || !metadata.backendFiltersApplied;
             }
-            if (metadata.columns) {
-                choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
-            }
         }
         return choices;
     }
 
-    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }, overrideMetadata = null) {
+    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        let select = this._buildSelectClause(MNS, choices.castColumns);
+        let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
@@ -291,10 +289,9 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MNS, dateFields = []) {
-        const columns = MNS.columns.map(name => R.schema.column.getBase(name)).map(
-            name => dateFields.includes(name) ? name + '::text' : name
-        ).concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+    _buildSelectClause(MNS) {
+        const columns = MNS.columns.map(name => R.schema.column.getBase(name))
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
 
@@ -416,10 +413,6 @@ export default class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
-                    if (this.metadata.dates_as_numbers && this.metadata.dates_as_numbers.includes(name)) {
-                        dateFields.push(name);
-                        return;
-                    }
                     const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
@@ -503,14 +496,15 @@ export default class Windshaft {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
-                const d = Date.parse(f.properties[name]);
-                if (Number.isNaN(d)) {
-                    throw new Error('invalid MVT date');
+                const d = f.properties[name];
+                if (Number.isNaN(new Date().setTime(d))) {
+                    throw new Error(`invalid MVT date ${d}`);
                 }
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
-                const n = (d - min) / (max.getTime() - min.getTime());
+                const n = (1000*d - min.getTime()) / (max.getTime() - min.getTime());
+
                 properties[index + catFields.length + numFields.length][i] = n;
             });
         }
@@ -519,13 +513,12 @@ export default class Windshaft {
     }
 
     _adaptMetadata(meta) {
-        const { stats, aggregation } = meta;
+        const { stats, aggregation, dates_as_numbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
         const columns = Object.keys(stats.columns)
             .map(name => Object.assign({ name }, stats.columns[name]))
             .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
-            .map(col => Object.assign(col, adaptColumnValues(col)))
             .filter(col => ['number', 'date', 'category'].includes(col.type));
         const categoryIDs = {};
         columns.forEach(column => {
@@ -535,8 +528,15 @@ export default class Windshaft {
                 });
                 column.categoryNames = column.categories.map(cat => cat.category);
             }
+            else if (dates_as_numbers && dates_as_numbers.includes(column.name)) {
+                column.type = 'date';
+                ['min', 'max', 'avg'].map(fn => {
+                    column[fn] = new Time(column[fn]).value
+                });
+            }
         });
-        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
+
+        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt, dates_as_numbers);
     }
 }
 
@@ -586,28 +586,6 @@ function adaptColumnType(type) {
         return 'category';
     }
     return type;
-}
-
-function adaptColumnValues(column) {
-    let adaptedColumn = { name: column.name, type: column.type };
-    Object.keys(column).forEach(key => {
-        if (!['name', 'type'].includes(key)) {
-            adaptedColumn[key] = adaptColumnValue(column[key], column.type);
-        }
-    });
-    return adaptedColumn;
-}
-
-function adaptColumnValue(value, type) {
-    switch (type) {
-        case 'date':
-            if (Number.isNaN(Date.parse(value))) {
-                throw new Error(`Invalid date: '${value}'`);
-            }
-            return new Date(value);
-        default:
-            return value;
-    }
 }
 
 // generate a promise under certain assumptions/choices; then if the result changes the assumptions,
