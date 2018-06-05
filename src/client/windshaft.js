@@ -354,7 +354,7 @@ export default class Windshaft {
         };
         if (!overrideMetadata) {
             const excludedColumns = ['the_geom', 'the_geom_webmercator'];
-            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
+            const includedColumns = columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
@@ -401,7 +401,6 @@ export default class Windshaft {
 
     requestDataframe(x, y, z) {
         const mvt_extent = 4096;
-
         return fetch(this._getTileUrl(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
@@ -417,6 +416,10 @@ export default class Windshaft {
                 const catFields = [];
                 const dateFields = [];
                 this._MNS.columns.map(name => {
+                    if (this.metadata.dates_as_numbers && this.metadata.dates_as_numbers.includes(name)) {
+                        dateFields.push(name);
+                        return;
+                    }
                     const basename = R.schema.column.getBase(name);
                     const type = this.metadata.columns.find(c => c.name == basename).type;
                     if (type == 'category') {
