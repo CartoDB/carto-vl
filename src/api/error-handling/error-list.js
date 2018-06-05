@@ -84,6 +84,10 @@ const validation = {
             messageRegex: /nonValidTemplateURL/,
             friendlyMessage: '`templateURL` property is not a valid URL.'
         },
+        'metadata-required': {
+            messageRegex: /metadataRequired/,
+            friendlyMessage: '`metadata` property is required for MVT source.'
+        },
         'table-name-required': {
             messageRegex: /tableNameRequired/,
             friendlyMessage: '`tableName` property is required.'

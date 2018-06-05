@@ -7,6 +7,8 @@ import * as LRU from 'lru-cache';
 import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
 import featureDecoder from '../../client/mvt/feature-decoder';
 import { validateTemplateURL } from '../url';
+import * as util from '../util';
+import CartoValidationError from '../error-handling/carto-validation-error';
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -36,7 +38,7 @@ export default class MVT extends Base {
      */
     constructor(templateURL, metadata) {
         super();
-        validateTemplateURL(templateURL);
+        this._validateInputParams(templateURL, metadata);
         this._templateURL = templateURL;
         this._requestGroupID = 0;
         this._oldDataframes = [];
@@ -56,6 +58,13 @@ export default class MVT extends Base {
         };
         this.metadata = this._buildMetadata(metadata);
         this.cache = LRU(lruOptions);
+    }
+
+    _validateInputParams(url, metadata) {
+        validateTemplateURL(url);
+        if (util.isUndefined(metadata)) {
+            throw new CartoValidationError('source', 'metadataRequired');
+        }
     }
 
     _buildMetadata(mvtMetadata) {
