@@ -426,16 +426,6 @@ export default class Layer {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
         }
-
-        // FIXME !!!
-        // TODO this is an implementation detail of the integrator
-
-        const c = this._integrator.map.getCenter();
-        const center = { x: c.lng / 180., y: util.projectToWebMercator(c).y / util.WM_R };
-
-        const sx = this._integrator.getZoom();
-        const sy = this._integrator.getZoom();
-        return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
     }
 
     _freeSource() {
