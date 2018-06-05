@@ -145,11 +145,12 @@
   const duration = nSteps/4*60/bpm;
   const steps = s.linear(s.prop('step'), 0, nSteps);
   const cycle = s.torque(steps, duration, s.fade(duration/nSteps/2, duration/nSteps/2));
+  const pulse = f => s.torque(0.5, duration/nSteps/f, s.fade(duration/nSteps/2/f, duration/nSteps/2/f));
   let op = s.add(0.75, s.div(s.mod(s.add(1,s.floor(s.div(s.sub(s.prop('step'),1),4))),2),4));
   op = s.add(s.div(op, 2), s.div(cycle, 2));
-  const size = sz => s.mul(sz,s.zoom());
-  const offSize = () => size(0.8);
-  const onSize = () => size(1.4);
+  const size = (sz, p, f) => s.add(s.mul(sz,s.zoom()), s.mul(p, pulse(f)));
+  const offSize = () => size(0.8, 5, 0.25);
+  const onSize = () => size(1.4, 20, 1);
   let viz = new carto.Viz({
       variables: {
         inst: s.prop('inst'),
@@ -182,7 +183,7 @@
   });
   const tol = 1E-1;
   function tick() {
-      const t = (s.now().eval().expr % duration)/duration;
+      const t = (s.now().eval() % duration)/duration;
       let nearStep = Math.round(t*nSteps) % nSteps;
       const err = duration*Math.abs(t - nearStep/nSteps);
       let nextStep = nearStep + 1;

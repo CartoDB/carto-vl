@@ -28,8 +28,7 @@ export default class Now extends BaseExpression {
         super({ now: number(0) });
     }
     eval() {
-        // return this.now.expr;
-        return number((Date.now() - INITIAL_TIMESTAMP) / 1000);
+        return (Date.now() - INITIAL_TIMESTAMP) / 1000;
     }
     isAnimated() {
         return true;
