@@ -36,6 +36,9 @@ export default class Variable extends BaseExpression {
         super({});
         this.name = name;
     }
+    isFeatureDependent(){
+        return this.alias? this.alias.isFeatureDependent(): undefined;
+    }
     get value() {
         return this.eval();
     }

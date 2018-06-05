@@ -41,6 +41,10 @@ export default class Base {
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
+    isFeatureDependent(){
+        return this._getChildren().some(child => child.isFeatureDependent());
+    }
+
     _prefaceCode(glslCode) {
         if (!glslCode) {
             return '';
