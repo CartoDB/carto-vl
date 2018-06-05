@@ -130,8 +130,8 @@ function _getPreClippedVertices(geom, mvtExtent) {
         let x = coord.x;
         let y = coord.y;
 
-        x = 2 * x / mvtExtent - 1;	
-        y = 2 * (1 - y / mvtExtent) - 1;	
+        x = 2 * x / mvtExtent - 1;
+        y = 2 * (1 - y / mvtExtent) - 1;
 
         return [x, y];
     });
