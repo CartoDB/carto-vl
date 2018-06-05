@@ -95,37 +95,35 @@
     dragRotate: false
   });
 
-  carto.setDefaultAuth({
-    user: 'cartogl',
-    apiKey: 'default_public'
-  });
-
   const nSteps = 16;
   const nInst = sounds.length;
 
-  const source = new carto.source.SQL(`
-    WITH params AS (
-      SELECT
-      0.0 AS x0, 0.0 AS y0,     -- center at the equator
-      50000 AS dx,
-      100000 AS dy
-    ),
-    positions AS (
-      SELECT
-        step,
-        inst,
-        step*dx + x0 AS x,
-        inst*dy + y0 AS y
-      FROM params,
-            generate_series(1, ${nSteps}) AS step, generate_series(1,${nInst}) AS inst
-    )
-    SELECT
-      row_number() over () AS cartodb_id,
-      step, inst,
-      ST_SetSRID(ST_MakePoint(x, y),3857) AS the_geom_webmercator,
-      ST_Transform(ST_SetSRID(ST_MakePoint(x, y),3857), 4326) AS the_geom
-      FROM params, positions
-  `);
+  const source = new carto.source.GeoJSON(generateData(nSteps, nInst));
+  function generateData(nSteps, nInst) {
+      const features = [];
+      const dx = 50000*360/2/Math.PI/6378137;
+      const dy = 100000*360/2/Math.PI/6378137;
+      const x0 = 0;
+      const y0 = 0;
+      let id = 1;
+      for (let step = 1; step <= nSteps; ++step) {
+        for (let inst = 1; inst <= nInst; ++inst) {
+          features.push({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [step*dx + x0, inst*dy + y0]
+            },
+            properties: {
+              cartodb_id: id++,
+              inst,
+              step
+            }
+          });
+        }
+      }
+      return { type: 'FeatureCollection', features };
+  }
 
   const palettes = ['ANTIQUE', 'BOLD', 'PASTEL', 'PRISM', 'SAFE', 'VIVID'];
   const s = carto.expressions;
