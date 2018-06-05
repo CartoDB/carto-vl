@@ -39,7 +39,7 @@ export default class Property extends BaseExpression {
         super({});
         this.name = name;
     }
-    _isFeatureDependent(){
+    isFeatureDependent(){
         return true;
     }
     get value() {

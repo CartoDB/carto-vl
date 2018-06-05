@@ -170,7 +170,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             });
             this._isViewport = true;
         }
-        _isFeatureDependent(){
+        isFeatureDependent(){
             return false;
         }
         get value() {
@@ -240,7 +240,7 @@ export class ViewportPercentile extends BaseExpression {
         });
         this._isViewport = true;
     }
-    _isFeatureDependent(){
+    isFeatureDependent(){
         return false;
     }
     get value() {

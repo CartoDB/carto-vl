@@ -181,7 +181,7 @@ export function checkArray(expressionName, parameterName, parameterIndex, array)
 }
 
 export function checkFeatureIndependent(expressionName, parameterName, parameterIndex, parameter) {
-    if (parameter._isFeatureDependent()) {
+    if (parameter.isFeatureDependent()) {
         throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
         parameter cannot be feature dependent`);
     }
