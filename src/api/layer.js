@@ -351,6 +351,7 @@ export default class Layer {
     _addToCartoMap(map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _addToMGLMap(map, beforeLayerID) {
