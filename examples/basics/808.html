@@ -183,7 +183,7 @@
   });
   const tol = 1E-1;
   function tick() {
-      const t = (s.now().eval() % duration)/duration;
+      const t = (layer.getTime() % duration)/duration;
       let nearStep = Math.round(t*nSteps) % nSteps;
       const err = duration*Math.abs(t - nearStep/nSteps);
       let nextStep = nearStep + 1;
