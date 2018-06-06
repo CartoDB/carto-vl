@@ -353,7 +353,7 @@ export default class Windshaft {
         };
         if (!overrideMetadata) {
             const excludedColumns = ['the_geom', 'the_geom_webmercator'];
-            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
+            const includedColumns = columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
@@ -499,9 +499,9 @@ export default class Windshaft {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
-                const d = Date.parse(f.properties[name]);
+                let d = Date.parse(f.properties[name]);
                 if (Number.isNaN(d)) {
-                    throw new Error('invalid MVT date');
+                    d = Number.POSITIVE_INFINITY;
                 }
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
