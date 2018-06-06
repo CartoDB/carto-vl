@@ -1,11 +1,11 @@
-# Introduction to Animation
+## Introduction to Animation
 
 Using CARTO VL you can make animated maps of points, lines, and polygons using the [`torque`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstorque) expression. 
 
 **Note:**
 While the expression name torque is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation.
 
-## Torque parameters
+### Torque parameters
 
 The general syntax for animating data in CARTO VL is:
 
@@ -13,12 +13,12 @@ The general syntax for animating data in CARTO VL is:
 filter: torque(input, duration, fade(fadeIn, fadeOut))
 ```
 
-### filter
+#### Filter
 The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). The `torque` expression generates a cyclic value ranging from `0` to `1` within a specified animation duration. If a feature exists, it will be given a value of `1`, if not, `0`. By applying this generated value to a [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions), features appear only when there is a match. 
 
 The next set of torque parameters are used to define the property, speed, and transition between animated features.
 
-### input
+#### Input
 
 The first torque parameter (input), is the attribute that you want to animate. By default, torque maps the attribute's minimum and maximum values to `0` and `1` respectively.
 
@@ -36,19 +36,19 @@ Similarly, if you have a timestamp property (`$date`), you can select a specific
 
 In both cases, the minimum value is mapped to `0` and the maximum value is mapped to `1`. Values outside of the specified range will not appear in the animation. 
 
-### duration
+#### Duration
 
 This parameter defines the duration of the animation cycle in seconds. As stated above, during the animation cycle, all possible input values are evaluated. When an input value is matched, torque returns a value of `1` for the feature and it is drawn.
 
-### fade
+#### Fade
 
 The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to `0` and the next set of features will begin to fade-in. 
 
-## Example
+### Example
 
 To illustrate these concepts, we will animate the journey of three birds from January to April of 2014 using data from [movebank.org](https://www.movebank.org/).
 
-### Animate points
+#### Animate points
 
 For the temporal component of the animation we will use the input `date_time` that has the date of the bird track and associated timestamp. We will set the duration to `30` and both fade parameters to `1`. 
 
@@ -57,7 +57,7 @@ filter: torque($date_time,30,fade(1,1))
 ```
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/animation/step-1.html)
 
-### Adjust duration
+#### Adjust duration
 
 In the animation above, we can see that the birds spend the majority of this three month period in West Africa and then eventually migrate to Northern Europe. To see this happen more quickly in our animation, we'll adjust the duration to `10` seconds.
 
@@ -75,7 +75,7 @@ filter: torque($date_time,10,fade(1,1))
 ```
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/animation/step-3.html)
 
-### Final touches
+#### Final touches
 
 Since we are visualizing the journey of three different birds, we can color each one with a unique color using `buckets`, decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`.
 
