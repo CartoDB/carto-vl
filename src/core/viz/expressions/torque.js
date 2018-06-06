@@ -133,7 +133,7 @@ export class Torque extends BaseExpression {
         checkLooseType('torque', 'duration', 1, 'number', duration);
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
-        
+
         const _cycle = div(mod(now(), duration), duration);
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
@@ -147,7 +147,8 @@ export class Torque extends BaseExpression {
         const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        const output = 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        return output;
     }
     /**
      * Get the current time stamp of the simulation
