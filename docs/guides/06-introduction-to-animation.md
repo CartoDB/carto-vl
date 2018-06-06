@@ -2,7 +2,8 @@
 
 Using CARTO VL you can make animated maps of points, lines, and polygons using the [`torque`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstorque) expression. 
 
-_Note: While the expression name torque is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation._
+**Note:**
+While the expression name torque is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation.
 
 ## Torque parameters
 
@@ -41,7 +42,7 @@ This parameter defines the duration of the animation cycle in seconds. As stated
 
 ### fade
 
-The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to 0 and the next set of features will begin to fade-in. 
+The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to `0` and the next set of features will begin to fade-in. 
 
 ## Example
 
