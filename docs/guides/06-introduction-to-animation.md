@@ -66,7 +66,7 @@ filter: torque($date_time,10,fade(1,1))
 ```
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/animation/step-2.html)
 
-### Adjust fade
+#### Adjust fade
 
 Since we are visualizing migration, we can adjust the `fade` parameters to give us a better sense of the journey these birds took. We will set the `fadeIn` parameter to `0` and the `fadeOut` parameter to `0.5`. What this does is keep the previous point in the animation visible for longer which helps us better visualize the path of migration. 
 
