@@ -2,7 +2,7 @@
 
 Using CARTO VL you can make animated maps of points, lines, and polygons using the [`torque`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstorque) expression. 
 
-_Note: While the expression name `torque` is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation._
+_Note: While the expression name torque is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation._
 
 ## Torque parameters
 
@@ -19,7 +19,7 @@ The next set of torque parameters are used to define the property, speed, and tr
 
 ### input
 
-The first torque parameter (input), is the attribute that you want to animate. By default, torque maps this attribute's minimum and maximum values to `0` and `1` respectively.
+The first torque parameter (input), is the attribute that you want to animate. By default, torque maps the attribute's minimum and maximum values to `0` and `1` respectively.
 
 In the case where you only want to visualize a subset of data, that can be done manually, using linear interpolation. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to: 
 
@@ -27,7 +27,7 @@ In the case where you only want to visualize a subset of data, that can be done 
   torque(linear($month, 2, 6))
 ```
 
-Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expressions: 
+Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression: 
 
 ```js
   torque(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
