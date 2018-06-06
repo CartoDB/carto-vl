@@ -30,14 +30,29 @@ describe('src/core/viz/expressions/linear', () => {
     describe('.eval()', () => {
         it('should return value linearly interpolated to min-max range (100%)', () => {
             const actual = s.linear(100, 0, 100).eval();
-
             expect(actual).toEqual(1);
         });
 
         it('should return value linearly interpolated to min-max range (10%)', () => {
             const actual = s.linear(100, 0, 1000).eval();
-
             expect(actual).toEqual(0.1);
+        });
+    });
+
+    describe('regression', ()=>{
+        it('should eval correctly with date properties', ()=>{
+            const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
+            l._compile({
+                columns: [{
+                    type:'date',
+                    name: 'wadus',
+                    min: new Date('1880-01-01T00:00:07Z'),
+                    max: new Date('1880-01-01T00:00:09Z')
+                }]
+            });
+            expect(l.eval({
+                wadus: 0.5
+            })).toEqual(0.5);
         });
     });
 });
