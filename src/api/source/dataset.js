@@ -9,7 +9,7 @@ export default class Dataset extends BaseWindshaft {
      * to a table in the server.
      *
      * If you have a table named `european_cities` in your CARTO account you could load all the
-     * data in a layer using a `carto.Dataset`.
+     * data in a layer using a `carto.source.Dataset`.
      *
      * If you want to load data applying a SQL query see {@link carto.source.SQL|carto.source.SQL}.
      *
