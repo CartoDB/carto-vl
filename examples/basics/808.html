@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title> EKO ComputeRhythm | CARTO VL</title>
+  <title> CARTO-Rhythm-VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -17,39 +17,42 @@
       height: 100%;
       width: 100%;
     }
-    #timer {
+    #story {
       position: absolute;
       top: '20px', left: '20px';
-      color: white;
+      color: gray;
       font-family: Arial;
-      font-size: 20pt;
+      font-size: 35pt;
+      opacity: 0.2;
+      overflow:visible;
+      pointer-events:none;
+      background:none !important;
+      padding: 1em;
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  <div id="timer"></div>
+  <div id="story">
+    1972: EKO ComputeRhythm is the first programmable drum machine,
+    stting the path for the immensely popular TR 808 and the expensive Linn's of the 80s,
+    innumerable step sequencer programs and devices to come, thousands of apps, plugins, pedals and whatnot.
+    But now, 45 years later, for the first time ever, the first video game speed (60 solid fps) drum machine,
+    the amaxing CARTO-Rhythm-VL!!
+  </div>
   <script>
   const AudioContext = window.AudioContext || window.webkitAudioContext;
-  const soundPrefix = 'https://blog.omgmog.net/beatmaker/sounds/';
   const sounds = [
-    'bass_drum.wav',
-    'snare_drum.wav',
-    'cl_hi_hat.wav',
-    'low_tom.wav',
-    'mid_tom.wav',
-    'hi_tom.wav',
-    'rim_shot.wav',
-    'cowbell.wav',
-    'low_conga.wav',
-    'mid_conga.wav',
-  ];
+    'bass_drum.wav', 'snare_drum.wav', 'cl_hi_hat.wav',
+    'low_tom.wav', 'mid_tom.wav', 'hi_tom.wav',
+    'rim_shot.wav', 'cowbell.wav', 'low_conga.wav', 'mid_conga.wav',
+  ].map(s => 'https://blog.omgmog.net/beatmaker/sounds/' + s);
 
   const context = new AudioContext();
   const buffers = {};
 
   function playInst(inst) {
-    const url = soundPrefix + sounds[inst - 1];
+    const url = sounds[inst - 1];
     let audio = buffers[url];
     if (audio) {
       playBuffer(audio);
@@ -100,8 +103,8 @@
   const source = new carto.source.GeoJSON(generateData(nSteps, nInst));
   function generateData(nSteps, nInst) {
       const features = [];
-      const dx = 50000*360/2/Math.PI/6378137;
-      const dy = 100000*360/2/Math.PI/6378137;
+      const dx = 0.45;
+      const dy = 0.9;
       const x0 = 0;
       const y0 = 0;
       let id = 1;
@@ -146,12 +149,11 @@
       color: s.opacity(s.ramp(s.div(s.sub(s.prop('inst'),1),nInst-1),palette), op),
       width: offSize()
   });
-  let pattern = {};
+  const pattern = {};
   const layer = new carto.Layer('layer', source, viz);
   layer.addTo(map, 'background');
   const interactivity = new carto.Interactivity(layer);
   interactivity.on('featureClick', featureEvent => {
-    const coords = featureEvent.coordinates;
     const feature = featureEvent.features[0];
     if (feature) {
       const inst = feature.variables.inst.value;
@@ -164,7 +166,6 @@
       const state = pattern[step][inst];
       const width = state ? onSize() : offSize();
       feature.width.blendTo(width, 100);
-      // console.log("Instrument",inst,"At",step,":",step);
     }
   });
   const tol = 1E-1;
