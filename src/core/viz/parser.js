@@ -15,8 +15,8 @@ Object.keys(functions)
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
-lowerCaseFunctions.center = functions.CENTER;
-lowerCaseFunctions.bottom = functions.BOTTOM;
+lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
+lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
 lowerCaseFunctions.pi = functions.PI;
 lowerCaseFunctions.e = functions.E;
 

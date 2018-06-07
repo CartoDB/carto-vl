@@ -373,7 +373,7 @@ export const FALSE = new Constant(0);
 export const PI = new Constant(Math.PI);
 export const E = new Constant(Math.E);
 
-export const CENTER = new Placement(constant(0), constant(0));
-export const BOTTOM = new Placement(constant(0), constant(-1));
+export const ALIGN_CENTER = new Placement(constant(0), constant(0));
+export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));
 
 export { palettes, Asc, Desc };

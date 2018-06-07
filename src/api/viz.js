@@ -16,7 +16,7 @@ const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
 const DEFAULT_SYMBOL_EXPRESSION = () => { const expr = s.FALSE; expr._default = true; return expr; };
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => s.BOTTOM;
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => s.ALIGN_BOTTOM;
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;

@@ -8,7 +8,7 @@ const viz = new carto.Viz(`
 width: 50
 color: ramp(linear($numeric), prism)
 symbol: sprite('../../../../../common/marker.svg')
-symbolPlacement: bottom
+symbolPlacement: align_bottom
 `);
 const layer = new carto.Layer('layer', source, viz);
 

@@ -51,7 +51,7 @@ void main(void) {
     gl_PointSize = size * devicePixelRatio;
 
     vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);
-    p.xy -= ($symbolPlacement_inline)*gl_PointSize/resolution;
+    p.xy += ($symbolPlacement_inline)*gl_PointSize/resolution;
     if (size==0. || color.a==0. || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
