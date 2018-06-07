@@ -19,15 +19,15 @@ export function validateTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
-        
+
         validateConstructorTimeTypeError(expressionName, simpleArgs);
 
-        if (equalArgs(simpleArgs, propertyArgs)){
+        if (equalArgs(simpleArgs, propertyArgs)) {
             return;
         }
-        if (argTypes.every(isArgConstructorTimeTyped)) {           
+        if (argTypes.every(isArgConstructorTimeTyped)) {
             validateConstructorTimeTypeError(expressionName, propertyArgs);
-        }else{
+        } else {
             validateCompileTimeTypeError(expressionName, propertyArgs);
         }
     });
@@ -123,6 +123,8 @@ function getSimpleArg(type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'sprites':
+            return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
         default:
             return [type, `${type}`];
     }
@@ -146,6 +148,8 @@ function getPropertyArg(type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'sprites':
+            return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
         default:
             return [type, `${type}`];
     }

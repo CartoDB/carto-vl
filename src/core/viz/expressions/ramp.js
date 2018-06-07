@@ -62,6 +62,9 @@ export default class Ramp extends BaseExpression {
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
         checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array', 'sprites'], palette);
+        if (palette.type == 'sprites') {
+            checkLooseType('ramp', 'input', 0, 'category', input);
+        }
 
         super({ input: input });
         this.minKey = 0;
@@ -110,6 +113,9 @@ export default class Ramp extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
+        if (this.palette.type == 'sprites') {
+            checkType('ramp', 'input', 0, 'category', this.input);
+        }
         this._texCategories = null;
         this._GLtexCategories = null;
     }
