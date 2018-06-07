@@ -30,11 +30,13 @@ export default class Sprites extends Base {
     }
     _preDraw(program, drawMetadata, gl) {
         this.init = true;
+
         for (let i = 0; i < this.numSprites; i++) {
             const sprite = this[`sprite${i}`];
-            this.init = this.init && sprite.ready;
+            this.init = this.init && sprite.canvas;
         }
-        if (this.init && !this.ready) {
+
+        if (this.init && !this.texture) {
             const textureAtlasSize = 4096;
             const spriteSize = 256;
 
@@ -54,19 +56,21 @@ export default class Sprites extends Base {
             for (let i = 0; i < this.numSprites; i++) {
                 const sprite = this[`sprite${i}`];
                 // get image, push image to texture atlas
-                const canvas = sprite.image;
-                gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+                gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, sprite.canvas);
                 offsetX += spriteSize;
+
                 if (offsetX + spriteSize > textureAtlasSize) {
                     offsetX = 0;
                     offsetY += spriteSize;
                 }
+
+                sprite.canvas = null;
             }
 
             gl.generateMipmap(gl.TEXTURE_2D);
-            this.ready = true;
         }
-        if (this.ready) {
+
+        if (this.texture) {
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
