@@ -1,7 +1,7 @@
 import Base from './base';
 
 export default class Sprites extends Base {
-    constructor(...sprites) {
+    constructor(sprites) {
         const children = {};
         sprites.forEach((sprite, i) => children[`sprite${i}`] = sprite);
         super(children);

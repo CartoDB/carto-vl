@@ -34,7 +34,7 @@
     const viz = new carto.Viz(`
     width: sqrt($pop_max) * 0.03
     color: ramp(linear($pop_max, 0, 10000000), prism)
-    symbol: ramp(buckets($pop_max, [1000000]), sprites(sprite('./marker.svg'), sprite('./marker2.svg')))
+    symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('./marker.svg'), sprite('./marker2.svg')]))
     symbolPlacement: align_bottom
     `);
 
