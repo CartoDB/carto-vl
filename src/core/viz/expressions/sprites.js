@@ -1,7 +1,10 @@
 import Base from './base';
+import { checkArray, checkLooseType } from './utils';
 
 export default class Sprites extends Base {
     constructor(sprites) {
+        checkArray('sprites', 'sprites', 0, sprites);
+        sprites.forEach((sprite, i) => checkLooseType('sprites', `sprites[${i}]`, 0, 'sprite', sprite));
         const children = {};
         sprites.forEach((sprite, i) => children[`sprite${i}`] = sprite);
         super(children);

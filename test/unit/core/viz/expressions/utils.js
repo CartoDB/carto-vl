@@ -125,6 +125,8 @@ function getSimpleArg(type) {
             return [s.palettes.PRISM, 'PRISM'];
         case 'sprites':
             return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
+        case 'sprite-array':
+            return [[s.sprite('wadus.svg')], '[sprite(\'wadus\')]'];
         default:
             return [type, `${type}`];
     }
@@ -150,6 +152,8 @@ function getPropertyArg(type) {
             return [s.palettes.PRISM, 'PRISM'];
         case 'sprites':
             return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
+        case 'sprite-array':
+            return [[s.sprite('wadus.svg')], '[sprite(\'wadus\')]'];
         default:
             return [type, `${type}`];
     }

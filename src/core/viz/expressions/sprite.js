@@ -5,7 +5,7 @@ export default class Sprite extends Base {
     constructor(url) {
         checkString('sprite', 'url', 0, url);
         super({});
-        this.type = 'color';
+        this.type = 'sprite';
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {
