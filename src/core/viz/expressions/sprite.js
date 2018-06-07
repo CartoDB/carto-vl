@@ -6,10 +6,7 @@ export default class Sprite extends Base {
         this.type = 'color';
         this.canvas = null;
         this._url = url;
-    }
-
-    loadSprites() {
-        return new Promise((resolve, reject) => {
+        this._promise = new Promise((resolve, reject) => {
             this.image = new Image();
             this.image.onload = () => {
                 this.canvas = getCanvasFromImage(this.image);
@@ -21,6 +18,11 @@ export default class Sprite extends Base {
         });
     }
 
+    loadSprites() {
+        this.count = this.count + 1 || 1;
+        return this._promise;
+    }
+
     _compile(meta) {
         super._compile(meta);
     }
@@ -30,7 +32,7 @@ export default class Sprite extends Base {
             gl.deleteTexture(this.texture);
         }
     }
-    
+
     _applyToShaderSource() {
         return {
             preface: this._prefaceCode(`
