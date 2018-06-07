@@ -2,20 +2,29 @@ import BaseExpression from './base';
 import { checkLooseType, checkType, implicitCast } from './utils';
 
 /**
- * Placement.
+ * Placement. Define a sprite offset relative to its size. Where:
+ * -`placement(1,1)` means to align the bottom left corner of the sprite with the point center.
+ * -`placement(0,0)` means to align the center of the sprite with the point center.
+ * -`placement(-1,-1)` means to align the top right corner of the sprite with the point center.
  *
- * @param {number} x - first numeric expression
- * @param {number} y - second numeric expression
- * @return {carto.expressions.Base} Numeric expression
+ *           |1
+ *           |
+ *           |
+ * -1 -------+------- 1
+ *           |
+ *           |
+ *         -1|
  *
- * @example <caption>Creating a number expression.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   width: s.number(15);  // Equivalent to `width: 15`
- * });
+ * @param {number} x - first numeric expression that indicates the sprite offset in the X direction.
+ * @param {number} y - second numeric expression that indicates the sprite offset in the Y direction.
+ * @return {Placement} Numeric expression
+ *
+ * @example <caption>Setting the aligment to the top corner of the sprite.</caption>
+ *   symbol: sprite('./marker.svg')
+ *   symbolPlacement: placement(1, 0)
  *
  * @memberof carto.expressions
- * @name vec2
+ * @name placement
  * @function
  * @api
  */
