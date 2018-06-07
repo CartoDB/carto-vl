@@ -24,7 +24,9 @@ export default class Sprite extends Base {
         super._compile(meta);
     }
     _free(gl) {
-        gl.deleteTexture(this.texture);
+        if (this.texture) {
+            gl.deleteTexture(this.texture);
+        }
     }
     _applyToShaderSource() {
         return {
