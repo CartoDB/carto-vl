@@ -14,12 +14,7 @@ export default class Sprites extends Base {
         uniform sampler2D atlas${this._uid};
 
         vec4 atlas${this._uid}Fn(vec2 spriteUV, float cat){
-            /*if (true){
-                return vec4(1,0,0,0.1);
-            }else{
-                return vec4(0,1,1,1);
-            }*/
-            return texture2D(atlas${this._uid}, spriteUV/16.  + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
+            return texture2D(atlas${this._uid}, spriteUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
         }
         `),
             inline: `atlas${this._uid}Fn`
@@ -30,7 +25,6 @@ export default class Sprites extends Base {
     }
     _preDraw(program, drawMetadata, gl) {
         this.init = true;
-
         for (let i = 0; i < this.numSprites; i++) {
             const sprite = this[`sprite${i}`];
             this.init = this.init && sprite.canvas;
@@ -40,7 +34,6 @@ export default class Sprites extends Base {
             const textureAtlasSize = 4096;
             const spriteSize = 256;
 
-            this.init = true;
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
             this.texture = gl.createTexture();
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
