@@ -6,7 +6,7 @@ export default class Sprite extends Base {
         this.type = 'color';
         this._url = url;
     }
-    
+
     loadSprites() {
         return new Promise((resolve, reject) => {
             this.image = new Image();
@@ -19,7 +19,7 @@ export default class Sprite extends Base {
             this.image.src = this._url;
         });
     }
-    
+
     _compile(meta) {
         super._compile(meta);
     }
@@ -52,6 +52,7 @@ export default class Sprite extends Base {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.generateMipmap(gl.TEXTURE_2D);
+            this.image = null;
         }
         if (this.ready) {
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
