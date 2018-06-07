@@ -27,13 +27,7 @@ describe('src/core/viz/expressions/ramp', () => {
         });
 
         it('should work with color palettes', () => {
-            // const r = ramp(buckets(0, [10]), [31, 57]);
-            // r._compile();
-            // expect(r.eval()).toEqual(31);
-            //
-            // const r2 = ramp(buckets(11, [10]), [31, 57]);
-            // r2._compile();
-            // expect(r2.eval()).toEqual(57);
+            // TODO
         });
     });
 });
