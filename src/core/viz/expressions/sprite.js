@@ -1,7 +1,9 @@
 import Base from './base';
+import { checkString } from './utils';
 
 export default class Sprite extends Base {
     constructor(url) {
+        checkString('sprite', 'url', 0, url);
         super({});
         this.type = 'color';
         this.canvas = null;
