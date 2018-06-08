@@ -499,10 +499,7 @@ export default class Windshaft {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
-                let d = Date.parse(f.properties[name]);
-                if (Number.isNaN(d)) {
-                    d = Number.POSITIVE_INFINITY;
-                }
+                const d = Date.parse(f.properties[name]);
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
