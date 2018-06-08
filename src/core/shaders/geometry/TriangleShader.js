@@ -3,9 +3,7 @@ import { VS, FS } from './triangle-glsl';
 
 export default class TriangleShader {
     constructor(gl) {
-        const { program, programID } = compileProgram(gl, VS, FS);
-        this.program = program;
-        this.programID = programID;
+        Object.assign(this,  compileProgram(gl, VS, FS));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.normalAttr = gl.getAttribLocation(this.program, 'normal');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');

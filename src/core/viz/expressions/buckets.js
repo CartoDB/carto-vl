@@ -1,8 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex } from './utils';
 
-let bucketUID = 0;
-
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
@@ -94,7 +92,6 @@ export default class Buckets extends BaseExpression {
         };
         list.elems.map((item, index) => children[`arg${index}`] = item);
         super(children);
-        this.bucketUID = bucketUID++;
         this.numCategories = list.elems.length + 1;
         this.list = list;
         this.type = 'category';
@@ -132,7 +129,7 @@ export default class Buckets extends BaseExpression {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
-        const funcName = `buckets${this.bucketUID}`;
+        const funcName = `buckets${this._uid}`;
         const cmp = this.input.type == 'category' ? '==' : '<';
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){

@@ -20,6 +20,6 @@ node scripts/cdn/invalidate.js
 
 echo "Uploading to npm..."
 
-# npm publish
+npm publish
 
 echo "All done."

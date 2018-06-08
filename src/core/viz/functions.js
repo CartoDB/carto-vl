@@ -227,6 +227,9 @@ import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercenti
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
+import Sprite from './expressions/sprite';
+import Placement from './expressions/placement';
+import Sprites from './expressions/sprites';
 
 
 /* Expose classes as constructor functions */
@@ -275,6 +278,7 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
+export const sprite = (...args) => new Sprite(...args);
 
 export const hex = (...args) => new Hex(...args);
 
@@ -340,6 +344,7 @@ export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
+export const sprites = (...args) => new Sprites(...args);
 
 export const variable = (...args) => new Variable(...args);
 export { variable as var };
@@ -361,10 +366,14 @@ export const globalPercentile = (...args) => new GlobalPercentile(...args);
 export const xyz = (...args) => new XYZ(...args);
 
 export const zoom = (...args) => new Zoom(...args);
+export const placement = (...args) => new Placement(...args);
 
 export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 export const PI = new Constant(Math.PI);
 export const E = new Constant(Math.E);
+
+export const ALIGN_CENTER = new Placement(constant(0), constant(0));
+export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));
 
 export { palettes, Asc, Desc };

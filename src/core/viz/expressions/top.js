@@ -1,7 +1,9 @@
 import BaseExpression from './base';
+import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance } from './utils';
+import Property from './basic/property';
 
 /**
- * Get the top `n` properties.
+ * Get the top `n` properties, aggregating the rest into an "others" bucket category.
  *
  * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned
@@ -25,9 +27,12 @@ import BaseExpression from './base';
  */
 export default class Top extends BaseExpression {
     constructor(property, buckets) {
-        // TODO 'cat'
+        buckets = implicitCast(buckets);
+        checkInstance('top', 'property', 0, Property, property);
+        checkLooseType('top', 'buckets', 1, 'number', buckets);
+        checkFeatureIndependent('top', 'buckets', 1, buckets);
         super({ property, buckets });
-        // TODO improve type check
+        this.type = 'category';
     }
     eval(feature) {
         const p = this.property.eval(feature);
@@ -42,11 +47,10 @@ export default class Top extends BaseExpression {
         return ret;
     }
     _compile(metadata) {
+        checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         super._compile(metadata);
-        if (this.property.type != 'category') {
-            throw new Error(`top() first argument must be of type category, but it is of type '${this.property.type}'`);
-        }
-        this.type = 'category';
+        checkType('top', 'property', 0, 'category', this.property);
+        checkType('top', 'buckets', 1, 'number', this.buckets);
         this.othersBucket = true;
         this._meta = metadata;
         this._textureBuckets = null;
@@ -68,6 +72,8 @@ export default class Top extends BaseExpression {
         this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
+        this.property._preDraw(program, drawMetadata);
+        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         let buckets = Math.round(this.buckets.eval());
         if (buckets > this.property.numCategories) {
             buckets = this.property.numCategories;
@@ -92,8 +98,6 @@ export default class Top extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
-        this.property._preDraw(program, drawMetadata);
-        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
         drawMetadata.freeTexUnit++;

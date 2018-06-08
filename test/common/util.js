@@ -43,7 +43,7 @@ function takeReference(file, template, asyncLoad) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
         let options = loadOptions();
-        options.url = `file://${getHTML(file)}`;
+        options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
         options.output = `${getPNG(file)}`;
         if (asyncLoad) options.waitForFn = () => window.loaded;
         return exquisite.getReference(options);
@@ -53,7 +53,7 @@ function takeReference(file, template, asyncLoad) {
 function testSST(file, template, asyncLoad) {
     writeTemplate(file, template);
     let options = loadOptions();
-    options.url = `file://${getHTML(file)}`;
+    options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
@@ -64,9 +64,9 @@ function testSST(file, template, asyncLoad) {
 function writeTemplate(file, template) {
     const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(getHTML(file), template({
-        file: file,
+        file: `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.js`,
         sources: sources,
-        cartovl: path.join(mainDir, 'dist', 'carto-vl.js'),
+        cartovl: 'http://localhost:5000/dist/carto-vl.js',
         mapboxgl: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
         mapboxglcss: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
