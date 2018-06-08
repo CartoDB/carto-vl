@@ -194,7 +194,16 @@ export class Torque extends BaseExpression {
         checkFeatureIndependent('torque', 'duration', 1, this.duration);
 
 
-        this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+        this.preface = `
+        float torque(float _input, float cycle, float duration, float fadeIn, float fadeOut){
+            float x = 0.;
+            if (_input <= 0.0 || 0.0 <= _input){
+                x = 1.- clamp(abs(_input-cycle)*duration/(_input>cycle? fadeIn: fadeOut), 0.,1.);
+            }
+            return x;
+        }
+        `;
+        this.inlineMaker = inline =>
+            `torque(${inline._input}, ${inline._cycle}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }
