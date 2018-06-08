@@ -195,6 +195,8 @@ export class Torque extends BaseExpression {
 
 
         this.preface = `
+        #ifndef TORQUE
+        #define TORQUE
         float torque(float _input, float cycle, float duration, float fadeIn, float fadeOut){
             float x = 0.;
             if (_input <= 0.0 || 0.0 <= _input){
@@ -202,6 +204,7 @@ export class Torque extends BaseExpression {
             }
             return x;
         }
+        #endif
         `;
         this.inlineMaker = inline =>
             `torque(${inline._input}, ${inline._cycle}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
