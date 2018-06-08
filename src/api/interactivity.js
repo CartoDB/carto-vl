@@ -32,7 +32,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature is now under the cursor.
+ * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature (as reported by featureHover or featureLeave) is now under the cursor.
  * The list of features that are now behind the cursor and that weren't before is provided.
  *
  * @event featureEnter
@@ -50,7 +50,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature is no longer behind the cursor.
+ * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature (as reported by featureHover or featureEnter) is no longer behind the cursor.
  * The list of features that are no longer behind the cursor and that were before is provided.
  *
  * @event featureLeave
