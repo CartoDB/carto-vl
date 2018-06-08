@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
 import { ramp, buckets } from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/ramp', () => {
@@ -6,6 +6,7 @@ describe('src/core/viz/expressions/ramp', () => {
         validateStaticTypeErrors('ramp', []);
         validateStaticTypeErrors('ramp', ['number']);
         validateStaticTypeErrors('ramp', ['category']);
+        validateDynamicTypeErrors('ramp', ['number', 'sprites']);
     });
 
     describe('type', () => {
@@ -13,6 +14,7 @@ describe('src/core/viz/expressions/ramp', () => {
         validateStaticType('ramp', ['category', 'palette'], 'color');
         validateStaticType('ramp', ['category', 'color-array'], 'color');
         validateStaticType('ramp', ['category', 'number-array'], 'number');
+        validateStaticType('ramp', ['category', 'sprites'], 'color');
     });
 
     describe('eval', () => {
@@ -27,13 +29,7 @@ describe('src/core/viz/expressions/ramp', () => {
         });
 
         it('should work with color palettes', () => {
-            // const r = ramp(buckets(0, [10]), [31, 57]);
-            // r._compile();
-            // expect(r.eval()).toEqual(31);
-            //
-            // const r2 = ramp(buckets(11, [10]), [31, 57]);
-            // r2._compile();
-            // expect(r2.eval()).toEqual(57);
+            // TODO
         });
     });
 });
