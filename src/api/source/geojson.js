@@ -13,6 +13,12 @@ export default class GeoJSON extends Base {
      * Create a carto.source.GeoJSON.
      *
      * @param {object} data - A GeoJSON data object
+     * @param {object} options - Options
+     *
+     * Valid options:
+     * * `dateColumns` list of columns that contain dates.
+     *   Dates can be encoded either in text form or as
+     *   numbers (UNIX epoch in milliseconds, like Date.prototype.getTime())
      *
      * @example
      * const source = new carto.source.GeoJSON({
@@ -33,7 +39,7 @@ export default class GeoJSON extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(data) {
+    constructor(data, options = {}) {
         super();
         this._checkData(data);
 
@@ -42,6 +48,8 @@ export default class GeoJSON extends Base {
         this._numCategories = 0;
         this._numFields = new Set();
         this._catFields = new Set();
+        this._dateFields = new Set();
+        this._providedDateColumns = new Set(options.dateColumns);
         this._columns = [];
         this._categoryIDs = {};
         this._boundColumns = new Set();
@@ -92,7 +100,7 @@ export default class GeoJSON extends Base {
     }
 
     _clone() {
-        return new GeoJSON(this._data);
+        return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
     _checkData(data) {
@@ -119,9 +127,7 @@ export default class GeoJSON extends Base {
                     continue;
                 }
                 const value = properties[name];
-                Number.isFinite(value) ?
-                    this._addNumericPropertyToMetadata(name, value) :
-                    this._addCategoryPropertyToMetadata(name, value);
+                this._addPropertyToMetadata(name, value);
             }
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
@@ -160,7 +166,7 @@ export default class GeoJSON extends Base {
     }
 
     _addNumericPropertyToMetadata(propertyName, value) {
-        if (this._catFields.has(propertyName)) {
+        if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName, this._columns);
@@ -184,10 +190,50 @@ export default class GeoJSON extends Base {
                 count: 0
             });
         }
+        this
+    }
+
+    _addDatePropertyToMetadata(propertyName, value) {
+        if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
+            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+        }
+        this._addDateColumnField(propertyName, this._columns);
+        const column = this._columns.find(c => c.name == propertyName);
+        const dateValue = util.time(value);
+        column.min = column.min ? util.time(Math.min(column.min, dateValue)) : dateValue;
+        column.max = column.max ? util.time(Math.max(column.max, dateValue)) : dateValue;
+        column.sum += value;
+        column.count++;
+    }
+
+    _addDateColumnField(propertyName) {
+        if (!this._dateFields.has(propertyName)) {
+            this._dateFields.add(propertyName);
+            this._columns.push({
+                name: propertyName,
+                type: 'date',
+                min: null,
+                max: null,
+                avg: null,
+                sum: 0,
+                count: 0
+            });
+        }
+        this
+    }
+
+    _addPropertyToMetadata(propertyName, value) {
+        if (this._providedDateColumns.has(propertyName)) {
+            this._addDatePropertyToMetadata(propertyName, value);
+        } else if (Number.isFinite(value)) {
+            this._addNumericPropertyToMetadata(propertyName, value);
+        } else {
+            this._addCategoryPropertyToMetadata(propertyName, value);
+        }
     }
 
     _addCategoryPropertyToMetadata(propertyName, value) {
-        if (this._numFields.has(propertyName)) {
+        if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._catFields.has(propertyName)) {
@@ -204,7 +250,7 @@ export default class GeoJSON extends Base {
 
     _decodeUnboundProperties() {
         const properties = {};
-        [...this._numFields].concat([...this._catFields]).map(name => {
+        [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]).map(name => {
             if (this._boundColumns.has(name)) {
                 return;
             }
@@ -214,6 +260,7 @@ export default class GeoJSON extends Base {
 
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
+        const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
         for (var i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
@@ -227,7 +274,15 @@ export default class GeoJSON extends Base {
                 }
                 properties[name][i] = Number(f.properties[name]);
             });
-            // TODO support date / timestamp properties
+            dateFields.forEach(name => {
+                const column = this._columns.find(c => c.name == name);
+                // dates in Dataframes are mapped to [0,1] to maximize precision
+                const d= util.time(f.properties[name]).getTime();
+                const min = column.min;
+                const max = column.max;
+                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
+                properties[name][i] = n;
+            });
         }
         return properties;
     }

@@ -1,4 +1,5 @@
 import BaseExpression from './base';
+import { time } from '../../../api/util';
 
 /**
  * Time contant expression
@@ -24,19 +25,10 @@ import BaseExpression from './base';
  */
 export default class Time extends BaseExpression {
     constructor(date) {
-        if (!(date instanceof Date)) {
-            if (typeof(date) === 'number') {
-                const epoch = date;
-                date = new Date(0);
-                date.setUTCSeconds(epoch);
-            } else {
-                date = new Date(date);
-            }
-        }
         super({});
         // TODO improve type check
         this.type = 'time';
-        this.date = date;
+        this.date = time(date);
         this.inlineMaker = () => undefined;
     }
     get value() {

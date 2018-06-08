@@ -32,6 +32,19 @@ function isObject(value) {
     return value != null && (type == 'object' || type == 'function');
 }
 
+function time(date) {
+    if (!(date instanceof Date)) {
+        if (typeof(date) === 'number') {
+            const epoch = date;
+            date = new Date(0);
+            date.setUTCSeconds(epoch/1000);
+        } else {
+            date = new Date(date);
+        }
+    }
+    return date;
+}
+
 export {
     WM_R,
     WM_2R,
@@ -39,5 +52,6 @@ export {
     isUndefined,
     isString,
     isNumber,
-    isObject
+    isObject,
+    time
 };

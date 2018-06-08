@@ -33,7 +33,7 @@ const metadataExample = {
 */
 
 export default class Metadata {
-    constructor(categoryIDs, columns, featureCount, sample, geomType, isAggregated = false, dates_as_numbers = undefined) {
+    constructor(categoryIDs, columns, featureCount, sample, geomType, isAggregated = false) {
         this.categoryIDsToName = {};
         Object.keys(categoryIDs).forEach(name=>{
             this.categoryIDsToName[categoryIDs[name]] = name;
@@ -45,6 +45,5 @@ export default class Metadata {
         this.sample = sample;
         this.geomType = geomType;
         this.isAggregated = isAggregated;
-        this.dates_as_numbers = dates_as_numbers;
     }
 }

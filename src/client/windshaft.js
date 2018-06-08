@@ -496,14 +496,14 @@ export default class Windshaft {
                 properties[index + catFields.length][i] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
-                const d = f.properties[name];
+                const d = f.properties[name] * 1000;
                 if (Number.isNaN(new Date().setTime(d))) {
                     throw new Error(`invalid MVT date ${d}`);
                 }
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
-                const n = (1000*d - min.getTime()) / (max.getTime() - min.getTime());
+                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
 
                 properties[index + catFields.length + numFields.length][i] = n;
             });
@@ -531,12 +531,14 @@ export default class Windshaft {
             else if (dates_as_numbers && dates_as_numbers.includes(column.name)) {
                 column.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
-                    column[fn] = new Time(column[fn]).value
+                    if (column[fn]) {
+                        column[fn] = new Time(column[fn]*1000).value
+                    }
                 });
             }
         });
 
-        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt, dates_as_numbers);
+        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
 }
 
