@@ -297,7 +297,11 @@ export default class Layer {
     }
 
     _fire(eventType, eventData) {
-        return this._emitter.emit(eventType, eventData);
+        try {
+            return this._emitter.emit(eventType, eventData);
+        } catch(err) {
+            console.error(err);
+        }
     }
 
     /**
