@@ -4,9 +4,7 @@ import { VS, FS } from './line-glsl';
 
 export default class LineShader {
     constructor(gl) {
-        const { program, programID } = compileProgram(gl, VS, FS);
-        this.program = program;
-        this.programID = programID;
+        Object.assign(this,  compileProgram(gl, VS, FS));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.normalAttr = gl.getAttribLocation(this.program, 'normal');

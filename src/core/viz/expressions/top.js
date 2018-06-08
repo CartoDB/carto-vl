@@ -72,6 +72,8 @@ export default class Top extends BaseExpression {
         this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
+        this.property._preDraw(program, drawMetadata);
+        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         let buckets = Math.round(this.buckets.eval());
         if (buckets > this.property.numCategories) {
             buckets = this.property.numCategories;
@@ -96,8 +98,6 @@ export default class Top extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
-        this.property._preDraw(program, drawMetadata);
-        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
         drawMetadata.freeTexUnit++;
