@@ -193,10 +193,8 @@ export default class Dataframe {
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureIndex]) {
-                featureIndex++;
-            }
+        let scale;
+        let computeScale = ()=>{
             const f = {};
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
@@ -204,7 +202,14 @@ export default class Dataframe {
             // Line with is saturated at 336px
             const lineWidth = Math.min(vizWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = lineWidth / 2 * widthScale;
+            scale = lineWidth / 2 * widthScale;
+        };
+        computeScale();
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+                computeScale();
+            }
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
@@ -243,10 +248,8 @@ export default class Dataframe {
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureIndex]) {
-                featureIndex++;
-            }
+        let scale;
+        let computeScale = ()=>{
             const f = {};
             columnNames.forEach(name => {
                 f[name] = this.properties[name][featureIndex];
@@ -254,7 +257,14 @@ export default class Dataframe {
             // Line with is saturated at 336px
             const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = lineWidth / 2 * widthScale;
+            scale = lineWidth / 2 * widthScale;
+        };
+        computeScale();
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i >= breakpoints[featureIndex]) {
+                featureIndex++;
+                computeScale();
+            }
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
