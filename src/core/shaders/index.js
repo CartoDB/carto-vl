@@ -9,16 +9,14 @@ import LineShader from './geometry/LineShader';
 import PointShader from './geometry/PointShader';
 import TriangleShader from './geometry/TriangleShader';
 
-import ColorShader from './style/ColorShader';
-import WidthShader from './style/WidthShader';
-import FilterShader from './style/FilterShader';
-
 let programID = 0;
 
-export const styleColorGLSL = {VS: stylerGLSL.VS,
+export const styleColorGLSL = {
+    VS: stylerGLSL.VS,
     FS: stylerGLSL.FS.replace('$style_inline', '$color_inline').replace('$style_preface', '$color_preface')
 };
-export const styleWidthGLSL = {VS: stylerGLSL.VS,
+export const styleWidthGLSL = {
+    VS: stylerGLSL.VS,
     FS: stylerGLSL.FS.replace('$style_inline', 'vec4(encodeWidth($width_inline))').replace('$style_preface',
         `   // From pixels in [0.,255.] to [0.,1.] in exponential-like form
         float encodeWidth(float x){
@@ -35,7 +33,8 @@ export const styleWidthGLSL = {VS: stylerGLSL.VS,
         $width_preface
         ` )
 };
-export const styleFilterGLSL = {VS: stylerGLSL.VS,
+export const styleFilterGLSL = {
+    VS: stylerGLSL.VS,
     FS: stylerGLSL.FS.replace('$style_inline', 'vec4($filter_inline)').replace('$style_preface', '$filter_preface')
 };
 
@@ -106,10 +105,4 @@ export function createShader(gl, glslTemplate, codes) {
     return shader;
 }
 
-const styler = {
-    createColorShader: (gl, preface, inline) => new ColorShader(gl, preface, inline),
-    createWidthShader: (gl, preface, inline) => new WidthShader(gl, preface, inline),
-    createFilterShader: (gl, preface, inline) => new FilterShader(gl, preface, inline)
-};
-
-export { renderer, AABlender, styler };
+export { renderer, AABlender };
