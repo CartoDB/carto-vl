@@ -3,9 +3,9 @@ import { checkLooseType, checkType, implicitCast } from './utils';
 
 /**
  * Placement. Define a sprite offset relative to its size. Where:
- * -`placement(1,1)` means to align the bottom left corner of the sprite with the point center.
- * -`placement(0,0)` means to align the center of the sprite with the point center.
- * -`placement(-1,-1)` means to align the top right corner of the sprite with the point center.
+ * - `symbolPlacement: placement(1,1)` means to align the bottom left corner of the sprite with the point center.
+ * - `symbolPlacement: placement(0,0)` means to align the center of the sprite with the point center.
+ * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the sprite with the point center.
  *
  *           |1
  *           |
@@ -14,6 +14,10 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  *           |
  *           |
  *         -1|
+ *
+ * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
+ * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
+ * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
  *
  * @param {number} x - first numeric expression that indicates the sprite offset in the X direction.
  * @param {number} y - second numeric expression that indicates the sprite offset in the Y direction.
@@ -28,6 +32,8 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * @function
  * @api
  */
+
+
 export default class Placement extends BaseExpression {
     constructor(x, y) {
         x = implicitCast(x);
