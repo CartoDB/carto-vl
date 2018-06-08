@@ -1,4 +1,4 @@
-import { createShader } from '../shaders';
+import {createShaderFromTemplate} from '../shaders';
 
 class IDGenerator {
     constructor() {
@@ -33,7 +33,7 @@ export function compileShader(gl, template, expressions) {
     });
     codes.propertyPreface = Object.keys(tid).map(name => `uniform sampler2D propertyTex${tid[name]};`).join('\n');
 
-    const shader = createShader(gl, template, codes);
+    const shader = createShaderFromTemplate(gl, template, codes);
     Object.keys(tid).map(name => {
         tid[name] = gl.getUniformLocation(shader.program, `propertyTex${tid[name]}`);
     });
