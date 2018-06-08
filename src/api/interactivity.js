@@ -101,6 +101,7 @@ export default class Interactivity {
         }
         preCheckLayerList(layerList);
         this._init(layerList);
+        this._numListeners = {};
     }
 
     /**
@@ -114,6 +115,7 @@ export default class Interactivity {
      */
     on(eventName, callback) {
         checkEvent(eventName);
+        this._numListeners[eventName] = (this._numListeners[eventName] || 0) + 1;
         return this._emitter.on(eventName, callback);
     }
 
@@ -128,6 +130,7 @@ export default class Interactivity {
      */
     off(eventName, callback) {
         checkEvent(eventName);
+        this._numListeners[eventName] = this._numListeners[eventName] - 1;
         return this._emitter.off(eventName, callback);
     }
 
@@ -148,6 +151,10 @@ export default class Interactivity {
     }
 
     _onMouseMove(event) {
+        if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
+            return;
+        }
+
         const featureEvent = this._createFeatureEvent(event);
         const currentFeatures = featureEvent.features;
 
@@ -178,6 +185,10 @@ export default class Interactivity {
     }
 
     _onClick(event) {
+        if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
+            return;
+        }
+
         const featureEvent = this._createFeatureEvent(event);
         const currentFeatures = featureEvent.features;
 
