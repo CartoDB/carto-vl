@@ -1,8 +1,10 @@
-import ShaderCache from './Cache';
+import Cache from './Cache';
 
 import * as stylerGLSL from './styler';
 
-const shaderCache = new ShaderCache();
+const shaderCache = new Cache();
+const programCache = new Cache();
+
 import AntiAliasingShader from './common/AntiAliasingShader';
 
 import LineShader from './geometry/LineShader';
@@ -63,6 +65,10 @@ const renderer = {
 };
 
 function compileProgram(gl, glslVS, glslFS) {
+    const code = glslVS + glslFS;
+    if (programCache.has(gl, code)) {
+        return programCache.get(gl, code);
+    }
     const shader = {};
     const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
     const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
@@ -76,6 +82,7 @@ function compileProgram(gl, glslVS, glslFS) {
         throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
     }
     shader.programID = programID++;
+    programCache.set(gl, code, shader);
     return shader;
 }
 
