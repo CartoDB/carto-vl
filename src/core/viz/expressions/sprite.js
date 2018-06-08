@@ -1,6 +1,27 @@
 import Base from './base';
 import { checkString } from './utils';
 
+/**
+ * Sprite. Load an image and use it as a symbol.
+ *
+ * @param {string} url - Image path
+ *
+ * @example <caption>Load a svg image.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.sprite('./marker.svg')
+ * });
+ *
+ * @example <caption>Load a svg image. (String)</caption>
+ * const viz = new carto.Viz(`
+ *    symbol: sprite('./marker.svg')
+ * `);
+ * @memberof carto.expressions
+ * @name sprite
+ * @function
+ * @api
+*/
+
 export default class Sprite extends Base {
     constructor(url) {
         checkString('sprite', 'url', 0, url);
