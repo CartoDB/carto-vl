@@ -4,6 +4,8 @@ import { checkString } from './utils';
 /**
  * Sprite. Load an image and use it as a symbol.
  *
+ * Note: images have to be square
+ *
  * @param {string} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
