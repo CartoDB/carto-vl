@@ -1,5 +1,5 @@
 
-# Animations
+# Animations in depth
 
 CARTO VL provides a number of tools which can be used to create animated maps; that is, maps that change dynamically, for example showing the variation over time of some data attribute.
 
@@ -15,19 +15,42 @@ torque(input, duration, fade(fadeIn, fadeOut))
 
 ### Input value parameter
 
-The first parameter of `torque`, the input value, is a numeric or date property expression or a generic numeric expression (in which case the [0,1] range of the expression will be used, this is very useful since you can use `linear`).
-A special and common case is to use a property for this argument, in which case it will be automatically mapped to the minimum and maximum values of the property. Thus, `torque($time)` would be equivalent to
+The first parameter of `torque`, the input,is a numeric or date property expression or a generic numeric expression, which determines a range of values
+that will be ciclycally iterated: those between the minimum and maximum values
+of the expression. Note that for properties the rage is determined by the
+values present in the dataset. You can specify a custom range by using a `linear` expression to define the minimum and maximum values. If the input is not a property or linear expresion the range will be [0, 1].
+
+Thus, `torque($time)` would be equivalent to
 `torque(linear($time, globalMin($time), globalMax($time)))`
 
-The `linear(value, min, max)` function applies a linear map to a value, in a way that the `min` value is mapped to 0 and the `max` value is mapped to 1. This allows to easily adjust the range of values of any expression to the [0,1] range. Values outside the [0,1] range won't appear on the animation. This means that if we have data for an entire year and we want to animate between February and June we can use: `torque(linear($month, 2, 6))`. Similarly, if we have a timestamp property `$date` in our data we could select a specific period using `time` expressions: `torque(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))`
+Torque will generate internally all the values in the range in succession. We'll call simulation time to those values. At any given intant, the current simulation time will be match against the value of the expression, and the torque expression will take the value `1` in the case of a match, or a `0` in any other case. If torque is applied to the `filter` property this cause the features to be shown only when the input value is match by the simulation time cycle.
+
+#### TODO: diagram
+```
+CLOCK: simTime = 3 =>                   CLOCK: simTime = 4 =>
+         * t = 1 -- is invisible                 * t = 1 -- is invisible
+              * t = 3 -- is visible                   * t = 3 -- is invisible
+
+           * t = 2 -- is invisible                 * t = 2 -- is invisible
+        * t = 4 -- is invisible                 * t = 4 -- is visible
+```
+
+The `linear(value, min, max)` function used for the input of torque
+is very useful when value is not a simple property, or when its global limits
+don't coincide with the range of interest. The animation will be limited to
+the `min` and `max` values of `linear`, and any values outside this range
+won't be shown at any time.
+
+For example, if we have data for an entire year with and we want to animate between February and June we can use: `torque(linear($month, 2, 6))`. Similarly, if we have a timestamp property `$date` in our data we could select a specific period using `time` expressions: `torque(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))`
 
 ### duration parameter
 
-Defines the duration of an animation cycle in seconds, during which all possible input values are matched in succession. When an input value is matched by the animation cycle torque returns a 1 value for the feature. A 0 value means the absence of a match. The transition between 0 and 1 will be smooth by the fade parameter.
+Defines the duration of an animation cycle in seconds, during which all possible values in the input range are matched in succession. When an input value is matched by the animation cycle torque returns a 1 value for the feature. A 0 value means the absence of a match. The transition between 0 and 1 will be smooth by the fade parameter.
 
 ### fade parameter
 
-This allows defining two additional durations (in seconds) by means of the `fade` function. During the *fade-in* phase the matching result will transition from 0 to 1, and during the *fade-out* phase it will transition back to 0 again. This way, changes in features selected by torque, or in general in any style property controlled by it, can occur gradually.
+This allows defining two additional durations (in seconds) by means of the `fade` function. During the *fade-in* phase the matching result will transition from 0 to 1, and during the *fade-out* phase it will transition back to 0 again. This way, changes in features selected by torque, or in general in any style property controlled by it, can occur gradually. So, in general `torque` doesn't match a unique value at a given time, but a range of values. And the result of `torque` may not only be 0 or 1, but any other value in between.
+
 
 ## Operation
 
@@ -38,6 +61,33 @@ The values generated by torque can be interpreted as a *simulation time* when th
 The convention in CARTO VL is for 0 to represent the boolean `false` value, i.e. the notion of absence or *off* state, while 1 represents `true` (presence or *on* state). Filters or opacity act like this. But sometimes the values between 0 and 1 can also be used to represent in-between states. Filters and opacity support this interpretation by making use of partial visibility of the features (by grading their opacity/transparency). This can be a powerful animation tool.
 
 The way for torque to generate intermediate values between 0 and 1 is by means of the fade parameter. This defines a range of values around the *current* one (i.e. a period of simulated time) for which the torque result varies between 0 and 1. The fade-in and fade-out parameters of the `fade` function are defined as a *real* time length, just like the `duration` parameter. So they can be interpreted as the fraction of the duration in which the matching transitions from 0 to 1 and back to 0 again.
+
+## Advanced use
+
+We usually aplly torque to a filter, but since the result of a torque expression is a number between 0 and 1 it can be used in other expressions for many different effects.
+
+We could use the torque expression to the opacity of a feature's color, obtaning a similar result than when applying a filter (but affecting only the stroke or the fill, for example).
+
+```
+color: opacity(red, torque($time))
+```
+
+We could use it in an expression to compute the width of the features, thus making the width vary periodically. Just remember that the result of torque will be a value between 0 and 1.
+
+```
+width: 10 + 5*torque($time)
+```
+
+Finally, we can use torque with an input that doesn't vary from feature to featur, for example a constant value. Then we'll have a variation affecting all the features at the same time. For example, we would get a pulsing effect by changing the size of points like this:
+
+```
+width: 10 + 5*torque(0.5, 2, fade(1, 1));
+```
+
+In this example the pulsing period is 2 seconds: torque will take the value 1 when its internal simulation time has the value 0.5 (at the middle of the cycle),
+and this value will fade out to 0 in 1 second, then fade in again during the next second.
+
+##### TODO: gif with example
 
 ## Usage
 
@@ -52,64 +102,112 @@ So, at any given moment with have a torque simulation time, and the feature matc
 
 Here's the code for our animation demonstration:
 
-```javascript
-  const animStart = '2018-04-11T12:00:00Z';
-  const animEnd = '2018-04-12T12:00:00Z';
-  const animDuration = 10;
-  const lineLength = 600000;
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="https://cartodb.github.io/carto-vl/dist/carto-vl.js"></script>
+  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background', type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
 
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-    center: [0, 0],
-    zoom: 6,
-    dragRotate: false
-  });
+    const animStart = '2018-04-11T12:00:00Z';
+    const animEnd = '2018-04-12T12:00:00Z';
 
-  carto.setDefaultAuth({
-    user: 'cartogl',
-    apiKey: 'default_public'
-  });
+    const source = new carto.source.GeoJSON(generateData(), { dateColumns: ['sim_time'] });
+    function generateData() {
+      const features = [];
+      const length = 200;
+      const n = 50;
+      const x0 = 0;
+      const y0 = 0;
+      let id = 1;
+      const min_st = new Date(animStart);
+      const max_st = new Date(animEnd);
+      for (let step = 1; step <= n; ++step) {
+          features.push({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [step/n*length + x0 - length/2, y0]
+            },
+            properties: {
+              cartodb_id: id++,
+              sim_time: (min_st.getTime() + (max_st - min_st)*step/n)
+            }
+          });
+      }
+      return { type: 'FeatureCollection', features };
+    }
 
-  const source = new carto.source.SQL(`
-    WITH params AS (
-      SELECT
-      -- simulation time limits:
-      '${animStart}'::timestamp with time zone AS min_st,
-      '${animEnd}'::timestamp with time zone AS max_st,
-      0.0 AS x0, 0.0 AS y0,     -- center at the equator
-      600000 AS length,         -- line length: 600 km
-      100 AS n                  -- 100 points
-    ),
-    positions AS (
-      SELECT
-        step::float8/n AS s,
-        x0 + (step::float8/n)*length AS x, y0 AS y
-      FROM params, generate_series(1, n) AS step
-    )
-    SELECT
-      row_number() over () AS cartodb_id,
-      min_st + (max_st - min_st)*s AS sim_time,
-      ST_SetSRID(ST_MakePoint(x, y),3857) AS the_geom_webmercator,
-      ST_Transform(ST_SetSRID(ST_MakePoint(x, y),3857), 4326) AS the_geom
-      FROM params, positions
-  `);
-  const s = carto.expressions;
-  let torque = s.torque(s.prop('sim_time'), 5, s.fade(0.5, 1));
-  setInterval(() => document.getElementById("timer").textContent = torque.getSimTime(), 100);
-  let viz = new carto.Viz({
-      strokeWidth: 1,
-      color: s.hsv(torque, 1, 1),
-      width:  s.add(1,s.mul(torque,30)),
-      order: s.desc(s.width())
-
-  });
-  const layer = new carto.Layer('layer', source, viz);
-  layer.addTo(map, 'watername_ocean');
+    const s = carto.expressions;
+    const duration = 8;
+    const torque = s.torque(
+      s.prop('sim_time'),
+      duration,
+      s.fade(duration/10, duration/5)
+    );
+    setInterval(
+      () => {
+        const time = torque.getSimTime().toISOString();
+        document.getElementById("timer").textContent = time;
+      },
+      100
+    );
+    const viz = new carto.Viz({
+        strokeWidth: 1,
+        color: s.hsv(torque, 1, 1),
+        width: s.add(1,s.mul(torque,30)),
+        order: s.desc(s.width())
+    });
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+  </script>
+</body>
+</html>
 ```
 
 And the result:
 
-
-![animation demonstration](toque_red_stroke_4.gif "Simple animation")
+![animation demonstration](animation.gif "Simple animation")
 
