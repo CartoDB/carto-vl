@@ -143,6 +143,9 @@ export class Torque extends BaseExpression {
     }
     eval(feature) {
         const input = this.input.eval(feature);
+        if (Number.isNaN(input)){
+            return 0;
+        }
         const cycle = this._cycle.eval(feature);
         const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
@@ -199,6 +202,7 @@ export class Torque extends BaseExpression {
         #define TORQUE
         float torque(float _input, float cycle, float duration, float fadeIn, float fadeOut){
             float x = 0.;
+            // Check for NaN
             if (_input <= 0.0 || 0.0 <= _input){
                 x = 1.- clamp(abs(_input-cycle)*duration/(_input>cycle? fadeIn: fadeOut), 0.,1.);
             }
