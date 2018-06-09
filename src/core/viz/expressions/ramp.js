@@ -70,15 +70,13 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        if (palette.type == 'number-array') {
-            this.type = 'number';
-        } else {
-            this.type = 'color';
-        }
         try {
             if (palette.type == 'number-array') {
+                this.type = 'number';
                 this.palette.floats = this.palette.eval();
-            } else if (palette.type == 'color-array') {
+            }
+            else if (palette.type == 'color-array') {
+                this.type = 'color';
                 this.palette.colors = this.palette.eval();
             }
         } catch (error) {
