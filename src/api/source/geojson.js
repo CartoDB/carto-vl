@@ -14,11 +14,7 @@ export default class GeoJSON extends Base {
      *
      * @param {object} data - A GeoJSON data object
      * @param {object} options - Options
-     *
-     * Valid options:
-     * * `dateColumns` list of columns that contain dates.
-     *   Dates can be encoded either in text form or as
-     *   numbers (UNIX epoch in milliseconds, like Date.prototype.getTime())
+     * @param {array<string>} options.dateColumns - List of columns that contain dates. 
      *
      * @example
      * const source = new carto.source.GeoJSON({
