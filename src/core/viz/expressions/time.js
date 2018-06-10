@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { time } from '../../../api/util';
+import * as util from '../../../api/util';
 
 /**
  * Time contant expression
@@ -28,7 +28,7 @@ export default class Time extends BaseExpression {
         super({});
         // TODO improve type check
         this.type = 'time';
-        this.date = time(date);
+        this.date = util.castDate(date);
         this.inlineMaker = () => undefined;
     }
     get value() {

@@ -194,9 +194,9 @@ export default class GeoJSON extends Base {
         }
         this._addDateColumnField(propertyName, this._columns);
         const column = this._columns.find(c => c.name == propertyName);
-        const dateValue = util.time(value);
-        column.min = column.min ? util.time(Math.min(column.min, dateValue)) : dateValue;
-        column.max = column.max ? util.time(Math.max(column.max, dateValue)) : dateValue;
+        const dateValue = util.castDate(value);
+        column.min = column.min ? util.castDate(Math.min(column.min, dateValue)) : dateValue;
+        column.max = column.max ? util.castDate(Math.max(column.max, dateValue)) : dateValue;
         column.sum += value;
         column.count++;
     }
@@ -218,12 +218,12 @@ export default class GeoJSON extends Base {
 
     _addPropertyToMetadata(propertyName, value) {
         if (this._providedDateColumns.has(propertyName)) {
-            this._addDatePropertyToMetadata(propertyName, value);
-        } else if (Number.isFinite(value)) {
-            this._addNumericPropertyToMetadata(propertyName, value);
-        } else {
-            this._addCategoryPropertyToMetadata(propertyName, value);
+            return this._addDatePropertyToMetadata(propertyName, value);
         }
+        if (Number.isFinite(value)) {
+            return this._addNumericPropertyToMetadata(propertyName, value);
+        }
+        this._addCategoryPropertyToMetadata(propertyName, value);
     }
 
     _addCategoryPropertyToMetadata(propertyName, value) {
@@ -271,7 +271,7 @@ export default class GeoJSON extends Base {
             dateFields.forEach(name => {
                 const column = this._columns.find(c => c.name == name);
                 // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d= util.time(f.properties[name]).getTime();
+                const d = util.castDate(f.properties[name]).getTime();
                 const min = column.min;
                 const max = column.max;
                 const n = (d - min.getTime()) / (max.getTime() - min.getTime());

@@ -31,18 +31,22 @@ function isObject(value) {
     const type = typeof value;
     return value != null && (type == 'object' || type == 'function');
 }
-
-function time(date) {
-    if (!(date instanceof Date)) {
-        if (typeof(date) === 'number') {
-            const epoch = date;
-            date = new Date(0);
-            date.setUTCSeconds(epoch/1000);
-        } else {
-            date = new Date(date);
-        }
+/**
+ * Transform the given parameter into a Date object.
+ * When a number is given as a parameter is asummed to be a milliseconds epoch.
+ * @param {Date|number|string} date 
+ */
+function castDate(date) {
+    if (date instanceof Date) {
+        return date;
     }
-    return date;
+    if (typeof (date) === 'number') {
+        const msEpoch = date;
+        date = new Date(0);
+        date.setUTCMilliseconds(msEpoch);
+        return date;
+    }
+    return new Date(date);
 }
 
 export {
@@ -53,5 +57,5 @@ export {
     isString,
     isNumber,
     isObject,
-    time
+    castDate
 };
