@@ -7,10 +7,9 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
-import Time from '../core/viz/expressions/time'
+import Time from '../core/viz/expressions/time';
 
 import featureDecoder from './mvt/feature-decoder';
-import { date } from '../core/viz/functions';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -532,7 +531,7 @@ export default class Windshaft {
                 column.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
                     if (column[fn]) {
-                        column[fn] = new Time(column[fn]*1000).value
+                        column[fn] = new Time(column[fn]*1000).value;
                     }
                 });
             }
