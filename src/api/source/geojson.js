@@ -186,7 +186,6 @@ export default class GeoJSON extends Base {
                 count: 0
             });
         }
-        this
     }
 
     _addDatePropertyToMetadata(propertyName, value) {
@@ -215,7 +214,6 @@ export default class GeoJSON extends Base {
                 count: 0
             });
         }
-        this
     }
 
     _addPropertyToMetadata(propertyName, value) {
