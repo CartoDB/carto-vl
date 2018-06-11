@@ -68,6 +68,7 @@ export class Fade extends BaseExpression {
  * @param {Number} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
+ * If `input` is NULL or NaN the filter won't be passed at any moment of the animation.
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
@@ -133,9 +134,14 @@ export class Torque extends BaseExpression {
         checkLooseType('torque', 'duration', 1, 'number', duration);
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
+<<<<<<< HEAD
         
         const _cycle = _getCycleFunction(duration);
         
+=======
+
+        const _cycle = div(mod(now(), duration), duration);
+>>>>>>> master
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
@@ -145,11 +151,19 @@ export class Torque extends BaseExpression {
 
     eval(feature) {
         const input = this.input.eval(feature);
+<<<<<<< HEAD
+=======
+        if (Number.isNaN(input)){
+            return 0;
+        }
+        const cycle = this._cycle.eval(feature);
+>>>>>>> master
         const duration = this.duration.value;
         const cycle = this._cycle.eval(feature);
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        const output = 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        return output;
     }
     /**
      * Get the current time stamp of the simulation
@@ -197,9 +211,23 @@ export class Torque extends BaseExpression {
         checkFeatureIndependent('torque', 'duration', 1, this.duration);
 
         this._cycle = _getCycleFunction(this.duration.value);
-        
-        this.inlineMaker = (inline) =>
-            `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
+
+        this.preface = `
+            #ifndef TORQUE
+            #define TORQUE
+            float torque(float _input, float cycle, float duration, float fadeIn, float fadeOut){
+                float x = 0.;
+                // Check for NaN
+                if (_input <= 0.0 || 0.0 <= _input){
+                    x = 1.- clamp(abs(_input-cycle)*duration/(_input>cycle? fadeIn: fadeOut), 0.,1.);
+                }
+                return x;
+            }
+            #endif
+        `;
+
+        this.inlineMaker = inline =>
+            `torque(${inline._input}, ${inline._cycle}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }
 
