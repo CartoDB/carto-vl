@@ -15,7 +15,9 @@ export default class RenderLayer {
             this._checkDataframeType(dataframe);
         }
         this.type = dataframe.type;
-        dataframe.bind(this.renderer);
+        if (this.renderer) {
+            dataframe.bind(this.renderer);
+        }
         this.dataframes.push(dataframe);
     }
 

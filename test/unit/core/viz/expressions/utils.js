@@ -15,19 +15,42 @@ const metadata = {
     ],
 };
 
+// Validate feature independence checks at constructor and compile times, mark the dependent argument with 'dependent' in argTypes
+export function validateFeatureDependentErrors(expressionName, argTypes) {
+    {
+        const args = argTypes.map(type => type == 'dependent' ? 'number-property' : type).map(getPropertyArg);
+        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time a feature dependent error`, () => {
+            expect(() =>
+                s[expressionName](...args.map(arg => arg[0]))
+            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+        });
+    }
+    {
+        const v = s.variable('var1');
+        const args = argTypes.map(type => type == 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
+        it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
+            const expr = s[expressionName](...args.map(arg => arg[0]));
+            v.alias = s.property('wadus');
+            expect(() =>
+                expr._compile({ columns: [{ name: 'wadus', type: 'number' }] })
+            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+        });
+    }
+}
+
 export function validateTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
-        
+
         validateConstructorTimeTypeError(expressionName, simpleArgs);
 
-        if (equalArgs(simpleArgs, propertyArgs)){
+        if (equalArgs(simpleArgs, propertyArgs)) {
             return;
         }
-        if (argTypes.every(isArgConstructorTimeTyped)) {           
+        if (argTypes.every(isArgConstructorTimeTyped)) {
             validateConstructorTimeTypeError(expressionName, propertyArgs);
-        }else{
+        } else {
             validateCompileTimeTypeError(expressionName, propertyArgs);
         }
     });
@@ -123,6 +146,10 @@ function getSimpleArg(type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'sprites':
+            return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
+        case 'sprite-array':
+            return [[s.sprite('wadus.svg')], '[sprite(\'wadus\')]'];
         default:
             return [type, `${type}`];
     }
@@ -146,6 +173,10 @@ function getPropertyArg(type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'sprites':
+            return [s.sprites([s.sprite('wadus.svg')]), 'sprites([sprite(\'wadus\')])'];
+        case 'sprite-array':
+            return [[s.sprite('wadus.svg')], '[sprite(\'wadus\')]'];
         default:
             return [type, `${type}`];
     }

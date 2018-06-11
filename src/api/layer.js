@@ -78,6 +78,9 @@ export default class Layer {
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
+        this._integratorPromise = new Promise((resolve) => {
+            this._integratorCallback = resolve;
+        });
 
         this.metadata = null;
         this._renderLayer = new RenderLayer();
@@ -139,7 +142,11 @@ export default class Layer {
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
+        await this._integratorPromise;
+        await loadSpritesPromise;
+
         await this._context;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
@@ -156,6 +163,10 @@ export default class Layer {
         this.requestData();
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
+        await this._context;
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
 
         if (this._viz) {
             this._viz.onChange(null);
@@ -230,6 +241,7 @@ export default class Layer {
     initCallback() {
         this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
+        this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
         this.requestMetadata();
     }
 
@@ -238,7 +250,6 @@ export default class Layer {
         if (!viz) {
             return;
         }
-        await this._context;
         return this._source.requestMetadata(viz);
     }
 
@@ -286,15 +297,19 @@ export default class Layer {
                 this._isUpdated = false;
                 this._fire('updated');
             }
-        }
-        if (!this._isLoaded && this.state == 'dataLoaded') {
-            this._isLoaded = true;
-            this._fire('loaded');
+            if (!this._isLoaded && this.state == 'dataLoaded') {
+                this._isLoaded = true;
+                this._fire('loaded');
+            }
         }
     }
 
     _fire(eventType, eventData) {
-        return this._emitter.emit(eventType, eventData);
+        try {
+            return this._emitter.emit(eventType, eventData);
+        } catch(err) {
+            console.error(err);
+        }
     }
 
     /**
@@ -343,6 +358,7 @@ export default class Layer {
     _addToCartoMap(map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -358,6 +374,7 @@ export default class Layer {
     _onMapLoaded(map, beforeLayerID) {
         this._integrator = getMGLIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _compileShaders(viz, metadata) {
@@ -370,7 +387,10 @@ export default class Layer {
             throw new Error('A source is required before changing the viz');
         }
         const source = this._source;
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
+        await loadSpritesPromise;
+
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
@@ -417,7 +437,6 @@ export default class Layer {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
         }
-        throw new Error('?');
     }
 
     _freeSource() {
