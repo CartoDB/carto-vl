@@ -228,14 +228,14 @@ describe('Interactivity', () => {
                     const featureEnterSpy = jasmine.createSpy('featureEnterSpy');
                     onLoaded(() => {
                         interactivity.on('featureEnter', featureEnterSpy);
-                        interactivity.on('featureHover', () => {
-                            expect(featureEnterSpy).toHaveBeenCalledTimes(1);
-                            done();
-                        });
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
                         // Move mouse inside the same feature 1
                         util.simulateMove({ lng: 5, lat: 15 });
+                        setTimeout(() => {
+                            expect(featureEnterSpy).toHaveBeenCalledTimes(1);
+                            done();
+                        }, 0);
                     });
                 });
             });
