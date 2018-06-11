@@ -134,17 +134,19 @@ export class Torque extends BaseExpression {
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
         
-        const _cycle = div(mod(now(), duration), duration);
+        const _cycle = _getCycleFunction(duration);
+        
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
         this.type = 'number';
         this._originalInput = originalInput;
     }
+
     eval(feature) {
         const input = this.input.eval(feature);
-        const cycle = this._cycle.eval(feature);
         const duration = this.duration.value;
+        const cycle = this._cycle.eval(feature);
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
         return 1 - clamp(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
@@ -168,7 +170,6 @@ export class Torque extends BaseExpression {
             return min + c * (max - min);
         }
 
-
         const tmin = min.getTime();
         const tmax = max.getTime();
         const m = c;
@@ -179,12 +180,15 @@ export class Torque extends BaseExpression {
         return date;
 
     }
+
     get input() {
         return this._input instanceof Variable ? this._input.alias : this._input;
     }
+    
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
+
         checkType('torque', 'input', 0, ['number', 'date'], this._originalInput);
         checkType('torque', 'duration', 1, 'number', this.duration);
         super._compile(meta);
@@ -192,8 +196,13 @@ export class Torque extends BaseExpression {
         checkType('torque', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('torque', 'duration', 1, this.duration);
 
-
+        this._cycle = _getCycleFunction(this.duration.value);
+        
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }
+}
+
+function _getCycleFunction (duration) {
+    return div(mod(now(), duration), duration);
 }
