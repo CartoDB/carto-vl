@@ -155,7 +155,7 @@ type of their parameters.</p>
     <p>Color palettes.</p>
 <p>Palettes are constants that allow to use <a href="https://carto.com/carto-colors/">CARTOColors</a> and <a href="https://github.com/axismaps/colorbrewer/">ColorBrewer</a> palettes easily.
 Use them with a <a href="carto.expressions.html#.ramp">ramp</a></p>
-<p>The following palettes are availiable in the namespace <a href="carto.expressions.html#.palettes">carto.expressions.palettes</a>.</p>
+<p>The following palettes are available in the namespace <a href="carto.expressions.html#.palettes">carto.expressions.palettes</a>.</p>
 <pre class="prettyprint source"><code> BURG, BURGYL, REDOR, ORYEL, PEACH, PINKYL, MINT, BLUGRN, DARKMINT, EMRLD, AG_GRNYL, BLUYL, TEAL, TEALGRN,
  PURP, PURPOR, SUNSET, MAGENTA, SUNSETDARK, AG_SUNSET, BRWNYL, ARMYROSE, FALL, GEYSER, TEMPS, TEALROSE, TROPIC,
  EARTH, ANTIQUE, BOLD, PASTEL, PRISM, SAFE, VIVID, CB_YLGN, CB_YLGNBU, CB_GNBU, CB_BUGN, CB_PUBUGN, CB_PUBU,
@@ -9564,6 +9564,205 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".placement"><span class="type-signature">(static) </span>placement<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {Placement}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Placement. Define a sprite offset relative to its size. Where:</p>
+<ul>
+<li><code>symbolPlacement: placement(1,1)</code> means to align the bottom left corner of the sprite with the point center.</li>
+<li><code>symbolPlacement: placement(0,0)</code> means to align the center of the sprite with the point center.</li>
+<li><p><code>symbolPlacement: placement(-1,-1)</code> means to align the top right corner of the sprite with the point center.</p>
+<pre class="prettyprint source"><code>    |1
+    |
+    |</code></pre><p>-1 -------+------- 1</p>
+<pre class="prettyprint source"><code>    |
+    |
+  -1|</code></pre></li>
+</ul>
+<p>You can also use <code>align_center</code> and <code>align_bottom</code> to set the simbol placement as follows:</p>
+<ul>
+<li><code>symbolPlacement: align_bottom</code> is equivalent to <code>symbolPlacement: placement(0, 1)</code></li>
+<li><code>symbolPlacement: align_center</code> is equivalent to <code>symbolPlacement: placement(0, 0)</code></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>first numeric expression that indicates the sprite offset in the X direction.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>second numeric expression that indicates the sprite offset in the Y direction.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Numeric expression</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Placement</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Setting the aligment to the top corner of the sprite.</p>
+    
+    <pre class="prettyprint"><code>  symbol: sprite('./marker.svg')
+  symbolPlacement: placement(1, 0)</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".pow"><span class="type-signature">(static) </span>pow<span class="signature">(base, exponent)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -11282,6 +11481,299 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".sprite"><span class="type-signature">(static) </span>sprite<span class="signature">(url)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Sprite. Load an image and use it as a symbol.</p>
+<p>Note: images have to be square</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Image path</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Load a svg image.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.sprite('./marker.svg')
+});</code></pre>
+
+        <p class="code-caption">Load a svg image. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   symbol: sprite('./marker.svg')
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".sprites"><span class="type-signature">(static) </span>sprites<span class="signature">(sprites)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Sprites. Load an array of images and use them as a symbols.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sprites</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Sprite></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Array of sprites</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Match different sprites to the different categories generated by buckets.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.ramp(s.buckets(s.prop('pop_max'), [10]), s.sprites([s.sprite('./marker.svg'), s.sprite('./marker2.svg')]))
+});</code></pre>
+
+        <p class="code-caption">Match different sprites to the different categories generated by buckets. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   symbol: ramp(buckets($pop_max, [10]), sprites([sprite('./marker.svg'), sprite('./marker2.svg')]))
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".sqrt"><span class="type-signature">(static) </span>sqrt<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -11985,7 +12477,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Get the top <code>n</code> properties.</p>
+    <p>Get the top <code>n</code> properties, aggregating the rest into an &quot;others&quot; bucket category.</p>
 </div>
 
 
@@ -12226,7 +12718,8 @@ const viz = new carto.Viz({
 
             <td class="description last"><p>input to base the temporal filter,
 if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
-this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.</p>
+this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
+If <code>input</code> is NULL or NaN the filter won't be passed at any moment of the animation.</p>
 <p>It can be combined with linear and time expressions.</p></td>
         </tr>
 
@@ -14151,7 +14644,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 28 2018 18:36:17 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jun 11 2018 16:13:40 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
