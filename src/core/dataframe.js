@@ -174,7 +174,7 @@ export default class Dataframe {
             const scale = diameter / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._getUserFeature(featureIndex));
             }
         }
         return features;
@@ -230,7 +230,7 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._getUserFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -251,7 +251,7 @@ export default class Dataframe {
         return isFiltered;
     }
 
-    _addFeatureToArray(featureIndex, features) {
+    _getUserFeature(featureIndex) {
         let id = '';
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
@@ -266,7 +266,7 @@ export default class Dataframe {
                 properties[propertyName] = prop;
             }
         });
-        features.push({ id, properties });
+        return { id, properties };
     }
 
     _addProperty(propertyName, propertiesFloat32Array) {
