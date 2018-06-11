@@ -433,7 +433,7 @@ export default class Windshaft {
                 numFields.map((name, i) => fieldMap[name] = i + catFields.length);
                 dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
 
-                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
+                const { points, featureGeometries, properties, nFeatures } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
                 var rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
@@ -441,7 +441,7 @@ export default class Windshaft {
                     dataframeProperties[name] = properties[pid];
                 });
                 let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, nFeatures, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
             });
@@ -477,12 +477,21 @@ export default class Windshaft {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
+        let nFeatures = 0;
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
             if (metadata.geomType == geometryTypes.POINT) {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                // Tiles may contain points in the border;
+                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
+                if (x < -1 || x >= 1 || y < -1 || y >= 1) {
+                    continue;
+                }
+                points[2 * nFeatures + 0] = x;
+                points[2 * nFeatures + 1] = y;
+
             } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
@@ -493,10 +502,10 @@ export default class Windshaft {
             }
 
             catFields.map((name, index) => {
-                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
+                properties[index][nFeatures] = this._getCategoryIDFromString(f.properties[name]);
             });
             numFields.map((name, index) => {
-                properties[index + catFields.length][i] = Number(f.properties[name]);
+                properties[index + catFields.length][nFeatures] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
                 const d = Date.parse(f.properties[name]);
@@ -504,11 +513,12 @@ export default class Windshaft {
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
                 const n = (d - min) / (max.getTime() - min.getTime());
-                properties[index + catFields.length + numFields.length][i] = n;
+                properties[index + catFields.length + numFields.length][nFeatures] = n;
             });
+            nFeatures += 1;
         }
 
-        return { properties, points, featureGeometries };
+        return { properties, points, featureGeometries, nFeatures };
     }
 
     _adaptMetadata(meta) {
