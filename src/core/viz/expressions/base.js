@@ -31,17 +31,28 @@ export default class Base {
         this._shaderBindings = new Map();
     }
 
+    loadSprites() {
+        return Promise.all(this._getChildren().map(child => child.loadSprites()));
+    }
+
     _bind(metadata) {
         this._compile(metadata);
         return this;
     }
 
-    _setUID(idGenerator){
+    _setUID(idGenerator) {
         this._uid = idGenerator.getID(this);
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
+    isFeatureDependent(){
+        return this._getChildren().some(child => child.isFeatureDependent());
+    }
+
     _prefaceCode(glslCode) {
+        if (!glslCode) {
+            return '';
+        }
         return `
         #ifndef DEF_${this._uid}
         #define DEF_${this._uid}

@@ -14,7 +14,8 @@ module.exports = function (config) {
             'index.test.js': ['webpack', 'sourcemap'],
         },
         webpack: {
-            devtool: 'inline-source-map'
+            devtool: 'inline-source-map',
+            mode: 'development'
         },
         customLaunchers: {
             // Add no-sandbox flag due a bug. https://github.com/karma-runner/karma-chrome-launcher/issues/158

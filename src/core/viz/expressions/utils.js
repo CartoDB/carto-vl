@@ -104,14 +104,32 @@ export function throwInvalidString(expressionName, parameterName, parameterIndex
     '${str}' is not a string`);
 }
 
-// Try to check the type, but accept undefined types without throwing
+// Try to check the type, but accept undefined types without throwing, unless the expected type had to be known at constructor time
+// This condition happens with types like color or fade, see isArgConstructorTimeTyped for details
+//
 // This is useful to make constructor-time checks, at constructor-time some types can be already known and errors can be throw.
 // Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
-// they must be loose
+// they must be loose, the unknown of variables aliases types makes, also, a point to reduce the strictness of the check
 export function checkLooseType(expressionName, parameterName, parameterIndex, expectedType, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
-    if (parameter.type !== undefined) {
+    const constructorTimeTyped = Array.isArray(expectedType) ? expectedType.every(isArgConstructorTimeTyped) : isArgConstructorTimeTyped(expectedType);
+    if (parameter.type !== undefined || constructorTimeTyped) {
         checkType(expressionName, parameterName, parameterIndex, expectedType, parameter);
+    }
+}
+
+// Returns true if the argument is of a type that cannot be strictly checked at constructor time
+export function isArgConstructorTimeTyped(arg) {
+    switch (arg) {
+        case 'number':
+        case 'number-array':
+        case 'number-property':
+        case 'category':
+        case 'category-array':
+        case 'category-property':
+            return false;
+        default:
+            return true;
     }
 }
 
@@ -159,6 +177,13 @@ export function checkString(expressionName, parameterName, parameterIndex, str) 
 export function checkArray(expressionName, parameterName, parameterIndex, array) {
     if (!Array.isArray(array)) {
         throwInvalidArray(expressionName, parameterName, parameterIndex, array);
+    }
+}
+
+export function checkFeatureIndependent(expressionName, parameterName, parameterIndex, parameter) {
+    if (parameter.isFeatureDependent()) {
+        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        parameter cannot be feature dependent`);
     }
 }
 

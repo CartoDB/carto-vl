@@ -6,9 +6,19 @@ import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
+import { version } from '../../package';
+
+import featureDecoder from './mvt/feature-decoder';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
+
+const geometryTypes = {
+    UNKNOWN: 'unknown',
+    POINT: 'point',
+    LINE: 'line',
+    POLYGON: 'polygon'
+};
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -343,7 +353,7 @@ export default class Windshaft {
         };
         if (!overrideMetadata) {
             const excludedColumns = ['the_geom', 'the_geom_webmercator'];
-            const includedColumns =  columns.filter(name => !excludedColumns.includes(name));
+            const includedColumns = columns.filter(name => !excludedColumns.includes(name));
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
@@ -355,6 +365,9 @@ export default class Windshaft {
         }
         const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
+        if (!response.ok) {
+            throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
+        }
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
@@ -427,7 +440,7 @@ export default class Windshaft {
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
                 });
-                let dataFrameGeometry = this.metadata.geomType == 'point' ? points : featureGeometries;
+                let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
                 const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
@@ -441,135 +454,6 @@ export default class Windshaft {
     _getSubdomain(x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
-    }
-
-    _decodePolygons(geom, featureGeometries, mvt_extent) {
-        let polygon = null;
-        let geometry = [];
-        /*
-            All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
-            It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
-            See:
-                https://github.com/mapbox/vector-tile-spec/tree/master/2.1
-                https://en.wikipedia.org/wiki/Shoelace_formula
-        */
-        for (let j = 0; j < geom.length; j++) {
-            //if exterior
-            //   push current polygon & set new empty
-            //else=> add index to holes
-            let hole = false;
-            if (isClockWise(geom[j])) {
-                if (polygon) {
-                    geometry.push(polygon);
-                }
-                polygon = {
-                    flat: [],
-                    holes: [],
-                    clipped: [],
-                    clippedType: [], // Store a bitmask of the clipped half-planes
-                };
-            } else {
-                if (j == 0) {
-                    throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-                }
-                hole = true;
-            }
-            let preClippedVertices = [];
-            for (let k = 0; k < geom[j].length; k++) {
-                let x = geom[j][k].x;
-                let y = geom[j][k].y;
-                x = 2 * x / mvt_extent - 1;
-                y = 2 * (1 - y / mvt_extent) - 1;
-                preClippedVertices.push([x, y]);
-            }
-            this._clipPolygon(preClippedVertices, polygon, hole);
-        }
-        //if current polygon is not empty=> push it
-        if (polygon) {
-            geometry.push(polygon);
-        }
-        featureGeometries.push(geometry);
-    }
-
-    // Add polygon composed by preClippedVertices to the `polygon.flat` array
-    _clipPolygon(preClippedVertices, polygon, isHole) {
-        // Sutherland-Hodgman Algorithm to clip polygons to the tile
-        // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
-        const clippingEdges = [
-            p => p[0] <= 1,
-            p => p[1] <= 1,
-            p => p[0] >= -1,
-            p => p[1] >= -1,
-        ];
-        const clippingEdgeIntersectFn = [
-            (a, b) => this._intersect(a, b, [1, -10], [1, 10]),
-            (a, b) => this._intersect(a, b, [-10, 1], [10, 1]),
-            (a, b) => this._intersect(a, b, [-1, -10], [-1, 10]),
-            (a, b) => this._intersect(a, b, [-10, -1], [10, -1]),
-        ];
-
-        // for each clipping edge
-        for (let i = 0; i < 4; i++) {
-            const preClippedVertices2 = [];
-
-            // for each edge on polygon
-            for (let k = 0; k < preClippedVertices.length - 1; k++) {
-                // clip polygon edge
-                const a = preClippedVertices[k];
-                const b = preClippedVertices[k + 1];
-
-                const insideA = clippingEdges[i](a);
-                const insideB = clippingEdges[i](b);
-
-                if (insideA && insideB) {
-                    // case 1: both inside, push B vertex
-                    preClippedVertices2.push(b);
-                } else if (insideA) {
-                    // case 2: just A outside, push intersection
-                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
-                    preClippedVertices2.push(intersectionPoint);
-                } else if (insideB) {
-                    // case 4: just B outside: push intersection, push B
-                    const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
-                    preClippedVertices2.push(intersectionPoint);
-                    preClippedVertices2.push(b);
-                } else {
-                    // case 3: both outside: do nothing
-                }
-            }
-            if (preClippedVertices2.length) {
-                preClippedVertices2.push(preClippedVertices2[0]);
-            }
-            preClippedVertices = preClippedVertices2;
-        }
-
-        if (preClippedVertices.length > 3) {
-            if (isHole) {
-                polygon.holes.push(polygon.flat.length / 2);
-            }
-            preClippedVertices.forEach(v => {
-                polygon.flat.push(v[0], v[1]);
-            });
-        }
-    }
-    _intersect(a, b, c, d) {
-        //If AB intersects CD => return intersection point
-        // Intersection method from Real Time Rendering, Third Edition, page 780
-        const o1 = a;
-        const o2 = c;
-        const d1 = sub(b, a);
-        const d2 = sub(d, c);
-        const d1t = perpendicular(d1);
-        const d2t = perpendicular(d2);
-
-        const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);
-        const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);
-
-        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-            // Intersects!
-            return [o1[0] + s * d1[0], o1[1] + s * d1[1]];
-        }
-        // Doesn't intersects
     }
 
     _decodeLines(geom, featureGeometries, mvt_extent) {
@@ -589,19 +473,20 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
-        if (metadata.geomType == 'point') {
+        if (metadata.geomType == geometryTypes.POINT) {
             var points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         for (var i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (metadata.geomType == 'point') {
+            if (metadata.geomType == geometryTypes.POINT) {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (metadata.geomType == 'polygon') {
-                this._decodePolygons(geom, featureGeometries, mvt_extent);
-            } else if (metadata.geomType == 'line') {
+            } else if (metadata.geomType == geometryTypes.POLYGON) {
+                const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
+                featureGeometries.push(decodedPolygons);
+            } else if (metadata.geomType == geometryTypes.LINE) {
                 this._decodeLines(geom, featureGeometries, mvt_extent);
             } else {
                 throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
@@ -615,9 +500,6 @@ export default class Windshaft {
             });
             dateFields.map((name, index) => {
                 const d = Date.parse(f.properties[name]);
-                if (Number.isNaN(d)) {
-                    throw new Error('invalid MVT date');
-                }
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
@@ -649,18 +531,6 @@ export default class Windshaft {
         });
         return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
-
-}
-
-
-function isClockWise(vertices) {
-    let a = 0;
-    for (let i = 0; i < vertices.length; i++) {
-        let j = (i + 1) % vertices.length;
-        a += vertices[i].x * vertices[j].y;
-        a -= vertices[j].x * vertices[i].y;
-    }
-    return a > 0;
 }
 
 const endpoint = (conf, path = '') => {
@@ -684,6 +554,7 @@ function authURL(url, conf) {
     if (conf.apiKey) {
         const sep = url.includes('?') ? '&' : '?';
         url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
+        url += '&client=' + encodeURIComponent('vl-' + version);
     }
     return url;
 }
@@ -744,16 +615,6 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
     else {
         return promiseGenerator(finalAssumptions);
     }
-}
-
-function sub([ax, ay], [bx, by]) {
-    return ([ax - bx, ay - by]);
-}
-function dot([ax, ay], [bx, by]) {
-    return (ax * bx + ay * by);
-}
-function perpendicular([x, y]) {
-    return [-y, x];
 }
 
 /**

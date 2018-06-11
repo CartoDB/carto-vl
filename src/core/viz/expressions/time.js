@@ -25,7 +25,13 @@ import BaseExpression from './base';
 export default class Time extends BaseExpression {
     constructor(date) {
         if (!(date instanceof Date)) {
-            date = new Date(date);
+            if (typeof(date) === 'number') {
+                const epoch = date;
+                date = new Date(0);
+                date.setUTCSeconds(epoch);
+            } else {
+                date = new Date(date);
+            }
         }
         super({});
         // TODO improve type check

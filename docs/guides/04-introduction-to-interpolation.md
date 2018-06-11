@@ -10,7 +10,7 @@ In data visualization, interpolation is traditionally used for two basic purpose
 
 Using CARTO VL, you can interpolate both color and size, while also taking advantage of these capabilities for powerful web based, multi-scale cartography.
 
-#### Interpolate Color
+### Interpolate Color
 
 We will start by creating a map where each point's area is proportionate to its attribute value (`amount`) using the square root (`sqrt`) function.
 
@@ -31,7 +31,7 @@ strokeWidth: 0
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/interpolation/step-1.html)
 
-#### Interpolate Size Through Zoom
+### Interpolate Size Through Zoom
 
 Using CartoCSS powered renderers, you can write conditional styling to change the appearance of features through zoom. However, a limitation of these renderers is that they lack smooth transitions between each zoom-based style. CARTO VL's interpolation capabilities enable us to combinie multiple styles for different zoom levels with smooth transitions.
 

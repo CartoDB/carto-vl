@@ -7,6 +7,7 @@ import { parseVizDefinition } from '../core/viz/parser';
 import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
+import { symbolizerGLSL } from '../core/shaders/symbolizer';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -14,6 +15,8 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
 const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
+const DEFAULT_SYMBOL_EXPRESSION = () => { const expr = s.FALSE; expr._default = true; return expr; };
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => s.ALIGN_BOTTOM;
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -26,6 +29,8 @@ const SUPPORTED_PROPERTIES = [
     'strokeWidth',
     'order',
     'filter',
+    'symbol',
+    'symbolPlacement',
     'resolution',
     'variables'
 ];
@@ -33,7 +38,8 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
 
     /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled, 
+    * displayed and processed.
     *
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -82,6 +88,10 @@ export default class Viz {
 
         this._resolveAliases();
         this._validateAliasDAG();
+    }
+
+    loadSprites() {
+        return Promise.all(this._getRootExpressions().map(expr => expr.loadSprites()));
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
@@ -135,6 +145,8 @@ export default class Viz {
             this.strokeWidth,
             this.order,
             this.filter,
+            this.symbol,
+            this.symbolPlacement,
             ...Object.values(this.variables)
         ];
     }
@@ -151,7 +163,9 @@ export default class Viz {
             this.width.isAnimated() ||
             this.strokeColor.isAnimated() ||
             this.strokeWidth.isAnimated() ||
-            this.filter.isAnimated();
+            this.filter.isAnimated() ||
+            this.symbol.isAnimated() ||
+            this.symbolPlacement.isAnimated();
     }
 
     onChange(callback) {
@@ -167,26 +181,8 @@ export default class Viz {
     }
 
     getMinimumNeededSchema() {
-        const exprs = [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.filter,
-        ].concat(Object.values(this.variables)).filter(x => x && x._getMinimumNeededSchema);
+        const exprs = this._getRootExpressions().filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
-    }
-
-    compileShaders(gl, metadata) {
-        this._compileColorShader(gl, metadata);
-        this._compileWidthShader(gl, metadata);
-        this._compileStrokeColorShader(gl, metadata);
-        this._compileStrokeWidthShader(gl, metadata);
-        this._compileFilterShader(gl, metadata);
-
-        Object.values(this.variables).map(v => {
-            v._bind(metadata);
-        });
     }
 
     setDefaultsIfRequired(geomType) {
@@ -242,6 +238,8 @@ export default class Viz {
             this.strokeColor,
             this.strokeWidth,
             this.filter,
+            this.symbol,
+            this.symbolPlacement
         ].concat(Object.values(this.variables)).forEach(expr =>
             expr._resolveAliases(this.variables)
         );
@@ -267,45 +265,35 @@ export default class Viz {
             ...this.strokeColor._getDependencies(),
             ...this.width._getDependencies(),
             ...this.strokeWidth._getDependencies(),
-            ...this.filter._getDependencies()];
+            ...this.filter._getDependencies(),
+            ...this.symbol._getDependencies(),
+            ...this.symbolPlacement._getDependencies()];
         while (unmarked.length) {
             visit(unmarked.pop());
         }
     }
 
-    _compileColorShader(gl, metadata) {
+    compileShaders(gl, metadata) {
         this.color._bind(metadata);
-        const r = compileShader(gl, this.color, shaders.styler.createColorShader);
-        this.propertyColorTID = r.tid;
-        this.colorShader = r.shader;
-    }
-
-    _compileWidthShader(gl, metadata) {
         this.width._bind(metadata);
-        const r = compileShader(gl, this.width, shaders.styler.createWidthShader);
-        this.propertyWidthTID = r.tid;
-        this.widthShader = r.shader;
-    }
-
-    _compileStrokeColorShader(gl, metadata) {
         this.strokeColor._bind(metadata);
-        const r = compileShader(gl, this.strokeColor, shaders.styler.createColorShader);
-        this.propertyStrokeColorTID = r.tid;
-        this.strokeColorShader = r.shader;
-    }
-
-    _compileStrokeWidthShader(gl, metadata) {
         this.strokeWidth._bind(metadata);
-        const r = compileShader(gl, this.strokeWidth, shaders.styler.createWidthShader);
-        this.propertyStrokeWidthTID = r.tid;
-        this.strokeWidthShader = r.shader;
-    }
-
-    _compileFilterShader(gl, metadata) {
+        this.symbol._bind(metadata);
         this.filter._bind(metadata);
-        const r = compileShader(gl, this.filter, shaders.styler.createFilterShader);
-        this.propertyFilterTID = r.tid;
-        this.filterShader = r.shader;
+
+        this.colorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.color });
+        this.widthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.width });
+        this.strokeColorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.strokeColor });
+        this.strokeWidthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.strokeWidth });
+        this.filterShader = compileShader(gl, shaders.styleFilterGLSL, { filter: this.filter });
+
+        this.symbolPlacement._bind(metadata);
+        if (!this.symbol._default) {
+            this.symbolShader = compileShader(gl, symbolizerGLSL, {
+                symbol: this.symbol,
+                symbolPlacement: this.symbolPlacement
+            });
+        }
     }
 
     replaceChild(toReplace, replacer) {
@@ -332,6 +320,14 @@ export default class Viz {
             replacer.notify = toReplace.notify;
         } else if (toReplace == this.filter) {
             this.filter = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this.symbol) {
+            this.symbol = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace == this.symbolPlacement) {
+            this.symbolPlacement = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -389,13 +385,19 @@ export default class Viz {
         if (util.isUndefined(vizSpec.resolution)) {
             vizSpec.resolution = DEFAULT_RESOLUTION();
         }
+        if (util.isUndefined(vizSpec.symbol)) {
+            vizSpec.symbol = DEFAULT_SYMBOL_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.symbolPlacement)) {
+            vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
+        }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
 
     _checkVizSpec(vizSpec) {
         /**
-         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
+         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
          * @property {Color} color - fill color of points and polygons and color of lines
@@ -414,6 +416,8 @@ export default class Viz {
         // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
+        vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
@@ -442,6 +446,12 @@ export default class Viz {
         }
         if (!(vizSpec.filter instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[filter]');
+        }
+        if (!(vizSpec.symbol instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[symbol]');
+        }
+        if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
         }
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {

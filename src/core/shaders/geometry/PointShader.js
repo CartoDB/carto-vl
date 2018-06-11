@@ -4,9 +4,7 @@ import { VS, FS } from './point-glsl';
 
 export default class PointShader {
     constructor(gl) {
-        const { program, programID } = compileProgram(gl, VS, FS);
-        this.program = program;
-        this.programID = programID;
+        Object.assign(this,  compileProgram(gl, VS, FS));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');

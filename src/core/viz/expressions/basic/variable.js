@@ -29,12 +29,15 @@ import { checkString } from '../utils';
  */
 export default class Variable extends BaseExpression {
     constructor(name) {
-        checkString('name', 'name', 0, name);
+        checkString('variable', 'name', 0, name);
         if (name == '') {
             throw new Error('variable(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
+    }
+    isFeatureDependent(){
+        return this.alias? this.alias.isFeatureDependent(): undefined;
     }
     get value() {
         return this.eval();

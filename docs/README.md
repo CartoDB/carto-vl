@@ -19,9 +19,9 @@ https://github.com/CartoDB/carto-vl-webpack-demo
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include CARTO Mapbox GL JS fork -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <style>
     body { margin: 0; padding: 0; }
     #map { position: absolute; height: 100%; width: 100%; }

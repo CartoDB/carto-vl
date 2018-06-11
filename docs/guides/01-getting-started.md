@@ -9,11 +9,11 @@ The easiest way to use CARTO VL is to include the required files from our CDN. T
 ```html
 <head>
   <!-- Include CARTO VL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/carto-vl/v0.3.0/carto-vl.js"></script>
+  <script src="https://libs.cartocdn.com/carto-vl/v0.4.0/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
 </head>
 ```
 
@@ -40,7 +40,7 @@ Once we have the `div`, we use the `mapboxgl` object to initialize our map using
 - **`container`** indicates where the map is going to be placed
 - **`style`** contains the information about the basemap
 - **`center`** indicates the area of the world we are going to visualize
-- **`zoom`** defines the default zoom level  
+- **`zoom`** defines the default zoom level
 - **`dragRotate`** disables the map rotation
 
 ```js
@@ -49,7 +49,7 @@ const map = new mapboxgl.Map({
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
       zoom: 2,
-      dragRotate: false  
+      dragRotate: false
     });
 ```
 
