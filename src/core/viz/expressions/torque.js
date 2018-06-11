@@ -68,6 +68,7 @@ export class Fade extends BaseExpression {
  * @param {Number} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
  * this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
+ * If `input` is NULL or NaN the filter won't be passed at any moment of the animation.
  *
  * It can be combined with linear and time expressions.
  * @param {Number} duration duration of the animation in seconds, optional, defaults to 10 seconds
