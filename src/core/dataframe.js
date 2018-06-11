@@ -189,26 +189,14 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.width;
+        let scale = this._computeScale(columnNames, featureIndex, viz.width, widthScale);
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        let scale;
-        let computeScale = ()=>{
-            const f = {};
-            columnNames.forEach(name => {
-                f[name] = this.properties[name][featureIndex];
-            });
-            // Line with is saturated at 336px
-            const lineWidth = Math.min(vizWidth.eval(f), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            scale = lineWidth / 2 * widthScale;
-        };
-        computeScale();
         for (let i = 0; i < vertices.length; i += 6) {
             if (i >= breakpoints[featureIndex]) {
                 featureIndex++;
-                computeScale();
+                scale = this._computeScale(columnNames, featureIndex, viz.strokeWidth, widthScale);
             }
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
@@ -244,26 +232,14 @@ export default class Dataframe {
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizStrokeWidth = viz.strokeWidth;
+        let scale = this._computeScale(columnNames, featureIndex, viz.strokeWidth, widthScale);
         // Linear search for all features
         // Tests triangles instead of polygons since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        let scale;
-        let computeScale = ()=>{
-            const f = {};
-            columnNames.forEach(name => {
-                f[name] = this.properties[name][featureIndex];
-            });
-            // Line with is saturated at 336px
-            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            scale = lineWidth / 2 * widthScale;
-        };
-        computeScale();
         for (let i = 0; i < vertices.length; i += 6) {
             if (i >= breakpoints[featureIndex]) {
                 featureIndex++;
-                computeScale();
+                scale = this._computeScale(columnNames, featureIndex, viz.strokeWidth, widthScale);
             }
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
@@ -286,6 +262,18 @@ export default class Dataframe {
             }
         }
         return features;
+    }
+
+    _computeScale(columnNames, featureIndex, widthExpression, widthScale) {
+        const f = {};
+        columnNames.forEach(name => {
+            f[name] = this.properties[name][featureIndex];
+        });
+        // Width is saturated at 336px
+        const width = Math.min(widthExpression.eval(f), 336);
+        // width is a diameter and scale is radius-like, we need to divide by 2
+        const scale = width / 2 * widthScale;
+        return scale;
     }
 
     _addFeatureToArray(featureIndex, features) {
