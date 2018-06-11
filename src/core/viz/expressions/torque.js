@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp, checkType, checkLooseType } from './utils';
+import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
@@ -131,8 +131,9 @@ export class Torque extends BaseExpression {
 
         checkLooseType('torque', 'input', 0, 'number', input);
         checkLooseType('torque', 'duration', 1, 'number', duration);
+        checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
-
+        
         const _cycle = div(mod(now(), duration), duration);
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
@@ -189,6 +190,9 @@ export class Torque extends BaseExpression {
         super._compile(meta);
         checkType('torque', 'input', 0, 'number', this.input);
         checkType('torque', 'fade', 2, 'fade', this.fade);
+        checkFeatureIndependent('torque', 'duration', 1, this.duration);
+
+
         this.inlineMaker = (inline) =>
             `(1.- clamp(abs(${inline._input}-${inline._cycle})*(${inline.duration})/(${inline._input}>${inline._cycle}? ${inline.fade.in}: ${inline.fade.out}), 0.,1.) )`;
     }

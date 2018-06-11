@@ -7,7 +7,7 @@ const programCache = new Cache();
 /**
  * Compile a webgl program.
  * Use a cache to improve speed.
- * 
+ *
  * @param {WebGLRenderingContext} gl - The context where the program will be executed
  * @param {string} glslVS - vertex shader code
  * @param {string} glslFS - fragment shader code
@@ -17,12 +17,21 @@ export function compileProgram(gl, glslVS, glslFS) {
     if (programCache.has(gl, code)) {
         return programCache.get(gl, code);
     }
+    const shader = {};
     const VS = compileShader(gl, glslVS, gl.VERTEX_SHADER);
     const FS = compileShader(gl, glslFS, gl.FRAGMENT_SHADER);
-
-    const program = createProgram(gl, VS, FS);
-    programCache.set(gl, code, { program: program, programID: programID++ });
-    return { program, programID };
+    shader.program = gl.createProgram();
+    gl.attachShader(shader.program, VS);
+    gl.attachShader(shader.program, FS);
+    gl.linkProgram(shader.program);
+    gl.deleteShader(VS);
+    gl.deleteShader(FS);
+    if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
+        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
+    }
+    shader.programID = programID++;
+    programCache.set(gl, code, shader);
+    return shader;
 }
 
 function compileShader(gl, sourceCode, type) {
@@ -39,17 +48,4 @@ function compileShader(gl, sourceCode, type) {
     }
     shaderCache.set(gl, sourceCode, shader);
     return shader;
-}
-
-function createProgram(gl, VS, FS) {
-    const program = gl.createProgram();
-    gl.attachShader(program, VS);
-    gl.attachShader(program, FS);
-    gl.linkProgram(program);
-    gl.deleteShader(VS);
-    gl.deleteShader(FS);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(program));
-    }
-    return program;
 }

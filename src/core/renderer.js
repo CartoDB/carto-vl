@@ -206,9 +206,9 @@ class Renderer {
         return drawMetadata;
     }
 
-    renderLayer(renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
-        const viz = renderLayer.viz;
+    renderLayer(layer) {
+        const tiles = layer.getActiveDataframes();
+        const viz = layer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
 
@@ -225,13 +225,14 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
 
-        const drawMetadata = this._computeDrawMetadata(renderLayer);
+        const drawMetadata = this._computeDrawMetadata(layer);
 
         Object.values(viz.variables).map(v => {
             v._updateDrawMetadata(drawMetadata);
         });
 
-        const styleDataframe = (tile, tileTexture, shader, vizExpr, TID) => {
+        const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
+            const TID = shader.tid;
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -256,11 +257,11 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color, viz.propertyColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width, viz.propertyWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor, viz.propertyStrokeColorTID));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth, viz.propertyStrokeWidthTID));
-        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.filter, viz.propertyFilterTID));
+        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
+        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
+        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
+        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.filter));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -268,7 +269,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (renderLayer.type != 'point') {
+        if (layer.type != 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -291,12 +292,14 @@ class Renderer {
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
-
+            let freeTexUnit = 0;
             let renderer = null;
-            if (tile.type == 'point') {
+            if (!viz.symbol._default) {
+                renderer = viz.symbolShader;
+            } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
                 renderer = this.lineRendererProgram;
@@ -340,28 +343,53 @@ class Renderer {
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
             }
 
-            gl.activeTexture(gl.TEXTURE0);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
-            gl.uniform1i(renderer.colorTexture, 0);
+            gl.uniform1i(renderer.colorTexture, freeTexUnit);
+            freeTexUnit++;
 
-            gl.activeTexture(gl.TEXTURE1);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
-            gl.uniform1i(renderer.widthTexture, 1);
+            gl.uniform1i(renderer.widthTexture, freeTexUnit);
+            freeTexUnit++;
 
 
-            gl.activeTexture(gl.TEXTURE2);
+            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
-            gl.uniform1i(renderer.filterTexture, 2);
+            gl.uniform1i(renderer.filterTexture, freeTexUnit);
+            freeTexUnit++;
 
-            if (tile.type != 'line') {
+            if (!viz.symbol._default) {
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.tid).length;
+                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbol._updateDrawMetadata(drawMetadata);
+                viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
+
+                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbolPlacement._updateDrawMetadata(drawMetadata);
+                viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
+
+                freeTexUnit = drawMetadata.freeTexUnit;
+                Object.keys(viz.symbolShader.tid).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                    gl.uniform1i(viz.symbolShader.tid[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            } else if (tile.type != 'line') {
                 // Lines don't support stroke
-                gl.activeTexture(gl.TEXTURE3);
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-                gl.uniform1i(renderer.colorStrokeTexture, 3);
+                gl.uniform1i(renderer.colorStrokeTexture, freeTexUnit);
+                freeTexUnit++;
 
-                gl.activeTexture(gl.TEXTURE4);
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
-                gl.uniform1i(renderer.strokeWidthTexture, 4);
+                gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
+                freeTexUnit++;
             }
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
@@ -376,7 +404,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type != 'point') {
+        if (layer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -395,6 +423,7 @@ class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
+
     }
 
 

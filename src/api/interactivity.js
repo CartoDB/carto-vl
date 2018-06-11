@@ -250,6 +250,6 @@ function postCheckLayerList(layerList) {
 
 function checkEvent(eventName) {
     if (!EVENTS.includes(eventName)) {
-        throw new Error(`Unrecognized event: ${eventName}. Availiable events: ${EVENTS.join(', ')}`);
+        throw new Error(`Unrecognized event: ${eventName}. Available events: ${EVENTS.join(', ')}`);
     }
 }

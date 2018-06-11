@@ -96,6 +96,7 @@ export default class Dataframe {
                     index++;
                 }
             }
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }

@@ -142,8 +142,12 @@ export default class Layer {
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
         await this._integratorPromise;
+        await loadSpritesPromise;
+
+        await this._context;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
         }
@@ -302,7 +306,11 @@ export default class Layer {
     }
 
     _fire(eventType, eventData) {
-        return this._emitter.emit(eventType, eventData);
+        try {
+            return this._emitter.emit(eventType, eventData);
+        } catch(err) {
+            console.error(err);
+        }
     }
 
     /**
@@ -380,7 +388,10 @@ export default class Layer {
             throw new Error('A source is required before changing the viz');
         }
         const source = this._source;
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
+        await loadSpritesPromise;
+
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }

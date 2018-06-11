@@ -153,7 +153,9 @@ function generateGlobalAggregattion(metadataPropertyName) {
             super({ _value: number(0) });
             this.property = implicitCast(property);
         }
-
+        isFeatureDependent(){
+            return false;
+        }
         get value() {
             return this._value.expr;
         }
@@ -224,7 +226,9 @@ export class GlobalPercentile extends BaseExpression {
         this.property = property;
         this.percentile = percentile;
     }
-
+    isFeatureDependent(){
+        return false;
+    }
     get value() {
         return this._value.expr;
     }
