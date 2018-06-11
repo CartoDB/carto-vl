@@ -134,14 +134,9 @@ export class Torque extends BaseExpression {
         checkLooseType('torque', 'duration', 1, 'number', duration);
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
-<<<<<<< HEAD
         
         const _cycle = _getCycleFunction(duration);
         
-=======
-
-        const _cycle = div(mod(now(), duration), duration);
->>>>>>> master
         super({ _input: input, _cycle, fade, duration });
         // TODO improve type check
         this.duration = duration;
@@ -151,13 +146,12 @@ export class Torque extends BaseExpression {
 
     eval(feature) {
         const input = this.input.eval(feature);
-<<<<<<< HEAD
-=======
+
         if (Number.isNaN(input)){
             return 0;
         }
+        
         const cycle = this._cycle.eval(feature);
->>>>>>> master
         const duration = this.duration.value;
         const cycle = this._cycle.eval(feature);
         const fadeIn = this.fade.fadeIn.eval(feature);
