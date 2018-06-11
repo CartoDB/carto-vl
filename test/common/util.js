@@ -7,6 +7,7 @@ const exquisite = require('exquisite-sst');
 let testsDir = '';
 const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
+const PORT = 5000;
 
 function loadFiles(directory) {
     testsDir = directory;
@@ -43,7 +44,7 @@ function takeReference(file, template, asyncLoad) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
         let options = loadOptions();
-        options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
+        options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
         options.output = `${getPNG(file)}`;
         if (asyncLoad) options.waitForFn = () => window.loaded;
         return exquisite.getReference(options);
@@ -53,7 +54,7 @@ function takeReference(file, template, asyncLoad) {
 function testSST(file, template, asyncLoad) {
     writeTemplate(file, template);
     let options = loadOptions();
-    options.url = `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.html`;
+    options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
@@ -62,13 +63,12 @@ function testSST(file, template, asyncLoad) {
 }
 
 function writeTemplate(file, template) {
-    const mainDir = path.resolve(__dirname, '..', '..');
     fs.writeFileSync(getHTML(file), template({
-        file: `http://localhost:5000/test/integration/render/scenarios${getHTML(getName(file))}/scenario.js`,
+        file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
-        cartovl: 'http://localhost:5000/dist/carto-vl.js',
-        mapboxgl: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
-        mapboxglcss: path.join(mainDir, 'node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
+        cartovl: `http://localhost:${PORT}/dist/carto-vl.js`,
+        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
 }
 
@@ -83,6 +83,9 @@ function loadGeoJSONSources() {
     return JSON.stringify(sources);
 }
 
+function getLocalhostURL(file) {
+    return file.substr(file.indexOf('test/') + 'test/'.length).replace('scenario.js', '');
+}
 function getHTML(file) {
     return file.replace(testFile, 'scenario.html');
 }
@@ -124,5 +127,6 @@ module.exports = {
     loadFiles,
     loadTemplate,
     takeReference,
-    testSST
+    testSST,
+    PORT,
 };
