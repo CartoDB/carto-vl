@@ -28,6 +28,7 @@ export default class Map {
 
         this._layers = [];
         this._repaint = true;
+        this.invalidateWebGLState = () => { };
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
