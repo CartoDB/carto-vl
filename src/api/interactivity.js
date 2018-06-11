@@ -32,7 +32,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature is now under the cursor.
+ * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature (as reported by featureHover or featureLeave) is now under the cursor.
  * The list of features that are now behind the cursor and that weren't before is provided.
  *
  * @event featureEnter
@@ -50,7 +50,7 @@ import { wToR } from '../client/rsys';
  */
 
 /**
- * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature is no longer behind the cursor.
+ * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature (as reported by featureHover or featureEnter) is no longer behind the cursor.
  * The list of features that are no longer behind the cursor and that were before is provided.
  *
  * @event featureLeave
@@ -101,6 +101,7 @@ export default class Interactivity {
         }
         preCheckLayerList(layerList);
         this._init(layerList);
+        this._numListeners = {};
     }
 
     /**
@@ -114,6 +115,7 @@ export default class Interactivity {
      */
     on(eventName, callback) {
         checkEvent(eventName);
+        this._numListeners[eventName] = (this._numListeners[eventName] || 0) + 1;
         return this._emitter.on(eventName, callback);
     }
 
@@ -128,6 +130,7 @@ export default class Interactivity {
      */
     off(eventName, callback) {
         checkEvent(eventName);
+        this._numListeners[eventName] = this._numListeners[eventName] - 1;
         return this._emitter.off(eventName, callback);
     }
 
@@ -148,6 +151,10 @@ export default class Interactivity {
     }
 
     _onMouseMove(event) {
+        if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
+            return;
+        }
+
         const featureEvent = this._createFeatureEvent(event);
         const currentFeatures = featureEvent.features;
 
@@ -178,6 +185,10 @@ export default class Interactivity {
     }
 
     _onClick(event) {
+        if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
+            return;
+        }
+
         const featureEvent = this._createFeatureEvent(event);
         const currentFeatures = featureEvent.features;
 
