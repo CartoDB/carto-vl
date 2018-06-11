@@ -58,6 +58,11 @@ function testSST(file, template, asyncLoad) {
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
+    options.pageEvents = {
+        error: err => console.error(err.message),
+        pageerror: err => console.error(err.message),
+        requestfailed: _onRequestFailed,
+    };
     if (asyncLoad) options.waitForFn = () => window.loaded;
     return exquisite.test(options);
 }
@@ -119,6 +124,12 @@ function handleBrowserConsole(consoleMessage) {
         if (consoleMessage.type() === 'warning' || consoleMessage.type() === 'error') {
             console.log(consoleMessage.text());
         }
+    }
+}
+
+function _onRequestFailed(request) {
+    if (request.failure()) {
+        console.error(`${request.url()} --> ${request.failure().errorText}`);
     }
 }
 
