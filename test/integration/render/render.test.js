@@ -13,7 +13,7 @@ const PORT = 5000;
 
 describe('Render tests:', () => {
     let server;
-    
+
     before(() => {
         server = http.createServer(handler);
         server.listen(PORT);
