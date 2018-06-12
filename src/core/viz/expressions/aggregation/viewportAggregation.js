@@ -182,9 +182,11 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             });
             this._isViewport = true;
         }
+
         isFeatureDependent() {
             return false;
         }
+
         get value() {
             return resolveFn(this);
         }
@@ -192,6 +194,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
         eval() {
             return resolveFn(this);
         }
+
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
@@ -199,15 +202,19 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             this.type = 'number';
             super.inlineMaker = inline => inline._impostor;
         }
+
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
         }
+
         _resetViewportAgg() {
             zeroFn(this);
         }
+
         _accumViewportAgg(feature) {
             accumFn(this, this.property.eval(feature));
         }
+
         _preDraw(...args) {
             this._impostor.expr = this.eval();
             super._preDraw(...args);
@@ -252,9 +259,11 @@ export class ViewportPercentile extends BaseExpression {
         });
         this._isViewport = true;
     }
+
     isFeatureDependent() {
         return false;
     }
+
     get value() {
         return this.eval();
     }
@@ -277,17 +286,21 @@ export class ViewportPercentile extends BaseExpression {
         this.type = 'number';
         super.inlineMaker = inline => inline.impostor;
     }
+
     _getMinimumNeededSchema() {
         return this.property._getMinimumNeededSchema();
     }
+
     _resetViewportAgg() {
         this._value = null;
         this._array = [];
     }
+
     _accumViewportAgg(feature) {
         const v = this.property.eval(feature);
         this._array.push(v);
     }
+
     _preDraw(...args) {
         this.impostor.expr = this.eval();
         super._preDraw(...args);
@@ -338,16 +351,19 @@ export class ViewportHistogram extends BaseExpression {
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
+
     _resetViewportAgg() {
         this._cached = null;
         this._histogram = new Map();
     }
+
     _accumViewportAgg(feature) {
         const x = this.x.eval(feature);
         const weight = this.weight.eval(feature);
         const count = this._histogram.get(x) || 0;
         this._histogram.set(x, count + weight);
     }
+
     get value() {
         if (this._cached == null) {
             if (!this._histogram) {
@@ -385,6 +401,7 @@ export class ViewportHistogram extends BaseExpression {
         }
         return this._cached;
     }
+
     _compile(metadata) {
         this._metatada = metadata;
         super._compile(metadata);
