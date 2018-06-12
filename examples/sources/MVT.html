@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -50,10 +52,12 @@
     });
 
     // Define layer
-    const metadata = new carto.source.mvt.Metadata([])
+    const metadata = { columns: [], geomType: 'polygon' };
     const source = new carto.source.MVT("https://cartocdn-gusc-a.global.ssl.fastly.net/cartovl/api/v1/map/3aec81c452bb1f8b714c3e709c7ce7bd:1526490769962/{z}/{x}/{y}.mvt", metadata);
 
-    const viz = new carto.Viz();
+    const viz = new carto.Viz(`
+
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -64,4 +68,5 @@
     }
   </script>
 </body>
+
 </html>

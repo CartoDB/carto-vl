@@ -56,7 +56,7 @@ export default class MVT extends Base {
             }
             , maxAge: 1000 * 60 * 60
         };
-        this.metadata = this._buildMetadata(metadata);
+        this.metadata = metadata;
         this.cache = LRU(lruOptions);
     }
 
@@ -65,10 +65,6 @@ export default class MVT extends Base {
         if (util.isUndefined(metadata)) {
             throw new CartoValidationError('source', 'metadataRequired');
         }
-    }
-
-    _buildMetadata(mvtMetadata) {
-        return new Metadata([], mvtMetadata.columns, 0, 0, '');
     }
 
     _clone(){
