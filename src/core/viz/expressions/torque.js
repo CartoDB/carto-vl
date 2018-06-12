@@ -34,6 +34,11 @@ const DEFAULT_FADE = 0.15;
  * const viz = new carto.Viz(`
  *   filter: torque($day, 40, fade(0.5))
  * `);
+ * 
+ * @example<caption>Fade in of 0.3 seconds without fading out. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.3, HOLD))
+ * `);
  *
  * @memberof carto.expressions
  * @name fade
