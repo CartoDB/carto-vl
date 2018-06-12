@@ -1,12 +1,14 @@
 import * as s from '../../../../../../src/core/viz/functions';
 
-describe('src/core/viz/expressions/viewportAggregation', () => {
+fdescribe('src/core/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
+    const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');
     describe('viewport filtering', () => {
         function fakeDrawMetadata(expr) {
             expr._compile({
                 columns: [
+                    { name: 'numeric_with_nulls', type: 'number' },
                     { name: 'price', type: 'number' },
                     { name: 'cat', type: 'category', categoryNames: ['a', 'b', 'c'] }
                 ],
@@ -17,39 +19,80 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
                 }
             });
             expr._resetViewportAgg();
-            expr._accumViewportAgg({ price: 0, cat: 0 });
-            expr._accumViewportAgg({ price: 0.5, cat: 1 });
-            expr._accumViewportAgg({ price: 1.5, cat: 1 });
-            expr._accumViewportAgg({ price: 2, cat: 2 });
+            expr._accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
+            expr._accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
+            expr._accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });
+            expr._accumViewportAgg({ price: 2, cat: 2, numeric_with_nulls: 2 });
         }
-        it('viewportMin($price) should return the metadata min', () => {
-            const viewportMin = s.viewportMin($price);
-            fakeDrawMetadata(viewportMin);
-            expect(viewportMin.eval()).toEqual(0);
+
+        describe('viewportMin()', () => {
+            it('($price) should return the metadata min', () => {
+                const viewportMin = s.viewportMin($price);
+                fakeDrawMetadata(viewportMin);
+                expect(viewportMin.eval()).toEqual(0);
+            });
+
+            it('($nulls) should return the metadata min', () => {
+                const viewportMin = s.viewportMin($nulls);
+                fakeDrawMetadata(viewportMin);
+                expect(viewportMin.eval()).toEqual(0);
+            });
         });
 
-        it('viewportAvg($price) should return the metadata avg', () => {
-            const viewportAvg = s.viewportAvg($price);
-            fakeDrawMetadata(viewportAvg);
-            expect(viewportAvg.eval()).toEqual(1);
+        describe('viewportAvg()', () => {
+            it('($price) should return the metadata avg', () => {
+                const viewportAvg = s.viewportAvg($price);
+                fakeDrawMetadata(viewportAvg);
+                expect(viewportAvg.eval()).toEqual(1);
+            });
+
+            it('($nulls) should return the metadata avg', () => {
+                const viewportAvg = s.viewportAvg($nulls);
+                fakeDrawMetadata(viewportAvg);
+                expect(viewportAvg.eval()).toEqual(1);
+            });
         });
 
-        it('viewportMax($price) should return the metadata max', () => {
-            const viewportMax = s.viewportMax($price);
-            fakeDrawMetadata(viewportMax);
-            expect(viewportMax.eval()).toEqual(2);
+        describe('viewportMax', () => {
+            it('($price) should return the metadata max', () => {
+                const viewportMax = s.viewportMax($price);
+                fakeDrawMetadata(viewportMax);
+                expect(viewportMax.eval()).toEqual(2);
+            });
+
+            it('($nulls) should return the metadata max', () => {
+                const viewportMax = s.viewportMax($nulls);
+                fakeDrawMetadata(viewportMax);
+                expect(viewportMax.eval()).toEqual(2);
+            });
         });
 
-        it('viewportSum($price) should return the metadata sum', () => {
-            const viewportSum = s.viewportSum($price);
-            fakeDrawMetadata(viewportSum);
-            expect(viewportSum.eval()).toEqual(4);
+        describe('viewportSum', () => {
+            it('($price) should return the metadata sum', () => {
+                const viewportSum = s.viewportSum($price);
+                fakeDrawMetadata(viewportSum);
+                expect(viewportSum.eval()).toEqual(4);
+            });
+
+            it('($nulls) should return the metadata sum', () => {
+                const viewportSum = s.viewportSum($nulls);
+                fakeDrawMetadata(viewportSum);
+                expect(viewportSum.eval()).toEqual(3);
+            });
         });
 
-        it('viewportCount($price) should return the metadata count', () => {
-            const viewportCount = s.viewportCount($price);
-            fakeDrawMetadata(viewportCount);
-            expect(viewportCount.eval()).toEqual(4);
+        describe('viewportCount', () => {
+            it('($price) should return the metadata count', () => {
+                const viewportCount = s.viewportCount($price);
+                fakeDrawMetadata(viewportCount);
+                expect(viewportCount.eval()).toEqual(4);
+            });
+
+            it('($nulls) should return the metadata count', () => {
+                const viewportCount = s.viewportCount($nulls);
+                fakeDrawMetadata(viewportCount);
+                expect(viewportCount.eval()).toEqual(4);
+            });
         });
 
         it('viewportPercentile($price) should return the metadata count', () => {
