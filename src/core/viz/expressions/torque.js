@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
-import { number, linear, sub, add, globalMin, globalMax } from '../functions';
+import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
 
