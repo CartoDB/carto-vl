@@ -8,7 +8,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
 
-import featureDecoder from './mvt/feature-decoder';
+import {decodeLines, decodePolygons} from './mvt/feature-decoder';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -456,18 +456,6 @@ export default class Windshaft {
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
-    _decodeLines(geom, featureGeometries, mvt_extent) {
-        let geometry = [];
-        geom.map(l => {
-            let line = [];
-            l.map(point => {
-                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-            });
-            geometry.push(line);
-        });
-        featureGeometries.push(geometry);
-    }
-
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
         const properties = [];
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
@@ -484,10 +472,11 @@ export default class Windshaft {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             } else if (metadata.geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
+                const decodedPolygons = decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
             } else if (metadata.geomType == geometryTypes.LINE) {
-                this._decodeLines(geom, featureGeometries, mvt_extent);
+                const decodedLines = decodeLines(geom, mvt_extent);
+                featureGeometries.push(decodedLines);
             } else {
                 throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }

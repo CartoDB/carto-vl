@@ -1,11 +1,10 @@
 import Base from './base';
 import * as rsys from '../../client/rsys';
 import Dataframe from '../../core/dataframe';
-import Metadata from '../../core/metadata';
 import * as Protobuf from 'pbf';
 import * as LRU from 'lru-cache';
 import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
-import featureDecoder from '../../client/mvt/feature-decoder';
+import {decodeLines, decodePolygons} from '../../client/mvt/feature-decoder';
 import { validateTemplateURL } from '../url';
 import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
@@ -183,19 +182,6 @@ export default class MVT extends Base {
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
-
-    _decodeLines(geom, featureGeometries, mvt_extent) {
-        let geometry = [];
-        geom.map(l => {
-            let line = [];
-            l.map(point => {
-                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-            });
-            geometry.push(line);
-        });
-        featureGeometries.push(geometry);
-    }
-
     _decodeMVTLayer(mvtLayer, mvt_extent, MNS, jsonFields, numFields, stringFields, fieldMap) {
         const properties = [];
         this.metadata.columns.map(c => {
@@ -222,10 +208,11 @@ export default class MVT extends Base {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             } else if (geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
+                const decodedPolygons = decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
             } else if (geomType == geometryTypes.LINE) {
-                this._decodeLines(geom, featureGeometries, mvt_extent);
+                const decodedLines = decodeLines(geom, mvt_extent);
+                featureGeometries.push(decodedLines);
             } else {
                 throw new Error(`Unimplemented geometry type: '${geomType}'`);
             }

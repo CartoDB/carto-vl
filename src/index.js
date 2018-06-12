@@ -23,7 +23,6 @@ import GeoJSON from './api/source/geojson';
 import Dataset from './api/source/dataset';
 import SQL from './api/source/sql';
 import MVT from './api/source/mvt';
-import Metadata from './api/source/mvt/metadata';
 import Layer from './api/layer';
 import Viz from './api/viz';
 import { setDefaultAuth } from './api/setup/auth-service';
@@ -33,8 +32,7 @@ import Interactivity from './api/interactivity';
 
 // Namespaces
 
-const mvt = { Metadata };
-const source = { Dataset, SQL, GeoJSON, MVT, mvt };
+const source = { Dataset, SQL, GeoJSON, MVT };
 
 export {
     setDefaultAuth,
