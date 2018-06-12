@@ -65,7 +65,11 @@ export const ViewportAvg = genViewportAgg('avg',
  */
 export const ViewportMax = genViewportAgg('max',
     self => { self._value = Number.NEGATIVE_INFINITY; },
-    (self, y) => { self._value = Math.max(self._value, y); },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = Math.max(self._value, y);
+        }
+    },
     self => self._value
 );
 
@@ -95,7 +99,11 @@ export const ViewportMax = genViewportAgg('max',
  */
 export const ViewportMin = genViewportAgg('min',
     self => { self._value = Number.POSITIVE_INFINITY; },
-    (self, y) => { self._value = Math.min(self._value, y); },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = Math.min(self._value, y);
+        }
+    },
     self => self._value);
 
 /**
@@ -124,7 +132,11 @@ export const ViewportMin = genViewportAgg('min',
  */
 export const ViewportSum = genViewportAgg('sum',
     self => { self._value = 0; },
-    (self, y) => { self._value = self._value + y; },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = self._value + y;
+        }
+    },
     self => self._value);
 
 /**
@@ -170,7 +182,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             });
             this._isViewport = true;
         }
-        isFeatureDependent(){
+        isFeatureDependent() {
             return false;
         }
         get value() {
@@ -240,7 +252,7 @@ export class ViewportPercentile extends BaseExpression {
         });
         this._isViewport = true;
     }
-    isFeatureDependent(){
+    isFeatureDependent() {
         return false;
     }
     get value() {
