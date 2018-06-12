@@ -336,14 +336,13 @@ export default class Dataframe {
             gl.deleteTexture(this.texFilter);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texWidth = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.texFilter = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
+        }
+        Object.keys(this).map(key => {
+            this[key] = null;
+        });
+        this.freed = true;
+        if (this.freeObserver) {
+            this.freeObserver(this);
         }
     }
 }

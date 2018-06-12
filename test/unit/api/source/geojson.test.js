@@ -274,9 +274,8 @@ describe('api/source/geojson', () => {
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
-        const fakeRemoveDataframe = jasmine.createSpy('removeDataframe');
         const fakeDataLoaded = jasmine.createSpy('dataLoaded');
-        source.bindLayer(fakeAddDataframe, fakeRemoveDataframe, fakeDataLoaded);
+        source.bindLayer(fakeAddDataframe, fakeDataLoaded);
         expect(fakeDataLoaded).not.toHaveBeenCalled();
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();

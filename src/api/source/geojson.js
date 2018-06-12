@@ -56,9 +56,8 @@ export default class GeoJSON extends Base {
         }
     }
 
-    bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+    bindLayer(addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
     }
 

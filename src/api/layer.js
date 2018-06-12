@@ -155,7 +155,7 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
         }
@@ -307,7 +307,7 @@ export default class Layer {
     _fire(eventType, eventData) {
         try {
             return this._emitter.emit(eventType, eventData);
-        } catch(err) {
+        } catch (err) {
             console.error(err);
         }
     }
@@ -317,20 +317,15 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
+        dataframe.freeObserver = () => {
+            this._renderLayer.removeDataframe(dataframe);
+            this._integrator.invalidateWebGLState();
+            this._integrator.needRefresh();
+        };
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         this._integrator.needRefresh();
         this._isUpdated = true;
-    }
-
-    /**
-     * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataFrameRemoved(dataframe) {
-        this._renderLayer.removeDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-        this._integrator.needRefresh();
     }
 
     /**

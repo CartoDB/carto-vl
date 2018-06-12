@@ -2,13 +2,13 @@ import * as R from '../core/renderer';
 import * as rsys from './rsys';
 import Dataframe from '../core/dataframe';
 import * as Protobuf from 'pbf';
-import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
 
-import {decodeLines, decodePolygons} from './mvt/feature-decoder';
+import { decodeLines, decodePolygons } from './mvt/feature-decoder';
+import DataframeCache from '../api/source/DataframeCache';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -39,27 +39,12 @@ export default class Windshaft {
         this._promiseMNS = null;
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
-        const lruOptions = {
-            max: 1000
-            // TODO improve cache length heuristic
-            , length: function () { return 1; }
-            , dispose: (key, promise) => {
-                promise.then(dataframe => {
-                    if (!dataframe.empty) {
-                        dataframe.free();
-                        this._removeDataframe(dataframe);
-                    }
-                });
-            }
-            , maxAge: 1000 * 60 * 60
-        };
-        this.cache = LRU(lruOptions);
+        this._cache = new DataframeCache();
         this.inProgressInstantiations = {};
     }
 
-    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+    _bindLayer(addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
@@ -218,7 +203,7 @@ export default class Windshaft {
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
         this._oldDataframes = [];
-        this.cache.reset();
+        this._cache = new DataframeCache();
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
         this._MNS = MNS;
@@ -316,7 +301,7 @@ export default class Windshaft {
     }
 
     free() {
-        this.cache.reset();
+        this._cache = new DataframeCache();
         this._oldDataframes = [];
     }
 
@@ -388,17 +373,10 @@ export default class Windshaft {
     }
 
     getDataframe(x, y, z) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            return c;
-        }
-        const promise = this.requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        return promise;
+        return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z));
     }
 
-    requestDataframe(x, y, z) {
+    _requestDataframe(x, y, z) {
         const mvt_extent = 4096;
 
         return fetch(this._getTileUrl(x, y, z))

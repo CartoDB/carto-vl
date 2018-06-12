@@ -2,12 +2,12 @@ import Base from './base';
 import * as rsys from '../../client/rsys';
 import Dataframe from '../../core/dataframe';
 import * as Protobuf from 'pbf';
-import * as LRU from 'lru-cache';
 import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
-import {decodeLines, decodePolygons} from '../../client/mvt/feature-decoder';
+import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
 import { validateTemplateURL } from '../url';
 import * as util from '../util';
 import CartoValidationError from '../error-handling/carto-validation-error';
+import DataframeCache from './DataframeCache';
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -41,22 +41,8 @@ export default class MVT extends Base {
         this._templateURL = templateURL;
         this._requestGroupID = 0;
         this._oldDataframes = [];
-        const lruOptions = {
-            max: 1000
-            // TODO improve cache length heuristic
-            , length: function () { return 1; }
-            , dispose: (key, promise) => {
-                promise.then(dataframe => {
-                    if (!dataframe.empty) {
-                        dataframe.free();
-                        this._removeDataframe(dataframe);
-                    }
-                });
-            }
-            , maxAge: 1000 * 60 * 60
-        };
         this.metadata = metadata;
-        this.cache = LRU(lruOptions);
+        this._cache = new DataframeCache();
     }
 
     _validateInputParams(url, metadata) {
@@ -66,13 +52,12 @@ export default class MVT extends Base {
         }
     }
 
-    _clone(){
+    _clone() {
         return new MVT(this._templateURL, this.metadata);
     }
 
-    bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+    bindLayer(addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
@@ -87,7 +72,7 @@ export default class MVT extends Base {
     }
 
     free() {
-        this.cache.reset();
+        this._cache = new DataframeCache();
         this._oldDataframes = [];
     }
 
@@ -115,14 +100,7 @@ export default class MVT extends Base {
     }
 
     _getDataframe(x, y, z) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            return c;
-        }
-        const promise = this._requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        return promise;
+        return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z));
     }
 
     _requestDataframe(x, y, z) {
