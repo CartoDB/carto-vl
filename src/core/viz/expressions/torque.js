@@ -151,9 +151,10 @@ export class Torque extends BaseExpression {
     _setTimestamp(timestamp) {
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
-        const lastTime = this._lastTime || 0;
     
-        deltaTime = timestamp - lastTime;
+        if (this._lastTime !== undefined) {
+            deltaTime = timestamp - this._lastTime;
+        }
 
         this._lastTime = timestamp;
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
