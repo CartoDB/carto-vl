@@ -205,8 +205,10 @@ import Time from './expressions/time';
 
 import Top from './expressions/top';
 
-import { Fade } from './expressions/torque';
-import { Torque } from './expressions/torque';
+import Fade from './expressions/fade';
+import FadeIn from './expressions/fadeIn';
+
+import Torque from './expressions/torque';
 
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
@@ -221,7 +223,7 @@ import { Ceil } from './expressions/unary';
 
 import Variable from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 
 import XYZ from './expressions/xyz';
@@ -331,6 +333,8 @@ export { time as date };
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
+export const fadeIn = (...args) => new FadeIn(...args);
+
 export const torque = (...args) => new Torque(...args);
 
 export const log = (...args) => new Log(...args);
