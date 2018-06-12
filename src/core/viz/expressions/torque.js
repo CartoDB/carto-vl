@@ -149,12 +149,11 @@ export class Torque extends BaseExpression {
     }
 
     _setTimestamp(timestamp) {
-        let deltaTime;
-        const speed = 1 / this.duration.eval();
-        
-        if (this._lastTime) {
-            deltaTime = timestamp - this._lastTime;
-        }
+        let deltaTime = 0;
+        const speed = 1 / this.duration.value;
+        const lastTime = this._lastTime || 0;
+    
+        deltaTime = timestamp - lastTime;
 
         this._lastTime = timestamp;
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
@@ -169,8 +168,8 @@ export class Torque extends BaseExpression {
             return 0;
         }
 
-        const progress = this.progress.eval();
-        const duration = this.duration.eval();
+        const progress = this.progress.value;
+        const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
         
@@ -222,14 +221,18 @@ export class Torque extends BaseExpression {
         this.preface = `
             #ifndef TORQUE
             #define TORQUE
+            
             float torque(float _input, float progress, float duration, float fadeIn, float fadeOut){
                 float x = 0.;
+                
                 // Check for NaN
                 if (_input <= 0.0 || 0.0 <= _input){
-                    x = 1.- clamp(abs(_input-progress)*duration/(_input>progress? fadeIn: fadeOut), 0.,1.);
+                    x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
                 }
+
                 return x;
             }
+
             #endif
         `;
 
