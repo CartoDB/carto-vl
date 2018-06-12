@@ -19,6 +19,7 @@ lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
 lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
 lowerCaseFunctions.pi = functions.PI;
 lowerCaseFunctions.e = functions.E;
+lowerCaseFunctions.hold = functions.HOLD;
 
 export function parseVizExpression(str) {
     prepareJsep();
@@ -141,8 +142,6 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
-    } else if (node.name.toLowerCase() === 'hold') {
-        return functions.number(Number.POSITIVE_INFINITY);
     } else {
         throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
