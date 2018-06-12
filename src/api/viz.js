@@ -38,7 +38,7 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
 
     /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled, 
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
     * displayed and processed.
     *
     *
@@ -186,8 +186,12 @@ export default class Viz {
     }
 
     setDefaultsIfRequired(geomType) {
+        if (this._appliedDefaults) {
+            return;
+        }
         let defaults = this._getDefaultGeomStyle(geomType);
         if (defaults) {
+            this._appliedDefaults = true;
             if (this.color.default) {
                 this.color = defaults.COLOR_EXPRESSION();
             }
@@ -212,16 +216,14 @@ export default class Viz {
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        }
-        if (geomType === 'line') {
+        } else if (geomType === 'line') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
             };
-        }
-        if (geomType === 'polygon') {
+        } else if (geomType === 'polygon') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons

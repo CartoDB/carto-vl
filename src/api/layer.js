@@ -171,6 +171,7 @@ export default class Layer {
         if (this._viz) {
             this._viz.onChange(null);
         }
+        viz.setDefaultsIfRequired(this._renderLayer.type);
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
@@ -229,6 +230,7 @@ export default class Layer {
                 if (this._viz) {
                     this._viz.onChange(null);
                 }
+                viz.setDefaultsIfRequired(this._renderLayer.type);
                 this._viz = viz;
                 this._viz.onChange(this._vizChanged.bind(this));
             });
@@ -324,7 +326,9 @@ export default class Layer {
         };
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
-        this._viz.setDefaultsIfRequired(dataframe.type);
+        if (this._viz) {
+            this._viz.setDefaultsIfRequired(dataframe.type);
+        }
         this._integrator.needRefresh();
         this._isUpdated = true;
     }
