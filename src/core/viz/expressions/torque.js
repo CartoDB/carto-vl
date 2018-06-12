@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
+import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { div, mod, now, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
@@ -41,15 +41,7 @@ const DEFAULT_FADE = 0.15;
  * @api
 */
 export class Fade extends BaseExpression {
-    constructor(param1 = DEFAULT, param2 = DEFAULT) {
-        let fadeIn = param1;
-        let fadeOut = param2;
-        if (param1 == DEFAULT) {
-            fadeIn = DEFAULT_FADE;
-        }
-        if (param2 == DEFAULT) {
-            fadeOut = fadeIn;
-        }
+    constructor(fadeIn = DEFAULT_FADE, fadeOut = DEFAULT_FADE) {
         fadeIn = implicitCast(fadeIn);
         fadeOut = implicitCast(fadeOut);
         // TODO improve type check
@@ -144,7 +136,7 @@ export class Torque extends BaseExpression {
     }
     eval(feature) {
         const input = this.input.eval(feature);
-        if (Number.isNaN(input)){
+        if (Number.isNaN(input)) {
             return 0;
         }
         const cycle = this._cycle.eval(feature);
