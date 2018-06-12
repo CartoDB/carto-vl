@@ -12,9 +12,9 @@
     </script>
     <script src="<%- cartovl %>"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://unpkg.com/@carto/mapbox-gl@0.44.1-carto1/dist/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <style>
       body { margin: 0; padding: 0; }
       #map { position: absolute; height: 100%; width: 100%; }

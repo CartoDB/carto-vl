@@ -9,14 +9,13 @@ const http = require('http');
 
 const files = util.loadFiles(path.join(__dirname, 'scenarios'));
 const template = util.loadTemplate(path.join(__dirname, 'render.html.tpl'));
-const PORT = 5000;
 
 describe('Render tests:', () => {
     let server;
 
     before(() => {
         server = http.createServer(handler);
-        server.listen(PORT);
+        server.listen(util.PORT);
     });
 
     files.forEach(test);

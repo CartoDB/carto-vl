@@ -9,15 +9,13 @@ const http = require('http');
 
 const files = util.loadFiles(path.join(__dirname, 'e2e'));
 const template = util.loadTemplate(path.join(__dirname, 'e2e.html.tpl'));
-const PORT = 5000;
-
 
 describe('E2E tests:', () => {
     let server;
     
     before(() => {
         server = http.createServer(handler);
-        server.listen(PORT);
+        server.listen(util.PORT);
     });
 
     files.forEach(test);
