@@ -141,6 +141,8 @@ function parseIdentifier(node) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
+    } else if (node.name.toLowerCase() === 'persist') {
+        return functions.number(Number.POSITIVE_INFINITY);
     } else {
         throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
     }
