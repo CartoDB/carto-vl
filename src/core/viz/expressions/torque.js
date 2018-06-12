@@ -140,11 +140,8 @@ export class Torque extends BaseExpression {
         
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
-        this.duration = duration;
-        this.progress = progress; // 0 to 1
         this.type = 'number';
         this._originalInput = originalInput;
-        this._lastTime = 0;
     }
 
     isAnimated() {
@@ -152,9 +149,13 @@ export class Torque extends BaseExpression {
     }
 
     _setTimestamp(timestamp) {
-        const deltaTime = timestamp - this._lastTime;
+        let deltaTime;
         const speed = 1 / this.duration.eval();
         
+        if (this._lastTime) {
+            deltaTime = timestamp - this._lastTime;
+        }
+
         this._lastTime = timestamp;
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
 
