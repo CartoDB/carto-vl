@@ -69,7 +69,7 @@
       const layergroup = await response.json();
       const tilejson = layergroup.metadata.tilejson.vector;
 
-      const source = new carto.source.MVT(tilejson.tiles[0], { columns: [] });
+      const source = new carto.source.MVT(tilejson.tiles[0]);
 
       const viz = new carto.Viz();
       const layer = new carto.Layer('layer', source, viz);

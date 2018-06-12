@@ -35,7 +35,7 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(templateURL, metadata) {
+    constructor(templateURL, metadata = { columns: [] }) {
         super();
         this._validateInputParams(templateURL, metadata);
         this._templateURL = templateURL;
