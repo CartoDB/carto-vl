@@ -74,6 +74,7 @@ export default class Dataframe {
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
+        this.height = height;
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
