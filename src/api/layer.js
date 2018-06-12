@@ -324,6 +324,7 @@ export default class Layer {
         };
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
+        this._viz.setDefaultsIfRequired(dataframe.type);
         this._integrator.needRefresh();
         this._isUpdated = true;
     }
