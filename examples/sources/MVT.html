@@ -45,27 +45,44 @@
       touchZoomRotate: false,
     });
 
-    // Define user
-    carto.setDefaultAuth({
-      user: 'cartovl',
-      apiKey: 'default_public'
-    });
+    async function loadMVT() {
+      const mapConfig = {
+        buffersize: { mvt: 0 },
+        layers: [
+          {
+            id: 'europe',
+            type: 'mapnik',
+            options: {
+              sql: `SELECT * FROM ne_adm0_europe`
+            }
+          }
+        ]
+      }
+      const response = await fetch('https://cartovl.carto.com/api/v1/map', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mapConfig)
+      });
+      const layergroup = await response.json();
+      const tilejson = layergroup.metadata.tilejson.vector;
 
-    // Define layer
-    const metadata = { columns: [], geomType: 'polygon' };
-    const source = new carto.source.MVT("https://cartocdn-gusc-a.global.ssl.fastly.net/cartovl/api/v1/map/3aec81c452bb1f8b714c3e709c7ce7bd:1526490769962/{z}/{x}/{y}.mvt", metadata);
+      const source = new carto.source.MVT(tilejson.tiles[0], { columns: [], geomType: 'polygon' });
 
-    const viz = new carto.Viz(`
+      const viz = new carto.Viz();
+      const layer = new carto.Layer('layer', source, viz);
 
-    `);
-    const layer = new carto.Layer('layer', source, viz);
+      layer.addTo(map, 'watername_ocean');
+      layer.on('loaded', hideLoader);
 
-    layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', hideLoader);
-
-    function hideLoader() {
-      document.getElementById('loader').style.opacity = '0';
+      function hideLoader() {
+        document.getElementById('loader').style.opacity = '0';
+      }
     }
+
+    loadMVT();
   </script>
 </body>
 
