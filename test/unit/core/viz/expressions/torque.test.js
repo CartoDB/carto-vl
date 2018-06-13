@@ -33,4 +33,38 @@ describe('src/core/viz/expressions/torque', () => {
             expect(t.eval()).toEqual(0.75);
         });
     });
+
+    describe('.play', () => {
+        it('should start the simulation when paused/stopped', () => {
+
+        });
+
+        it('should not affect the simulation when playing', () => {
+            
+        });
+    });
+
+    describe('.pause', () => {
+        it('should not affect the simulation when paused/stopped', () => {
+
+        });
+
+        it('should pause the simulation when playing', () => {
+            
+        });
+    });
+
+    describe('.stop', () => {
+        it('should stop the simulation when playing', () => {
+
+        });
+
+        it('should stop the simulation when paused/stopped', () => {
+
+        });
+    });
+
+    describe('.setSimulationTime', () => {
+
+    });
 });
