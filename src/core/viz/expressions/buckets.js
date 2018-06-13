@@ -122,17 +122,17 @@ export default class Buckets extends BaseExpression {
 
     _compile(metadata) {
         super._compile(metadata);
-        this.othersBucket = this.input.type === 'category';
-
-        const input = this.input;
-        if (input.type != 'number' && input.type != 'category') {
-            throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
+        this.isCategoryType = this.input.type === 'category';
+        this.isBucketComplete = this.isCategoryType && this.list.elems.length === this.input.alias.numCategories;
+        
+        if (this.input.type != 'number' && this.input.type != 'category') {
+            throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
         
         this.list.elems.map((item, index) => {
-            if (input.type != item.type) {
+            if (this.input.type != item.type) {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
-                    `\n\texpected type was ${input.type}\n\tactual type was ${item.type}`);
+                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`);
             } else if (item.type != 'number' && item.type != 'category') {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
             }

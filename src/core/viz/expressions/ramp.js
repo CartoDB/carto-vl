@@ -69,7 +69,7 @@ export default class Ramp extends BaseExpression {
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
-        this.defaultOtherColor = '#E2E2E2';
+        this.defaultOtherColor = 'gray';
         this.palette = palette;
         if (palette.type == 'number-array') {
             this.type = 'number';
@@ -167,7 +167,7 @@ export default class Ramp extends BaseExpression {
     _getColorsFromColorArrayType (input, palette) {
         return input.isBucketComplete && input.numCategories - 1 === palette.colors.length
             ? _addOtherColorToColors(palette.colors, this.defaultOtherColor)
-            : palette.colors; 
+            : palette.colors;
     }
 
     _getSubPalettes(input, palette) {
@@ -186,6 +186,7 @@ export default class Ramp extends BaseExpression {
             super._postShaderCompile(program, gl);
             return;
         }
+
         this.input._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
@@ -308,7 +309,7 @@ function _removeOtherFromColors (colors) {
 }
 
 function _addOtherColorToColors (colors, otherColor) {
-    return colors.push(otherColor);
+    return [...colors, otherColor];
 }
 
 function _needsToRemoveOtherCategory (input, palette, colors) {
