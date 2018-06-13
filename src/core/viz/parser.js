@@ -19,6 +19,7 @@ lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
 lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
 lowerCaseFunctions.pi = functions.PI;
 lowerCaseFunctions.e = functions.E;
+lowerCaseFunctions.hold = functions.HOLD;
 
 export function parseVizExpression(str) {
     prepareJsep();
