@@ -13,7 +13,7 @@ const geometryTypes = {
     POLYGON: 'polygon'
 };
 
-export default class MVT extends Base{
+export default class MVT extends Base {
 
     /**
      * Create a carto.source.MVT.
@@ -32,6 +32,7 @@ export default class MVT extends Base{
      * @memberof carto.source
      * @api
      */
+    // FIXME, multi subdomain
     constructor(templateURL, metadata = { columns: [] }) {
         super();
         this._templateURL = templateURL;
@@ -65,7 +66,6 @@ export default class MVT extends Base{
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-        this._metadata.geomType = geometryTypes.POLYGON;
 
         const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, mvt_extent);
 
@@ -79,7 +79,7 @@ export default class MVT extends Base{
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
         let points;
-        if (metadata.geomType == geometryTypes.POINT) { // TODO, FIXME, autodiscover geometry type
+        if (metadata.geomType == geometryTypes.POINT) {
             points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
@@ -87,6 +87,25 @@ export default class MVT extends Base{
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
+            const mvtGeomType = f.type;
+            if (metadata.geomType === undefined) {
+                switch (mvtGeomType) {
+                    case 1:
+                        metadata.geomType = geometryTypes.POINT;
+                        break;
+                    case 2:
+                        metadata.geomType = geometryTypes.LINE;
+                        break;
+                    case 3:
+                        metadata.geomType = geometryTypes.POLYGON;
+                        break;
+                    default:
+                        throw new Error('MVT: invalid geometry type');
+                }
+                if (metadata.geomType == geometryTypes.POINT) {
+                    points = new Float32Array(mvtLayer.length * 2);
+                }
+            }
             if (metadata.geomType == geometryTypes.POINT) {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;

@@ -1,24 +1,12 @@
 import * as R from '../core/renderer';
-import * as rsys from './rsys';
-import Dataframe from '../core/dataframe';
-import * as Protobuf from 'pbf';
 import * as windshaftFiltering from './windshaft-filtering';
-import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
 
-import { decodeLines, decodePolygons } from './mvt/feature-decoder';
-import DataframeCache from '../api/source/DataframeCache';
+import MVT from '../api/source/mvt';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
-
-const geometryTypes = {
-    UNKNOWN: 'unknown',
-    POINT: 'point',
-    LINE: 'line',
-    POLYGON: 'polygon'
-};
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -30,22 +18,15 @@ export default class Windshaft {
 
     constructor(source) {
         this._source = source;
-
         this._exclusive = true;
 
-        this._requestGroupID = 0;
-        this._oldDataframes = [];
         this._MNS = null;
         this._promiseMNS = null;
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
-        this._cache = new DataframeCache();
         this.inProgressInstantiations = {};
     }
 
-    _bindLayer(addDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
+    bindLayer(addDataframe, dataLoadedCallback) {
+        this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
     _getInstantiationID(MNS, resolution, filtering, choices) {
@@ -87,33 +68,9 @@ export default class Windshaft {
      * @param {*} viewport
      */
     getData(viewport) {
-        if (this._isInstantiated()) {
-            const tiles = rsys.rTiles(viewport);
-            this._getTiles(tiles);
+        if (this._mvtClient) {
+            return this._mvtClient.requestData(viewport);// FIXME extend
         }
-    }
-
-    _getTiles(tiles) {
-        this._requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
-        const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
-            this.getDataframe(x, y, z).then(dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.map(d => d.active = false);
-                    completedTiles.map(d => d.active = true);
-                    this._oldDataframes = completedTiles;
-                    this._dataLoadedCallback();
-                }
-            });
-        });
     }
 
     /**
@@ -134,22 +91,6 @@ export default class Windshaft {
 
     _isInstantiated() {
         return !!this.metadata;
-    }
-
-    _getCategoryIDFromString(category, readonly = true) {
-        if (category === undefined) {
-            category = 'null';
-        }
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        if (readonly) {
-            console.warn(`category ${category} not present in metadata`);
-            return -1;
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _intantiationChoices(metadata) {
@@ -202,8 +143,8 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        this._oldDataframes = [];
-        this._cache = new DataframeCache();
+        // FIXME
+        this._mvtClient = new MVT(urlTemplate.replace('{s}', this._getSubdomain(0, 0)));
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
         this._MNS = MNS;
@@ -211,7 +152,10 @@ export default class Windshaft {
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
-
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
+    }
     async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
@@ -301,23 +245,9 @@ export default class Windshaft {
     }
 
     free() {
-        this._cache = new DataframeCache();
-        this._oldDataframes = [];
-    }
-
-    _generateDataFrame(rs, geometry, properties, size, type) {
-        const dataframe = new Dataframe({
-            active: false,
-            center: rs.center,
-            geom: geometry,
-            properties: properties,
-            scale: rs.scale,
-            size: size,
-            type: type,
-            metadata: this.metadata,
-        });
-
-        return dataframe;
+        if (this._mvtClient) {
+            this._mvtClient.free();
+        }
     }
 
     async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
@@ -372,99 +302,7 @@ export default class Windshaft {
         };
     }
 
-    getDataframe(x, y, z) {
-        return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z));
-    }
-
-    _requestDataframe(x, y, z) {
-        const mvt_extent = 4096;
-
-        return fetch(this._getTileUrl(x, y, z))
-            .then(rawData => rawData.arrayBuffer())
-            .then(response => {
-
-                if (response.byteLength == 0 || response == 'null') {
-                    return { empty: true };
-                }
-                var tile = new VectorTile(new Protobuf(response));
-                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {};
-
-                const numFields = [];
-                const catFields = [];
-                const dateFields = [];
-                this._MNS.columns.map(name => {
-                    const basename = R.schema.column.getBase(name);
-                    const type = this.metadata.columns.find(c => c.name == basename).type;
-                    if (type == 'category') {
-                        catFields.push(name);
-                    } else if (type == 'number') {
-                        numFields.push(name);
-                    } else if (type == 'date') {
-                        dateFields.push(name);
-                    } else {
-                        throw new Error(`Column type '${type}' not supported`);
-                    }
-
-                });
-                catFields.map((name, i) => fieldMap[name] = i);
-                numFields.map((name, i) => fieldMap[name] = i + catFields.length);
-                dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
-
-                const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
-
-                var rs = rsys.getRsysFromTile(x, y, z);
-                let dataframeProperties = {};
-                Object.keys(fieldMap).map((name, pid) => {
-                    dataframeProperties[name] = properties[pid];
-                });
-                let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, this.metadata.geomType);
-                this._addDataframe(dataframe);
-                return dataframe;
-            });
-    }
-
-    _getTileUrl(x, y, z) {
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
-    }
-
-    _getSubdomain(x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
-    }
-
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
-        const properties = [];
-        for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
-            properties.push(new Float32Array(mvtLayer.length + 1024));
-        }
-        if (metadata.geomType == geometryTypes.POINT) {
-            var points = new Float32Array(mvtLayer.length * 2);
-        }
-        let featureGeometries = [];
-        for (var i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            const geom = f.loadGeometry();
-            if (metadata.geomType == geometryTypes.POINT) {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (metadata.geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = decodePolygons(geom, mvt_extent);
-                featureGeometries.push(decodedPolygons);
-            } else if (metadata.geomType == geometryTypes.LINE) {
-                const decodedLines = decodeLines(geom, mvt_extent);
-                featureGeometries.push(decodedLines);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
-            }
-
-            catFields.map((name, index) => {
-                properties[index][i] = this._getCategoryIDFromString(f.properties[name]);
-            });
-            numFields.map((name, index) => {
-                properties[index + catFields.length][i] = Number(f.properties[name]);
-            });
+    /* FIXME
             dateFields.map((name, index) => {
                 const d = Date.parse(f.properties[name]);
                 const metadataColumn = metadata.columns.find(c => c.name == name);
@@ -473,10 +311,7 @@ export default class Windshaft {
                 const n = (d - min) / (max.getTime() - min.getTime());
                 properties[index + catFields.length + numFields.length][i] = n;
             });
-        }
-
-        return { properties, points, featureGeometries };
-    }
+*/
 
     _adaptMetadata(meta) {
         const { stats, aggregation } = meta;
@@ -583,7 +418,3 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
         return promiseGenerator(finalAssumptions);
     }
 }
-
-/**
- * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
- */
