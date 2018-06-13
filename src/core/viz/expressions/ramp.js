@@ -146,30 +146,41 @@ export default class Ramp extends BaseExpression {
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }
+    
     _getColorsFromPalette(input, palette) {
-        if (palette.type == 'palette') {
-            let colors;
-            if (input.numCategories) {
-                // If we are not gonna pop the others we don't need to get the extra color
-                const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
-                if (palette.subPalettes[subPalette]) {
-                    colors = palette.subPalettes[subPalette];
-                } else {
-                    // More categories than palettes, new colors will be created by linear interpolation
-                    colors = palette.getLongestSubPalette();
-                }
-            } else {
-                colors = palette.getLongestSubPalette();
-            }
-            // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
-            if (palette.tags.includes('qualitative') && !input.othersBucket) {
-                colors = colors.slice(0, colors.length - 1);
-            }
-            return colors;
-        } else {
-            return palette.colors;
-        }
+        return palette.type == 'palette'
+            ? this._getColorsFromPaletteType(input, palette)
+            : this._getColorsFromColorArrayType(input, palette);
     }
+
+    _getColorsFromPaletteType (input, palette) {
+        let colors = input.numCategories
+            ? this._getSubPalettes(input, palette)
+            : palette.getLongestSubPalette();
+
+        const othersBucket = input.othersBucket && (input.numCategories - 1) < colors.length;
+        // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
+        return palette.tags.includes('qualitative') && !othersBucket
+            ? _removeOtherFromColors(colors)
+            : colors;
+    }
+
+    _getColorsFromColorArrayType (input, palette) {
+        const isBucketColorsComplete = input.othersBucket && (input.numCategories - 1) < palette.colors.length;
+        
+        return isBucketColorsComplete
+            ? _removeOtherFromColors(palette.colors)
+            : palette.colors;
+    }
+
+    _getSubPalettes(input, palette) {
+        const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
+
+        return palette.subPalettes[subPalette]
+            ? palette.subPalettes[subPalette]
+            : palette.getLongestSubPalette();
+    }
+    
     _postShaderCompile(program, gl) {
         if (this.palette.type == 'sprites') {
             this.palette._postShaderCompile(program, gl);
@@ -204,6 +215,7 @@ export default class Ramp extends BaseExpression {
                     pixel[4 * i + 2] = v.b * 255;
                     pixel[4 * i + 3] = v.a * 255;
                 }
+                
                 this.pixel = pixel;
             } else {
                 const pixel = new Float32Array(width);
@@ -284,4 +296,8 @@ function interpolate(low, high, m) {
     };
 
     return cielabToSRGB(cielabInterpolated);
+}
+
+function _removeOtherFromColors (colors) {
+    return colors.slice(0, colors.length - 1);
 }
