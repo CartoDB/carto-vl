@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Animation | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../dist/carto-vl.js"></script>
+    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+        }
+
+        #sidebar {
+            padding: 25px;
+            width: 275px;
+            background: #f8f8f8;
+        }
+
+        #sidebar h1 {
+            font: 100 42px/1.4 'Roboto';
+            margin-bottom: 10px;
+        }
+
+        #sidebar h2 {
+            font: 200 21px/1.4 'Roboto';
+            margin-bottom: 10px;
+        }
+
+        #sidebar div {
+            font: 300 14px/1.6 'Roboto';
+            margin-bottom: 20px;
+        }
+
+        #sidebar div input {
+            margin-right: 5px;
+        }
+
+        input[type="button"] {
+            align-items: center;
+            background: #1785FB;
+            border-radius: 4px;
+            border: 0;
+            box-shadow: none;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            font: 500 12px/20px 'Roboto';
+            margin: 0;
+            padding: 6px 12px;
+            transition: all 0.2s ease;
+            vertical-align: top;
+        }
+
+        #map {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <h1>Torque</h1>
+        <h2>Controls</h2>
+        <div>
+            <input type="button" id="js-play-btn" value="PLAY">
+            <input type="button" id="js-stop-btn" value="STOP">
+            <input type="button" id="js-pause-btn" value="PAUSE">
+        </div>
+        <h2>Duration</h2>
+        <div>
+            <input type="range" id="js-duration-range" min="1" max="60" step="1">
+            <span id="js-duration-span"></span> 10 seconds
+        </div>
+
+        <h2>Time</h2>
+        <div>
+            <input type="range" id="js-time-range" min="0" max="1" step="0.1">
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {},
+                layers: [{
+                    id: 'background',
+                    type: 'background',
+                    paint: {
+                        'background-color': 'black'
+                    }
+                }]
+            },
+            center: [0, 0],
+            zoom: 0,
+            dragRotate: false
+        });
+
+        const animStart = '2018-04-11T12:00:00Z';
+        const animEnd = '2018-04-12T12:00:00Z';
+
+        const source = new carto.source.GeoJSON(generateData(), {
+            dateColumns: ['sim_time']
+        });
+
+        function generateData() {
+            const features = [];
+            const length = 200;
+            const n = 50;
+            const x0 = 0;
+            const y0 = 0;
+            let id = 1;
+            const min_st = new Date(animStart);
+            const max_st = new Date(animEnd);
+            for (let step = 1; step <= n; ++step) {
+                features.push({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [step / n * length + x0 - length / 2, y0]
+                    },
+                    properties: {
+                        cartodb_id: id++,
+                        sim_time: (min_st.getTime() + (max_st - min_st) * step / n)
+                    }
+                });
+            }
+            return {
+                type: 'FeatureCollection',
+                features
+            };
+        }
+
+
+        const viz = new carto.Viz(`
+            @duration: 10
+            @torque: torque($sim_time, @duration, fade(0.2, 0.2))
+            width: linear($sim_time) * 100 + 1
+            strokeWidth: 0
+            filter: @torque`
+        );
+
+        const layer = new carto.Layer('layer', source, viz);
+        layer.addTo(map, 'background');
+
+        // Elements
+        const $playBtn = document.getElementById('js-play-btn');
+        const $stopBtn = document.getElementById('js-stop-btn');
+        const $pauseBtn = document.getElementById('js-pause-btn');
+        const $durationRange = document.getElementById('js-duration-range');
+        const $timeRange = document.getElementById('js-time-range');
+        const $spanDuration = document.getElementById('js-duration-span');
+
+        // Callbacks
+        $durationRange.onchange = () => {
+            const duration = parseInt($durationRange.value, 10);
+            viz.variables.duration = $spanDuration.innerHTML = duration;
+        }
+
+        $timeRange.onchange = () => {
+            const percent = parseInt($durationRange.value, 1);
+            viz.variables.torque.setSimTime(percent);
+        }
+
+        $playBtn.onclick = () => viz.variables.torque.play();
+        $pauseBtn.onclick = () => viz.variables.torque.pause();
+        $stopBtn.onclick = () => viz.variables.torque.stop();
+
+
+    </script>
+</body>
+
+</html>
