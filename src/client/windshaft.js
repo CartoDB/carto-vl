@@ -429,7 +429,7 @@ export default class Windshaft {
                 numFields.map((name, i) => fieldMap[name] = i + catFields.length);
                 dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
 
-                const { points, featureGeometries, properties, nFeatures } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
+                const { points, featureGeometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
                 let rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
@@ -437,7 +437,7 @@ export default class Windshaft {
                     dataframeProperties[name] = properties[pid];
                 });
                 let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, nFeatures, this.metadata.geomType);
+                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, numFeatures, this.metadata.geomType);
                 this._addDataframe(dataframe);
                 return dataframe;
             });
@@ -474,7 +474,7 @@ export default class Windshaft {
             points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
-        let nFeatures = 0;
+        let numFeatures = 0;
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
@@ -486,8 +486,8 @@ export default class Windshaft {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                points[2 * nFeatures + 0] = x;
-                points[2 * nFeatures + 1] = y;
+                points[2 * numFeatures + 0] = x;
+                points[2 * numFeatures + 1] = y;
 
             } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
@@ -499,10 +499,10 @@ export default class Windshaft {
             }
 
             catFields.map((name, index) => {
-                properties[index][nFeatures] = this._getCategoryIDFromString(f.properties[name]);
+                properties[index][numFeatures] = this._getCategoryIDFromString(f.properties[name]);
             });
             numFields.map((name, index) => {
-                properties[index + catFields.length][nFeatures] = Number(f.properties[name]);
+                properties[index + catFields.length][numFeatures] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
                 const d = f.properties[name] * 1000;
@@ -510,12 +510,12 @@ export default class Windshaft {
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
                 const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[index + catFields.length + numFields.length][nFeatures] = n;
+                properties[index + catFields.length + numFields.length][numFeatures] = n;
             });
-            nFeatures += 1;
+            numFeatures += 1;
         }
 
-        return { properties, points, featureGeometries, nFeatures };
+        return { properties, points, featureGeometries, numFeatures };
     }
 
     _adaptMetadata(meta) {
