@@ -496,9 +496,6 @@ export default class Windshaft {
             });
             dateFields.map((name, index) => {
                 const d = f.properties[name] * 1000;
-                if (Number.isNaN(new Date().setTime(d))) {
-                    throw new Error(`invalid MVT date ${d}`);
-                }
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;

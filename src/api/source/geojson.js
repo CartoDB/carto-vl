@@ -10,7 +10,7 @@ const SAMPLE_TARGET_SIZE = 1000;
 export default class GeoJSON extends Base {
 
     /**
-     * Create a carto.source.GeoJSON.
+     * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
      * @param {object} data - A GeoJSON data object
      * @param {object} options - Options

@@ -24,6 +24,7 @@ describe('src/core/viz/expressions/torque', () => {
         });
         it('should eval close to 0.75 when the input is 0 and we have wait a quarter of the animation', () => {
             const t = s.torque(0, 1, s.fade(1));
+            t._setTimestamp(0);
             t._setTimestamp(0.25);
             expect(t.eval()).toEqual(0.75);
         });

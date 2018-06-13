@@ -78,6 +78,9 @@ export default class Layer {
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
+        this._integratorPromise = new Promise((resolve) => {
+            this._integratorCallback = resolve;
+        });
 
         this.metadata = null;
         this._renderLayer = new RenderLayer();
@@ -141,6 +144,7 @@ export default class Layer {
         const uid = this._atomicChangeUID;
         const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
+        await this._integratorPromise;
         await loadSpritesPromise;
 
         await this._context;
@@ -159,6 +163,11 @@ export default class Layer {
         }
         this._source = source;
         this.requestData();
+
+        await this._context;
+        if (this._atomicChangeUID > uid) {
+            throw new Error('Another atomic change was done before this one committed');
+        }
 
         if (this._viz) {
             this._viz.onChange(null);
@@ -233,6 +242,7 @@ export default class Layer {
     initCallback() {
         this._renderLayer.renderer = this._integrator.renderer;
         this._contextInitCallback();
+        this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
         this.requestMetadata();
     }
 
@@ -241,7 +251,6 @@ export default class Layer {
         if (!viz) {
             return;
         }
-        await this._context;
         return this._source.requestMetadata(viz);
     }
 
@@ -289,10 +298,10 @@ export default class Layer {
                 this._isUpdated = false;
                 this._fire('updated');
             }
-        }
-        if (!this._isLoaded && this.state == 'dataLoaded') {
-            this._isLoaded = true;
-            this._fire('loaded');
+            if (!this._isLoaded && this.state == 'dataLoaded') {
+                this._isLoaded = true;
+                this._fire('loaded');
+            }
         }
     }
 
@@ -350,6 +359,7 @@ export default class Layer {
     _addToCartoMap(map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _addToMGLMap(map, beforeLayerID) {
@@ -365,6 +375,7 @@ export default class Layer {
     _onMapLoaded(map, beforeLayerID) {
         this._integrator = getMGLIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
+        this._integratorCallback(this._integrator);
     }
 
     _compileShaders(viz, metadata) {
@@ -427,7 +438,6 @@ export default class Layer {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
         }
-        throw new Error('?');
     }
 
     _freeSource() {

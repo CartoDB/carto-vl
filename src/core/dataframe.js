@@ -155,16 +155,17 @@ export default class Dataframe {
         const columnNames = Object.keys(this.properties);
         const vizWidth = viz.width;
         const vizStrokeWidth = viz.strokeWidth;
+
         for (let i = 0; i < points.length; i += 2) {
             const featureIndex = i / 2;
             const center = {
                 x: points[i],
                 y: points[i + 1],
             };
-            const f = {};
-            columnNames.forEach(name => {
-                f[name] = this.properties[name][featureIndex];
-            });
+            const f = this._getFeature(columnNames, featureIndex);
+            if (this._isFeatureFiltered(f, viz.filter)) {
+                continue;
+            }
             const pointWidth = vizWidth.eval(f);
             const pointStrokeWidth = vizStrokeWidth.eval(f);
             const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
@@ -173,88 +174,48 @@ export default class Dataframe {
             const scale = diameter / 2 * widthScale;
             const inside = pointInCircle(p, center, scale);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._getUserFeature(featureIndex));
             }
         }
         return features;
     }
 
     _getLinesAtPosition(pos, viz) {
-        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
-        const vertices = this.decodedGeom.vertices;
-        const normals = this.decodedGeom.normals;
-        const breakpoints = this.decodedGeom.breakpoints;
-        let featureIndex = 0;
-        const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.width;
-        // Linear search for all features
-        // Tests triangles instead of polygons since we already have the triangulated form
-        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureIndex]) {
-                featureIndex++;
-            }
-            const f = {};
-            columnNames.forEach(name => {
-                f[name] = this.properties[name][featureIndex];
-            });
-            // Line with is saturated at 336px
-            const lineWidth = Math.min(vizWidth.eval(f), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = lineWidth / 2 * widthScale;
-            const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * scale,
-                y: vertices[i + 1] + normals[i + 1] * scale
-            };
-            const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * scale,
-                y: vertices[i + 3] + normals[i + 3] * scale
-            };
-            const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * scale,
-                y: vertices[i + 5] + normals[i + 5] * scale
-            };
-            const inside = pointInTriangle(p, v1, v2, v3);
-            if (inside) {
-                this._addFeatureToArray(featureIndex, features);
-                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
-                // Also, don't waste CPU cycles
-                i = breakpoints[featureIndex] - 6;
-            }
-        }
-        return features;
-
+        return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
     }
-
     _getPolygonAtPosition(pos, viz) {
+        return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
+    }
+    _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
-        let featureIndex = 0;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
         const columnNames = Object.keys(this.properties);
-        const vizStrokeWidth = viz.strokeWidth;
         // Linear search for all features
-        // Tests triangles instead of polygons since we already have the triangulated form
-        // Moreover, with an acceleration structure and triangle testing features can be subdivided easily
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i >= breakpoints[featureIndex]) {
-                featureIndex++;
-            }
-            const f = {};
-            columnNames.forEach(name => {
-                f[name] = this.properties[name][featureIndex];
-            });
-            // Line with is saturated at 336px
-            const lineWidth = Math.min(vizStrokeWidth.eval(f), 336);
+        // Tests triangles since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
+        let featureIndex = -1;
+        let scale;
+        let computeScale = feature => {
+            // Width is saturated at 336px
+            const width = Math.min(widthExpression.eval(feature), 336);
             // width is a diameter and scale is radius-like, we need to divide by 2
-            const scale = lineWidth / 2 * widthScale;
+            scale = width / 2 * widthScale;
+        };
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i == 0 || i >= breakpoints[featureIndex]) {
+                featureIndex++;
+                const feature = this._getFeature(columnNames, featureIndex);
+                if (this._isFeatureFiltered(feature, filterExpression)) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
+                computeScale(feature);
+            }
             const v1 = {
                 x: vertices[i + 0] + normals[i + 0] * scale,
                 y: vertices[i + 1] + normals[i + 1] * scale
@@ -269,7 +230,7 @@ export default class Dataframe {
             };
             const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                this._addFeatureToArray(featureIndex, features);
+                features.push(this._getUserFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -278,7 +239,19 @@ export default class Dataframe {
         return features;
     }
 
-    _addFeatureToArray(featureIndex, features) {
+    _getFeature(columnNames, featureIndex) {
+        const f = {};
+        columnNames.forEach(name => {
+            f[name] = this.properties[name][featureIndex];
+        });
+        return f;
+    }
+    _isFeatureFiltered(feature, filterExpression) {
+        const isFiltered = filterExpression.eval(feature) < 0.5;
+        return isFiltered;
+    }
+
+    _getUserFeature(featureIndex) {
         let id = '';
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
@@ -293,7 +266,7 @@ export default class Dataframe {
                 properties[propertyName] = prop;
             }
         });
-        features.push({ id, properties });
+        return { id, properties };
     }
 
     _addProperty(propertyName, propertiesFloat32Array) {
@@ -305,6 +278,7 @@ export default class Dataframe {
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
+        this.height = height;
 
         let propertyID = this.propertyID[propertyName];
         if (propertyID === undefined) {
@@ -326,10 +300,6 @@ export default class Dataframe {
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties(properties) {
-        const width = this.renderer.RTT_WIDTH;
-        const height = Math.ceil(this.numFeatures / width);
-
-        this.height = height;
         Object.keys(properties).forEach(propertyName => {
             this._addProperty(propertyName, properties[propertyName]);
             this.properties[propertyName] = properties[propertyName];

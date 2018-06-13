@@ -225,17 +225,17 @@ describe('Interactivity', () => {
                 });
 
                 it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
-                    const featureClickOutSpy = jasmine.createSpy('featureClickOutSpy');
+                    const featureEnterSpy = jasmine.createSpy('featureEnterSpy');
                     onLoaded(() => {
+                        interactivity.on('featureEnter', featureEnterSpy);
                         // Move mouse inside a feature 1
                         util.simulateMove({ lng: 5, lat: 5 });
-                        interactivity.on('featureEnter', featureClickOutSpy);
-                        interactivity.on('featureHover', () => {
-                            expect(featureClickOutSpy).not.toHaveBeenCalled();
-                            done();
-                        });
                         // Move mouse inside the same feature 1
                         util.simulateMove({ lng: 5, lat: 15 });
+                        setTimeout(() => {
+                            expect(featureEnterSpy).toHaveBeenCalledTimes(1);
+                            done();
+                        }, 0);
                     });
                 });
             });
@@ -256,13 +256,13 @@ describe('Interactivity', () => {
 
                 it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
                     onLoaded(() => {
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
                         interactivity.on('featureLeave', event => {
                             expect(event.features[0].id).toEqual(-0);
                             expect(event.features[0].layerId).toEqual('layer1');
                             done();
                         });
+                        // Move mouse inside a feature 1
+                        util.simulateMove({ lng: 5, lat: 5 });
                         // Move mouse outside any feature
                         util.simulateMove({ lng: -5, lat: -5 });
                     });

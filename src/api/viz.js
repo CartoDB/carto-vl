@@ -38,7 +38,8 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
 
     /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be displayed and processed.
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled, 
+    * displayed and processed.
     *
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -396,7 +397,7 @@ export default class Viz {
 
     _checkVizSpec(vizSpec) {
         /**
-         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controling multiple aspects.
+         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
          * @property {Color} color - fill color of points and polygons and color of lines
