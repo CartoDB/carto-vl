@@ -174,7 +174,7 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import { NamedColor } from './expressions/color/named-color';
+import { NamedColor } from './expressions/color/NamedColor';
 
 import Near from './expressions/near';
 
