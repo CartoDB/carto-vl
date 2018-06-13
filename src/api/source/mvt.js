@@ -1,13 +1,10 @@
-import Base from './base';
 import * as rsys from '../../client/rsys';
 import Dataframe from '../../core/dataframe';
 import * as Protobuf from 'pbf';
-import { VectorTile, VectorTileFeature } from '@mapbox/vector-tile';
+import { VectorTile } from '@mapbox/vector-tile';
 import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
-import { validateTemplateURL } from '../url';
-import * as util from '../util';
-import CartoValidationError from '../error-handling/carto-validation-error';
-import DataframeCache from './DataframeCache';
+import TileClient from './TileClient';
+import Base from './base';
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -16,7 +13,7 @@ const geometryTypes = {
     POLYGON: 'polygon'
 };
 
-export default class MVT extends Base {
+export default class MVT extends Base{
 
     /**
      * Create a carto.source.MVT.
@@ -37,184 +34,112 @@ export default class MVT extends Base {
      */
     constructor(templateURL, metadata = { columns: [] }) {
         super();
-        this._validateInputParams(templateURL, metadata);
         this._templateURL = templateURL;
-        this._requestGroupID = 0;
-        this._oldDataframes = [];
-        this.metadata = metadata;
-        this._cache = new DataframeCache();
-    }
-
-    _validateInputParams(url, metadata) {
-        validateTemplateURL(url);
-        if (util.isUndefined(metadata)) {
-            throw new CartoValidationError('source', 'metadataRequired');
-        }
+        this._metadata = metadata;
+        this._tileClient = new TileClient(templateURL);
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
     }
 
     _clone() {
-        return new MVT(this._templateURL, this.metadata);
+        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)));
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
+        this._tileClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
-    async requestMetadata(viz) {
-        this._MNS = viz.getMinimumNeededSchema();
-        return this.metadata;
+    async requestMetadata() {
+        return this._metadata;
     }
 
     requestData(viewport) {
-        const tiles = rsys.rTiles(viewport);
-        this._getTiles(tiles);
+        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this));
     }
 
-    free() {
-        this._cache = new DataframeCache();
-        this._oldDataframes = [];
-    }
-
-    _getTiles(tiles) {
-        this._requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
-        const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
-            this._getDataframe(x, y, z).then(dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.map(d => d.active = false);
-                    completedTiles.map(d => d.active = true);
-                    this._oldDataframes = completedTiles;
-                    this._dataLoadedCallback();
-                }
-            });
-        });
-    }
-
-    _getDataframe(x, y, z) {
-        return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z));
-    }
-
-    _requestDataframe(x, y, z) {
+    async responseToDataframeTransformer(response, x, y, z) {
         const mvt_extent = 4096;
+        const arrayBuffer = await response.arrayBuffer();
+        if (arrayBuffer.byteLength == 0 || response == 'null') {
+            return { empty: true };
+        }
+        const tile = new VectorTile(new Protobuf(arrayBuffer));
+        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+        this._metadata.geomType = geometryTypes.POLYGON;
 
-        return fetch(this._getTileUrl(x, y, z))
-            .then(rawData => rawData.arrayBuffer())
-            .then(response => {
+        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, mvt_extent);
 
-                if (response.byteLength == 0 || response == 'null') {
-                    return { empty: true };
-                }
-                var tile = new VectorTile(new Protobuf(response));
-                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {};
-                const numFields = [];
-                const jsonFields = [];
-                const stringFields = [];
-                this.metadata.columns.map(c => {
-                    const type = c.type;
-                    if (type == 'json') {
-                        jsonFields.push(c.name);
-                    } else if (type == 'number') {
-                        numFields.push(c.name);
-                    } else if (type == 'category') {
-                        stringFields.push(c.name);
-                    } else {
-                        throw new Error(`Column type '${type}' not supported`);
-                    }
 
-                });
-                numFields.map((name, i) => fieldMap[name] = i);
-                jsonFields.map((name, i) => fieldMap[name] = i + numFields.length);
-                stringFields.map((name, i) => fieldMap[name] = i + jsonFields.length);
-
-                const { points, featureGeometries, properties, geomType } = this._decodeMVTLayer(mvtLayer, mvt_extent, this._MNS, jsonFields, numFields, stringFields, fieldMap);
-                this.metadata.geomType = geomType;
-
-                var rs = rsys.getRsysFromTile(x, y, z);
-                let dataframeProperties = {};
-                Object.keys(fieldMap).map((name, pid) => {
-                    dataframeProperties[name] = properties[pid];
-                });
-                let dataFrameGeometry = geomType == geometryTypes.POINT ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, mvtLayer.length, geomType);
-                this._addDataframe(dataframe);
-                return dataframe;
-            });
+        const rs = rsys.getRsysFromTile(x, y, z);
+        const dataframeGeometry = this._metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
+        const dataframe = this._generateDataFrame(rs, dataframeGeometry, properties, mvtLayer.length, this._metadata.geomType);
+        return dataframe;
     }
 
-    _getTileUrl(x, y, z) {
-        return this._templateURL.replace('{x}', x).replace('{y}', y).replace('{z}', z);
-    }
 
-    _getSubdomain(x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
-    }
-
-    _decodeMVTLayer(mvtLayer, mvt_extent, MNS, jsonFields, numFields, stringFields, fieldMap) {
-        const properties = [];
-        this.metadata.columns.map(c => {
-            var e = null;
-            if (c.type == 'number') {
-                e = new Float32Array(mvtLayer.length + 1024);
-            } else if (c.type == 'json') {
-                e = {};
-            } else if (c.type == 'category') {
-                e = {};
-            }
-            properties[fieldMap[c.name]] = e;
-        });
-        var points = null;
-        const geomType = VectorTileFeature.types[mvtLayer.feature(0).type].toLowerCase();
+    _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
+        let points;
+        if (metadata.geomType == geometryTypes.POINT) { // TODO, FIXME, autodiscover geometry type
+            points = new Float32Array(mvtLayer.length * 2);
+        }
         let featureGeometries = [];
-        for (var i = 0; i < mvtLayer.length; i++) {
+        const decodedProperties = {};
+        for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            if (geomType == geometryTypes.POINT) {
-                if (points == null) {
-                    points = new Float32Array(mvtLayer.length * 2);
-                }
+            if (metadata.geomType == geometryTypes.POINT) {
                 points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (geomType == geometryTypes.POLYGON) {
+            } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
-            } else if (geomType == geometryTypes.LINE) {
+            } else if (metadata.geomType == geometryTypes.LINE) {
                 const decodedLines = decodeLines(geom, mvt_extent);
                 featureGeometries.push(decodedLines);
             } else {
-                throw new Error(`Unimplemented geometry type: '${geomType}'`);
+                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }
-
-            // TODO check number of properties received and send error if not all the defined
-            // properties are being received
-            this.metadata.columns.map(c => {
-                var e = null;
-                if (c.type === 'number') {
-                    e = Number(f.properties[c.name]);
-                } else if (c.type == 'json') {
-                    e = JSON.parse(f.properties[c.name]);
-                } else if (c.type == 'category') {
-                    e = f.properties[c.name];
+            Object.keys(f.properties).forEach(propertyName => {
+                const propertyValue = f.properties[propertyName];
+                const decodedPropertyValue = this._decodeProperty(propertyName, propertyValue);
+                if (decodedPropertyValue !== undefined) {
+                    if (decodedProperties[propertyName] === undefined) {
+                        decodedProperties[propertyName] = new Float32Array(mvtLayer.length + 1024);
+                        decodedProperties[propertyName].fill(Number.NaN);
+                    }
+                    decodedProperties[propertyName][i] = decodedPropertyValue;
                 }
-                properties[fieldMap[c.name]][i] = e;
             });
         }
+        return { properties: decodedProperties, points, featureGeometries };
+    }
 
-        return { properties, points, featureGeometries, geomType };
+    _decodeProperty(propertyName, propertyValue) {
+        // TODO custom decoding
+        if (typeof propertyValue === 'string') {
+            return this._categorizeString(propertyValue);
+        } else if (typeof propertyValue === 'number') {
+            return propertyValue;
+        } else if (propertyValue == null || propertyValue == undefined) {
+            return Number.NaN;
+        } else {
+            throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+        }
+    }
+    _categorizeString(category) {
+        if (category === undefined) {
+            category = 'null';
+        }
+        if (this._categoryStringToIDMap[category] !== undefined) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._categoryStringToIDMap[category] = this._numCategories;
+        this._numCategories++;
+        return this._categoryStringToIDMap[category];
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
-        const dataframe = new Dataframe({
+        return new Dataframe({
             active: false,
             center: rs.center,
             geom: geometry,
@@ -222,9 +147,11 @@ export default class MVT extends Base {
             scale: rs.scale,
             size: size,
             type: type,
-            metadata: this.metadata,
+            metadata: this._metadata,
         });
+    }
 
-        return dataframe;
+    free() {
+        this._tileClient.free();
     }
 }

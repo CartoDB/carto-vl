@@ -53,7 +53,7 @@
             id: 'europe',
             type: 'mapnik',
             options: {
-              sql: `SELECT * FROM ne_adm0_europe`
+              sql: `SELECT * FROM mnmappluto`
             }
           }
         ]
@@ -69,9 +69,9 @@
       const layergroup = await response.json();
       const tilejson = layergroup.metadata.tilejson.vector;
 
-      const source = new carto.source.MVT(tilejson.tiles[0]);
+      const source = new carto.source.MVT(tilejson.tiles[0], { columns: [{ name: 'numfloors', type: 'number' }] });
 
-      const viz = new carto.Viz();
+      const viz = new carto.Viz(`color: ramp(linear($numfloors 0, 20), temps)`);
       const layer = new carto.Layer('layer', source, viz);
 
       layer.addTo(map, 'watername_ocean');
