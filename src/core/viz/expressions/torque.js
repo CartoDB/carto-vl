@@ -123,7 +123,7 @@ export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
         let originalInput = input;
-        
+
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         } else {
@@ -135,9 +135,9 @@ export class Torque extends BaseExpression {
         checkLooseType('torque', 'duration', 1, 'number', duration);
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
-        
+
         const progress = number(0);
-        
+
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
         this.type = 'number';
@@ -149,9 +149,12 @@ export class Torque extends BaseExpression {
     }
 
     _setTimestamp(timestamp) {
+        if (this._paused) {
+            return;
+        }
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
-    
+
         if (this._lastTime !== undefined) {
             deltaTime = timestamp - this._lastTime;
         }
@@ -173,10 +176,11 @@ export class Torque extends BaseExpression {
         const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        
+
         const output = 1 - clamp(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
         return output;
     }
+
     /**
      * Get the current time stamp of the simulation
      *
@@ -186,7 +190,6 @@ export class Torque extends BaseExpression {
      * @instance
      * @name getSimTime
      */
-    
     getSimTime() {
         const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
@@ -203,10 +206,22 @@ export class Torque extends BaseExpression {
         return new Date(tmix);
     }
 
+    /**
+    * Pause the simulation
+    *
+    * @api
+    * @memberof carto.expressions.Torque
+    * @instance
+    * @name pause
+    */
+    pause() {
+        this._paused = true;
+    }
+
     get input() {
         return this._input instanceof Variable ? this._input.alias : this._input;
     }
-    
+
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
