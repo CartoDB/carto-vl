@@ -142,16 +142,14 @@ export class Torque extends BaseExpression {
         // TODO improve type check
         this.type = 'number';
         this._originalInput = originalInput;
+        this._paused = false;
     }
 
     isAnimated() {
-        return true;
+        return !this.paused;
     }
 
     _setTimestamp(timestamp) {
-        if (this._paused) {
-            return;
-        }
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -160,6 +158,11 @@ export class Torque extends BaseExpression {
         }
 
         this._lastTime = timestamp;
+
+        if (this._paused) {
+            return;
+        }
+
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
 
         super._setTimestamp(timestamp);
@@ -207,14 +210,51 @@ export class Torque extends BaseExpression {
     }
 
     /**
-    * Pause the simulation
-    *
-    * @api
-    * @memberof carto.expressions.Torque
-    * @instance
-    * @name pause
-    */
+     * 
+     * @param {number} percentage - A number in the [0-100] range setting the animation status.
+     */
+    setSimTime(percentage) {
+        percentage = Number.parseFloat(percentage);
+        if (percentage < 0 || percentage > 100) {
+            throw new TypeError(`torque.setSimTime requires a number between 0 and 100 as parameter but got: ${percentage}`);
+        }
+        this.progress.expr = percentage / 100;
+    }
+
+    /**
+     * Pause the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name pause
+     */
     pause() {
+        this._paused = true;
+    }
+
+    /**
+     * Play/resume the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name play
+     */
+    play() {
+        this._paused = false;
+    }
+
+    /**
+     * Stops the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name stop
+     */
+    stop() {
+        this.progress.expr = 0;
         this._paused = true;
     }
 

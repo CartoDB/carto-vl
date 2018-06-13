@@ -9,23 +9,23 @@ describe('src/core/viz/expressions/torque', () => {
         validateTypeErrors('torque', ['color', 10]);
         validateTypeErrors('torque', ['number', 'color']);
     });
-    
+
     describe('type', () => {
         validateStaticType('torque', ['number'], 'number');
         validateStaticType('torque', ['number', 10], 'number');
     });
-    
+
     describe('.eval()', () => {
         it('should eval to 0 when the input is 1', () => {
             expect(s.torque(1).eval()).toEqual(0);
         });
-        
+
         it('should eval close to 1 when the input is 0 and the fading is high', () => {
             const t = s.torque(0, 10, s.fade(10));
             t._setTimestamp(0);
             expect(t.eval()).toEqual(1);
         });
-        
+
         it('should eval close to 0.75 when the input is 0 and we have wait a quarter of the animation', () => {
             const t = s.torque(0, 1, s.fade(1));
             t._setTimestamp(0);
@@ -40,31 +40,38 @@ describe('src/core/viz/expressions/torque', () => {
         });
 
         it('should not affect the simulation when playing', () => {
-            
+
         });
     });
 
-    describe('.pause', () => {
-        it('should not affect the simulation when paused/stopped', () => {
-
-        });
-
+    fdescribe('.pause', () => {
         it('should pause the simulation when playing', () => {
-            
+            const t = s.torque(1, 1, s.fade(0.5));
+            t._setTimestamp(0);
+            t.pause();
+            t._setTimestamp(1);
+            expect(t.eval()).toEqual(0);
         });
     });
 
-    describe('.stop', () => {
+    fdescribe('.stop', () => {
+        let t;
+        beforeEach(() => t = s.torque(1, 1, s.fade(1)));
         it('should stop the simulation when playing', () => {
+            t._setTimestamp(0);
+            t.stop();
+            t._setTimestamp(1);
+
+            expect(t.eval()).toEqual(0);
 
         });
 
-        it('should stop the simulation when paused/stopped', () => {
+        it('should reset the simulation time', () => {
+            t._setTimestamp(0);
+            t.stop();
+            t._setTimestamp(1);
 
+            expect(t.progress.value).toEqual(0);
         });
-    });
-
-    describe('.setSimulationTime', () => {
-
     });
 });

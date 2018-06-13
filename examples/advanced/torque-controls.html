@@ -84,7 +84,7 @@
 
         <h2>Time</h2>
         <div>
-            <input type="range" id="js-time-range" min="0" max="1" step="0.1">
+            <input type="range" id="js-time-range" min="0" max="100" step="0.5">
         </div>
     </div>
 
@@ -170,13 +170,16 @@
         }
 
         $timeRange.onchange = () => {
-            const percent = parseInt($durationRange.value, 1);
-            viz.variables.torque.setSimTime(percent);
+            viz.variables.torque.setSimTime($timeRange.value);
         }
 
         $playBtn.onclick = () => viz.variables.torque.play();
         $pauseBtn.onclick = () => viz.variables.torque.pause();
         $stopBtn.onclick = () => viz.variables.torque.stop();
+
+        setInterval(() => {
+            $timeRange.value = viz.variables.torque.progress.value * 100;
+        }, 500)
 
 
     </script>
