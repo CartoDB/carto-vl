@@ -36,17 +36,17 @@ fdescribe('src/core/viz/expressions/torque', () => {
 
 
 
-    fdescribe('.pause', () => {
+    describe('.pause', () => {
         it('should pause the simulation when playing', () => {
             const t = s.torque(1, 10, s.fade(0));
-            t._setTimestamp(1);
+            t._setTimestamp(0);
             t.pause();
             t._setTimestamp(1);
             expect(t.getSimProgress()).toEqual(0);
         });
     });
 
-    fdescribe('.play', () => {
+    describe('.play', () => {
         it('should start the simulation when paused/stopped', () => {
             const t = s.torque(1, 10, s.fade(0));
             t._setTimestamp(0);
@@ -57,7 +57,7 @@ fdescribe('src/core/viz/expressions/torque', () => {
         });
     });
 
-    fdescribe('.stop', () => {
+    describe('.stop', () => {
         it('should stop the simulation when playing', () => {
             const t = s.torque(1, 10, s.fade(0));
             t._setTimestamp(0);
@@ -67,12 +67,13 @@ fdescribe('src/core/viz/expressions/torque', () => {
             expect(t.getSimProgress()).toEqual(0);
         });
 
-        xit('should reset the simulation time', () => {
+        it('should reset the simulation time', () => {
             const t = s.torque(1, 10, s.fade(0));
+            t._setTimestamp(0);
             t._setTimestamp(1);
             expect(t.getSimProgress()).toEqual(0.1);
 
-            t.pause();
+            t.stop();
             expect(t.getSimProgress()).toEqual(0);
         });
     });
