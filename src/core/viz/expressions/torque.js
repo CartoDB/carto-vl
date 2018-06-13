@@ -3,6 +3,7 @@ import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIn
 import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
+import { isDate } from '../../../api/util';
 
 const DEFAULT_FADE = 0.15;
 
@@ -199,7 +200,7 @@ export class Torque extends BaseExpression {
         const max = this.input.max.eval();
 
         if (!(min instanceof Date)) {
-            return progress * (max - min) + min;
+            return new Date(progress * (max - min) + min);
         }
 
         const tmin = min.getTime();
@@ -218,9 +219,18 @@ export class Torque extends BaseExpression {
      * @param {Date} simulationTime - A javascript Date object with the new simulation time
      */
     setSimTime(simulationTime) {
-        // Normalize the date to the date range
-        // Throw if date is outside the range 
-        // Asign the progress
+        const tmin = this._input.min.eval();
+        const tmax = this._input.max.eval();
+        if (!isDate(simulationTime)) {
+            throw new TypeError(`torque.setSimTime requires a valid date as parameter but got ${simulationTime}`);
+        }
+        if (simulationTime.getTime() < tmin) {
+            throw new RangeError('torque.setSimTime requires the date parameter to be higher than the minimal date of the dataset');
+        }
+        if (simulationTime.getTime() > tmax) {
+            throw new RangeError('torque.setSimTime requires the date parameter to be lower than the maximun date of the dataset');
+        }
+        this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
     }
 
     /**
