@@ -69,6 +69,7 @@ export default class Ramp extends BaseExpression {
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
+        this.defaultOtherColor = '#E2E2E2';
         this.palette = palette;
         if (palette.type == 'number-array') {
             this.type = 'number';
@@ -158,26 +159,24 @@ export default class Ramp extends BaseExpression {
             ? this._getSubPalettes(input, palette)
             : palette.getLongestSubPalette();
 
-        const othersBucket = input.othersBucket && (input.numCategories - 1) < colors.length;
-        // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
-        return palette.tags.includes('qualitative') && !othersBucket
+        return _needsToRemoveOtherCategory(input, palette, colors)
             ? _removeOtherFromColors(colors)
             : colors;
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        const isBucketColorsComplete = input.othersBucket && (input.numCategories - 1) < palette.colors.length;
-        
-        return isBucketColorsComplete
-            ? _removeOtherFromColors(palette.colors)
-            : palette.colors;
+        return input.isBucketComplete && input.numCategories - 1 === palette.colors.length
+            ? _addOtherColorToColors(palette.colors, this.defaultOtherColor)
+            : palette.colors; 
     }
 
     _getSubPalettes(input, palette) {
-        const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
+        const subPaletteNumber = palette.tags.includes('qualitative') && !input.isCategoryType
+            ? input.numCategories
+            : input.numCategories - 1;
 
-        return palette.subPalettes[subPalette]
-            ? palette.subPalettes[subPalette]
+        return palette.subPalettes[subPaletteNumber]
+            ? palette.subPalettes[subPaletteNumber]
             : palette.getLongestSubPalette();
     }
     
@@ -192,6 +191,7 @@ export default class Ramp extends BaseExpression {
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
+
     _computeTextureIfNeeded() {
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
@@ -199,10 +199,13 @@ export default class Ramp extends BaseExpression {
             if (this.input.type == 'category') {
                 this.maxKey = this.input.numCategories - 1;
             }
+
             const width = 256;
+            
             if (this.type == 'color') {
                 const pixel = new Uint8Array(4 * width);
                 const colors = this._getColorsFromPalette(this.input, this.palette);
+
                 for (let i = 0; i < width; i++) {
                     const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
                     const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
@@ -230,6 +233,8 @@ export default class Ramp extends BaseExpression {
             }
         }
     }
+
+
     _computeGLTextureIfNeeded(gl) {
         this._computeTextureIfNeeded();
         if (this._GLtexCategories !== this.input.numCategories) {
@@ -300,4 +305,14 @@ function interpolate(low, high, m) {
 
 function _removeOtherFromColors (colors) {
     return colors.slice(0, colors.length - 1);
+}
+
+function _addOtherColorToColors (colors, otherColor) {
+    return colors.push(otherColor);
+}
+
+function _needsToRemoveOtherCategory (input, palette, colors) {
+    return palette.tags.includes('qualitative') && 
+    !input.isCategoryType &&
+    (input.numCategories - 1) >= colors.length;
 }
