@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
-describe('src/core/viz/expressions/torque', () => {
+fdescribe('src/core/viz/expressions/torque', () => {
     describe('error control', () => {
         validateFeatureDependentErrors('torque', [0.5, 'dependent']);
         validateTypeErrors('torque', ['category', 10]);
@@ -34,44 +34,46 @@ describe('src/core/viz/expressions/torque', () => {
         });
     });
 
-    describe('.play', () => {
-        it('should start the simulation when paused/stopped', () => {
 
-        });
-
-        it('should not affect the simulation when playing', () => {
-
-        });
-    });
 
     fdescribe('.pause', () => {
         it('should pause the simulation when playing', () => {
-            const t = s.torque(1, 1, s.fade(0.5));
-            t._setTimestamp(0);
+            const t = s.torque(1, 10, s.fade(0));
+            t._setTimestamp(1);
             t.pause();
             t._setTimestamp(1);
-            expect(t.eval()).toEqual(0);
+            expect(t.getSimProgress()).toEqual(0);
+        });
+    });
+
+    fdescribe('.play', () => {
+        it('should start the simulation when paused/stopped', () => {
+            const t = s.torque(1, 10, s.fade(0));
+            t._setTimestamp(0);
+            t.pause();
+            t.play();
+            t._setTimestamp(1);
+            expect(t.getSimProgress()).toEqual(0.1);
         });
     });
 
     fdescribe('.stop', () => {
-        let t;
-        beforeEach(() => t = s.torque(1, 1, s.fade(1)));
         it('should stop the simulation when playing', () => {
+            const t = s.torque(1, 10, s.fade(0));
             t._setTimestamp(0);
             t.stop();
             t._setTimestamp(1);
 
-            expect(t.eval()).toEqual(0);
-
+            expect(t.getSimProgress()).toEqual(0);
         });
 
-        it('should reset the simulation time', () => {
-            t._setTimestamp(0);
-            t.stop();
+        xit('should reset the simulation time', () => {
+            const t = s.torque(1, 10, s.fade(0));
             t._setTimestamp(1);
+            expect(t.getSimProgress()).toEqual(0.1);
 
-            expect(t.progress.value).toEqual(0);
+            t.pause();
+            expect(t.getSimProgress()).toEqual(0);
         });
     });
 });

@@ -84,7 +84,7 @@
 
         <h2>Time</h2>
         <div>
-            <input type="range" id="js-time-range" min="0" max="100" step="0.5">
+            <input type="range" id="js-time-range" min="0" max="1" step="0.01">
         </div>
     </div>
 
@@ -170,7 +170,7 @@
         }
 
         $timeRange.onchange = () => {
-            viz.variables.torque.setSimTime($timeRange.value);
+            viz.variables.torque.setSimProgress($timeRange.value);
         }
 
         $playBtn.onclick = () => viz.variables.torque.play();
@@ -178,7 +178,7 @@
         $stopBtn.onclick = () => viz.variables.torque.stop();
 
         setInterval(() => {
-            $timeRange.value = viz.variables.torque.progress.value * 100;
+            $timeRange.value = viz.variables.torque.getSimProgress();
         }, 500)
 
 

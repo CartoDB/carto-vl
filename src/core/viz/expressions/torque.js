@@ -210,15 +210,46 @@ export class Torque extends BaseExpression {
     }
 
     /**
-     * 
-     * @param {number} percentage - A number in the [0-100] range setting the animation status.
+     * Set the time stamp of the simulation
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name getSimTime
+     * @param {Date} simulationTime - A javascript Date object with the new simulation time
      */
-    setSimTime(percentage) {
-        percentage = Number.parseFloat(percentage);
-        if (percentage < 0 || percentage > 100) {
-            throw new TypeError(`torque.setSimTime requires a number between 0 and 100 as parameter but got: ${percentage}`);
+    setSimTime(simulationTime) {
+        // Normalize the date to the date range
+        // Throw if date is outside the range 
+        // Asign the progress
+    }
+
+    /**
+     * Get the simulation progress.
+     * 
+     * @returns {Number} A number representing the progress. 0 when the animation just started and 1 when complete.
+     * @api
+     * @instance
+     * @memberof carto.expressions.Torque
+     * @name getSimTime
+     */
+    getSimProgress() {
+        return this.progress.value;
+    }
+
+    /**
+     * Set the simulation progress from 0 to 1.
+     * @param {number} progress - A number in the [0-1] range setting the animation progress.
+     * @api
+     * @instance
+     * @memberof carto.expressions.Torque
+     * @name getSimTime
+     */
+    setSimProgress(progress) {
+        progress = Number.parseFloat(progress);
+        if (progress < 0 || progress > 1) {
+            throw new TypeError(`torque.setSimTime requires a number between 0 and 100 as parameter but got: ${progress}`);
         }
-        this.progress.expr = percentage / 100;
+        this.progress.expr = progress;
     }
 
     /**
