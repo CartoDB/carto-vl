@@ -69,7 +69,7 @@ By default your CARTO data is secured. So the first thing you need to do is [aut
 
 ```js
 carto.setDefaultAuth({
-    user: 'cartogl',
+    user: 'cartovl',
     apiKey: 'default_public'
 });
 ```

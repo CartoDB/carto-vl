@@ -1,11 +1,11 @@
 ## Introduction to Animation
 
-Using CARTO VL you can make animated maps of points, lines, and polygons using the [`torque`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstorque) expression. 
+Using CARTO VL you can make animated maps of points, lines, and polygons using the [`torque`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstorque) expression.
 
 **Note:**
-While the expression name torque is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation.
+While the expression name *torque* is inspired by another [CARTO technology](https://carto.com/torque/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation.
 
-### Torque parameters
+### Animation expression
 
 The general syntax for animating data in CARTO VL is:
 
@@ -14,27 +14,33 @@ filter: torque(input, duration, fade(fadeIn, fadeOut))
 ```
 
 #### Filter
-The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). The `torque` expression generates a cyclic value ranging from `0` to `1` within a specified animation duration. If a feature exists, it will be given a value of `1`, if not, `0`. By applying this generated value to a [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions), features appear only when there is a match. 
+
+The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). When the expression assigned to [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) (`torque` in our case) has the value `0` for a given feature, that feature will be filtered-out and not be shown. If the value is `1`, the feature will be visible.
+
+#### Torque expression
+
+The `torque` expression acts like a clock, generating cyclic values over a determinate period to match the values of its input; when a match occurs between the input and the internal cyclic value torque returns a `1` value and otherwise it returns a `0'.
 
 The next set of torque parameters are used to define the property, speed, and transition between animated features.
 
 #### Input
 
-The first torque parameter (input), is the attribute that you want to animate. By default, torque maps the attribute's minimum and maximum values to `0` and `1` respectively.
+The first torque parameter (input), is the attribute that you want to animate. By default, the torque cycle varies from the attributes's minimum value
+to its maximum.
 
-In the case where you only want to visualize a subset of data, that can be done manually, using linear interpolation. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to: 
+You can change this range of values by using a `linear` expression, and thus visualize a subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
 
 ```js
   torque(linear($month, 2, 6))
 ```
 
-Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression: 
+Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression:
 
 ```js
   torque(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
-``` 
+```
 
-In both cases, the minimum value is mapped to `0` and the maximum value is mapped to `1`. Values outside of the specified range will not appear in the animation. 
+Values outside of the specified range will not appear in the animation.
 
 #### Duration
 
@@ -42,7 +48,7 @@ This parameter defines the duration of the animation cycle in seconds. As stated
 
 #### Fade
 
-The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to `0` and the next set of features will begin to fade-in. 
+The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to `0` and the next set of features will begin to fade-in.
 
 ### Example
 
@@ -50,7 +56,8 @@ To illustrate these concepts, we will animate the journey of three birds from Ja
 
 #### Animate points
 
-For the temporal component of the animation we will use the input `date_time` that has the date of the bird track and associated timestamp. We will set the duration to `30` and both fade parameters to `1`. 
+For the temporal component of the animation we will use the input `date_time` that has the date of the bird track and associated timestamp. We will set the duration to `30` and both fade parameters to `1`, so that the animation will repeat every 30 seconds and features will take 1 second to gradually become visible and another second
+to disappear.
 
 ```js
 filter: torque($date_time,30,fade(1,1))
@@ -68,7 +75,7 @@ filter: torque($date_time,10,fade(1,1))
 
 #### Adjust fade
 
-Since we are visualizing migration, we can adjust the `fade` parameters to give us a better sense of the journey these birds took. We will set the `fadeIn` parameter to `0` and the `fadeOut` parameter to `0.5`. What this does is keep the previous point in the animation visible for longer which helps us better visualize the path of migration. 
+Since we are visualizing migration, we can adjust the `fade` parameters to give us a better sense of the journey these birds took. We will set the `fadeIn` parameter to `0` and the `fadeOut` parameter to `0.5`. What this does is keep the previous point in the animation visible for longer which helps us better visualize the path of migration.
 
 ```js
 filter: torque($date_time,10,fade(1,1))
