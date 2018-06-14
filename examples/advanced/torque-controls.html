@@ -92,68 +92,31 @@
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
-            style: {
-                version: 8,
-                sources: {},
-                layers: [{
-                    id: 'background',
-                    type: 'background',
-                    paint: {
-                        'background-color': 'black'
-                    }
-                }]
-            },
-            center: [0, 0],
-            zoom: 0,
-            dragRotate: false
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [-73.96, 40.75],
+            zoom: 11,
+            scrollZoom: false,
+            dragRotate: false,
+            touchZoomRotate: false,
         });
 
-        const animStart = '2018-04-11T12:00:00Z';
-        const animEnd = '2018-04-12T12:00:00Z';
-
-        const source = new carto.source.GeoJSON(generateData(), {
-            dateColumns: ['sim_time']
+        // Define user
+        carto.setDefaultAuth({
+            user: 'cartovl',
+            apiKey: 'default_public'
         });
 
-        function generateData() {
-            const features = [];
-            const length = 200;
-            const n = 50;
-            const x0 = 0;
-            const y0 = 0;
-            let id = 1;
-            const min_st = new Date(animStart);
-            const max_st = new Date(animEnd);
-            for (let step = 1; step <= n; ++step) {
-                features.push({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [step / n * length + x0 - length / 2, y0]
-                    },
-                    properties: {
-                        cartodb_id: id++,
-                        sim_time: (min_st.getTime() + (max_st - min_st) * step / n)
-                    }
-                });
-            }
-            return {
-                type: 'FeatureCollection',
-                features
-            };
-        }
-
+        // Define layer
+        const source = new carto.source.Dataset('taxi_50k');
 
         const viz = new carto.Viz(`
-            @duration: 10
-            @torque: torque($sim_time, @duration, fade(0.2, 0.2))
-            width: linear($sim_time) * 100 + 1
-            strokeWidth: 0
-            filter: @torque`
-        );
+            @duration: 30
+            @torque: torque(linear($tpep_pickup_datetime, time('2016-05-01T00:00:07Z'), time('2016-05-06T10:40:59Z')), @duration, fade(0.1, 0.5))
+            filter: @torque
+        `);
 
         const layer = new carto.Layer('layer', source, viz);
-        layer.addTo(map, 'background');
+        layer.addTo(map, 'watername_ocean');
 
         // Elements
         const $playBtn = document.getElementById('js-play-btn');
