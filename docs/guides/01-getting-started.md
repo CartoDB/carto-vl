@@ -81,7 +81,7 @@ const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 ```
 
 ### Defining the viz
-A [`viz`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed and processed. In this case we create an empty viz.
+A [`viz`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed, and processed. In this case we create an empty viz.
 
 ```js
 const viz = new carto.Viz();
@@ -103,9 +103,9 @@ layer.addTo(map);
 ```
 
 ### Giving styles to the map
-Using the viz object you can create complex visualizations of your data.
+Using the viz object you can decide how to visualize your data.
 
-The following Viz changes the color and size of the points on our map [See example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html).
+The following Viz changes the color and size of the points on our map. [See example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html).
 
 ```js
 const viz = new carto.Viz(`
