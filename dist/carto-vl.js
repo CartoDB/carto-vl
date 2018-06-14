@@ -14348,7 +14348,11 @@ const ViewportAvg = genViewportAgg('avg',
  */
 const ViewportMax = genViewportAgg('max',
     self => { self._value = Number.NEGATIVE_INFINITY; },
-    (self, y) => { self._value = Math.max(self._value, y); },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = Math.max(self._value, y);
+        }
+    },
     self => self._value
 );
 
@@ -14378,7 +14382,11 @@ const ViewportMax = genViewportAgg('max',
  */
 const ViewportMin = genViewportAgg('min',
     self => { self._value = Number.POSITIVE_INFINITY; },
-    (self, y) => { self._value = Math.min(self._value, y); },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = Math.min(self._value, y);
+        }
+    },
     self => self._value);
 
 /**
@@ -14407,7 +14415,11 @@ const ViewportMin = genViewportAgg('min',
  */
 const ViewportSum = genViewportAgg('sum',
     self => { self._value = 0; },
-    (self, y) => { self._value = self._value + y; },
+    (self, y) => {
+        if (!Number.isNaN(y)) {
+            self._value = self._value + y;
+        }
+    },
     self => self._value);
 
 /**
@@ -14453,9 +14465,11 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             });
             this._isViewport = true;
         }
-        isFeatureDependent(){
+
+        isFeatureDependent() {
             return false;
         }
+
         get value() {
             return resolveFn(this);
         }
@@ -14463,6 +14477,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
         eval() {
             return resolveFn(this);
         }
+
         _compile(metadata) {
             super._compile(metadata);
             // TODO improve type check
@@ -14470,15 +14485,19 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             this.type = 'number';
             super.inlineMaker = inline => inline._impostor;
         }
+
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();
         }
+
         _resetViewportAgg() {
             zeroFn(this);
         }
+
         _accumViewportAgg(feature) {
             accumFn(this, this.property.eval(feature));
         }
+
         _preDraw(...args) {
             this._impostor.expr = this.eval();
             super._preDraw(...args);
@@ -14523,9 +14542,11 @@ class ViewportPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         });
         this._isViewport = true;
     }
-    isFeatureDependent(){
+
+    isFeatureDependent() {
         return false;
     }
+
     get value() {
         return this.eval();
     }
@@ -14548,17 +14569,21 @@ class ViewportPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.type = 'number';
         super.inlineMaker = inline => inline.impostor;
     }
+
     _getMinimumNeededSchema() {
         return this.property._getMinimumNeededSchema();
     }
+
     _resetViewportAgg() {
         this._value = null;
         this._array = [];
     }
+
     _accumViewportAgg(feature) {
         const v = this.property.eval(feature);
         this._array.push(v);
     }
+
     _preDraw(...args) {
         this.impostor.expr = this.eval();
         super._preDraw(...args);
@@ -14609,16 +14634,19 @@ class ViewportHistogram extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
+
     _resetViewportAgg() {
         this._cached = null;
         this._histogram = new Map();
     }
+
     _accumViewportAgg(feature) {
         const x = this.x.eval(feature);
         const weight = this.weight.eval(feature);
         const count = this._histogram.get(x) || 0;
         this._histogram.set(x, count + weight);
     }
+
     get value() {
         if (this._cached == null) {
             if (!this._histogram) {
@@ -14656,6 +14684,7 @@ class ViewportHistogram extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         }
         return this._cached;
     }
+
     _compile(metadata) {
         this._metatada = metadata;
         super._compile(metadata);
@@ -19027,6 +19056,17 @@ const DEFAULT_FADE = 0.15;
  * const viz = new carto.Viz(`
  *   filter: torque($day, 40, fade(0.5))
  * `);
+ * 
+ * @example<caption>Fade in of 0.3 seconds without fading out.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, s.HOLD))
+ * });
+ * 
+ * @example<caption>Fade in of 0.3 seconds without fading out. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.3, HOLD))
+ * `);
  *
  * @memberof carto.expressions
  * @name fade
@@ -19116,6 +19156,7 @@ class Torque extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(duration);
         let originalInput = input;
+        
         if (input instanceof _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"]) {
             input = Object(_functions__WEBPACK_IMPORTED_MODULE_2__["linear"])(input, Object(_functions__WEBPACK_IMPORTED_MODULE_2__["globalMin"])(input), Object(_functions__WEBPACK_IMPORTED_MODULE_2__["globalMax"])(input));
         } else {
@@ -19127,24 +19168,46 @@ class Torque extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('torque', 'duration', 1, 'number', duration);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkFeatureIndependent"])('torque', 'duration', 1, duration);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('torque', 'fade', 2, 'fade', fade);
-
-        const _cycle = Object(_functions__WEBPACK_IMPORTED_MODULE_2__["div"])(Object(_functions__WEBPACK_IMPORTED_MODULE_2__["mod"])(Object(_functions__WEBPACK_IMPORTED_MODULE_2__["now"])(), duration), duration);
-        super({ _input: input, _cycle, fade, duration });
+        
+        const progress = Object(_functions__WEBPACK_IMPORTED_MODULE_2__["number"])(0);
+        
+        super({ _input: input, progress, fade, duration });
         // TODO improve type check
-        this.duration = duration;
         this.type = 'number';
         this._originalInput = originalInput;
     }
+
+    isAnimated() {
+        return true;
+    }
+
+    _setTimestamp(timestamp) {
+        let deltaTime = 0;
+        const speed = 1 / this.duration.value;
+    
+        if (this._lastTime !== undefined) {
+            deltaTime = timestamp - this._lastTime;
+        }
+
+        this._lastTime = timestamp;
+        this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
+
+        super._setTimestamp(timestamp);
+    }
+
     eval(feature) {
         const input = this.input.eval(feature);
-        if (Number.isNaN(input)){
+
+        if (Number.isNaN(input)) {
             return 0;
         }
-        const cycle = this._cycle.eval(feature);
+
+        const progress = this.progress.value;
         const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        const output = 1 - Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(Math.abs(input - cycle) * duration / (input > cycle ? fadeIn : fadeOut), 0, 1);
+        
+        const output = 1 - Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
         return output;
     }
     /**
@@ -19156,56 +19219,59 @@ class Torque extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
      * @instance
      * @name getSimTime
      */
+    
     getSimTime() {
-        const c = this._cycle.eval(); //from 0 to 1
-
+        const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
         const max = this.input.max.eval();
 
-        if (!(this.input.min.eval() instanceof Date)) {
-            return min + c * (max - min);
+        if (!(min instanceof Date)) {
+            return progress * (max - min) + min;
         }
-
 
         const tmin = min.getTime();
         const tmax = max.getTime();
-        const m = c;
-        const tmix = tmax * m + (1 - m) * tmin;
+        const tmix = (1 - progress) * tmin + tmax * progress;
 
-        const date = new Date();
-        date.setTime(tmix);
-        return date;
-
+        return new Date(tmix);
     }
+
     get input() {
         return this._input instanceof _basic_variable__WEBPACK_IMPORTED_MODULE_4__["default"] ? this._input.alias : this._input;
     }
+    
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
+
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('torque', 'input', 0, ['number', 'date'], this._originalInput);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('torque', 'duration', 1, 'number', this.duration);
         super._compile(meta);
+
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('torque', 'input', 0, 'number', this.input);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('torque', 'fade', 2, 'fade', this.fade);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkFeatureIndependent"])('torque', 'duration', 1, this.duration);
 
-
         this.preface = `
-        #ifndef TORQUE
-        #define TORQUE
-        float torque(float _input, float cycle, float duration, float fadeIn, float fadeOut){
-            float x = 0.;
-            // Check for NaN
-            if (_input <= 0.0 || 0.0 <= _input){
-                x = 1.- clamp(abs(_input-cycle)*duration/(_input>cycle? fadeIn: fadeOut), 0.,1.);
+            #ifndef TORQUE
+            #define TORQUE
+            
+            float torque(float _input, float progress, float duration, float fadeIn, float fadeOut){
+                float x = 0.;
+                
+                // Check for NaN
+                if (_input <= 0.0 || 0.0 <= _input){
+                    x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
+                }
+
+                return x;
             }
-            return x;
-        }
-        #endif
+
+            #endif
         `;
+
         this.inlineMaker = inline =>
-            `torque(${inline._input}, ${inline._cycle}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
+            `torque(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }
 
@@ -19920,7 +19986,7 @@ class Zoom extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 /*!***********************************!*\
   !*** ./src/core/viz/functions.js ***!
   \***********************************/
-/*! exports provided: animate, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, sprite, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, near, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, torque, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, sprites, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, xyz, zoom, placement, TRUE, FALSE, PI, E, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
+/*! exports provided: animate, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, sprite, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, near, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, torque, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, sprites, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, xyz, zoom, placement, HOLD, TRUE, FALSE, PI, E, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20023,6 +20089,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placement", function() { return placement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOLD", function() { return HOLD; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TRUE", function() { return TRUE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FALSE", function() { return FALSE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PI", function() { return PI; });
@@ -20444,6 +20511,7 @@ const xyz = (...args) => new _expressions_xyz__WEBPACK_IMPORTED_MODULE_34__["def
 const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_35__["default"](...args);
 const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
 
+const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_10__["default"](Number.MAX_SAFE_INTEGER);
 const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_10__["default"](1);
 const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_10__["default"](0);
 const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_10__["default"](Math.PI);
@@ -20496,6 +20564,7 @@ lowerCaseFunctions.align_center = _functions__WEBPACK_IMPORTED_MODULE_1__["ALIGN
 lowerCaseFunctions.align_bottom = _functions__WEBPACK_IMPORTED_MODULE_1__["ALIGN_BOTTOM"];
 lowerCaseFunctions.pi = _functions__WEBPACK_IMPORTED_MODULE_1__["PI"];
 lowerCaseFunctions.e = _functions__WEBPACK_IMPORTED_MODULE_1__["E"];
+lowerCaseFunctions.hold = _functions__WEBPACK_IMPORTED_MODULE_1__["HOLD"];
 
 function parseVizExpression(str) {
     prepareJsep();
