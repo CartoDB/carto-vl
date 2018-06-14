@@ -3,7 +3,7 @@ import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIn
 import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
-import { isDate, castDate } from '../../../api/util';
+import { castDate } from '../../../api/util';
 
 const DEFAULT_FADE = 0.15;
 
@@ -219,9 +219,20 @@ export class Torque extends BaseExpression {
      * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
      */
     setSimTime(simulationTime) {
+        console.log(`
+        
+        
+        
+        `);
         simulationTime = castDate(simulationTime);
+        
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
+
+        console.log('st: ', simulationTime.toLocaleDateString());
+        console.log('tm: ', new Date(tmin).toLocaleDateString());
+        console.log('tM: ', new Date(tmax).toLocaleDateString());
+
         if (simulationTime.getTime() < tmin) {
             throw new RangeError('torque.setSimTime requires the date parameter to be higher than the lower limit');
         }

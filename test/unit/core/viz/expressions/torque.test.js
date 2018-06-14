@@ -77,4 +77,40 @@ describe('src/core/viz/expressions/torque', () => {
             expect(t.getSimProgress()).toEqual(0);
         });
     });
+
+    describe('.setProgress', () => {
+        it('should update the simulation progress', () => {
+            const t = s.torque(1, 10, s.fade(0));
+            t._setTimestamp(0);
+            t._setTimestamp(5);
+            expect(t.getSimProgress()).toEqual(0.5);
+            t.setSimProgress(0.4);
+            t._setTimestamp(6);
+            expect(t.getSimProgress()).toEqual(0.5);
+        });
+    });
+
+    xdescribe('.setSimTime', () => {
+        let t;
+        beforeEach(() => {
+            t = s.torque(s.linear(s.time(1528966615070), s.time(1528966415070), s.time(1528966715070)), 10, s.fade(0));
+            t._setTimestamp(0);
+        });
+        
+        xit('should throw an Range Error when date is below the lower limit ', () => {
+            expect(() => {
+                t.setSimTime(new Date(1528966315070));
+            }).toThrowError(RangeError, 'torque.setSimTime requires the date parameter to be higher than the lower limit');
+        });
+
+        xit('should throw an Range Error when date is over the higher limit ', () => {
+            expect(() => {
+                t.setSimTime(new Date(1528966815070));
+            }).toThrowError(RangeError, 'torque.setSimTime requires the date parameter to be lower than the higher limit');
+        });
+
+        it('should update the simulation time when the date is valid', () => {
+
+        });
+    });
 });
