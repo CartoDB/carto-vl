@@ -3,7 +3,7 @@ import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIn
 import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
-import { isDate } from '../../../api/util';
+import { isDate, castDate } from '../../../api/util';
 
 const DEFAULT_FADE = 0.15;
 
@@ -200,7 +200,7 @@ export class Torque extends BaseExpression {
         const max = this.input.max.eval();
 
         if (!(min instanceof Date)) {
-            return new Date(progress * (max - min) + min);
+            return progress * (max - min) + min;
         }
 
         const tmin = min.getTime();
@@ -215,20 +215,18 @@ export class Torque extends BaseExpression {
      * @api
      * @memberof carto.expressions.Torque
      * @instance
-     * @name getSimTime
-     * @param {Date} simulationTime - A javascript Date object with the new simulation time
+     * @name setSimTime
+     * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
      */
     setSimTime(simulationTime) {
+        simulationTime = castDate(simulationTime);
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
-        if (!isDate(simulationTime)) {
-            throw new TypeError(`torque.setSimTime requires a valid date as parameter but got ${simulationTime}`);
-        }
         if (simulationTime.getTime() < tmin) {
-            throw new RangeError('torque.setSimTime requires the date parameter to be higher than the minimal date of the dataset');
+            throw new RangeError('torque.setSimTime requires the date parameter to be higher than the lower limit');
         }
         if (simulationTime.getTime() > tmax) {
-            throw new RangeError('torque.setSimTime requires the date parameter to be lower than the maximun date of the dataset');
+            throw new RangeError('torque.setSimTime requires the date parameter to be lower than the higher limit');
         }
         this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
     }
@@ -236,11 +234,11 @@ export class Torque extends BaseExpression {
     /**
      * Get the simulation progress.
      * 
-     * @returns {Number} A number representing the progress. 0 when the animation just started and 1 when complete.
+     * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
      * @memberof carto.expressions.Torque
-     * @name getSimTime
+     * @name getSimProgress
      */
     getSimProgress() {
         return this.progress.value;
@@ -252,12 +250,12 @@ export class Torque extends BaseExpression {
      * @api
      * @instance
      * @memberof carto.expressions.Torque
-     * @name getSimTime
+     * @name setSimProgress
      */
     setSimProgress(progress) {
         progress = Number.parseFloat(progress);
         if (progress < 0 || progress > 1) {
-            throw new TypeError(`torque.setSimTime requires a number between 0 and 100 as parameter but got: ${progress}`);
+            throw new TypeError(`torque.setSimProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
         this.progress.expr = progress;
     }

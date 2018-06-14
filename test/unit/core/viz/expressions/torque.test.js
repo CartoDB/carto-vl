@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
-fdescribe('src/core/viz/expressions/torque', () => {
+describe('src/core/viz/expressions/torque', () => {
     describe('error control', () => {
         validateFeatureDependentErrors('torque', [0.5, 'dependent']);
         validateTypeErrors('torque', ['category', 10]);

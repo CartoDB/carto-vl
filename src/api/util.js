@@ -36,6 +36,14 @@ function isObject(value) {
     return value != null && (type == 'object' || type == 'function');
 }
 
+function castDate(value) {
+    if (value instanceof Date) {
+        return value;
+    }
+    const date = new Date(0).setUTCMilliseconds(value);
+    return date;
+}
+
 export {
     WM_R,
     WM_2R,
@@ -44,5 +52,6 @@ export {
     isString,
     isNumber,
     isObject,
-    isDate
+    isDate,
+    castDate
 };
