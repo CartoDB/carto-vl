@@ -146,10 +146,10 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        this._mvtClient = new MVT(urlTemplate.replace('{s}', this._getSubdomain(0, 0)));
+        this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const column = this.metadata.columns.find(column => column.name == propertyName);
-            if (!column){
+            if (!column) {
                 return;
             }
             switch (column.type) {

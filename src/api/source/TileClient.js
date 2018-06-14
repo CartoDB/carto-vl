@@ -4,9 +4,12 @@ import { rTiles } from '../../client/rsys';
 
 
 export default class TileClient {
-    constructor(templateURL) {
-        validateTemplateURL(templateURL);
-        this._templateURL = templateURL;
+    constructor(templateURLs) {
+        if (!Array.isArray(templateURLs)) {
+            templateURLs = [templateURLs];
+        }
+        templateURLs.map(validateTemplateURL);
+        this._templateURLs = templateURLs;
         this._requestGroupID = 0;
         this._oldDataframes = [];
         this._cache = new DataframeCache();
@@ -56,12 +59,13 @@ export default class TileClient {
     }
 
     _getTileUrl(x, y, z) {
-        return this._templateURL.replace('{x}', x).replace('{y}', y).replace('{z}', z);
+        const subdomainIndex = this._getSubdomainIndex(x, y);
+        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
     }
 
-    _getSubdomain(x, y) {
+    _getSubdomainIndex(x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
+        return Math.abs(x + y) % this._templateURLs.length;
     }
 
     async _requestDataframe(x, y, z, responseToDataframeTransformer) {
