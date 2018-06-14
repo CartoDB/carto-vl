@@ -177,11 +177,17 @@
         $pauseBtn.onclick = () => viz.variables.torque.pause();
         $stopBtn.onclick = () => viz.variables.torque.stop();
 
-        setInterval(() => {
-            $timeRange.value = viz.variables.torque.getSimProgress();
-        }, 500)
-
-
+        let last = $timeRange.value;
+        $timeRange.onchange = () => {
+            viz.variables.torque.setSimProgress($timeRange.value);
+            last = $timeRange.value;
+        }
+        layer.on('updated', () => {
+            if ($timeRange.value == last) {
+                $timeRange.value = viz.variables.torque.getSimProgress();
+                last = $timeRange.value;
+            }
+        });
     </script>
 </body>
 
