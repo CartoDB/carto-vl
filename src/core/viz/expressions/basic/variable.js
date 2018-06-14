@@ -36,17 +36,21 @@ export default class Variable extends BaseExpression {
         super({});
         this.name = name;
     }
+
     isFeatureDependent(){
         return this.alias? this.alias.isFeatureDependent(): undefined;
     }
+    
     get value() {
         return this.eval();
     }
+    
     eval(feature) {
         if (this.alias) {
             return this.alias.eval(feature);
         }
     }
+    
     _resolveAliases(aliases) {
         if (aliases[this.name]) {
             this.childrenNames.push('alias');
@@ -56,16 +60,23 @@ export default class Variable extends BaseExpression {
             throw new Error(`variable() name '${this.name}' doesn't exist`);
         }
     }
+    
     _compile(meta) {
         this.alias._compile(meta);
         this.type = this.alias.type;
+        this.numCategories = this.alias.numCategories;
+        this.isBucketComplete = this.alias.isBucketComplete;
+        this.isCategoryType = this.alias.isCategoryType;
     }
+
     _applyToShaderSource(getGLSLforProperty) {
         return this.alias._applyToShaderSource(getGLSLforProperty);
     }
+
     _getDependencies() {
         return [this.alias];
     }
+    
     _getMinimumNeededSchema() {
         return this.alias._getMinimumNeededSchema();
     }
