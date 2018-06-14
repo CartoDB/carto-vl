@@ -38,7 +38,7 @@ describe('src/core/viz/expressions/torque', () => {
 
     describe('.pause', () => {
         it('should pause the simulation when playing', () => {
-            const t = s.torque(1, 10, s.fade(0));
+            const t = s.torque(1, 10, s.fade(1));
             t._setTimestamp(0);
             t.pause();
             t._setTimestamp(1);
@@ -48,7 +48,7 @@ describe('src/core/viz/expressions/torque', () => {
 
     describe('.play', () => {
         it('should start the simulation when paused/stopped', () => {
-            const t = s.torque(1, 10, s.fade(0));
+            const t = s.torque(1, 10, s.fade(1));
             t._setTimestamp(0);
             t.pause();
             t.play();
@@ -59,7 +59,7 @@ describe('src/core/viz/expressions/torque', () => {
 
     describe('.stop', () => {
         it('should stop the simulation when playing', () => {
-            const t = s.torque(1, 10, s.fade(0));
+            const t = s.torque(1, 10, s.fade(1));
             t._setTimestamp(0);
             t.stop();
             t._setTimestamp(1);
@@ -68,7 +68,7 @@ describe('src/core/viz/expressions/torque', () => {
         });
 
         it('should reset the simulation time', () => {
-            const t = s.torque(1, 10, s.fade(0));
+            const t = s.torque(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(1);
             expect(t.getSimProgress()).toEqual(0.1);
@@ -80,7 +80,7 @@ describe('src/core/viz/expressions/torque', () => {
 
     describe('.setProgress', () => {
         it('should update the simulation progress', () => {
-            const t = s.torque(1, 10, s.fade(0));
+            const t = s.torque(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(5);
             expect(t.getSimProgress()).toEqual(0.5);
@@ -93,10 +93,10 @@ describe('src/core/viz/expressions/torque', () => {
     describe('.setSimTime', () => {
         let t;
         beforeEach(() => {
-            t = s.torque(s.linear(s.time('2018-06-13T00:00:00.070Z'), s.time('2018-06-10T00:00:00.070Z'), s.time('2018-06-15T00:00:00.070Z')), 10, s.fade(0));
+            t = s.torque(s.linear(s.time('2018-06-13T00:00:00.070Z'), s.time('2018-06-10T00:00:00.070Z'), s.time('2018-06-15T00:00:00.070Z')), 10, s.fade(1));
             t._setTimestamp(0);
         });
-        
+
         it('should throw an Range Error when date is below the lower limit ', () => {
             expect(() => {
                 t.setSimTime(new Date('2017-06-13T00:00:00.070Z'));
