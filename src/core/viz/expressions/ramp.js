@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import { NamedColor } from './color/NamedColor';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -70,6 +71,7 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.defaultOtherColor = 'gray';
+
         this.palette = palette;
         if (palette.type == 'number-array') {
             this.type = 'number';
@@ -309,7 +311,8 @@ function _removeOtherFromColors (colors) {
 }
 
 function _addOtherColorToColors (colors, otherColor) {
-    return [...colors, otherColor];
+    const otherColorRGB = new NamedColor(otherColor).eval();
+    return [...colors, otherColorRGB];
 }
 
 function _needsToRemoveOtherCategory (input, palette, colors) {

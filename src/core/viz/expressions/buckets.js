@@ -123,7 +123,7 @@ export default class Buckets extends BaseExpression {
     _compile(metadata) {
         super._compile(metadata);
         this.isCategoryType = this.input.type === 'category';
-        this.isBucketComplete = this.isCategoryType && this.list.elems.length === this.input.alias.numCategories;
+        this.isBucketComplete = this.isCategoryType && this.list.elems.length === this.input.numCategories;
         
         if (this.input.type != 'number' && this.input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
