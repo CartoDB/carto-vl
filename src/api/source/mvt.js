@@ -120,7 +120,7 @@ export default class MVT extends Base {
             }
             Object.keys(f.properties).forEach(propertyName => {
                 const propertyValue = f.properties[propertyName];
-                const decodedPropertyValue = this._decodeProperty(propertyName, propertyValue);
+                const decodedPropertyValue = this.decodeProperty(propertyName, propertyValue);
                 if (decodedPropertyValue !== undefined) {
                     if (decodedProperties[propertyName] === undefined) {
                         decodedProperties[propertyName] = new Float32Array(mvtLayer.length + 1024);
@@ -133,8 +133,7 @@ export default class MVT extends Base {
         return { properties: decodedProperties, points, featureGeometries };
     }
 
-    _decodeProperty(propertyName, propertyValue) {
-        // TODO custom decoding
+    decodeProperty(propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
             return this._categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {

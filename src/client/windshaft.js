@@ -23,6 +23,9 @@ export default class Windshaft {
         this._MNS = null;
         this._promiseMNS = null;
         this.inProgressInstantiations = {};
+
+        this._categoryStringToIDMap = {};
+        this._numCategories = 0;
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
@@ -143,8 +146,29 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        // FIXME
         this._mvtClient = new MVT(urlTemplate.replace('{s}', this._getSubdomain(0, 0)));
+        this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
+            const column = this.metadata.columns.find(column => column.name == propertyName);
+            if (!column){
+                return;
+            }
+            switch (column.type) {
+                case 'date':
+                {
+                    const d = Date.parse(propertyValue);
+                    const min = column.min;
+                    const max = column.max;
+                    const n = (d - min) / (max.getTime() - min.getTime());
+                    return n;
+                }
+                case 'category':
+                    return this._categorizeString(propertyValue);
+                case 'number':
+                    return propertyValue;
+                default:
+                    throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+            }
+        };
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
         this._MNS = MNS;
@@ -301,17 +325,18 @@ export default class Windshaft {
             body: JSON.stringify(mapConfigAgg),
         };
     }
-
-    /* FIXME
-            dateFields.map((name, index) => {
-                const d = Date.parse(f.properties[name]);
-                const metadataColumn = metadata.columns.find(c => c.name == name);
-                const min = metadataColumn.min;
-                const max = metadataColumn.max;
-                const n = (d - min) / (max.getTime() - min.getTime());
-                properties[index + catFields.length + numFields.length][i] = n;
-            });
-*/
+    _categorizeString(category) {
+        // FIXME
+        if (category === undefined) {
+            category = 'null';
+        }
+        if (this._categoryStringToIDMap[category] !== undefined) {
+            return this._categoryStringToIDMap[category];
+        }
+        this._categoryStringToIDMap[category] = this._numCategories;
+        this._numCategories++;
+        return this._categoryStringToIDMap[category];
+    }
 
     _adaptMetadata(meta) {
         const { stats, aggregation } = meta;
@@ -326,7 +351,7 @@ export default class Windshaft {
         columns.forEach(column => {
             if (column.type === 'category' && column.categories) {
                 column.categories.forEach(category => {
-                    categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
+                    categoryIDs[category.category] = this._categorizeString(category.category);
                 });
                 column.categoryNames = column.categories.map(cat => cat.category);
             }
