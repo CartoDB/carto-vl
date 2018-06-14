@@ -219,19 +219,10 @@ export class Torque extends BaseExpression {
      * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
      */
     setSimTime(simulationTime) {
-        console.log(`
-        
-        
-        
-        `);
         simulationTime = castDate(simulationTime);
         
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
-
-        console.log('st: ', simulationTime.toLocaleDateString());
-        console.log('tm: ', new Date(tmin).toLocaleDateString());
-        console.log('tM: ', new Date(tmax).toLocaleDateString());
 
         if (simulationTime.getTime() < tmin) {
             throw new RangeError('torque.setSimTime requires the date parameter to be higher than the lower limit');
