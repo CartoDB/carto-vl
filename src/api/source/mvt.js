@@ -35,7 +35,6 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    // FIXME, multi subdomain
     constructor(templateURL, metadata = { columns: [] }) {
         super();
         this._templateURL = templateURL;

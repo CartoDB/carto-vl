@@ -326,7 +326,6 @@ export default class Windshaft {
         };
     }
     _categorizeString(category) {
-        // FIXME
         if (category === undefined) {
             category = 'null';
         }
