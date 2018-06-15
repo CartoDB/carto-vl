@@ -27,10 +27,6 @@ function isNumber(value) {
     return typeof value == 'number';
 }
 
-function isDate(value) {
-    return Object.prototype.toString.call(value) === '[object Date]';
-}
-
 function isObject(value) {
     const type = typeof value;
     return value != null && (type == 'object' || type == 'function');
@@ -52,6 +48,5 @@ export {
     isString,
     isNumber,
     isObject,
-    isDate,
     castDate
 };
