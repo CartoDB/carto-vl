@@ -80,8 +80,8 @@ The next step is to define the [`source`](https://carto.com/developers/carto-vl/
 const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 ```
 
-### Defining the viz
-A [`viz`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed, and processed. In this case we create an empty viz.
+### Defining the Viz object
+A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed, and processed. In this case we create an empty Viz object.
 
 ```js
 const viz = new carto.Viz();
@@ -89,7 +89,7 @@ const viz = new carto.Viz();
 
 ### Defining the layer
 
-Now that we have defined our `source` and `viz`, we need to define a [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be accessed by CARTO VL.
+Now that we have defined our `source` and a `Viz object`, we need to define a [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be accessed by CARTO VL.
 
 ```js
 const layer = new carto.Layer('layer', source, viz);
@@ -103,9 +103,9 @@ layer.addTo(map);
 ```
 
 ### Styling the map
-Using the viz object you can decide how to visualize your data.
+Using the Viz object you can decide how to visualize your data.
 
-The following Viz changes the color and size of the points on our map. [See example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html).
+The following Viz object changes the color and size of the points on our map. [See example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html).
 
 ```js
 const viz = new carto.Viz(`
