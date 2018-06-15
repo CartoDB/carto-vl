@@ -2,7 +2,8 @@
   box-sizing: border-box;
 }
 
-body, html {
+body,
+html {
   display: block;
   height: 100%;
   margin: 0;
@@ -13,7 +14,28 @@ body {
 }
 
 #map {
- flex: 1; 
+  flex: 1;
+}
+
+.cvl-MapInfo {
+  position: absolute;
+  font-size: 12px;
+  padding: 5px;
+  font-weight: 200;
+  background: white;
+  top: 0;
+  margin: 0;
+}
+
+.cvl-FeaturesInfo {
+  position: absolute;
+  top: 0;
+  background: white;
+  margin: 0;
+  right: 0;
+  padding: 5px;
+  font-weight: 200;
+  font-size: 12px;
 }
 
 .cvl-Container {
@@ -25,6 +47,7 @@ body {
 .cvl-Sidebar {
   padding: 0 15px;
   width: 350px;
+  overflow: scroll;
 }
 
 .cvl-Sidebar--BasemapConfig {
@@ -102,27 +125,27 @@ body {
 
 .cvl-ButtonList--Primary button {
   -webkit-font-smoothing: antialiased;
-    -webkit-box-align: center;
-    align-items: center;
-    box-shadow: none;
-    color: rgb(255, 255, 255);
-    cursor: pointer;
-    display: inline-flex;
-    vertical-align: top;
-    background: rgb(23, 133, 251);
-    border-radius: 4px;
-    border-width: 0px;
-    border-style: initial;
-    border-color: initial;
-    border-image: initial;
-    margin: 5px 10px 5px 0;
-    padding: 6px 12px;
-    transition: background 0.2s ease;
+  -webkit-box-align: center;
+  align-items: center;
+  box-shadow: none;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: inline-flex;
+  vertical-align: top;
+  background: rgb(23, 133, 251);
+  border-radius: 4px;
+  border-width: 0px;
+  border-style: initial;
+  border-color: initial;
+  border-image: initial;
+  margin: 5px 10px 5px 0;
+  padding: 6px 12px;
+  transition: background 0.2s ease;
 }
 
 .cvl-Main {
   flex: 1;
   display: flex;
-  flex-direction: column;  
+  flex-direction: column;
   position: relative;
 }
