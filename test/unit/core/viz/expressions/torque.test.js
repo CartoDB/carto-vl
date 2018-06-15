@@ -116,4 +116,20 @@ describe('src/core/viz/expressions/torque', () => {
             expect(t.getSimProgress()).toEqual(0.8);
         });
     });
+
+
+    describe('.stop and .play', () => {
+        it('should reset the simulation time', () => {
+            const t = s.torque(1, 10, s.fade(1));
+            t._setTimestamp(0);
+            t._setTimestamp(1);
+            expect(t.getSimProgress()).toEqual(0.1);
+            t.stop();
+            expect(t.getSimProgress()).toEqual(0);
+            t.play();
+            expect(t.getSimProgress()).toEqual(0);
+            t._setTimestamp(2);
+            expect(t.getSimProgress()).toEqual(0.1);
+        });
+    });
 });
