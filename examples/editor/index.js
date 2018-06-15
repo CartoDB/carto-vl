@@ -233,7 +233,11 @@ function saveConfig() {
 }
 
 function getConfig() {
-    return '#' + btoa(JSON.stringify({
+    return '#' + btoa(JSON.stringify(getJSONConfig()));
+}
+
+function getJSONConfig() {
+    return {
         a: $('#dataset').val(),
         b: '',
         c: $('#user').val(),
@@ -242,7 +246,7 @@ function getConfig() {
         f: map.getCenter(),
         g: map.getZoom(),
         h: basemap
-    }));
+    };
 }
 
 function setConfig(input) {
@@ -365,3 +369,95 @@ document.getElementById('fullscreen').onclick = () => {
     document.querySelector('.map-info').style.display = 'none';
     map.resize();
 };
+
+const $exportMapButton = document.getElementById('export-map-button');
+const $mapTextarea = document.getElementById('map-textarea');
+
+$exportMapButton.addEventListener('click', () => {
+    const config = getJSONConfig();
+    $mapTextarea.value = generateSnippet(config);
+});
+
+
+/**
+
+
+"a":"sf_stclines",
+"b":"",
+"c":"dmanzanares",
+"d":"carto.com",
+"e":"color: ramp($st_type, prism) \nwidth: 1.5",
+"f":{
+    "lng":-122.44408486861192,
+    "lat":37.773706736149705
+    },
+ "g":11.664310802866805
+}
+
+* @param {*} config 
+ * 
+ */
+function generateSnippet(config) {
+    const dataset = config.a;
+    const apiKey = config.b || 'default_public';
+    const username = config.c;
+    const serverURL = config.d || 'https://{user}.carto.com';
+    const vizSpec = config.e || '';
+    const center = config.f || { lat: 0, lng: 0 };
+    const zoom = config.g || 10;
+    const basemap = config.h || 'dark-matter';
+
+
+    return `<!DOCTYPE html>
+        <html>
+        <head>
+        <title>Add layer | CARTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <!-- Include CARTO VL JS -->
+        <script src="https://cartodb.github.io/carto-vl/dist/carto-vl.js"></script>
+        <!-- Include Mapbox GL JS -->
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+        <!-- Include Mapbox GL CSS -->
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <style>
+           #map {
+                position: absolute;
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+        </head>
+        <body>
+        <div id="map"></div>
+
+        <script>
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+                center: [${center.lng}, ${center.lat}],
+                zoom: ${zoom},
+                dragRotate: false,
+                touchZoomRotate: false
+            });
+        
+            carto.setDefaultConfig({
+                serverURL: '${serverURL}'
+            });
+
+            carto.setDefaultAuth({
+                user: '${username}',
+                apiKey: '${apiKey}'
+            });
+
+        
+            const source = new carto.source.Dataset('${dataset}');
+            const viz = new carto.Viz(\`${vizSpec}\`);
+            const layer = new carto.Layer('layer', source, viz);
+        
+            layer.addTo(map, 'watername_ocean');
+        </script>
+        </body>
+        </html>
+    `;
+}
