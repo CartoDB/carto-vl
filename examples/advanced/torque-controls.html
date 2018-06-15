@@ -9,45 +9,150 @@
     <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../style.css">
     <style type="text/css">
-        * {
-            margin: 0;
-            padding: 0;
+        aside.toolbox {
+            right: 96px;
         }
 
-        body {
+        .box {
+            width: 320px;
+            background: #f2f2f2;
+        }
+
+        section {
             display: flex;
-            height: 100vh;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        #sidebar {
-            padding: 25px;
-            width: 275px;
-            background: #f8f8f8;
+        hr {
+            margin: 15px auto;
         }
 
-        #sidebar h1 {
-            font: 100 42px/1.4 'Roboto';
-            margin-bottom: 10px;
+        input[type=range] {
+            /*removes default webkit styles*/
+            -webkit-appearance: none;
+
+            /*fix for FF unable to apply focus style bug */
+            border: 1px solid white;
+
+            /*required for proper track sizing in FF*/
+            background: transparent;
+            border: none;
+
+            cursor: pointer;
+            flex: 1;
+            padding: auto 10px;
+
+            margin: auto 5px;
         }
 
-        #sidebar h2 {
-            font: 200 21px/1.4 'Roboto';
-            margin-bottom: 10px;
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
         }
 
-        #sidebar div {
-            font: 300 14px/1.6 'Roboto';
-            margin-bottom: 20px;
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+            margin-top: -4px;
         }
 
-        #sidebar div input {
-            margin-right: 5px;
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-moz-range-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+
+        input[type=range].white-thumb::-moz-range-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range].white-thumb::-webkit-slider-thumb {
+            border-radius: 50%;
+            border: 3px solid #1785FB;
+            background: white;
+            height: 15px;
+            width: 15px;
+            margin-top: -6px;
+        }
+
+        input[type=range].white-thumb::-ms-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range]:-moz-focusring {
+            outline: 1px solid white;
+            outline-offset: -1px;
+        }
+
+        input[type=range]::-ms-track {
+            height: 3px;
+            /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
+            background: transparent;
+            /*leave room for the larger thumb to overflow with a transparent border */
+            border-color: transparent;
+            border-width: 6px 0;
+            /*remove default tick marks*/
+            color: transparent;
+        }
+
+        input[type=range]::-ms-fill-lower {
+            background: #1785FB;
+        }
+
+        input[type="range"]::-moz-range-progress {
+            background: #1785FB;
+        }
+
+        input[type=range]::-ms-fill-upper {
+            background: #ccc;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: #ccc;
+        }
+
+        input[type=range]::-ms-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
         }
 
         input[type="button"] {
-            align-items: center;
-            background: #1785FB;
+            width: 36px;
+            height: 36px;
             border-radius: 4px;
             border: 0;
             box-shadow: none;
@@ -56,39 +161,68 @@
             display: inline-flex;
             font: 500 12px/20px 'Roboto';
             margin: 0;
-            padding: 6px 12px;
-            transition: all 0.2s ease;
-            vertical-align: top;
+            margin-right: 10px;
         }
 
         #map {
             flex: 1;
         }
+
+        #js-duration-span {
+            background: white;
+            border: 1px solid #ddd;
+            width: 32px;
+            height: 32px;
+            ;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #js-play-btn {
+            background: url('./play.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
+
+        #js-pause-btn {
+            background: url('./pause.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
     </style>
 </head>
 
 <body>
-    <div id="sidebar">
-        <h1>Torque</h1>
-        <h2>Controls</h2>
-        <div>
-            <input type="button" id="js-play-btn" value="PLAY">
-            <input type="button" id="js-stop-btn" value="STOP">
-            <input type="button" id="js-pause-btn" value="PAUSE">
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Taxi pickups</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Multi-scale animation with color interpolation through time of day and sized by trip distance</p>
+            </section>
+            <section style="margin-top: 15px;">
+                <input type="button" id="js-play-btn">
+                <input type="button" id="js-pause-btn">
+                <input type="range" id="js-time-range" min="0" max="1" step="0.01">
+            </section>
+            <hr>
+            <section>
+                <span style="margin-right: 5px" class="open-sans">Duration (seconds)</span>
+                <input class="white-thumb" type="range" id="js-duration-range" min="1" max="60" step="1">
+                <span style="margin-left: 5px" class="open-sans" id="js-duration-span">10</span>
+            </section>
         </div>
-        <h2>Duration</h2>
-        <div>
-            <input type="range" id="js-duration-range" min="1" max="60" step="1">
-            <span id="js-duration-span">10</span> seconds
-        </div>
-
-        <h2>Time</h2>
-        <div>
-            <input type="range" id="js-time-range" min="0" max="1" step="0.01">
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
         </div>
     </div>
-
-    <div id="map"></div>
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
@@ -120,7 +254,7 @@
 
         // Elements
         const $playBtn = document.getElementById('js-play-btn');
-        const $stopBtn = document.getElementById('js-stop-btn');
+        // const $stopBtn = document.getElementById('js-stop-btn');
         const $pauseBtn = document.getElementById('js-pause-btn');
         const $durationRange = document.getElementById('js-duration-range');
         const $timeRange = document.getElementById('js-time-range');
@@ -136,9 +270,17 @@
             viz.variables.torque.setSimProgress($timeRange.value);
         }
 
-        $playBtn.onclick = () => viz.variables.torque.play();
-        $pauseBtn.onclick = () => viz.variables.torque.pause();
-        $stopBtn.onclick = () => viz.variables.torque.stop();
+        $playBtn.onclick = () => {
+            viz.variables.torque.play()
+            $playBtn.style.display = 'none';
+            $pauseBtn.style.display = 'initial';
+        };
+        $pauseBtn.onclick = () => {
+            viz.variables.torque.pause();
+            $pauseBtn.style.display = 'none';
+            $playBtn.style.display = 'initial';
+        };
+        $pauseBtn.style.display = 'none';
 
         let last = $timeRange.value;
         $timeRange.onchange = () => {
@@ -151,6 +293,12 @@
                 last = $timeRange.value;
             }
         });
+
+        layer.on('loaded', hideLoader);
+
+        function hideLoader() {
+            document.getElementById('loader').style.opacity = '0';
+        }
     </script>
 </body>
 
