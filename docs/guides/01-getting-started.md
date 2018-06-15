@@ -102,7 +102,7 @@ Once we have the layer we need to use the [`addTo`](https://carto.com/developers
 layer.addTo(map);
 ```
 
-### Giving styles to the map
+### Styling the map
 Using the viz object you can decide how to visualize your data.
 
 The following Viz changes the color and size of the points on our map. [See example](http://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basicStyling.html).
