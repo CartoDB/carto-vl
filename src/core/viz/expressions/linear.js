@@ -53,25 +53,13 @@ export default class Linear extends BaseExpression {
         this.type = 'number';
     }
     eval(feature) {
-        if (this.input.type == 'date') {
-            const input = this.input.eval(feature);
-
-            const min = this.min.eval().getTime();
-            const max = this.max.eval().getTime();
-
-            const metadata = this._metadata;
-            const inputMin = metadata.columns.find(c => c.name == this.input.name).min.getTime();
-            const inputMax = metadata.columns.find(c => c.name == this.input.name).max.getTime();
-            const inputDiff = inputMax - inputMin;
-
-            const smin = (min - inputMin) / inputDiff;
-            const smax = (max - inputMin) / inputDiff;
-            return (input - smin) / (smax - smin);
-
-        }
         const v = this.input.eval(feature);
-        const min = this.min.eval(feature);
-        const max = this.max.eval(feature);
+        let min = this.min.eval(feature);
+        let max = this.max.eval(feature);
+        if (this.input.type == 'date') {
+            min = this.min.getMappedValue();
+            max = this.max.getMappedValue();
+        }
         return (v - min) / (max - min);
     }
     _compile(metadata) {

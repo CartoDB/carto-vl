@@ -34,7 +34,7 @@ export default class Time extends BaseExpression {
                 date = new Date(date);
             }
         }
-        super({_impostor: number(0)});
+        super({ _impostor: number(0) });
         // TODO improve type check
         this.type = 'time';
         this.date = date;
@@ -50,6 +50,9 @@ export default class Time extends BaseExpression {
         const tMapped = (t - inputMin) / inputDiff;
 
         this._impostor.expr = tMapped;
+    }
+    getMappedValue() {
+        return this._impostor.expr;
     }
     get value() {
         return this.eval();
