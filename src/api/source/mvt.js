@@ -5,6 +5,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
 import TileClient from './TileClient';
 import Base from './base';
+import { RTT_WIDTH } from '../../core/renderer';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -125,7 +126,8 @@ export default class MVT extends Base {
                 const decodedPropertyValue = this.decodeProperty(propertyName, propertyValue);
                 if (decodedPropertyValue !== undefined) {
                     if (decodedProperties[propertyName] === undefined) {
-                        decodedProperties[propertyName] = new Float32Array(mvtLayer.length + 1024);
+                        // To avoid extra copies to upload the properties to WebGL we need to put a padding of RTT_WIDTH to all property arrays
+                        decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
                         decodedProperties[propertyName].fill(Number.NaN);
                     }
                     decodedProperties[propertyName][i] = decodedPropertyValue;
