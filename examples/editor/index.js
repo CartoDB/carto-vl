@@ -371,11 +371,17 @@ document.getElementById('fullscreen').onclick = () => {
 };
 
 const $exportMapButton = document.getElementById('export-map-button');
+const $copyHTMLButton = document.getElementById('copy-html-button');
 const $mapTextarea = document.getElementById('map-textarea');
 
 $exportMapButton.addEventListener('click', () => {
     const config = getJSONConfig();
     $mapTextarea.value = generateSnippet(config);
+});
+
+$copyHTMLButton.addEventListener('click', () => {
+    $mapTextarea.select();
+    document.execCommand('copy');
 });
 
 
