@@ -25,7 +25,7 @@ import BaseExpression from './base';
 export default class Time extends BaseExpression {
     constructor(date) {
         if (!(date instanceof Date)) {
-            if (typeof(date) === 'number') {
+            if (typeof (date) === 'number') {
                 const epoch = date;
                 date = new Date(0);
                 date.setUTCSeconds(epoch);
@@ -37,7 +37,19 @@ export default class Time extends BaseExpression {
         // TODO improve type check
         this.type = 'time';
         this.date = date;
-        this.inlineMaker = () => undefined;
+        this.inlineMaker = () => {
+            const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
+            const inputMax = this.metadata.columns.find(c => c.name == this.dateProperty.name).max.getTime();
+            const inputDiff = inputMax - inputMin;
+
+            const t = this.date.getTime();
+
+            const tMapped = (t - inputMin) / inputDiff;
+            return tMapped.toFixed(20);
+        };
+    }
+    _compile(meta) {
+        this.metadata = meta;
     }
     get value() {
         return this.eval();
