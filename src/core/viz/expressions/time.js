@@ -1,4 +1,5 @@
 import BaseExpression from './base';
+import { number } from '../functions';
 
 /**
  * Time contant expression
@@ -33,23 +34,22 @@ export default class Time extends BaseExpression {
                 date = new Date(date);
             }
         }
-        super({});
+        super({_impostor: number(0)});
         // TODO improve type check
         this.type = 'time';
         this.date = date;
-        this.inlineMaker = () => {
-            const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
-            const inputMax = this.metadata.columns.find(c => c.name == this.dateProperty.name).max.getTime();
-            const inputDiff = inputMax - inputMin;
-
-            const t = this.date.getTime();
-
-            const tMapped = (t - inputMin) / inputDiff;
-            return tMapped.toFixed(20);
-        };
+        this.inlineMaker = inline => inline._impostor;
     }
     _compile(meta) {
         this.metadata = meta;
+        const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
+        const inputMax = this.metadata.columns.find(c => c.name == this.dateProperty.name).max.getTime();
+        const inputDiff = inputMax - inputMin;
+
+        const t = this.date.getTime();
+        const tMapped = (t - inputMin) / inputDiff;
+
+        this._impostor.expr = tMapped;
     }
     get value() {
         return this.eval();
