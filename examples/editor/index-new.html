@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>CARTO-VL EDITOR</title>
 
+    <!-- Remove jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
     <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
     <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
@@ -16,11 +19,35 @@
 
 <body>
     <aside>
-        
+        <section>
+            <h1>Local config</h1>
+            <textarea class="four columns" id="user">cartovl</textarea>
+            <textarea class="four columns" id="dataset">spend_data</textarea>
+            <textarea class="four columns" id="serverURL">https://{user}.carto.com</textarea>
+            <div id="basemap"></div>
+        </section>
+        <section>
+            <h1>Examples</h1>
+            <div id='buttonlist'>
+                <button id="fullscreen">Fullscreen</button>
+                <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
+                <button id='barcelona'>Barcelona (with tutorial)</button>
+            </div>
+        </section>
+        <section>
+            <h1>Export map</h1>
+            <button id="export-map-button">Export Map</button>
+            <textarea name="map-textarea" id="map-textarea"></textarea>
+        </section>
+        <section>
+            <textarea id="feedback">¿?</textarea>
+            <h3 id='title'>~ 0 features</h3>
+        </section>
     </aside>
     <main>
-        <div id="map"></div>
-        <textarea name="vizSpec" id="viz-spec-area" cols="30" rows="10"></textarea>
+        <div id='map' class='map'></div>
+        <div class="map-info"></div>
+        <textarea name="vizSpec" id="styleEntry" cols="30" rows="10"></textarea>
     </main>
 
 </body>
