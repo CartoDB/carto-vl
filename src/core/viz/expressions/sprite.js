@@ -40,6 +40,7 @@ export default class Sprite extends Base {
             };
             this.image.onerror = reject;
             this.image.src = this._url;
+            this.image.crossOrigin = 'anonymous';
         });
     }
 
