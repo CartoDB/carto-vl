@@ -1,22 +1,20 @@
-import Time from '../../../../../src/core/viz/expressions/time';
+import * as s from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/time', () => {
-    const expectedDate = new Date('2016-05-30T13:45:00+05:00');
-    it('should return a valid date when the parameter is a ISO_8601 string', () => {
-        const time = new Time('2016-05-30T13:45:00+05:00');
-        const actual = time.eval();
-        expect(actual).toEqual(expectedDate);
+    describe('time', () => {
+        const date = new Date('2016-05-30T13:45:00+05:00');
+        test('time', '2016-05-30T13:45:00+05:00', date);
+        test('time', 1464597900, date);
+        test('time', date, date);
     });
 
-    it('should return a valid date when the parameter is a number containing a MILLISECONDS Unix Time', () => {
-        const time = new Time(1464597900000);
-        const actual = time.eval();
-        expect(actual).toEqual(expectedDate);
-    });
+    function test(fn, param1, expected) {
+        it(`${fn}(${param1}) should return ${expected}`, () => {
+            let actual = s[fn](param1).eval();
+            expect(actual).toEqual(expected);
+            actual = s[fn](param1).value;
+            expect(actual).toEqual(expected);
+        });
+    }
 
-    it('should return a valid date when the parameter is a javascript Date object', () => {
-        const time = new Time(expectedDate);
-        const actual = time.eval();
-        expect(actual).toEqual(expectedDate);
-    });
 });
