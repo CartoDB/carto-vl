@@ -6,6 +6,9 @@ import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
 import TileClient from './TileClient';
 import Base from './base';
 
+// Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
+const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
+
 const geometryTypes = {
     UNKNOWN: 'unknown',
     POINT: 'point',
@@ -90,13 +93,13 @@ export default class MVT extends Base {
             const mvtGeomType = f.type;
             if (metadata.geomType === undefined) {
                 switch (mvtGeomType) {
-                    case 1:
+                    case mvtDecoderGeomTypes.point:
                         metadata.geomType = geometryTypes.POINT;
                         break;
-                    case 2:
+                    case mvtDecoderGeomTypes.line:
                         metadata.geomType = geometryTypes.LINE;
                         break;
-                    case 3:
+                    case mvtDecoderGeomTypes.polygon:
                         metadata.geomType = geometryTypes.POLYGON;
                         break;
                     default:
