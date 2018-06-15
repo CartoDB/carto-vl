@@ -94,9 +94,9 @@ const BASEMAPS = {
 };
 const DEFAULT_BASEMAP = 'DarkMatter';
 
-var basemap = DEFAULT_BASEMAP;
-var mapboxgl = window.mapboxgl;
-var map = new mapboxgl.Map({
+let basemap = DEFAULT_BASEMAP;
+let mapboxgl = window.mapboxgl;
+let map = new mapboxgl.Map({
     container: 'map',
     style: { version: 8, sources: {}, layers: [] },
     center: [0, 0],
@@ -191,7 +191,7 @@ map.on('load', () => {
     $('#serverURL').on('input', superRefresh);
 
     const addButton = (name, code) => {
-        var button = document.createElement('button');
+        let button = document.createElement('button');
         button.innerText = name;
         button.onclick = () => {
             $('.step').css('display', 'none');

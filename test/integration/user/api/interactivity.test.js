@@ -333,7 +333,7 @@ describe('Interactivity', () => {
     });
 
     function onLoaded(callback) {
-        var allLoaded = 0;
+        let allLoaded = 0;
         function loaded() {
             allLoaded++;
             if (allLoaded == 2) {

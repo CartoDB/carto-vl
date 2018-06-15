@@ -110,8 +110,8 @@ export default class Windshaft {
 
     _getTiles(tiles) {
         this._requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
+        let completedTiles = [];
+        let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
         tiles.forEach(t => {
             const { x, y, z } = t;
@@ -408,9 +408,9 @@ export default class Windshaft {
                 if (response.byteLength == 0 || response == 'null') {
                     return { empty: true };
                 }
-                var tile = new VectorTile(new Protobuf(response));
+                let tile = new VectorTile(new Protobuf(response));
                 const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {};
+                let fieldMap = {};
 
                 const numFields = [];
                 const catFields = [];
@@ -435,7 +435,7 @@ export default class Windshaft {
 
                 const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
-                var rs = rsys.getRsysFromTile(x, y, z);
+                let rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
@@ -473,11 +473,12 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
+        let points;
         if (metadata.geomType == geometryTypes.POINT) {
-            var points = new Float32Array(mvtLayer.length * 2);
+            points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
-        for (var i = 0; i < mvtLayer.length; i++) {
+        for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
             if (metadata.geomType == geometryTypes.POINT) {

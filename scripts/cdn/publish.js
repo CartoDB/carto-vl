@@ -4,9 +4,9 @@
 
 // Load secrets file
 
-var fs = require('fs');
+let fs = require('fs');
 
-var secrets = JSON.parse(fs.readFileSync('secrets.json'));
+let secrets = JSON.parse(fs.readFileSync('secrets.json'));
 if (!secrets ||
     !secrets.AWS_USER_S3_KEY ||
     !secrets.AWS_USER_S3_SECRET ||
@@ -16,9 +16,9 @@ if (!secrets ||
 
 // Load package version
 
-var semver = require('semver');
+let semver = require('semver');
 
-var version = JSON.parse(fs.readFileSync('package.json')).version;
+let version = JSON.parse(fs.readFileSync('package.json')).version;
 if (!version || !semver.valid(version)) {
     throw Error('package.json version is not valid');
 }
@@ -28,25 +28,25 @@ if (!version || !semver.valid(version)) {
 //   v1.2.3: v1 / v1.2 / v1.2.3
 //   v1.2.3-beta.4: v1.2.3-beta / v1.2.3-beta.4
 
-var s3 = require('s3');
+let s3 = require('s3');
 
-var client = s3.createClient({
+let client = s3.createClient({
     s3Options: {
         accessKeyId: secrets.AWS_USER_S3_KEY,
         secretAccessKey: secrets.AWS_USER_S3_SECRET
     }
 });
 
-var major = semver.major(version);
-var minor = semver.minor(version);
-var patch = semver.patch(version);
-var prerelease = semver.prerelease(version);
+let major = semver.major(version);
+let minor = semver.minor(version);
+let patch = semver.patch(version);
+let prerelease = semver.prerelease(version);
 
 if (prerelease) {
     /**
     * Publish prerelease URLs
     */
-    var base = 'v' + major + '.' + minor + '.' + patch + '-';
+    let base = 'v' + major + '.' + minor + '.' + patch + '-';
     if (prerelease[0]) { // alpha, beta, rc
         uploadFiles(base + prerelease[0]);
     }
@@ -64,7 +64,7 @@ if (prerelease) {
 
 function uploadFiles(version) {
     console.log('Publish', version);
-    var uploader = client.uploadDir({
+    let uploader = client.uploadDir({
         localDir: 'dist',
         deleteRemoved: true,
         s3Params: {

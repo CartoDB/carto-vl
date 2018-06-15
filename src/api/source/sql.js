@@ -68,7 +68,7 @@ export default class SQL extends BaseWindshaft {
         if (query === '') {
             throw new CartoValidationError('source', 'nonValidQuery');
         }
-        var sqlRegex = /\bSELECT\b/i;
+        let sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
             throw new CartoValidationError('source', 'nonValidSQLQuery');
         }
