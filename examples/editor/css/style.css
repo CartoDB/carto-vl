@@ -50,6 +50,33 @@ body {
   overflow: scroll;
 }
 
+.cvl-Logo {
+  display: flex;
+}
+
+.cvl-Logo-Title {
+  text-transform: uppercase;
+  padding: 0 15px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: rgb(23, 133, 251);
+}
+
+.cvl-Logo-Image {
+  width: 28px;
+}
+
+.cvl-Logo-Link {
+  font-size: 12px;
+  text-decoration: none;
+  color: rgb(23, 133, 251);
+}
+
+.cvl-Logo-Link:visited,
+.cvl-Logo-Link:focus {
+  color: rgb(23, 133, 251);
+}
+
 .cvl-Sidebar--BasemapConfig {
   display: flex;
   font: 400 11px system-ui;
@@ -80,8 +107,10 @@ body {
   padding: 6px 8px;
 }
 
-.cvl-Sidebar--Textarea {
+.cvl-Sidebar--Textarea,
+.cvl-Main--Textarea {
   width: 100%;
+  font-family: Monospace;
 }
 
 .cvl-Debugger {

@@ -21,6 +21,15 @@
 <body>
     <div class="cvl-Container">
         <aside class="cvl-Sidebar">
+            <header class="cvl-Sidebar--Header">
+                <div class="cvl-Logo">
+                    <img class="cvl-Logo-Image" src="https://carto.com/developers/img/icons/carto-vl.svg" alt="CartoVL logo">
+                    <p class="cvl-Logo-Title">CARTO VL Editor</p>
+                </div>
+
+                <a class="cvl-Logo-Link" href="https://carto.com/developers/carto-vl/" target="_blank">Documentation</a>
+            </header>
+            
             <section class="cvl-Sidebar--Config">
                 <h1>Local config</h1>
                 <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl"/>
@@ -63,7 +72,7 @@
             <div>
                 <div class="cvl-MapInfo map-info"></div>
                 <p class="cvl-FeaturesInfo" id='title'>~ 0 features</p>
-                <textarea class="cvl-Sidebar--Input cvl-Sidebar--Textarea" name="vizSpec" id="styleEntry" cols="30" rows="10"></textarea>
+                <textarea class="cvl-Sidebar--Input cvl-Main--Textarea" name="vizSpec" id="styleEntry" cols="30" rows="10"></textarea>
             </div>
         </main>
     </div>
