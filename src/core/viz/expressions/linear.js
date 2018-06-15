@@ -45,11 +45,11 @@ export default class Linear extends BaseExpression {
 
         super({ input, min, max });
 
-        if (this.min.type != 'time') {
-            checkLooseType('linear', 'input', 0, 'number', this.input);
-            checkLooseType('linear', 'min', 1, 'number', this.min);
-            checkLooseType('linear', 'max', 2, 'number', this.max);
-        }
+        checkLooseType('linear', 'input', 0, ['number', 'date'], this.input);
+        checkLooseType('linear', 'min', 1, ['number', 'time'], this.min);
+        checkLooseType('linear', 'max', 2, ['number', 'time'], this.max);
+        // FIXME check type
+
         this.type = 'number';
     }
     eval(feature) {
@@ -66,7 +66,7 @@ export default class Linear extends BaseExpression {
 
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
-            return (input-smin)/(smax-smin);
+            return (input - smin) / (smax - smin);
 
         }
         const v = this.input.eval(feature);
@@ -75,27 +75,17 @@ export default class Linear extends BaseExpression {
         return (v - min) / (max - min);
     }
     _compile(metadata) {
-        super._compile(metadata);
-
-        if (this.input.type == 'date') {
-            const min = this.min.eval().getTime();
-            const max = this.max.eval().getTime();
-
-            this._metadata = metadata;
-            const inputMin = metadata.columns.find(c => c.name == this.input.name).min.getTime();
-            const inputMax = metadata.columns.find(c => c.name == this.input.name).max.getTime();
-            const inputDiff = inputMax - inputMin;
-
-            const smin = (min - inputMin) / inputDiff;
-            const smax = (max - inputMin) / inputDiff;
-            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-
-        } else {
-            checkType('linear', 'input', 0, 'number', this.input);
-            checkType('linear', 'min', 1, 'number', this.min);
-            checkType('linear', 'max', 2, 'number', this.max);
-
-            this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
+        this._metadata = metadata;
+        if (this.min.type == 'time') {
+            this.min.dateProperty = this.input;
+            this.max.dateProperty = this.input;
         }
+        super._compile(metadata);
+        checkType('linear', 'input', 0, ['number', 'date'], this.input);
+        checkType('linear', 'min', 1, ['number', 'time'], this.min);
+        checkType('linear', 'max', 2, ['number', 'time'], this.max);
+        // FIXME check type
+
+        this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
     }
 }
