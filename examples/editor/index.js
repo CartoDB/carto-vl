@@ -411,7 +411,7 @@ function generateSnippet(config) {
     const vizSpec = config.e || '';
     const center = config.f || { lat: 0, lng: 0 };
     const zoom = config.g || 10;
-    const basemap = config.h || 'dark-matter';
+    // const basemap = config.h || 'dark-matter';
 
 
     return `<!DOCTYPE html>
