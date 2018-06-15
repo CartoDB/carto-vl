@@ -9,7 +9,7 @@ import Hex from './expressions/color/hex';
 
 const aggFns = [];
 
-var lowerCaseFunctions = {};
+const lowerCaseFunctions = {};
 Object.keys(functions)
     .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
@@ -195,7 +195,7 @@ function cleanJsep() {
  * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
  */
 export function cleanComments(str) {
-    var mode = {
+    const mode = {
         singleQuote: false,
         doubleQuote: false,
         blockComment: false,
@@ -206,7 +206,7 @@ export function cleanComments(str) {
     // Adding chars to avoid index checking
     str = ('_' + str + '_').split('');
 
-    for (var i = 0, l = str.length; i < l; i++) {
+    for (let i = 0, l = str.length; i < l; i++) {
 
         if (mode.singleQuote) {
             if (str[i] == '\\') {
