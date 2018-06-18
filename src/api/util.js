@@ -31,6 +31,23 @@ function isObject(value) {
     const type = typeof value;
     return value != null && (type == 'object' || type == 'function');
 }
+/**
+ * Transform the given parameter into a Date object.
+ * When a number is given as a parameter is asummed to be a milliseconds epoch.
+ * @param {Date|number|string} date 
+ */
+function castDate(date) {
+    if (date instanceof Date) {
+        return date;
+    }
+    if (typeof (date) === 'number') {
+        const msEpoch = date;
+        date = new Date(0);
+        date.setUTCMilliseconds(msEpoch);
+        return date;
+    }
+    return new Date(date);
+}
 
 export {
     WM_R,
@@ -39,5 +56,6 @@ export {
     isUndefined,
     isString,
     isNumber,
-    isObject
+    isObject,
+    castDate
 };

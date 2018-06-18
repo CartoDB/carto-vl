@@ -66,7 +66,7 @@ class Renderer {
         // Use a "big" triangle instead of a square for performance and simplicity
         this.bigTriangleVBO = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        var vertices = [
+        const vertices = [
             10.0, -10.0,
             0.0, 10.0,
             -10.0, -10.0,
