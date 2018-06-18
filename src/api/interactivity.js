@@ -101,7 +101,6 @@ export default class Interactivity {
         }
         preCheckLayerList(layerList);
         this._init(layerList);
-        this._numListeners = {};
     }
 
     /**
@@ -139,9 +138,17 @@ export default class Interactivity {
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
+        this._numListeners = {};
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        }).then(this._setInteractiveCursor.bind(this));
+    }
+
+    _setInteractiveCursor() {
+        this.on('featureHover', event => {
+            // eslint-disable-next-line 
+            map.getCanvas().style.cursor = event.features.length ? 'pointer' : ''; // map is know at runtime
         });
     }
 
