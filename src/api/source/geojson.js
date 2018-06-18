@@ -110,7 +110,7 @@ export default class GeoJSON extends Base {
 
         const featureCount = this._features.length;
         const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
-        for (var i = 0; i < this._features.length; i++) {
+        for (let i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             const keys = Object.keys(properties);
             for (let j = 0, len = keys.length; j < len; j++) {
@@ -214,7 +214,7 @@ export default class GeoJSON extends Base {
 
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
-        for (var i = 0; i < this._features.length; i++) {
+        for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
             catFields.forEach(name => {
