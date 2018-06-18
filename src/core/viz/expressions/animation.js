@@ -101,16 +101,16 @@ export class Fade extends BaseExpression {
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
  *
- * @example <caption>Using the `getTime` method to get the simulated time.</caption>
+ * @example <caption>Using the `getTimestamp` method to get the animation current timestamp</caption>
  * const s = carto.expressions;
- * let torqueExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
- * const torqueStyle = {
+ * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+ * const animationStyle = {
  *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
  *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
- *   filter: torqueExpr
+ *   filter: animationExpr
  * };
  * layer.on('updated', () => {
- *   let currTime = Math.floor(torqueExpr.getTime());
+ *   let currTime = Math.floor(animationExpr.getTimestamp());
  *   document.getElementById('timestamp').innerHTML = currTime;
  * });
  *
@@ -197,15 +197,15 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Get the current time stamp of the simulation
+     * Get the current time stamp of the animation
      *
      * @api
-     * @returns {Number|Date} Current time stamp of the simulation, if the simulation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
+     * @returns {Number|Date} Current time stamp of the animation. If the animation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
      * @memberof carto.expressions.Animation
      * @instance
-     * @name getTime
+     * @name getTimestamp
      */
-    getTime() {
+    getTimestamp() {
         const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
         const max = this.input.max.eval();
@@ -222,30 +222,30 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Set the time stamp of the simulation
+     * Set the time stamp of the animation
      * @api
      * @memberof carto.expressions.Animation
      * @instance
-     * @name setTime
-     * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
+     * @name setTimestamp
+     * @param {Date|number} timestamp - A JavaScript Date object with the new animation time
      */
-    setTime(simulationTime) {
-        simulationTime = castDate(simulationTime);
-        
+    setTimestamp(timestamp) {
+        const date = castDate(timestamp);
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
 
-        if (simulationTime.getTime() < tmin) {
-            throw new RangeError('animation.setTime requires the date parameter to be higher than the lower limit');
+        if (date.getTime() < tmin) {
+            throw new RangeError('animation.setTimestamp requires the date parameter to be higher than the lower limit');
         }
-        if (simulationTime.getTime() > tmax) {
-            throw new RangeError('animation.setTime requires the date parameter to be lower than the higher limit');
+        if (date.getTime() > tmax) {
+            throw new RangeError('animation.setTimestamp requires the date parameter to be lower than the higher limit');
         }
-        this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
+
+        this.progress.expr = (date.getTime() - tmin) / (tmax - tmin);
     }
 
     /**
-     * Get the simulation progress.
+     * Get the animation progress.
      * 
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
@@ -258,7 +258,7 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Set the simulation progress from 0 to 1.
+     * Set the animation progress from 0 to 1.
      * @param {number} progress - A number in the [0-1] range setting the animation progress.
      * @api
      * @instance
@@ -274,7 +274,7 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Pause the simulation
+     * Pause the animation
      *
      * @api
      * @memberof carto.expressions.Animation
@@ -286,7 +286,7 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Play/resume the simulation
+     * Play/resume the animation
      *
      * @api
      * @memberof carto.expressions.Animation
@@ -298,7 +298,7 @@ export class Animation extends BaseExpression {
     }
 
     /**
-     * Stops the simulation
+     * Stops the animation
      *
      * @api
      * @memberof carto.expressions.Animation

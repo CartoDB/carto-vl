@@ -90,7 +90,7 @@ describe('src/core/viz/expressions/animation', () => {
         });
     });
 
-    describe('.setTime', () => {
+    describe('.setTimestamp', () => {
         let t;
         beforeEach(() => {
             t = s.animation(s.linear(s.time('2018-06-13T00:00:00.070Z'), s.time('2018-06-10T00:00:00.070Z'), s.time('2018-06-15T00:00:00.070Z')), 10, s.fade(1));
@@ -99,20 +99,20 @@ describe('src/core/viz/expressions/animation', () => {
 
         it('should throw an Range Error when date is below the lower limit ', () => {
             expect(() => {
-                t.setTime(new Date('2017-06-13T00:00:00.070Z'));
-            }).toThrowError(RangeError, 'animation.setTime requires the date parameter to be higher than the lower limit');
+                t.setTimestamp(new Date('2017-06-13T00:00:00.070Z'));
+            }).toThrowError(RangeError, 'animation.setTimestamp requires the date parameter to be higher than the lower limit');
         });
 
         it('should throw an Range Error when date is over the higher limit ', () => {
             expect(() => {
-                t.setTime(new Date('2019-06-13T00:00:00.070Z'));
-            }).toThrowError(RangeError, 'animation.setTime requires the date parameter to be lower than the higher limit');
+                t.setTimestamp(new Date('2019-06-13T00:00:00.070Z'));
+            }).toThrowError(RangeError, 'animation.setTimestamp requires the date parameter to be lower than the higher limit');
         });
 
         it('should update the simulation time when the date is valid', () => {
             const date = new Date('2018-06-14T00:00:00.070Z');
-            t.setTime(date);
-            expect(t.getTime().getTime()).toEqual(date.getTime());
+            t.setTimestamp(date);
+            expect(t.getTimestamp().getTime()).toEqual(date.getTime());
             expect(t.getProgress()).toEqual(0.8);
         });
     });
