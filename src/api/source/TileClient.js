@@ -35,8 +35,7 @@ export default class TileClient {
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
+        tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
                 dataframe => {
                     if (dataframe.empty) {
