@@ -9,15 +9,13 @@ export class Polygon {
 }
 
 export function decodeLines(geom, mvt_extent) {
-    let geometry = [];
-    geom.map(l => {
+    return geom.map(l => {
         let line = [];
-        l.map(point => {
+        l.forEach(point => {
             line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
         });
-        geometry.push(line);
+        return line;
     });
-    return geometry;
 }
 
 /*
