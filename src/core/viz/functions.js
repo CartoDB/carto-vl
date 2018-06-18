@@ -205,8 +205,8 @@ import Time from './expressions/time';
 
 import Top from './expressions/top';
 
-import { Fade } from './expressions/torque';
-import { Torque } from './expressions/torque';
+import { Fade } from './expressions/animation';
+import { Animation } from './expressions/animation';
 
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
@@ -331,7 +331,7 @@ export { time as date };
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
-export const torque = (...args) => new Torque(...args);
+export const animation = (...args) => new Animation(...args);
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);

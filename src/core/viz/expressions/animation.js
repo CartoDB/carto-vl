@@ -8,7 +8,7 @@ import { castDate } from '../../../api/util';
 const DEFAULT_FADE = 0.15;
 
 /**
- * Create a FadeIn/FadeOut configuration. See `torque` for more details.
+ * Create a FadeIn/FadeOut configuration. See `animation` for more details.
  *
  * @param {Number} param1 - Expression of type number or Number
  * @param {Number} param2 - Expression of type number or Number
@@ -17,34 +17,34 @@ const DEFAULT_FADE = 0.15;
  * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, 0.3))
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
  * });
  *
  * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: torque($day, 40, fade(0.1, 0.3))
+ *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
  *
  * @example<caption>Fade in and fade out of 0.5 seconds.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.torque(s.prop('day'), 40, s.fade(0.5))
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.5))
  * });
  *
  * @example<caption>Fade in and fade out of 0.5 seconds. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: torque($day, 40, fade(0.5))
+ *   filter: animation($day, 40, fade(0.5))
  * `);
  * 
  * @example<caption>Fade in of 0.3 seconds without fading out.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, s.HOLD))
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, s.HOLD))
  * });
  * 
  * @example<caption>Fade in of 0.3 seconds without fading out. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: torque($day, 40, fade(0.3, HOLD))
+ *   filter: animation($day, 40, fade(0.3, HOLD))
  * `);
  *
  * @memberof carto.expressions
@@ -75,7 +75,7 @@ export class Fade extends BaseExpression {
 }
 
 /**
- * Create an animated temporal filter (torque).
+ * Create an animated temporal filter (animation).
  *
  * @param {Number} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
@@ -91,19 +91,19 @@ export class Fade extends BaseExpression {
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque($day, 40, fade(0.1, 0.3))
+ *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
  *
  * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
- *   filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
+ *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
  *
  * @example <caption>Using the `getSimTime` method to get the simulated time.</caption>
  * const s = carto.expressions;
- * let torqueExpr = s.torque(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+ * let torqueExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
  * const torqueStyle = {
  *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
  *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
@@ -115,23 +115,23 @@ export class Fade extends BaseExpression {
  * });
  *
  * @memberof carto.expressions
- * @name torque
+ * @name animation
  * @function
  * @api
 */
 /**
- * Torque class
+ * Animation class
  *
- * This class is instanced automatically by using the `torque` function. It is documented for its methods.
+ * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
  * @memberof carto.expressions
- * @name Torque
+ * @name Animation
  * @abstract
  * @hideconstructor
  * @class
  * @api
  */
-export class Torque extends BaseExpression {
+export class Animation extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
         let originalInput = input;
@@ -143,10 +143,10 @@ export class Torque extends BaseExpression {
             originalInput = input;
         }
 
-        checkLooseType('torque', 'input', 0, 'number', input);
-        checkLooseType('torque', 'duration', 1, 'number', duration);
-        checkFeatureIndependent('torque', 'duration', 1, duration);
-        checkLooseType('torque', 'fade', 2, 'fade', fade);
+        checkLooseType('animation', 'input', 0, 'number', input);
+        checkLooseType('animation', 'duration', 1, 'number', duration);
+        checkFeatureIndependent('animation', 'duration', 1, duration);
+        checkLooseType('animation', 'fade', 2, 'fade', fade);
 
         const progress = number(0);
 
@@ -201,7 +201,7 @@ export class Torque extends BaseExpression {
      *
      * @api
      * @returns {Number|Date} Current time stamp of the simulation, if the simulation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @instance
      * @name getSimTime
      */
@@ -224,7 +224,7 @@ export class Torque extends BaseExpression {
     /**
      * Set the time stamp of the simulation
      * @api
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @instance
      * @name setSimTime
      * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
@@ -236,10 +236,10 @@ export class Torque extends BaseExpression {
         const tmax = this._input.max.eval();
 
         if (simulationTime.getTime() < tmin) {
-            throw new RangeError('torque.setSimTime requires the date parameter to be higher than the lower limit');
+            throw new RangeError('animation.setSimTime requires the date parameter to be higher than the lower limit');
         }
         if (simulationTime.getTime() > tmax) {
-            throw new RangeError('torque.setSimTime requires the date parameter to be lower than the higher limit');
+            throw new RangeError('animation.setSimTime requires the date parameter to be lower than the higher limit');
         }
         this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
     }
@@ -250,7 +250,7 @@ export class Torque extends BaseExpression {
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @name getSimProgress
      */
     getSimProgress() {
@@ -262,13 +262,13 @@ export class Torque extends BaseExpression {
      * @param {number} progress - A number in the [0-1] range setting the animation progress.
      * @api
      * @instance
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @name setSimProgress
      */
     setSimProgress(progress) {
         progress = Number.parseFloat(progress);
         if (progress < 0 || progress > 1) {
-            throw new TypeError(`torque.setSimProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
+            throw new TypeError(`animation.setSimProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
         this.progress.expr = progress;
     }
@@ -277,7 +277,7 @@ export class Torque extends BaseExpression {
      * Pause the simulation
      *
      * @api
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @instance
      * @name pause
      */
@@ -289,7 +289,7 @@ export class Torque extends BaseExpression {
      * Play/resume the simulation
      *
      * @api
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @instance
      * @name play
      */
@@ -301,7 +301,7 @@ export class Torque extends BaseExpression {
      * Stops the simulation
      *
      * @api
-     * @memberof carto.expressions.Torque
+     * @memberof carto.expressions.Animation
      * @instance
      * @name stop
      */
@@ -318,19 +318,19 @@ export class Torque extends BaseExpression {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
 
-        checkType('torque', 'input', 0, ['number', 'date'], this._originalInput);
-        checkType('torque', 'duration', 1, 'number', this.duration);
+        checkType('animation', 'input', 0, ['number', 'date'], this._originalInput);
+        checkType('animation', 'duration', 1, 'number', this.duration);
         super._compile(meta);
 
-        checkType('torque', 'input', 0, 'number', this.input);
-        checkType('torque', 'fade', 2, 'fade', this.fade);
-        checkFeatureIndependent('torque', 'duration', 1, this.duration);
+        checkType('animation', 'input', 0, 'number', this.input);
+        checkType('animation', 'fade', 2, 'fade', this.fade);
+        checkFeatureIndependent('animation', 'duration', 1, this.duration);
 
         this.preface = `
-            #ifndef TORQUE
-            #define TORQUE
+            #ifndef ANIMATION
+            #define ANIMATION
             
-            float torque(float _input, float progress, float duration, float fadeIn, float fadeOut){
+            float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
                 float x = 0.;
                 
                 // Check for NaN
@@ -345,6 +345,6 @@ export class Torque extends BaseExpression {
         `;
 
         this.inlineMaker = inline =>
-            `torque(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
+            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }

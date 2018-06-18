@@ -42,7 +42,7 @@
     const source = new carto.source.SQL('SELECT * FROM buildings_detroit');
     const viz = new carto.Viz(`
       color: ramp(buckets($year_built,[1900,1910,1920,1930,1940,1950,1960,1970,1980,1990,2000,2010,2014]),[#59A2BA,#81B3AB,#81B3AB,#BFD48A,#DAE677,#FAFA64,#FCD553,#FCB344,#FA8D34,#F76E2A,#F0471D,#E81515,#CC33FF])
-      filter: torque(linear($year_built,1900,2018),15, fade(0, 100000))
+      filter: animation(linear($year_built,1900,2018),15, fade(0, 100000))
       strokeWidth: 0
     `);
     const layer = new carto.Layer('layer', source, viz);
