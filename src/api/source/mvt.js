@@ -34,7 +34,7 @@ export default class MVT extends Base {
      * @constructor MVT
      * @extends carto.source.Base
      * @memberof carto.source
-     * @api
+     * @IGNOREapi
      */
     constructor(templateURL, metadata = { columns: [] }) {
         super();
