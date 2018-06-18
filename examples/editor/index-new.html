@@ -28,12 +28,15 @@
 
                 <a class="cvl-Logo-Link" href="https://carto.com/developers/carto-vl/" target="_blank">Documentation</a>
             </header>
-            
+
             <section class="cvl-Sidebar--Config">
                 <h1>Local config</h1>
-                <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl"/>
+                <label class="cvl-Sidebar--label" for="user"> Username</label>
+                <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl" />
+                <label class="cvl-Sidebar--label" for="user"> Dataset</label>
                 <input type="text" class="cvl-Sidebar--Input" id="dataset" value="spend_data">
-                <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com"/>
+                <label class="cvl-Sidebar--label" for="user"> Server URL</label>
+                <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com" />
                 <div id="basemap" class="cvl-Sidebar--BasemapConfig"></div>
             </section>
 
@@ -44,7 +47,7 @@
                     <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
                 </div>
             </section>
-            
+
             <section class="cvl-Sidebar--Examples">
                 <h1>Examples</h1>
                 <div class="cvl-ButtonList" id='buttonlist'>
@@ -54,7 +57,7 @@
 
             <section class="cvl-Sidebar--Export">
                 <h1>Export map</h1>
-                
+
                 <div class="cvl-ButtonList cvl-ButtonList--Primary">
                     <button id="export-map-button">Generate HTML</button>
                     <button id="copy-html-button">Copy HTML</button>
@@ -66,7 +69,7 @@
 
         <main class="cvl-Main">
             <textarea class="cvl-Debugger" id="feedback">¿?</textarea>
-                    
+
             <div id='map' class='map'></div>
             <div>
                 <div class="cvl-MapInfo map-info"></div>
