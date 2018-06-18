@@ -332,11 +332,10 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
-        dataframe.freeObserver = () => {
-            this._renderLayer.removeDataframe(dataframe);
+        dataframe.setFreeObserver(() => {
             this._integrator.invalidateWebGLState();
             this._integrator.needRefresh();
-        };
+        });
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         if (this._viz) {

@@ -63,6 +63,10 @@ export default class Dataframe {
         }
     }
 
+    setFreeObserver(freeObserver){
+        this.freeObserver = freeObserver;
+    }
+
     bind(renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -337,12 +341,13 @@ export default class Dataframe {
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
         }
+        const freeObserver = this.freeObserver;
         Object.keys(this).map(key => {
             this[key] = null;
         });
         this.freed = true;
-        if (this.freeObserver) {
-            this.freeObserver(this);
+        if (freeObserver) {
+            freeObserver(this);
         }
     }
 }
