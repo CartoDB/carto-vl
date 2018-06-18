@@ -101,7 +101,7 @@ export class Fade extends BaseExpression {
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
  *
- * @example <caption>Using the `getSimTime` method to get the simulated time.</caption>
+ * @example <caption>Using the `getTime` method to get the simulated time.</caption>
  * const s = carto.expressions;
  * let torqueExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
  * const torqueStyle = {
@@ -110,7 +110,7 @@ export class Fade extends BaseExpression {
  *   filter: torqueExpr
  * };
  * layer.on('updated', () => {
- *   let currTime = Math.floor(torqueExpr.getSimTime());
+ *   let currTime = Math.floor(torqueExpr.getTime());
  *   document.getElementById('timestamp').innerHTML = currTime;
  * });
  *
@@ -203,9 +203,9 @@ export class Animation extends BaseExpression {
      * @returns {Number|Date} Current time stamp of the simulation, if the simulation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
      * @memberof carto.expressions.Animation
      * @instance
-     * @name getSimTime
+     * @name getTime
      */
-    getSimTime() {
+    getTime() {
         const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
         const max = this.input.max.eval();
@@ -226,20 +226,20 @@ export class Animation extends BaseExpression {
      * @api
      * @memberof carto.expressions.Animation
      * @instance
-     * @name setSimTime
+     * @name setTime
      * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
      */
-    setSimTime(simulationTime) {
+    setTime(simulationTime) {
         simulationTime = castDate(simulationTime);
         
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
 
         if (simulationTime.getTime() < tmin) {
-            throw new RangeError('animation.setSimTime requires the date parameter to be higher than the lower limit');
+            throw new RangeError('animation.setTime requires the date parameter to be higher than the lower limit');
         }
         if (simulationTime.getTime() > tmax) {
-            throw new RangeError('animation.setSimTime requires the date parameter to be lower than the higher limit');
+            throw new RangeError('animation.setTime requires the date parameter to be lower than the higher limit');
         }
         this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
     }
@@ -251,9 +251,9 @@ export class Animation extends BaseExpression {
      * @api
      * @instance
      * @memberof carto.expressions.Animation
-     * @name getSimProgress
+     * @name getProgress
      */
-    getSimProgress() {
+    getProgress() {
         return this.progress.value;
     }
 
@@ -263,12 +263,12 @@ export class Animation extends BaseExpression {
      * @api
      * @instance
      * @memberof carto.expressions.Animation
-     * @name setSimProgress
+     * @name setProgress
      */
-    setSimProgress(progress) {
+    setProgress(progress) {
         progress = Number.parseFloat(progress);
         if (progress < 0 || progress > 1) {
-            throw new TypeError(`animation.setSimProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
+            throw new TypeError(`animation.setProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
         this.progress.expr = progress;
     }

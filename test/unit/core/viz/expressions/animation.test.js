@@ -42,7 +42,7 @@ describe('src/core/viz/expressions/animation', () => {
             t._setTimestamp(0);
             t.pause();
             t._setTimestamp(1);
-            expect(t.getSimProgress()).toEqual(0);
+            expect(t.getProgress()).toEqual(0);
         });
     });
 
@@ -53,7 +53,7 @@ describe('src/core/viz/expressions/animation', () => {
             t.pause();
             t.play();
             t._setTimestamp(1);
-            expect(t.getSimProgress()).toEqual(0.1);
+            expect(t.getProgress()).toEqual(0.1);
         });
     });
 
@@ -64,17 +64,17 @@ describe('src/core/viz/expressions/animation', () => {
             t.stop();
             t._setTimestamp(1);
 
-            expect(t.getSimProgress()).toEqual(0);
+            expect(t.getProgress()).toEqual(0);
         });
 
         it('should reset the simulation time', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(1);
-            expect(t.getSimProgress()).toEqual(0.1);
+            expect(t.getProgress()).toEqual(0.1);
 
             t.stop();
-            expect(t.getSimProgress()).toEqual(0);
+            expect(t.getProgress()).toEqual(0);
         });
     });
 
@@ -83,14 +83,14 @@ describe('src/core/viz/expressions/animation', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(5);
-            expect(t.getSimProgress()).toEqual(0.5);
-            t.setSimProgress(0.4);
+            expect(t.getProgress()).toEqual(0.5);
+            t.setProgress(0.4);
             t._setTimestamp(6);
-            expect(t.getSimProgress()).toEqual(0.5);
+            expect(t.getProgress()).toEqual(0.5);
         });
     });
 
-    describe('.setSimTime', () => {
+    describe('.setTime', () => {
         let t;
         beforeEach(() => {
             t = s.animation(s.linear(s.time('2018-06-13T00:00:00.070Z'), s.time('2018-06-10T00:00:00.070Z'), s.time('2018-06-15T00:00:00.070Z')), 10, s.fade(1));
@@ -99,21 +99,21 @@ describe('src/core/viz/expressions/animation', () => {
 
         it('should throw an Range Error when date is below the lower limit ', () => {
             expect(() => {
-                t.setSimTime(new Date('2017-06-13T00:00:00.070Z'));
-            }).toThrowError(RangeError, 'animation.setSimTime requires the date parameter to be higher than the lower limit');
+                t.setTime(new Date('2017-06-13T00:00:00.070Z'));
+            }).toThrowError(RangeError, 'animation.setTime requires the date parameter to be higher than the lower limit');
         });
 
         it('should throw an Range Error when date is over the higher limit ', () => {
             expect(() => {
-                t.setSimTime(new Date('2019-06-13T00:00:00.070Z'));
-            }).toThrowError(RangeError, 'animation.setSimTime requires the date parameter to be lower than the higher limit');
+                t.setTime(new Date('2019-06-13T00:00:00.070Z'));
+            }).toThrowError(RangeError, 'animation.setTime requires the date parameter to be lower than the higher limit');
         });
 
         it('should update the simulation time when the date is valid', () => {
             const date = new Date('2018-06-14T00:00:00.070Z');
-            t.setSimTime(date);
-            expect(t.getSimTime().getTime()).toEqual(date.getTime());
-            expect(t.getSimProgress()).toEqual(0.8);
+            t.setTime(date);
+            expect(t.getTime().getTime()).toEqual(date.getTime());
+            expect(t.getProgress()).toEqual(0.8);
         });
     });
 
@@ -123,13 +123,13 @@ describe('src/core/viz/expressions/animation', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(1);
-            expect(t.getSimProgress()).toEqual(0.1);
+            expect(t.getProgress()).toEqual(0.1);
             t.stop();
-            expect(t.getSimProgress()).toEqual(0);
+            expect(t.getProgress()).toEqual(0);
             t.play();
-            expect(t.getSimProgress()).toEqual(0);
+            expect(t.getProgress()).toEqual(0);
             t._setTimestamp(2);
-            expect(t.getSimProgress()).toEqual(0.1);
+            expect(t.getProgress()).toEqual(0.1);
         });
     });
 });

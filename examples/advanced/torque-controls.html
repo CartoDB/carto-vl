@@ -267,7 +267,7 @@
         }
 
         $timeRange.onchange = () => {
-            viz.variables.animation.setSimProgress($timeRange.value);
+            viz.variables.animation.setProgress($timeRange.value);
         }
 
         $playBtn.onclick = () => {
@@ -284,12 +284,12 @@
 
         let last = $timeRange.value;
         $timeRange.onchange = () => {
-            viz.variables.animation.setSimProgress($timeRange.value);
+            viz.variables.animation.setProgress($timeRange.value);
             last = $timeRange.value;
         }
         layer.on('updated', () => {
             if ($timeRange.value == last) {
-                $timeRange.value = viz.variables.animation.getSimProgress();
+                $timeRange.value = viz.variables.animation.getProgress();
                 last = $timeRange.value;
             }
         });
