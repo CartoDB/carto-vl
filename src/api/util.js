@@ -49,14 +49,6 @@ function castDate(date) {
     return new Date(date);
 }
 
-function castDate(value) {
-    if (value instanceof Date) {
-        return value;
-    }
-    const date = new Date(0).setUTCMilliseconds(value);
-    return date;
-}
-
 export {
     WM_R,
     WM_2R,
