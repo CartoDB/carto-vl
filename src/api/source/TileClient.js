@@ -2,7 +2,6 @@ import { validateTemplateURL } from '../url';
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../../client/rsys';
 
-
 export default class TileClient {
     constructor(templateURLs) {
         if (!Array.isArray(templateURLs)) {
@@ -35,22 +34,29 @@ export default class TileClient {
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
-            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
-                dataframe => {
-                    if (dataframe.empty) {
-                        needToComplete--;
-                    } else {
-                        completedTiles.push(dataframe);
-                    }
-                    if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                        this._oldDataframes.map(d => d.active = false);
-                        completedTiles.map(d => d.active = true);
-                        this._oldDataframes = completedTiles;
-                        this._dataLoadedCallback();
-                    }
-                });
+        tiles.forEach(({ x, y, z }) => {
+            const KEY = `${x},${y},${z}`;
+            let dataframePromise;
+            if (this._cache.has(KEY)) {
+                dataframePromise = this._cache.get(KEY);
+            }
+            else {
+                dataframePromise = this._requestDataframe(x, y, z, responseToDataframeTransformer);
+                this._cache.set(KEY, dataframePromise);
+            }
+            dataframePromise.then(dataframe => {
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
+                    this._oldDataframes.forEach(d => d.active = false);
+                    completedTiles.forEach(d => d.active = true);
+                    this._oldDataframes = completedTiles;
+                    this._dataLoadedCallback();
+                }
+            });
         });
     }
 
