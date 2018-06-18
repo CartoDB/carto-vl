@@ -396,7 +396,7 @@ function generateSnippet(config) {
     const vizSpec = config.e || '';
     const center = config.f || { lat: 0, lng: 0 };
     const zoom = config.g || 10;
-    // const basemap = config.h || 'dark-matter';
+    const basemap = BASEMAPS[config.h] || 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
 
 
     return `<!DOCTYPE html>
@@ -425,7 +425,7 @@ function generateSnippet(config) {
         <script>
             const map = new mapboxgl.Map({
                 container: 'map',
-                style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+                style: '${basemap}',
                 center: [${center.lng}, ${center.lat}],
                 zoom: ${zoom},
                 dragRotate: false,
