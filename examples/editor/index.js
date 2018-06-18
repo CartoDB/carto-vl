@@ -386,22 +386,7 @@ $copyHTMLButton.addEventListener('click', () => {
 
 
 /**
-
-
-"a":"sf_stclines",
-"b":"",
-"c":"dmanzanares",
-"d":"carto.com",
-"e":"color: ramp($st_type, prism) \nwidth: 1.5",
-"f":{
-    "lng":-122.44408486861192,
-    "lat":37.773706736149705
-    },
- "g":11.664310802866805
-}
-
-* @param {*} config 
- * 
+ * Generates an HTML template for the given map configuration
  */
 function generateSnippet(config) {
     const dataset = config.a;
