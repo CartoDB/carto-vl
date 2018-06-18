@@ -121,7 +121,7 @@
  * @api
  */
 
-import Animate from './expressions/animate';
+import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
@@ -234,7 +234,7 @@ import Sprites from './expressions/sprites';
 
 /* Expose classes as constructor functions */
 
-export const animate = (...args) => new Animate(...args);
+export const transition = (...args) => new Transition(...args);
 
 export const array = (...args) => new BaseArray(...args);
 

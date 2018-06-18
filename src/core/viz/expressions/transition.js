@@ -2,23 +2,23 @@ import BaseExpression from './base';
 import { checkNumber, getStringErrorPreface } from './utils';
 
 /**
- * Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
+ * Transition returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
  * The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.
  *
  * @param {number} duration - Animation duration in milliseconds
  * @return {Number}
  *
  * @memberof carto.expressions
- * @name animate
+ * @name transition
  * @function
  * @api
  */
 //TODO refactor to use uniformfloat class
-export default class Animate extends BaseExpression {
+export default class Transition extends BaseExpression {
     constructor(duration) {
-        checkNumber('animate', 'duration', 0, duration);
+        checkNumber('transition', 'duration', 0, duration);
         if (duration < 0) {
-            throw new Error(getStringErrorPreface('animate', 'duration', 0) + 'duration must be greater than or equal to 0');
+            throw new Error(getStringErrorPreface('transition', 'duration', 0) + 'duration must be greater than or equal to 0');
         }
         super({});
         this.aTime = Date.now();
