@@ -37,7 +37,7 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event only once when ready', (done) => {
-            var update = jasmine.createSpy('update');
+            let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
                 expect(update).toHaveBeenCalledTimes(1);
@@ -46,7 +46,7 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event when the source is updated', (done) => {
-            var update = jasmine.createSpy('update');
+            let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(new carto.source.GeoJSON(featureData), viz);
@@ -57,7 +57,7 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event when the viz is updated', (done) => {
-            var update = jasmine.createSpy('update');
+            let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(source, new carto.Viz('color: blue'));
@@ -68,7 +68,7 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event when the _onDataframeAdded is called', (done) => {
-            var update = jasmine.createSpy('update');
+            let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
                 layer._onDataframeAdded(layer._source._dataframe);
@@ -79,7 +79,7 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event when the viz is animated', async (done) => {
-            var update = jasmine.createSpy('update');
+            let update = jasmine.createSpy('update');
             await layer.update(source, new carto.Viz('width: now()'));
             layer.on('updated', update);
             layer.on('loaded', () => {

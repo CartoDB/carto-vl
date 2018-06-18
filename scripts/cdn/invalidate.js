@@ -4,9 +4,9 @@
 
 // Load secrets file
 
-var fs = require('fs');
+let fs = require('fs');
 
-var secrets = JSON.parse(fs.readFileSync('secrets.json'));
+let secrets = JSON.parse(fs.readFileSync('secrets.json'));
 if (!secrets ||
     !secrets.FASTLY_API_KEY ||
     !secrets.FASTLY_CARTODB_SERVICE) {
@@ -15,7 +15,7 @@ if (!secrets ||
 
 // Purge all cache
 
-var fastly = require('fastly')(secrets.FASTLY_API_KEY);
+let fastly = require('fastly')(secrets.FASTLY_API_KEY);
 
 console.log('Invalidate CDN');
 fastly.purgeAll(secrets.FASTLY_CARTODB_SERVICE, function (err) {
