@@ -54,10 +54,6 @@ export default class TileClient {
         });
     }
 
-    _getDataframe(x, y, z) {
-        return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z));
-    }
-
     _getTileUrl(x, y, z) {
         const subdomainIndex = this._getSubdomainIndex(x, y);
         return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
