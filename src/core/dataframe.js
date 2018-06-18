@@ -63,7 +63,7 @@ export default class Dataframe {
         }
     }
 
-    setFreeObserver(freeObserver){
+    setFreeObserver(freeObserver) {
         this.freeObserver = freeObserver;
     }
 
@@ -264,7 +264,7 @@ export default class Dataframe {
             if (propertyName === 'cartodb_id') {
                 id = prop;
             } else {
-                const column = this.metadata.columns.find(c => c.name == propertyName);
+                const column = this.metadata.columns[propertyName];
                 if (column && column.type == 'category') {
                     prop = this.metadata.categoryIDsToName[prop];
                 }

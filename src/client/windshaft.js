@@ -145,7 +145,7 @@ export default class Windshaft {
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
         this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const column = this.metadata.columns.find(column => column.name == propertyName);
+            const column = this.metadata.columns[propertyName];
             if (!column) {
                 return;
             }
@@ -354,7 +354,7 @@ export default class Windshaft {
                 column.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
                     if (column[fn]) {
-                        column[fn] = new Time(column[fn]*1000).value;
+                        column[fn] = new Time(column[fn] * 1000).value;
                     }
                 });
             }

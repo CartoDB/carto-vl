@@ -52,7 +52,7 @@ export default class Property extends BaseExpression {
         return feature[this.name];
     }
     _compile(meta) {
-        const metaColumn = meta.columns.find(c => c.name == this.name);
+        const metaColumn = meta.columns[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }

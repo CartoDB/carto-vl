@@ -150,7 +150,7 @@ class Renderer {
         const aspect = this.getAspect();
         let drawMetadata = {
             zoom: 1. / this._zoom,
-            columns: []
+            columns: [] // What is this?
         };
 
         const s = 1. / this._zoom;

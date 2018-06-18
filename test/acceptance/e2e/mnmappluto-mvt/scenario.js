@@ -31,7 +31,11 @@ async function loadMVT() {
     const layergroup = await response.json();
     const tilejson = layergroup.metadata.tilejson.vector;
 
-    const source = new carto.source.MVT(tilejson.tiles[0], { columns: [{name: 'numfloors', type: 'number'}], geomType: 'polygon' });
+    const source = new carto.source.MVT(tilejson.tiles[0], {
+        properties: {
+            numfloors: { type: 'number' }
+        }
+    });
 
     const viz = new carto.Viz(`
         color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])

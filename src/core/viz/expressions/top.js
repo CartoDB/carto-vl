@@ -37,7 +37,7 @@ export default class Top extends BaseExpression {
     eval(feature) {
         const p = this.property.eval(feature);
         const buckets = Math.round(this.buckets.eval());
-        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        const metaColumn = this._meta.columns[this.property.name];
         let ret;
         metaColumn.categoryNames.map((name, i) => {
             if (i == p) {
@@ -83,7 +83,7 @@ export default class Top extends BaseExpression {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
-            const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+            const metaColumn = this._meta.columns[this.property.name];
             metaColumn.categoryNames.map((name, i) => {
                 if (i < buckets) {
                     pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);

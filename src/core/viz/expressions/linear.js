@@ -60,8 +60,8 @@ export default class Linear extends BaseExpression {
             const max = this.max.eval().getTime();
 
             const metadata = this._metadata;
-            const inputMin = metadata.columns.find(c => c.name == this.input.name).min.getTime();
-            const inputMax = metadata.columns.find(c => c.name == this.input.name).max.getTime();
+            const inputMin = metadata.columns[this.input.name].min.getTime();
+            const inputMax = metadata.columns[this.input.name].max.getTime();
             const inputDiff = inputMax - inputMin;
 
             const smin = (min - inputMin) / inputDiff;
@@ -82,8 +82,8 @@ export default class Linear extends BaseExpression {
             const max = this.max.eval().getTime();
 
             this._metadata = metadata;
-            const inputMin = metadata.columns.find(c => c.name == this.input.name).min.getTime();
-            const inputMax = metadata.columns.find(c => c.name == this.input.name).max.getTime();
+            const inputMin = metadata.columns[this.input.name].min.getTime();
+            const inputMax = metadata.columns[this.input.name].max.getTime();
             const inputDiff = inputMax - inputMin;
 
             const smin = (min - inputMin) / inputDiff;
