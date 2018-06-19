@@ -137,27 +137,27 @@ export default class Ramp extends BaseExpression {
         const high = this.pixel[highIndex];
 
         const fract = len * middle - Math.floor(len * middle);
-        const index = fract * high + (1 - fract) * low;
-
+        
         if (this.palette.type === paletteTypes.COLOR_ARRAY) {
+        
             if (middle < 1) {
                 return {
-                    r: this.pixel[lowIndex],
-                    g: this.pixel[lowIndex + 1],
-                    b: this.pixel[lowIndex + 2],
-                    a: this.pixel[lowIndex + 3] / 255
+                    r: fract * this.pixel[lowIndex+0] + (1- fract) * this.pixel[highIndex+0],
+                    g: fract * this.pixel[lowIndex+1] + (1- fract) * this.pixel[highIndex+1],
+                    b: fract * this.pixel[lowIndex+2] + (1- fract) * this.pixel[highIndex+2],
+                    a: (fract * this.pixel[lowIndex+3] + (1- fract) * this.pixel[highIndex+3]) / 255
                 };
             } else {
                 return {
-                    r: this.pixel[highIndex - 3],
-                    g: this.pixel[highIndex - 2],
-                    b: this.pixel[highIndex - 1],
-                    a: this.pixel[highIndex] / 255
+                    r: fract * this.pixel[lowIndex-3] + (1- fract) * this.pixel[highIndex-3],
+                    g: fract * this.pixel[lowIndex-2] + (1- fract) * this.pixel[highIndex-2],
+                    b: fract * this.pixel[lowIndex-1] + (1- fract) * this.pixel[highIndex-1],
+                    a: (fract * this.pixel[lowIndex-0] + (1- fract) * this.pixel[highIndex-0]) / 255
                 };
             }
         }
 
-        return index;
+        return fract * high + (1 - fract) * low;
     }
     
     _compile(meta) {

@@ -35,11 +35,11 @@ describe('src/core/viz/expressions/ramp', () => {
 
             const r = ramp(buckets(0, [10]), [firstColor, secondColor]);
             r._compile();
-            expect(r.eval()).toEqual(firstColor._nameToRGB());
+            expect(r.eval()).toEqual(firstColor._nameToRGBA());
 
             const r2 = ramp(buckets(11, [10]), [firstColor, secondColor]);
             r2._compile();
-            expect(r2.eval()).toEqual(secondColor._nameToRGB());
+            expect(r2.eval()).toEqual(secondColor._nameToRGBA());
         });
     });
 });
