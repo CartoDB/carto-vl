@@ -65,7 +65,16 @@ const EVENTS = [
     'featureHover',
     'featureLeave',
 ];
+
+// https://github.com/CartoDB/carto-vl/pull/578#discussion_r196356856
+const _interactivityMap = new Map();
+
 export default class Interactivity {
+    
+    static get _interactivityMap() {
+        return _interactivityMap;
+    }
+
     /**
     *
     * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
@@ -152,9 +161,17 @@ export default class Interactivity {
     }
 
     _setInteractiveCursor() {
+        const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
+        if (!map.__carto_interacivities) {
+            map.__carto_interacivities = new Set();
+        }
         this.on('featureHover', event => {
-            const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
-            map.getCanvas().style.cursor = event.features.length ? 'pointer' : 'auto';
+            if (event.features.length) {
+                map.__carto_interacivities.add(this);
+            } else {
+                map.__carto_interacivities.delete(this);
+            }
+            map.getCanvas().style.cursor = (map.__carto_interacivities.size > 0) ? 'pointer' : '';
         });
     }
 
