@@ -76,7 +76,7 @@ export default class Interactivity {
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     * @param {object} [options={}] - Object containing interactivity options
-    * @param {boolean} [options.defaultCursor=false] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
+    * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
     * 
     * @example
     * const interactivity = new carto.Interactivity(layer);
@@ -96,7 +96,7 @@ export default class Interactivity {
     * @memberof carto
     * @api
     */
-    constructor(layerList, options={}) {
+    constructor(layerList, options = { autoChangePointer: true }) {
         if (layerList instanceof Layer) {
             // Allow one layer as input
             layerList = [layerList];
@@ -145,7 +145,7 @@ export default class Interactivity {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         }).then(() => {
-            if (!options.defaultCursor) {
+            if (options.autoChangePointer) {
                 this._setInteractiveCursor();
             }
         });
@@ -154,7 +154,7 @@ export default class Interactivity {
     _setInteractiveCursor() {
         this.on('featureHover', event => {
             const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
-            map.getCanvas().style.cursor = event.features.length ? 'pointer' : '';
+            map.getCanvas().style.cursor = event.features.length ? 'pointer' : 'auto';
         });
     }
 
