@@ -348,3 +348,50 @@ describe('Interactivity', () => {
         document.body.removeChild(div);
     });
 });
+
+describe('Cursor', () => {
+    let map, source1, viz1, layer1;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        map = setup.map;
+
+        source1 = new carto.source.GeoJSON(feature1);
+        viz1 = new carto.Viz(`
+            color: red
+            @wadus: 123
+        `);
+        layer1 = new carto.Layer('layer1', source1, viz1);
+
+        layer1.addTo(map);
+    });
+
+    describe('when the interactivity is instantiated by default', () => {
+        it('should set the cursor to be pointer when user is over a feature', done => {
+            new carto.Interactivity(layer1);
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('pointer');
+                    done();
+                }, 0);
+            });
+        });
+
+        it('should set the cursor to be empty when user is over a feature', done => {
+            new carto.Interactivity(layer1, { autoChangePointer: false });
+            expect(map.getCanvas().style.cursor).toEqual('');
+            layer1.on('loaded', () => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 0);
+            });
+        });
+    });
+});
