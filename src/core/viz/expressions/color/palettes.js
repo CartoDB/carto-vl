@@ -92,7 +92,7 @@ Object.keys(cartocolor).map(name => {
  * @function
  * @api
  */
-class Reverse extends BaseExpression{
+class Reverse extends BaseExpression {
     constructor(palette) {
         super({});
         this.type = 'palette';

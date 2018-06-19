@@ -141,20 +141,18 @@ export default class Ramp extends BaseExpression {
 
         if (this.palette.type === paletteTypes.COLOR_ARRAY) {
             if (middle < 1) {
-                console.log('!!!', this.pixel[lowIndex + 3]);
                 return {
                     r: this.pixel[lowIndex],
                     g: this.pixel[lowIndex + 1],
                     b: this.pixel[lowIndex + 2],
-                    a: this.pixel[lowIndex + 3]
+                    a: this.pixel[lowIndex + 3] / 255
                 };
             } else {
-                console.log('!!!', this.pixel[highIndex]);
                 return {
                     r: this.pixel[highIndex - 3],
                     g: this.pixel[highIndex - 2],
                     b: this.pixel[highIndex - 1],
-                    a: this.pixel[highIndex]
+                    a: this.pixel[highIndex] / 255
                 };
             }
         }
@@ -263,38 +261,34 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureColor() {
-        const WIDTH = 256;
-
-        const pixel = new Uint8Array(4 * WIDTH);
+        const width = 256;
+        const pixel = new Uint8Array(4 * width);
         const colors = this._getColorsFromPalette(this.input, this.palette);
-
-        for (let i = 0; i < WIDTH; i++) {
-            const vlowRaw = colors[Math.floor(i / (WIDTH - 1) * (colors.length - 1))];
-            const vhighRaw = colors[Math.ceil(i / (WIDTH - 1) * (colors.length - 1))];
-            const vlow = [vlowRaw.r / WIDTH, vlowRaw.g / WIDTH, vlowRaw.b / WIDTH, vlowRaw.a];
-            const vhigh = [vhighRaw.r / WIDTH, vhighRaw.g / WIDTH, vhighRaw.b / WIDTH, vhighRaw.a];
-            const m = i / (WIDTH - 1) * (colors.length - 1) - Math.floor(i / (WIDTH - 1) * (colors.length - 1));
+        for (let i = 0; i < width; i++) {
+            const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
+            const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
+            const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
+            const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
+            const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-            pixel[4 * i + 0] = v.r * WIDTH;
-            pixel[4 * i + 1] = v.g * WIDTH;
-            pixel[4 * i + 2] = v.b * WIDTH;
-            pixel[4 * i + 3] = v.a * WIDTH;
+            pixel[4 * i + 0] = v.r * 256;
+            pixel[4 * i + 1] = v.g * 256;
+            pixel[4 * i + 2] = v.b * 256;
+            pixel[4 * i + 3] = v.a * 255;
         }
         
         return pixel;
     }
 
     _computeTexture() {
-        const WIDTH = 256;
-
-        const pixel = new Float32Array(WIDTH);
+        const width = 256;
+        const pixel = new Float32Array(width);
         const floats = this.palette.floats;
-        
-        for (let i = 0; i < WIDTH; i++) {
-            const vlowRaw = floats[Math.floor(i / (WIDTH - 1) * (floats.length - 1))];
-            const vhighRaw = floats[Math.ceil(i / (WIDTH - 1) * (floats.length - 1))];
-            const m = i / (WIDTH - 1) * (floats.length - 1) - Math.floor(i / (WIDTH - 1) * (floats.length - 1));
-            pixel[i] = ((1.0 - m) * vlowRaw + m * vhighRaw);
+        for (let i = 0; i < width; i++) {
+            const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
+            const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
+            const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+            pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
         return pixel;
@@ -312,15 +306,11 @@ export default class Ramp extends BaseExpression {
             const pixel = this.pixel;
             if (this.type == 'color') {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                    pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, 1, 0, gl.ALPHA, gl.FLOAT,
-                    pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, width, 1, 0, gl.ALPHA, gl.FLOAT, pixel);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
@@ -329,6 +319,7 @@ export default class Ramp extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
     }
+
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
         if (this.palette.type === paletteTypes.SPRITES) {
