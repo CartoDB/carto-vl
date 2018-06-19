@@ -137,27 +137,26 @@ export default class Ramp extends BaseExpression {
         const high = this.pixel[highIndex];
 
         const fract = len * middle - Math.floor(len * middle);
-        
-        if (this.palette.type === paletteTypes.COLOR_ARRAY) {
-        
-            if (middle < 1) {
-                return {
-                    r: fract * this.pixel[lowIndex+0] + (1- fract) * this.pixel[highIndex+0],
-                    g: fract * this.pixel[lowIndex+1] + (1- fract) * this.pixel[highIndex+1],
-                    b: fract * this.pixel[lowIndex+2] + (1- fract) * this.pixel[highIndex+2],
-                    a: (fract * this.pixel[lowIndex+3] + (1- fract) * this.pixel[highIndex+3]) / 255
-                };
-            } else {
-                return {
-                    r: fract * this.pixel[lowIndex-3] + (1- fract) * this.pixel[highIndex-3],
-                    g: fract * this.pixel[lowIndex-2] + (1- fract) * this.pixel[highIndex-2],
-                    b: fract * this.pixel[lowIndex-1] + (1- fract) * this.pixel[highIndex-1],
-                    a: (fract * this.pixel[lowIndex-0] + (1- fract) * this.pixel[highIndex-0]) / 255
-                };
-            }
+
+        if (this.palette.type !== paletteTypes.COLOR_ARRAY) {
+            return fract * high + (1 - fract) * low;
         }
 
-        return fract * high + (1 - fract) * low;
+        if (lowIndex === len) {
+            return {
+                r: fract * this.pixel[lowIndex-3] + (1- fract) * this.pixel[highIndex-3],
+                g: fract * this.pixel[lowIndex-2] + (1- fract) * this.pixel[highIndex-2],
+                b: fract * this.pixel[lowIndex-1] + (1- fract) * this.pixel[highIndex-1],
+                a: (fract * this.pixel[lowIndex-0] + (1- fract) * this.pixel[highIndex-0]) / 255
+            };   
+        }
+
+        return {
+            r: fract * this.pixel[lowIndex+0] + (1- fract) * this.pixel[highIndex+0],
+            g: fract * this.pixel[lowIndex+1] + (1- fract) * this.pixel[highIndex+1],
+            b: fract * this.pixel[lowIndex+2] + (1- fract) * this.pixel[highIndex+2],
+            a: (fract * this.pixel[lowIndex+3] + (1- fract) * this.pixel[highIndex+3]) / 255
+        };
     }
     
     _compile(meta) {
@@ -264,6 +263,7 @@ export default class Ramp extends BaseExpression {
         const width = 256;
         const pixel = new Uint8Array(4 * width);
         const colors = this._getColorsFromPalette(this.input, this.palette);
+        
         for (let i = 0; i < width; i++) {
             const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
             const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
@@ -271,12 +271,13 @@ export default class Ramp extends BaseExpression {
             const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
             const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+            
             pixel[4 * i + 0] = v.r * 256;
             pixel[4 * i + 1] = v.g * 256;
             pixel[4 * i + 2] = v.b * 256;
             pixel[4 * i + 3] = v.a * 255;
         }
-        
+
         return pixel;
     }
 
@@ -284,6 +285,7 @@ export default class Ramp extends BaseExpression {
         const width = 256;
         const pixel = new Float32Array(width);
         const floats = this.palette.floats;
+
         for (let i = 0; i < width; i++) {
             const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
             const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
