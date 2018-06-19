@@ -26,7 +26,7 @@ export default class BaseCategory extends BaseExpression {
     eval() {
         if (this._metadata) {
             // If it has metadata return the category ID
-            return this._metadata.categoryIDs[this.expr];
+            return this._metadata.IDToCategory[this.expr];
         }
     }
     isAnimated() {
@@ -45,7 +45,7 @@ export default class BaseCategory extends BaseExpression {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
     }
     _preDraw(program, drawMetadata, gl) {
-        const id = this._metadata.categoryIDs[this.expr];
+        const id = this._metadata.categoryToID.get(this.expr);
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
 }

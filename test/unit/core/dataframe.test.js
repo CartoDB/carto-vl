@@ -18,14 +18,14 @@ describe('src/core/dataframe', () => {
                 size: 2,
                 active: true,
                 metadata: {
-                    columns: [{
-                        name: 'id',
-                        type: 'number'
-                    },
-                    {
-                        name: 'cartodb_id',
-                        type: 'number'
-                    }]
+                    properties: {
+                        id: {
+                            type: 'number',
+                        },
+                        cartodb_id: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const feature1 = { id: 0, properties: { id: 1 } };
@@ -78,13 +78,14 @@ describe('src/core/dataframe', () => {
                 size: 1,
                 active: true,
                 metadata: {
-                    columns: [{
-                        name: 'numeric_prop',
-                        type: 'number'
-                    }, {
-                        name: 'cartodb_id',
-                        type: 'number'
-                    }]
+                    properties: {
+                        numeric_prop: {
+                            type: 'number',
+                        },
+                        cartodb_id: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const feature1 = {
@@ -139,15 +140,14 @@ describe('src/core/dataframe', () => {
                 size: 1,
                 active: true,
                 metadata: {
-                    columns: [
-                        {
-                            name: 'cartodb_id',
-                            type: 'number'
+                    properties: {
+                        id: {
+                            type: 'number',
                         },
-                        {
-                            name: 'numeric_property',
-                            type: 'number'
-                        }]
+                        numeric_property: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const viz = {

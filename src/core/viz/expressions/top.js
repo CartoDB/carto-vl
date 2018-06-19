@@ -37,7 +37,7 @@ export default class Top extends BaseExpression {
     eval(feature) {
         const p = this.property.eval(feature);
         const buckets = Math.round(this.buckets.eval());
-        const metaColumn = this._meta.columns[this.property.name];
+        const metaColumn = this._meta.properties[this.property.name];
         let ret;
         metaColumn.categoryNames.map((name, i) => {
             if (i == p) {
@@ -83,10 +83,15 @@ export default class Top extends BaseExpression {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let pixels = new Uint8Array(4 * width);
-            const metaColumn = this._meta.columns[this.property.name];
-            metaColumn.categoryNames.map((name, i) => {
+            const metaColumn = this._meta.properties[this.property.name];
+
+            const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+                b.frequency - a.frequency
+            );
+
+            orderedCategoryNames.map((cat, i) => {
                 if (i < buckets) {
-                    pixels[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
+                    pixels[4 * this._meta.categoryToID.get(cat.name) + 3] = (i + 1);
                 }
             });
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);

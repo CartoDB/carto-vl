@@ -24,11 +24,9 @@ describe('src/core/viz/expressions/basic/category', () => {
 
     describe('.eval', () => {
         const fakeMetadata = {
-            columns: [{
-                type: 'category',
-                name: 'category',
-                categoryNames: ['cat0', 'cat1', 'cat2']
-            }],
+            properties: {
+                category: { type: 'category', categories: { cat0: 0, cat1: 0, cat2: 0 } }
+            },
             categoryIDs: {
                 'cat0': 0,
                 'cat1': 1,

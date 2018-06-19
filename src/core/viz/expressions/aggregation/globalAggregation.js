@@ -170,7 +170,7 @@ function generateGlobalAggregattion(metadataPropertyName) {
             this.property._compile(metadata);
             this.type = 'number';
             super.inlineMaker = inline => inline._value;
-            this._value.expr = metadata.columns[this.property.name][metadataPropertyName];
+            this._value.expr = metadata.properties[this.property.name][metadataPropertyName];
         }
         _getMinimumNeededSchema() {
             return this.property._getMinimumNeededSchema();

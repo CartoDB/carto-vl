@@ -264,9 +264,9 @@ export default class Dataframe {
             if (propertyName === 'cartodb_id') {
                 id = prop;
             } else {
-                const column = this.metadata.columns[propertyName];
+                const column = this.metadata.properties[propertyName];
                 if (column && column.type == 'category') {
-                    prop = this.metadata.categoryIDsToName[prop];
+                    prop = this.metadata.IDToCategory.get(prop);
                 }
                 properties[propertyName] = prop;
             }
