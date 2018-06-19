@@ -348,3 +348,58 @@ describe('Interactivity', () => {
         document.body.removeChild(div);
     });
 });
+
+describe('Cursor', () => {
+    let map, source1, viz1, layer1, interactivity;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        map = setup.map;
+
+        source1 = new carto.source.GeoJSON(feature1);
+        viz1 = new carto.Viz(`
+            color: red
+            @wadus: 123
+        `);
+        layer1 = new carto.Layer('layer1', source1, viz1);
+
+        layer1.addTo(map);
+    });
+
+    describe('when the interactivity is instantiated by default', () => {
+        it('should set the cursor to pointer when user is over a feature', done => {
+            interactivity = new carto.Interactivity(layer1);
+            expect(map.getCanvas().style.cursor).toEqual('');
+            interactivity.on('featureHover', () => {
+                // This callback is executed before the one that acutally changes the cursor so we set a timeout to ensure the cursor was changed.
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('pointer');
+                    done();
+                }, 10);
+
+            });
+
+            layer1.on('loaded', () => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+            });
+        });
+
+        it('should set the cursor to pointer when user is over a feature', done => {
+            interactivity = new carto.Interactivity(layer1, { autoChangePointer: false });
+            expect(map.getCanvas().style.cursor).toEqual('');
+            interactivity.on('featureHover', () => {
+                // This callback is executed before the one that acutally changes the cursor so we set a timeout to ensure the cursor was changed.
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 10);
+
+            });
+            layer1.on('loaded', () => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+            });
+        });
+    });
+});
