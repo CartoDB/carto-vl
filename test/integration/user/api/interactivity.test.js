@@ -367,38 +367,30 @@ describe('Cursor', () => {
     });
 
     describe('when the interactivity is instantiated by default', () => {
-        it('should set the cursor to pointer when user is over a feature', done => {
+        it('should set the cursor to be pointer when user is over a feature', done => {
             interactivity = new carto.Interactivity(layer1);
             expect(map.getCanvas().style.cursor).toEqual('');
-            interactivity.on('featureHover', () => {
-                // This callback is executed before the one that acutally changes the cursor so we set a timeout to ensure the cursor was changed.
+
+            layer1.on('loaded', () => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
                 setTimeout(() => {
                     expect(map.getCanvas().style.cursor).toEqual('pointer');
                     done();
-                }, 10);
-
-            });
-
-            layer1.on('loaded', () => {
-                // Move mouse inside a feature 1
-                util.simulateMove({ lng: 5, lat: 5 });
+                }, 100);
             });
         });
 
-        it('should set the cursor to pointer when user is over a feature', done => {
+        it('should set the cursor to be empty when user is over a feature', done => {
             interactivity = new carto.Interactivity(layer1, { autoChangePointer: false });
             expect(map.getCanvas().style.cursor).toEqual('');
-            interactivity.on('featureHover', () => {
-                // This callback is executed before the one that acutally changes the cursor so we set a timeout to ensure the cursor was changed.
-                setTimeout(() => {
-                    expect(map.getCanvas().style.cursor).toEqual('');
-                    done();
-                }, 10);
-
-            });
             layer1.on('loaded', () => {
                 // Move mouse inside a feature 1
                 util.simulateMove({ lng: 5, lat: 5 });
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 100);
             });
         });
     });
