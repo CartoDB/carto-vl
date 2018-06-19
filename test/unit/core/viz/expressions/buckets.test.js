@@ -16,80 +16,140 @@ describe('src/core/viz/expressions/buckets', () => {
 
     describe('eval', () => {
         describe('when input type is category', () => {
+            const METADATA = {
+                columns: [
+                    {
+                        name: 'city',
+                        type: 'category',
+                        categoryNames: [
+                            'Madrid', 
+                            'Murcia',
+                            'Pontevedra',
+                            'Barcelona'
+                        ],
+                    },
+                ],
+                categoryIDs: {
+                    'Mardrid': 0,
+                    'Murcia': 1,
+                    'Pontevedra': 2,
+                    'Barcelona': 3 
+                }
+            };
+
+            let bucketExpression;
+            let $cities = s.property('city');
+
             describe('and it has one breakpoint', () => {
-                const city = 'Murcia';
-                let bucketExpression;
-                let inputFeature = { city };
-                let $cities = s.property('city');
-                const METADATA = {
-                    columns: [
-                        {
-                            name: 'city',
-                            type: 'category',
-                            categoryNames: ['Murcia', 'Madrid'],
-
-
-                        }
-                    ],
-                    categoryIDs: {
-                        'Murcia': 0,
-                        'Madrid': 1
-                    }
-                };
-
                 beforeEach(() => {
                     $cities._compile(METADATA);
-                    bucketExpression = s.buckets($cities, [city]);
+                    bucketExpression = s.buckets($cities, ['Murcia']);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
-                    const response = bucketExpression.eval(inputFeature);
-                    expect(response).toEqual(0);
+                    const expected = 0;
+                    const feature = { city: 'Murcia' };
+                    const response = bucketExpression.eval(feature);
+                    
+                    expect(response).toEqual(expected);
+                });
+
+                it('should classify unknown category as other', () => {
+                    const expected = 1;
+                    let feature;
+                    let response;
+                    
+                    feature = { city: 'Pontevedra' };
+                    response = bucketExpression.eval(feature);
+
+                    expect(response).toEqual(expected);
+
+                    feature = { city: 'Barcelona' };
+                    response = bucketExpression.eval(feature);
+
+                    expect(response).toEqual(expected);
                 });
             });
 
-            fdescribe('and it has two breakpoints', () => {
-                let bucketExpression;
-                let $cities = s.property('city');
-                const METADATA = {
-                    columns: [
-                        {
-                            name: 'city',
-                            type: 'category',
-                            categoryNames: ['Madrid', 'Murcia'],
-
-                        },
-                    ],
-                    categoryIDs: {
-                        'Mardrid': 0,
-                        'Murcia': 1,
-                    }
-                };
-
+            describe('and it has two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Murcia', 'Madrid']);
                     bucketExpression._compile(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
-                    const inputFeature = { city: 'Murcia' };
-                    const actual = bucketExpression.eval(inputFeature);
                     const expected = 0;
+                    const feature = { city: 'Murcia' };
+                    const actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
                 });
 
                 it('should classify the input feature in the last bucket', () => {
-                    const inputFeature = { city: 'Madrid' };
-                    const actual = bucketExpression.eval(inputFeature);
                     const expected = 1;
+                    const feature = { city: 'Madrid' };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify unknown category as other', () => {
+                    const expected = 2;
+                    let feature;
+                    let actual;
+
+                    feature = { city: 'Pontevedra' };
+                    actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+
+                    feature = { city: 'Barcelona' };
+                    actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
                 });
             });
 
             describe('and it has more than two breakpoints', () => {
+                beforeEach(() => {
+                    $cities._compile(METADATA);
+                    bucketExpression = s.buckets($cities, ['Pontevedra', 'Murcia', 'Madrid']);
+                });
 
+                it('should classify the input feature in the first bucket', () => {
+                    const expected = 0;
+                    const feature = { city: 'Pontevedra' };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify the input feature in the second bucket', () => {
+                    const expected = 1;
+                    const feature = { city: 'Murcia' };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify the input feature in the third bucket', () => {
+                    const expected = 2;
+                    const feature = { city: 'Madrid' };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify unknown category as other', () => {
+                    const expected = 3;
+                    let feature;
+                    let response;
+                    
+                    feature = { city: 'Barcelona' };
+                    response = bucketExpression.eval(feature);
+                    
+                    expect(response).toEqual(expected);
+                });
             });
         });
 
