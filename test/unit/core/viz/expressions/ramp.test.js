@@ -41,5 +41,21 @@ describe('src/core/viz/expressions/ramp', () => {
             r2._compile();
             expect(r2.eval()).toEqual(secondColor._nameToRGBA());
         });
+
+        it('should not show interpolation when having same number of categories than custom colors', () => {
+            const colorA = s.namedColor('red');
+            const colorB = s.namedColor('blue');
+            const colorC = s.namedColor('yellow');
+            const colorD = s.namedColor('purple');
+
+            const categories = ['A', 'B', 'C', 'D'];
+            const colors = [colorA, colorB, colorC, colorD];
+
+            categories.forEach((category, index) => {
+                const r = ramp(buckets(category, categories), colors);
+                r._compile();
+                expect(r.eval()).toEqual(colors[index]._nameToRGBA());    
+            });
+        });
     });
 });
