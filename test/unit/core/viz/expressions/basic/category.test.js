@@ -40,7 +40,7 @@ describe('src/core/viz/expressions/basic/category', () => {
             categoryExpresion._compile(fakeMetadata);
             const actual = categoryExpresion.eval();
 
-            expect(actual).toEqual(0);
+            expect(actual).toEqual('cat0');
         });
     });
 });

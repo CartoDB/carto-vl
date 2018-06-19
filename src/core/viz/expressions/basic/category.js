@@ -26,6 +26,10 @@ export default class BaseCategory extends BaseExpression {
     }
     
     eval() {
+        if (this._metadata && this._metadata.categoryIDs[this.expr]) {
+            return this._metadata.categoryIDs[this.expr];
+        }
+        
         return this.expr;
     }
     
