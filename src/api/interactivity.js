@@ -75,7 +75,9 @@ export default class Interactivity {
     * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
-    *
+    * @param {object} [options={}] - Object containing interactivity options
+    * @param {boolean} [options.defaultCursor=false] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
+    * 
     * @example
     * const interactivity = new carto.Interactivity(layer);
     * interactivity.on('click', event => {
@@ -94,13 +96,13 @@ export default class Interactivity {
     * @memberof carto
     * @api
     */
-    constructor(layerList) {
+    constructor(layerList, options={}) {
         if (layerList instanceof Layer) {
             // Allow one layer as input
             layerList = [layerList];
         }
         preCheckLayerList(layerList);
-        this._init(layerList);
+        this._init(layerList, options);
     }
 
     /**
@@ -133,7 +135,7 @@ export default class Interactivity {
         return this._emitter.off(eventName, callback);
     }
 
-    _init(layerList) {
+    _init(layerList, options) {
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
@@ -142,13 +144,17 @@ export default class Interactivity {
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
-        }).then(this._setInteractiveCursor.bind(this));
+        }).then(() => {
+            if (!options.defaultCursor) {
+                this._setInteractiveCursor();
+            }
+        });
     }
 
     _setInteractiveCursor() {
         this.on('featureHover', event => {
-            // eslint-disable-next-line 
-            map.getCanvas().style.cursor = event.features.length ? 'pointer' : ''; // map is know at runtime
+            const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
+            map.getCanvas().style.cursor = event.features.length ? 'pointer' : '';
         });
     }
 
