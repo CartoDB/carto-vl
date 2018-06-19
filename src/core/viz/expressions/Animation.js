@@ -1,78 +1,10 @@
 import BaseExpression from './base';
-import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
+import { Fade } from './Fade';
+import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
 import { castDate } from '../../../api/util';
-
-const DEFAULT_FADE = 0.15;
-
-/**
- * Create a FadeIn/FadeOut configuration. See `animation` for more details.
- *
- * @param {Number} param1 - Expression of type number or Number
- * @param {Number} param2 - Expression of type number or Number
- * @return {Fade}
- *
- * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
- * });
- *
- * @example <caption>Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</caption>
- * const viz = new carto.Viz(`
- *   filter: animation($day, 40, fade(0.1, 0.3))
- * `);
- *
- * @example<caption>Fade in and fade out of 0.5 seconds.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   filter: s.animation(s.prop('day'), 40, s.fade(0.5))
- * });
- *
- * @example<caption>Fade in and fade out of 0.5 seconds. (String)</caption>
- * const viz = new carto.Viz(`
- *   filter: animation($day, 40, fade(0.5))
- * `);
- * 
- * @example<caption>Fade in of 0.3 seconds without fading out.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, s.HOLD))
- * });
- * 
- * @example<caption>Fade in of 0.3 seconds without fading out. (String)</caption>
- * const viz = new carto.Viz(`
- *   filter: animation($day, 40, fade(0.3, HOLD))
- * `);
- *
- * @memberof carto.expressions
- * @name fade
- * @function
- * @api
-*/
-export class Fade extends BaseExpression {
-    constructor(param1 = DEFAULT, param2 = DEFAULT) {
-        let fadeIn = param1;
-        let fadeOut = param2;
-        if (param1 == DEFAULT) {
-            fadeIn = DEFAULT_FADE;
-        }
-        if (param2 == DEFAULT) {
-            fadeOut = fadeIn;
-        }
-        fadeIn = implicitCast(fadeIn);
-        fadeOut = implicitCast(fadeOut);
-        // TODO improve type check
-        super({ fadeIn, fadeOut });
-        this.type = 'fade';
-        this.inlineMaker = (inline) => ({
-            in: inline.fadeIn,
-            out: inline.fadeOut,
-        });
-    }
-}
 
 /**
  * Create an animated temporal filter (animation).

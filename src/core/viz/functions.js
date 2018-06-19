@@ -205,8 +205,8 @@ import Time from './expressions/time';
 
 import Top from './expressions/top';
 
-import { Fade } from './expressions/animation';
-import { Animation } from './expressions/animation';
+import { Fade } from './expressions/Fade';
+import { Animation } from './expressions/Animation';
 
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';

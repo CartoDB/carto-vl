@@ -1,7 +1,7 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
-describe('src/core/viz/expressions/animation', () => {
+describe('src/core/viz/expressions/Animation', () => {
     describe('error control', () => {
         validateFeatureDependentErrors('animation', [0.5, 'dependent']);
         validateTypeErrors('animation', ['category', 10]);
@@ -15,7 +15,7 @@ describe('src/core/viz/expressions/animation', () => {
         validateStaticType('animation', ['number', 10], 'number');
     });
 
-    describe('.eval()', () => {
+    describe('.eval', () => {
         it('should eval to 0 when the input is 1', () => {
             expect(s.animation(1).eval()).toEqual(0);
         });
