@@ -66,15 +66,7 @@ const EVENTS = [
     'featureLeave',
 ];
 
-// https://github.com/CartoDB/carto-vl/pull/578#discussion_r196356856
-const _interactivityMap = new Map();
-
 export default class Interactivity {
-    
-    static get _interactivityMap() {
-        return _interactivityMap;
-    }
-
     /**
     *
     * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
