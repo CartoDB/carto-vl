@@ -127,6 +127,7 @@ export default class Ramp extends BaseExpression {
         this._computeTextureIfNeeded();
 
         const input = this.input.eval(feature);
+
         const middle = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
         const lowIndex = clamp(Math.floor(len * middle), 0, len);
@@ -137,13 +138,25 @@ export default class Ramp extends BaseExpression {
 
         const fract = len * middle - Math.floor(len * middle);
         const index = fract * high + (1 - fract) * low;
-        
+
         if (this.palette.type === paletteTypes.COLOR_ARRAY) {
-            return {
-                r: this.pixel[index],
-                g: this.pixel[index + 1],
-                b: this.pixel[index + 2]
-            };
+            if (middle < 1) {
+                console.log('!!!', this.pixel[lowIndex + 3]);
+                return {
+                    r: this.pixel[lowIndex],
+                    g: this.pixel[lowIndex + 1],
+                    b: this.pixel[lowIndex + 2],
+                    a: this.pixel[lowIndex + 3]
+                };
+            } else {
+                console.log('!!!', this.pixel[highIndex]);
+                return {
+                    r: this.pixel[highIndex - 3],
+                    g: this.pixel[highIndex - 2],
+                    b: this.pixel[highIndex - 1],
+                    a: this.pixel[highIndex]
+                };
+            }
         }
 
         return index;

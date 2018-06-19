@@ -34,7 +34,7 @@ export class NamedColor extends BaseExpression {
         super({});
         this.type = 'color';
         this.name = colorName;
-        this.color = this._nameToRGB(this.name);
+        this.color = this._nameToRGB();
     }
     get value() {
         return this.eval();
@@ -47,15 +47,16 @@ export class NamedColor extends BaseExpression {
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
 
-    _nameToRGB(name) {
+    _nameToRGB() {
         const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
         const fakeDiv = document.createElement('div');
-        fakeDiv.style.backgroundColor = name;
+        fakeDiv.style.backgroundColor = this.name;
         document.body.appendChild(fakeDiv);
         const rgbSring = getComputedStyle(fakeDiv).backgroundColor;
         document.body.removeChild(fakeDiv);
 
         const match = colorRegex.exec(rgbSring);
+
         return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
     }
 }

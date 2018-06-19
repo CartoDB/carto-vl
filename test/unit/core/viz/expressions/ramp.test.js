@@ -30,13 +30,16 @@ describe('src/core/viz/expressions/ramp', () => {
         });
 
         it('should work with color palettes', () => {
-            const r = ramp(buckets(0, [10]), [s.namedColor('red'), s.namedColor('blue')]);
-            r._compile();
-            expect(r.eval()).toEqual({r: 255, g: 0, b: 0});
+            const firstColor = s.namedColor('red');
+            const secondColor = s.namedColor('blue');
 
-            const r2 = ramp(buckets(11, [10]), [s.namedColor('red'), s.namedColor('blue')]);
+            const r = ramp(buckets(0, [10]), [firstColor, secondColor]);
+            r._compile();
+            expect(r.eval()).toEqual(firstColor._nameToRGB());
+
+            const r2 = ramp(buckets(11, [10]), [firstColor, secondColor]);
             r2._compile();
-            expect(r2.eval()).toEqual({r: 0, g: 0, b: 255});
+            expect(r2.eval()).toEqual(secondColor._nameToRGB());
         });
     });
 });
