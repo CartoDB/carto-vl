@@ -32,10 +32,10 @@ describe('src/core/viz/expressions/buckets', () => {
                     },
                 ],
                 categoryIDs: {
-                    'Mardrid': 0,
-                    'Murcia': 1,
-                    'Pontevedra': 2,
-                    'Barcelona': 3
+                    'Mardrid': 'Madrid',
+                    'Murcia': 'Murcia',
+                    'Pontevedra': 'Pontevedra',
+                    'Barcelona': 'Barcelona'
                 }
             };
 
