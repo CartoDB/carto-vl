@@ -377,7 +377,7 @@ describe('Cursor', () => {
                 setTimeout(() => {
                     expect(map.getCanvas().style.cursor).toEqual('pointer');
                     done();
-                }, 100);
+                }, 0);
             });
         });
 
@@ -390,7 +390,7 @@ describe('Cursor', () => {
                 setTimeout(() => {
                     expect(map.getCanvas().style.cursor).toEqual('');
                     done();
-                }, 100);
+                }, 0);
             });
         });
     });
