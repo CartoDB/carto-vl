@@ -14,7 +14,9 @@ describe('src/core/viz/expressions/buckets', () => {
         validateStaticType('buckets', ['category', 'category-array'], 'category');
     });
 
-    describe('eval', () => {
+    fdescribe('eval', () => {
+        let bucketExpression;
+
         describe('when input type is category', () => {
             const METADATA = {
                 columns: [
@@ -22,7 +24,7 @@ describe('src/core/viz/expressions/buckets', () => {
                         name: 'city',
                         type: 'category',
                         categoryNames: [
-                            'Madrid', 
+                            'Madrid',
                             'Murcia',
                             'Pontevedra',
                             'Barcelona'
@@ -33,24 +35,23 @@ describe('src/core/viz/expressions/buckets', () => {
                     'Mardrid': 0,
                     'Murcia': 1,
                     'Pontevedra': 2,
-                    'Barcelona': 3 
+                    'Barcelona': 3
                 }
             };
 
-            let bucketExpression;
             let $cities = s.property('city');
 
             describe('and it has one breakpoint', () => {
                 beforeEach(() => {
-                    $cities._compile(METADATA);
                     bucketExpression = s.buckets($cities, ['Murcia']);
+                    bucketExpression._compile(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
                     const expected = 0;
                     const feature = { city: 'Murcia' };
                     const response = bucketExpression.eval(feature);
-                    
+
                     expect(response).toEqual(expected);
                 });
 
@@ -58,7 +59,7 @@ describe('src/core/viz/expressions/buckets', () => {
                     const expected = 1;
                     let feature;
                     let response;
-                    
+
                     feature = { city: 'Pontevedra' };
                     response = bucketExpression.eval(feature);
 
@@ -112,8 +113,8 @@ describe('src/core/viz/expressions/buckets', () => {
 
             describe('and it has more than two breakpoints', () => {
                 beforeEach(() => {
-                    $cities._compile(METADATA);
                     bucketExpression = s.buckets($cities, ['Pontevedra', 'Murcia', 'Madrid']);
+                    bucketExpression._compile(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -144,26 +145,104 @@ describe('src/core/viz/expressions/buckets', () => {
                     const expected = 3;
                     let feature;
                     let response;
-                    
+
                     feature = { city: 'Barcelona' };
                     response = bucketExpression.eval(feature);
-                    
+
                     expect(response).toEqual(expected);
                 });
             });
         });
 
         describe('when input type is number', () => {
-            describe('and it has one breakpoint', () => {
+            const METADATA = {
+                columns: [
+                    {
+                        name: 'price',
+                        type: 'number',
+                    }
+                ]
+            };
 
+            const $price = s.property('price');
+
+            describe('and it has one breakpoint', () => {
+                beforeEach(() => {
+                    bucketExpression = s.buckets($price, [10]);
+                    bucketExpression._compile(METADATA);
+                });
+
+                it('should classify the input in the first category when is lower than the breakpoint', () => {
+                    const expected = 0;
+                    const feature = { price: 5 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify the input in the second category when is higher than the breakpoint', () => {
+                    const expected = 1;
+                    const feature = { price: 11 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify the input in the second category when is equal than the breakpoint', () => {
+                    const expected = 1;
+                    const feature = { price: 10 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
             });
 
             describe('and it has two breakpoints', () => {
+                beforeEach(() => {
+                    bucketExpression = s.buckets($price, [10, 20]);
+                    bucketExpression._compile(METADATA);
+                });
+                
+                it('should classify the input in the first category when is lower than the first breakpoint', () => {
+                    const expected = 0;
+                    const feature = { price: 9 };
+                    const actual = bucketExpression.eval(feature);
 
-            });
+                    expect(actual).toEqual(expected);
 
-            describe('and it has more than two breakpoints', () => {
+                });
 
+                it('should classify the input in the second category when is equal than the first breakpoint', () => {
+                    const expected = 1;
+                    const feature = { price: 10 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+                
+                it('should classify the input in the second category when is lower than the second breakpoint', () => {
+                    const expected = 1;
+                    const feature = { price: 15 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+                
+                it('should classify the input in the third category when is equal than the third breakpoint', () => {
+                    const expected = 2;
+                    const feature = { price: 20 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should classify the input in the third category when is higher than the third breakpoint', () => {
+                    const expected = 2;
+                    const feature = { price: 21 };
+                    const actual = bucketExpression.eval(feature);
+
+                    expect(actual).toEqual(expected);
+                });
             });
         });
     });
