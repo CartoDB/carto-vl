@@ -14,7 +14,7 @@ describe('src/core/viz/expressions/buckets', () => {
         validateStaticType('buckets', ['category', 'category-array'], 'category');
     });
 
-    fdescribe('eval', () => {
+    describe('eval', () => {
         let bucketExpression;
 
         describe('when input type is category', () => {
