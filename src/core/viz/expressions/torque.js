@@ -3,6 +3,7 @@ import { implicitCast, DEFAULT, clamp, checkType, checkLooseType, checkFeatureIn
 import { number, linear, globalMin, globalMax } from '../functions';
 import Property from './basic/property';
 import Variable from './basic/variable';
+import { castDate } from '../../../api/util';
 
 const DEFAULT_FADE = 0.15;
 
@@ -33,6 +34,17 @@ const DEFAULT_FADE = 0.15;
  * @example<caption>Fade in and fade out of 0.5 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: torque($day, 40, fade(0.5))
+ * `);
+ * 
+ * @example<caption>Fade in of 0.3 seconds without fading out.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.torque(s.prop('day'), 40, s.fade(0.1, s.HOLD))
+ * });
+ * 
+ * @example<caption>Fade in of 0.3 seconds without fading out. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: torque($day, 40, fade(0.3, HOLD))
  * `);
  *
  * @memberof carto.expressions
@@ -123,7 +135,7 @@ export class Torque extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
         let originalInput = input;
-        
+
         if (input instanceof Property) {
             input = linear(input, globalMin(input), globalMax(input));
         } else {
@@ -135,28 +147,34 @@ export class Torque extends BaseExpression {
         checkLooseType('torque', 'duration', 1, 'number', duration);
         checkFeatureIndependent('torque', 'duration', 1, duration);
         checkLooseType('torque', 'fade', 2, 'fade', fade);
-        
+
         const progress = number(0);
-        
+
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
         this.type = 'number';
         this._originalInput = originalInput;
+        this._paused = false;
     }
 
     isAnimated() {
-        return true;
+        return !this.paused;
     }
 
     _setTimestamp(timestamp) {
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
-    
+
         if (this._lastTime !== undefined) {
             deltaTime = timestamp - this._lastTime;
         }
 
         this._lastTime = timestamp;
+
+        if (this._paused) {
+            return;
+        }
+
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
 
         super._setTimestamp(timestamp);
@@ -173,10 +191,11 @@ export class Torque extends BaseExpression {
         const duration = this.duration.value;
         const fadeIn = this.fade.fadeIn.eval(feature);
         const fadeOut = this.fade.fadeOut.eval(feature);
-        
+
         const output = 1 - clamp(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
         return output;
     }
+
     /**
      * Get the current time stamp of the simulation
      *
@@ -186,7 +205,6 @@ export class Torque extends BaseExpression {
      * @instance
      * @name getSimTime
      */
-    
     getSimTime() {
         const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
@@ -203,10 +221,99 @@ export class Torque extends BaseExpression {
         return new Date(tmix);
     }
 
+    /**
+     * Set the time stamp of the simulation
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name setSimTime
+     * @param {Date|number} simulationTime - A javascript Date object with the new simulation time
+     */
+    setSimTime(simulationTime) {
+        simulationTime = castDate(simulationTime);
+        
+        const tmin = this._input.min.eval();
+        const tmax = this._input.max.eval();
+
+        if (simulationTime.getTime() < tmin) {
+            throw new RangeError('torque.setSimTime requires the date parameter to be higher than the lower limit');
+        }
+        if (simulationTime.getTime() > tmax) {
+            throw new RangeError('torque.setSimTime requires the date parameter to be lower than the higher limit');
+        }
+        this.progress.expr = (simulationTime.getTime() - tmin) / (tmax - tmin);
+    }
+
+    /**
+     * Get the simulation progress.
+     * 
+     * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
+     * @api
+     * @instance
+     * @memberof carto.expressions.Torque
+     * @name getSimProgress
+     */
+    getSimProgress() {
+        return this.progress.value;
+    }
+
+    /**
+     * Set the simulation progress from 0 to 1.
+     * @param {number} progress - A number in the [0-1] range setting the animation progress.
+     * @api
+     * @instance
+     * @memberof carto.expressions.Torque
+     * @name setSimProgress
+     */
+    setSimProgress(progress) {
+        progress = Number.parseFloat(progress);
+        if (progress < 0 || progress > 1) {
+            throw new TypeError(`torque.setSimProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
+        }
+        this.progress.expr = progress;
+    }
+
+    /**
+     * Pause the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name pause
+     */
+    pause() {
+        this._paused = true;
+    }
+
+    /**
+     * Play/resume the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name play
+     */
+    play() {
+        this._paused = false;
+    }
+
+    /**
+     * Stops the simulation
+     *
+     * @api
+     * @memberof carto.expressions.Torque
+     * @instance
+     * @name stop
+     */
+    stop() {
+        this.progress.expr = 0;
+        this._paused = true;
+    }
+
     get input() {
         return this._input instanceof Variable ? this._input.alias : this._input;
     }
-    
+
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);

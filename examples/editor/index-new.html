@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CARTO-VL EDITOR</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
+    <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+    <script src="../../dist/carto-vl.js"></script>
+    <script src="index.js" defer></script>
+</head>
+
+<body>
+    <div class="cvl-Container">
+        <aside class="cvl-Sidebar">
+            <header class="cvl-Sidebar--Header">
+                <div class="cvl-Logo">
+                    <img class="cvl-Logo-Image" src="https://carto.com/developers/img/icons/carto-vl.svg" alt="CartoVL logo">
+                    <p class="cvl-Logo-Title">CARTO VL Editor</p>
+                </div>
+
+                <a class="cvl-Logo-Link" href="https://carto.com/developers/carto-vl/" target="_blank">Documentation</a>
+            </header>
+
+            <section class="cvl-Sidebar--Config">
+                <h1>Local config</h1>
+                <label class="cvl-Sidebar--label" for="user"> Username</label>
+                <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl" />
+                <label class="cvl-Sidebar--label" for="user"> Dataset</label>
+                <input type="text" class="cvl-Sidebar--Input" id="dataset" value="spend_data">
+                <label class="cvl-Sidebar--label" for="user"> Server URL</label>
+                <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com" />
+                <div id="basemap" class="cvl-Sidebar--BasemapConfig"></div>
+            </section>
+
+            <section class="cvl-Sidebar--Config">
+                <h1>Settings</h1>
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="fullscreen">Fullscreen</button>
+                    <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
+                </div>
+            </section>
+
+            <section class="cvl-Sidebar--Examples">
+                <h1>Examples</h1>
+                <div class="cvl-ButtonList" id='buttonlist'>
+                    <button id='barcelona'>Barcelona (with tutorial)</button>
+                </div>
+            </section>
+
+            <section class="cvl-Sidebar--Export">
+                <h1>Export map</h1>
+
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="export-map-button">Generate HTML</button>
+                    <button id="copy-html-button">Copy HTML</button>
+                </div>
+
+                <textarea id="map-textarea" class="cvl-Sidebar--Input cvl-Sidebar--Textarea" name="map-textarea" rows="10"></textarea>
+            </section>
+        </aside>
+
+        <main class="cvl-Main">
+            <textarea class="cvl-Debugger" id="feedback">¿?</textarea>
+
+            <div id='map' class='map'></div>
+            <div>
+                <div class="cvl-MapInfo map-info"></div>
+                <p class="cvl-FeaturesInfo" id='title'>~ 0 features</p>
+                <textarea class="cvl-Sidebar--Input cvl-Main--Textarea" name="vizSpec" id="styleEntry" cols="30" rows="10"></textarea>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

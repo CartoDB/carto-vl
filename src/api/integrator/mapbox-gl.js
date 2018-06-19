@@ -104,7 +104,7 @@ class MGLIntegrator {
     }
 
     move() {
-        var c = this.map.getCenter();
+        const c = this.map.getCenter();
         // TODO create getCenter method
         this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         this.renderer.setZoom(this.getZoom());
@@ -116,11 +116,11 @@ class MGLIntegrator {
     }
 
     getZoom() {
-        var b = this.map.getBounds();
-        var c = this.map.getCenter();
-        var nw = b.getNorthWest();
-        var sw = b.getSouthWest();
-        var z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+        const b = this.map.getBounds();
+        const c = this.map.getCenter();
+        const nw = b.getNorthWest();
+        const sw = b.getSouthWest();
+        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
         this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         return z;
     }
