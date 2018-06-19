@@ -3,6 +3,23 @@ import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from 
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
 import { NamedColor } from './color/NamedColor';
 
+const paletteTypes = {
+    PALETTE: 'palette',
+    COLOR_ARRAY: 'color-array',
+    NUMBER_ARRAY: 'number-array',
+    SPRITES: 'sprites'
+};
+
+const rampTypes = {
+    COLOR: 'color',
+    NUMBER: 'number'
+};
+
+const inputTypes = {
+    NUMBER: 'number',
+    CATEGORY: 'category'
+};
+
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
 *
@@ -61,10 +78,11 @@ export default class Ramp extends BaseExpression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-        checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array', 'sprites'], palette);
-        if (palette.type == 'sprites') {
-            checkLooseType('ramp', 'input', 0, 'category', input);
+        checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
+        checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
+        
+        if (palette.type == paletteTypes.SPRITES) {
+            checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
         super({ input: input });
@@ -73,15 +91,17 @@ export default class Ramp extends BaseExpression {
         this.defaultOtherColor = 'gray';
 
         this.palette = palette;
-        if (palette.type == 'number-array') {
-            this.type = 'number';
+        
+        if (palette.type == paletteTypes.NUMBER_ARRAY) {
+            this.type = rampTypes.NUMBER;
         } else {
-            this.type = 'color';
+            this.type = rampTypes.COLOR;
         }
+        
         try {
-            if (palette.type == 'number-array') {
+            if (palette.type == paletteTypes.NUMBER_ARRAY) {
                 this.palette.floats = this.palette.eval();
-            } else if (palette.type == 'color-array') {
+            } else if (palette.type == paletteTypes.COLOR_ARRAY) {
                 this.palette.colors = this.palette.eval();
             }
         } catch (error) {
@@ -98,27 +118,45 @@ export default class Ramp extends BaseExpression {
         this.palette._setUID(idGenerator);
     }
 
-    eval(o) {
-        if (this.palette.type != 'number-array') {
-            super.eval(o);
+    eval(feature) {
+        if (this.palette.type !== paletteTypes.NUMBER_ARRAY
+           && this.palette.type !== paletteTypes.COLOR_ARRAY) {
+            super.eval(feature);
         }
+
         this._computeTextureIfNeeded();
-        const input = this.input.eval(o);
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+
+        const input = this.input.eval(feature);
+        const middle = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
-        const lowIndex = clamp(Math.floor(len * m), 0, len);
-        const highIndex = clamp(Math.ceil(len * m), 0, len);
+        const lowIndex = clamp(Math.floor(len * middle), 0, len);
+        const highIndex = clamp(Math.ceil(len * middle), 0, len);
+
         const low = this.pixel[lowIndex];
         const high = this.pixel[highIndex];
-        const fract = len * m - Math.floor(len * m);
-        return fract * high + (1 - fract) * low;
+
+        const fract = len * middle - Math.floor(len * middle);
+        const index = fract * high + (1 - fract) * low;
+        
+        if (this.palette.type === paletteTypes.COLOR_ARRAY) {
+            return {
+                r: this.pixel[index],
+                g: this.pixel[index + 1],
+                b: this.pixel[index + 2]
+            };
+        }
+
+        return index;
     }
+    
     _compile(meta) {
         super._compile(meta);
-        checkType('ramp', 'input', 0, ['number', 'category'], this.input);
-        if (this.palette.type == 'sprites') {
-            checkType('ramp', 'input', 0, 'category', this.input);
+        checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
+        
+        if (this.palette.type == paletteTypes.SPRITES) {
+            checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
         }
+
         this._texCategories = null;
         this._GLtexCategories = null;
     }
@@ -131,7 +169,7 @@ export default class Ramp extends BaseExpression {
 
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type == '') {
             const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
             return {
                 preface: input.preface + sprites.preface,
@@ -144,14 +182,14 @@ export default class Ramp extends BaseExpression {
         uniform float keyMin${this._uid};
         uniform float keyWidth${this._uid};
         `),
-            inline: this.palette.type == 'number-array' ?
+            inline: this.palette.type === paletteTypes.NUMBER_ARRAY ?
                 `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }
     
     _getColorsFromPalette(input, palette) {
-        return palette.type == 'palette'
+        return palette.type == paletteTypes.PALETTE
             ? this._getColorsFromPaletteType(input, palette)
             : this._getColorsFromColorArrayType(input, palette);
     }
@@ -167,15 +205,15 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        return input.isBucketComplete && input.numCategories - 1 === palette.colors.length
+        return input.isBucketComplete && this.maxKey === palette.colors.length
             ? _addOtherColorToColors(palette.colors, this.defaultOtherColor)
             : palette.colors;
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.tags.includes('qualitative') && !input.isCategoryType
+        const subPaletteNumber = palette.isQualitative() && !input.isCategoryType
             ? input.numCategories
-            : input.numCategories - 1;
+            : this.maxKey;
 
         return palette.subPalettes[subPaletteNumber]
             ? palette.subPalettes[subPaletteNumber]
@@ -183,7 +221,7 @@ export default class Ramp extends BaseExpression {
     }
     
     _postShaderCompile(program, gl) {
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type === paletteTypes.SPRITES) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -199,47 +237,59 @@ export default class Ramp extends BaseExpression {
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
-            if (this.input.type == 'category') {
+            if (this.input.type == inputTypes.CATEGORY) {
                 this.maxKey = this.input.numCategories - 1;
             }
 
-            const width = 256;
-            
-            if (this.type == 'color') {
-                const pixel = new Uint8Array(4 * width);
-                const colors = this._getColorsFromPalette(this.input, this.palette);
-
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
-                    const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
-                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                    const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
-                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                    pixel[4 * i + 0] = v.r * 255;
-                    pixel[4 * i + 1] = v.g * 255;
-                    pixel[4 * i + 2] = v.b * 255;
-                    pixel[4 * i + 3] = v.a * 255;
-                }
-                
-                this.pixel = pixel;
-            } else {
-                const pixel = new Float32Array(width);
-                const floats = this.palette.floats;
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
-                    const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
-                    const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
-                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-                }
-                this.pixel = pixel;
-            }
+            this.pixel = this.type === rampTypes.COLOR
+                ? this._computeTextureColor()
+                : this._computeTexture();
         }
+
+        return this.pixel;
     }
 
+    _computeTextureColor() {
+        const WIDTH = 256;
+
+        const pixel = new Uint8Array(4 * WIDTH);
+        const colors = this._getColorsFromPalette(this.input, this.palette);
+
+        for (let i = 0; i < WIDTH; i++) {
+            const vlowRaw = colors[Math.floor(i / (WIDTH - 1) * (colors.length - 1))];
+            const vhighRaw = colors[Math.ceil(i / (WIDTH - 1) * (colors.length - 1))];
+            const vlow = [vlowRaw.r / WIDTH, vlowRaw.g / WIDTH, vlowRaw.b / WIDTH, vlowRaw.a];
+            const vhigh = [vhighRaw.r / WIDTH, vhighRaw.g / WIDTH, vhighRaw.b / WIDTH, vhighRaw.a];
+            const m = i / (WIDTH - 1) * (colors.length - 1) - Math.floor(i / (WIDTH - 1) * (colors.length - 1));
+            const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+            pixel[4 * i + 0] = v.r * WIDTH;
+            pixel[4 * i + 1] = v.g * WIDTH;
+            pixel[4 * i + 2] = v.b * WIDTH;
+            pixel[4 * i + 3] = v.a * WIDTH;
+        }
+        
+        return pixel;
+    }
+
+    _computeTexture() {
+        const WIDTH = 256;
+
+        const pixel = new Float32Array(WIDTH);
+        const floats = this.palette.floats;
+        
+        for (let i = 0; i < WIDTH; i++) {
+            const vlowRaw = floats[Math.floor(i / (WIDTH - 1) * (floats.length - 1))];
+            const vhighRaw = floats[Math.ceil(i / (WIDTH - 1) * (floats.length - 1))];
+            const m = i / (WIDTH - 1) * (floats.length - 1) - Math.floor(i / (WIDTH - 1) * (floats.length - 1));
+            pixel[i] = ((1.0 - m) * vlowRaw + m * vhighRaw);
+        }
+
+        return pixel;
+    }
 
     _computeGLTextureIfNeeded(gl) {
         this._computeTextureIfNeeded();
+
         if (this._GLtexCategories !== this.input.numCategories) {
             this._GLtexCategories = this.input.numCategories;
 
@@ -268,7 +318,7 @@ export default class Ramp extends BaseExpression {
     }
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type === paletteTypes.SPRITES) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
@@ -316,7 +366,7 @@ function _addOtherColorToColors (colors, otherColor) {
 }
 
 function _needsToRemoveOtherCategory (input, palette, colors) {
-    return palette.tags.includes('qualitative') && 
+    return palette.isQualitative() && 
     !input.isCategoryType &&
     (input.numCategories - 1) >= colors.length;
 }

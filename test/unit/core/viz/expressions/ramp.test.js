@@ -1,5 +1,6 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
 import { ramp, buckets } from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/core/viz/functions';
 
 describe('src/core/viz/expressions/ramp', () => {
     describe('error control', () => {
@@ -17,7 +18,7 @@ describe('src/core/viz/expressions/ramp', () => {
         validateStaticType('ramp', ['category', 'sprites'], 'color');
     });
 
-    describe('eval', () => {
+    describe('.eval', () => {
         it('should work with numeric palettes', () => {
             const r = ramp(buckets(0, [10]), [31, 57]);
             r._compile();
@@ -29,7 +30,13 @@ describe('src/core/viz/expressions/ramp', () => {
         });
 
         it('should work with color palettes', () => {
-            // TODO
+            const r = ramp(buckets(0, [10]), [s.namedColor('red'), s.namedColor('blue')]);
+            r._compile();
+            expect(r.eval()).toEqual({r: 255, g: 0, b: 0});
+
+            const r2 = ramp(buckets(11, [10]), [s.namedColor('red'), s.namedColor('blue')]);
+            r2._compile();
+            expect(r2.eval()).toEqual({r: 0, g: 0, b: 255});
         });
     });
 });

@@ -71,7 +71,7 @@ export default class Buckets extends BaseExpression {
 
         let looseType = undefined;
         if (input.type) {
-            if (input.type != 'number' && input.type != 'category') {
+            if (input.type !== 'number' && input.type !== 'category') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;

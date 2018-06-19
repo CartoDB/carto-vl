@@ -51,6 +51,7 @@ class PaletteGenerator extends BaseExpression {
         });
         this.tags = subPalettes.tags;
     }
+
     getLongestSubPalette() {
         const s = this.subPalettes;
         for (let i = 20; i >= 0; i--) {
@@ -58,6 +59,10 @@ class PaletteGenerator extends BaseExpression {
                 return s[i];
             }
         }
+    }
+
+    isQualitative() {
+        return this.tags.includes('qualitative');
     }
 }
 
@@ -102,11 +107,17 @@ class Reverse extends BaseExpression{
             }
         });
     }
+
     getLongestSubPalette() {
         return this._reversePalette(this._originalPalette.getLongestSubPalette());
     }
+
+    isQualitative() {
+        return this.tags.includes('qualitative');
+    }
+
     _reversePalette(palette) {
-        if (this.tags.includes('qualitative')) {
+        if (this.isQualitative()) {
             // Last color is 'others', therefore, we shouldn't change the order of that one
             const copy = [...palette];
             const others = copy.pop();
