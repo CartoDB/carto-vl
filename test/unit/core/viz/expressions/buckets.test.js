@@ -21,24 +21,54 @@ describe('src/core/viz/expressions/buckets', () => {
                 let bucketExpression;
                 let inputFeature = { city };
                 let $cities = s.property('city');
+                const METADATA = {
+                    columns: [
+                        {
+                            name: 'city',
+                            type: 'category',
+                            categoryNames: ['Murcia', 'Madrid'],
+
+
+                        }
+                    ],
+                    categoryIDs: {
+                        'Murcia': 0,
+                        'Madrid': 1
+                    }
+                };
 
                 beforeEach(() => {
+                    $cities._compile(METADATA);
                     bucketExpression = s.buckets($cities, [city]);
                 });
-                
+
                 it('should classify the input feature in the first bucket', () => {
                     const response = bucketExpression.eval(inputFeature);
                     expect(response).toEqual(0);
                 });
             });
 
-            describe('and it has two breakpoints', () => {
-                const breakpoints = ['Murcia', 'Madrid'];
+            fdescribe('and it has two breakpoints', () => {
                 let bucketExpression;
                 let $cities = s.property('city');
-                
+                const METADATA = {
+                    columns: [
+                        {
+                            name: 'city',
+                            type: 'category',
+                            categoryNames: ['Madrid', 'Murcia'],
+
+                        },
+                    ],
+                    categoryIDs: {
+                        'Mardrid': 0,
+                        'Murcia': 1,
+                    }
+                };
+
                 beforeEach(() => {
-                    bucketExpression = s.buckets($cities, breakpoints);
+                    bucketExpression = s.buckets($cities, ['Murcia', 'Madrid']);
+                    bucketExpression._compile(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
