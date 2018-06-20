@@ -363,10 +363,12 @@ function setBasemap(id) {
 }
 
 document.getElementById('fullscreen').onclick = () => {
-    document.getElementById('mapDiv').style.height = '100%';
-    document.body.style.overflow = 'hidden';
-    document.querySelector('.container').style.display = 'none';
-    document.querySelector('.map-info').style.display = 'none';
+    document.getElementById('map').style.position = 'fixed';
+    document.getElementById('map').style.left = '0';
+    document.getElementById('map').style.right = '0';
+    document.getElementById('map').style.top = '0';
+    document.getElementById('map').style.bottom = '0';
+    document.getElementById('map').style.zIndex = '1';
     map.resize();
 };
 
