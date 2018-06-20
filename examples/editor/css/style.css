@@ -1,0 +1,185 @@
+* {
+    box-sizing: border-box;
+}
+
+body,
+html {
+    display: block;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+#map {
+    flex: 1;
+}
+
+.cvl-MapInfo {
+    position: absolute;
+    font-size: 12px;
+    padding: 5px;
+    font-weight: 200;
+    background: white;
+    top: 0;
+    margin: 0;
+}
+
+.cvl-FeaturesInfo {
+    position: absolute;
+    top: 0;
+    background: white;
+    margin: 0;
+    right: 0;
+    padding: 5px;
+    font-weight: 200;
+    font-size: 12px;
+}
+
+.cvl-Container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.cvl-Sidebar {
+    padding: 0 15px;
+    width: 350px;
+    overflow: scroll;
+}
+
+.cvl-Sidebar--label {
+    font-weight: 200;
+    font-size: 12px;
+}
+
+.cvl-Logo {
+    display: flex;
+}
+
+.cvl-Logo-Title {
+    text-transform: uppercase;
+    padding: 0 15px;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: rgb(23, 133, 251);
+}
+
+.cvl-Logo-Image {
+    width: 28px;
+}
+
+.cvl-Logo-Link {
+    font-size: 12px;
+    text-decoration: none;
+    color: rgb(23, 133, 251);
+}
+
+.cvl-Logo-Link:visited,
+.cvl-Logo-Link:focus {
+    color: rgb(23, 133, 251);
+}
+
+.cvl-Sidebar--BasemapConfig {
+    display: flex;
+    font: 400 11px system-ui;
+}
+
+.cvl-Sidebar--BasemapConfig label {
+    margin: 10px 15px 0 0;
+}
+
+.cvl-Sidebar--Config {
+    display: flex;
+    flex-direction: column;
+}
+
+.cvl-Sidebar--Input {
+    box-shadow: rgb(209, 213, 215) 0px 0px 0px 1px inset;
+    margin: 5px 0;
+    box-sizing: border-box;
+    color: rgb(44, 44, 44);
+    min-height: 32px;
+    background: rgb(255, 255, 255);
+    border-radius: 4px;
+    border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+    border-color: rgb(23, 133, 251);
+    padding: 6px 8px;
+}
+
+.cvl-Sidebar--Textarea,
+.cvl-Main--Textarea {
+    width: 100%;
+    font-family: Monospace;
+}
+
+.cvl-Debugger {
+    right: 0;
+    top: 0;
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 580px;
+    max-height: 580px;
+    background-color: rgba(218, 22, 22, 0.5);
+    color: #ffffff;
+    padding: 30px;
+    display: none;
+}
+
+.cvl-ButtonList {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.cvl-ButtonList button {
+    -webkit-font-smoothing: antialiased;
+    -webkit-box-align: center;
+    align-items: center;
+    box-shadow: none;
+    color: rgb(23, 133, 251);
+    cursor: pointer;
+    display: inline-flex;
+    vertical-align: top;
+    background: transparent;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(23, 133, 251);
+    border-image: initial;
+    margin: 5px 5px 5px 0;
+    padding: 6px 12px;
+    transition: background 0.2s ease;
+}
+
+.cvl-ButtonList--Primary button {
+    -webkit-font-smoothing: antialiased;
+    -webkit-box-align: center;
+    align-items: center;
+    box-shadow: none;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    display: inline-flex;
+    vertical-align: top;
+    background: rgb(23, 133, 251);
+    border-radius: 4px;
+    border-width: 0px;
+    border-style: initial;
+    border-color: initial;
+    border-image: initial;
+    margin: 5px 10px 5px 0;
+    padding: 6px 12px;
+    transition: background 0.2s ease;
+}
+
+.cvl-Main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}

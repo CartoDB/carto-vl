@@ -65,6 +65,7 @@ const EVENTS = [
     'featureHover',
     'featureLeave',
 ];
+
 export default class Interactivity {
     /**
     *
@@ -75,7 +76,9 @@ export default class Interactivity {
     * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
-    *
+    * @param {object} [options={}] - Object containing interactivity options
+    * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
+    * 
     * @example
     * const interactivity = new carto.Interactivity(layer);
     * interactivity.on('click', event => {
@@ -94,14 +97,13 @@ export default class Interactivity {
     * @memberof carto
     * @api
     */
-    constructor(layerList) {
+    constructor(layerList, options = { autoChangePointer: true }) {
         if (layerList instanceof Layer) {
             // Allow one layer as input
             layerList = [layerList];
         }
         preCheckLayerList(layerList);
-        this._init(layerList);
-        this._numListeners = {};
+        this._init(layerList, options);
     }
 
     /**
@@ -134,14 +136,34 @@ export default class Interactivity {
         return this._emitter.off(eventName, callback);
     }
 
-    _init(layerList) {
+    _init(layerList, options) {
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
+        this._numListeners = {};
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+        }).then(() => {
+            if (options.autoChangePointer) {
+                this._setInteractiveCursor();
+            }
+        });
+    }
+
+    _setInteractiveCursor() {
+        const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
+        if (!map.__carto_interacivities) {
+            map.__carto_interacivities = new Set();
+        }
+        this.on('featureHover', event => {
+            if (event.features.length) {
+                map.__carto_interacivities.add(this);
+            } else {
+                map.__carto_interacivities.delete(this);
+            }
+            map.getCanvas().style.cursor = (map.__carto_interacivities.size > 0) ? 'pointer' : '';
         });
     }
 
