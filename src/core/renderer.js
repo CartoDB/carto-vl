@@ -299,7 +299,6 @@ class Renderer {
             let renderer = null;
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
-                gl.uniform1i(renderer.overrideColor, !viz.color.default);
             } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
@@ -308,6 +307,10 @@ class Renderer {
                 renderer = this.triRendererProgram;
             }
             gl.useProgram(renderer.program);
+
+            if (!viz.symbol._default) {
+                gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
+            }
 
             //Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
