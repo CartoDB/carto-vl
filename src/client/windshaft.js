@@ -25,11 +25,11 @@ export default class Windshaft {
         this._promiseMNS = null;
         this.inProgressInstantiations = {};
 
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
+        this._addDataframe = addDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
         this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
@@ -143,9 +143,14 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
+        if (this._mvtClient) {
+            this._mvtClient.free();
+        }
         this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
+        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const column = this.metadata.columns.find(column => column.name == propertyName);
+            const basename = R.schema.column.getBase(propertyName);
+            const column = this.metadata.properties[basename];
             if (!column) {
                 return;
             }
@@ -159,7 +164,7 @@ export default class Windshaft {
                     return n;
                 }
                 case 'category':
-                    return this._categorizeString(propertyValue);
+                    return this.metadata.categorizeString(propertyValue);
                 case 'number':
                     return propertyValue;
                 default:
@@ -168,6 +173,7 @@ export default class Windshaft {
         };
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
+        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
@@ -307,7 +313,7 @@ export default class Windshaft {
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
         };
     }
 
@@ -322,45 +328,40 @@ export default class Windshaft {
             body: JSON.stringify(mapConfigAgg),
         };
     }
-    _categorizeString(category) {
-        if (category === undefined) {
-            category = 'null';
-        }
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
-    }
 
-    _adaptMetadata(meta) {
+    _adaptMetadata(meta, agg) {
         const { stats, aggregation, dates_as_numbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
-        const columns = Object.keys(stats.columns)
-            .map(name => Object.assign({ name }, stats.columns[name]))
-            .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
-            .filter(col => ['number', 'date', 'category'].includes(col.type));
-        const categoryIDs = {};
-        columns.forEach(column => {
-            if (column.type === 'category' && column.categories) {
-                column.categories.forEach(category => {
-                    categoryIDs[category.category] = this._categorizeString(category.category);
+
+        const properties = stats.columns;
+        Object.keys(agg.columns).forEach(aggName => {
+            const basename = R.schema.column.getBase(aggName);
+            properties[basename].sourceName = aggName;
+        });
+        Object.values(properties).map(property => {
+            property.type = adaptColumnType(property.type);
+        });
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
+        Object.keys(properties).forEach(propertyName => {
+            const property = properties[propertyName];
+            if (property.type === 'category' && property.categories) {
+                property.categories.forEach(category => {
+                    metadata.categorizeString(category.category);
+                    category.name = category.category;
+                    delete category.category;
                 });
-                column.categoryNames = column.categories.map(cat => cat.category);
-            }
-            else if (dates_as_numbers && dates_as_numbers.includes(column.name)) {
-                column.type = 'date';
+            } else if (dates_as_numbers && dates_as_numbers.includes(propertyName)) {
+                property.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
-                    if (column[fn]) {
-                        column[fn] = new Time(column[fn]*1000).value;
+                    if (property[fn]) {
+                        property[fn] = new Time(property[fn] * 1000).value;
                     }
                 });
             }
         });
 
-        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
+        return metadata;
     }
 }
 

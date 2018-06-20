@@ -26,6 +26,7 @@ export default class TileClient {
     }
 
     free() {
+        this._cache.free();
         this._cache = new DataframeCache();
         this._oldDataframes = [];
     }

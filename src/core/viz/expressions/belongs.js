@@ -85,7 +85,7 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             this.type = 'number';
         }
         eval(feature) {
-            return jsEval(this.value.eval(feature), this.list.eval());
+            return jsEval(this.value.eval(feature), this.list.eval(feature));
         }
         _compile(meta) {
             super._compile(meta);

@@ -1,19 +1,16 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import Metadata from '../../../../../src/core/metadata';
 
 describe('src/core/viz/expressions/belongs', () => {
-    const fakeMetadata = {
-        columns: [{
-            type: 'category',
-            name: 'category',
-            categoryNames: ['category0', 'category1', 'category2']
-        }],
-        categoryIDs: {
-            'category0': 0,
-            'category1': 1,
-            'category2': 2
+    const fakeMetadata = new Metadata({
+        properties: {
+            category: {
+                type: 'category',
+                categories: [{ name: 'category0' }, { name: 'category1' }, { name: 'category2' }]
+            }
         }
-    };
+    });
 
     let $category = null;
 
@@ -38,7 +35,7 @@ describe('src/core/viz/expressions/belongs', () => {
     describe('eval', () => {
         describe('in', () => {
             it('in($category, ["category1", "category2"]) should return 0', () => {
-                const fakeFeature = { category: 0 };
+                const fakeFeature = { category: 'category0' };
                 const sIn = s.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
@@ -46,7 +43,7 @@ describe('src/core/viz/expressions/belongs', () => {
             });
 
             it('in($category, ["category1", "category2"]) should return 1', () => {
-                const fakeFeature = { category: 1 };
+                const fakeFeature = { category: 'category1' };
                 const sIn = s.in($category, ['category1', 'category2']);
                 sIn._compile(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
@@ -56,7 +53,7 @@ describe('src/core/viz/expressions/belongs', () => {
 
         describe('nin', () => {
             it('nin($category, ["category1", "category2"]) should return 1', () => {
-                const fakeFeature = { category: 0 };
+                const fakeFeature = { category: 'category0' };
                 const nin = s.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
@@ -64,7 +61,7 @@ describe('src/core/viz/expressions/belongs', () => {
             });
 
             it('nin($category, ["category1", "category2"]) should return 0', () => {
-                const fakeFeature = { category: 1 };
+                const fakeFeature = { category: 'category1' };
                 const nin = s.nin($category, ['category1', 'category2']);
                 nin._compile(fakeMetadata);
                 const actual = nin.eval(fakeFeature);

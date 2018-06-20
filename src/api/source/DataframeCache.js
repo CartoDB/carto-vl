@@ -30,4 +30,8 @@ export default class DataframeCache {
         this._cache.set(uid, dataframePromise);
         return dataframePromise;
     }
+
+    free(){
+        this._cache.reset();
+    }
 }

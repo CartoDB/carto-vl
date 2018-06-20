@@ -6,6 +6,7 @@ import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
 import TileClient from './TileClient';
 import Base from './base';
 import { RTT_WIDTH } from '../../core/renderer';
+import Metadata from '../../core/metadata';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -36,13 +37,11 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @IGNOREapi
      */
-    constructor(templateURL, metadata = { columns: [] }) {
+    constructor(templateURL, metadata = new Metadata()) {
         super();
         this._templateURL = templateURL;
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
     }
 
     _clone() {
@@ -87,6 +86,12 @@ export default class MVT extends Base {
         }
         let featureGeometries = [];
         const decodedProperties = {};
+        const decodingPropertyNames = Object.keys(metadata.properties).
+            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
+            map(propertyName => metadata.properties[propertyName].sourceName || propertyName);
+        decodingPropertyNames.forEach(propertyName => {
+            decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
+        });
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
@@ -121,17 +126,9 @@ export default class MVT extends Base {
             } else {
                 throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }
-            Object.keys(f.properties).forEach(propertyName => {
+            decodingPropertyNames.forEach(propertyName => {
                 const propertyValue = f.properties[propertyName];
-                const decodedPropertyValue = this.decodeProperty(propertyName, propertyValue);
-                if (decodedPropertyValue !== undefined) {
-                    if (decodedProperties[propertyName] === undefined) {
-                        // To avoid extra copies to upload the properties to WebGL we need to put a padding of RTT_WIDTH to all property arrays
-                        decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
-                        decodedProperties[propertyName].fill(Number.NaN);
-                    }
-                    decodedProperties[propertyName][i] = decodedPropertyValue;
-                }
+                decodedProperties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
             });
         }
         return { properties: decodedProperties, points, featureGeometries };
@@ -139,7 +136,7 @@ export default class MVT extends Base {
 
     decodeProperty(propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
-            return this._categorizeString(propertyValue);
+            return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
             return propertyValue;
         } else if (propertyValue == null || propertyValue == undefined) {
@@ -147,17 +144,6 @@ export default class MVT extends Base {
         } else {
             throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
         }
-    }
-    _categorizeString(category) {
-        if (category === undefined) {
-            category = 'null';
-        }
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _generateDataFrame(rs, geometry, properties, size, type) {
