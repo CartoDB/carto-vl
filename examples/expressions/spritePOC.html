@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+        <title>Add layer | CARTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <!-- Include CARTO VL JS -->
+        <script src="../../dist/carto-vl.js"></script>
+        <!-- Include Mapbox GL JS -->
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+        <!-- Include Mapbox GL CSS -->
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <style>
+           #map {
+                position: absolute;
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+        </head>
+        <body>
+        <div id="map"></div>
+
+        <script>
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+                center: [-120.1841133153415, 36.28010412674644],
+                zoom: 9.581408580104632,
+                dragRotate: false,
+                touchZoomRotate: false
+            });
+
+            carto.setDefaultConfig({
+                serverURL: 'https://{user}.carto.com'
+            });
+
+            carto.setDefaultAuth({
+                user: 'mamataakella',
+                apiKey: 'default_public'
+            });
+
+
+            const source = new carto.source.Dataset('fire_perimeters_copy');
+            const viz = new carto.Viz(`width: $gis_acres/10000+  30
+color: white
+symbol: ramp(buckets(100*(0.1*now()%1 >0.5),  [50]), sprites([
+    sprite('./NASA.svg'),
+    sprite('./NASA.svg')
+]))
+`);
+            const layer = new carto.Layer('layer', source, viz);
+
+            layer.addTo(map, 'watername_ocean');
+        </script>
+        </body>
+        </html>

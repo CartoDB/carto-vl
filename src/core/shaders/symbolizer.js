@@ -70,8 +70,7 @@ $propertyPreface
 void main(void) {
     vec2 featureID = featureIDVar;
     vec2 spriteUV = gl_PointCoord.xy;
-    // Ignore RGB channels from the symbol, just use the alpha one
-    vec4 c = color*vec4(vec3(1), ($symbol_inline).a);
+    vec4 c = color*($symbol_inline);
     gl_FragColor = vec4(c.rgb*c.a, c.a);
 }`
 };
