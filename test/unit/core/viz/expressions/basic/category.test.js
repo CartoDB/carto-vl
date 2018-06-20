@@ -22,23 +22,4 @@ describe('src/core/viz/expressions/basic/category', () => {
         });
     });
 
-    describe('.eval', () => {
-        const fakeMetadata = {
-            properties: {
-                category: { type: 'category', categories: { cat0: 0, cat1: 0, cat2: 0 } }
-            },
-            categoryIDs: {
-                'cat0': 0,
-                'cat1': 1,
-                'cat2': 2,
-            }
-        };
-        it('should return the value from the metadata', () => {
-            const categoryExpresion = s.category('cat0');
-            categoryExpresion._compile(fakeMetadata);
-            const actual = categoryExpresion.eval();
-
-            expect(actual).toEqual(0);
-        });
-    });
 });

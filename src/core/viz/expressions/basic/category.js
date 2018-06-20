@@ -24,10 +24,7 @@ export default class BaseCategory extends BaseExpression {
         return this.expr;
     }
     eval() {
-        if (this._metadata) {
-            // If it has metadata return the category ID
-            return this._metadata.IDToCategory[this.expr];
-        }
+        return this.expr;
     }
     isAnimated() {
         return false;
