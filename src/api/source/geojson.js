@@ -13,6 +13,8 @@ export default class GeoJSON extends Base {
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
      * @param {object} data - A GeoJSON data object
+     * @param {object} options - Options
+     * @param {array<string>} options.dateColumns - List of columns that contain dates. 
      *
      * @example
      * const source = new carto.source.GeoJSON({
@@ -33,7 +35,7 @@ export default class GeoJSON extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(data) {
+    constructor(data, options = {}) {
         super();
         this._checkData(data);
 
@@ -42,6 +44,8 @@ export default class GeoJSON extends Base {
         this._numCategories = 0;
         this._numFields = new Set();
         this._catFields = new Set();
+        this._dateFields = new Set();
+        this._providedDateColumns = new Set(options.dateColumns);
         this._columns = [];
         this._categoryIDs = {};
         this._boundColumns = new Set();
@@ -92,7 +96,7 @@ export default class GeoJSON extends Base {
     }
 
     _clone() {
-        return new GeoJSON(this._data);
+        return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
     _checkData(data) {
@@ -110,7 +114,7 @@ export default class GeoJSON extends Base {
 
         const featureCount = this._features.length;
         const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
-        for (var i = 0; i < this._features.length; i++) {
+        for (let i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             const keys = Object.keys(properties);
             for (let j = 0, len = keys.length; j < len; j++) {
@@ -119,9 +123,7 @@ export default class GeoJSON extends Base {
                     continue;
                 }
                 const value = properties[name];
-                Number.isFinite(value) ?
-                    this._addNumericPropertyToMetadata(name, value) :
-                    this._addCategoryPropertyToMetadata(name, value);
+                this._addPropertyToMetadata(name, value);
             }
             this._sampleFeatureOnMetadata(properties, sample, this._features.length);
         }
@@ -160,7 +162,7 @@ export default class GeoJSON extends Base {
     }
 
     _addNumericPropertyToMetadata(propertyName, value) {
-        if (this._catFields.has(propertyName)) {
+        if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName, this._columns);
@@ -186,8 +188,46 @@ export default class GeoJSON extends Base {
         }
     }
 
+    _addDatePropertyToMetadata(propertyName, value) {
+        if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
+            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+        }
+        this._addDateColumnField(propertyName, this._columns);
+        const column = this._columns.find(c => c.name == propertyName);
+        const dateValue = util.castDate(value);
+        column.min = column.min ? util.castDate(Math.min(column.min, dateValue)) : dateValue;
+        column.max = column.max ? util.castDate(Math.max(column.max, dateValue)) : dateValue;
+        column.sum += value;
+        column.count++;
+    }
+
+    _addDateColumnField(propertyName) {
+        if (!this._dateFields.has(propertyName)) {
+            this._dateFields.add(propertyName);
+            this._columns.push({
+                name: propertyName,
+                type: 'date',
+                min: null,
+                max: null,
+                avg: null,
+                sum: 0,
+                count: 0
+            });
+        }
+    }
+
+    _addPropertyToMetadata(propertyName, value) {
+        if (this._providedDateColumns.has(propertyName)) {
+            return this._addDatePropertyToMetadata(propertyName, value);
+        }
+        if (Number.isFinite(value)) {
+            return this._addNumericPropertyToMetadata(propertyName, value);
+        }
+        this._addCategoryPropertyToMetadata(propertyName, value);
+    }
+
     _addCategoryPropertyToMetadata(propertyName, value) {
-        if (this._numFields.has(propertyName)) {
+        if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         if (!this._catFields.has(propertyName)) {
@@ -204,7 +244,7 @@ export default class GeoJSON extends Base {
 
     _decodeUnboundProperties() {
         const properties = {};
-        [...this._numFields].concat([...this._catFields]).map(name => {
+        [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]).map(name => {
             if (this._boundColumns.has(name)) {
                 return;
             }
@@ -214,7 +254,9 @@ export default class GeoJSON extends Base {
 
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
-        for (var i = 0; i < this._features.length; i++) {
+        const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
+        
+        for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
             catFields.forEach(name => {
@@ -227,7 +269,15 @@ export default class GeoJSON extends Base {
                 }
                 properties[name][i] = Number(f.properties[name]);
             });
-            // TODO support date / timestamp properties
+            dateFields.forEach(name => {
+                const column = this._columns.find(c => c.name == name);
+                // dates in Dataframes are mapped to [0,1] to maximize precision
+                const d = util.castDate(f.properties[name]).getTime();
+                const min = column.min;
+                const max = column.max;
+                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
+                properties[name][i] = n;
+            });
         }
         return properties;
     }

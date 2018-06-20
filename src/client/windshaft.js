@@ -7,6 +7,7 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
+import Time from '../core/viz/expressions/time';
 
 import featureDecoder from './mvt/feature-decoder';
 
@@ -110,8 +111,8 @@ export default class Windshaft {
 
     _getTiles(tiles) {
         this._requestGroupID++;
-        var completedTiles = [];
-        var needToComplete = tiles.length;
+        let completedTiles = [];
+        let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
         tiles.forEach(t => {
             const { x, y, z } = t;
@@ -170,24 +171,20 @@ export default class Windshaft {
     _intantiationChoices(metadata) {
         let choices = {
             // default choices
-            backendFilters: true,
-            castColumns: []
+            backendFilters: true
         };
         if (metadata) {
             if (metadata.featureCount >= 0) {
                 choices.backendFilters = metadata.featureCount > MIN_FILTERING || !metadata.backendFiltersApplied;
             }
-            if (metadata.columns) {
-                choices.castColumns = metadata.columns.filter(c => c.type == 'date').map(c => c.name);
-            }
         }
         return choices;
     }
 
-    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true, castColumns: [] }, overrideMetadata = null) {
+    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
-        let select = this._buildSelectClause(MNS, choices.castColumns);
+        let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
 
         const query = `(${aggSQL}) AS tmp`;
@@ -291,10 +288,9 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MNS, dateFields = []) {
-        const columns = MNS.columns.map(name => R.schema.column.getBase(name)).map(
-            name => dateFields.includes(name) ? name + '::text' : name
-        ).concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+    _buildSelectClause(MNS) {
+        const columns = MNS.columns.map(name => R.schema.column.getBase(name))
+            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
 
@@ -339,14 +335,15 @@ export default class Windshaft {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 1
+                'mvt': 0
             },
             layers: [
                 {
                     type: 'mapnik',
                     options: {
                         sql: aggSQL,
-                        aggregation: agg
+                        aggregation: agg,
+                        dates_as_numbers: true
                     }
                 }
             ]
@@ -400,7 +397,6 @@ export default class Windshaft {
 
     requestDataframe(x, y, z) {
         const mvt_extent = 4096;
-
         return fetch(this._getTileUrl(x, y, z))
             .then(rawData => rawData.arrayBuffer())
             .then(response => {
@@ -408,9 +404,9 @@ export default class Windshaft {
                 if (response.byteLength == 0 || response == 'null') {
                     return { empty: true };
                 }
-                var tile = new VectorTile(new Protobuf(response));
+                let tile = new VectorTile(new Protobuf(response));
                 const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                var fieldMap = {};
+                let fieldMap = {};
 
                 const numFields = [];
                 const catFields = [];
@@ -435,7 +431,7 @@ export default class Windshaft {
 
                 const { points, featureGeometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
 
-                var rs = rsys.getRsysFromTile(x, y, z);
+                let rs = rsys.getRsysFromTile(x, y, z);
                 let dataframeProperties = {};
                 Object.keys(fieldMap).map((name, pid) => {
                     dataframeProperties[name] = properties[pid];
@@ -473,12 +469,13 @@ export default class Windshaft {
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
             properties.push(new Float32Array(mvtLayer.length + 1024));
         }
+        let points;
         if (metadata.geomType == geometryTypes.POINT) {
-            var points = new Float32Array(mvtLayer.length * 2);
+            points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
         let numFeatures = 0;
-        for (var i = 0; i < mvtLayer.length; i++) {
+        for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
             if (metadata.geomType == geometryTypes.POINT) {
@@ -508,11 +505,12 @@ export default class Windshaft {
                 properties[index + catFields.length][numFeatures] = Number(f.properties[name]);
             });
             dateFields.map((name, index) => {
-                const d = Date.parse(f.properties[name]);
+                const d = f.properties[name] * 1000;
                 const metadataColumn = metadata.columns.find(c => c.name == name);
                 const min = metadataColumn.min;
                 const max = metadataColumn.max;
-                const n = (d - min) / (max.getTime() - min.getTime());
+                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
+
                 properties[index + catFields.length + numFields.length][numFeatures] = n;
             });
             numFeatures += 1;
@@ -522,13 +520,12 @@ export default class Windshaft {
     }
 
     _adaptMetadata(meta) {
-        const { stats, aggregation } = meta;
+        const { stats, aggregation, dates_as_numbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
         const columns = Object.keys(stats.columns)
             .map(name => Object.assign({ name }, stats.columns[name]))
             .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
-            .map(col => Object.assign(col, adaptColumnValues(col)))
             .filter(col => ['number', 'date', 'category'].includes(col.type));
         const categoryIDs = {};
         columns.forEach(column => {
@@ -538,7 +535,16 @@ export default class Windshaft {
                 });
                 column.categoryNames = column.categories.map(cat => cat.category);
             }
+            else if (dates_as_numbers && dates_as_numbers.includes(column.name)) {
+                column.type = 'date';
+                ['min', 'max', 'avg'].map(fn => {
+                    if (column[fn]) {
+                        column[fn] = new Time(column[fn]*1000).value;
+                    }
+                });
+            }
         });
+
         return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
     }
 }
@@ -589,28 +595,6 @@ function adaptColumnType(type) {
         return 'category';
     }
     return type;
-}
-
-function adaptColumnValues(column) {
-    let adaptedColumn = { name: column.name, type: column.type };
-    Object.keys(column).forEach(key => {
-        if (!['name', 'type'].includes(key)) {
-            adaptedColumn[key] = adaptColumnValue(column[key], column.type);
-        }
-    });
-    return adaptedColumn;
-}
-
-function adaptColumnValue(value, type) {
-    switch (type) {
-        case 'date':
-            if (Number.isNaN(Date.parse(value))) {
-                throw new Error(`Invalid date: '${value}'`);
-            }
-            return new Date(value);
-        default:
-            return value;
-    }
 }
 
 // generate a promise under certain assumptions/choices; then if the result changes the assumptions,

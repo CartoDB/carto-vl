@@ -119,6 +119,11 @@
           z-index: 100000;
         }
 
+        #map-textarea {
+            width: 100%;
+            height: 300px;
+        }
+
         /* Safari */
         @-webkit-keyframes spin {
           0% { -webkit-transform: rotate(0deg); }
@@ -162,6 +167,10 @@
                 <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
                 <button id='barcelona'>Barcelona (with tutorial)</button>
             </div>
+        </div>
+        <div class="row">
+            <button id="export-map-button">Export Map</button>
+            <textarea name="map-textarea" id="map-textarea"></textarea>
         </div>
     </div>
 </body>

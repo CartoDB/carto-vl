@@ -38,7 +38,7 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
 
     /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled, 
+    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
     * displayed and processed.
     *
     *

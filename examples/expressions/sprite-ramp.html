@@ -26,15 +26,16 @@
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
-    width: sqrt($pop_max) * 0.03
+    width: (sqrt($pop_max) * 0.003)*zoom()
     color: ramp(linear($pop_max, 0, 10000000), prism)
-    symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('./marker.svg'), sprite('./marker2.svg')]))
+    strokeColor: black
+    symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('./marker.svg'), sprite('./star.svg')]))
     symbolPlacement: align_bottom
     `);
 
