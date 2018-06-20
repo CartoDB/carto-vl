@@ -38,8 +38,12 @@ export default class Top extends BaseExpression {
         const p = this.property.eval(feature);
         const buckets = Math.round(this.buckets.eval());
         const metaColumn = this._meta.properties[this.property.name];
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
+
         let ret;
-        metaColumn.categoryNames.map((name, i) => {
+        orderedCategoryNames.map((name, i) => {
             if (i == p) {
                 ret = i < buckets ? i + 1 : 0;
             }
