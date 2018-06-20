@@ -48,6 +48,7 @@ body {
     padding: 0 15px;
     width: 350px;
     overflow: scroll;
+    margin-bottom: 15px;
 }
 
 .cvl-Sidebar--label {
@@ -116,6 +117,7 @@ body {
 .cvl-Main--Textarea {
     width: 100%;
     font-family: Monospace;
+    resize:vertical;
 }
 
 .cvl-Debugger {
@@ -182,4 +184,5 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
+    margin: 15px;
 }
