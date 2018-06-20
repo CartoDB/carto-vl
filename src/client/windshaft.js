@@ -5,7 +5,6 @@ import { version } from '../../package';
 import Time from '../core/viz/expressions/time';
 
 import MVT from '../api/source/mvt';
-import { extendMetadata } from '../api/source/utils';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -173,7 +172,7 @@ export default class Windshaft {
             }
         };
         this.urlTemplate = urlTemplate;
-        this.metadata = extendMetadata(metadata);
+        this.metadata = metadata;
         this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
@@ -343,7 +342,7 @@ export default class Windshaft {
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);
         });
-        const metadata = extendMetadata(new Metadata(null, properties, featureCount, stats.sample, geomType, aggregation.mvt));
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
         Object.keys(properties).forEach(propertyName => {
             const property = properties[propertyName];
             if (property.type === 'category' && property.categories) {

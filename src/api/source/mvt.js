@@ -6,7 +6,7 @@ import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
 import TileClient from './TileClient';
 import Base from './base';
 import { RTT_WIDTH } from '../../core/renderer';
-import { extendMetadata } from './utils';
+import Metadata from '../../core/metadata';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -37,10 +37,10 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @IGNOREapi
      */
-    constructor(templateURL, metadata = { properties: {} }) {
+    constructor(templateURL, metadata = new Metadata()) {
         super();
         this._templateURL = templateURL;
-        this._metadata = extendMetadata(metadata);
+        this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
     }
 

@@ -47,7 +47,6 @@ export default class GeoJSON extends Base {
         this._dateFields = new Set();
         this._providedDateColumns = new Set(options.dateColumns);
         this._columns = [];
-        this._categoryIDs = {};
         this._boundColumns = new Set();
 
         this._data = data;
@@ -131,13 +130,6 @@ export default class GeoJSON extends Base {
             const column = this._columns.find(c => c.name == name);
             column.avg = column.sum / column.count;
         });
-        this._catFields.forEach(name => {
-            if (!this._boundColumns.has(name)) {
-                const column = this._columns.find(c => c.name == name);
-                column.categoryNames = [...column.categoryNames];
-                column.categoryNames.forEach(name => this._categoryIDs[name] = this._getCategoryIDFromString(name));
-            }
-        });
 
         let geomType = '';
         if (featureCount > 0) {
@@ -145,7 +137,7 @@ export default class GeoJSON extends Base {
             geomType = this._getDataframeType(this._features[0].geometry.type);
         }
 
-        this._metadata = new Metadata(this._categoryIDs, this._columns, featureCount, sample, geomType);
+        this._metadata = new Metadata({ properties: this._columns, featureCount, sample, geomType });
 
         return this._metadata;
     }
@@ -254,7 +246,7 @@ export default class GeoJSON extends Base {
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
-        
+
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
 
