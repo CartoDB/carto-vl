@@ -15,6 +15,12 @@ export default class Metadata {
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
+
+        Object.values(properties).map(property => {
+            if (property.categories) {
+                property.categories.map(category => this.categorizeString(category.name));
+            }
+        });
     }
     categorizeString(category) {
         if (category === undefined) {

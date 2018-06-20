@@ -46,7 +46,7 @@ export default class GeoJSON extends Base {
         this._catFields = new Set();
         this._dateFields = new Set();
         this._providedDateColumns = new Set(options.dateColumns);
-        this._columns = [];
+        this._properties = {};
         this._boundColumns = new Set();
 
         this._data = data;
@@ -127,8 +127,8 @@ export default class GeoJSON extends Base {
         }
 
         this._numFields.forEach(name => {
-            const column = this._columns.find(c => c.name == name);
-            column.avg = column.sum / column.count;
+            const property = this._properties[name];
+            property.avg = property.sum / property.count;
         });
 
         let geomType = '';
@@ -137,7 +137,7 @@ export default class GeoJSON extends Base {
             geomType = this._getDataframeType(this._features[0].geometry.type);
         }
 
-        this._metadata = new Metadata({ properties: this._columns, featureCount, sample, geomType });
+        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType });
 
         return this._metadata;
     }
@@ -156,26 +156,24 @@ export default class GeoJSON extends Base {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        this._addNumericColumnField(propertyName, this._columns);
-        const column = this._columns.find(c => c.name == propertyName);
-        column.min = Math.min(column.min, value);
-        column.max = Math.max(column.max, value);
-        column.sum += value;
-        column.count++;
+        this._addNumericColumnField(propertyName);
+        const property = this._properties[propertyName];
+        property.min = Math.min(property.min, value);
+        property.max = Math.max(property.max, value);
+        property.sum += value;
     }
 
     _addNumericColumnField(propertyName) {
         if (!this._numFields.has(propertyName)) {
             this._numFields.add(propertyName);
-            this._columns.push({
-                name: propertyName,
+            this._properties[propertyName] = {
                 type: 'number',
                 min: Number.POSITIVE_INFINITY,
                 max: Number.NEGATIVE_INFINITY,
                 avg: Number.NaN,
                 sum: 0,
                 count: 0
-            });
+            };
         }
     }
 
@@ -183,8 +181,8 @@ export default class GeoJSON extends Base {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
-        this._addDateColumnField(propertyName, this._columns);
-        const column = this._columns.find(c => c.name == propertyName);
+        this._addDateColumnField(propertyName);
+        const column = this._properties[propertyName];
         const dateValue = util.castDate(value);
         column.min = column.min ? util.castDate(Math.min(column.min, dateValue)) : dateValue;
         column.max = column.max ? util.castDate(Math.max(column.max, dateValue)) : dateValue;
@@ -195,15 +193,14 @@ export default class GeoJSON extends Base {
     _addDateColumnField(propertyName) {
         if (!this._dateFields.has(propertyName)) {
             this._dateFields.add(propertyName);
-            this._columns.push({
-                name: propertyName,
+            this._properties[propertyName] = {
                 type: 'date',
                 min: null,
                 max: null,
                 avg: null,
                 sum: 0,
                 count: 0
-            });
+            };
         }
     }
 
@@ -223,14 +220,18 @@ export default class GeoJSON extends Base {
         }
         if (!this._catFields.has(propertyName)) {
             this._catFields.add(propertyName);
-            this._columns.push({
-                name: propertyName,
+            this._properties[propertyName] = {
                 type: 'category',
-                categoryNames: new Set(),
-            });
+                categories: [],
+            };
         }
-        const column = this._columns.find(c => c.name == propertyName);
-        column.categoryNames.add(value);
+        const property = this._properties[propertyName];
+        const cat = property.categories.find(cat => cat.name == value);
+        if (cat) {
+            cat.frequency++;
+        } else {
+            property.categories.push({ name: value, frequency: 1 });
+        }
     }
 
     _decodeUnboundProperties() {
@@ -261,11 +262,11 @@ export default class GeoJSON extends Base {
                 properties[name][i] = Number(f.properties[name]);
             });
             dateFields.forEach(name => {
-                const column = this._columns.find(c => c.name == name);
+                const property = this._properties[name];
                 // dates in Dataframes are mapped to [0,1] to maximize precision
                 const d = util.castDate(f.properties[name]).getTime();
-                const min = column.min;
-                const max = column.max;
+                const min = property.min;
+                const max = property.max;
                 const n = (d - min.getTime()) / (max.getTime() - min.getTime());
                 properties[name][i] = n;
             });
