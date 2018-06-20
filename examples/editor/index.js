@@ -374,7 +374,7 @@ const $exportMapButton = document.getElementById('export-map-button');
 const $copyHTMLButton = document.getElementById('copy-html-button');
 const $mapTextarea = document.getElementById('map-textarea');
 
-if ($copyHTMLButton) {
+if ($exportMapButton) {
     $exportMapButton.addEventListener('click', () => {
         const config = getJSONConfig();
         $mapTextarea.value = generateSnippet(config);
