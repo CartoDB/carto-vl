@@ -362,15 +362,48 @@ function setBasemap(id) {
     });
 }
 
-document.getElementById('fullscreen').onclick = () => {
-    document.getElementById('map').style.position = 'fixed';
-    document.getElementById('map').style.left = '0';
-    document.getElementById('map').style.right = '0';
-    document.getElementById('map').style.top = '0';
-    document.getElementById('map').style.bottom = '0';
-    document.getElementById('map').style.zIndex = '1';
-    map.resize();
+const $map = document.getElementById('map');
+const $fullscreenButton = document.getElementById('fullscreen');
+
+$fullscreenButton.onclick = () => {
+    if ($map.style.position === 'fixed') {
+        exitFullScreen();
+    } else {
+        enterFullScreen();
+    }
 };
+
+function enterFullScreen() {
+    $fullscreenButton.style.position = 'fixed';
+    $fullscreenButton.style.top = '10px';
+    $fullscreenButton.style.right = '10px';
+    $fullscreenButton.style.zIndex = '1000';
+    $fullscreenButton.innerText = 'Exit Fullscreen';
+
+    $map.style.position = 'fixed';
+    $map.style.left = '0';
+    $map.style.right = '0';
+    $map.style.top = '0';
+    $map.style.bottom = '0';
+    $map.style.zIndex = '1';
+    map.resize();
+}
+
+function exitFullScreen() {
+    $fullscreenButton.style.position = '';
+    $fullscreenButton.style.top = '';
+    $fullscreenButton.style.right = '';
+    $fullscreenButton.style.zIndex = '';
+    $fullscreenButton.innerText = 'Fullscreen';
+
+    $map.style.position = '';
+    $map.style.left = '';
+    $map.style.right = '';
+    $map.style.top = '';
+    $map.style.bottom = '';
+    $map.style.zIndex = '';
+    map.resize();
+}
 
 const $exportMapButton = document.getElementById('export-map-button');
 const $copyHTMLButton = document.getElementById('copy-html-button');
