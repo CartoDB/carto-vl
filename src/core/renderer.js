@@ -299,6 +299,7 @@ class Renderer {
             let renderer = null;
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
+                gl.uniform1i(renderer.overrideColor, !viz.color.default);
             } else if (tile.type == 'point') {
                 renderer = this.finalRendererProgram;
             } else if (tile.type == 'line') {
