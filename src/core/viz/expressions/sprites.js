@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkArray, checkLooseType, checkInstance } from './utils';
+import { checkArray, checkInstance } from './utils';
 import Sprite from './sprite';
 
 /**

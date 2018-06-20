@@ -11,7 +11,7 @@ describe('src/core/viz/expressions/sprites', () => {
     });
 
     describe('type', () => {
-        validateStaticType('sprite', ['wadus.svg'], 'sprite');
+        validateStaticType('sprite', ['wadus.svg'], 'color');
     });
 
     describe('eval', () => {
