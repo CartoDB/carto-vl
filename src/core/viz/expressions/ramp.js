@@ -88,7 +88,7 @@ export default class Ramp extends BaseExpression {
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
-        this.defaultOtherColor = 'gray';
+        this.defaultOtherColor = new NamedColor('gray').eval();
 
         this.palette = palette;
         
@@ -367,8 +367,7 @@ function _removeOtherFromColors (colors) {
 }
 
 function _addOtherColorToColors (colors, otherColor) {
-    const otherColorRGB = new NamedColor(otherColor).eval();
-    return [...colors, otherColorRGB];
+    return [...colors, otherColor];
 }
 
 function _needsToRemoveOtherCategory (input, palette, colors) {

@@ -77,31 +77,178 @@ describe('src/core/viz/expressions/ramp', () => {
     });
 
     describe('.eval with buckets', () => {
+        const METADATA = {
+            columns: [
+                {
+                    name: 'grade',
+                    type: 'category',
+                    categoryNames: [
+                        'A',
+                        'B',
+                        'C',
+                        'D',
+                        'E'
+                    ],
+                },
+            ],
+            categoryIDs: {
+                'A': 'A',
+                'B': 'B',
+                'C': 'C',
+                'D': 'D',
+                'E': 'E'
+            }
+        };
+
         describe('when palettes are color arrays', () => {
+            const red = s.namedColor('red');
+            const blue = s.namedColor('blue');
+            const yellow = s.namedColor('yellow');
+            const purple = s.namedColor('purple');
+            const green = s.namedColor('green');
+            const orange = s.namedColor('orange');
+
+            let actual;
+            let expected;
+
             describe('and there are less categories than colors', () => {
-                // TODO
+                describe('with "others"', () => {
+                    it('should not show interpolation', () => {
+                        const r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = blue._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+
+                    it('should use last color for "others"', () => {
+                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = purple._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('without "others"', () => {
+                    it('should show interpolation', () => {
+                        const r = ramp(buckets('C', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = yellow._nameToRGBA();
+        
+                        expect(actual).not.toEqual(expected);
+                    });
+                });
             });
 
             describe('and there are the same categories than colors', () => {
-                it('should not show', () => {
-                    const colorA = s.namedColor('red');
-                    const colorB = s.namedColor('blue');
-                    const colorC = s.namedColor('yellow');
-                    const colorD = s.namedColor('purple');
+                describe('with "others"', () => {
+                    it('should not show interpolation', () => {
+                        const categories = ['A', 'B', 'C', 'D'];
+                        const colors = [red, blue, yellow, purple];
+    
+                        categories.forEach((category, index) => {
+                            const r = ramp(buckets(category, categories), colors);
+                            r._compile();
+                            expect(r.eval()).toEqual(colors[index]._nameToRGBA());
+                        });
+                    });
 
-                    const categories = ['A', 'B', 'C', 'D'];
-                    const colors = [colorA, colorB, colorC, colorD];
+                    it('should use the last color for the last category', () => {
+                        const r = ramp(buckets('E', ['A', 'B', 'C']), [red, blue, purple]);
+                        r._compile(METADATA);
 
-                    categories.forEach((category, index) => {
-                        const r = ramp(buckets(category, categories), colors);
-                        r._compile();
-                        expect(r.eval()).toEqual(colors[index]._nameToRGBA());
+                        actual = r.eval();
+                        expected = r.defaultOtherColor._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+
+                    it('should use the default color for "others"', () => {
+                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
+                        r._compile(METADATA);
+
+                        actual = r.eval();
+                        expected = r.defaultOtherColor._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('without "others"', () => {
+                    it('should not show interpolation', () => {
+                        const categories = ['A', 'B', 'C', 'D', 'E'];
+                        const colors = [red, blue, yellow, purple, green];
+    
+                        categories.forEach((category, index) => {
+                            const r = ramp(buckets(category, categories), colors);
+                            r._compile();
+                            expect(r.eval()).toEqual(colors[index]._nameToRGBA());
+                        });
                     });
                 });
             });
 
             describe('and there are the more categories than colors', () => {
-                // TODO
+                describe('with "others"', () => {
+                    it('should show interpolation', () => {
+                        const r = ramp(buckets('B', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = blue._nameToRGBA();
+        
+                        expect(actual).not.toEqual(expected);
+                    });
+
+                    it('should use the last color for the last category', () => {
+                        const r = ramp(buckets('D', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = purple._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+
+                    it('should use the default color for others', () => {
+                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = r.defaultOtherColor._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('without "others"', () => {
+                    it('should show interpolation', () => {
+                        const r = ramp(buckets('C', ['A', 'B', 'C', 'D', 'E']), [red, blue, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = blue._nameToRGBA();
+        
+                        expect(actual).not.toEqual(expected);
+                    });
+
+                    it('should use the last color for the last category', () => {
+                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, purple]);
+                        
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = purple._nameToRGBA();
+
+                        expect(actual).toEqual(expected);
+                    });
+                });
             });
         });
 
