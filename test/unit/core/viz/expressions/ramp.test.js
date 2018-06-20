@@ -1,8 +1,8 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
-import * as cartocolor from 'cartocolor';;
-import { hexToRgb } from '../utils';
+import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes } from '../../../../../src/core/viz/functions';
 import * as s from '../../../../../src/core/viz/functions';
+import { hexToRgb } from '../../../../../src/core/viz/expressions/utils';
 
 describe('src/core/viz/expressions/ramp', () => {
     describe('error control', () => {
@@ -282,29 +282,57 @@ describe('src/core/viz/expressions/ramp', () => {
                     }
                 };
 
-                const CATEGORIES = ['Pontevedra', 'Zaragoza', 'Cordoba', 'Alicante', 'Murcia'];
-                const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
                 let actual;
                 let expected;
 
-                it('should not show interpolation', () => {
-                    const r = ramp(buckets('Cordoba', CATEGORIES), palettes.PRISM);
+                describe('with "others"', () => {
+                    const CATEGORIES = ['Pontevedra', 'Zaragoza', 'Cordoba', 'Alicante', 'Murcia'];
+                    const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
 
-                    r._compile(METADATA);
-                    actual = r.eval();
-                    expected = hexToRgb(RAMP_COLORS[2]);
+                    it('should not show interpolation', () => {
+                        const r = ramp(buckets('Cordoba', CATEGORIES), palettes.PRISM);
     
-                    expect(actual).not.toEqual(expected);                        
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = hexToRgb(RAMP_COLORS[2]);
+        
+                        expect(actual).not.toEqual(expected);                        
+                    });
+    
+                    it('should set the last color to "others"', () => {
+                        const r = ramp(buckets('Madrid', CATEGORIES), palettes.PRISM);
+    
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = hexToRgb(RAMP_COLORS[5]);
+        
+                        expect(actual).toEqual(expected);  
+                    });
                 });
 
-                it('should set the last color to "others"', () => {
-                    const r = ramp(buckets('Madrid', CATEGORIES), palettes.PRISM);
-
-                    r._compile(METADATA);
-                    actual = r.eval();
-                    expected = hexToRgb(RAMP_COLORS[5]);
+                describe('without "others"', () => {
+                    const CATEGORIES = ['Murcia', 'Madrid', 'Pontevedra', 'Barcelona', 'Alicante', 'Cordoba', 'Zaragoza'];
+                    const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
+                    
+                    it('should not show interpolation', () => {
+                        const r = ramp(buckets('Barcelona', CATEGORIES), palettes.PRISM);
     
-                    expect(actual).toEqual(expected);  
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = hexToRgb(RAMP_COLORS[3]);
+        
+                        expect(actual).not.toEqual(expected);                        
+                    });
+
+                    it('should not set the "others" color to the last category', () => {
+                        const r = ramp(buckets('Zaragoza', CATEGORIES), palettes.PRISM);
+    
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = hexToRgb(RAMP_COLORS[6]);
+        
+                        expect(actual).toEqual(expected);  
+                    });
                 });
             });
 
@@ -314,7 +342,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         {
                             name: 'number',
                             type: 'number'
-                        },
+                        }
                     ]
                 };
 
@@ -322,26 +350,27 @@ describe('src/core/viz/expressions/ramp', () => {
                 let expected;
 
                 describe('and there are less or equal than 7 categories', () => {
+                    const CATEGORIES = [10, 20, 30];
+                    const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
+                    
                     it('should not show interpolation', () => {
-                        const CATEGORIES = [10, 20, 30];
-                        const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-                        let r;
-                        
-                        r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
+                        const r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
 
                         r._compile(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[1]);
         
-                        expect(actual).toEqual(expected);
+                        expect(actual).toEqual(expected);    
+                    });
 
-                        r = ramp(buckets(30, [10, 20, 30]), palettes.PRISM);
+                    it('should not use last color in the array for last bucket', () => {
+                        const r = ramp(buckets(30, [10, 20, 30]), palettes.PRISM);
 
                         r._compile(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[2]);
         
-                        expect(actual).toEqual(expected);     
+                        expect(actual).toEqual(expected); 
                     });
                 });
     
@@ -349,9 +378,7 @@ describe('src/core/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const CATEGORIES = [10, 20, 30, 40, 50, 60, 70, 80];
                         const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-                        let r;
-                        
-                        r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
+                        const r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
 
                         r._compile(METADATA);
                         actual = r.eval();
