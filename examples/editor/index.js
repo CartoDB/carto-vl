@@ -374,15 +374,20 @@ const $exportMapButton = document.getElementById('export-map-button');
 const $copyHTMLButton = document.getElementById('copy-html-button');
 const $mapTextarea = document.getElementById('map-textarea');
 
-$exportMapButton.addEventListener('click', () => {
-    const config = getJSONConfig();
-    $mapTextarea.value = generateSnippet(config);
-});
+if ($exportMapButton) {
+    $exportMapButton.addEventListener('click', () => {
+        const config = getJSONConfig();
+        $mapTextarea.value = generateSnippet(config);
+    });
+}
 
-$copyHTMLButton.addEventListener('click', () => {
-    $mapTextarea.select();
-    document.execCommand('copy');
-});
+
+if ($copyHTMLButton) {
+    $copyHTMLButton.addEventListener('click', () => {
+        $mapTextarea.select();
+        document.execCommand('copy');
+    });
+}
 
 
 /**
