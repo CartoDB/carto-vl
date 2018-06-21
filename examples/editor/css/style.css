@@ -117,7 +117,8 @@ body {
 .cvl-Main--Textarea {
     width: 100%;
     font-family: Monospace;
-    resize:vertical;
+    resize: vertical;
+    font-size: 16px;
 }
 
 .cvl-Debugger {
