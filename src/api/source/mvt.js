@@ -61,7 +61,7 @@ export default class MVT extends Base {
     }
 
     async responseToDataframeTransformer(response, x, y, z) {
-        const mvt_extent = 4096;
+        const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength == 0 || response == 'null') {
             return { empty: true };
@@ -69,7 +69,7 @@ export default class MVT extends Base {
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, mvt_extent);
+        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
 
 
         const rs = rsys.getRsysFromTile(x, y, z);
