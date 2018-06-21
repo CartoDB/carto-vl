@@ -41,7 +41,7 @@ function isClipped(polygon, i, j) {
     if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {
         if (polygon.clippedType[polygon.clipped.indexOf(i)] &
             polygon.clippedType[polygon.clipped.indexOf(j)]) {
-                return true;
+            return true;
         }
     }
     return false;

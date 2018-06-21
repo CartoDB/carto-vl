@@ -53,7 +53,7 @@ export function isClockWise(vertices) {
     return a > 0;
 }
 
-const CLIPMAX = 1
+const CLIPMAX = 1;
 const CLIPMIN = -CLIPMAX;
 
 export function clipPolygon(preClippedVertices, polygon, isHole) {
@@ -80,7 +80,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
         const preClippedVertices2 = [];
         const clippedTypes2 = {};
 
-        function setClippedType(vertexIndex, oldVertexIndex, edge = -1) {
+        const setClippedType = (vertexIndex, oldVertexIndex, edge = -1) => {
             let clippedType = 0;
             if (oldVertexIndex >= 0) {
                 clippedType = clippedTypes[oldVertexIndex] || 0;
@@ -91,7 +91,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
             if (clippedType) {
                 clippedTypes2[vertexIndex] = clippedType;
             }
-        }
+        };
 
         // for each edge on polygon
         for (let k = 0; k < preClippedVertices.length - 1; k++) {
