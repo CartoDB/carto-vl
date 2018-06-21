@@ -31,7 +31,7 @@ export default class Sprites extends Base {
         sprites.forEach((sprite, i) => children[`sprite${i}`] = sprite);
         super(children);
         this.numSprites = sprites.length;
-        this.type = 'sprites';
+        this.type = 'sprite';
     }
     _applyToShaderSource() {
         return {

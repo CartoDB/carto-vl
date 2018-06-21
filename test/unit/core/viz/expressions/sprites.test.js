@@ -12,7 +12,7 @@ describe('src/core/viz/expressions/sprites', () => {
     });
 
     describe('type', () => {
-        validateStaticType('sprites', ['sprite-array'], 'sprites');
+        validateStaticType('sprites', ['sprite-array'], 'sprite');
     });
 
     describe('eval', () => {

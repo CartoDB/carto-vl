@@ -308,6 +308,10 @@ class Renderer {
             }
             gl.useProgram(renderer.program);
 
+            if (!viz.symbol._default) {
+                gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
+            }
+
             //Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
