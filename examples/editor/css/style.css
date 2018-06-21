@@ -163,6 +163,49 @@ body {
     margin: 15px;
 }
 
+.loader {
+    left: 0;
+    right: 0;
+    height: 5px;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.loader:before {
+    display: block;
+    position: absolute;
+    content: "";
+    left: -200px;
+    width: 200px;
+    height: 5px;
+    background-color: rgb(23, 133, 251);
+    animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+    from {
+        left: -200px;
+        width: 30%;
+    }
+    50% {
+        width: 30%;
+    }
+    70% {
+        width: 70%;
+    }
+    80% {
+        left: 50%;
+    }
+    95% {
+        left: 120%;
+    }
+    to {
+        left: 100%;
+    }
+}
+
 .cvl-Main--MapWrapper {
     position: relative;
     flex: 1;

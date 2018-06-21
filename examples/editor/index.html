@@ -7,8 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>CARTO-VL EDITOR</title>
 
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
-
     <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
     <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="./css/style.css">
@@ -65,10 +63,19 @@
 
                 <textarea id="map-textarea" class="cvl-Sidebar--Input cvl-Sidebar--Textarea" name="map-textarea" rows="12"></textarea>
             </section>
+
+            <section class="cvl-Sidebar--Debug">
+                <h1>Debugging</h1>
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="prev-button">PREV</button>
+                    <button id="next-button">NEXT</button>
+                </div>
+            </section>
         </aside>
 
         <main class="cvl-Main">
             <div class="cvl-Main--MapWrapper">
+                <div class="loader"></div>
                 <div id='map' class='map'></div>
                 <div class="cvl-MapInfo map-info"></div>
                 <p class="cvl-FeaturesInfo" id='title'>~ 0 features</p>
