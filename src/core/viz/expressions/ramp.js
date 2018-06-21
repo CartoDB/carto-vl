@@ -130,7 +130,7 @@ export default class Ramp extends BaseExpression {
         this._computeTextureIfNeeded();
 
         const input = this.input.eval(feature);
-        const len = this.pixel.length - 1;
+        const len = this.colorValues.length - 1;
         const m = input / this.maxKey;
 
         if (this.palette.type !== paletteTypes.COLOR_ARRAY) {
@@ -138,8 +138,8 @@ export default class Ramp extends BaseExpression {
             const highIndex = clamp(Math.ceil(len * m), 0, len);
     
             const fract = len * m - Math.floor(len * m);
-            const low = this.pixel[lowIndex];
-            const high = this.pixel[highIndex];
+            const low = this.colorValues[lowIndex];
+            const high = this.colorValues[highIndex];
     
             return Math.round(fract * high + (1 - fract) * low);
         }
@@ -147,10 +147,10 @@ export default class Ramp extends BaseExpression {
         const index = Math.round(m * COLOR_VALUES);
 
         return {
-            r: Math.round(this.pixel[index * 4 + 0]),
-            g: Math.round(this.pixel[index * 4 + 1]),
-            b: Math.round(this.pixel[index * 4 + 2]),
-            a: Math.round(this.pixel[index * 4 + 3]) / COLOR_VALUES
+            r: Math.round(this.colorValues[index * 4 + 0]),
+            g: Math.round(this.colorValues[index * 4 + 1]),
+            b: Math.round(this.colorValues[index * 4 + 2]),
+            a: Math.round(this.colorValues[index * 4 + 3]) / COLOR_VALUES
         };
     }
     
@@ -246,16 +246,16 @@ export default class Ramp extends BaseExpression {
                 this.maxKey = this.input.numCategories - 1;
             }
 
-            this.pixel = this.type === rampTypes.COLOR
+            this.colorValues = this.type === rampTypes.COLOR
                 ? this._computeTextureColor()
                 : this._computeTexture();
         }
 
-        return this.pixel;
+        return this.colorValues;
     }
 
     _computeTextureColor() {
-        const pixel = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
+        const colorValues = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
         
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
@@ -266,27 +266,27 @@ export default class Ramp extends BaseExpression {
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
-            pixel[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
-            pixel[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
-            pixel[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
-            pixel[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
+            colorValues[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
+            colorValues[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
+            colorValues[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
+            colorValues[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
         }
 
-        return pixel;
+        return colorValues;
     }
 
     _computeTexture() {
-        const pixel = new Float32Array(COLOR_VALUES);
+        const colorValues = new Float32Array(COLOR_VALUES);
         const floats = this.palette.floats;
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
             const vlowRaw = floats[Math.floor(i / COLOR_VALUES * (floats.length - 1))];
             const vhighRaw = floats[Math.ceil(i / COLOR_VALUES * (floats.length - 1))];
             const m = i / COLOR_VALUES * (floats.length - 1) - Math.floor(i / COLOR_VALUES * (floats.length - 1));
-            pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+            colorValues[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
-        return pixel;
+        return colorValues;
     }
 
     _computeGLTextureIfNeeded(gl) {
@@ -297,14 +297,14 @@ export default class Ramp extends BaseExpression {
 
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const pixel = this.pixel;
+            const colorValues = this.colorValues;
             if (this.type == 'color') {
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+                gl.colorValuesStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, colorValues);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, colorValues);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
