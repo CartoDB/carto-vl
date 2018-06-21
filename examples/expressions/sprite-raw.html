@@ -20,23 +20,21 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      center: [-95.907985, 37.746163],
+      zoom: 4,
       dragRotate: false
     });
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      user: 'arianaescobar',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
-    width: 50
-    symbol: sprite('./NASA.svg')
-    filter: $pop_max>3000000
+    width: 25
+    symbol: sprite('./walmart.svg')
     `);
-
 
     const layer = new carto.Layer('layer', source, viz);
 
