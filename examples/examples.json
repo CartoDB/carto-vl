@@ -114,7 +114,7 @@
             ]
         },
         {
-            "title": "Interactivity",
+            "title": "Sprites",
             "samples": [
                 {
                     "title": "Single Sprite",
@@ -124,7 +124,7 @@
                 {
                     "title": "Multiple Sprites",
                     "desc": "Show different sprites based on a category",
-                    "file": "sprites/sprite-rmap.html"
+                    "file": "sprites/sprite-ramp.html"
                 }
             ]
         },
