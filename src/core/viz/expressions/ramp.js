@@ -20,6 +20,9 @@ const inputTypes = {
     CATEGORY: 'category'
 };
 
+const COLOR_ARRAY_LENGTH = 256;
+const COLOR_VALUES = COLOR_ARRAY_LENGTH - 1;
+
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
 *
@@ -141,13 +144,13 @@ export default class Ramp extends BaseExpression {
             return fract * high + (1 - fract) * low;
         }
         
-        const index = Math.round(m * 255);
+        const index = Math.round(m * COLOR_VALUES);
 
         const color = {
             r: this.pixel[index * 4 + 0],
             g: this.pixel[index * 4 + 1],
             b: this.pixel[index * 4 + 2],
-            a: this.pixel[index * 4 + 3] / 255
+            a: this.pixel[index * 4 + 3] / COLOR_VALUES
         };
         
         return color;
@@ -254,36 +257,34 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureColor() {
-        const width = 256;
-        const pixel = new Uint8Array(4 * width);
+        const pixel = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
         
-        for (let i = 0; i < width; i++) {
-            const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
-            const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
-            const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-            const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-            const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
+        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
+            const vlowRaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vhighRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vlow = [vlowRaw.r / COLOR_VALUES, vlowRaw.g / COLOR_VALUES, vlowRaw.b / COLOR_VALUES, vlowRaw.a];
+            const vhigh = [vhighRaw.r / COLOR_VALUES, vhighRaw.g / COLOR_VALUES, vhighRaw.b / COLOR_VALUES, vhighRaw.a];
+            const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
-            pixel[4 * i + 0] = Math.round(v.r * 255);
-            pixel[4 * i + 1] = Math.round(v.g * 255);
-            pixel[4 * i + 2] = Math.round(v.b * 255);
-            pixel[4 * i + 3] = Math.round(v.a * 255);
+            pixel[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
+            pixel[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
+            pixel[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
+            pixel[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
         }
 
         return pixel;
     }
 
     _computeTexture() {
-        const width = 256;
-        const pixel = new Float32Array(width);
+        const pixel = new Float32Array(COLOR_VALUES);
         const floats = this.palette.floats;
 
-        for (let i = 0; i < width; i++) {
-            const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
-            const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
-            const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
+        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
+            const vlowRaw = floats[Math.floor(i / COLOR_VALUES * (floats.length - 1))];
+            const vhighRaw = floats[Math.ceil(i / COLOR_VALUES * (floats.length - 1))];
+            const m = i / COLOR_VALUES * (floats.length - 1) - Math.floor(i / COLOR_VALUES * (floats.length - 1));
             pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
@@ -296,17 +297,16 @@ export default class Ramp extends BaseExpression {
         if (this._GLtexCategories !== this.input.numCategories) {
             this._GLtexCategories = this.input.numCategories;
 
-            const width = 256;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const pixel = this.pixel;
             if (this.type == 'color') {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, width, 1, 0, gl.ALPHA, gl.FLOAT, pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, pixel);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
