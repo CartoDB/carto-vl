@@ -1,6 +1,7 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import Sprites from './sprites';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -61,8 +62,9 @@ export default class Ramp extends BaseExpression {
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array', 'sprites'], palette);
-        if (palette.type == 'sprites') {
+        checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array', 'sprite'], palette);
+        if (palette.type == 'sprite') {
+            checkInstance('ramp', 'palette', 1, Sprites, palette);
             checkLooseType('ramp', 'input', 0, 'category', input);
         }
 
@@ -113,8 +115,9 @@ export default class Ramp extends BaseExpression {
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type == 'sprite') {
             checkType('ramp', 'input', 0, 'category', this.input);
+            checkInstance('ramp', 'palette', 1, Sprites, this.palette);
         }
         this._texCategories = null;
         this._GLtexCategories = null;
@@ -128,7 +131,7 @@ export default class Ramp extends BaseExpression {
 
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type == 'sprite') {
             const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
             return {
                 preface: input.preface + sprites.preface,
@@ -171,7 +174,7 @@ export default class Ramp extends BaseExpression {
         }
     }
     _postShaderCompile(program, gl) {
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type == 'sprite') {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -248,7 +251,7 @@ export default class Ramp extends BaseExpression {
     }
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
-        if (this.palette.type == 'sprites') {
+        if (this.palette.type == 'sprite') {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
