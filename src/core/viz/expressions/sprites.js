@@ -1,6 +1,5 @@
 import Base from './base';
-import { checkArray, checkInstance } from './utils';
-import Sprite from './sprite';
+import { checkArray, checkLooseType } from './utils';
 
 /**
  * Sprites. Load an array of images and use them as a symbols.
@@ -27,12 +26,12 @@ import Sprite from './sprite';
 export default class Sprites extends Base {
     constructor(sprites) {
         checkArray('sprites', 'sprites', 0, sprites);
-        sprites.forEach((sprite, i) => checkInstance('sprites', `sprites[${i}]`, 0, Sprite, sprite));
+        sprites.forEach((sprite, i) => checkLooseType('sprites', `sprites[${i}]`, 0, 'sprite', sprite));
         const children = {};
         sprites.forEach((sprite, i) => children[`sprite${i}`] = sprite);
         super(children);
         this.numSprites = sprites.length;
-        this.type = 'sprites';
+        this.type = 'sprite';
     }
     _applyToShaderSource() {
         return {
