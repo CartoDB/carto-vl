@@ -133,27 +133,25 @@ export default class Ramp extends BaseExpression {
         const len = this.pixel.length - 1;
         const m = input / this.maxKey;
 
-        const lowIndex = clamp(Math.floor(len * m), 0, len);
-        const highIndex = clamp(Math.ceil(len * m), 0, len);
-
         if (this.palette.type !== paletteTypes.COLOR_ARRAY) {
+            const lowIndex = clamp(Math.floor(len * m), 0, len);
+            const highIndex = clamp(Math.ceil(len * m), 0, len);
+    
             const fract = len * m - Math.floor(len * m);
             const low = this.pixel[lowIndex];
             const high = this.pixel[highIndex];
     
-            return fract * high + (1 - fract) * low;
+            return Math.round(fract * high + (1 - fract) * low);
         }
         
         const index = Math.round(m * COLOR_VALUES);
 
-        const color = {
-            r: this.pixel[index * 4 + 0],
-            g: this.pixel[index * 4 + 1],
-            b: this.pixel[index * 4 + 2],
-            a: this.pixel[index * 4 + 3] / COLOR_VALUES
+        return {
+            r: Math.round(this.pixel[index * 4 + 0]),
+            g: Math.round(this.pixel[index * 4 + 1]),
+            b: Math.round(this.pixel[index * 4 + 2]),
+            a: Math.round(this.pixel[index * 4 + 3]) / COLOR_VALUES
         };
-        
-        return color;
     }
     
     _compile(meta) {

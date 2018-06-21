@@ -114,8 +114,26 @@ describe('src/core/viz/expressions/ramp', () => {
 
             describe('and there are less categories than colors', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
-                    xit('should not show interpolation', () => {
-                        const r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                    it('should not show interpolation', () => {
+                        let r;
+                        
+                        r = ramp(buckets('A', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = red._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = blue._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                         r._compile(METADATA);
                         actual = r.eval();
@@ -161,7 +179,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         });
                     });
 
-                    xit('should use the last color for the last category', () => {
+                    it('should use the last color for the last category', () => {
                         const r = ramp(buckets('E', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
@@ -171,7 +189,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).toEqual(expected);
                     });
 
-                    xit('should use the default color for "others"', () => {
+                    it('should use the default color for "others"', () => {
                         const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
