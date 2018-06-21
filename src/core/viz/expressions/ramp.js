@@ -95,17 +95,13 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
+        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOtherColor = new NamedColor('gray');
-
-        if (palette.type == 'number-array') {
-            this.type = 'number';
-        } else {
-            this.type = 'color';
-        }
+        
         try {
-            if (palette.type == 'number-array') {
+            if (palette.type === paletteTypes.NUMBER_ARRAY) {
                 this.palette.floats = this.palette.eval();
-            } else if (palette.type == 'color-array') {
+            } else if (palette.type === paletteTypes.COLOR_ARRAY) {
                 this.palette.colors = this.palette.eval();
             }
         } catch (error) {
@@ -181,7 +177,7 @@ export default class Ramp extends BaseExpression {
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
 
-        if (this.palette.type === inputTypes.SPRITE) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
             
             return {
@@ -209,7 +205,7 @@ export default class Ramp extends BaseExpression {
             return palette.colors;
         }
 
-        return palette.type == paletteTypes.PALETTE
+        return palette.type === paletteTypes.PALETTE
             ? this._getColorsFromPaletteType(input, palette)
             : this._getColorsFromColorArrayType(palette);
     }
