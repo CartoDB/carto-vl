@@ -273,7 +273,7 @@ function setupMap(opts) {
 function handleError(error) {
     const err = `Invalid viz: ${error}:${error.stack}`;
     console.warn(err);
-    document.getElementById('feedback').value = err;
+    document.getElementById('feedback').innerText = err;
     document.getElementById('feedback').style.display = 'block';
 }
 
