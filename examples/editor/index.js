@@ -108,7 +108,7 @@ map.touchZoomRotate.disableRotation();
 let layer = null;
 setInterval(() => {
     if (layer) {
-        document.getElementById('title').innerText = `~ ${layer.getNumFeatures()} features`;
+        document.getElementById('title').innerText = `Features: ${layer.getNumFeatures()}`;
     }
 }, 500);
 
@@ -117,7 +117,7 @@ map.on('move', updateMapInfo);
 
 function updateMapInfo() {
     let center = map.getCenter();
-    document.querySelector('.map-info').innerText = `center: [${center.lng.toFixed(6)}, ${center.lat.toFixed(6)}],zoom: ${map.getZoom().toFixed(6)}`;
+    document.querySelector('.map-info').innerText = `Center: [${center.lng.toFixed(6)}, ${center.lat.toFixed(6)}]  Zoom: ${map.getZoom().toFixed(6)}`;
 }
 
 map.on('load', () => {
