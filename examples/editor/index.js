@@ -405,10 +405,13 @@ function generateSnippet(config) {
         <!-- Include Mapbox GL CSS -->
         <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
         <style>
+           html, body {
+               margin: 0;
+           }
            #map {
                 position: absolute;
-                width: 100vw;
-                height: 100vh;
+                width: 100%;
+                height: 100%;
             }
         </style>
         </head>
