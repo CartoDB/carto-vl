@@ -335,7 +335,7 @@ export default class Windshaft {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 0
+                'mvt': 1
             },
             layers: [
                 {

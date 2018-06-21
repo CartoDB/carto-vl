@@ -53,26 +53,45 @@ export function isClockWise(vertices) {
     return a > 0;
 }
 
+const CLIPMAX = 1
+const CLIPMIN = -CLIPMAX;
+
 export function clipPolygon(preClippedVertices, polygon, isHole) {
     // Sutherland-Hodgman Algorithm to clip polygons to the tile
     // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
     const clippingEdges = [
-        p => p[0] <= 1,
-        p => p[1] <= 1,
-        p => p[0] >= -1,
-        p => p[1] >= -1,
+        p => p[0] <= CLIPMAX,
+        p => p[1] <= CLIPMAX,
+        p => p[0] >= CLIPMIN,
+        p => p[1] >= CLIPMIN,
     ];
 
     const clippingEdgeIntersectFn = [
-        (a, b) => geometryUtils.intersect(a, b, [1, -10], [1, 10]),
-        (a, b) => geometryUtils.intersect(a, b, [-10, 1], [10, 1]),
-        (a, b) => geometryUtils.intersect(a, b, [-1, -10], [-1, 10]),
-        (a, b) => geometryUtils.intersect(a, b, [-10, -1], [10, -1]),
+        (a, b) => geometryUtils.intersect(a, b, [CLIPMAX, -10], [CLIPMAX, 10]),
+        (a, b) => geometryUtils.intersect(a, b, [-10, CLIPMAX], [10, CLIPMAX]),
+        (a, b) => geometryUtils.intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100]),
+        (a, b) => geometryUtils.intersect(a, b, [-10, CLIPMIN], [10, CLIPMIN]),
     ];
+
+    let clippedTypes = {};
 
     // for each clipping edge
     for (let i = 0; i < 4; i++) {
         const preClippedVertices2 = [];
+        const clippedTypes2 = {};
+
+        function setClippedType(vertexIndex, oldVertexIndex, edge = -1) {
+            let clippedType = 0;
+            if (oldVertexIndex >= 0) {
+                clippedType = clippedTypes[oldVertexIndex] || 0;
+            }
+            if (edge >= 0) {
+                clippedType = clippedType | (1 << edge);
+            }
+            if (clippedType) {
+                clippedTypes2[vertexIndex] = clippedType;
+            }
+        }
 
         // for each edge on polygon
         for (let k = 0; k < preClippedVertices.length - 1; k++) {
@@ -85,24 +104,32 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
 
             if (insideA && insideB) {
                 // case 1: both inside, push B vertex
+                setClippedType(preClippedVertices2.length, k + 1);
                 preClippedVertices2.push(b);
             } else if (insideA) {
                 // case 2: just B outside, push intersection
                 const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                setClippedType(preClippedVertices2.length, k + 1, i);
                 preClippedVertices2.push(intersectionPoint);
             } else if (insideB) {
                 // case 4: just A outside: push intersection, push B
                 const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                setClippedType(preClippedVertices2.length, k, i);
                 preClippedVertices2.push(intersectionPoint);
+                setClippedType(preClippedVertices2.length, k + 1);
                 preClippedVertices2.push(b);
             } else {
                 // case 3: both outside: do nothing
             }
         }
         if (preClippedVertices2.length) {
+            if (clippedTypes2[0]) {
+                clippedTypes2[preClippedVertices2.length] = clippedTypes2[0];
+            }
             preClippedVertices2.push(preClippedVertices2[0]);
         }
         preClippedVertices = preClippedVertices2;
+        clippedTypes = clippedTypes2;
     }
 
     if (preClippedVertices.length > 3) {
@@ -111,6 +138,10 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
         }
         preClippedVertices.forEach(v => {
             polygon.flat.push(v[0], v[1]);
+        });
+        Object.keys(clippedTypes).forEach(i => {
+            polygon.clipped.push(Number(i)*2);
+            polygon.clippedType.push(clippedTypes[i]);
         });
     }
 
