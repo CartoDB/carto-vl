@@ -121,6 +121,8 @@ export function checkLooseType(expressionName, parameterName, parameterIndex, ex
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
 export function isArgConstructorTimeTyped(arg) {
     switch (arg) {
+        case 'date':
+        case 'time':
         case 'number':
         case 'number-array':
         case 'number-property':
