@@ -141,9 +141,6 @@ map.on('load', () => {
     }
 
     function barcelona() {
-        // document.querySelector('.step').css('display', 'inline');
-        // document.getElementById('tutorial').text(texts[index]);
-
         document.getElementById('dataset').value = 'spend_data';
         document.getElementById('user').value = 'cartovl';
         document.getElementById('serverURL').value = 'https://{user}.carto.com';
@@ -451,7 +448,6 @@ function addExample(example) {
     let button = document.createElement('button');
     button.innerText = name;
     button.onclick = () => {
-        // document.getElementById('tutorial').innerText = '';
         setConfig(code);
     };
     document.getElementById('buttonlist').appendChild(button);
