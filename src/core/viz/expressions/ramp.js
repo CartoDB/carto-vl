@@ -1,13 +1,14 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import Sprites from './sprites';
 import { NamedColor } from './color/NamedColor';
 
 const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    SPRITES: 'sprites'
+    SPRITE: 'sprite'
 };
 
 const rampTypes = {
@@ -22,6 +23,7 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const COLOR_VALUES = COLOR_ARRAY_LENGTH - 1;
+
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -84,27 +86,26 @@ export default class Ramp extends BaseExpression {
         checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
         checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
         
-        if (palette.type == paletteTypes.SPRITES) {
+        if (palette.type === paletteTypes.SPRITE) {
+            checkInstance('ramp', 'palette', 1, Sprites, palette);
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
+        this.palette = palette;
         this.defaultOtherColor = new NamedColor('gray');
 
-        this.palette = palette;
-        
-        if (palette.type == paletteTypes.NUMBER_ARRAY) {
-            this.type = rampTypes.NUMBER;
+        if (palette.type == 'number-array') {
+            this.type = 'number';
         } else {
-            this.type = rampTypes.COLOR;
+            this.type = 'color';
         }
-        
         try {
-            if (palette.type == paletteTypes.NUMBER_ARRAY) {
+            if (palette.type == 'number-array') {
                 this.palette.floats = this.palette.eval();
-            } else if (palette.type == paletteTypes.COLOR_ARRAY) {
+            } else if (palette.type == 'color-array') {
                 this.palette.colors = this.palette.eval();
             }
         } catch (error) {
@@ -127,30 +128,34 @@ export default class Ramp extends BaseExpression {
             super.eval(feature);
         }
 
-        this._computeTextureIfNeeded();
-
+        const colorValues = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
-        const len = this.colorValues.length - 1;
+        const numColorValues = colorValues.length - 1;
         const m = input / this.maxKey;
 
-        if (this.palette.type !== paletteTypes.COLOR_ARRAY) {
-            const lowIndex = clamp(Math.floor(len * m), 0, len);
-            const highIndex = clamp(Math.ceil(len * m), 0, len);
+        return this.palette.type !== paletteTypes.COLOR_ARRAY
+            ? this._getColorValue(colorValues, numColorValues, m)
+            : this._getRGBAColorValue(colorValues, m);
+    }
+
+    _getColorValue(colorValues, numColorValues, m) {
+        const lowIndex = clamp(Math.floor(numColorValues * m), 0, numColorValues);
+        const highIndex = clamp(Math.ceil(numColorValues * m), 0, numColorValues);
+        const fract = numColorValues * m - Math.floor(numColorValues * m);
+        const low = colorValues[lowIndex];
+        const high = colorValues[highIndex];
+
+        return Math.round(fract * high + (1 - fract) * low);
+    }
     
-            const fract = len * m - Math.floor(len * m);
-            const low = this.colorValues[lowIndex];
-            const high = this.colorValues[highIndex];
-    
-            return Math.round(fract * high + (1 - fract) * low);
-        }
-        
+    _getRGBAColorValue(colorValues, m) {
         const index = Math.round(m * COLOR_VALUES);
 
         return {
-            r: Math.round(this.colorValues[index * 4 + 0]),
-            g: Math.round(this.colorValues[index * 4 + 1]),
-            b: Math.round(this.colorValues[index * 4 + 2]),
-            a: Math.round(this.colorValues[index * 4 + 3]) / COLOR_VALUES
+            r: Math.round(colorValues[index * 4 + 0]),
+            g: Math.round(colorValues[index * 4 + 1]),
+            b: Math.round(colorValues[index * 4 + 2]),
+            a: Math.round(colorValues[index * 4 + 3]) / COLOR_VALUES
         };
     }
     
@@ -158,8 +163,9 @@ export default class Ramp extends BaseExpression {
         super._compile(meta);
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
         
-        if (this.palette.type === paletteTypes.SPRITES) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
+            checkInstance('ramp', 'palette', 1, Sprites, this.palette);
         }
 
         this._texCategories = null;
@@ -174,29 +180,35 @@ export default class Ramp extends BaseExpression {
 
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        let preface;
-        let inline;
 
-        if (this.palette.type == '') {
+        if (this.palette.type === inputTypes.SPRITE) {
             const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
             
-            preface = input.preface + sprites.preface;
-            inline = `${sprites.inline}(spriteUV, ${input.inline})`;
+            return {
+                preface: input.preface + sprites.preface,
+                inline: `${sprites.inline}(spriteUV, ${input.inline})`
+            };
         }
-
-        preface = this._prefaceCode(input.preface + `
-                    uniform sampler2D texRamp${this._uid};
-                    uniform float keyMin${this._uid};
-                    uniform float keyWidth${this._uid};`);
-        
-        inline = this.palette.type === paletteTypes.NUMBER_ARRAY
-            ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
-            : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`;
-
-        return { preface, inline };
+    
+        return { 
+            preface: this._prefaceCode(
+                input.preface + `
+                uniform sampler2D texRamp${this._uid};
+                uniform float keyMin${this._uid};
+                uniform float keyWidth${this._uid};`
+            ),
+            
+            inline: this.palette.type === paletteTypes.NUMBER_ARRAY
+                ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
+                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
+        };
     }
     
     _getColorsFromPalette(input, palette) {
+        if (palette.type === paletteTypes.SPRITE) {
+            return palette.colors;
+        }
+
         return palette.type == paletteTypes.PALETTE
             ? this._getColorsFromPaletteType(input, palette)
             : this._getColorsFromColorArrayType(palette);
@@ -229,7 +241,7 @@ export default class Ramp extends BaseExpression {
     }
     
     _postShaderCompile(program, gl) {
-        if (this.palette.type === paletteTypes.SPRITES) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -245,16 +257,18 @@ export default class Ramp extends BaseExpression {
         if (this._texCategories !== this.input.numCategories) {
             this._texCategories = this.input.numCategories;
 
-            if (this.input.type == inputTypes.CATEGORY) {
+            if (this.input.type === inputTypes.CATEGORY) {
                 this.maxKey = this.input.numCategories - 1;
             }
 
-            this.colorValues = this.type === rampTypes.COLOR
+            const colorValues = this.type === rampTypes.COLOR
                 ? this._computeTextureColor()
                 : this._computeTexture();
+
+            return colorValues;
         }
 
-        return this.colorValues;
+        return [];
     }
 
     _computeTextureColor() {
@@ -293,16 +307,16 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeGLTextureIfNeeded(gl) {
-        this._computeTextureIfNeeded();
+        const colorValues = this._computeTextureIfNeeded();
 
         if (this._GLtexCategories !== this.input.numCategories) {
             this._GLtexCategories = this.input.numCategories;
 
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const colorValues = this.colorValues;
-            if (this.type == 'color') {
-                gl.colorValuesStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+
+            if (this.type === rampTypes.COLOR) {
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, colorValues);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -319,10 +333,12 @@ export default class Ramp extends BaseExpression {
 
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
-        if (this.palette.type === paletteTypes.SPRITES) {
+
+        if (this.palette.type === paletteTypes.SPRITE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
+
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         this._computeGLTextureIfNeeded(gl);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);

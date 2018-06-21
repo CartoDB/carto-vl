@@ -89,7 +89,7 @@ export default class Top extends BaseExpression {
                     colorValues[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
                 }
             });
-            gl.colorValuesStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                 colorValues);

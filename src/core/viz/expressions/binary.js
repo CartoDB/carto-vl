@@ -8,6 +8,7 @@ const NUMBERS_TO_NUMBER = 1;
 const NUMBER_AND_COLOR_TO_COLOR = 2;
 const COLORS_TO_COLOR = 4;
 const CATEGORIES_TO_NUMBER = 8;
+const SPRITES_TO_SPRITE = 16;
 
 /**
  * Multiply two numeric expressions.
@@ -33,7 +34,7 @@ const CATEGORIES_TO_NUMBER = 8;
  * @api
  */
 export const Mul = genBinaryOp('mul',
-    NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR | SPRITES_TO_SPRITE,
     (x, y) => x * y,
     (x, y) => `(${x} * ${y})`
 );
@@ -62,7 +63,7 @@ export const Mul = genBinaryOp('mul',
  * @api
  */
 export const Div = genBinaryOp('div',
-    NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR,
+    NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR | SPRITES_TO_SPRITE,
     (x, y) => x / y,
     (x, y) => `(${x} / ${y})`
 );
@@ -91,7 +92,7 @@ export const Div = genBinaryOp('div',
  * @api
  */
 export const Add = genBinaryOp('add',
-    NUMBERS_TO_NUMBER | COLORS_TO_COLOR,
+    NUMBERS_TO_NUMBER | COLORS_TO_COLOR | SPRITES_TO_SPRITE,
     (x, y) => x + y,
     (x, y) => `(${x} + ${y})`
 );
@@ -120,7 +121,7 @@ export const Add = genBinaryOp('add',
  * @api
  */
 export const Sub = genBinaryOp('sub',
-    NUMBERS_TO_NUMBER | COLORS_TO_COLOR,
+    NUMBERS_TO_NUMBER | COLORS_TO_COLOR | SPRITES_TO_SPRITE,
     (x, y) => x - y,
     (x, y) => `(${x} - ${y})`
 );
@@ -484,11 +485,11 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
 
 function getSignatureLoose(a, b) {
     if (!a.type || !b.type) {
-        if (!a.type && !b.type){
+        if (!a.type && !b.type) {
             return undefined;
         }
         const knownType = a.type || b.type;
-        if (knownType == 'color'){
+        if (knownType == 'color') {
             return NUMBER_AND_COLOR_TO_COLOR;
         }
     } else if (a.type == 'number' && b.type == 'number') {
@@ -501,6 +502,11 @@ function getSignatureLoose(a, b) {
         return COLORS_TO_COLOR;
     } else if (a.type == 'category' && b.type == 'category') {
         return CATEGORIES_TO_NUMBER;
+    } else if ((a.type == 'sprite' && b.type == 'color') ||
+        (a.type == 'sprite' && b.type == 'color') ||
+        (a.type == 'sprite' && b.type == 'sprite') ||
+        (a.type == 'color' && b.type == 'sprite')) {
+        return SPRITES_TO_SPRITE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -519,6 +525,11 @@ function getSignature(a, b) {
         return COLORS_TO_COLOR;
     } else if (a.type == 'category' && b.type == 'category') {
         return CATEGORIES_TO_NUMBER;
+    } else if ((a.type == 'sprite' && b.type == 'color') ||
+        (a.type == 'sprite' && b.type == 'color') ||
+        (a.type == 'sprite' && b.type == 'sprite') ||
+        (a.type == 'color' && b.type == 'sprite')) {
+        return SPRITES_TO_SPRITE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -534,6 +545,8 @@ function getReturnTypeFromSignature(signature) {
             return 'color';
         case CATEGORIES_TO_NUMBER:
             return 'number';
+        case SPRITES_TO_SPRITE:
+            return 'sprite';
         default:
             return undefined;
     }
