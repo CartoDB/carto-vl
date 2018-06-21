@@ -88,7 +88,7 @@ export default class Ramp extends BaseExpression {
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
-        this.defaultOtherColor = new NamedColor('gray').eval();
+        this.defaultOtherColor = new NamedColor('gray');
 
         this.palette = palette;
         
@@ -127,43 +127,37 @@ export default class Ramp extends BaseExpression {
         this._computeTextureIfNeeded();
 
         const input = this.input.eval(feature);
-
-        const middle = (input - this.minKey) / (this.maxKey - this.minKey);
         const len = this.pixel.length - 1;
-        const lowIndex = clamp(Math.floor(len * middle), 0, len);
-        const highIndex = clamp(Math.ceil(len * middle), 0, len);
+        const m = input / this.maxKey;
 
-        const low = this.pixel[lowIndex];
-        const high = this.pixel[highIndex];
-
-        const fract = len * middle - Math.floor(len * middle);
+        const lowIndex = clamp(Math.floor(len * m), 0, len);
+        const highIndex = clamp(Math.ceil(len * m), 0, len);
 
         if (this.palette.type !== paletteTypes.COLOR_ARRAY) {
+            const fract = len * m - Math.floor(len * m);
+            const low = this.pixel[lowIndex];
+            const high = this.pixel[highIndex];
+    
             return fract * high + (1 - fract) * low;
         }
+        
+        const index = Math.round(m * 255);
 
-        if (lowIndex === len) {
-            return {
-                r: fract * this.pixel[lowIndex-3] + (1- fract) * this.pixel[highIndex-3],
-                g: fract * this.pixel[lowIndex-2] + (1- fract) * this.pixel[highIndex-2],
-                b: fract * this.pixel[lowIndex-1] + (1- fract) * this.pixel[highIndex-1],
-                a: (fract * this.pixel[lowIndex-0] + (1- fract) * this.pixel[highIndex-0]) / 255
-            };   
-        }
-
-        return {
-            r: fract * this.pixel[lowIndex+0] + (1- fract) * this.pixel[highIndex+0],
-            g: fract * this.pixel[lowIndex+1] + (1- fract) * this.pixel[highIndex+1],
-            b: fract * this.pixel[lowIndex+2] + (1- fract) * this.pixel[highIndex+2],
-            a: (fract * this.pixel[lowIndex+3] + (1- fract) * this.pixel[highIndex+3]) / 255
+        const color = {
+            r: this.pixel[index * 4 + 0],
+            g: this.pixel[index * 4 + 1],
+            b: this.pixel[index * 4 + 2],
+            a: this.pixel[index * 4 + 3] / 255
         };
+        
+        return color;
     }
     
     _compile(meta) {
         super._compile(meta);
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
         
-        if (this.palette.type == paletteTypes.SPRITES) {
+        if (this.palette.type === paletteTypes.SPRITES) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
         }
 
@@ -201,7 +195,7 @@ export default class Ramp extends BaseExpression {
     _getColorsFromPalette(input, palette) {
         return palette.type == paletteTypes.PALETTE
             ? this._getColorsFromPaletteType(input, palette)
-            : this._getColorsFromColorArrayType(input, palette);
+            : this._getColorsFromColorArrayType(palette);
     }
 
     _getColorsFromPaletteType (input, palette) {
@@ -214,8 +208,8 @@ export default class Ramp extends BaseExpression {
             : colors;
     }
 
-    _getColorsFromColorArrayType (input, palette) {
-        return input.isBucketComplete && this.maxKey === palette.colors.length
+    _getColorsFromColorArrayType (palette) {
+        return this.maxKey === palette.colors.length
             ? _addOtherColorToColors(palette.colors, this.defaultOtherColor)
             : palette.colors;
     }
@@ -271,11 +265,11 @@ export default class Ramp extends BaseExpression {
             const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
             const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-            
-            pixel[4 * i + 0] = v.r * 256;
-            pixel[4 * i + 1] = v.g * 256;
-            pixel[4 * i + 2] = v.b * 256;
-            pixel[4 * i + 3] = v.a * 255;
+
+            pixel[4 * i + 0] = Math.round(v.r * 255);
+            pixel[4 * i + 1] = Math.round(v.g * 255);
+            pixel[4 * i + 2] = Math.round(v.b * 255);
+            pixel[4 * i + 3] = Math.round(v.a * 255);
         }
 
         return pixel;
@@ -345,6 +339,7 @@ function interpolate(low, high, m) {
         b: low.b,
         a: low.a,
     });
+
     const cielabHigh = sRGBToCielab({
         r: high.r,
         g: high.g,
