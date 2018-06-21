@@ -174,23 +174,26 @@ export default class Ramp extends BaseExpression {
 
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
+        let preface;
+        let inline;
+
         if (this.palette.type == '') {
             const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
-            return {
-                preface: input.preface + sprites.preface,
-                inline: `${sprites.inline}(spriteUV, ${input.inline})`
-            };
+            
+            preface = input.preface + sprites.preface;
+            inline = `${sprites.inline}(spriteUV, ${input.inline})`;
         }
-        return {
-            preface: this._prefaceCode(input.preface + `
-        uniform sampler2D texRamp${this._uid};
-        uniform float keyMin${this._uid};
-        uniform float keyWidth${this._uid};
-        `),
-            inline: this.palette.type === paletteTypes.NUMBER_ARRAY ?
-                `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
-                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
-        };
+
+        preface = this._prefaceCode(input.preface + `
+                    uniform sampler2D texRamp${this._uid};
+                    uniform float keyMin${this._uid};
+                    uniform float keyWidth${this._uid};`);
+        
+        inline = this.palette.type === paletteTypes.NUMBER_ARRAY
+            ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
+            : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`;
+
+        return { preface, inline };
     }
     
     _getColorsFromPalette(input, palette) {
@@ -210,8 +213,8 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (palette) {
-        return this.maxKey === palette.colors.length
-            ? _addOtherColorToColors(palette.colors, this.defaultOtherColor)
+        return this.maxKey >= palette.colors.length
+            ? _addOtherColorToColors(palette.colors, this.defaultOtherColor.eval())
             : palette.colors;
     }
 

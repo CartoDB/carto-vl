@@ -186,12 +186,11 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
 
                     it('should use the last color for the last category', () => {
-                        const r = ramp(buckets('E', ['A', 'B', 'C']), [red, blue, purple]);
+                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
                         actual = r.eval();
                         expected = r.defaultOtherColor._nameToRGBA();
-        
                         checkRGBAThreshold.call(this, actual, expected);
                     });
 
