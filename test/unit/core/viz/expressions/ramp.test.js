@@ -113,13 +113,13 @@ describe('src/core/viz/expressions/ramp', () => {
             let expected;
 
             describe('and there are less categories than colors', () => {
-                describe('with "others"', () => {
-                    it('should not show interpolation', () => {
-                        const r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                describe('and not all categories in the dataset have a bucket defined', () => {
+                    xit('should not show interpolation', () => {
+                        const r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                         r._compile(METADATA);
                         actual = r.eval();
-                        expected = blue._nameToRGBA();
+                        expected = yellow._nameToRGBA();
         
                         expect(actual).toEqual(expected);
                     });
@@ -135,13 +135,13 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('without "others"', () => {
+                describe('and all categories in the dataset have a bucket defined', () => {
                     it('should show interpolation', () => {
-                        const r = ramp(buckets('C', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
+                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
 
                         r._compile(METADATA);
                         actual = r.eval();
-                        expected = yellow._nameToRGBA();
+                        expected = orange._nameToRGBA();
         
                         expect(actual).not.toEqual(expected);
                     });
@@ -149,7 +149,7 @@ describe('src/core/viz/expressions/ramp', () => {
             });
 
             describe('and there are the same categories than colors', () => {
-                describe('with "others"', () => {
+                describe('and not all categories in the dataset have a bucket defined', () => {
                     it('should not show interpolation', () => {
                         const categories = ['A', 'B', 'C', 'D'];
                         const colors = [red, blue, yellow, purple];
@@ -161,7 +161,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         });
                     });
 
-                    it('should use the last color for the last category', () => {
+                    xit('should use the last color for the last category', () => {
                         const r = ramp(buckets('E', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
@@ -171,7 +171,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should use the default color for "others"', () => {
+                    xit('should use the default color for "others"', () => {
                         const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
@@ -182,7 +182,7 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('without "others"', () => {
+                describe('and all categories in the dataset have a bucket defined', () => {
                     it('should not show interpolation', () => {
                         const categories = ['A', 'B', 'C', 'D', 'E'];
                         const colors = [red, blue, yellow, purple, green];
@@ -197,27 +197,7 @@ describe('src/core/viz/expressions/ramp', () => {
             });
 
             describe('and there are the more categories than colors', () => {
-                describe('with "others"', () => {
-                    it('should show interpolation', () => {
-                        const r = ramp(buckets('B', ['A', 'B', 'C', 'D']), [red, blue, purple]);
-
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = blue._nameToRGBA();
-        
-                        expect(actual).not.toEqual(expected);
-                    });
-
-                    it('should use the last color for the last category', () => {
-                        const r = ramp(buckets('D', ['A', 'B', 'C', 'D']), [red, blue, purple]);
-
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = purple._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
-                    });
-
+                describe('and not all categories in the dataset have a bucket defined', () => {
                     it('should use the default color for others', () => {
                         const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
 
@@ -225,28 +205,6 @@ describe('src/core/viz/expressions/ramp', () => {
                         actual = r.eval();
                         expected = r.defaultOtherColor._nameToRGBA();
         
-                        expect(actual).toEqual(expected);
-                    });
-                });
-
-                describe('without "others"', () => {
-                    it('should show interpolation', () => {
-                        const r = ramp(buckets('C', ['A', 'B', 'C', 'D', 'E']), [red, blue, purple]);
-
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = blue._nameToRGBA();
-        
-                        expect(actual).not.toEqual(expected);
-                    });
-
-                    it('should use the last color for the last category', () => {
-                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, purple]);
-                        
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = purple._nameToRGBA();
-
                         expect(actual).toEqual(expected);
                     });
                 });
@@ -285,7 +243,7 @@ describe('src/core/viz/expressions/ramp', () => {
                 let actual;
                 let expected;
 
-                describe('with "others"', () => {
+                describe('and not all categories in the dataset have a bucket defined', () => {
                     const CATEGORIES = ['Pontevedra', 'Zaragoza', 'Cordoba', 'Alicante', 'Murcia'];
                     const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
 
@@ -310,7 +268,7 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('without "others"', () => {
+                describe('and all categories in the dataset have a bucket defined', () => {
                     const CATEGORIES = ['Murcia', 'Madrid', 'Pontevedra', 'Barcelona', 'Alicante', 'Cordoba', 'Zaragoza'];
                     const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
                     
