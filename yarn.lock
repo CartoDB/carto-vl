@@ -4034,10 +4034,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-karma-benchmark-reporter@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/karma-benchmark-reporter/-/karma-benchmark-reporter-0.1.1.tgz#3b7e49f05700e428ff10824ad0d410ae2d07d27a"
-
 karma-benchmark@^0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/karma-benchmark/-/karma-benchmark-0.7.1.tgz#21e20071b7334853208f7c594f1c1ffe26e8ce5a"
@@ -4046,6 +4042,10 @@ karma-benchmark@^0.7.1:
     karma "1.3.0"
     lodash "4.17.4"
     platform "1.3.3"
+
+karma-carto-benchmark-reporter@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/karma-carto-benchmark-reporter/-/karma-carto-benchmark-reporter-0.0.0.tgz#f786bfb717039ed5b2b2283a50c3cc0481ca05a6"
 
 karma-chrome-launcher@^2.2.0:
   version "2.2.0"

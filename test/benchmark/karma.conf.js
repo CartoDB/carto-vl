@@ -2,7 +2,7 @@ module.exports = function (config) {
     config.set({
         frameworks: ['benchmark'],
         files: ['index.test.js'],
-        reporters: ['benchmark'],
+        reporters: ['carto-benchmark'],
         port: 9876,  // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
