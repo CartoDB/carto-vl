@@ -114,6 +114,21 @@
             ]
         },
         {
+            "title": "Interactivity",
+            "samples": [
+                {
+                    "title": "Single Sprite",
+                    "desc": "Show a sprite in the place of points",
+                    "file": "sprites/sprite.html"
+                },
+                {
+                    "title": "Multiple Sprites",
+                    "desc": "Show different sprites based on a category",
+                    "file": "sprites/sprite-rmap.html"
+                }
+            ]
+        },
+        {
             "title": "Advanced",
             "samples": [
                 {
@@ -140,6 +155,11 @@
                     "title": "Hurricane Harvey",
                     "desc": "Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall. Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.",
                     "file": "advanced/hurricane-harvey.html"
+                },
+                {
+                    "title": "Torque controls",
+                    "desc": "Control torque animations",
+                    "file": "advanced/torque-controls.html"
                 }
             ]
         }
