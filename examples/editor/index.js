@@ -124,79 +124,77 @@ map.on('load', () => {
     let index = 0; //vizs.length - 1;
     updateMapInfo();
 
-    function updateViz(v) {
+    function updateViz(event) {
+        let v = event.target.value;
         v = v || document.getElementById('styleEntry').value;
         document.getElementById('styleEntry').value = v;
         saveConfig();
         try {
             if (layer) {
-                $('#loader').addClass('spin');
+                // document.getElementById('loader').addClass('spin');
                 document.getElementById('feedback').style.display = 'none';
                 layer.blendToViz(new carto.Viz(v)).then(() => {
-                    $('#loader').removeClass('spin');
+                    // // document.getElementById('loader').removeClass('spin');
                 }).catch(error => {
                     handleError(error);
-                    $('#loader').removeClass('spin');
+                    // document.getElementById('loader').removeClass('spin');
                 });
             }
         } catch (error) {
             handleError(error);
-            $('#loader').removeClass('spin');
+            // // document.getElementById('loader').removeClass('spin');
         }
     }
 
     function barcelona() {
-        $('.step').css('display', 'inline');
-        $('#styleEntry').removeClass('twelve columns').addClass('eight columns');
-        $('#tutorial').text(texts[index]);
+        // document.querySelector('.step').css('display', 'inline');
+        // document.getElementById('tutorial').text(texts[index]);
 
-        $('#dataset').val('spend_data');
-        $('#user').val('cartovl');
-        $('#serverURL').val('https://{user}.carto.com');
+        document.getElementById('dataset').value = 'spend_data';
+        document.getElementById('user').value = 'cartovl';
+        document.getElementById('serverURL').value = 'https://{user}.carto.com';
 
         document.getElementById('styleEntry').value = vizs[index];
         superRefresh({ zoom: 13, center: [2.17, 41.38], basemap: 'DarkMatter' });
     }
 
-    $('#prev').click(() => {
-        $('#prev').attr('disabled', false);
-        $('#next').attr('disabled', false);
-        if (index > 0) {
-            index--;
-            $('#tutorial').text(texts[index]);
-            updateViz(vizs[index]);
-        }
-        if (index == 0) {
-            $('#prev').attr('disabled', true);
-        }
-    });
-    $('#next').click(() => {
-        $('#prev').attr('disabled', false);
-        $('#next').attr('disabled', false);
-        if (index < vizs.length - 1) {
-            index++;
-            $('#tutorial').text(texts[index]);
-            updateViz(vizs[index]);
-        }
-        if (index == vizs.length - 1) {
-            $('#next').prop('disabled', true);
-        }
-    });
+    // document.getElementById('prev').addEventListener('click', () => {
+    //     document.getElementById('prev').attr('disabled', false);
+    //     document.getElementById('next').attr('disabled', false);
+    //     if (index > 0) {
+    //         index--;
+    //         document.getElementById('tutorial').text(texts[index]);
+    //         updateViz(vizs[index]);
+    //     }
+    //     if (index == 0) {
+    //         document.getElementById('prev').attr('disabled', true);
+    //     }
+    // });
+    // document.getElementById('next').addEventListener('click', () => {
+    //     document.getElementById('prev').attr('disabled', false);
+    //     document.getElementById('next').attr('disabled', false);
+    //     if (index < vizs.length - 1) {
+    //         index++;
+    //         document.getElementById('tutorial').text(texts[index]);
+    //         updateViz(vizs[index]);
+    //     }
+    //     if (index == vizs.length - 1) {
+    //         document.getElementById('next').prop('disabled', true);
+    //     }
+    // });
 
-    $('#barcelona').click(barcelona);
-    $('#styleEntry').on('input', () => updateViz());
+    document.getElementById('barcelona').addEventListener('click', barcelona);
+    document.getElementById('styleEntry').addEventListener('input', updateViz);
 
-    $('#dataset').on('input', superRefresh);
-    $('#user').on('input', superRefresh);
-    $('#serverURL').on('input', superRefresh);
+    document.getElementById('dataset').addEventListener('input', superRefresh);
+    document.getElementById('user').addEventListener('input', superRefresh);
+    document.getElementById('serverURL').addEventListener('input', superRefresh);
 
     const addButton = (name, code) => {
         let button = document.createElement('button');
         button.innerText = name;
         button.onclick = () => {
-            $('.step').css('display', 'none');
-            $('#styleEntry').removeClass('eight columns').addClass('twelve columns');
-            $('#tutorial').text('');
+            document.getElementById('tutorial').text('');
             setConfig(code);
         };
         document.getElementById('buttonlist').appendChild(button);
@@ -238,11 +236,11 @@ function getConfig() {
 
 function getJSONConfig() {
     return {
-        a: $('#dataset').val(),
+        a: document.getElementById('dataset').value,
         b: '',
-        c: $('#user').val(),
-        d: $('#serverURL').val(),
-        e: $('#styleEntry').val(),
+        c: document.getElementById('user').value,
+        d: document.getElementById('serverURL').value,
+        e: document.getElementById('styleEntry').value,
         f: map.getCenter(),
         g: map.getZoom(),
         h: basemap
@@ -258,31 +256,31 @@ function setConfig(input) {
     if (c.d == 'carto.com') {
         c.d = 'https://{user}.carto.com';
     }
-    $('#dataset').val(c.a);
-    $('#user').val(c.c);
-    $('#serverURL').val(c.d);
-    $('#styleEntry').val(c.e);
+    document.getElementById('dataset').value = c.a;
+    document.getElementById('user').value = c.c;
+    document.getElementById('serverURL').value = c.d;
+    document.getElementById('styleEntry').value = c.e;
     try {
         superRefresh({ zoom: c.g, center: c.f, basemap: c.h });
     } catch (error) {
         handleError(error);
-        $('#loader').removeClass('spin');
+        // document.getElementById('loader').classList.remove('spin');
     }
 }
 
 const superRefresh = (opts) => {
     opts = opts || {};
-    $('#loader').addClass('spin');
+    // // document.getElementById('loader').addClass('spin');
     document.getElementById('feedback').style.display = 'none';
-    const SourceClass = $('#dataset').val().toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
+    const SourceClass = document.getElementById('dataset').value.toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
     const source = new SourceClass(
-        $('#dataset').val(),
+        document.getElementById('dataset').value,
         {
-            user: $('#user').val(),
+            user: document.getElementById('user').value,
             apiKey: 'default_public'
         },
         {
-            serverURL: $('#serverURL').val()
+            serverURL: document.getElementById('serverURL').value
         }
     );
     const vizStr = document.getElementById('styleEntry').value;
@@ -291,16 +289,16 @@ const superRefresh = (opts) => {
         setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
-            $('#loader').removeClass('spin');
+            // // document.getElementById('loader').removeClass('spin');
         });
         layer.addTo(map, 'watername_ocean');
     } else {
         layer.update(source, viz).then(() => {
             setupMap(opts);
-            $('#loader').removeClass('spin');
+            // // document.getElementById('loader').removeClass('spin');
         }).catch(error => {
             handleError(error);
-            $('#loader').removeClass('spin');
+            // // document.getElementById('loader').removeClass('spin');
         });
     }
 };
