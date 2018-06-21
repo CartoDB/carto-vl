@@ -38,8 +38,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 0,
+      center: [-73.97720677029952, 40.77784846220871],
+      zoom: 13,
       scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
@@ -75,7 +75,10 @@
         }
       });
 
-      const viz = new carto.Viz(`color: ramp(linear($numfloors 0, 20), temps)`);
+      const viz = new carto.Viz(`
+      color: ramp(linear($numfloors 0, 20), temps)
+      strokeWidth: 0
+      `);
       const layer = new carto.Layer('layer', source, viz);
 
       layer.addTo(map, 'watername_ocean');
