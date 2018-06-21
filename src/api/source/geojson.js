@@ -14,7 +14,7 @@ export default class GeoJSON extends Base {
      *
      * @param {object} data - A GeoJSON data object
      * @param {object} options - Options
-     * @param {array<string>} options.dateColumns - List of columns that contain dates. 
+     * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
      * @example
      * const source = new carto.source.GeoJSON({
@@ -91,6 +91,10 @@ export default class GeoJSON extends Base {
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
+    }
+
+    requiresNewMetadata() {
+        return false;
     }
 
     _clone() {
