@@ -50,7 +50,7 @@ export default class Windshaft {
      */
     async getMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
-        this._checkAceptableMNS(MNS);
+        this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
@@ -65,7 +65,18 @@ export default class Windshaft {
         return this.metadata;
     }
 
-    _checkAceptableMNS(MNS) {
+    requiresNewMetadata(viz){
+        const MNS = viz.getMinimumNeededSchema();
+        this._checkAcceptableMNS(MNS);
+        const resolution = viz.resolution;
+        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
+        if (!MNS.columns.includes('cartodb_id')) {
+            MNS.columns.push('cartodb_id');
+        }
+        return this._needToInstantiate(MNS, resolution, filtering);
+    }
+
+    _checkAcceptableMNS(MNS) {
         const columnAgg = {};
         MNS.columns.map(column => {
             const basename = R.schema.column.getBase(column);

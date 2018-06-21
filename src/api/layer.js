@@ -217,7 +217,7 @@ export default class Layer {
         try {
             this._checkViz(viz);
             viz.setDefaultsIfRequired(this.metadata.geomType);
-            if (this._viz) {
+            if (this._viz && this._source.requiresNewMetadata(viz)) {
                 Object.keys(this._viz.variables).map(varName => {
                     // If an existing variable is not re-declared we add it to the new viz
                     if (!viz.variables[varName]) {

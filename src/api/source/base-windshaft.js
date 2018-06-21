@@ -27,6 +27,10 @@ export default class BaseWindshaft extends Base {
         this._client.bindLayer(...args);
     }
 
+    requiresNewMetadata(viz){
+        return this._client.requiresNewMetadata(viz);
+    }
+
     requestMetadata(viz) {
         return this._client.getMetadata(viz);
     }
