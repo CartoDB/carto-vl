@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, checkRGBAThreshold } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes } from '../../../../../src/core/viz/functions';
 import * as s from '../../../../../src/core/viz/functions';
@@ -171,11 +171,17 @@ describe('src/core/viz/expressions/ramp', () => {
                     it('should not show interpolation', () => {
                         const categories = ['A', 'B', 'C', 'D'];
                         const colors = [red, blue, yellow, purple];
-    
+
                         categories.forEach((category, index) => {
                             const r = ramp(buckets(category, categories), colors);
-                            r._compile();
-                            expect(r.eval()).toEqual(colors[index]._nameToRGBA());
+                            let actual, expected;
+
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = colors[index]._nameToRGBA();
+                            
+                            checkRGBAThreshold.call(this, actual, expected);
                         });
                     });
 
@@ -186,7 +192,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         actual = r.eval();
                         expected = r.defaultOtherColor._nameToRGBA();
         
-                        expect(actual).toEqual(expected);
+                        checkRGBAThreshold.call(this, actual, expected);
                     });
 
                     it('should use the default color for "others"', () => {
@@ -204,11 +210,17 @@ describe('src/core/viz/expressions/ramp', () => {
                     it('should not show interpolation', () => {
                         const categories = ['A', 'B', 'C', 'D', 'E'];
                         const colors = [red, blue, yellow, purple, green];
-    
+
                         categories.forEach((category, index) => {
                             const r = ramp(buckets(category, categories), colors);
-                            r._compile();
-                            expect(r.eval()).toEqual(colors[index]._nameToRGBA());
+                            let actual, expected;
+
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = colors[index]._nameToRGBA();
+                            
+                            checkRGBAThreshold.call(this, actual, expected);
                         });
                     });
                 });
