@@ -151,10 +151,16 @@ map.on('load', () => {
     }
 
     document.getElementById('prev-button').addEventListener('click', () => {
+        if (document.getElementById('dataset').value !== 'spend_data') {
+            barcelona();
+        }
         index = mod(--index, vizs.length);
         updateViz(vizs[index]);
     });
     document.getElementById('next-button').addEventListener('click', () => {
+        if (document.getElementById('dataset').value !== 'spend_data') {
+            barcelona();
+        }
         index = mod(++index, vizs.length);
         updateViz(vizs[index]);
     });
