@@ -65,7 +65,7 @@ export default class Windshaft {
         return this.metadata;
     }
 
-    requiresNewMetadata(viz){
+    requiresNewMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
@@ -367,12 +367,11 @@ export default class Windshaft {
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);
         });
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
+
         Object.keys(properties).forEach(propertyName => {
             const property = properties[propertyName];
             if (property.type === 'category' && property.categories) {
                 property.categories.forEach(category => {
-                    metadata.categorizeString(category.category);
                     category.name = category.category;
                     delete category.category;
                 });
@@ -386,6 +385,7 @@ export default class Windshaft {
             }
         });
 
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
         return metadata;
     }
 }
