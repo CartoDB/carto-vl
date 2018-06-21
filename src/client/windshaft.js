@@ -50,6 +50,7 @@ export default class Windshaft {
      */
     async getMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
+        this._checkAceptableMNS(MNS);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
@@ -62,6 +63,19 @@ export default class Windshaft {
             this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
+    }
+
+    _checkAceptableMNS(MNS) {
+        const columnAgg = {};
+        MNS.columns.map(column => {
+            const basename = R.schema.column.getBase(column);
+            const isAgg = R.schema.column.isAggregated(column);
+            if (columnAgg[basename] === undefined) {
+                columnAgg[basename] = isAgg;
+            } else if (columnAgg[basename] !== isAgg) {
+                throw new Error(`Incompatible combination of cluster aggregation with un-aggregated property: '${basename}'`);
+            }
+        });
     }
 
     /**
