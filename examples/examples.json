@@ -103,6 +103,10 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
+                },
+                {
+                    "title": "Animation controls",
+                    "file": "interactivity/animation-controls.html"
                 }
             ]
         },
@@ -128,10 +132,6 @@
                 {
                     "title": "Hurricane Harvey",
                     "file": "advanced/hurricane-harvey.html"
-                },
-                {
-                    "title": "Animation controls",
-                    "file": "advanced/animation-controls.html"
                 }
             ]
         }
