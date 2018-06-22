@@ -135,7 +135,7 @@ describe('src/core/viz/expressions/binary', () => {
             test('pow', -2, -3, -0.125);
         });
 
-        fdescribe('gt', () => {
+        describe('gt', () => {
             test('gt', 0, 0, 0);
             test('gt', 0, 1, 0);
             test('gt', 1, 0, 1);
@@ -147,7 +147,7 @@ describe('src/core/viz/expressions/binary', () => {
             test('gt', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
-        describe('gte', () => {
+        fdescribe('gte', () => {
             test('gte', 0, 0, 1);
             test('gte', 0, 1, 0);
             test('gte', 1, 0, 1);
@@ -155,9 +155,12 @@ describe('src/core/viz/expressions/binary', () => {
             test('gte', 2, 3, 0);
             test('gte', 3, 2, 1);
             test('gte', -3, 2, 0);
+            test('gte', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('gte', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
+            test('gte', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
         });
 
-        describe('lt', () => {
+        fdescribe('lt', () => {
             test('lt', 0, 0, 0);
             test('lt', 0, 1, 1);
             test('lt', 1, 0, 0);
@@ -165,6 +168,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('lt', 2, 3, 1);
             test('lt', 3, 2, 0);
             test('lt', -3, 2, 1);
+            test('lt', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('lt', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
         describe('lte', () => {
@@ -175,6 +180,9 @@ describe('src/core/viz/expressions/binary', () => {
             test('lte', 2, 3, 1);
             test('lte', 3, 2, 0);
             test('lte', -3, 2, 1);
+            test('lte', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('lte', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
+            test('lte', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
         });
 
         describe('eq', () => {
@@ -183,6 +191,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('eq', 1, 0, 0);
             test('eq', 2, 2, 1);
             test('eq', 2, 3, 0);
+            test('eq', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('eq', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
         describe('neq', () => {
@@ -191,6 +201,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('neq', 1, 0, 1);
             test('neq', 2, 2, 0);
             test('neq', 2, 3, 1);
+            test('neq', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('neq', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
         function test(fn, param1, param2, expected) {
