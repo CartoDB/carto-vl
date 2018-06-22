@@ -74,6 +74,10 @@
                 {
                     "title": "Multiple Sprites",
                     "file": "styling/multiple-sprites.html"
+                },
+                {
+                    "title": "Raw Sprite",
+                    "file": "styling/raw-sprite.html"
                 }
             ]
         },
@@ -99,6 +103,10 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
+                },
+                {
+                    "title": "Animation controls",
+                    "file": "interactivity/animation-controls.html"
                 }
             ]
         },
@@ -124,10 +132,6 @@
                 {
                     "title": "Hurricane Harvey",
                     "file": "advanced/hurricane-harvey.html"
-                },
-                {
-                    "title": "Animation controls",
-                    "file": "advanced/animation-controls.html"
                 }
             ]
         }
