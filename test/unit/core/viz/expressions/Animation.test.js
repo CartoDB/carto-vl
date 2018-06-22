@@ -112,7 +112,7 @@ describe('src/core/viz/expressions/Animation', () => {
         it('should update the simulation time when the date is valid', () => {
             const date = new Date('2018-06-14T00:00:00.070Z');
             t.setTimestamp(date);
-            expect(t.getTimestamp().getTime()).toEqual(date.getTime());
+            expect(t.getCurrentValue().getTime()).toEqual(date.getTime());
             expect(t.getProgress()).toEqual(0.8);
         });
     });

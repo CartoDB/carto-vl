@@ -233,7 +233,6 @@ import Sprite from './expressions/sprite';
 import Placement from './expressions/placement';
 import Sprites from './expressions/sprites';
 
-
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
@@ -334,6 +333,7 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
+export const torque = (...args) => new Animation(...args);
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);

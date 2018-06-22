@@ -2,9 +2,6 @@
 
 Using CARTO VL you can make animated maps of points, lines, and polygons using the [`animation`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsanimation) expression.
 
-**Note:**
-While the expression name *animation* is inspired by another [CARTO technology](https://carto.com/animation/) for temporal mapping, the two are not equal. When creating temporal maps with CARTO VL, always refer to this documentation.
-
 ### Animation expression
 
 The general syntax for animating data in CARTO VL is:
