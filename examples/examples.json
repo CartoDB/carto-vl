@@ -80,6 +80,16 @@
                     "title": "Zoom based styling",
                     "desc": "Set symbol size proportionate to zoom",
                     "file": "styling/zoom.html"
+                },
+                {
+                    "title": "Single Sprite",
+                    "desc": "Show a sprite instead of points",
+                    "file": "styling/sprite.html"
+                },
+                {
+                    "title": "Multiple Sprites",
+                    "desc": "Show different sprites based on a category property",
+                    "file": "styling/multiple-sprites.html"
                 }
             ]
         },
@@ -114,21 +124,6 @@
             ]
         },
         {
-            "title": "Sprites",
-            "samples": [
-                {
-                    "title": "Single Sprite",
-                    "desc": "Show a sprite in the place of points",
-                    "file": "sprites/sprite.html"
-                },
-                {
-                    "title": "Multiple Sprites",
-                    "desc": "Show different sprites based on a category",
-                    "file": "sprites/sprite-ramp.html"
-                }
-            ]
-        },
-        {
             "title": "Advanced",
             "samples": [
                 {
@@ -157,9 +152,9 @@
                     "file": "advanced/hurricane-harvey.html"
                 },
                 {
-                    "title": "Torque controls",
+                    "title": "Animation controls",
                     "desc": "Control torque animations",
-                    "file": "advanced/torque-controls.html"
+                    "file": "advanced/animation-controls.html"
                 }
             ]
         }
