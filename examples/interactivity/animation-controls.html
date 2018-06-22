@@ -267,7 +267,7 @@
         }
 
         $timeRange.onchange = () => {
-            viz.variables.animation.setProgress($timeRange.value);
+            viz.variables.animation.setProgressPct($timeRange.value);
         }
 
         $playBtn.onclick = () => {
@@ -284,7 +284,7 @@
 
         let last = $timeRange.value;
         $timeRange.onchange = () => {
-            viz.variables.animation.setProgress($timeRange.value);
+            viz.variables.animation.setProgressPct($timeRange.value);
             last = $timeRange.value;
         }
         layer.on('updated', () => {

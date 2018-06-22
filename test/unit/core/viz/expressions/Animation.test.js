@@ -78,13 +78,13 @@ describe('src/core/viz/expressions/Animation', () => {
         });
     });
 
-    describe('.setProgress', () => {
-        it('should update the simulation progress', () => {
+    describe('.setProgressPct', () => {
+        it('should update the simulation progress percentage', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(5);
             expect(t.getProgress()).toEqual(0.5);
-            t.setProgress(0.4);
+            t.setProgressPct(0.4);
             t._setTimestamp(6);
             expect(t.getProgress()).toEqual(0.5);
         });
@@ -112,7 +112,7 @@ describe('src/core/viz/expressions/Animation', () => {
         it('should update the simulation time when the date is valid', () => {
             const date = new Date('2018-06-14T00:00:00.070Z');
             t.setTimestamp(date);
-            expect(t.getCurrentValue().getTime()).toEqual(date.getTime());
+            expect(t.getProgressPct().getTime()).toEqual(date.getTime());
             expect(t.getProgress()).toEqual(0.8);
         });
     });

@@ -33,7 +33,7 @@ import { castDate } from '../../../api/util';
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
  *
- * @example <caption>Using the `getCurrentValue` method to get the animation current value</caption>
+ * @example <caption>Using the `getProgressValue` method to get the animation current value</caption>
  * const s = carto.expressions;
  * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
  * const animationStyle = {
@@ -42,7 +42,7 @@ import { castDate } from '../../../api/util';
  *   filter: animationExpr
  * };
  * layer.on('updated', () => {
- *   let currTime = Math.floor(animationExpr.getCurrentValue());
+ *   let currTime = Math.floor(animationExpr.getProgressValue());
  *   document.getElementById('timestamp').innerHTML = currTime;
  * });
  *
@@ -135,9 +135,9 @@ export class Animation extends BaseExpression {
      * @returns {Number|Date} Current time stamp of the animation. If the animation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
      * @memberof carto.expressions.Animation
      * @instance
-     * @name getCurrentValue
+     * @name getProgressValue
      */
-    getCurrentValue() {
+    getProgressValue() {
         const progress = this.progress.eval(); //from 0 to 1
         const min = this.input.min.eval();
         const max = this.input.max.eval();
@@ -183,9 +183,9 @@ export class Animation extends BaseExpression {
      * @api
      * @instance
      * @memberof carto.expressions.Animation
-     * @name getProgress
+     * @name getProgressPct
      */
-    getProgress() {
+    getProgressPct() {
         return this.progress.value;
     }
 
@@ -195,13 +195,15 @@ export class Animation extends BaseExpression {
      * @api
      * @instance
      * @memberof carto.expressions.Animation
-     * @name setProgress
+     * @name setProgressPct
      */
-    setProgress(progress) {
+    setProgressPct(progress) {
         progress = Number.parseFloat(progress);
+        
         if (progress < 0 || progress > 1) {
-            throw new TypeError(`animation.setProgress requires a number between 0 and 1 as parameter but got: ${progress}`);
+            throw new TypeError(`animation.setProgressPct requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
+
         this.progress.expr = progress;
     }
 
