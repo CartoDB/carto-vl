@@ -14,5 +14,8 @@ module.exports = {
     mode: 'development',
     plugins: [
         new webpack.BannerPlugin(banner)
-    ]
+    ],
+    module: {
+        rules: [{ test: /\.glsl$/, use: 'shader-loader' }]
+    }
 };

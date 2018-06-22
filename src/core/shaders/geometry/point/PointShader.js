@@ -1,10 +1,10 @@
-import { compileProgram } from '../utils';
-import { VS, FS } from './point-glsl';
-
+import { compileProgram } from '../../utils';
+import pointVertexShader from './point-vertex-shader.glsl';
+import pointFragmentShader from './point-fragment-shader.glsl';
 
 export default class PointShader {
     constructor(gl) {
-        Object.assign(this,  compileProgram(gl, VS, FS));
+        Object.assign(this,  compileProgram(gl, pointVertexShader, pointFragmentShader));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
