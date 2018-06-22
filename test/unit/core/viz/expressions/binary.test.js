@@ -135,7 +135,7 @@ describe('src/core/viz/expressions/binary', () => {
             test('pow', -2, -3, -0.125);
         });
 
-        describe('gt', () => {
+        fdescribe('gt', () => {
             test('gt', 0, 0, 0);
             test('gt', 0, 1, 0);
             test('gt', 1, 0, 1);
@@ -143,6 +143,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('gt', 2, 3, 0);
             test('gt', 3, 2, 1);
             test('gt', -3, 2, 0);
+            test('gt', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('gt', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
         describe('gte', () => {
