@@ -9,7 +9,7 @@ const NUMBER_AND_COLOR_TO_COLOR = 2;
 const COLORS_TO_COLOR = 4;
 const CATEGORIES_TO_NUMBER = 8;
 const SPRITES_TO_SPRITE = 16;
-
+const DATES_TO_NUMBER = 32;
 /**
  * Multiply two numeric expressions.
  *
@@ -211,7 +211,7 @@ export const Pow = genBinaryOp('pow',
  * @api
  */
 export const GreaterThan = genBinaryOp('greaterThan',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x > y ? 1 : 0,
     (x, y) => `(${x}>${y}? 1.:0.)`
 );
@@ -462,12 +462,15 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
         }
+
         get value() {
             return this.eval();
         }
+
         eval(feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
+
         _compile(meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
@@ -507,6 +510,8 @@ function getSignatureLoose(a, b) {
         (a.type == 'sprite' && b.type == 'sprite') ||
         (a.type == 'color' && b.type == 'sprite')) {
         return SPRITES_TO_SPRITE;
+    } else if (a.type === 'time' && b.type === 'time') {
+        return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -530,6 +535,8 @@ function getSignature(a, b) {
         (a.type == 'sprite' && b.type == 'sprite') ||
         (a.type == 'color' && b.type == 'sprite')) {
         return SPRITES_TO_SPRITE;
+    } else if (a.type === 'time' && b.type === 'time') {
+        return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }

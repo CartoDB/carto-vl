@@ -32,11 +32,11 @@ export default class Time extends BaseExpression {
         this.date = util.castDate(date);
         this.inlineMaker = inline => inline._impostor;
     }
-    
+
     _compile(meta) {
         this.metadata = meta;
-        const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
-        const inputMax = this.metadata.columns.find(c => c.name == this.dateProperty.name).max.getTime();
+        const inputMin = util.castDate(this.metadata.columns.find(c => c.name).min).getTime();
+        const inputMax = util.castDate(this.metadata.columns.find(c => c.name).max).getTime();
         const inputDiff = inputMax - inputMin;
 
         const t = this.date.getTime();
@@ -44,19 +44,19 @@ export default class Time extends BaseExpression {
 
         this._impostor.expr = tMapped;
     }
-    
+
     getMappedValue() {
         return this._impostor.expr;
     }
-    
+
     get value() {
         return this.eval();
     }
-    
+
     eval() {
         return this.date;
     }
-    
+
     isAnimated() {
         return false;
     }
