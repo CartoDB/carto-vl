@@ -119,34 +119,35 @@ export default class Ramp extends BaseExpression {
     }
 
     eval(feature) {
-        const colorValues = this._computeTextureIfNeeded();
-        const input = this.input.eval(feature);
-        const numColorValues = colorValues.length - 1;
-        const m = input / this.maxKey;
+        const pixelValues = this._computeTextureIfNeeded();
 
-        return this.palette.type === paletteTypes.NUMBER_ARRAY
-            ? this._getColorValue(colorValues, numColorValues, m)
-            : this._getRGBAColorValue(colorValues, m);
+        const input = this.input.eval(feature);
+        const numValues = pixelValues.length - 1;
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+
+        return this.type === rampTypes.NUMBER
+            ? this._getValue(pixelValues, numValues, m)
+            : this._getColorValue(pixelValues, m);
     }
 
-    _getColorValue(colorValues, numColorValues, m) {
-        const lowIndex = clamp(Math.floor(numColorValues * m), 0, numColorValues);
-        const highIndex = clamp(Math.ceil(numColorValues * m), 0, numColorValues);
-        const fract = numColorValues * m - Math.floor(numColorValues * m);
-        const low = colorValues[lowIndex];
-        const high = colorValues[highIndex];
+    _getValue(pixelValues, numValues, m) {
+        const lowIndex = clamp(Math.floor(numValues * m), 0, numValues);
+        const highIndex = clamp(Math.ceil(numValues * m), 0, numValues);
+        const fract = numValues * m - Math.floor(numValues * m);
+        const low = pixelValues[lowIndex];
+        const high = pixelValues[highIndex];
 
         return Math.round(fract * high + (1 - fract) * low);
     }
     
-    _getRGBAColorValue(colorValues, m) {
+    _getColorValue(pixelValues, m) {
         const index = Math.round(m * COLOR_VALUES);
 
         return {
-            r: Math.round(colorValues[index * 4 + 0]),
-            g: Math.round(colorValues[index * 4 + 1]),
-            b: Math.round(colorValues[index * 4 + 2]),
-            a: Math.round(colorValues[index * 4 + 3]) / COLOR_VALUES
+            r: Math.round(pixelValues[index * 4 + 0]),
+            g: Math.round(pixelValues[index * 4 + 1]),
+            b: Math.round(pixelValues[index * 4 + 2]),
+            a: Math.round(pixelValues[index * 4 + 3]) / COLOR_VALUES
         };
     }
     
@@ -256,18 +257,16 @@ export default class Ramp extends BaseExpression {
                 this.maxKey = this.input.numCategories - 1;
             }
 
-            const colorValues = this.type === rampTypes.COLOR
+            return this.type === rampTypes.COLOR
                 ? this._computeTextureColor()
                 : this._computeTexture();
-
-            return colorValues;
         }
 
         return [];
     }
 
     _computeTextureColor() {
-        const colorValues = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
+        const pixelValues = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
         
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
@@ -278,45 +277,45 @@ export default class Ramp extends BaseExpression {
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
-            colorValues[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
-            colorValues[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
-            colorValues[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
-            colorValues[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
+            pixelValues[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
+            pixelValues[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
+            pixelValues[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
+            pixelValues[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
         }
 
-        return colorValues;
+        return pixelValues;
     }
 
     _computeTexture() {
-        const colorValues = new Float32Array(COLOR_VALUES);
+        const pixelValues = new Float32Array(COLOR_ARRAY_LENGTH);
         const floats = this.palette.floats;
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
             const vlowRaw = floats[Math.floor(i / COLOR_VALUES * (floats.length - 1))];
             const vhighRaw = floats[Math.ceil(i / COLOR_VALUES * (floats.length - 1))];
             const m = i / COLOR_VALUES * (floats.length - 1) - Math.floor(i / COLOR_VALUES * (floats.length - 1));
-            colorValues[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+            pixelValues[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
-        return colorValues;
+        return pixelValues;
     }
 
     _computeGLTextureIfNeeded(gl) {
-        const colorValues = this._computeTextureIfNeeded();
+        const pixelValues = this._computeTextureIfNeeded();
 
         if (this._GLtexCategories !== this.input.numCategories) {
             this._GLtexCategories = this.input.numCategories;
 
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
+            
             if (this.type === rampTypes.COLOR) {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, colorValues);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixelValues);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, colorValues);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, pixelValues);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
