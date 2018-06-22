@@ -1,168 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta charset='utf-8' />
-    <title>Display a map</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-        crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CARTO VL EDITOR</title>
+
     <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
     <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
-    <link href='css/normalize.css' rel='stylesheet' />
-    <link href='css/skeleton.css' rel='stylesheet' />
-    <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
     <script src="../../dist/carto-vl.js"></script>
     <script src="index.js" defer></script>
-    <style>
-        html,
-        body,
-        .map {
-            width: 100%;
-            height: 100%;
-        }
-
-        .mapClass {
-            width: 100%;
-            height: 70%;
-            position: relative;
-        }
-
-        #good {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-        }
-
-        textarea {
-            min-height: 40px;
-            height: auto;
-            max-height: 400px;
-            font-size: 14px;
-            font-family: monospace;
-        }
-
-        .text {
-            height: 200px;
-        }
-
-        #styleEntry {
-            height: 180px;
-        }
-
-
-        #feedback {
-            right: 10px;
-            top: 10px;
-            position: absolute;
-            z-index: 1;
-            width: 650px;
-            height: 580px;
-            max-height: 580px;
-            opacity: 0.75;
-            background-color: rgba(218, 22, 22, 0.637);
-            color: #ffffff;
-            font-weight: bold;
-            display: none;
-        }
-
-        #title {
-            float: left;
-        }
-        #basemap {
-            float: right;
-            margin-top: 12px;
-        }
-        #basemap label {
-            display: inline;
-            margin: 0 8px;
-        }
-        #basemap input {
-            margin: 0 8px;
-        }
-
-        .step {
-            height: 180px;
-            display: none;
-        }
-
-        #popup {
-            display: none;
-            position: absolute;
-            z-index: 1;
-            height: 120px;
-            opacity: 0.75;
-            color: #161616;
-            font-weight: bold;
-            overflow: hidden;
-        }
-
-        .map-info{
-            font-size: 13px;
-            padding: 0 5px;
-            position: absolute;
-            bottom: 0;
-            background: rgba(255, 255, 255, .5);
-        }
-
-        .spin {
-          position: absolute;
-          border: 8px solid #FFF3;
-          border-radius: 50%;
-          border-top: 8px solid #0095dd;
-          top: 45%;
-          left: 45%;
-          width: 60px;
-          height: 60px;
-          -webkit-animation: spin 2s linear infinite; /* Safari */
-          animation: spin 2s linear infinite;
-          z-index: 100000;
-        }
-
-        /* Safari */
-        @-webkit-keyframes spin {
-          0% { -webkit-transform: rotate(0deg); }
-          100% { -webkit-transform: rotate(360deg); }
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 
 <body>
-    <textarea id='popup'>test</textarea>
-    <div id='mapDiv' class='mapClass u-full-width'>
-        <textarea class="u-full-width" id="feedback">¿?</textarea>
-        <div id="loader"></div>
-        <div id='map' class='map'></div>
-        <div class="map-info"></div>
-    </div>
-    <div class="container">
-        <div class="row">
-            <div class="row">
-              <h3 id='title'>~ 0 features</h3>
-              <div id="basemap"></div>
+    <div class="cvl-Container">
+        <aside class="cvl-Sidebar">
+            <header class="cvl-Sidebar--Header">
+                <div class="cvl-Logo">
+                    <img class="cvl-Logo-Image" src="https://carto.com/developers/img/icons/carto-vl.svg" alt="CartoVL logo">
+                    <p class="cvl-Logo-Title">CARTO VL Editor</p>
+                </div>
+
+                <a class="cvl-Logo-Link" href="https://carto.com/developers/carto-vl/" target="_blank">Documentation</a>
+            </header>
+
+            <section class="cvl-Sidebar--Config">
+                <h1>Local config</h1>
+                <label class="cvl-Sidebar--label" for="user"> Username</label>
+                <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl" />
+                <label class="cvl-Sidebar--label" for="user"> Dataset/Query</label>
+                <textarea class="cvl-Sidebar--Input" id="dataset" value="spend_data"></textarea>
+                <label class="cvl-Sidebar--label" for="user"> Server URL</label>
+                <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com" />
+                <div id="basemap" class="cvl-Sidebar--BasemapConfig"></div>
+            </section>
+
+            <section class="cvl-Sidebar--Config">
+                <h1>Settings</h1>
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="fullscreen">Fullscreen</button>
+                    <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
+                </div>
+            </section>
+
+            <section class="cvl-Sidebar--Examples">
+                <h1>Examples</h1>
+                <div class="cvl-ButtonList" id='buttonlist'>
+                    <button id='barcelona'>Barcelona (with tutorial)</button>
+                </div>
+            </section>
+
+            <section class="cvl-Sidebar--Debug">
+                <h1>Debugging</h1>
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="prev-button">PREV</button>
+                    <button id="next-button">NEXT</button>
+                </div>
+            </section>
+
+            <section class="cvl-Sidebar--Export">
+                <h1>Export map</h1>
+
+                <div class="cvl-ButtonList cvl-ButtonList--Primary">
+                    <button id="export-map-button">Generate HTML</button>
+                    <button id="copy-html-button">Copy HTML</button>
+                </div>
+
+                <textarea id="map-textarea" class="cvl-Sidebar--Input cvl-Sidebar--Textarea" name="map-textarea" rows="12"></textarea>
+            </section>
+        </aside>
+
+        <main class="cvl-Main">
+            <div class="cvl-Main--MapWrapper">
+                <div class="loader"></div>
+                <div id='map' class='map'></div>
+                <div class="cvl-MapInfo map-info"></div>
+                <p class="cvl-FeaturesInfo" id='title'>~ 0 features</p>
+                <pre class="cvl-Debugger" id="feedback">¿?</pre>
             </div>
-            <h5 id='tutorial'></h5>
-            <div class='row'>
-                <button id='prev' class='two columns step'>Previous</button>
-                <textarea class="twelve columns" id="styleEntry"></textarea>
-                <button id='next' class='two columns step'>Next</button>
-            </div>
-            <div class='row'>
-                <textarea class="four columns" id="user">cartovl</textarea>
-                <textarea class="four columns" id="dataset">spend_data</textarea>
-                <textarea class="four columns" id="serverURL">https://{user}.carto.com</textarea>
-            </div>
-            <div id='buttonlist'>
-                <button id="fullscreen">Fullscreen</button>
-                <button id='clean' onclick="location.hash='';location.reload();">Clean & Refresh</button>
-                <button id='barcelona'>Barcelona (with tutorial)</button>
-            </div>
-        </div>
+            <textarea class="cvl-Sidebar--Input cvl-Main--Textarea" name="vizSpec" id="styleEntry" cols="30" rows="12"></textarea>
+        </main>
     </div>
 </body>
+
 </html>

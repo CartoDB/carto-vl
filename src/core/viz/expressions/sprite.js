@@ -4,7 +4,9 @@ import { checkString } from './utils';
 /**
  * Sprite. Load an image and use it as a symbol.
  *
- * Note: images have to be square
+ * Note: sprite RGB color will be overridden if the viz `color` property is set.
+ *
+ * Limitation: images have to be square.
  *
  * @param {string} url - Image path
  *
@@ -40,6 +42,7 @@ export default class Sprite extends Base {
             };
             this.image.onerror = reject;
             this.image.src = this._url;
+            this.image.crossOrigin = 'anonymous';
         });
     }
 

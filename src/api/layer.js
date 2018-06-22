@@ -136,6 +136,19 @@ export default class Layer {
         }
     }
 
+    /**
+     * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.: the viz will be changed with the source, not before it.
+     * This method will return a promise that will be resolved once the source and the visualization are validated.
+     * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
+     * The promise will be rejected also if this method is invoked again before the first promise is resolved.
+     * If the promise is rejected the layer's source and viz won't be changed.
+     * @param {carto.source.Base} source - the new Source object
+     * @param {carto.Viz} viz - the new Viz object
+     * @memberof carto.Layer
+     * @async
+     * @instance
+     * @api
+     */
     async update(source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
