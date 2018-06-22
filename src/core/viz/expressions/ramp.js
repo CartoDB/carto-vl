@@ -119,17 +119,12 @@ export default class Ramp extends BaseExpression {
     }
 
     eval(feature) {
-        if (this.palette.type !== paletteTypes.NUMBER_ARRAY
-           && this.palette.type !== paletteTypes.COLOR_ARRAY) {
-            super.eval(feature);
-        }
-
         const colorValues = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
         const numColorValues = colorValues.length - 1;
         const m = input / this.maxKey;
 
-        return this.palette.type !== paletteTypes.COLOR_ARRAY
+        return this.palette.type === paletteTypes.NUMBER_ARRAY
             ? this._getColorValue(colorValues, numColorValues, m)
             : this._getRGBAColorValue(colorValues, m);
     }
