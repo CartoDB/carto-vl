@@ -6,7 +6,7 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
 
-describe('src/core/viz/expressions/binary', () => {
+fdescribe('src/core/viz/expressions/binary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
             validateDynamicTypeErrors('mul', ['number', 'category']);
@@ -143,6 +143,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('gt', 2, 3, 0);
             test('gt', 3, 2, 1);
             test('gt', -3, 2, 0);
+            test('gt', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('gt', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
         });
 
         describe('gte', () => {
@@ -153,6 +155,9 @@ describe('src/core/viz/expressions/binary', () => {
             test('gte', 2, 3, 0);
             test('gte', 3, 2, 1);
             test('gte', -3, 2, 0);
+            test('gte', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('gte', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 1);
+            test('gte', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
         });
 
         describe('lt', () => {
@@ -163,6 +168,8 @@ describe('src/core/viz/expressions/binary', () => {
             test('lt', 2, 3, 1);
             test('lt', 3, 2, 0);
             test('lt', -3, 2, 1);
+            test('lt', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
+            test('lt', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 0);
         });
 
         describe('lte', () => {
@@ -173,6 +180,9 @@ describe('src/core/viz/expressions/binary', () => {
             test('lte', 2, 3, 1);
             test('lte', 3, 2, 0);
             test('lte', -3, 2, 1);
+            test('lte', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
+            test('lte', s.time('2018-01-01T00:00:00Z'), s.time('1950-01-01T00:00:00Z'), 0);
+            test('lte', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
         });
 
         describe('eq', () => {
@@ -181,6 +191,9 @@ describe('src/core/viz/expressions/binary', () => {
             test('eq', 1, 0, 0);
             test('eq', 2, 2, 1);
             test('eq', 2, 3, 0);
+            // TODO: js functions in binary operations need tu use the milliseconds
+            test('eq', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
+            test('eq', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
         });
 
         describe('neq', () => {
@@ -189,6 +202,9 @@ describe('src/core/viz/expressions/binary', () => {
             test('neq', 1, 0, 1);
             test('neq', 2, 2, 0);
             test('neq', 2, 3, 1);
+            // TODO: js functions in binary operations need tu use the milliseconds
+            test('neq', s.time('1950-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 1);
+            test('neq', s.time('2018-01-01T00:00:00Z'), s.time('2018-01-01T00:00:00Z'), 0);
         });
 
         function test(fn, param1, param2, expected) {
