@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation demo / SQL source | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const animStart = '2018-04-11T12:00:00Z';
+    const animEnd = '2018-04-12T12:00:00Z';
+    const animDuration = 10;
+    const lineLength = 600000;
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background', type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartogl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.SQL(`
+      WITH params AS (
+        SELECT
+        -- simulation time limits:
+        '${animStart}'::timestamp with time zone AS min_st,
+        '${animEnd}'::timestamp with time zone AS max_st,
+        0.0 AS x0, 0.0 AS y0,     -- center at the equator
+        200 AS length,         -- line length: 600 km
+        50 AS n                  -- 100 points
+      ),
+      positions AS (
+        SELECT
+          step::float8/n AS s,
+          x0 + (step::float8/n - 0.5)*length AS x, y0 AS y
+        FROM params, generate_series(1, n) AS step
+      )
+      SELECT
+        row_number() over () AS cartodb_id,
+        min_st + (max_st - min_st)*s AS sim_time,
+        ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
+        ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
+        FROM params, positions
+    `);
+
+    const s = carto.expressions;
+    const duration = 8;
+    const torque = s.torque(
+      s.prop('sim_time'),
+      duration,
+      s.fade(duration/10, duration/5)
+    );
+    const viz = new carto.Viz({
+        strokeWidth: 1,
+        color: s.hsv(torque, 1, 1),
+        width: s.add(1,s.mul(torque,30)),
+        order: s.desc(s.width())
+    });
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    layer.on('updated', () => {
+        const time = torque.getSimTime().toISOString();
+        document.getElementById("timer").textContent = time;
+    });
+  </script>
+</body>
+</html>
