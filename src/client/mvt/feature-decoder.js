@@ -201,7 +201,7 @@ function clipLine(line) {
         const nextType = type1;
         const nextPoint = point1;
 
-        while (true) {
+        for(;;) {
             if (!(type0 | type1)) {
                 // both points inside
                 clippedLine.push(...point0);
