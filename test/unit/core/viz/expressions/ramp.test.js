@@ -283,7 +283,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[2]);
         
-                        expect(actual).not.toEqual(expected);                        
+                        expect(actual).toEqual(expected);                        
                     });
     
                     it('should set the last color to "others"', () => {
@@ -318,7 +318,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[6]);
         
-                        expect(actual).toEqual(expected);  
+                        expect(actual).not.toEqual(expected);  
                     });
                 });
             });
