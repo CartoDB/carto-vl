@@ -56,22 +56,23 @@ export function isClockWise(vertices) {
 const CLIPMAX = 1;
 const CLIPMIN = -CLIPMAX;
 
+const clippingEdges = [
+    p => p[0] <= CLIPMAX,
+    p => p[1] <= CLIPMAX,
+    p => p[0] >= CLIPMIN,
+    p => p[1] >= CLIPMIN,
+];
+
+const clippingEdgeIntersectFn = [
+    (a, b) => geometryUtils.intersect(a, b, [CLIPMAX, -100], [CLIPMAX, 100]),
+    (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMAX], [100, CLIPMAX]),
+    (a, b) => geometryUtils.intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100]),
+    (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMIN], [100, CLIPMIN]),
+];
+
 export function clipPolygon(preClippedVertices, polygon, isHole) {
     // Sutherland-Hodgman Algorithm to clip polygons to the tile
     // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
-    const clippingEdges = [
-        p => p[0] <= CLIPMAX,
-        p => p[1] <= CLIPMAX,
-        p => p[0] >= CLIPMIN,
-        p => p[1] >= CLIPMIN,
-    ];
-
-    const clippingEdgeIntersectFn = [
-        (a, b) => geometryUtils.intersect(a, b, [CLIPMAX, -10], [CLIPMAX, 10]),
-        (a, b) => geometryUtils.intersect(a, b, [-10, CLIPMAX], [10, CLIPMAX]),
-        (a, b) => geometryUtils.intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100]),
-        (a, b) => geometryUtils.intersect(a, b, [-10, CLIPMIN], [10, CLIPMIN]),
-    ];
 
     let clippedTypes = {};
 
@@ -161,15 +162,103 @@ function _getPreClippedVertices(geom, mvtExtent) {
         let x = coord.x;
         let y = coord.y;
 
-        x = 2 * x / mvtExtent - 1;	
-        y = 2 * (1 - y / mvtExtent) - 1;	
+        x = 2 * x / mvtExtent - 1;
+        y = 2 * (1 - y / mvtExtent) - 1;
 
         return [x, y];
     });
 }
 
+function clipLine(line) {
+    // linestring clipping based on the Cohen-Sutherland algorithm
+    // input is a single linestring [point0, point1, ...]
+    // output is an array of flat linestrings:
+    // [[p0x, p0y, p1x, p1y, ...], ...]
+    let clippedLine = [];
+    const clippedLines = [];
+    function clipType(point) {
+        let type = 0;
+        for (let i = 0; i < 4; i++) {
+            type = type | (clippingEdges[i](point) ? 0 : (1 << i));
+        }
+        return type
+    }
+    function intersect(point1, point2, type) {
+        for (let i = 0; i < 4; i++) {
+            const mask = 1 << i;
+            if (type & mask) {
+                const p = clippingEdgeIntersectFn[i](point1, point2);
+                type = clipType(p) & ~mask;
+                return [p, type];
+            }
+        }
+    }
+    let point0 = line[0];
+    let type0 = clipType(point0);
+    let numIter = 0;
+    for (let i=1; i<line.length; ++i) {
+        let point1 = line[i];
+        let type1 = clipType(point1);
+        const nextType = type1;
+        const nextPoint = point1;
+
+        while (true) {
+            if (!(type0 | type1)) {
+                // both points inside
+                clippedLine.push(...point0);
+                if (type1 !== nextType) {
+                    clippedLine.push(...point1);
+                    if (i < line.length - 1) {
+                        // break line
+                        clippedLines.push(clippedLine);
+                        clippedLine = [];
+                    }
+                }
+                else if (i === line.length - 1) {
+                    clippedLine.push(...point1);
+                }
+                break;
+            }
+            else if (type0 & type1) {
+                // both points outside
+                break;
+            }
+            else if (type0) {
+                // only point1 inside
+                [point0, type0] = intersect(point0, point1, type0)
+            }
+            else {
+                // only point0 inside
+                [point1, type1] = intersect(point0, point1, type1)
+            }
+        }
+
+        point0 = nextPoint;
+        type0 = nextType;
+    }
+    if (clippedLine.length > 0) {
+        clippedLines.push(clippedLine);
+    }
+
+    return clippedLines;
+}
+
+function decodeLines(geometries, mvt_extent) {
+    let decodedGeometries = [];
+    geometries.map(l => {
+        let line = [];
+        l.map(point => {
+            line.push([2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1]);
+        });
+        decodedGeometries.push(...clipLine(line));
+    });
+    return decodedGeometries
+}
+
+
 export default {
     decodePolygons,
+    decodeLines,
     isClockWise,
     clipPolygon
 };
