@@ -181,7 +181,7 @@ function clipLine(line) {
         for (let i = 0; i < 4; i++) {
             type = type | (clippingEdges[i](point) ? 0 : (1 << i));
         }
-        return type
+        return type;
     }
     function intersect(point1, point2, type) {
         for (let i = 0; i < 4; i++) {
@@ -195,7 +195,6 @@ function clipLine(line) {
     }
     let point0 = line[0];
     let type0 = clipType(point0);
-    let numIter = 0;
     for (let i=1; i<line.length; ++i) {
         let point1 = line[i];
         let type1 = clipType(point1);
@@ -225,11 +224,11 @@ function clipLine(line) {
             }
             else if (type0) {
                 // only point1 inside
-                [point0, type0] = intersect(point0, point1, type0)
+                [point0, type0] = intersect(point0, point1, type0);
             }
             else {
                 // only point0 inside
-                [point1, type1] = intersect(point0, point1, type1)
+                [point1, type1] = intersect(point0, point1, type1);
             }
         }
 
@@ -252,7 +251,7 @@ function decodeLines(geometries, mvt_extent) {
         });
         decodedGeometries.push(...clipLine(line));
     });
-    return decodedGeometries
+    return decodedGeometries;
 }
 
 
