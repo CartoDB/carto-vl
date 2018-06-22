@@ -66,7 +66,6 @@ export default class Variable extends BaseExpression {
         this.type = this.alias.type;
         this.numCategories = this.alias.numCategories;
         this.isBucketComplete = this.alias.isBucketComplete;
-        this.isCategoryType = this.alias.isCategoryType;
     }
 
     _applyToShaderSource(getGLSLforProperty) {
