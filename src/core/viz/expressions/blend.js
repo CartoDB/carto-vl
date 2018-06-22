@@ -59,6 +59,10 @@ export default class Blend extends BaseExpression {
         }
     }
     eval(feature) {
+        if (this.originalMix instanceof Animate && !this.originalMix.isAnimated()) {
+            this.parent.replaceChild(this, this.b);
+            this.notify();
+        }
         const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);

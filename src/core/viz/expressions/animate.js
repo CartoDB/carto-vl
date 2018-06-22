@@ -31,6 +31,7 @@ export default class Animate extends BaseExpression {
         return Math.min(this.mix, 1.);
     }
     isAnimated() {
+        this.eval();
         return !this.mix || this.mix <= 1.;
     }
     _applyToShaderSource() {
