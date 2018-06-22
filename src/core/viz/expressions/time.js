@@ -60,4 +60,8 @@ export default class Time extends BaseExpression {
     isAnimated() {
         return false;
     }
+
+    toString(){
+        return this.date.toUTCString();
+    }
 }

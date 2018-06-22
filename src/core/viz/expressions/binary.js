@@ -1,5 +1,5 @@
 import { number } from '../functions';
-import { implicitCast } from './utils';
+import { implicitCast, dateToNumber } from './utils';
 import BaseExpression from './base';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
@@ -242,7 +242,7 @@ export const GreaterThan = genBinaryOp('greaterThan',
  * @api
  */
 export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x >= y ? 1 : 0,
     (x, y) => `(${x}>=${y}? 1.:0.)`
 );
@@ -273,7 +273,7 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * @api
  */
 export const LessThan = genBinaryOp('lessThan',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x < y ? 1 : 0,
     (x, y) => `(${x}<${y}? 1.:0.)`
 );
@@ -304,7 +304,7 @@ export const LessThan = genBinaryOp('lessThan',
  * @api
  */
 export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x <= y ? 1 : 0,
     (x, y) => `(${x}<=${y}? 1.:0.)`
 );
@@ -335,7 +335,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * @api
  */
 export const Equals = genBinaryOp('equals',
-    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x == y ? 1 : 0,
     (x, y) => `(${x}==${y}? 1.:0.)`
 );
@@ -366,7 +366,7 @@ export const Equals = genBinaryOp('equals',
  * @api
  */
 export const NotEquals = genBinaryOp('notEquals',
-    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x != y ? 1 : 0,
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
@@ -510,7 +510,7 @@ function getSignatureLoose(a, b) {
         (a.type == 'sprite' && b.type == 'sprite') ||
         (a.type == 'color' && b.type == 'sprite')) {
         return SPRITES_TO_SPRITE;
-    } else if (a.type === 'time' && b.type === 'time') {
+    } else if (a.type === 'time' || a.type === 'date' && b.type === 'time' || b.type === 'date') {
         return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
@@ -535,7 +535,7 @@ function getSignature(a, b) {
         (a.type == 'sprite' && b.type == 'sprite') ||
         (a.type == 'color' && b.type == 'sprite')) {
         return SPRITES_TO_SPRITE;
-    } else if (a.type === 'time' && b.type === 'time') {
+    } else if (a.type === 'time' || a.type === 'date' && b.type === 'time' || b.type === 'date') {
         return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
@@ -545,6 +545,7 @@ function getSignature(a, b) {
 function getReturnTypeFromSignature(signature) {
     switch (signature) {
         case NUMBERS_TO_NUMBER:
+        case DATES_TO_NUMBER:
             return 'number';
         case NUMBER_AND_COLOR_TO_COLOR:
             return 'color';
