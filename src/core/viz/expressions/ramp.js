@@ -226,9 +226,14 @@ export default class Ramp extends BaseExpression {
             ? input.numCategories
             : this.maxKey;
 
-        return palette.subPalettes[subPaletteNumber]
+        const colors = palette.subPalettes[subPaletteNumber]
             ? palette.subPalettes[subPaletteNumber]
             : palette.getLongestSubPalette();
+        
+        console.log('!!!', subPaletteNumber);
+        return !palette.isQualitative()
+            ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval())
+            : colors;
     }
     
     _postShaderCompile(program, gl) {

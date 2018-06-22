@@ -338,34 +338,37 @@ describe('src/core/viz/expressions/ramp', () => {
 
                 describe('and there are less or equal than 7 categories', () => {
                     const CATEGORIES = [10, 20, 30];
-                    const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
+                    const RAMP_COLORS = cartocolor.Burg[CATEGORIES.length];
                     
                     it('should not show interpolation', () => {
-                        const r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
+                        CATEGORIES.forEach((category, index) => {
+                            const r = ramp(buckets(category - 1, [10, 20, 30]), palettes.BURG);
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = hexToRgb(RAMP_COLORS[1]);
-        
-                        expect(actual).toEqual(expected);    
-                    });
-
-                    it('should not use last color in the array for last bucket', () => {
-                        const r = ramp(buckets(30, [10, 20, 30]), palettes.PRISM);
-
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = hexToRgb(RAMP_COLORS[2]);
-        
-                        expect(actual).toEqual(expected); 
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = hexToRgb(RAMP_COLORS[index]);
+            
+                            expect(actual).toEqual(expected);  
+                        });
                     });
                 });
     
                 describe('and there are more than 7 categories', () => {
                     it('should show interpolation', () => {
-                        const CATEGORIES = [10, 20, 30, 40, 50, 60, 70, 80];
-                        const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-                        const r = ramp(buckets(20, [10, 20, 30]), palettes.PRISM);
+                        const CATEGORIES = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+                        const RAMP_COLORS = cartocolor.Burg[7];
+                        let r;
+
+                        r = ramp(buckets(9, CATEGORIES), palettes.BURG);
+
+                        r._compile(METADATA);
+                        actual = r.eval();
+                        expected = hexToRgb(RAMP_COLORS[0]);
+        
+                        expect(actual).toEqual(expected);
+
+
+                        r = ramp(buckets(10, CATEGORIES), palettes.BURG);
 
                         r._compile(METADATA);
                         actual = r.eval();
