@@ -8,27 +8,22 @@
             "samples": [
                 {
                     "title": "Add layer",
-                    "desc": "Add one CARTO layer to your map",
                     "file": "basics/add-layer.html"
                 },
                 {
                     "title": "Style layer",
-                    "desc": "Basic styling of a layer",
                     "file": "basics/basic-style.html"
                 },
                 {
-                    "title": "Query layer",
-                    "desc": "Use SQL to query features",
+                    "title": "SQL Source layer",
                     "file": "basics/query-layer.html"
                 },
                 {
                     "title": "Add multiple layers",
-                    "desc": "Add multiple CARTO layers to your map",
                     "file": "basics/multiple-layers.html"
                 },
                 {
                     "title": "Select layer",
-                    "desc": "Update the source of your layers",
                     "file": "basics/select-layer.html"
                 }
             ]
@@ -38,48 +33,47 @@
             "samples": [
                 {
                     "title": "Color spaces",
-                    "desc": "The color spaces that we support",
                     "file": "styling/color-spaces.html"
                 },
                 {
                     "title": "Color schemes",
-                    "desc": "How to use CARTOcolors and custom color schemes",
                     "file": "styling/color-schemes.html"
                 },
                 {
                     "title": "Style by category",
-                    "desc": "Options for symbolizing category attributes",
                     "file": "styling/style-by-category.html"
                 },
                 {
                     "title": "Style by number",
-                    "desc": "Options for symbolizing numeric attributes",
                     "file": "styling/style-by-number.html"
                 },
                 {
                     "title": "Style with variables",
-                    "desc": "How to define styling properties using variables",
                     "file": "styling/style-with-variables.html"
                 },
                 {
                     "title": "Animate by date/time",
-                    "desc": "How to animate features by date/time",
                     "file": "styling/animation.html"
                 },
                 {
                     "title": "Filter based styling",
-                    "desc": "Filter data in the browser",
                     "file": "styling/filter.html"
                 },
                 {
                     "title": "Viewport based styling",
-                    "desc": "Vary symbol color based on data in current viewport",
                     "file": "styling/viewport.html"
                 },
                 {
                     "title": "Zoom based styling",
-                    "desc": "Set symbol size proportionate to zoom",
                     "file": "styling/zoom.html"
+                },
+                {
+                    "title": "Single Sprite",
+                    "file": "styling/sprite.html"
+                },
+                {
+                    "title": "Multiple Sprites",
+                    "file": "styling/multiple-sprites.html"
                 }
             ]
         },
@@ -88,27 +82,22 @@
             "samples": [
                 {
                     "title": "Hover",
-                    "desc": "Detect a feature hover events",
                     "file": "interactivity/hover.html"
                 },
                 {
                     "title": "Click",
-                    "desc": "Detect a feature click event",
                     "file": "interactivity/click.html"
                 },
                 {
                     "title": "Interact with multiple layers",
-                    "desc": "Detect multiple features from different layers",
                     "file": "interactivity/interact-multiple-layers.html"
                 },
                 {
                     "title": "Interactive based styling",
-                    "desc": "Style a feature based on type of interactivity",
                     "file": "interactivity/interactive-based-styling.html"
                 },
                 {
                     "title": "Add pop-ups",
-                    "desc": "Create pop-up information windows and interact with your map",
                     "file": "interactivity/pop-ups.html"
                 }
             ]
@@ -118,28 +107,27 @@
             "samples": [
                 {
                     "title": "Denver trees",
-                    "desc": "Size symbols by attributes value",
                     "file": "advanced/denver-trees.html"
                 },
                 {
                     "title": "US population by county",
-                    "desc": "This map uses viewportMax to draw symbol sizes proportional to population values in the current viewport and also applies the same to the color and outline width. When you zoom in, you will see the map update all of its symbology with the values in the current viewport",
                     "file": "advanced/us-population-by-county.html"
                 },
                 {
                     "title": "Taxi pickups",
-                    "desc": "Multi-variate styling",
                     "file": "advanced/taxi-pickups.html"
                 },
                 {
                     "title": "Ocean bathymetry",
-                    "desc": "This map symbolizes ocean bathymetery. Since the ocean is forever active, and moving, we wanted to demonstrate how we could animate the points to give that sense of movement.",
                     "file": "advanced/ocean-bathymetry.html"
                 },
                 {
                     "title": "Hurricane Harvey",
-                    "desc": "Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall. Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.",
                     "file": "advanced/hurricane-harvey.html"
+                },
+                {
+                    "title": "Animation controls",
+                    "file": "advanced/animation-controls.html"
                 }
             ]
         }
