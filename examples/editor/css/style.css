@@ -86,6 +86,7 @@ body {
     border-image: initial;
     border-color: rgb(23, 133, 251);
     padding: 6px 8px;
+    resize: vertical;
 }
 
 .cvl-Sidebar--Textarea,
