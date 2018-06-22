@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { number } from '../functions';
+import * as util from '../../../api/util';
 
 /**
  * Time contant expression
@@ -25,21 +26,13 @@ import { number } from '../functions';
  */
 export default class Time extends BaseExpression {
     constructor(date) {
-        if (!(date instanceof Date)) {
-            if (typeof (date) === 'number') {
-                const epoch = date;
-                date = new Date(0);
-                date.setUTCSeconds(epoch);
-            } else {
-                date = new Date(date);
-            }
-        }
         super({ _impostor: number(0) });
         // TODO improve type check
         this.type = 'time';
-        this.date = date;
+        this.date = util.castDate(date);
         this.inlineMaker = inline => inline._impostor;
     }
+    
     _compile(meta) {
         this.metadata = meta;
         const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
@@ -51,15 +44,19 @@ export default class Time extends BaseExpression {
 
         this._impostor.expr = tMapped;
     }
+    
     getMappedValue() {
         return this._impostor.expr;
     }
+    
     get value() {
         return this.eval();
     }
+    
     eval() {
         return this.date;
     }
+    
     isAnimated() {
         return false;
     }

@@ -66,7 +66,7 @@ class Renderer {
         // Use a "big" triangle instead of a square for performance and simplicity
         this.bigTriangleVBO = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        var vertices = [
+        const vertices = [
             10.0, -10.0,
             0.0, 10.0,
             -10.0, -10.0,
@@ -307,6 +307,10 @@ class Renderer {
                 renderer = this.triRendererProgram;
             }
             gl.useProgram(renderer.program);
+
+            if (!viz.symbol._default) {
+                gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
+            }
 
             //Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);

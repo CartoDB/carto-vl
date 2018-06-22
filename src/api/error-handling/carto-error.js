@@ -34,7 +34,7 @@ class CartoError extends Error {
         this.origin = (error && error.origin) || GENERIC_ORIGIN;
 
         // Add extra fields
-        var extraFields = this._getExtraFields();
+        const extraFields = this._getExtraFields();
         this.message = extraFields.friendlyMessage;
     }
 
@@ -69,7 +69,7 @@ class CartoError extends Error {
         if (!error.friendlyMessage) {
             return this.message;
         }
-        var match = this.message && this.message.match(error.messageRegex);
+        const match = this.message && this.message.match(error.messageRegex);
         if (match && match.length > 1) {
             return error.friendlyMessage.replace('$0', match[1]);
         }

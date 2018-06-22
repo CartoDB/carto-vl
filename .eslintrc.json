@@ -29,6 +29,7 @@
             "always"
         ],
         "no-console": "off",
-        "no-useless-escape": "off"
+        "no-useless-escape": "off",
+        "no-var": "error"
     }
 }
