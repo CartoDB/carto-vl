@@ -62,4 +62,8 @@ export default class Palette extends BaseExpression {
     isQualitative() {
         return this.tags.includes('qualitative');
     }
+
+    isQuantitative() {
+        return this.tags.includes('quantitative');
+    }
 }

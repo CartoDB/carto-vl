@@ -1,4 +1,4 @@
-import BaseExpression from '../../base';
+import Palette from './Palette';
 
 /**
  * Reverse the provided Palette.
@@ -23,7 +23,7 @@ import BaseExpression from '../../base';
  * @api
  */
 
-export default class PaletteReverse extends BaseExpression {
+export default class PaletteReverse extends Palette {
     constructor(palette) {
         super({});
         this.type = 'palette';
@@ -42,11 +42,7 @@ export default class PaletteReverse extends BaseExpression {
     getLongestSubPalette() {
         return this._reversePalette(this._originalPalette.getLongestSubPalette());
     }
-
-    isQualitative() {
-        return this.tags.includes('qualitative');
-    }
-
+    
     _reversePalette(palette) {
         if (this.isQualitative()) {
             // Last color is 'others', therefore, we shouldn't change the order of that one
