@@ -223,7 +223,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.isQualitative() && (input.type !== inputTypes.CATEGORY)
+        const subPaletteNumber = palette.isQualitative() && input.isBucketComplete === undefined
             ? input.numCategories
             : this.maxKey;
 
@@ -231,7 +231,7 @@ export default class Ramp extends BaseExpression {
             ? palette.subPalettes[subPaletteNumber]
             : palette.getLongestSubPalette();
         
-        return palette.isQuantitative()
+        return palette.isQuantitative() && input.isBucketComplete !== undefined && input.numCategories > colors.length
             ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval())
             : colors;
     }

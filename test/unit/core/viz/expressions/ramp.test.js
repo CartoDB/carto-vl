@@ -275,7 +275,7 @@ describe('src/core/viz/expressions/ramp', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
                     const CATEGORIES = ['Pontevedra', 'Zaragoza', 'Cordoba', 'Alicante', 'Murcia'];
                     const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-
+                
                     it('should not show interpolation', () => {
                         const r = ramp(buckets('Cordoba', CATEGORIES), palettes.PRISM);
     
