@@ -1,4 +1,5 @@
 export const VS = `
+#define ANTIALIASING 1.0 / DEVICE_PIXEL_RATIO / 2.0
 
 precision highp float;
 
@@ -36,11 +37,13 @@ void main(void) {
     color.rgb *= color.a;
     float size = decodeWidth(texture2D(widthTex, featureID).a);
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+    vec4 p = vec4(vertexScale * (vertexPosition) + normalScale * normal * size - vertexOffset, 0.5, 1.);
+    
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
-    gl_Position  = p;
+
+    gl_Position = p;
 }`;
 
 export const FS = `

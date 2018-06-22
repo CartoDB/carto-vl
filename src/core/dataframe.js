@@ -1,4 +1,4 @@
-import decoder from './decoder';
+import { decodeGeometry } from './decoder/geometry-decoder';
 import { wToR } from '../client/rsys';
 
 export default class Dataframe {
@@ -11,7 +11,7 @@ export default class Dataframe {
         this.scale = scale;
         this.size = size;
         this.type = type;
-        this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
+        this.decodedGeom = decodeGeometry(this.type, this.geom);
         this.numVertex = this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
