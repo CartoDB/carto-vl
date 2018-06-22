@@ -333,7 +333,10 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => new Animation(...args);
+export const torque = (...args) => {
+    console.warn('DeprecationWarning: "torque" expression is deprecated. Please use "animation" instead.');
+    return new Animation(...args);
+};
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
