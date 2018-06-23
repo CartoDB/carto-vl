@@ -13,7 +13,7 @@ module.exports = {
     devtool: false,
     mode: 'production',
     module: {
-        rules: [{ test: /\.glsl$/, use: 'shader-loader' }]
+        rules: [{ test: /\.glsl$/, use: 'webpack-glsl-loader' }]
     },
     plugins: [
         new webpack.BannerPlugin(banner)
