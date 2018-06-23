@@ -282,15 +282,11 @@ export default class Viz {
         this.symbol._bind(metadata);
         this.filter._bind(metadata);
 
-        const colorShader = shaders.renderer.createStylerColorShader(gl);
-        const widthShader = shaders.renderer.createStylerWidthShader(gl);
-        const filterShader = shaders.renderer.createStylerFilterShader(gl);
-
-        this.colorShader = compileShader(gl, colorShader, { color: this.color });
-        this.widthShader = compileShader(gl, widthShader, { width: this.width });
-        this.strokeColorShader = compileShader(gl, colorShader, { color: this.strokeColor });
-        this.strokeWidthShader = compileShader(gl, widthShader, { width: this.strokeWidth });
-        this.filterShader = compileShader(gl, filterShader, { filter: this.filter });
+        this.colorShader = compileShader(gl, shaders.styler.colorShader, { color: this.color });
+        this.widthShader = compileShader(gl, shaders.styler.widthShader, { width: this.width });
+        this.strokeColorShader = compileShader(gl, shaders.styler.colorShader, { color: this.strokeColor });
+        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShader, { width: this.strokeWidth });
+        this.filterShader = compileShader(gl,shaders.styler.filterShader, { filter: this.filter });
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {

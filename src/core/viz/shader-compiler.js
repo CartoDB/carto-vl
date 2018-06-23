@@ -31,6 +31,7 @@ export function compileShader(gl, template, expressions) {
         codes[exprName + '_preface'] = exprCodes.preface;
         codes[exprName + '_inline'] = exprCodes.inline;
     });
+    
     codes.propertyPreface = Object.keys(tid).map(name => `uniform sampler2D propertyTex${tid[name]};`).join('\n');
 
     const shader = createShaderFromTemplate(gl, template, codes);

@@ -4,7 +4,7 @@ import triangleFragmentShader from './triangle-fragment-shader.glsl';
 
 export default class TriangleShader {
     constructor(gl) {
-        Object.assign(this,  compileProgram(gl, triangleVertexShader, triangleFragmentShader));
+        Object.assign(this,  compileProgram(gl, `${triangleVertexShader}`, `${triangleFragmentShader}`));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.normalAttr = gl.getAttribLocation(this.program, 'normal');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');

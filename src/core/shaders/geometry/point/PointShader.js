@@ -4,7 +4,7 @@ import pointFragmentShader from './point-fragment-shader.glsl';
 
 export default class PointShader {
     constructor(gl) {
-        Object.assign(this,  compileProgram(gl, pointVertexShader, pointFragmentShader));
+        Object.assign(this,  compileProgram(gl, `${pointVertexShader}`, `${pointFragmentShader}`));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');

@@ -1,6 +1,6 @@
-precision highp float
+precision highp float;
 
-varying vec2 uv
+varying vec2 uv;
 
 $style_preface
 $propertyPreface

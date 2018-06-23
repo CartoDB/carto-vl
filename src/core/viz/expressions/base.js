@@ -53,12 +53,12 @@ export default class Base {
         if (!glslCode) {
             return '';
         }
+        
         return `
-        #ifndef DEF_${this._uid}
-        #define DEF_${this._uid}
-        ${glslCode}
-        #endif
-        `;
+            #ifndef DEF_${this._uid}
+            #define DEF_${this._uid}
+            ${glslCode}
+            #endif`;
     }
 
     _getDependencies() {
