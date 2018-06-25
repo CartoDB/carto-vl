@@ -16,13 +16,13 @@ The convention in CARTO VL is that `0` represents the boolean value `false`, (th
 
 #### Animation expression
 
-The `animation` expression acts like a clock, generating cyclic values over a determinate period to match the values of its input; when a match occurs between the input and the internal cyclic value animation returns a `1` value and otherwise it returns a `0'.
+The `animation` expression acts like a clock, generating cyclic progress values over a determinate period to match the values of its input. When a match occurs between the input and the progress value animation returns a `1` value and otherwise it returns a `0'.
 
 The next set of animation parameters are used to define the property, speed, and transition between animated features.
 
 #### Input
 
-The first animation parameter (input), is the attribute that you want to animate. By default, the animation cycle varies from the attributes's minimum value
+The first animation parameter (input), is the attribute that you want to animate. By default, the cyclic animation progress varies from the attributes's minimum value
 to its maximum.
 
 You can change this range of values by using a `linear` expression, and thus visualize a subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
@@ -41,7 +41,7 @@ Values outside of the specified range will not appear in the animation.
 
 #### Duration
 
-This parameter defines the duration of the animation cycle in seconds. As stated above, during the animation cycle, all possible input values are evaluated. When an input value is matched, animation returns a value of `1` for the feature and it is drawn.
+This parameter defines the duration of the animation progress in seconds. As stated above, during the animation cycle, all possible input values are evaluated. When an input value is matched, animation returns a value of `1` for the feature and it is drawn.
 
 #### Fade
 
