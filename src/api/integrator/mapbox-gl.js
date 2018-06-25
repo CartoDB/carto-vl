@@ -22,14 +22,15 @@ class MGLIntegrator {
         this.renderer = new R.Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
-        this._emitter = mitt();
-
-
-        this._suscribeToMapEvents(map);
         this.moveObservers = {};
+        
+        this._emitter = mitt();
         this._layers = [];
         this._paintedLayers = 0;
-        this.invalidateWebGLState = () => { };
+        this._isRendererInitialized = false;
+        
+        this._suscribeToMapEvents(map);
+        this.invalidateWebGLState = () => {};
     }
 
     on(name, cb) {
@@ -65,16 +66,18 @@ class MGLIntegrator {
     addLayer(layer, beforeLayerID) {
         const callbackID = `_cartovl_${uid++}`;
         const layerId = layer.getId();
+
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        let firstCallback = true;
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (firstCallback) {
-                firstCallback = false;
+        
+            if (!this._isRendererInitialized) {
+                this._isRendererInitialized = true;
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
                 this._layers.map(layer => layer.initCallback());
             }
+
             layer.$paintCallback();
             this._paintedLayers++;
 
@@ -91,10 +94,12 @@ class MGLIntegrator {
 
             invalidate();
         });
+
         this.map.addLayer({
             id: layerId,
             type: 'custom-webgl'
         }, beforeLayerID);
+
         this._layers.push(layer);
         this.move();
     }
