@@ -1,4 +1,4 @@
-# CARTO VL
+****# CARTO VL
 
 [![CircleCI](https://circleci.com/gh/CartoDB/carto-vl.svg?style=svg)](https://circleci.com/gh/CartoDB/carto-vl)
 
@@ -82,17 +82,19 @@ To watch the files
 yarn build:watch
 ```
 
-### Release a version
+### Releasing a version
 
-```
-yarn bump
-```
+#### Update the version
+Remember we follow [SemVer](http://semver.org/) rules.
 
-To publish a release to the `CDN` and `npm`
+    yarn bump:patch|minor|major
 
-```
-yarn release
-```
+#### Publishing the library
+Once you have your `secrets.json` file configured run
+
+    yarn release
+
+This will upload the library to [npm](https://www.npmjs.com/) and into our CDN. 
 
 ### Run the tests
 
